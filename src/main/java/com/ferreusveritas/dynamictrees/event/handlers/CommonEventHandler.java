@@ -16,11 +16,11 @@ public class CommonEventHandler {
 
 	@SubscribeEvent
 	public void onWorldTick(TickEvent.WorldTickEvent event) {
-		if(event.side == LogicalSide.SERVER) {
+		if (event.side == LogicalSide.SERVER) {
 			FutureBreak.process(event.world);
 		}
 
-		if(event.type == TickEvent.Type.WORLD && event.phase == TickEvent.Phase.START) {
+		if (event.type == TickEvent.Type.WORLD && event.phase == TickEvent.Phase.START) {
 			SeasonHelper.updateTick(event.world, event.world.getDayTime());
 		}
 	}

@@ -60,8 +60,8 @@ public class BottomFlareGenFeature extends GenFeature implements IPostGenFeature
 		int radius3 = TreeHelper.getRadius(world, rootPos.above(3));
 
 		if(radius3 > configuredGenFeature.get(MIN_RADIUS)) {
-			family.getDynamicBranch().setRadius(world, rootPos.above(2), radius3 + 1, Direction.UP);
-			family.getDynamicBranch().setRadius(world, rootPos.above(1), radius3 + 2, Direction.UP);
+			family.getBranch().setRadius(world, rootPos.above(2), radius3 + 1, Direction.UP);
+			family.getBranch().setRadius(world, rootPos.above(1), radius3 + 2, Direction.UP);
 		}
 	}
 	

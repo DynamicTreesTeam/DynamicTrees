@@ -1,20 +1,18 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.RecipeRegistryEvent;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import net.minecraft.client.util.RecipeBookCategories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapelessRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -26,26 +24,32 @@ import java.util.stream.Stream;
 @Mod.EventBusSubscriber
 public final class DTRecipes {
 
-    @SubscribeEvent
-    public static void registerDirtBucketRecipes(final RecipeRegistryEvent event) {
-        if (event.getType() != IRecipeType.CRAFTING || !DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get())
-            return;
-
+    public static void registerDirtBucketRecipes(final Map<ResourceLocation, IRecipe<?>> craftingRecipes) {
         for (final Species species : Species.REGISTRY.getAll()) {
             // If the species doesn't have a seed it doesn't need any recipes.
             if (!species.hasSeed())
                 continue;
 
-            final ResourceLocation saplingToSeed = ResourceLocationUtils.suffix(species.getRegistryName(), "_to_seed");
-            final ResourceLocation seedToSapling = ResourceLocationUtils.suffix(species.getRegistryName(), "_to_sapling");
+            final ResourceLocation registryName = species.getRegistryName();
 
             species.getPrimitiveSaplingItems().forEach(primitiveSapling -> {
-                event.registerIfAbsent(saplingToSeed, createShapeless(saplingToSeed, species.getSeedStack(1),
+                assert primitiveSapling.getRegistryName() != null;
+
+                final ResourceLocation saplingToSeed = new ResourceLocation(registryName.getNamespace(),
+                        separate(primitiveSapling.getRegistryName()) + "_to_" + registryName.getPath() + "_seed");
+                final ResourceLocation seedToSapling = new ResourceLocation(registryName.getNamespace(),
+                        registryName.getPath() + "_seed_to_" + separate(primitiveSapling.getRegistryName()));
+
+                craftingRecipes.putIfAbsent(saplingToSeed, createShapeless(saplingToSeed, species.getSeedStack(1),
                         ingredient(DTRegistries.DIRT_BUCKET), ingredient(primitiveSapling)));
-                event.registerIfAbsent(seedToSapling, createShapeless(seedToSapling, new ItemStack(primitiveSapling),
+                craftingRecipes.putIfAbsent(seedToSapling, createShapeless(seedToSapling, new ItemStack(primitiveSapling),
                         ingredient(DTRegistries.DIRT_BUCKET), ingredient(species.getSeed().map(Item.class::cast).orElse(Items.AIR))));
             });
         }
+    }
+
+    private static String separate (final ResourceLocation resourceLocation) {
+        return resourceLocation.getNamespace() + "_" + resourceLocation.getPath();
     }
 
     private static ShapelessRecipe createShapeless(final ResourceLocation registryName, final ItemStack out, final Ingredient... ingredients) {

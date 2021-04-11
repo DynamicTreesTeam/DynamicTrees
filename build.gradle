@@ -20,6 +20,9 @@ repositories {
     maven {
         url "https://www.cursemaven.com"
     }
+    maven {
+        url "http://harleyoconnor.com/maven"
+    }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -112,6 +115,9 @@ dependencies {
 
     // Compile full Serene Seasons mod and use in runtime.
     implementation fg.deobf("curse.maven:SereneSeasons-291874:3202233")
+
+    // At runtime, use suggestion provider fix mod.
+    runtimeOnly fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${config.mc_version}-${config.suggestion_provider_fix_version}")
 }
 
 jar {

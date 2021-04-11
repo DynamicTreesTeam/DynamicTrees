@@ -78,11 +78,11 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 
 	//Branches
 	/** The dynamic branch used by this tree family */
-	private BranchBlock dynamicBranch;
+	private BranchBlock branch;
 	/** The stripped variant of the branch used by this tree family */
-	private BranchBlock dynamicStrippedBranch;
+	private BranchBlock strippedBranch;
 	/** The dynamic branch's block item */
-	private Item dynamicBranchItem;
+	private Item branchItem;
 	/** The surface root used by this tree family */
 	private SurfaceRootBlock surfaceRoot;
 	/** The primitive (vanilla) log to base the texture, drops, and other behavior from */
@@ -101,7 +101,6 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	protected boolean hasConiferVariants = false;
 
 	protected boolean hasSurfaceRoot = false;
-
 	protected boolean hasStrippedBranch = true;
 
 	//Misc
@@ -133,11 +132,11 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	}
 
 	public void setupBlocks() {
-		this.setDynamicBranch(this.createBranch());
-		this.setDynamicBranchItem(this.createBranchItem(this.getBranchRegName(""), this.dynamicBranch));
+		this.setBranch(this.createBranch());
+		this.setBranchItem(this.createBranchItem(this.getBranchRegName(""), this.branch));
 
 		if (this.hasStrippedBranch()) {
-			this.setDynamicStrippedBranch(this.createBranch(this.getBranchRegName("stripped_")));
+			this.setStrippedBranch(this.createBranch(this.getBranchRegName("stripped_")));
 		}
 
 		if (this.hasSurfaceRoot()) {
@@ -240,8 +239,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	}
 
 	public boolean stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem){
-		if (getDynamicStrippedBranch() != null) {
-			getDynamicBranch().stripBranch(state, world, pos, player, heldItem);
+		if (getStrippedBranch() != null) {
+			this.getBranch().stripBranch(state, world, pos, player, heldItem);
 
 			if (world.isClientSide) {
 				world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
@@ -318,40 +317,40 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return RegistryHandler.addItem(registryName, new BlockItem(branch, new Item.Properties()));
 	}
 
-	protected Family setDynamicBranch(final BranchBlock branch) {
-		this.dynamicBranch = this.setupBranch(branch, this.hasStrippedBranch);
+	protected Family setBranch(final BranchBlock branch) {
+		this.branch = this.setupBranch(branch, this.hasStrippedBranch);
 		return this;
 	}
 
-	protected Family setDynamicStrippedBranch(final BranchBlock branch) {
-		this.dynamicStrippedBranch = this.setupBranch(branch, false);
+	protected Family setStrippedBranch(final BranchBlock branch) {
+		this.strippedBranch = this.setupBranch(branch, false);
 		return this;
 	}
 
 	protected BranchBlock setupBranch (final BranchBlock branchBlock, final boolean canBeStripped) {
 		branchBlock.setFamily(this); // Link the branch to the tree.
-		branchBlock.setCanBeStripped(canBeStripped);
+	branchBlock.setCanBeStripped(canBeStripped);
 		this.addValidBranches(branchBlock); // Add the branch as a valid branch.
 		return branchBlock;
 	}
 
-	protected Family setDynamicBranchItem (Item branchItem) {
-		this.dynamicBranchItem = branchItem;
+	protected Family setBranchItem(Item branchItem) {
+		this.branchItem = branchItem;
 		return this;
 	}
 
 	@Nullable
-	public BranchBlock getDynamicBranch() {
-		return dynamicBranch;
+	public BranchBlock getBranch() {
+		return branch;
 	}
 
 	@Nullable
-	public BranchBlock getDynamicStrippedBranch() {
-		return dynamicStrippedBranch;
+	public BranchBlock getStrippedBranch() {
+		return strippedBranch;
 	}
 
-	public Item getDynamicBranchItem() {
-		return dynamicBranchItem;
+	public Item getBranchItem() {
+		return branchItem;
 	}
 
 	public boolean isThick() {
@@ -412,8 +411,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	protected Family setPrimitiveLog(Block primitiveLog) {
 		this.primitiveLog = primitiveLog;
 
-		if (this.dynamicBranch != null)
-			this.dynamicBranch.setPrimitiveLogDrops(new ItemStack(primitiveLog));
+		if (this.branch != null)
+			this.branch.setPrimitiveLogDrops(new ItemStack(primitiveLog));
 
 		return this;
 	}
@@ -421,8 +420,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	protected Family setPrimitiveStrippedLog(Block primitiveStrippedLog) {
 		this.primitiveStrippedLog = primitiveStrippedLog;
 
-		if (this.dynamicStrippedBranch != null)
-			this.dynamicStrippedBranch.setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
+		if (this.strippedBranch != null)
+			this.strippedBranch.setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
 
 		return this;
 	}

@@ -2,10 +2,7 @@ package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -113,9 +110,8 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
      * {@link ModLoader#postEvent(Event)} and as such should only be called during the initial
      * loading phase.
      */
-    @SuppressWarnings("unchecked")
     public final void postTypeRegistryEvent() {
-        ModLoader.get().postEvent(new TypeRegistryEvent<>((TypedRegistry<V>) this));
+        ModLoader.get().postEvent(new TypeRegistryEvent<>(this));
     }
 
     /**
@@ -143,7 +139,7 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
         }
 
         @Nullable
-        public V decode (final JsonObject jsonObject) {
+        public V decode(final JsonObject jsonObject) {
             final DataResult<Pair<V, JsonElement>> dataResult = this.codec.decode(JsonOps.INSTANCE, jsonObject);
 
             if (!dataResult.result().isPresent()) {

@@ -530,7 +530,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		if(hasLeaves) {
 			//Finally set the leaves block to a branch
 			Family family = signal.getSpecies().getFamily();
-			family.getDynamicBranch().setRadius(world, pos, (int) family.getPrimaryThickness(), null);
+			family.getBranch().setRadius(world, pos, (int) family.getPrimaryThickness(), null);
 			signal.radius = family.getSecondaryThickness();//For the benefit of the parent branch
 		}
 		

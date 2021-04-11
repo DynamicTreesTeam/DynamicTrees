@@ -27,11 +27,11 @@ public class TransformNode implements INodeInspector {
 		if(branch != null && fromSpecies.getFamily() == branch.getFamily()) {
 			int radius = branch.getRadius(blockState);
 			if(radius > 0) {
-				BranchBlock newBranchBlock = toSpecies.getFamily().getDynamicBranch();
+				BranchBlock newBranchBlock = toSpecies.getFamily().getBranch();
 
 				// If the branch is stripped, make the replacement branch stripped.
-				if (fromSpecies.getFamily().getDynamicStrippedBranch().equals(branch)) {
-					newBranchBlock = toSpecies.getFamily().getDynamicStrippedBranch();
+				if (fromSpecies.getFamily().getStrippedBranch().equals(branch)) {
+					newBranchBlock = toSpecies.getFamily().getStrippedBranch();
 				}
 
 				newBranchBlock.setRadius(world, pos, radius, null);

@@ -24,7 +24,7 @@ public class ModelHelper {
 	 * @param tree
 	 */
 	public static void regModel(Family tree) {
-		BranchBlock branchBlock = tree.getDynamicBranch();
+		BranchBlock branchBlock = tree.getBranch();
 		ModelResourceLocation modelLocation = getBranchModelResourceLocation(branchBlock);
 
 		setGenericStateMapper(branchBlock, modelLocation);

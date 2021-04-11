@@ -285,10 +285,34 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	/**
-	 * @return True if this species is the common of its tree.
+	 * Returns the common {@link Species} of this {@link Species}'s {@link Family}.
+	 *
+	 * @return The {@link #family}'s {@link Family#commonSpecies}.
 	 */
-	public boolean isCommonSpecies () {
-		return this.family.getCommonSpecies().equals(this);
+	public Species getCommonSpecies() {
+		return this.family.getCommonSpecies();
+	}
+
+	/**
+	 * Checks if this {@link Species} is the common species of its {@link Family}
+	 * (it equals {@link Family#commonSpecies}).
+	 *
+	 * @return {@code true} if this species is the common of {@link #family};
+	 *         {@code false} otherwise.
+	 */
+	public boolean isCommonSpecies() {
+		return this.getCommonSpecies() == this;
+	}
+
+	/**
+	 * Checks whether or not {@link #seed} is the same instance as the {@link Seed}
+	 * of the common {@link Species} of the owning {@link Family}.
+	 *
+	 * @return {@code true} if {@link #seed} {@code ==} the {@link Seed} of the
+	 *         common {@link Species} of {@link #family}; {@code false} otherwise.
+	 */
+	public boolean isSeedCommon() {
+		return this.getCommonSpecies().getSeed().orElse(null) == this.seed;
 	}
 
 	public Species setUnlocalizedName(String name) {
@@ -853,7 +877,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		//Ensure planting conditions are right
 		Family family = getFamily();
 		if(world.isEmptyBlock(pos.above()) && isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()))) {
-			family.getDynamicBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
+			family.getBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
 			world.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
 			placeRootyDirtBlock(world, pos.below(), 15);//Set to fully fertilized rooty dirt underneath
 			
@@ -1367,7 +1391,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			return suitabilityEvent.getSuitability();
 		}
 		
-		float ugs = (float)(double) DTConfigs.SCALE_BIOME_GROWTH_RATE.get();//universal growth scalar
+		float ugs = (float)(double) DTConfigs.SCALE_BIOME_GROWTH_RATE.get(); // Universal growth scalar.
 		
 		if (ugs == 1.0f || this.isBiomePerfect(biome)) {
 			return 1.0f;

@@ -1,14 +1,9 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
@@ -185,8 +180,16 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
         return this.entries.stream().filter(entry -> entry.getRegistryName().equals(registryName)).findFirst();
     }
 
+    public final Optional<V> getOptional(final String registryName) {
+        return this.getOptional(ResourceLocation.tryParse(registryName));
+    }
+
     public final V get(final ResourceLocation registryName) {
         return this.getOptional(registryName).orElse(this.nullValue);
+    }
+
+    public final V get(final String registryName) {
+        return this.get(ResourceLocation.tryParse(registryName));
     }
 
     public final DataResult<V> getAsDataResult(final ResourceLocation registryName) {
@@ -263,7 +266,7 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
         this.entries.clear();
     }
 
-    public Codec<V> getGetterCodec() {
+    public final Codec<V> getGetterCodec() {
         return getterCodec;
     }
 

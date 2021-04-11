@@ -165,7 +165,7 @@ public class JoCode {
 		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
 		// If the family doesn't have a branch then don't attempt growth.
-		if (species.getFamily().getDynamicBranch() == null)
+		if (species.getFamily().getBranch() == null)
 			return;
 
 		// A Tree generation boundary radius is at least 2 and at most 8.
@@ -286,7 +286,7 @@ public class JoCode {
 		assert branch != null;
 
 		branch.analyse(treeState, world, treePos, null, signal);
-		BranchBlock.destroyMode = DynamicTrees.DESTROY_MODE.IGNORE;
+		BranchBlock.destroyMode = DynamicTrees.DestroyMode.IGNORE;
 
 		for (BlockPos pos : blocksToDestroy) {
 			if (safeBounds.inBounds(pos, false)) {
@@ -325,7 +325,7 @@ public class JoCode {
 			}
 		}
 
-		BranchBlock.destroyMode = DynamicTrees.DESTROY_MODE.HARVEST;
+		BranchBlock.destroyMode = DynamicTrees.DestroyMode.HARVEST;
 
 		// Now wreck out all surrounding leaves. Let them grow back naturally.
  		/*if (!endPoints.isEmpty()) {
@@ -372,7 +372,7 @@ public class JoCode {
 	
 	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, boolean isLast) {
 		if (world.getBlockState(pos).canBeReplacedByLogs(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-			Objects.requireNonNull(species.getFamily().getDynamicBranch())
+			Objects.requireNonNull(species.getFamily().getBranch())
 					.setRadius(world, pos, (int)species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
 			return false;
 		}

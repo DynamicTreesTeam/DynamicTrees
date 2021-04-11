@@ -2,9 +2,9 @@ package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesManager;
+import com.ferreusveritas.dynamictrees.init.DTRecipes;
 import com.ferreusveritas.dynamictrees.trees.FamilyManager;
 import com.ferreusveritas.dynamictrees.trees.SpeciesManager;
-import com.ferreusveritas.dynamictrees.util.RecipeRegistryEvent;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabaseManager;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeManager;
 import com.google.common.collect.ImmutableMap;
@@ -15,7 +15,6 @@ import net.minecraft.resources.DataPackRegistries;
 import net.minecraft.resources.IFutureReloadListener;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -124,8 +123,8 @@ public final class DTResourceRegistries {
             this.dataPackRegistries.getRecipeManager().recipes.forEach(((recipeType, currentRecipes) ->
                     recipes.put(recipeType, new HashMap<>(currentRecipes))));
 
-            // Post an event for each type.
-            recipes.forEach((recipeType, currentRecipes) -> MinecraftForge.EVENT_BUS.post(new RecipeRegistryEvent(recipeType, currentRecipes)));
+            // Register dirt bucket recipes.
+            DTRecipes.registerDirtBucketRecipes(recipes.get(IRecipeType.CRAFTING));
 
             // Revert each type's recipes back to immutable.
             recipes.forEach(((recipeType, currentRecipes) -> recipes.put(recipeType, ImmutableMap.copyOf(currentRecipes))));

@@ -2,27 +2,31 @@ package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.items.DendroPotion;
+import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
-import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
-* A registry for all of the dynamic trees. Use this for this mod or other mods.
-*
-* @author ferreusveritas
-*/
-public class TreeRegistry {
+ * Contains various utility functions relating to {@link Object}s with
+ * a {@link Registry}.
+ *
+ * @author ferreusveritas
+ */
+public final class TreeRegistry {
+
+	private TreeRegistry() {}
 
 	public static final IDropCreatorStorage GLOBAL_DROP_CREATOR_STORAGE = new StorageDropCreator();
 
@@ -46,15 +50,14 @@ public class TreeRegistry {
 	 * @return The tree that was found or null if not found
 	 */
 	public static Species findSpeciesSloppy(final String name) {
-
 		final ResourceLocation resourceLocation = getResLoc(name);
 
-		//Search specific domain first
+		// Search specific domain first.
 		if (Species.REGISTRY.has(resourceLocation)) {
 			return findSpecies(resourceLocation);
 		}
 
-		//Search all domains
+		// Search all domains.
 		for (Species species : Species.REGISTRY) {
 			if (species.getRegistryName().getPath().equals(resourceLocation.getPath())) {
 				return species;
@@ -64,40 +67,50 @@ public class TreeRegistry {
 		return Species.NULL_SPECIES;
 	}
 
+	/**
+	 * Returns a new {@link ArrayList<ResourceLocation>} from the
+	 * {@link Species#REGISTRY} values.
+	 *
+	 * @return A new {@link List} from the {@link Species#REGISTRY}.
+	 */
 	public static List<ResourceLocation> getSpeciesDirectory() {
 		return new ArrayList<>(Species.REGISTRY.getRegistryNames());
 	}
 
 	/**
-	 * @return A list of resource locations for species which can be transformed to other species.
+	 * Returns all {@link Species} registry names for which the {@link Species}
+	 * if marked {@code transformable}.
+	 *
+	 * @return A {@link List<ResourceLocation>} for which their {@link Species}
+	 *         can be transformed to other {@link Species}.
 	 */
 	public static List<ResourceLocation> getTransformableSpeciesLocations() {
-		final List<ResourceLocation> species = getSpeciesDirectory();
-		species.removeIf(resLoc -> !findSpecies(resLoc).isTransformable());
-		return species;
+		return Species.REGISTRY.getRegistryNames().stream().filter(resLoc ->
+				findSpecies(resLoc).isTransformable()).collect(Collectors.toList());
 	}
 
 	/**
-	 * @return All species which can be transformed.
+	 * Returns all {@link Species} which are marked {@code transformable}.
+	 *
+	 * @return A {@link List<Species>} which can be transformed to other
+	 *         {@link Species}.
 	 */
 	public static List<Species> getTransformableSpecies() {
-		final List<Species> species = new ArrayList<>();
-		getTransformableSpeciesLocations().forEach(speciesLoc -> species.add(findSpecies(speciesLoc)));
-		return species;
+		return getTransformableSpeciesLocations().stream().map(TreeRegistry::findSpecies).collect(Collectors.toList());
 	}
 
 	/**
-	 * @return All species which can be transformed and have their own seed (so should have a potion recipe created).
+	 * Returns a {@link List} of all transformable {@link Species} which can be
+	 * transformed by a {@link DendroPotion}. This includes any {@link Species}
+	 * which has a {@link Seed} and is not the common species (or whose seed is
+	 * common).
+	 *
+	 * @return All {@link Species} which are marked {@code transformable} and
+	 *         have their own {@link Seed}.
 	 */
 	public static List<Species> getPotionTransformableSpecies () {
-		final List<Species> speciesList = getTransformableSpecies();
-		speciesList.removeIf(species -> {
-			final Family family = species.getFamily();
-
-			// Remove the species if it doesn't have seeds, or if it's not the common species and its seed is the same as the common species'.
-			return !species.hasSeed() || (species != family.getCommonSpecies() && species.getSeed() == family.getCommonSpecies().getSeed());
-		});
-		return speciesList;
+		return getTransformableSpecies().stream().filter(species -> species.hasSeed() &&
+				(!species.isCommonSpecies() || species.isSeedCommon())).collect(Collectors.toList());
 	}
 
 	//////////////////////////////
@@ -109,7 +122,6 @@ public class TreeRegistry {
 	public static void registerSaplingReplacer(BlockState state, Species species) {
 		SAPLING_REPLACERS.put(state, species);
 	}
-
 
 	//////////////////////////////
 	// DROP HANDLING
@@ -131,7 +143,7 @@ public class TreeRegistry {
 		}
 	}
 
-	public static boolean registerGlobalDropCreator(final IDropCreator dropCreator){
+	public static boolean registerGlobalDropCreator(final IDropCreator dropCreator) {
 		return registerDropCreator(GLOBAL, dropCreator);
 	}
 
@@ -179,17 +191,27 @@ public class TreeRegistry {
 	}
 
 	/**
+	 * Parses resource location and  processes it via {@link #processResLoc(ResourceLocation)}.
+	 * If it could not be parsed, returns {@link DTTrees#NULL}.
+	 *
+	 * @param resourceLocationString The {@link ResourceLocation} {@link String} to parse.
+	 * @return The parsed and processed {@link ResourceLocation} object.
+	 */
+	public static ResourceLocation parseResLoc(final String resourceLocationString) {
+		return Optional.ofNullable(ResourceLocation.tryParse(resourceLocationString))
+				.orElse(DTTrees.NULL);
+	}
+
+	/**
 	 * Changes namespace of resource location to "dynamictrees" as a default if it is set to Minecraft.
 	 * This is safe since Minecraft won't (or shouldn't) have used any of our registries.
 	 *
-	 * @param resourceLocation The {@link ResourceLocation} to process.
+	 * @param resourceLocation The {@link ResourceLocation} to parse.
 	 * @return The {@link ResourceLocation} object.
 	 */
 	public static ResourceLocation processResLoc(final ResourceLocation resourceLocation) {
-		if (DynamicTrees.MINECRAFT.equals(resourceLocation.getNamespace())) {
-			return DynamicTrees.resLoc(resourceLocation.getPath());
-		}
-		return resourceLocation;
+		return DynamicTrees.MINECRAFT.equals(resourceLocation.getNamespace()) ?
+				DynamicTrees.resLoc(resourceLocation.getPath()) : resourceLocation;
 	}
 
 }

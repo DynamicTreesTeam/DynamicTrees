@@ -221,9 +221,9 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
-		destroyMode = DynamicTrees.DESTROY_MODE.SET_RADIUS;
+		destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
 		world.setBlock(pos, getStateForRadius(radius), flags);
-		destroyMode = DynamicTrees.DESTROY_MODE.SLOPPY;
+		destroyMode = DynamicTrees.DestroyMode.SLOPPY;
 		return radius;
 	}
 	
@@ -421,7 +421,7 @@ public class BasicBranchBlock extends BranchBlock {
 			BlockState state = world.getBlockState(pos);
 			if (signal.destroyLoopedNodes && state.getBlock() instanceof BranchBlock) {
 				BranchBlock branch = (BranchBlock) state.getBlock();
-				branch.breakDeliberate(world, pos, DynamicTrees.DESTROY_MODE.OVERFLOW);// Destroy one of the offending nodes
+				branch.breakDeliberate(world, pos, DynamicTrees.DestroyMode.OVERFLOW);// Destroy one of the offending nodes
 			}
 			signal.overflow = true;
 		}

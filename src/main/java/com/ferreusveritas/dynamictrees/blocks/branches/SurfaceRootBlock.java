@@ -76,7 +76,7 @@ public class SurfaceRootBlock extends Block {
 
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return new ItemStack(this.family.getDynamicBranchItem());
+		return new ItemStack(this.family.getBranchItem());
 	}
 
 	///////////////////////////////////////////

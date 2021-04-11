@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
+import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity.DestroyType;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
@@ -55,7 +56,7 @@ import java.util.stream.Collectors;
 public abstract class BranchBlock extends BlockWithDynamicHardness implements ITreePart, IFutureBreakable {
 
 	public static final int MAX_RADIUS = 8;
-	public static DynamicTrees.DESTROY_MODE destroyMode = DynamicTrees.DESTROY_MODE.SLOPPY;
+	public static DynamicTrees.DestroyMode destroyMode = DynamicTrees.DestroyMode.SLOPPY;
 
 	/** The {@link Family} for this {@link BranchBlock}. */
 	private Family family = Family.NULL_FAMILY;
@@ -100,13 +101,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 	
 	/**
-	 * Branches are considered the same if they have the same tree
+	 * Branches are considered the same if they have the same tree.
 	 *
-	 * @param branch
-	 * @return
+	 * @param branch The {@link BranchBlock} to compare with.
+	 * @return {@code true} if this and the given {@link BranchBlock} are from the same
+	 * 		   {@link Family}; {@code false} otherwise.
 	 */
 	public boolean isSameTree(@Nullable final BranchBlock branch) {
-		return branch != null && getFamily() == branch.getFamily();
+		return branch != null && this.getFamily() == branch.getFamily();
 	}
 	
 	@Override
@@ -152,22 +154,44 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 
 	public boolean canBeStripped(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
-		int stripRadius = DTConfigs.MIN_RADIUS_FOR_STRIP.get();
-		return stripRadius != 0 && stripRadius <= getRadius(state) && canBeStripped && isAxe(heldItem);
+		final int stripRadius = DTConfigs.MIN_RADIUS_FOR_STRIP.get();
+		return stripRadius != 0 && stripRadius <= this.getRadius(state) && this.canBeStripped && this.isAxe(heldItem);
 	}
 
+	/**
+	 * Strips the {@link BranchBlock}. This should only be called if {@link Family#hasStrippedBranch()}
+	 * evaluates to {@code true}.
+	 *
+	 * @param state The {@link BlockState} for the {@link BranchBlock} to strip.
+	 * @param world The {@link World} instance.
+	 * @param pos The {@link BlockPos} for the {@link BranchBlock} to strip.
+	 * @param player The {@link PlayerEntity} stripping the branch.
+	 * @param heldItem The {@link ItemStack} the given {@code player} used to strip the branch.
+	 * @throws AssertionError if the {@link Family} does not have a stripped branch.
+	 */
 	public void stripBranch (BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
-		int radius = this.getRadius(state);
+		final int radius = this.getRadius(state);
 		this.damageAxe(player, heldItem, radius / 2, new NetVolumeNode.Volume((radius * radius * 64) / 2), false);
-		getFamily().getDynamicStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get()?1:0)), null);
+
+		assert this.getFamily().getStrippedBranch() != null;
+		this.getFamily().getStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get()?1:0)), null);
 	}
 
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return new ItemStack(getFamily().getDynamicBranchItem());
+		return new ItemStack(getFamily().getBranchItem());
 	}
 
-	//this prevents bees and other mobs from getting stuck in branches
+	/**
+	 * Checks if the block is path-findable. This prevents mobs like bees from getting stuck
+	 * in branches.
+	 *
+	 * @param state The {@link BlockState} for the {@link BranchBlock}.
+	 * @param worldIn The {@link IBlockReader} instance.
+	 * @param pos The {@link BlockPos} of the {@link BranchBlock}.
+	 * @param type The {@link PathType} to check.
+	 * @return {@code false} to prevent mobs from getting stuck in ranches.
+	 */
 	@Override
 	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
@@ -178,19 +202,19 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	///////////////////////////////////////////
 	
 	public Connections getConnectionData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state) {
-		
-		Connections connections = new Connections();
+		final Connections connections = new Connections();
 
-		if(state.getBlock().equals(this)) {
-			int coreRadius = getRadius(state);
-			for(Direction dir: Direction.values()) {
-				BlockPos deltaPos = pos.relative(dir);
-				BlockState neighborBlockState = world.getBlockState(deltaPos);
-				int sideRadius = TreeHelper.getTreePart(neighborBlockState).getRadiusForConnection(neighborBlockState, world, deltaPos, this, dir, coreRadius);
-				connections.setRadius(dir, MathHelper.clamp(sideRadius, 0, coreRadius));
-			}
+		if (state.getBlock() != this)
+			return connections;
+
+		final int coreRadius = this.getRadius(state);
+		for (final Direction dir: Direction.values()) {
+			final BlockPos deltaPos = pos.relative(dir);
+			final BlockState neighborBlockState = world.getBlockState(deltaPos);
+			final int sideRadius = TreeHelper.getTreePart(neighborBlockState).getRadiusForConnection(neighborBlockState, world, deltaPos, this, dir, coreRadius);
+			connections.setRadius(dir, MathHelper.clamp(sideRadius, 0, coreRadius));
 		}
-		
+
 		return connections;
 	}
 
@@ -225,13 +249,16 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	///////////////////////////////////////////
 	
 	/**
-	 * Generally all branch blocks should be analyzed.
+	 * Generally, all branch blocks should be analyzed.
 	 */
 	@Override
 	public boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 		return true;
 	}
-	
+
+	/**
+	 * Holds an {@link ItemStack} and the {@link BlockPos} in which it should be dropped.
+	 */
 	public static class ItemStackPos {
 		public final ItemStack stack;
 		public final BlockPos pos;
@@ -245,46 +272,47 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	/**
 	 * Destroys all branches recursively not facing the branching direction with the root node
 	 *
-	 * @param world The world
-	 * @param cutPos The position of the branch being lobbed
-	 * @param toolDir The face that was pounded on when breaking the block at cutPos
-	 * @param wholeTree Indicates if the whole tree should be destroyed or just the branch
-	 * @return The volume of the portion of the tree that was destroyed
+	 * @param world The {@link World} instance.
+	 * @param cutPos The {@link BlockPos} of the branch being destroyed.
+	 * @param toolDir The face that was pounded on when breaking the block at the given
+	 * 				  {@code cutPos}.
+	 * @param wholeTree {@code true} if the whole tree should be destroyed; otherwise {@code false}
+	 *                  if only the branch should.
+	 * @return The {@link BranchDestructionData} {@link Object} created.
 	 */
 	public BranchDestructionData destroyBranchFromNode(World world, BlockPos cutPos, Direction toolDir, boolean wholeTree, @Nullable final LivingEntity entity) {
-
-		BlockState blockState = world.getBlockState(cutPos);
-		SpeciesNode speciesNode = new SpeciesNode();
-		MapSignal signal = analyse(blockState, world, cutPos, null, new MapSignal(speciesNode));// Analyze entire tree network to find root node and species
-		Species species = speciesNode.getSpecies();//Get the species from the root node
+		final BlockState blockState = world.getBlockState(cutPos);
+		final SpeciesNode speciesNode = new SpeciesNode();
+		final MapSignal signal = analyse(blockState, world, cutPos, null, new MapSignal(speciesNode)); // Analyze entire tree network to find root node and species.
+		final Species species = speciesNode.getSpecies(); // Get the species from the root node.
 		
-		// Analyze only part of the tree beyond the break point and map out the extended block states
-		// We can't destroy the branches during this step since we need accurate extended block states that include connections
+		// Analyze only part of the tree beyond the break point and map out the extended block states.
+		// We can't destroy the branches during this step since we need accurate extended block states that include connections.
 		StateNode stateMapper = new StateNode(cutPos);
-		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(stateMapper));
+		this.analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(stateMapper));
 		
-		// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
-		NetVolumeNode volumeSum = new NetVolumeNode();
-		DestroyerNode destroyer = new DestroyerNode(species).setPlayer(entity instanceof PlayerEntity ? (PlayerEntity) entity : null);
-		destroyMode = DynamicTrees.DESTROY_MODE.HARVEST;
-		analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
-		destroyMode = DynamicTrees.DESTROY_MODE.SLOPPY;
+		// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches.
+		final NetVolumeNode volumeSum = new NetVolumeNode();
+		final DestroyerNode destroyer = new DestroyerNode(species).setPlayer(entity instanceof PlayerEntity ? (PlayerEntity) entity : null);
+		destroyMode = DynamicTrees.DestroyMode.HARVEST;
+		this.analyse(blockState, world, cutPos, wholeTree ? null : signal.localRootDir, new MapSignal(volumeSum, destroyer));
+		destroyMode = DynamicTrees.DestroyMode.SLOPPY;
 		
-		//Destroy all the leaves on the branch, store them in a map and convert endpoint coordinates from absolute to relative
+		// Destroy all the leaves on the branch, store them in a map and convert endpoint coordinates from absolute to relative.
 		List<BlockPos> endPoints = destroyer.getEnds();
-		Map<BlockPos, BlockState> destroyedLeaves = new HashMap<>();
-		List<ItemStackPos> leavesDropsList = new ArrayList<>();
-		destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
+		final Map<BlockPos, BlockState> destroyedLeaves = new HashMap<>();
+		final List<ItemStackPos> leavesDropsList = new ArrayList<>();
+		this.destroyLeaves(world, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
 		endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
 		
-		//Calculate main trunk height
+		// Calculate main trunk height.
 		int trunkHeight = 1;
-		for(BlockPos iter = new BlockPos(0, 1, 0); stateMapper.getBranchConnectionMap().containsKey(iter); iter = iter.above()) {
+		for (BlockPos iter = new BlockPos(0, 1, 0); stateMapper.getBranchConnectionMap().containsKey(iter); iter = iter.above()) {
 			trunkHeight++;
 		}
 		
 		Direction cutDir = signal.localRootDir;
-		if(cutDir == null) {
+		if (cutDir == null) {
 			cutDir = Direction.DOWN;
 		}
 		
@@ -292,76 +320,79 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 	
 	/**
-	 * Sets the branch block to air. To be used when the block rots
+	 * Performs rot action. Default implementation simply breaks the block.
 	 *
-	 * @param world
-	 * @param pos
+	 * @param world The {@link World} instance.
+	 * @param pos The {@link BlockPos} of the block to rot.
 	 */
 	public void rot(IWorld world, BlockPos pos) {
-		breakDeliberate(world, pos, DynamicTrees.DESTROY_MODE.ROT);
+		this.breakDeliberate(world, pos, DynamicTrees.DestroyMode.ROT);
 	}
 	
 	/**
-	 * Attempt to destroy all of the leaves on the branch while leaving the other leaves unharmed.
+	 * Destroyed all leaves on the {@link BranchBlock} at the {@code cutPos} into the given {@code destroyedLeaves}
+	 * {@link Map} that can be safely destroyed without harming surrounding leaves.
 	 *
-	 * @param world The world
-	 * @param cutPos The position of the block that was initially destroyed
-	 * @param species The species of the tree that is being modified
-	 * @param endPoints The absolute positions of the branch endpoints
-	 * @param destroyedLeaves A map for collecting the positions and blockstates for all of the leaves blocks that will be destroyed.
-	 * @param drops A list for collecting the ItemStacks and their positions relative to the cut position
+	 * <p>Drops are not handled by this method, but instead put into the given {@code drops} {@link List}.</p>
+	 *
+	 * @param world The {@link World} instance.
+	 * @param cutPos The {@link BlockPos} of the {@link Block} that was initially destroyed.
+	 * @param species The {@link Species} of the tree that being modified.
+	 * @param endPoints A {@link List} of absolute {@link BlockPos} {@link Object}s of the branch endpoints.
+	 * @param destroyedLeaves A {@link Map} for collecting the {@link BlockPos} and {@link BlockState}s for all
+	 *                        of the {@link DynamicLeavesBlock} that are destroyed.
+	 * @param drops A {@link List} for collecting the {@link ItemStack}s and their {@link BlockPos} relative to
+	 *              the cut {@link BlockPos}.
 	 */
-	protected void destroyLeaves(World world, BlockPos cutPos, Species species, List<BlockPos> endPoints, Map<BlockPos, BlockState> destroyedLeaves, List<ItemStackPos> drops) {
+	protected void destroyLeaves(final World world, final BlockPos cutPos, final Species species, final List<BlockPos> endPoints, final Map<BlockPos, BlockState> destroyedLeaves, final List<ItemStackPos> drops) {
+		if (world.isClientSide || endPoints.isEmpty())
+			return;
 		
-		if (!world.isClientSide && !endPoints.isEmpty()) {
-			
-			//Make a bounding volume that holds all of the endpoints and expand the volume by 3 blocks for the leaves radius
-			BlockBounds bounds = new BlockBounds(endPoints).expand(3);
-			
-			//Create a voxmap to store the leaf destruction map
-			SimpleVoxmap vmap = new SimpleVoxmap(bounds);
-			
-			//For each of the endpoints add a 7x7 destruction volume around it
-			for(BlockPos endPos : endPoints) {
-				for(BlockPos leafPos : BlockPos.betweenClosed(endPos.offset(-3, -3, -3), endPos.offset(3, 3, 3)) ) {
-					vmap.setVoxel(leafPos, (byte) 1);//Flag this position for destruction
-				}
-				vmap.setVoxel(endPos, (byte) 0);//We know that the endpoint does not have a leaves block in it because it was a branch
+		// Make a bounding volume that holds all of the endpoints and expand the volume by 3 blocks for the leaves radius.
+		final BlockBounds bounds = new BlockBounds(endPoints).expand(3);
+
+		// Create a voxmap to store the leaf destruction map.
+		final SimpleVoxmap leafMap = new SimpleVoxmap(bounds);
+
+		// For each of the endpoints add a 7x7 destruction volume around it.
+		for (final BlockPos endPos : endPoints) {
+			for (final BlockPos leafPos : BlockPos.betweenClosed(endPos.offset(-3, -3, -3), endPos.offset(3, 3, 3)) ) {
+				leafMap.setVoxel(leafPos, (byte) 1); // Flag this position for destruction.
 			}
-			
-			Family family = species.getFamily();
-			BranchBlock familyBranch = family.getDynamicBranch();
-			int primaryThickness = (int) family.getPrimaryThickness();
-			
-			//Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints
-			for(BlockPos findPos : bounds.expand(3)) {
-				BlockState findState = world.getBlockState(findPos);
-				if( familyBranch.getRadius(findState) == primaryThickness ) { //Search for endpoints of the same tree family
-					Iterable<BlockPos.Mutable> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero();
-					for(BlockPos.Mutable leafpos : leaves) {
-						vmap.setVoxel(findPos.getX() + leafpos.getX(), findPos.getY() + leafpos.getY(), findPos.getZ() + leafpos.getZ(), (byte) 0);
-					}
-				}
-			}
-			
-			List<ItemStack> dropList = new ArrayList<>();
-			
-			//Destroy all family compatible leaves
-			for(Cell cell: vmap.getAllNonZeroCells()) {
-				BlockPos.Mutable pos = cell.getPos();
-				BlockState blockState = world.getBlockState(pos);
-				if( family.isCompatibleGenericLeaves(blockState, world, pos) ) {
-					dropList.clear();
-					species.getTreeHarvestDrops(world, pos, dropList, world.random);
-					BlockPos imPos = pos.immutable();//We are storing this so it must be immutable
-					BlockPos relPos = imPos.subtract(cutPos);
-					world.setBlock(imPos, DTRegistries.BLOCK_STATES.AIR, 3);
-					destroyedLeaves.put(relPos, blockState);
-					dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)) );
+			leafMap.setVoxel(endPos, (byte) 0); // We know that the endpoint does not have a leaves block in it because it was a branch.
+		}
+
+		final Family family = species.getFamily();
+		final BranchBlock familyBranch = family.getBranch();
+		final int primaryThickness = (int) family.getPrimaryThickness();
+
+		// Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints.
+		for (final BlockPos findPos : bounds.expand(3)) {
+			final BlockState findState = world.getBlockState(findPos);
+			if (familyBranch.getRadius(findState) == primaryThickness) { // Search for endpoints of the same tree family.
+				final Iterable<BlockPos.Mutable> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero();
+				for (BlockPos.Mutable leafPos : leaves) {
+					leafMap.setVoxel(findPos.getX() + leafPos.getX(), findPos.getY() + leafPos.getY(), findPos.getZ() + leafPos.getZ(), (byte) 0);
 				}
 			}
 		}
-		
+
+		final List<ItemStack> dropList = new ArrayList<>();
+
+		// Destroy all family compatible leaves.
+		for (final Cell cell: leafMap.getAllNonZeroCells()) {
+			final BlockPos.Mutable pos = cell.getPos();
+			final BlockState blockState = world.getBlockState(pos);
+			if (family.isCompatibleGenericLeaves(blockState, world, pos) ) {
+				dropList.clear();
+				species.getTreeHarvestDrops(world, pos, dropList, world.random);
+				final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
+				final BlockPos relPos = imPos.subtract(cutPos);
+				world.setBlock(imPos, DTRegistries.BLOCK_STATES.AIR, 3);
+				destroyedLeaves.put(relPos, blockState);
+				dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)) );
+			}
+		}
 	}
 	
 	public boolean canFall() {
@@ -373,10 +404,11 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	///////////////////////////////////////////
 
 	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NetVolumeNode.Volume volume) {
-		return getLogDrops(world, pos, species, volume, ItemStack.EMPTY);
+		return this.getLogDrops(world, pos, species, volume, ItemStack.EMPTY);
 	}
+
 	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NetVolumeNode.Volume volume, ItemStack handStack) {
-		volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get());// For cheaters.. you know who you are.
+		volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
 		return species.getLogsDrops(world, pos, new ArrayList<>(), volume, handStack);
 	}
 
@@ -398,34 +430,32 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 	@Override
 	public void futureBreak(BlockState state, World world, BlockPos cutPos, LivingEntity entity) {
-		
-		//Try to get the face being pounded on
-		// TODO: Check method of getting player reach distance (ForgeMod.REACH_DISTANCE.get()?)
+		// Tries to get the face being pounded on.
 		final double reachDistance = entity instanceof PlayerEntity ? entity.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() : 5.0D;
-		BlockRayTraceResult rtResult = playerRayTrace(entity, reachDistance, 1.0F);
-		Direction toolDir = rtResult != null ? (entity.isShiftKeyDown() ? rtResult.getDirection().getOpposite() : rtResult.getDirection()) : Direction.DOWN;
+		final BlockRayTraceResult ragTraceResult = this.playerRayTrace(entity, reachDistance, 1.0F);
+		final Direction toolDir = ragTraceResult != null ? (entity.isShiftKeyDown() ? ragTraceResult.getDirection().getOpposite() : ragTraceResult.getDirection()) : Direction.DOWN;
 		
-		//Do the actual destruction
-		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, toolDir, false, entity);
+		// Do the actual destruction.
+		final BranchDestructionData destroyData = this.destroyBranchFromNode(world, cutPos, toolDir, false, entity);
 		
-		//Get all of the wood drops
-		ItemStack heldItem = entity.getMainHandItem();
-		int fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, heldItem);
-		float fortuneFactor = 1.0f + 0.25f * fortune;
-		NetVolumeNode.Volume woodVolume = destroyData.woodVolume;// The amount of wood calculated from the body of the tree network
+		// Get all of the wood drops.
+		final ItemStack heldItem = entity.getMainHandItem();
+		final int fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, heldItem);
+		final float fortuneFactor = 1.0f + 0.25f * fortune;
+		final NetVolumeNode.Volume woodVolume = destroyData.woodVolume; // The amount of wood calculated from the body of the tree network.
 		woodVolume.multiplyVolume(fortuneFactor);
-		List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume, heldItem);
+		final List<ItemStack> woodItems = getLogDrops(world, cutPos, destroyData.species, woodVolume, heldItem);
 		
 		final float chance = 1.0f;
 
-		//Build the final wood drop list taking chance into consideration
-		List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.random.nextFloat() <= chance).collect(Collectors.toList());
+		// Build the final wood drop list taking chance into consideration.
+		final List<ItemStack> woodDropList = woodItems.stream().filter(i -> world.random.nextFloat() <= chance).collect(Collectors.toList());
 		
-		//This will drop the EntityFallingTree into the world
+		// Drop the FallingTreeEntity into the world.
 		FallingTreeEntity.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
 		
-		//Damage the axe by a prescribed amount
-		damageAxe(entity, heldItem, getRadius(state), woodVolume, true);
+		// Damage the axe by a prescribed amount.
+		this.damageAxe(entity, heldItem, getRadius(state), woodVolume, true);
 	}
 
 	/**
@@ -452,32 +482,33 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		FutureBreak.add(new FutureBreak(state, world, cutPos, entity, 0));
 		return false;
 	}
-	
+
 	protected void sloppyBreak(World world, BlockPos cutPos, DestroyType destroyType) {
-		//Do the actual destruction
-		BranchDestructionData destroyData = destroyBranchFromNode(world, cutPos, Direction.DOWN, false, null);
+		// Do the actual destruction.
+		final BranchDestructionData destroyData = this.destroyBranchFromNode(world, cutPos, Direction.DOWN, false, null);
 		
-		//Get all of the wood drops
-		List<ItemStack> woodDropList = getLogDrops(world, cutPos, destroyData.species, destroyData.woodVolume);
-		
-		if(!DTConfigs.SLOPPY_BREAK_DROPS.get()) {
+		// Get all of the wood drops.
+		final List<ItemStack> woodDropList = this.getLogDrops(world, cutPos, destroyData.species, destroyData.woodVolume);
+
+		// If sloppy break drops are off clear all drops.
+		if (!DTConfigs.SLOPPY_BREAK_DROPS.get()) {
 			destroyData.leavesDrops.clear();
 			woodDropList.clear();
 		}
 		
-		//This will drop the EntityFallingTree into the world
+		// This will drop the EntityFallingTree into the world.
 		FallingTreeEntity.dropTree(world, destroyData, woodDropList, destroyType);
 	}
 	
 	/**
-	 * This is a copy of Entity.rayTrace which is client side only.  There's no
-	 * reason for this function to be client side only as all of it's calls are
+	 * This is a copy of Entity.rayTrace which is client side only. There's no
+	 * reason for this function to be client-side only as all of it's calls are
 	 * client/server compatible.
 	 *
-	 * @param entity
-	 * @param blockReachDistance
-	 * @param partialTicks
-	 * @return
+	 * @param entity The {@link LivingEntity} to ray trace from.
+	 * @param blockReachDistance The {@code reachDistance} of the entity.
+	 * @param partialTicks The partial ticks.
+	 * @return The {@link BlockRayTraceResult} created.
 	 */
 	@Nullable
 	public BlockRayTraceResult playerRayTrace(LivingEntity entity, double blockReachDistance, float partialTicks) {
@@ -494,7 +525,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 		int damage;
 
-		switch(DTConfigs.AXE_DAMAGE_MODE.get()) {
+		switch (DTConfigs.AXE_DAMAGE_MODE.get()) {
 			default:
 			case VANILLA:
 				damage = 1;
@@ -510,7 +541,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		if (forBlockBreak)
 			damage--; // Minecraft already damaged the tool by one unit
 
-		if(damage > 0) {
+		if (damage > 0) {
 			heldItem.hurtAndBreak(damage, entity, LivingEntity::tick);
 		}
 	}
@@ -518,52 +549,57 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	protected boolean isAxe (ItemStack stack) {
 		return stack.getItem() instanceof AxeItem || stack.getItem().getToolTypes(stack).contains(ToolType.AXE);
 	}
-	
+
 	@Override
-	public void playerDestroy(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
-		if (!world.isClientSide && destroyMode == DynamicTrees.DESTROY_MODE.SLOPPY) {
-//			LogManager.getLogger().debug("Sloppy break detected at: " + pos);
-			final BlockState toBlockState = world.getBlockState(pos);
-			final Block toBlock = toBlockState.getBlock();
-
-			if (toBlock == Blocks.AIR) { // Block was set to air improperly.
-				world.setBlock(pos, state, 0); // Set the block back and attempt a proper breaking.
-				this.sloppyBreak(world, pos, DestroyType.VOID);
-				this.setBlockStateIgnored(world, pos, DTRegistries.BLOCK_STATES.AIR, 2); // Set back to air in case the sloppy break failed to do so.
-				return;
-			}
-			if (toBlock == Blocks.FIRE) { // Block has burned.
-				world.setBlock(pos, state, 0); // Set the branch block back and attempt a proper breaking.
-				this.sloppyBreak(world, pos, DestroyType.FIRE); // Applies fire effects to falling branches.
-				//this.setBlockStateIgnored(world, pos, Blocks.FIRE.getDefaultState(), 2); // Disabled because the fire is too aggressive.
-				this.setBlockStateIgnored(world, pos, DTRegistries.BLOCK_STATES.AIR, 2); // Set back to air instead.
-				return;
-			}
-			if (!toBlock.hasTileEntity(toBlockState) && world.getBlockEntity(pos) == null) { // Block seems to be a pure BlockState based block.
-				world.setBlock(pos, state, 0); // Set the branch block back and attempt a proper breaking.
-				this.sloppyBreak(world, pos, DestroyType.VOID);
-				this.setBlockStateIgnored(world, pos, toBlockState, 2); // Set back to whatever block caused this problem.
-				return;
-			}
-
-			// There's a tile entity block that snuck in.  Don't touch it!
-			for (final Direction dir : Direction.values()) { // Let's just play it safe and destroy all surrounding branch block networks.
-				final BlockPos offPos = pos.relative(dir);
-				final BlockState offState = world.getBlockState(offPos);
-
-				if (offState.getBlock() instanceof BranchBlock)
-					this.sloppyBreak(world, offPos, DestroyType.VOID);
-			}
+	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean flag) {
+		if (world.isClientSide || destroyMode != DynamicTrees.DestroyMode.SLOPPY) {
+			super.onRemove(state, world, pos, newState, flag);
+			return;
 		}
+
+		// LogManager.getLogger().debug("Sloppy break detected at: " + pos);
+		final BlockState toBlockState = world.getBlockState(pos);
+		final Block toBlock = toBlockState.getBlock();
+
+		if (toBlock == Blocks.AIR) { // Block was set to air improperly.
+			world.setBlock(pos, state, 0); // Set the block back and attempt a proper breaking.
+			this.sloppyBreak(world, pos, DestroyType.VOID);
+			this.setBlockStateIgnored(world, pos, DTRegistries.BLOCK_STATES.AIR, 2); // Set back to air in case the sloppy break failed to do so.
+			return;
+		}
+		if (toBlock == Blocks.FIRE) { // Block has burned.
+			world.setBlock(pos, state, 0); // Set the branch block back and attempt a proper breaking.
+			this.sloppyBreak(world, pos, DestroyType.FIRE); // Applies fire effects to falling branches.
+			//this.setBlockStateIgnored(world, pos, Blocks.FIRE.getDefaultState(), 2); // Disabled because the fire is too aggressive.
+			this.setBlockStateIgnored(world, pos, DTRegistries.BLOCK_STATES.AIR, 2); // Set back to air instead.
+			return;
+		}
+		if (!toBlock.hasTileEntity(toBlockState) && world.getBlockEntity(pos) == null) { // Block seems to be a pure BlockState based block.
+			world.setBlock(pos, state, 0); // Set the branch block back and attempt a proper breaking.
+			this.sloppyBreak(world, pos, DestroyType.VOID);
+			this.setBlockStateIgnored(world, pos, toBlockState, 2); // Set back to whatever block caused this problem.
+			return;
+		}
+
+		// There's a tile entity block that snuck in.  Don't touch it!
+		for (final Direction dir : Direction.values()) { // Let's just play it safe and destroy all surrounding branch block networks.
+			final BlockPos offPos = pos.relative(dir);
+			final BlockState offState = world.getBlockState(offPos);
+
+			if (offState.getBlock() instanceof BranchBlock)
+				this.sloppyBreak(world, offPos, DestroyType.VOID);
+		}
+
+		super.onRemove(state, world, pos, newState, flag);
 	}
 
 	/**
 	 * Provides a means to set a blockState over a branch block without triggering sloppy breaking.
 	 */
 	public void setBlockStateIgnored(World world, BlockPos pos, BlockState state, int flags) {
-		destroyMode = DynamicTrees.DESTROY_MODE.IGNORE; // Set the state machine to ignore so we don't accidentally recurse with breakBlock.
+		destroyMode = DynamicTrees.DestroyMode.IGNORE; // Set the state machine to ignore so we don't accidentally recurse with breakBlock.
 		world.setBlock(pos, state, flags);
-		destroyMode = DynamicTrees.DESTROY_MODE.SLOPPY; // Ready the state machine for sloppy breaking again.
+		destroyMode = DynamicTrees.DestroyMode.SLOPPY; // Ready the state machine for sloppy breaking again.
 	}
 
 	// Super member also does nothing
@@ -572,19 +608,26 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 	
 	/**
-	 * Sometimes you need to break the block deliberately.
+	 * Breaks the {@link BranchBlock} deliberately.
 	 *
-	 * @param world
-	 * @param pos
+	 * @param world The {@link IWorld} instance.
+	 * @param pos The {@link BlockPos} of the {@link BranchBlock} to destroy.
+	 * @param mode The {@link DynamicTrees.DestroyMode} to destroy it with.
 	 */
-	public void breakDeliberate(IWorld world, BlockPos pos, DynamicTrees.DESTROY_MODE mode) {
+	public void breakDeliberate(IWorld world, BlockPos pos, DynamicTrees.DestroyMode mode) {
 		destroyMode = mode;
 		world.removeBlock(pos, false);
-		destroyMode = DynamicTrees.DESTROY_MODE.SLOPPY;
+		destroyMode = DynamicTrees.DestroyMode.SLOPPY;
 	}
-	
-	// We do not allow the tree branches to be pushed by a piston for reasons that should be obvious if you
-	// are paying attention.
+
+	/**
+	 * Gets the {@link PushReaction} for this {@link Block}. By default, {@link BranchBlock}s
+	 * use {@link PushReaction#BLOCK} in order to prevent tree branches from being pushed by
+	 * a piston. This is done for reasons that should be obvious if you are paying any attention.
+	 *
+	 * @param state The {@link BlockState} of the {@link BranchBlock}.
+	 * @return {@link PushReaction#BLOCK} to prevent {@link BranchBlock}s being pushed.
+	 */
 	@Override
 	public PushReaction getPistonPushReaction(BlockState state) {
 		return PushReaction.BLOCK;
@@ -594,7 +637,15 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	// EXPLOSIONS AND FIRE
 	///////////////////////////////////////////
 
-	// Explosive harvesting methods will likely result in mostly sticks but I'm okay with that since it kinda makes sense.
+	/**
+	 * Handles destroying the {@link BranchBlock} when it's exploded. This is likely to result
+	 * in mostly sticks but that kind of makes sense anyway.
+	 *
+	 * @param state The {@link BlockState} of the {@link BranchBlock} being exploded.
+	 * @param world The {@link World} instance.
+	 * @param pos The {@link BlockPos} of the {@link BranchBlock} being exploded.
+	 * @param explosion The {@link Explosion} destroying the {@link BranchBlock}.
+	 */
 	@Override
 	public void onBlockExploded(BlockState state, World world, BlockPos pos, Explosion explosion) {
 		final Species species = TreeHelper.getExactSpecies(world, pos);

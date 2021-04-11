@@ -51,7 +51,7 @@ public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
         BlockState upState = world.getBlockState(pos.above());
         if (TreeHelper.isBranch(upState))
-            return new ItemStack(TreeHelper.getBranch(upState).getFamily().getDynamicBranchItem());
+            return new ItemStack(TreeHelper.getBranch(upState).getFamily().getBranchItem());
         return ItemStack.EMPTY;
     }
 
