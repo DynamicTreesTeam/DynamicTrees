@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.ferreusveritas.dynamictrees.util.ThrowableRunnable;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -79,6 +80,14 @@ public abstract class SubCommand {
     protected static int executesSuccess(final CommandContext<CommandSource> context, final Consumer<CommandContext<CommandSource>> executeConsumer) {
         executeConsumer.accept(context);
         return 1;
+    }
+
+    protected static RequiredArgumentBuilder<CommandSource, Boolean> booleanArgument(final String name) {
+        return Commands.argument(name, BoolArgumentType.bool());
+    }
+
+    protected static boolean booleanArgument(final CommandContext<CommandSource> context, final String name) {
+        return BoolArgumentType.getBool(context, name);
     }
 
     protected static RequiredArgumentBuilder<CommandSource, Integer> intArgument(final String name) {

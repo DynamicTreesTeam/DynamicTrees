@@ -11,6 +11,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
+import java.util.Optional;
+
 public final class GetTreeCommand extends SubCommand {
 
     @Override
@@ -23,20 +25,28 @@ public final class GetTreeCommand extends SubCommand {
         return 0;
     }
 
+    private static final String CODE_RAW = "code_raw";
+
     @Override
     public ArgumentBuilder<CommandSource, ?> registerArguments() {
-        return blockPosArgument().executes(context -> this.getTree(context.getSource(), blockPosArgument(context)));
+        return blockPosArgument().executes(context -> this.getTree(context.getSource(), blockPosArgument(context), false))
+                .then(booleanArgument(CODE_RAW).executes(context -> this.getTree(context.getSource(), blockPosArgument(context),
+                        booleanArgument(context, CODE_RAW))));
     }
 
-    private int getTree(final CommandSource source, final BlockPos pos) {
+    private int getTree(final CommandSource source, final BlockPos pos, final boolean codeRaw) {
         final World world = source.getLevel();
 
-        return TreeHelper.getBestGuessSpecies(world, pos).ifValidElse(species ->
-                        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.get_tree",
-                                species.getTextComponent(), TreeHelper.getJoCode(world, pos).map(JoCode::getTextComponent)
-                                .orElse(new StringTextComponent("?"))), false),
-                () -> source.sendFailure(new TranslationTextComponent("commands.dynamictrees.error.get_tree",
-                        CommandHelper.posComponent(pos).copy().withStyle(style -> style.withColor(TextFormatting.DARK_RED))))
+        return TreeHelper.getBestGuessSpecies(world, pos).ifValidElse(species -> {
+            final Optional<JoCode> joCode = TreeHelper.getJoCode(world, pos);
+
+            if (codeRaw)
+                source.sendSuccess(new StringTextComponent(joCode.map(JoCode::toString).orElse("?")), false);
+            else source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.get_tree",
+                    species.getTextComponent(), joCode.map(JoCode::getTextComponent)
+                    .orElse(new StringTextComponent("?"))), false);
+        }, () -> source.sendFailure(new TranslationTextComponent("commands.dynamictrees.error.get_tree",
+                            CommandHelper.posComponent(pos).copy().withStyle(style -> style.withColor(TextFormatting.DARK_RED))))
         ) ? 1 : 0;
     }
 

@@ -9,6 +9,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -30,19 +31,29 @@ public final class SoilLifeCommand extends SubCommand {
     }
 
     private static final String SOIL_LIFE = "soil_life";
+    private static final String RAW = "raw";
 
     @Override
     public ArgumentBuilder<CommandSource, ?> registerArguments() {
-        return blockPosArgument().executes(context -> executesSuccess(() -> this.getSoilLife(context.getSource(), rootPosArgument(context))))
-                .then(Commands.argument(SOIL_LIFE, IntegerArgumentType.integer(0, 15)).suggests(((context, builder) -> ISuggestionProvider.suggest(Stream.of(0, 7, 15).map(String::valueOf).collect(Collectors.toList()), builder)))
+        return blockPosArgument().executes(context -> executesSuccess(() -> this.getSoilLife(context.getSource(),
+                rootPosArgument(context), false)))
+                .then(booleanArgument(RAW).executes(context -> executesSuccess(() -> this.getSoilLife(context.getSource(),
+                        rootPosArgument(context), booleanArgument(context, RAW)))))
+                .then(Commands.argument(SOIL_LIFE, IntegerArgumentType.integer(0, 15)).suggests(((context, builder) ->
+                        ISuggestionProvider.suggest(Stream.of(0, 7, 15).map(String::valueOf).collect(Collectors.toList()), builder)))
                         .requires(commandSource -> commandSource.hasPermission(2)) // Setting soil life requires higher permission level.
                         .executes(context -> executesSuccess(() -> this.setSoilLife(context.getSource(), rootPosArgument(context),
                                 intArgument(context, SOIL_LIFE)))));
     }
 
-    private void getSoilLife(final CommandSource source, final BlockPos rootPos) {
+    private void getSoilLife(final CommandSource source, final BlockPos rootPos, final boolean raw) {
         final BlockState state = source.getLevel().getBlockState(rootPos);
         final int soilLife = Objects.requireNonNull(TreeHelper.getRooty(state)).getSoilLife(state, source.getLevel(), rootPos);
+
+        if (raw) {
+            source.sendSuccess(new StringTextComponent(String.valueOf(soilLife)), false);
+            return;
+        }
 
         source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.get_soil_life",
                 CommandHelper.posComponent(rootPos, TextFormatting.AQUA),
