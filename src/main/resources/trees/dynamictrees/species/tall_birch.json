@@ -1,0 +1,31 @@
+{
+    "family": "birch",
+    "tapering": 0.02,
+    "signal_energy": 24,
+    "up_probability": 7,
+    "lowest_branch_height": 7,
+    "growth_rate": 1.3,
+    "soil_longevity": 12,
+    "leaves_properties": "birch",
+    "environment_factors" : {
+        "cold": 0.75,
+        "hot": 0.5,
+        "dry": 0.5,
+        "forest": 1.05
+    },
+    "seed_drop_rarity": 1.0,
+    "stick_drop_rarity": 1.0,
+    "common_override": { "name": "minecraft:tall_birch.*" },
+    "perfect_biomes": { "name": "minecraft:tall_birch.*" },
+    "features" : [
+        {
+            "name": "mushroom_rot",
+            "properties": {
+                "_comment": "An alternate mushroom chance of 2 means that a brown mushroom will always be generated.",
+                "alternate_mushroom_chance": 2
+            }
+        },
+        "rot_soil",
+        "bee_nest"
+    ]
+}
