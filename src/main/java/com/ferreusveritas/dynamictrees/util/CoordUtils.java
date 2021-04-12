@@ -118,16 +118,16 @@ public final class CoordUtils {
 	 * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is BlockPos.ZERO
 	 */
 	public static BlockPos getRayTraceFruitPos(IWorld world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
+		final RayTraceResult result = branchRayTrace(world, species, treePos, branchPos, 45, 60, 4 + world.getRandom().nextInt(3), safeBounds);
 
-		RayTraceResult result = branchRayTrace(world, species, treePos, branchPos, 45, 60, 4 + world.getRandom().nextInt(3), safeBounds);
-
-		if(result != null) {
+		if (result != null) {
 			BlockPos hitPos = new BlockPos(result.getLocation());
-			if(hitPos != BlockPos.ZERO) {
-				do { //Run straight down until we hit a block that's non compatible leaves.
+			if (hitPos != BlockPos.ZERO) {
+				do { // Run straight down until we hit a block that's non compatible leaves.
 					hitPos = hitPos.below();
-				} while(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos));
-				if(world.isEmptyBlock(hitPos)) {//If that block is air then we have a winner.
+				} while (species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos));
+
+				if (world.isEmptyBlock(hitPos)) { // If that block is air then we have a winner.
 					return hitPos;
 				}
 			}

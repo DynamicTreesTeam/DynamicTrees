@@ -19,6 +19,7 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
@@ -287,7 +288,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	 * @return The instantiated {@link BranchBlock}.
 	 */
 	protected BranchBlock createBranchBlock() {
-		final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(this.getBranchMaterial()) : new BasicBranchBlock(this.getBranchMaterial());
+		final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(this.getProperties()) : new BasicBranchBlock(this.getProperties());
 
 		if (this.isFireProof())
 			branch.setFireSpreadSpeed(0).setFlammability(0);
@@ -453,7 +454,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	public boolean isFireProof () { return false; }
 
 	public SoundType getBranchSoundType (BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-		return SoundType.WOOD;
+		return this.getDefaultBranchSoundType();
 	}
 
 	public ToolType getBranchHarvestTool(BlockState state){
@@ -464,8 +465,45 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return 0;
 	}
 
-	public Material getBranchMaterial(){
-		return Material.WOOD; //Trees are made of wood. Brilliant.
+	public Material getDefaultBranchMaterial() {
+		return Material.WOOD;
+	}
+
+	public SoundType getDefaultBranchSoundType() {
+		return SoundType.WOOD;
+	}
+
+	public ToolType getDefaultBranchTool() {
+		return ToolType.AXE;
+	}
+
+	public AbstractBlock.Properties getDefaultBranchProperties(final Material material, final MaterialColor materialColor) {
+		return AbstractBlock.Properties.of(material, materialColor).sound(this.getDefaultBranchSoundType())
+				.noDrops().harvestLevel(0).harvestTool(this.getDefaultBranchTool());
+	}
+
+	private AbstractBlock.Properties properties;
+
+	/**
+	 * Gets the {@link #properties} for this {@link Family} object.
+	 *
+	 * @return The {@link #properties} for this {@link Family} object.
+	 */
+	public AbstractBlock.Properties getProperties() {
+		return this.properties == null ? this.getDefaultBranchProperties(this.getDefaultBranchMaterial(),
+				this.getDefaultBranchMaterial().getColor()) : this.properties;
+	}
+
+	/**
+	 * Sets the {@link #properties} for this {@link Family} object
+	 * to the given {@code properties}.
+	 *
+	 * @param properties The new {@link AbstractBlock.Properties} object to set.
+	 * @return This {@link Family} object for chaining.
+	 */
+	public Family setProperties(AbstractBlock.Properties properties) {
+		this.properties = properties;
+		return this;
 	}
 
 	///////////////////////////////////////////

@@ -21,7 +21,8 @@ public final class WorldGenEventHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void addDynamicTrees (final BiomeLoadingEvent event) {
-        event.getGeneration().addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_FEATURE.configured(new NoFeatureConfig()));
+        event.getGeneration().addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+                DTRegistries.DYNAMIC_TREE_FEATURE.configured(new NoFeatureConfig()));
     }
 
     /**

@@ -13,24 +13,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PoissonDiscProviderUniversal {
+public class UniversalPoissonDiscProvider {
 
 	private final Map<ResourceLocation, IPoissonDiscProvider> providerMap = new HashMap<>();
 
 	protected IPoissonDiscProvider createCircleProvider(ServerWorld world) {
-		BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(TreeGenerator.getTreeGenerator(), world);
-		IPoissonDiscProvider candidate = new PoissonDiscProvider(radiusCoordinator);
-		PoissonDiscProviderCreateEvent poissonDiscProviderCreateEvent = new PoissonDiscProviderCreateEvent(world, candidate);
+		final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(TreeGenerator.getTreeGenerator(), world);
+		final IPoissonDiscProvider candidate = new PoissonDiscProvider(radiusCoordinator);
+		final PoissonDiscProviderCreateEvent poissonDiscProviderCreateEvent = new PoissonDiscProviderCreateEvent(world, candidate);
 		MinecraftForge.EVENT_BUS.post(poissonDiscProviderCreateEvent);
 		return poissonDiscProviderCreateEvent.getPoissonDiscProvider();
 	}
 
 	public IPoissonDiscProvider getProvider(ServerWorld world) {
-		return providerMap.computeIfAbsent(world.dimension().location(), k -> createCircleProvider(world));
+		return this.providerMap.computeIfAbsent(world.dimension().location(), k -> createCircleProvider(world));
 	}
 
 	public List<PoissonDisc> getPoissonDiscs(ServerWorld world, ChunkPos chunkPos) {
-		IPoissonDiscProvider provider = getProvider(world);
+		final IPoissonDiscProvider provider = getProvider(world);
 		return provider.getPoissonDiscs(chunkPos.x, 0, chunkPos.z);
 	}
 
@@ -39,15 +39,15 @@ public class PoissonDiscProviderUniversal {
 	}
 
 	public void setChunkPoissonData(ServerWorld world, ChunkPos chunkPos, byte[] circleData) {
-		getProvider(world).setChunkPoissonData(chunkPos.x, 0, chunkPos.z, circleData);
+		this.getProvider(world).setChunkPoissonData(chunkPos.x, 0, chunkPos.z, circleData);
 	}
 
 	public byte[] getChunkPoissonData(ServerWorld world, ChunkPos chunkPos) {
-		return getProvider(world).getChunkPoissonData(chunkPos.x, 0, chunkPos.z);
+		return this.getProvider(world).getChunkPoissonData(chunkPos.x, 0, chunkPos.z);
 	}
 
 	public void unloadChunkPoissonData(ServerWorld world, ChunkPos chunkPos) {
-		getProvider(world).unloadChunkPoissonData(chunkPos.x, 0, chunkPos.z);
+		this.getProvider(world).unloadChunkPoissonData(chunkPos.x, 0, chunkPos.z);
 	}
 
 }

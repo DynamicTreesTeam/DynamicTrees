@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
+import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -59,6 +60,14 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
      */
     private static Runnable setCommonWarn(final Family family, final ResourceLocation registryName) {
         return () -> LOGGER.warn("Could not set common species for '" + family + "' as Species '" + registryName + "' was not found.");
+    }
+
+    @Override
+    protected void preLoad(JsonObject jsonObject, Family family, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
+        family.setProperties(JsonHelper.getBlockProperties(
+                JsonHelper.getOrDefault(jsonObject, "branch_properties", JsonObject.class, new JsonObject()),
+                family.getDefaultBranchMaterial(), family.getDefaultBranchMaterial().getColor(),
+                family::getDefaultBranchProperties, errorConsumer, warningConsumer));
     }
 
     @Override

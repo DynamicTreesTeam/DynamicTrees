@@ -1710,16 +1710,16 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
-			GenFeature genFeature = configuredGenFeature.getGenFeature();
+			final GenFeature genFeature = configuredGenFeature.getGenFeature();
 			if (genFeature instanceof IFullGenFeature) {
 				return ((IFullGenFeature) genFeature).generate(configuredGenFeature, world, rootPos, this, biome, random, radius, safeBounds);
 			}
 		}
 
-		Direction facing = CoordUtils.getRandomDir(random);
-		if(!DTResourceRegistries.JO_CODE_MANAGER.getCodes(this).isEmpty()) {
-			JoCode code = DTResourceRegistries.JO_CODE_MANAGER.getRandomCode(this, radius, random);
-			if(code != null) {
+		final Direction facing = CoordUtils.getRandomDir(random);
+		if (!DTResourceRegistries.JO_CODE_MANAGER.getCodes(this).isEmpty()) {
+			final JoCode code = DTResourceRegistries.JO_CODE_MANAGER.getRandomCode(this, radius, random);
+			if (code != null) {
 				code.generate(worldObj, world,this, rootPos, biome, facing, radius, safeBounds);
 				return true;
 			}

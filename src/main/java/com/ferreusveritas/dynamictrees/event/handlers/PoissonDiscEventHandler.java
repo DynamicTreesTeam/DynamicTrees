@@ -1,9 +1,11 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
-import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
+import com.ferreusveritas.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -30,27 +32,30 @@ public class PoissonDiscEventHandler {
 
 	@SubscribeEvent
 	public void onChunkDataLoad(ChunkDataEvent.Load event) {
-        IWorld world = event.getWorld();
-		if (world != null && !world.isClientSide()) {
-			byte[] circleData = event.getData().getByteArray(CIRCLE_DATA_ID);
-			PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
+        final IWorld world = event.getWorld();
 
-			final ChunkPos chunkPos = event.getChunk().getPos();
-			cp.setChunkPoissonData((ServerWorld) world, chunkPos, circleData);
-		}
+        if (world == null || world.isClientSide())
+        	return;
+
+		final byte[] circleData = event.getData().getByteArray(CIRCLE_DATA_ID);
+		final UniversalPoissonDiscProvider discProvider = TreeGenerator.getTreeGenerator().getCircleProvider();
+
+		final ChunkPos chunkPos = event.getChunk().getPos();
+		discProvider.setChunkPoissonData((ServerWorld) world, chunkPos, circleData);
 	}
 
 	@SubscribeEvent
 	public void onChunkDataSave(ChunkDataEvent.Save event) {
-		ServerWorld world = (ServerWorld) event.getWorld();
-		PoissonDiscProviderUniversal cp = TreeGenerator.getTreeGenerator().getCircleProvider();
-        final ChunkPos chunkPos = event.getChunk().getPos();
-        byte[] circleData = cp.getChunkPoissonData(world, chunkPos);
+		final ServerWorld world = (ServerWorld) event.getWorld();
+		final UniversalPoissonDiscProvider discProvider = TreeGenerator.getTreeGenerator().getCircleProvider();
+		final IChunk chunk = event.getChunk();
+		final ChunkPos chunkPos = chunk.getPos();
+
+		final byte[] circleData = discProvider.getChunkPoissonData(world, chunkPos);
 		event.getData().putByteArray(CIRCLE_DATA_ID, circleData); // Set circle data.
 
-		// This has helped eliminate some chunk data but hasn't prevented freezing.
-		if (!world.getChunkSource().isEntityTickingChunk(chunkPos))
-			cp.unloadChunkPoissonData(world, chunkPos);
+		if (chunk instanceof Chunk && !((Chunk) chunk).loaded)
+			discProvider.unloadChunkPoissonData(world, chunkPos);
 	}
 
 }

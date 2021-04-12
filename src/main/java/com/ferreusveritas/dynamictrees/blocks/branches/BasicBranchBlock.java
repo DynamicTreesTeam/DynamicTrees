@@ -51,12 +51,16 @@ public class BasicBranchBlock extends BranchBlock {
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
 	public BasicBranchBlock(Material material) {
-		this(AbstractBlock.Properties.of(material), RADIUS, MAX_RADIUS);
+		this(AbstractBlock.Properties.of(material).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
 	}
-	
+
+	public BasicBranchBlock(Properties properties) {
+		this(properties, RADIUS, MAX_RADIUS);
+	}
+
 	// Useful for more unique subclasses
 	public BasicBranchBlock(AbstractBlock.Properties properties, final IntegerProperty radiusProperty, final int maxRadius) {
-		super(properties.harvestLevel(0));
+		super(properties);
 
 		// Create branch state cache.
 		this.branchStates = this.createBranchStates(radiusProperty, maxRadius);

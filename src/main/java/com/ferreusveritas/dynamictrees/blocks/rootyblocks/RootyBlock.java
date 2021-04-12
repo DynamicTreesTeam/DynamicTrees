@@ -249,7 +249,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	@Override
 	public void playerWillDestroy(World world, @Nonnull BlockPos pos, BlockState state, @Nonnull PlayerEntity player) {
-		destroyTree(world, pos);
+		this.destroyTree(world, pos);
 		super.playerWillDestroy(world, pos, state, player);
 	}
 	

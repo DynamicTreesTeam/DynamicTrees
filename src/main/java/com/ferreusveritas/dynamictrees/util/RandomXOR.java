@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class RandomXOR extends Random {
 
-	private static final long SERIAL_VERSION_UID = -3477272122511092632L;
+	private static final long serialVersionUID = -3477272122511092632L;
 
 	private int xor = 0;
 	
@@ -18,7 +18,7 @@ public class RandomXOR extends Random {
 	}
 	
 	public void setXOR(BlockPos pos) {
-		setXOR((((int)pos.getX() * 674365771) ^ ((int)pos.getZ() * 254326997)) >> 4);
+		setXOR(((pos.getX() * 674365771) ^ (pos.getZ() * 254326997)) >> 4);
 	}
     
     public void setXOR(int xor) {

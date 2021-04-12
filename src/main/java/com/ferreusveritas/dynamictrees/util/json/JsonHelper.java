@@ -3,6 +3,9 @@ package com.ferreusveritas.dynamictrees.util.json;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,6 +14,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class JsonHelper {
@@ -109,6 +113,15 @@ public class JsonHelper {
 
 	public static JsonObjectReader ifContains (final JsonObject jsonObject, final String key, final Consumer<JsonElement> elementConsumer) {
 		return new JsonObjectReader(jsonObject).ifContains(key, elementConsumer);
+	}
+
+	public static AbstractBlock.Properties getBlockProperties(final JsonObject jsonObject, final Material defaultMaterial, final MaterialColor defaultMaterialColor, final BiFunction<Material, MaterialColor, AbstractBlock.Properties> defaultPropertiesGetter, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
+		final Material material = JsonHelper.getOrDefault(jsonObject, "material", Material.class, defaultMaterial);
+		final AbstractBlock.Properties properties = defaultPropertiesGetter.apply(material,
+				JsonHelper.getOrDefault(jsonObject, "material_color", MaterialColor.class, defaultMaterialColor));
+
+		JsonPropertyApplierLists.PROPERTIES.applyAll(jsonObject, properties).forEachErrorWarning(errorConsumer, warningConsumer);
+		return properties;
 	}
 
 	public static final class JsonElementReader {

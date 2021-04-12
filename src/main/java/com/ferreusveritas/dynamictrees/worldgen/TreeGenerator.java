@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Speci
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
-import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDiscProviderUniversal;
+import com.ferreusveritas.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -26,7 +26,7 @@ public class TreeGenerator {
 
 	protected static TreeGenerator INSTANCE;
 
-	protected final PoissonDiscProviderUniversal circleProvider;
+	protected final UniversalPoissonDiscProvider circleProvider;
 	protected final RandomXOR random = new RandomXOR();
 
 	public static void setup() {
@@ -39,7 +39,7 @@ public class TreeGenerator {
 
 	public TreeGenerator() {
 		INSTANCE = this; // Set this here in case the lines in the contructor lead to calls that use getTreeGenerator
-		this.circleProvider = new PoissonDiscProviderUniversal();
+		this.circleProvider = new UniversalPoissonDiscProvider();
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class TreeGenerator {
 
 	}
 
-	public PoissonDiscProviderUniversal getCircleProvider() {
+	public UniversalPoissonDiscProvider getCircleProvider() {
 		return circleProvider;
 	}
 
@@ -80,50 +80,51 @@ public class TreeGenerator {
 	}
 
 	public void makeConcreteCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
-		for(int ix = -circle.radius; ix <= circle.radius; ix++) {
-			for(int iz = -circle.radius; iz <= circle.radius; iz++) {
-				if(circle.isEdge(circle.x + ix, circle.z + iz)) {
-					safeBounds.setBlockState(world, new BlockPos(circle.x + ix, h, circle.z + iz), getConcreteByColor(DyeColor.byId((circle.x ^ circle.z) & 0xF)), flags, true);
+		for (int ix = -circle.radius; ix <= circle.radius; ix++) {
+			for (int iz = -circle.radius; iz <= circle.radius; iz++) {
+				if (circle.isEdge(circle.x + ix, circle.z + iz)) {
+					safeBounds.setBlockState(world, new BlockPos(circle.x + ix, h, circle.z + iz), this.getConcreteByColor(DyeColor.byId((circle.x ^ circle.z) & 0xF)), flags, true);
 				}
 			}
 		}
 
-		if(resultType != EnumGeneratorResult.GENERATED) {
-			BlockPos pos = new BlockPos(circle.x, h, circle.z);
-			DyeColor color = resultType.getColor();
-			safeBounds.setBlockState(world, pos, getConcreteByColor(color), true);
-			safeBounds.setBlockState(world, pos.above(), getConcreteByColor(color), true);
+		if (resultType != EnumGeneratorResult.GENERATED) {
+			final BlockPos pos = new BlockPos(circle.x, h, circle.z);
+			final DyeColor color = resultType.getColor();
+			safeBounds.setBlockState(world, pos, this.getConcreteByColor(color), true);
+			safeBounds.setBlockState(world, pos.above(), this.getConcreteByColor(color), true);
 		}
 	}
 
 	public EnumGeneratorResult makeTree(ISeedReader world, BiomeDatabase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
 
-		circle.add(8, 8);//Move the circle into the "stage"
+		circle.add(8, 8); // Move the circle into the "stage".
 
 		BlockPos pos = new BlockPos(circle.x, 0, circle.z);
 
-		Biome biome = world.getBiome(pos);
-		Entry entry = biomeDataBase.getEntry(biome);
+		final Biome biome = world.getBiome(pos);
+		final Entry entry = biomeDataBase.getEntry(biome);
 
 		if (entry.isBlacklisted())
 			return EnumGeneratorResult.UNHANDLED_BIOME;
 
 		pos = groundFinder.findGround(entry, world, pos);
 
-		if(pos == BlockPos.ZERO) {
+		if (pos == BlockPos.ZERO) {
 			return EnumGeneratorResult.NO_GROUND;
 		}
 
 		random.setXOR(pos);
 
-		BlockState dirtState = world.getBlockState(pos);
+		final BlockState dirtState = world.getBlockState(pos);
 
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 
-		BiomePropertySelectors.ISpeciesSelector speciesSelector = entry.getSpeciesSelector();
-		SpeciesSelection speciesSelection = speciesSelector.getSpecies(pos, dirtState, random);
+		final BiomePropertySelectors.ISpeciesSelector speciesSelector = entry.getSpeciesSelector();
+		final SpeciesSelection speciesSelection = speciesSelector.getSpecies(pos, dirtState, random);
+
 		if (speciesSelection.isHandled()) {
-			Species species = speciesSelection.getSpecies();
+			final Species species = speciesSelection.getSpecies();
 			if (species.isValid()) {
 				if (species.isAcceptableSoilForWorldgen(world, pos, dirtState)) {
 					if (entry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
@@ -145,10 +146,10 @@ public class TreeGenerator {
 
 		// Display concrete circles for testing the circle growing algorithm.
 		if (DTConfigs.WORLD_GEN_DEBUG.get()) {
-			makeConcreteCircle(world, circle, pos.getY(), result, safeBounds);
+			this.makeConcreteCircle(world, circle, pos.getY(), result, safeBounds);
 		}
 
-		circle.add(-8, -8); // Move the circle back to normal coords.
+		circle.sub(8, 8); // Move the circle back to normal coords.
 
 		return result;
 	}

@@ -266,28 +266,28 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	public void tick() {
 		super.tick();
 		
-		if(level.isClientSide && !clientBuilt) {
-			buildClient();
-			if(!isAlive()) {
+		if (this.level.isClientSide && !this.clientBuilt) {
+			this.buildClient();
+			if (!isAlive()) {
 				return;
 			}
 		}
 		
-		if(!level.isClientSide && firstUpdate) {
-			updateNeighbors();
+		if (!this.level.isClientSide && this.firstUpdate) {
+			this.updateNeighbors();
 		}
 		
-		handleMotion();
+		this.handleMotion();
 		
-		setBoundingBox(normAABB.move(this.getX(), this.getY(), this.getZ()));
+		this.setBoundingBox(normAABB.move(this.getX(), this.getY(), this.getZ()));
 		
-		if(shouldDie()) {
-			dropPayLoad();
-			kill();
-			modelCleanup();
+		if (this.shouldDie()) {
+			this.dropPayLoad();
+			this.kill();
+			this.modelCleanup();
 		}
 		
-		firstUpdate = false;
+		this.firstUpdate = false;
 	}
 	
 	/**

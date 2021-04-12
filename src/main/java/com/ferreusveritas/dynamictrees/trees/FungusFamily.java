@@ -1,14 +1,9 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
-import net.minecraft.entity.Entity;
+import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReader;
-
-import javax.annotation.Nullable;
 
 /**
  * @author Harley O'Connor
@@ -22,7 +17,12 @@ public final class FungusFamily extends Family {
     }
 
     @Override
-    public SoundType getBranchSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
+    public Material getDefaultBranchMaterial() {
+        return Material.NETHER_WOOD;
+    }
+
+    @Override
+    public SoundType getDefaultBranchSoundType() {
         return SoundType.STEM;
     }
 

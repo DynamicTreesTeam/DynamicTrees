@@ -7,6 +7,96 @@ import java.util.Map;
 
 public interface IPoissonDebug {
 
+	/**
+	 * An empty implementation of {@link IPoissonDebug} that doesn't do anything.
+	 */
+	IPoissonDebug EMPTY_POISSON_DEBUG = new IPoissonDebug() {
+		@Override
+		public void begin(int chunkX, int chunkZ) {
+
+		}
+
+		@Override
+		public void collectSolved(List<PoissonDisc> discs) {
+
+		}
+
+		@Override
+		public void doEdgeMasking(List<PoissonDisc> discs) {
+
+		}
+
+		@Override
+		public void maskSolvedDiscs(List<PoissonDisc> discs) {
+
+		}
+
+		@Override
+		public void createRootDisc(List<PoissonDisc> allDiscs, PoissonDisc rootDisc) {
+
+		}
+
+		@Override
+		public void gatherUnsolved(List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void updateCount(int count, List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void pickMasterDisc(PoissonDisc master, List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void getRadius(PoissonDisc master, int radius, List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void findSecondDisc(PoissonDisc master, PoissonDisc slave, List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void maskMasterSlave(PoissonDisc master, PoissonDisc slave, List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void intersectingList(PoissonDisc slave, Map<Integer, PoissonDisc> intersecting, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void findThirdDiscCandidate(PoissonDisc master1, PoissonDisc master2, PoissonDisc slave, List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void thirdCircleCandidateIntersects(PoissonDisc master1, PoissonDisc master2, PoissonDisc slave, PoissonDisc intersecting, List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void findThirdDiscSolved(PoissonDisc slave, List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void solveDiscs(List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+
+		@Override
+		public void gatherUnsolved2(List<PoissonDisc> unsolvedDiscs, List<PoissonDisc> allDiscs) {
+
+		}
+	};
+
 	void begin(int chunkX, int chunkZ);
 
 	void collectSolved(List<PoissonDisc> discs);

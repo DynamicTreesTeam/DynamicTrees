@@ -11,7 +11,7 @@ import net.minecraft.util.IStringSerializable;
  */
 public class RootConnections extends Connections {
 
-    public static ConnectionLevel[] PLACEHOLDER_CONNECTION_LEVELS = new ConnectionLevel[] {ConnectionLevel.MID, ConnectionLevel.MID, ConnectionLevel.MID, ConnectionLevel.MID};
+    public final static ConnectionLevel[] PLACEHOLDER_CONNECTION_LEVELS = new ConnectionLevel[] {ConnectionLevel.MID, ConnectionLevel.MID, ConnectionLevel.MID, ConnectionLevel.MID};
 
     /**
      * An array of connection levels, with the index being equivalent to their horizontal index of the connection level's

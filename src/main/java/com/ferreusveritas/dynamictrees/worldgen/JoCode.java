@@ -350,17 +350,17 @@ public class JoCode {
 	 * @return
 	 */
 	protected int generateFork(IWorld world, Species species, int codePos, BlockPos pos, boolean disabled) {
-		
-		while(codePos < instructions.length) {
-			int code = getCode(codePos);
-			switch(code) {
-				case FORK_CODE: codePos = generateFork(world, species, codePos + 1, pos, disabled); break;
+		while (codePos < instructions.length) {
+			final int code = this.getCode(codePos);
+
+			switch (code) {
+				case FORK_CODE: codePos = this.generateFork(world, species, codePos + 1, pos, disabled); break;
 				case RETURN_CODE: return codePos + 1;
 				default:
-					Direction dir = Direction.from3DDataValue(code);
+					final Direction dir = Direction.from3DDataValue(code);
 					pos = pos.relative(dir);
-					if(!disabled) {
-						disabled = setBlockForGeneration(world, species, pos, dir, careful, codePos + 1 == instructions.length);
+					if (!disabled) {
+						disabled = this.setBlockForGeneration(world, species, pos, dir, careful);
 					}
 					codePos++;
 					break;
@@ -370,8 +370,9 @@ public class JoCode {
 		return codePos;
 	}
 	
-	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, boolean isLast) {
-		if (world.getBlockState(pos).canBeReplacedByLogs(world, pos) && (!careful || isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
+	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful) {
+		if (world.getBlockState(pos).canBeReplacedByLogs(world, pos) &&
+				(!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
 			Objects.requireNonNull(species.getFamily().getBranch())
 					.setRadius(world, pos, (int)species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
 			return false;
@@ -386,55 +387,53 @@ public class JoCode {
 	 * @param leavesProperties
 	 */
 	protected void smother(SimpleVoxmap leafMap, LeavesProperties leavesProperties) {
-		
-		int smotherMax = leavesProperties.getSmotherLeavesMax();
-		
-		if(smotherMax != 0) { //Smothering is disabled if set to 0
-			
-			BlockPos saveCenter = leafMap.getCenter();
-			leafMap.setCenter(new BlockPos(0, 0, 0));
-			
-			int startY;
-			
-			//Find topmost block in build volume
-			for(startY = leafMap.getLenY() - 1; startY >= 0; startY--) {
-				if(leafMap.isYTouched(startY)) {
-					break;
-				}
+		final int smotherMax = leavesProperties.getSmotherLeavesMax();
+
+		// Smothering is disabled if set to 0.
+		if (smotherMax == 0)
+			return;
+
+		final BlockPos saveCenter = leafMap.getCenter();
+		leafMap.setCenter(new BlockPos(0, 0, 0));
+
+		int startY;
+
+		// Find topmost block in build volume.
+		for (startY = leafMap.getLenY() - 1; startY >= 0; startY--) {
+			if (leafMap.isYTouched(startY)) {
+				break;
 			}
-			
-			//Precompute smothering
-			for(int iz = 0; iz < leafMap.getLenZ(); iz++) {
-				for(int ix = 0; ix < leafMap.getLenX(); ix++) {
-					int count = 0;
-					for(int iy = startY; iy >= 0; iy--) {
-						int v = leafMap.getVoxel(new BlockPos(ix, iy, iz));
-						if(v == 0) {//Air
-							count = 0;//Reset the count
-						} else
-							if((v & 0x0F) != 0) {//Leaves
-								count++;
-								if(count > smotherMax){//Smother value
-									leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte)0);
-								}
-							} else
-								if((v & 0x10) != 0) {//Twig
-									count++;
-									leafMap.setVoxel(new BlockPos(ix, iy + 1, iz), (byte)4);
-								}
-					}
-				}
-			}
-			
-			leafMap.setCenter(saveCenter);
 		}
-		
+
+		// Precompute smothering.
+		for (int iz = 0; iz < leafMap.getLenZ(); iz++) {
+			for (int ix = 0; ix < leafMap.getLenX(); ix++) {
+				int count = 0;
+				for (int iy = startY; iy >= 0; iy--) {
+					final int v = leafMap.getVoxel(new BlockPos(ix, iy, iz));
+					if (v == 0) { // Air
+						count = 0; // Reset the count
+					} else
+						if ((v & 0x0F) != 0) { // Leaves
+							count++;
+							if (count > smotherMax){ // Smother value
+								leafMap.setVoxel(new BlockPos(ix, iy, iz), (byte) 0);
+							}
+						} else
+							if ((v & 0x10) != 0) { // Twig
+								count++;
+								leafMap.setVoxel(new BlockPos(ix, iy + 1, iz), (byte) 4);
+							}
+				}
+			}
+		}
+
+		leafMap.setCenter(saveCenter);
 	}
 	
 	protected boolean isClearOfNearbyBranches(IWorld world, BlockPos pos, Direction except) {
-		
-		for(Direction dir: Direction.values()) {
-			if(dir != except && TreeHelper.getBranch(world.getBlockState(pos.relative(dir))) != null) {
+		for (Direction dir: Direction.values()) {
+			if (dir != except && TreeHelper.getBranch(world.getBlockState(pos.relative(dir))) != null) {
 				return false;
 			}
 		}
@@ -443,27 +442,26 @@ public class JoCode {
 	}
 	
 	protected void addSnow(SimpleVoxmap leafMap, IWorld world, BlockPos rootPos, Biome biome) {
+		if (biome.getBaseTemperature() >= 0.4f)
+			return;
 		
-		if(biome.getBaseTemperature() < 0.4f) {
-			for (BlockPos.Mutable top : leafMap.getTops() ) {
-				if ( world.getUncachedNoiseBiome(rootPos.getX(), rootPos.getY(), rootPos.getZ()).shouldSnow(world, rootPos) ) {
-					BlockPos.Mutable iPos = new BlockPos.Mutable(top.getX(), top.getY(), top.getZ());
-					int yOffset = 0;
-					do {
-						BlockState state = world.getBlockState(iPos);
-						if(state.getMaterial() == Material.AIR) {
-							world.setBlock(iPos, Blocks.SNOW.defaultBlockState(), 2);
-							break;
-						}
-						else if (state.getBlock() == Blocks.SNOW) {
-							break;
-						}
-						iPos.setY(iPos.getY() + 1);
-					} while (yOffset++ < 4);
-				}
+		for (BlockPos.Mutable top : leafMap.getTops() ) {
+			if (world.getUncachedNoiseBiome(rootPos.getX(), rootPos.getY(), rootPos.getZ()).shouldSnow(world, rootPos)) {
+				final BlockPos.Mutable iPos = new BlockPos.Mutable(top.getX(), top.getY(), top.getZ());
+				int yOffset = 0;
+
+				do {
+					final BlockState state = world.getBlockState(iPos);
+					if (state.getMaterial() == Material.AIR) {
+						world.setBlock(iPos, Blocks.SNOW.defaultBlockState(), 2);
+						break;
+					} else if (state.getBlock() == Blocks.SNOW) {
+						break;
+					}
+					iPos.setY(iPos.getY() + 1);
+				} while (yOffset++ < 4);
 			}
 		}
-		
 	}
 	
 	static public String encode(byte[] array) {
