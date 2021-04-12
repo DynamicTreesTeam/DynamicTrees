@@ -330,18 +330,18 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 			color = this.colorNumber;
 		} else if (this.colorString != null) {
 			String code = this.colorString;
-			if(code.startsWith("@")) {
+			if (code.startsWith("@")) {
 				code = code.substring(1);
 				if ("biome".equals(code)) { // Built in code since we need access to super.
 					this.colorMultiplier = (state, world, pos, t) -> ((IWorld) world).getBiome(pos).getFoliageColor();
 					return;
 				}
 
-				IBlockColor blockColor = BlockColorMultipliers.find(code);
-				if(blockColor != null) {
+				final IBlockColor blockColor = BlockColorMultipliers.find(code);
+				if (blockColor != null) {
 					return;
 				} else {
-					LogManager.getLogger().error("Error: ColorMultiplier resource '{}' could not be found.", code);
+					LogManager.getLogger().error("ColorMultiplier resource '{}' could not be found.", code);
 				}
 			} else {
 				color = Color.decode(code).getRGB();

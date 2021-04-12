@@ -53,8 +53,7 @@ public final class DTRecipes {
     }
 
     private static ShapelessRecipe createShapeless(final ResourceLocation registryName, final ItemStack out, final Ingredient... ingredients) {
-        return new ShapelessRecipe(registryName, RecipeBookCategories.CRAFTING_MISC.name(),
-                out, NonNullList.of(Ingredient.EMPTY, ingredients));
+        return new ShapelessRecipe(registryName, "CRAFTING_MISC", out, NonNullList.of(Ingredient.EMPTY, ingredients));
     }
 
     private static Ingredient ingredient (final Item item) {

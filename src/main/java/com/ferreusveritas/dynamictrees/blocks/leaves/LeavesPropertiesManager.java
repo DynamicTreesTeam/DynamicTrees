@@ -25,13 +25,15 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
     @Override
     public void registerAppliers() {
         this.reloadAppliers.register("requires_shears", Boolean.class, LeavesProperties::setRequiresShears)
-                .register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
                 .register("cell_kit", CellKit.class, LeavesProperties::setCellKit)
                 .register("smother", Integer.class, LeavesProperties::setSmotherLeavesMax)
                 .register("light_requirement", Integer.class, LeavesProperties::setLightRequirement)
                 .register("fire_spread", Integer.class, LeavesProperties::setFireSpreadSpeed)
                 .register("flammability", Integer.class, LeavesProperties::setFlammability)
                 .register("connect_any_radius", Boolean.class, LeavesProperties::setConnectAnyRadius);
+
+        // Primitive leaves are needed both client and server (so cannot be done on setup).
+        this.setupAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves);
 
         super.registerAppliers();
     }

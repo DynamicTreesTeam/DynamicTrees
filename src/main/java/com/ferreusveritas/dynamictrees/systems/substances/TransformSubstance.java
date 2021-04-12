@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 
 public class TransformSubstance implements ISubstanceEffect {
 	
-	final Species toSpecies;
+	private final Species toSpecies;
 	
 	public TransformSubstance(final Species toTree) {
 		this.toSpecies = toTree;
@@ -25,9 +25,9 @@ public class TransformSubstance implements ISubstanceEffect {
 		final BlockState rootyState = world.getBlockState(rootPos);
 		final RootyBlock dirt = TreeHelper.getRooty(rootyState);
 
-		if (dirt != null && toSpecies != null) {
+		if (dirt != null && this.toSpecies.isValid()) {
 			Species fromSpecies = dirt.getSpecies(rootyState, world, rootPos);
-			if (fromSpecies.isTransformable() && fromSpecies!= toSpecies) {
+			if (fromSpecies.isTransformable() && fromSpecies != this.toSpecies) {
 				if (world.isClientSide) {
 					TreeHelper.treeParticles(world, rootPos, ParticleTypes.FIREWORK, 8);
 				} else {

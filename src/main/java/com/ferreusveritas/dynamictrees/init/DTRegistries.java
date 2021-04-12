@@ -99,7 +99,6 @@ public class DTRegistries {
 		setUpSoils();
 		setupConnectables();
 		setupItems();
-		setupEntities();
 	}
 
 	public static void setupBlocks() {
@@ -192,30 +191,24 @@ public class DTRegistries {
 	public final static String FALLING_TREE_ID = "falling_tree";
 	public final static String LINGERING_EFFECTOR_ID = "lingering_effector";
 	
-	public static EntityType<FallingTreeEntity> fallingTree;
-	public static EntityType<LingeringEffectorEntity> lingeringEffector;
+	public static final EntityType<FallingTreeEntity> FALLING_TREE = EntityType.Builder.<FallingTreeEntity>of(FallingTreeEntity::new, EntityClassification.MISC)
+			.setShouldReceiveVelocityUpdates(true)
+			.setTrackingRange(512)
+			.setUpdateInterval(Integer.MAX_VALUE)
+			.setCustomClientFactory((spawnEntity, world) -> new FallingTreeEntity(world))
+			.build(FALLING_TREE_ID);
+	public static final EntityType<LingeringEffectorEntity> LINGERING_EFFECTOR = EntityType.Builder.<LingeringEffectorEntity>of(LingeringEffectorEntity::new, EntityClassification.MISC)
+			// Giving it growth substance works for now as it's the only lingering substance, however this should be changed in the future.
+			.setCustomClientFactory((spawnEntity, world) ->
+					new LingeringEffectorEntity(world, new BlockPos(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), new GrowthSubstance()))
+			.build(LINGERING_EFFECTOR_ID);
 
-	private static void setupEntities() {
-		fallingTree = EntityType.Builder.of(FallingTreeEntity::new, EntityClassification.MISC)
-				.setShouldReceiveVelocityUpdates(true)
-				.setTrackingRange(512)
-				.setUpdateInterval(Integer.MAX_VALUE)
-				.setCustomClientFactory((spawnEntity, world) -> new FallingTreeEntity(fallingTree, world))
-				.build(FALLING_TREE_ID);
-
-		lingeringEffector = EntityType.Builder.<LingeringEffectorEntity>of(LingeringEffectorEntity::new, EntityClassification.MISC)
-				// Giving it growth substance works for now as it's the only lingering substance, however this should be changed in the future.
-				.setCustomClientFactory((spawnEntity, world) ->
-						new LingeringEffectorEntity(world, new BlockPos(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), new GrowthSubstance()))
-				.build(LINGERING_EFFECTOR_ID);
-	}
-	
 	@SubscribeEvent
 	public static void onEntitiesRegistry(final RegistryEvent.Register<EntityType<?>> entityRegistryEvent) {
 		IForgeRegistry<EntityType<?>> registry = entityRegistryEvent.getRegistry();
 		
-		registry.registerAll(fallingTree.setRegistryName(DynamicTrees.resLoc(FALLING_TREE_ID)),
-				lingeringEffector.setRegistryName(DynamicTrees.resLoc(LINGERING_EFFECTOR_ID)));
+		registry.registerAll(FALLING_TREE.setRegistryName(DynamicTrees.resLoc(FALLING_TREE_ID)),
+				LINGERING_EFFECTOR.setRegistryName(DynamicTrees.resLoc(LINGERING_EFFECTOR_ID)));
 	}
 	
 	///////////////////////////////////////////

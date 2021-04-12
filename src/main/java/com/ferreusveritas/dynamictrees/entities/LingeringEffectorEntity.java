@@ -19,14 +19,19 @@ public class LingeringEffectorEntity extends Entity {
 	private BlockPos blockPos;
 	private ISubstanceEffect effect;
 
-	public LingeringEffectorEntity(EntityType<?> entityTypeIn, World worldIn) {
+	public LingeringEffectorEntity(EntityType<? extends LingeringEffectorEntity> entityTypeIn, World worldIn) {
 		super(entityTypeIn, worldIn);
 		this.blockPos = BlockPos.ZERO;
 		this.effect = new GrowthSubstance();
 	}
 
+	@SuppressWarnings("unused")
+	private LingeringEffectorEntity(World world) {
+		super(DTRegistries.LINGERING_EFFECTOR, world);
+	}
+
 	public LingeringEffectorEntity(World world, BlockPos pos, ISubstanceEffect effect) {
-		this(DTRegistries.lingeringEffector, world);
+		this(DTRegistries.LINGERING_EFFECTOR, world);
 		this.maxUpStep = 1f;
 		this.noPhysics = true;
 		this.setBlockPos(pos);

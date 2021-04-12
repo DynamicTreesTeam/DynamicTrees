@@ -24,8 +24,8 @@ public class PoissonDiscEventHandler {
 	/** We'll use this instead because at least new chunks aren't created after the world is unloaded. I hope. >:( */
 	@SubscribeEvent
 	public void onWorldUnload(WorldEvent.Unload event) {
-        IWorld world = event.getWorld();
-		if(!world.isClientSide()) {
+        final IWorld world = event.getWorld();
+		if (!world.isClientSide()) {
 			TreeGenerator.getTreeGenerator().getCircleProvider().unloadWorld((ServerWorld) world);//clears the circles
 		}
 	}

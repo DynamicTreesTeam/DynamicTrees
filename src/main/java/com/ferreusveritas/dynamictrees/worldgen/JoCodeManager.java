@@ -84,7 +84,7 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
     }
 
     @Override
-    protected void apply(final Map<ResourceLocation, List<String>> preparedObject, final IResourceManager resourceManager, final boolean firstLoad) {
+    protected void apply(final Map<ResourceLocation, List<String>> preparedObject, final IResourceManager resourceManager, ApplicationType applicationType) {
         this.joCodes.clear();
 
         preparedObject.forEach((resourceLocation, lines) -> {

@@ -86,10 +86,14 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		ROOT
 	}
 	
-	public FallingTreeEntity(EntityType<?> entityTypeIn, World worldIn) {
-		super(entityTypeIn, worldIn);
+	public FallingTreeEntity(World world) {
+		super(DTRegistries.FALLING_TREE, world);
 	}
-	
+
+	public FallingTreeEntity(EntityType<? extends FallingTreeEntity> type, World world) {
+		super(type, world);
+	}
+
 	public boolean isClientBuilt() {
 		return clientBuilt;
 	}
@@ -481,7 +485,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		//Spawn the appropriate item entities into the world
 		if(!world.isClientSide) {// Only spawn entities server side
 			// Falling tree currently has severe rendering issues.
-			FallingTreeEntity entity = new FallingTreeEntity(DTRegistries.fallingTree, world).setData(destroyData, woodDropList, destroyType);
+			FallingTreeEntity entity = new FallingTreeEntity(world).setData(destroyData, woodDropList, destroyType);
 			if(entity.isAlive()) {
 				world.addFreshEntity(entity);
 			}

@@ -56,6 +56,10 @@ public final class TreesResourceManager implements IResourceManager {
         this.reloadListeners.forEach(reloadListener -> reloadListener.load(this).join());
     }
 
+    public void setup () {
+        this.reloadListeners.forEach(reloadListener -> reloadListener.setup(this).join());
+    }
+
     public void reload (final IFutureReloadListener.IStage stage, final Executor backgroundExecutor, final Executor gameExecutor) {
         this.reloadListeners.forEach(reloadListener -> reloadListener.reload(stage, this, backgroundExecutor, gameExecutor).join());
     }

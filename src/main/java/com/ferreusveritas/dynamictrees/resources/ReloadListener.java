@@ -16,6 +16,12 @@ import java.util.concurrent.Executor;
  */
 public abstract class ReloadListener<T> {
 
+    public enum ApplicationType {
+        LOAD,
+        SETUP,
+        RELOAD
+    }
+
     protected final String folderName;
 
     public ReloadListener(String folderName) {
@@ -32,7 +38,12 @@ public abstract class ReloadListener<T> {
      */
     public CompletableFuture<Void> load (final IResourceManager resourceManager) {
         return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), Util.backgroundExecutor())
-                .thenAccept(preparedObject -> this.apply(preparedObject, resourceManager, true));
+                .thenAccept(preparedObject -> this.apply(preparedObject, resourceManager, ApplicationType.LOAD));
+    }
+
+    public CompletableFuture<Void> setup(final IResourceManager resourceManager) {
+        return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), Util.backgroundExecutor())
+                .thenAccept(preparedObject -> this.apply(preparedObject, resourceManager, ApplicationType.SETUP));
     }
 
     /**
@@ -44,7 +55,7 @@ public abstract class ReloadListener<T> {
     public CompletableFuture<Void> reload (final IFutureReloadListener.IStage stage, final IResourceManager resourceManager, final Executor backgroundExecutor, final Executor gameExecutor) {
         return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), backgroundExecutor)
                 .thenCompose(stage::wait)
-                .thenAcceptAsync(preparedObject -> this.apply(preparedObject, resourceManager, false), gameExecutor);
+                .thenAcceptAsync(preparedObject -> this.apply(preparedObject, resourceManager, ApplicationType.RELOAD), gameExecutor);
     }
 
     /**
@@ -59,8 +70,8 @@ public abstract class ReloadListener<T> {
      *
      * @param preparedObject The prepared/formatted data.
      * @param resourceManager The {@link IResourceManager} object.
-     * @param firstLoad True if it's being called on first load (during game setup).
+     * @param applicationType The {@link ApplicationType} to use.
      */
-    protected abstract void apply(final T preparedObject, final IResourceManager resourceManager, final boolean firstLoad);
+    protected abstract void apply(final T preparedObject, final IResourceManager resourceManager, final ApplicationType applicationType);
 
 }

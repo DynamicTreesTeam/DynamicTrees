@@ -5,13 +5,11 @@ import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRecipes;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -80,7 +78,7 @@ public class DynamicTrees {
 
 		DTRegistries.DENDRO_POTION.registerRecipes();
 
-		DTResourceRegistries.BIOME_DATABASE_MANAGER.onCommonSetup();
+		DTResourceRegistries.TREES_RESOURCE_MANAGER.setup();
 	}
 
 	public static ResourceLocation resLoc (final String path) {

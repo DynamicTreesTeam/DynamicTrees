@@ -57,7 +57,7 @@ public class SafeChunkBounds {
 		for (Tile tile : TILES) {
 			final BlockBounds curr = this.chunkBounds[tile.index];
 			if (curr != BlockBounds.INVALID) {
-				for (Direction dir : CoordUtils.HORIZONTALS) {
+				for (final Direction dir : CoordUtils.HORIZONTALS) {
 					boolean validDir = false;
 					if ((tile.borders & (1 << dir.get3DDataValue())) != 0) {
 						final BlockBounds adjTile = this.chunkBounds[tile.index + dir.getStepX() + dir.getStepZ() * 4];

@@ -158,7 +158,23 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, List<JsonElement>> preparedObject, IResourceManager resourceManager, boolean firstLoad) {
+    protected void apply(Map<ResourceLocation, List<JsonElement>> preparedObject, IResourceManager resourceManager, ApplicationType applicationType) {
+        if (applicationType == ApplicationType.SETUP) {
+            // Ensure default database is reset.
+            this.defaultDatabase = new BiomeDatabase();
+
+            // If world gen is disabled don't waste processing power reading these.
+            if (!DTConfigs.WORLD_GEN.get())
+                return;
+
+            final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
+            MinecraftForge.EVENT_BUS.post(addFeatureCancellersEvent);
+
+            preparedObject.entrySet().stream().filter(this::isDefaultPopulator).forEach(defaultPopulator ->
+                    defaultPopulator.getValue().forEach(jsonElement -> this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), jsonElement, true)));
+            return;
+        }
+
         // Ensure databases are reset.
         this.defaultDatabase = new BiomeDatabase();
         this.dimensionDatabases.clear();
@@ -211,23 +227,6 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         });
     }
 
-    public void onCommonSetup() {
-        final Map<ResourceLocation, List<JsonElement>> preparedObject = this.prepare(DTResourceRegistries.TREES_RESOURCE_MANAGER);
-
-        // Ensure default database is reset.
-        this.defaultDatabase = new BiomeDatabase();
-
-        // If world gen is disabled don't waste processing power reading these.
-        if (!DTConfigs.WORLD_GEN.get())
-            return;
-
-        final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
-        MinecraftForge.EVENT_BUS.post(addFeatureCancellersEvent);
-
-        preparedObject.entrySet().stream().filter(this::isDefaultPopulator).forEach(defaultPopulator ->
-                defaultPopulator.getValue().forEach(jsonElement -> this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), jsonElement, true)));
-    }
-
     private boolean isDefaultPopulator (final Map.Entry<ResourceLocation, List<JsonElement>> entry) {
         return entry.getKey().getPath().equals(DEFAULT_POPULATOR);
     }
@@ -241,7 +240,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     private void readPopulatorSection (final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonObject jsonObject, final boolean readCancellerOnly) {
         final AtomicReference<BiomeList> biomeList = new AtomicReference<>();
 
-        if (!this.shouldLoad(jsonObject, "Error loading populator '" + resourceLocation + "': "))
+        if (!this.shouldLoad(jsonObject, error -> LOGGER.error("Error loading populator '{}': {}", resourceLocation, error)))
             return;
 
         final JsonHelper.JsonObjectReader reader = JsonHelper.JsonObjectReader.of(jsonObject).ifContains(SELECT, selectElement ->

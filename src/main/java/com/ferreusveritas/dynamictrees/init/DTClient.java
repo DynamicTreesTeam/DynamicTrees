@@ -25,9 +25,9 @@ import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
@@ -73,19 +73,21 @@ public class DTClient {
 //		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
 		
 		LeavesProperties.postInitClient();
+		cleanup();
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public static void discoverWoodColors() {
 
-		Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance().getTextureAtlas(AtlasTexture.LOCATION_BLOCKS);
+		final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance()
+				.getTextureAtlas(PlayerContainer.BLOCK_ATLAS);
 		
-		for(Family family : Species.REGISTRY.getAll().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
+		for (Family family : Species.REGISTRY.getAll().stream().map(Species::getFamily).distinct().collect(Collectors.toList())) {
 			family.woodRingColor = 0xFFF1AE;
 			family.woodBarkColor = 0xB3A979;
-			if(family != Family.NULL_FAMILY) {
+			if (family != Family.NULL_FAMILY) {
 				BlockState state = family.getPrimitiveLog().defaultBlockState();
-				if(state.getBlock() != Blocks.AIR) {
+				if (state.getBlock() != Blocks.AIR) {
 					family.woodRingColor = getFaceColor(state, Direction.DOWN, bakedTextureGetter);
 					family.woodBarkColor = getFaceColor(state, Direction.NORTH, bakedTextureGetter);
 				}
@@ -95,27 +97,27 @@ public class DTClient {
 
 	@OnlyIn(Dist.CLIENT)
 	private static int getFaceColor (BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter){
-		IBakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
+		final IBakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
 		List<BakedQuad> quads = model.getQuads(state, face, new Random(), EmptyModelData.INSTANCE);
-		if (quads.isEmpty()) //if the quad list is empty, means there is no face on that side, so we try with null
+		if (quads.isEmpty()) // If the quad list is empty, means there is no face on that side, so we try with null.
 			quads = model.getQuads(state, null, new Random(), EmptyModelData.INSTANCE);
-		if (quads.isEmpty()) {//if null still returns empty, there is nothing we can do so we just warn and exit
-			LogManager.getLogger().warn("Could not get color of "+face+" side for "+ state.getBlock()+"! Branch needs to be handled manually!");
+		if (quads.isEmpty()) { // If null still returns empty, there is nothing we can do so we just warn and exit.
+			LogManager.getLogger().warn("Could not get color of " + face + " side for " + state.getBlock()+ "! Branch needs to be handled manually!");
 			return 0;
 		}
-		ResourceLocation resloc = quads.get(0).getSprite().getName(); //Now we get the texture location of that selected face
-		if(!resloc.toString().isEmpty()) {
-			TextureUtils.PixelBuffer pixbuf = new TextureUtils.PixelBuffer(textureGetter.apply(resloc));
-			int u = pixbuf.w / 16;
-			TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
-			pixbuf.blit(center, u * -8, u * -8);
+		final ResourceLocation resLoc = quads.get(0).getSprite().getName(); // Now we get the texture location of that selected face.
+		if (!resLoc.toString().isEmpty()) {
+			final TextureUtils.PixelBuffer pixelBuffer = new TextureUtils.PixelBuffer(textureGetter.apply(resLoc));
+			final int u = pixelBuffer.w / 16;
+			final TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
+			pixelBuffer.blit(center, u * -8, u * -8);
 
 			return center.averageColor();
 		}
 		return 0;
 	}
 	
-	public void cleanUp() {
+	private static void cleanup() {
 		BlockColorMultipliers.cleanUp();
 	}
 	
@@ -134,15 +136,14 @@ public class DTClient {
 	}
 	
 	private static void registerColorHandlers() {
-		
 		final int white = 0xFFFFFFFF;
 		final int magenta = 0x00FF00FF;//for errors.. because magenta sucks.
 		
-		//BLOCKS
+		// BLOCKS
 		
 		final BlockColors blockColors = Minecraft.getInstance().getBlockColors();
 		
-		//Register Rooty Colorizers
+		// Register Rooty Colorizers
 		for (RootyBlock roots : RootyBlockHelper.generateListForRegistry(false)){
 			blockColors.register((state, world, pos, tintIndex) -> {
 				switch(tintIndex) {
@@ -154,32 +155,32 @@ public class DTClient {
 					);
 		}
 		
-		//Register Bonsai Pot Colorizer
+		// Register Bonsai Pot Colorizer
 		ModelHelper.regColorHandler(DTRegistries.BONSAI_POT, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BonsaiPotBlock)
 				? DTRegistries.BONSAI_POT.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
 		
-		//ITEMS
+		// ITEMS
 		
 		// Register Potion Colorizer
-		ModelHelper.regColorHandler(DTRegistries.DENDRO_POTION, (stack, tint) -> DTRegistries.DENDRO_POTION.getColor(stack, tint));
+		ModelHelper.regColorHandler(DTRegistries.DENDRO_POTION, DTRegistries.DENDRO_POTION::getColor);
 		
-		//Register Woodland Staff Colorizer
-		ModelHelper.regColorHandler(DTRegistries.STAFF, (stack, tint) -> DTRegistries.STAFF.getColor(stack, tint));
+		// Register Woodland Staff Colorizer
+		ModelHelper.regColorHandler(DTRegistries.STAFF, DTRegistries.STAFF::getColor);
 		
-		//TREE PARTS
+		// TREE PARTS
 		
-		//Register Sapling Colorizer
-		for (Species species : Species.REGISTRY){
-			if (species.getSapling().isPresent()){
+		// Register Sapling Colorizer
+		for (Species species : Species.REGISTRY) {
+			if (species.getSapling().isPresent()) {
 				ModelHelper.regColorHandler(species.getSapling().get(), (state, access, pos, tintIndex) ->
 				isValid(access, pos) ? species.saplingColorMultiplier(state, access, pos, tintIndex) : white);
 			}
 		}
 		
-		//Register Leaves Colorizers
-		for(DynamicLeavesBlock leaves: LeavesPaging.getLeavesList()) {
+		// Register Leaves Colorizers
+		for (DynamicLeavesBlock leaves: LeavesPaging.getLeavesList()) {
 			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) -> {
-						LeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getProperties(state);
+						final LeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getProperties(state);
 						return TreeHelper.isLeaves(state.getBlock()) ? properties.foliageColorMultiplier(state, worldIn, pos) : magenta;
 					}
 			);
@@ -199,8 +200,8 @@ public class DTClient {
 	}
 	
 	private static void registerEntityRenderers() {
-		RenderingRegistry.registerEntityRenderingHandler(DTRegistries.fallingTree, new FallingTreeRenderer.Factory());
-		RenderingRegistry.registerEntityRenderingHandler(DTRegistries.lingeringEffector, new LingeringEffectorRenderer.Factory());
+		RenderingRegistry.registerEntityRenderingHandler(DTRegistries.FALLING_TREE, new FallingTreeRenderer.Factory());
+		RenderingRegistry.registerEntityRenderingHandler(DTRegistries.LINGERING_EFFECTOR, new LingeringEffectorRenderer.Factory());
 	}
 	
 	private static int getFoliageColor(LeavesProperties leavesProperties, World world, BlockState blockState, BlockPos pos) {

@@ -111,7 +111,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			case DEPLETION: return new DepleteSubstance().setAmount(15);
 			case FERTILITY: return new FertilizeSubstance().setAmount(15);
 			case PERSISTENCE: return new FreezeSubstance();
-			case TRANSFORM: return new TransformSubstance(getTargetSpecies(itemStack));
+			case TRANSFORM: return new TransformSubstance(this.getTargetSpecies(itemStack));
 		}
 	}
 	
@@ -122,7 +122,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			return TreeRegistry.findSpecies(nbtTag.getString(TREE_TAG_KEY));
 		}
 
-		return null;
+		return Species.NULL_SPECIES;
 	}
 	
 	public ItemStack setTargetSpecies(ItemStack itemStack, Species species) {
@@ -174,26 +174,21 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 
 	@Override
-	public ITextComponent getName(ItemStack stack) {
-		return new TranslationTextComponent(super.getDescription().getString() + "." + getPotionType(stack).getName());
+	public String getDescriptionId(ItemStack stack) {
+		return this.getDescriptionId() + "." + getPotionType(stack).getName();
 	}
-	
+
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.appendHoverText(stack, worldIn, tooltip, flagIn);
-		
 		final DendroPotionType potionType = getPotionType(stack);
-		
-		if (potionType == DendroPotionType.TRANSFORM) {
-			Species species = getTargetSpecies(stack);
-			if(species == null) {
-				tooltip.add(getPotionType(stack).getDescription());
-			} else {
-				tooltip.add(new TranslationTextComponent("potion.transform.description", species.getLocalizedName()));
-			}
-		} else {
+
+		if (potionType != DendroPotionType.TRANSFORM || !this.getTargetSpecies(stack).isValid()) {
 			tooltip.add(getPotionType(stack).getDescription());
+			return;
 		}
+		
+		final Species species = this.getTargetSpecies(stack);
+		tooltip.add(new TranslationTextComponent("potion.transform.description", species.getLocalizedName()));
 	}
 	
 	public int getColor(ItemStack stack, int tint) {

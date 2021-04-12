@@ -80,6 +80,32 @@ public class JsonHelper {
 	}
 
 	/**
+	 * Gets the boolean value from the element name of the {@link JsonObject} given, or
+	 * returns the default value given if the element was not found or wasn't a boolean.
+	 *
+	 * @param jsonObject The {@link JsonObject}.
+	 * @param elementName The name of the element to get.
+	 * @param defaultValue The default value if it couldn't be obtained.
+	 * @param errorConsumer The {@link Consumer<String>} to accept if there is an error.
+	 * @return The boolean value.
+	 */
+	public static <T> T getOrDefault (final JsonObject jsonObject, final String elementName, final Class<T> type, final T defaultValue, final Consumer<String> errorConsumer) {
+		final JsonElement element = jsonObject.get(elementName);
+
+		if (element == null)
+			return defaultValue;
+
+		final ObjectFetchResult<T> result = JsonObjectGetters.getObjectGetter(type).get(element);
+
+		if (!result.wasSuccessful()) {
+			errorConsumer.accept(result.getErrorMessage());
+			return defaultValue;
+		}
+
+		return result.getValue();
+	}
+
+	/**
 	 * Gets the value of type {@link T} from the {@link JsonObject} using the given key,
 	 * or null if it was not found. It also prints a warning with the given <tt>errorPrefix</tt>
 	 * if it was unsuccessful in fetching the type {@link T}, or if the element was not

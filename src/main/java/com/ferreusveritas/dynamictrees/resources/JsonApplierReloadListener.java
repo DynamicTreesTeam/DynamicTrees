@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.resources;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
@@ -10,7 +11,7 @@ import net.minecraft.resources.IResourceManager;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * An abstract extension of {@link ReloadListener} that stores {@link JsonPropertyApplierList}
@@ -35,6 +36,10 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
     /** Holds appliers that should only be applied when loading. */
     protected final JsonPropertyApplierList<V> loadAppliers;
 
+    /** Holds appliers that should only be applied on {@link net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent}
+     *  (once all registries have been initiated). */
+    protected final JsonPropertyApplierList<V> setupAppliers;
+
     /** Holds appliers that should only be applied when reloading. */
     protected final JsonPropertyApplierList<V> reloadAppliers;
 
@@ -45,6 +50,7 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
 
         this.appliers = new JsonPropertyApplierList<>(objectType);
         this.loadAppliers = new JsonPropertyApplierList<>(objectType);
+        this.setupAppliers = new JsonPropertyApplierList<>(objectType);
         this.reloadAppliers = new JsonPropertyApplierList<>(objectType);
         this.applierListIdentifier = applierListIdentifier;
     }
@@ -57,6 +63,7 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
     public void registerAppliers() {
         this.postApplierEvent(this.appliers, this.applierListIdentifier);
         this.postApplierEvent(this.loadAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.LOAD_SUFFIX);
+        this.postApplierEvent(this.setupAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.SETUP_SUFFIX);
         this.postApplierEvent(this.reloadAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.RELOAD_SUFFIX);
     }
 
@@ -77,28 +84,48 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
      * to create custom species types if, for example, dynamic trees plus is installed.
      *
      * @param jsonObject The {@link JsonObject} to check.
-     * @param warnPrefix The prefix to give the warning if
+     * @param errorConsumer The {@link Consumer<String>} to accept if there is an error.
      * @return Whether or not the given entry should load.
      */
-    protected boolean shouldLoad(final JsonObject jsonObject, final String warnPrefix) {
-        final AtomicBoolean shouldLoad = new AtomicBoolean(true);
-
-        JsonHelper.JsonObjectReader.of(jsonObject).ifContains("only_if_loaded", String.class, modId ->
-                shouldLoad.set(ModList.get().isLoaded(modId))).elseWarn(warnPrefix);
-
-        return shouldLoad.get();
+    protected boolean shouldLoad(final JsonObject jsonObject, final Consumer<String> errorConsumer) {
+        return ModList.get().isLoaded(JsonHelper.getOrDefault(jsonObject, "only_if_loaded",
+                String.class, DynamicTrees.MOD_ID, errorConsumer));
     }
 
+    /**
+     * Gets the {@link #appliers} for this {@link JsonApplierReloadListener} object.
+     *
+     * @return The {@link #appliers} for this {@link JsonApplierReloadListener} object.
+     */
     public JsonPropertyApplierList<V> getAppliers() {
-        return appliers;
+        return this.appliers;
     }
 
+    /**
+     * Gets the {@link #loadAppliers} for this {@link JsonApplierReloadListener} object.
+     *
+     * @return The {@link #loadAppliers} for this {@link JsonApplierReloadListener} object.
+     */
     public JsonPropertyApplierList<V> getLoadAppliers() {
-        return loadAppliers;
+        return this.loadAppliers;
     }
 
+    /**
+     * Gets the {@link #setupAppliers} for this {@link JsonApplierReloadListener} object.
+     *
+     * @return The {@link #setupAppliers} for this {@link JsonApplierReloadListener} object.
+     */
+    public JsonPropertyApplierList<V> getSetupAppliers() {
+        return this.setupAppliers;
+    }
+
+    /**
+     * Gets the {@link #reloadAppliers} for this {@link JsonApplierReloadListener} object.
+     *
+     * @return The {@link #reloadAppliers} for this {@link JsonApplierReloadListener} object.
+     */
     public JsonPropertyApplierList<V> getReloadAppliers() {
-        return reloadAppliers;
+        return this.reloadAppliers;
     }
 
 }

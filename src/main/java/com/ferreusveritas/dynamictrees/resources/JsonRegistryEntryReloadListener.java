@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * An abstract extension of {@link JsonReloadListener} implementing {@link #apply(Map, IResourceManager, boolean)}
+ * An abstract extension of {@link JsonReloadListener} implementing {@link ReloadListener#apply(Object, IResourceManager, ApplicationType)}
  * for {@link RegistryEntry} (and {@link IResettable}) objects to be loaded, setup, and registered from Json.
  *
  * @param <V> The type of the {@link RegistryEntry}.
@@ -39,8 +39,10 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> preparedObject, IResourceManager resourceManager, boolean firstLoad) {
-        this.registry.unlock();
+    protected void apply(Map<ResourceLocation, JsonElement> preparedObject, IResourceManager resourceManager, ApplicationType applicationType) {
+        // Only unlock the registry on reload.
+        if (applicationType == ApplicationType.RELOAD)
+            this.registry.unlock();
 
         preparedObject.forEach((registryName, jsonElement) -> {
             if (!jsonElement.isJsonObject()) {
@@ -50,15 +52,20 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
 
             final JsonObject jsonObject = TypedRegistry.putJsonRegistryName(jsonElement.getAsJsonObject(), registryName);
 
+            final Consumer<String> errorConsumer = error -> LOGGER.error("Error whilst loading {} '{}': {}", this.registryName, registryName, error);
+            final Consumer<String> warningConsumer = warning -> LOGGER.warn("Warning whilst loading {} '{}': {}", this.registryName, registryName, warning);
+
             // Skip the current entry if it shouldn't load.
-            if (!this.shouldLoad(jsonObject, "Error loading data for " + this.registryName + " '" + registryName + "': "))
+            if (!this.shouldLoad(jsonObject, errorConsumer))
                 return;
 
             final boolean newEntry = !this.registry.has(registryName);
-            final V registryEntry;
 
-            final Consumer<String> errorConsumer = error -> LOGGER.error("Error whilst loading {} '{}': {}", this.registryName, registryName, error);
-            final Consumer<String> warningConsumer = warning -> LOGGER.warn("Warning whilst loading {} '{}': {}", this.registryName, registryName, warning);
+            // Don't load new entries on setup.
+            if (newEntry && applicationType == ApplicationType.SETUP)
+                return;
+
+            final V registryEntry;
 
             if (newEntry) {
                 registryEntry = this.registry.getType(jsonObject, registryName).decode(jsonObject);
@@ -67,7 +74,7 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
                 if (registryEntry == null)
                     return;
 
-                if (firstLoad) {
+                if (applicationType == ApplicationType.LOAD) {
                     this.preLoad(jsonObject, registryEntry, errorConsumer, warningConsumer);
                     this.loadAppliers.applyAll(jsonObject, registryEntry).forEachErrorWarning(errorConsumer, warningConsumer);
                 } else registryEntry.setPreReloadDefaults();
@@ -75,12 +82,18 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
                 registryEntry = this.registry.get(registryName).reset().setPreReloadDefaults();
             }
 
-            if (!firstLoad)
+            if (applicationType == ApplicationType.SETUP) {
+                // Run setup appliers and return.
+                this.setupAppliers.applyAll(jsonObject, registryEntry).forEachErrorWarning(errorConsumer, warningConsumer);
+                return;
+            }
+
+            if (applicationType == ApplicationType.RELOAD)
                 this.reloadAppliers.applyAll(jsonObject, registryEntry).forEachErrorWarning(errorConsumer, warningConsumer);
 
             this.appliers.applyAll(jsonObject, registryEntry).forEachError(errorConsumer).forEachErrorWarning(errorConsumer, warningConsumer);
 
-            if (!firstLoad)
+            if (applicationType == ApplicationType.RELOAD)
                 registryEntry.setPostReloadDefaults();
 
             if (newEntry) {
@@ -93,7 +106,8 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
             }
         });
 
-        if (!firstLoad)
+        // Only lock the registry on reload.
+        if (applicationType == ApplicationType.RELOAD)
             this.registry.lock();
     }
 
