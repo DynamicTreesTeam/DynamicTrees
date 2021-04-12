@@ -27,7 +27,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class PhysicsAnimationHandler implements IAnimationHandler {
 	@Override public String getName() { return "physics"; };
 	
-	class HandlerData extends DataAnimationHandler {
+	static class HandlerData extends DataAnimationHandler {
 		float rotYaw = 0;
 		float rotPit = 0;
 	}
@@ -39,19 +39,21 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 	@Override
 	public void initMotion(FallingTreeEntity entity) {
 		entity.dataAnimationHandler = new HandlerData();
-		BlockPos cutPos = entity.getDestroyData().cutPos;
+		final BlockPos cutPos = entity.getDestroyData().cutPos;
 		
-		long seed = entity.level.random.nextLong();
-		Random random = new Random(seed ^ (((long)cutPos.getX()) << 32 | ((long)cutPos.getZ())) );
-		float mass = entity.getDestroyData().woodVolume.getVolume();
-		float inertialMass = MathHelper.clamp(mass, 1, 3);
-		entity.lerpMotion(entity.getDeltaMovement().x/inertialMass, entity.getDeltaMovement().y/inertialMass, entity.getDeltaMovement().z/inertialMass);
+		final long seed = entity.level.random.nextLong();
+		final Random random = new Random(seed ^ (((long)cutPos.getX()) << 32 | ((long)cutPos.getZ())) );
+		final float mass = entity.getDestroyData().woodVolume.getVolume();
+		final float inertialMass = MathHelper.clamp(mass, 1, 3);
+		entity.setDeltaMovement(entity.getDeltaMovement().x / inertialMass,
+				entity.getDeltaMovement().y / inertialMass, entity.getDeltaMovement().z / inertialMass);
 		
 		getData(entity).rotPit = (random.nextFloat() - 0.5f) * 4 / inertialMass;
 		getData(entity).rotYaw = (random.nextFloat() - 0.5f) * 4 / inertialMass;
 
-		Direction cutDir = entity.getDestroyData().cutDir;
-		entity.push(cutDir.getOpposite().getStepX() * 0.1,cutDir.getOpposite().getStepX() * 0.1,cutDir.getOpposite().getStepX() * 0.1);
+		final Direction cutDir = entity.getDestroyData().cutDir;
+		entity.push(cutDir.getOpposite().getStepX() * 0.1,cutDir.getOpposite().getStepX() * 0.1,
+				cutDir.getOpposite().getStepX() * 0.1);
 		
 		FallingTreeEntity.standardDropLeavesPayLoad(entity);//Seeds and stuff fall out of the tree before it falls over
 	}
@@ -59,7 +61,7 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 	@Override
 	public void handleMotion(FallingTreeEntity entity) {
 		
-		if(entity.landed) {
+		if (entity.landed) {
 			return;
 		}
 
