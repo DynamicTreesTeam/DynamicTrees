@@ -67,8 +67,8 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		this(Properties.of(material));
 	}
 
-	public BranchBlock(Properties properties){
-		super(properties.noDrops().harvestTool(ToolType.AXE).harvestLevel(0)); //removes drops from block
+	public BranchBlock(Properties properties) {
+		super(properties); //removes drops from block
 	}
 
 	public BranchBlock setCanBeStripped(boolean truth){
@@ -434,7 +434,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		final double reachDistance = entity instanceof PlayerEntity ? entity.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() : 5.0D;
 		final BlockRayTraceResult ragTraceResult = this.playerRayTrace(entity, reachDistance, 1.0F);
 		final Direction toolDir = ragTraceResult != null ? (entity.isShiftKeyDown() ? ragTraceResult.getDirection().getOpposite() : ragTraceResult.getDirection()) : Direction.DOWN;
-		
+
+		// Play and render block break sound and particles (must be done before block is broken).
+		world.levelEvent(null, 2001, cutPos, getId(state));
+
 		// Do the actual destruction.
 		final BranchDestructionData destroyData = this.destroyBranchFromNode(world, cutPos, toolDir, false, entity);
 		
@@ -453,9 +456,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		
 		// Drop the FallingTreeEntity into the world.
 		FallingTreeEntity.dropTree(world, destroyData, woodDropList, DestroyType.HARVEST);
-		
+
 		// Damage the axe by a prescribed amount.
-		this.damageAxe(entity, heldItem, getRadius(state), woodVolume, true);
+		this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);
 	}
 
 	/**
@@ -602,7 +605,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		destroyMode = DynamicTrees.DestroyMode.SLOPPY; // Ready the state machine for sloppy breaking again.
 	}
 
-	// Super member also does nothing
 	@Override
 	public void playerWillDestroy(World world, BlockPos pos, BlockState state, PlayerEntity player) {
 	}
