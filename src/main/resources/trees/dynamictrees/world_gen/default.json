@@ -98,7 +98,7 @@
     "select": { "type": "coniferous", "name": "minecraft:.*" },
     "apply": {
       "species" : "spruce",
-      "chance": { "math": { "ifgt" : [ "radius", 6, 0.5, 1.0 ] } }
+      "chance": 1
     }
   },
   {
@@ -149,7 +149,7 @@
         }
       },
       "density": [ 0.05 ],
-      "chance": 0.1
+      "chance": 0.04
     }
   },
   {

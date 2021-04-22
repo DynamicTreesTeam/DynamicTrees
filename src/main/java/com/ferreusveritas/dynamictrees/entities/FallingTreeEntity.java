@@ -76,7 +76,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	public DataAnimationHandler dataAnimationHandler = null;
 
 	//Stores color for tinted quads that aren't the leaves
-	protected Map<BakedQuad, Integer> quadTints = new HashMap<>();
+//	protected Map<BakedQuad, Integer> quadTints = new HashMap<>();
 
 	public enum DestroyType {
 		VOID,
@@ -173,16 +173,16 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		onFire = tag.getBoolean("onfire");
 	}
 
-	public Map<BakedQuad, Integer> getQuadTints (){
-		return quadTints;
-	}
-	public void addTintedQuad (int tint, BakedQuad quad){
-		quadTints.put(quad, tint);
-	}
-	public void addTintedQuads (int tint, BakedQuad... quads){
-		for (BakedQuad quad : quads)
-			addTintedQuad(tint, quad);
-	}
+//	public Map<BakedQuad, Integer> getQuadTints (){
+//		return quadTints;
+//	}
+//	public void addTintedQuad (int tint, BakedQuad quad){
+//		quadTints.put(quad, tint);
+//	}
+//	public void addTintedQuads (int tint, BakedQuad... quads){
+//		for (BakedQuad quad : quads)
+//			addTintedQuad(tint, quad);
+//	}
 
 	public void buildClient() {
 		

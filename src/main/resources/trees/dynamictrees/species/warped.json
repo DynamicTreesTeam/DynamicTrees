@@ -15,5 +15,9 @@
     "primitive_sapling": "warped_fungus",
     "acceptable_soils": ["nether_soil_like", "fungus_like"],
     "acceptable_growth_blocks": ["warped_nylium"],
-    "mega_species": "mega_warped"
+    "mega_species": "mega_warped",
+    "features": [
+        "clear_volume",
+        "shroomlight"
+    ]
 }

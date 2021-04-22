@@ -19,7 +19,8 @@ public class UniversalPoissonDiscProvider {
 
 	protected IPoissonDiscProvider createCircleProvider(ServerWorld world) {
 		final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(TreeGenerator.getTreeGenerator(), world);
-		final IPoissonDiscProvider candidate = new PoissonDiscProvider(radiusCoordinator);
+		final PoissonDiscProvider candidate = new PoissonDiscProvider(radiusCoordinator);
+		candidate.setSeed(world.getSeed());
 		final PoissonDiscProviderCreateEvent poissonDiscProviderCreateEvent = new PoissonDiscProviderCreateEvent(world, candidate);
 		MinecraftForge.EVENT_BUS.post(poissonDiscProviderCreateEvent);
 		return poissonDiscProviderCreateEvent.getPoissonDiscProvider();

@@ -50,11 +50,6 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 
 		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks, matrixStack);
 
-		int color = treeModel.getLeavesColor();
-		float r = (float)(color >> 16 & 255) / 255.0F;
-		float g = (float)(color >> 8 & 255) / 255.0F;
-		float b = (float)(color & 255) / 255.0F;
-
 		treeModel.renderToBuffer(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1,1,1, 1.0F);
 
 		matrixStack.popPose();

@@ -262,7 +262,8 @@ public class DTRegistries {
 
 	public static final VoxelShape SAPLING = VoxelShapes.or(SAPLING_TRUNK, SAPLING_LEAVES);
 	public static final VoxelShape FLAT_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_FLAT);
-	public static final VoxelShape ROUND_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND, MUSHROOM_BRIM_E, MUSHROOM_BRIM_W, MUSHROOM_BRIM_S, MUSHROOM_BRIM_N);
+	public static final VoxelShape ROUND_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND);
+	public static final VoxelShape ROUND_MUSHROOM_RIM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND, MUSHROOM_BRIM_E, MUSHROOM_BRIM_W, MUSHROOM_BRIM_S, MUSHROOM_BRIM_N);
 
 	static {
 		COMMON_VOXEL_SHAPES.put("empty", VoxelShapes.empty());
@@ -270,6 +271,7 @@ public class DTRegistries {
 		COMMON_VOXEL_SHAPES.put("sapling", SAPLING);
 		COMMON_VOXEL_SHAPES.put("flat_mushroom", FLAT_MUSHROOM);
 		COMMON_VOXEL_SHAPES.put("round_mushroom", ROUND_MUSHROOM);
+		COMMON_VOXEL_SHAPES.put("round_mushroom_rim", ROUND_MUSHROOM_RIM);
 	}
 
 	public static final DynamicTreeFeature DYNAMIC_TREE_FEATURE = new DynamicTreeFeature();

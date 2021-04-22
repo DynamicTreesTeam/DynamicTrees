@@ -9,6 +9,7 @@ import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author Harley O'Connor
@@ -16,8 +17,14 @@ import java.util.Collections;
 public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
 
     private static final IVoidPropertyApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeString) ->
-            biomeList.removeIf(biome -> BiomeDictionary.getTypes(RegistryKey.create(ForgeRegistries.Keys.BIOMES, biome.getRegistryName()))
-                    .stream().noneMatch(type -> type.toString().toLowerCase().matches(typeString.toLowerCase())));
+            biomeList.removeIf(biome -> {
+                        Set<BiomeDictionary.Type> biomeTypes = BiomeDictionary.getTypes(RegistryKey.create(ForgeRegistries.Keys.BIOMES, biome.getRegistryName()));
+                        if (typeString.toCharArray()[0] == '!')
+                            return biomeTypes.stream().anyMatch(type -> type.toString().toLowerCase().matches(typeString.substring(1).toLowerCase()));
+                         else
+                            return biomeTypes.stream().noneMatch(type -> type.toString().toLowerCase().matches(typeString.toLowerCase()));
+                    }
+            );
 
     private static final IVoidPropertyApplier<BiomeList, String> NAME_APPLIER = (biomeList, nameString) ->
             biomeList.removeIf(biome -> !biome.getRegistryName().toString().matches(nameString.toLowerCase()));

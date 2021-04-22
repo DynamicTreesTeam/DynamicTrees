@@ -29,6 +29,7 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -492,6 +493,14 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	public DynamicLeavesBlock getValidLeafBlock (int index) {
 		return (DynamicLeavesBlock) validLeaves.get(index).getDynamicLeavesState().getBlock();
+	}
+
+	public int colorTreeQuads (int defaultColor, FallingTreeEntityModel.TreeQuadData treeQuad){
+		return defaultColor;
+	}
+
+	public int leafColorMultiplier (World world, BlockPos pos) {
+		return getLeavesProperties().foliageColorMultiplier(getLeavesProperties().getDynamicLeavesState(), world, pos);
 	}
 
 	///////////////////////////////////////////

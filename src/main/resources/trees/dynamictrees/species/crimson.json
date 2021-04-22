@@ -16,7 +16,7 @@
     "acceptable_soils": ["nether_soil_like", "fungus_like"],
     "acceptable_growth_blocks": ["crimson_nylium"],
     "mega_species": "mega_crimson",
-    "sapling_shape": "round_mushroom",
+    "sapling_shape": "round_mushroom_rim",
     "features": [
         {
             "name": "vines",
