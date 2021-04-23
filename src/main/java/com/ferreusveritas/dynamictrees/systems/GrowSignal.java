@@ -53,7 +53,6 @@ public class GrowSignal {
 	
 	public boolean step() {
 		numSteps++;
-		
 		delta = delta.relative(dir);
 		
 		if (--energy <= 0.0f) {

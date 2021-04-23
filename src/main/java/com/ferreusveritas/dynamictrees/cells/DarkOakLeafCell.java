@@ -6,7 +6,7 @@ public class DarkOakLeafCell extends MatrixCell {
 		super(value, valMap);
 	}
 
-	static final byte valMap[] = {
+	static final byte[] valMap = {
 			0, 1, 2, 3, 3, 0, 0, 0, //D Maps 4 -> 3, * -> *
 			0, 1, 2, 3, 3, 0, 0, 0, //U Maps 4 -> 3, * -> *
 			0, 1, 2, 3, 4, 0, 0, 0, //N Maps * -> *

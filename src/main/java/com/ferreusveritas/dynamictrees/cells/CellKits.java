@@ -56,9 +56,7 @@ public class CellKits {
 		}
 		
 	};
-	
-	
-	
+
 	public static final CellKit CONIFER = new CellKit(DynamicTrees.resLoc("conifer")) {
 		
 		private final ICell coniferBranch = new ConiferBranchCell();
@@ -167,8 +165,7 @@ public class CellKits {
 		}
 		
 	};
-	
-	
+
 	public static final CellKit DARK_OAK = new CellKit(DynamicTrees.resLoc("dark_oak")) {
 		
 		/** Typical branch with hydration 5 */
@@ -213,8 +210,7 @@ public class CellKits {
 		}
 		
 	};
-	
-	
+
 	public static final CellKit BARE = new CellKit(DynamicTrees.resLoc("bare")) {
 		
 		private final ICellSolver solver = new BasicSolver(new short[]{});
@@ -301,8 +297,53 @@ public class CellKits {
 		
 	};
 
+	public static final CellKit NETHER_FUNGUS = new CellKit(DynamicTrees.resLoc("nether_fungus")) {
+
+		private final ICell[] netherCells = {
+				CellNull.NULL_CELL,
+				new NormalCell(1),
+				new NormalCell(2),
+				new NormalCell(3),
+				new NormalCell(4),
+				new NormalCell(5),
+				new NormalCell(6),
+				new NormalCell(7)
+		};
+
+		/** Typical branch with hydration 5 */
+		private final ICell branchCell = new NormalCell(5);
+
+		private final BasicSolver netherFungusSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0332});
+
+		@Override
+		public ICell getCellForLeaves(int hydro) {
+			return netherCells[hydro];
+		}
+
+		@Override
+		public ICell getCellForBranch(int radius, int meta) {
+			return radius == 1 ? branchCell : CellNull.NULL_CELL;
+		}
+
+		@Override
+		public SimpleVoxmap getLeafCluster() {
+			return LeafClusters.NETHER_FUNGUS;
+		}
+
+		@Override
+		public ICellSolver getCellSolver() {
+			return netherFungusSolver;
+		}
+
+		@Override
+		public int getDefaultHydration() {
+			return 4;
+		}
+
+	};
+
 	public static void register(final Registry<CellKit> registry) {
-		registry.registerAll(DECIDUOUS, CONIFER, ACACIA, DARK_OAK, BARE, PALM);
+		registry.registerAll(DECIDUOUS, CONIFER, ACACIA, DARK_OAK, BARE, PALM, NETHER_FUNGUS);
 	}
 
 	/**

@@ -11,7 +11,7 @@ public class ConiferBranchCell implements ICell {
 		return 5;
 	}
 
-	static final int map[] = {2, 2, 3, 3, 3, 3};
+	static final int[] map = {2, 2, 3, 3, 3, 3};
 	
 	@Override
 	public int getValueFromSide(Direction side) {

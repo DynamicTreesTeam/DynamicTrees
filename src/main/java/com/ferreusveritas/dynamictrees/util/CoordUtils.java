@@ -162,12 +162,10 @@ public final class CoordUtils {
 		if(!safeBounds.inBounds(vantagePos, false) || world.isEmptyBlock(vantagePos)) {//The observing block must be in free space
 			RayTraceResult result = rayTraceBlocks(world, new CustomRayTraceContext(vantageVec, branchVec, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE), safeBounds);
 			//Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks
-			if (result != null){
-				final BlockPos hitPos = new BlockPos(result.getLocation());
-				if(result.getType() == RayTraceResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) {//We found a block
-					if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
-						return result;
-					}
+			final BlockPos hitPos = new BlockPos(result.getLocation());
+			if(result.getType() == RayTraceResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) {//We found a block
+				if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
+					return result;
 				}
 			}
 		}
@@ -363,5 +361,5 @@ public final class CoordUtils {
 			}
 		};
 	}
-	
+
 }

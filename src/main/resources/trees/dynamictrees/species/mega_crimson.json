@@ -8,6 +8,7 @@
     "growth_rate": 0.9,
     "soil_longevity": 16,
     "max_branch_radius": 20,
+    "growth_logic_kit": "nether_fungus",
     "leaves_properties": "crimson",
     "environment_factors" : {
         "cold": 0.25,
