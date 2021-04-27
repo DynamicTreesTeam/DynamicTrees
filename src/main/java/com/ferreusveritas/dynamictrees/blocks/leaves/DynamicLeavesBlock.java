@@ -362,7 +362,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		final BlockState belowBlockState = world.getBlockState(pos.below());
 		
 		// Prevent leaves from growing on the ground or above liquids.
-		if ((belowBlockState.canOcclude() && (!(belowBlockState.getBlock() instanceof LeavesBlock))) || belowBlockState.getBlock() instanceof FlowingFluidBlock)
+		if ((belowBlockState.canOcclude() && !TreeHelper.isBranch(belowBlockState) && !(belowBlockState.getBlock() instanceof LeavesBlock)) || belowBlockState.getBlock() instanceof FlowingFluidBlock)
 			return false;
 		
 		// Help to grow into double tall grass and ferns in a more natural way.
@@ -530,7 +530,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		if(hasLeaves) {
 			//Finally set the leaves block to a branch
 			Family family = signal.getSpecies().getFamily();
-			family.getBranch().setRadius(world, pos, (int) family.getPrimaryThickness(), null);
+			family.getBranch().setRadius(world, pos, family.getPrimaryThickness(), null);
 			signal.radius = family.getSecondaryThickness();//For the benefit of the parent branch
 		}
 		
@@ -639,7 +639,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 
 			final BranchBlock branch = TreeHelper.getBranch(state);
 
-			if (branch.getFamily() == leavesProperties.getFamily() && branch.getRadius(state) == 1)
+			if (branch.getFamily() == leavesProperties.getFamily() && branch.getRadius(state) == branch.getFamily().getPrimaryThickness())
 				branchList.add(dPos);
 		}
 
@@ -692,7 +692,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	@Override
 	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
 		// Leaves are only support for "twigs".
-		return radius == 1 && branch.getFamily() == getFamily(blockState, blockAccess, pos) ? BranchBlock.setSupport(0, 1) : 0;
+		return radius == branch.getFamily().getPrimaryThickness() && branch.getFamily() == getFamily(blockState, blockAccess, pos) ? BranchBlock.setSupport(0, 1) : 0;
 	}
 	
 	@Override

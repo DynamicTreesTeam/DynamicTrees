@@ -84,5 +84,7 @@ public class ConiferLogic extends GrowthLogicKit {
 		
 		return signalEnergy * species.biomeSuitability(world, pos) + (CoordUtils.coordHashCode(pos.above(month), 2) % heightVariation);//Vary the height energy by a psuedorandom hash function
 	}
-	
+
+	@Override
+	public int getLowestBranchHeight(World world, BlockPos pos, Species species, int lowestBranchHeight) { return lowestBranchHeight; }
 }

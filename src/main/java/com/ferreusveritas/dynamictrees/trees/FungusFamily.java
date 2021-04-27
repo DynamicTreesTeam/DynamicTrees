@@ -17,6 +17,16 @@ public final class FungusFamily extends Family {
     }
 
     @Override
+    public int getPrimaryThickness() {
+        return 3;
+    }
+
+    @Override
+    public int getSecondaryThickness() {
+        return 4;
+    }
+
+    @Override
     public Material getDefaultBranchMaterial() {
         return Material.NETHER_WOOD;
     }

@@ -98,7 +98,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 				if (!rootyBlockAdded && connectionArray[cutDir.get3DDataValue()] > 0) {
 					BlockPos offsetPos = BlockPos.ZERO.relative(cutDir);
 					float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.MAX_RADIUS)) / 16f;
-					treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vector3d(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, new ModelConnections(cutDir)),
+					treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vector3d(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, new ModelConnections(cutDir).setFamily(TreeHelper.getBranch(exState))),
 							exState));
 					bottomRingsAdded = true;
 				}
@@ -107,11 +107,11 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 				for (int index = 0; index < destructionData.getNumBranches(); index++) {
 					Block previousBranch = exState.getBlock();
 					exState = destructionData.getBranchBlockState(index);
-					if (exState != null && !previousBranch.equals(exState.getBlock())) //Update the branch model only if the block is different
+					if (!previousBranch.equals(exState.getBlock())) //Update the branch model only if the block is different
 						branchModel = dispatcher.getBlockModel(exState);
 					BlockPos relPos = destructionData.getBranchRelPos(index);
 					destructionData.getConnections(index, connectionArray);
-					ModelConnections modelConnections = new ModelConnections(connectionArray);
+					ModelConnections modelConnections = new ModelConnections(connectionArray).setFamily(TreeHelper.getBranch(exState));
 					if (index == 0 && bottomRingsAdded) modelConnections.setForceRing(cutDir);
 					treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), modelConnections),
 							exState));

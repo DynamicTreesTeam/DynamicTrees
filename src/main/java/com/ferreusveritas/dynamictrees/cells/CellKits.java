@@ -301,19 +301,21 @@ public class CellKits {
 
 		private final ICell[] netherCells = {
 				CellNull.NULL_CELL,
-				new NormalCell(1),
-				new NormalCell(2),
-				new NormalCell(3),
-				new NormalCell(4),
-				new NormalCell(5),
-				new NormalCell(6),
-				new NormalCell(7)
+				new NetherFungusLeafCell(1),
+				new NetherFungusLeafCell(2),
+				new NetherFungusLeafCell(3),
+				new NetherFungusLeafCell(4),
+				new NetherFungusLeafCell(5),
+				new NetherFungusLeafCell(6),
+				new NetherFungusLeafCell(7)
 		};
 
 		/** Typical branch with hydration 5 */
-		private final ICell branchCell = new NormalCell(5);
+		private final ICell branchCell = new NormalCell(8);
 
-		private final BasicSolver netherFungusSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0332});
+		private final ICell sideBranchCell = new NormalCell(7);
+
+		private final BasicSolver netherFungusSolver = new BasicSolver(new short[]{0x0817, 0x0726, 0x0635, 0x0413, 0x0312, 0x0211});
 
 		@Override
 		public ICell getCellForLeaves(int hydro) {
@@ -322,7 +324,9 @@ public class CellKits {
 
 		@Override
 		public ICell getCellForBranch(int radius, int meta) {
-			return radius == 1 ? branchCell : CellNull.NULL_CELL;
+			if (radius == 3) return branchCell;
+			else if (radius <= 5) return sideBranchCell;
+			else return CellNull.NULL_CELL;
 		}
 
 		@Override
@@ -337,7 +341,7 @@ public class CellKits {
 
 		@Override
 		public int getDefaultHydration() {
-			return 4;
+			return 7;
 		}
 
 	};

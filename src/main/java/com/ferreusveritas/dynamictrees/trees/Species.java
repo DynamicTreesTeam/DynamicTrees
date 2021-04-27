@@ -366,6 +366,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		this.growthRate = growthRate;
 	}
 
+	public float getSignalEnergy(){ return signalEnergy; }
+
 	public float getEnergy(World world, BlockPos rootPos) {
 		return getGrowthLogicKit().getEnergy(world, rootPos, this, signalEnergy);
 	}
@@ -394,7 +396,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return The lowest number of blocks from the RootyDirtBlock that a branch can form.
 	 */
 	public int getLowestBranchHeight(World world, BlockPos pos) {
-		return getLowestBranchHeight();
+		return getGrowthLogicKit().getLowestBranchHeight(world, pos, this, lowestBranchHeight);
 	}
 	
 	public float getTapering() {
@@ -1659,13 +1661,17 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	///////////////////////////////////////////
 
 	private Species megaSpecies = Species.NULL_SPECIES;
+	private boolean isMegaSpecies = false;
 
 	public Species getMegaSpecies() {
 		return this.megaSpecies;
 	}
 
+	public boolean isMegaSpecies() { return isMegaSpecies; }
+
 	public void setMegaSpecies(final Species megaSpecies) {
 		this.megaSpecies = megaSpecies;
+		megaSpecies.isMegaSpecies = true;
 	}
 
 	///////////////////////////////////////////

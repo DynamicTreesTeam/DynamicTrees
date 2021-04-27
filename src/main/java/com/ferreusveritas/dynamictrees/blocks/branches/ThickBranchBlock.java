@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import net.minecraft.block.Block;
@@ -156,11 +157,13 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 			return ReplaceableState.TREEPART;
 		}
 
+		if (BranchConnectables.isBlockConnectable(block)){
+			return ReplaceableState.TREEPART;
+		}
+
 		if (this.getFamily().getCommonSpecies().isAcceptableSoil(world, pos, state)) {
 			return ReplaceableState.REPLACEABLE;
 		}
-
-		//TODO: Possible configurable whitelist for destructable blocks
 
 		return ReplaceableState.BLOCKING;
 	}

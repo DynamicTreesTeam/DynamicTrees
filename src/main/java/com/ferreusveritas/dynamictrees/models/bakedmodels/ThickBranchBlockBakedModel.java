@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Maps;
@@ -166,12 +167,15 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 		List<BakedQuad> quads = new ArrayList<>(30);
 
 		int[] connections = new int[] {0,0,0,0,0,0};
-
 		Direction forceRingDir = null;
+		int twigRadius = 1;
+
 		if (extraData instanceof ModelConnections){
 			ModelConnections connectionsData = (ModelConnections) extraData;
 			connections = connectionsData.getAllRadii();
 			forceRingDir = connectionsData.getRingOnly();
+			Family family = connectionsData.getFamily();
+			if (family != null) twigRadius = family.getPrimaryThickness();
 		}
 
 		//Count number of connections
@@ -192,7 +196,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 		for (Direction face : Direction.values()) {
 			quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData));
 			if (face == Direction.UP || face == Direction.DOWN) {
-				if (connections[face.get3DDataValue()] < 1) {
+				if (connections[face.get3DDataValue()] < twigRadius) {
 					quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
 				} else if (connections[face.get3DDataValue()] < coreRadius) {
 					quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));

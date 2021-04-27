@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -166,12 +167,15 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 			if (coreRadius > 8) return Collections.emptyList();
 
 			int[] connections = new int[] {0,0,0,0,0,0};
-
 			Direction forceRingDir = null;
+			int twigRadius = 1;
+
 			if (extraData instanceof ModelConnections){
 				ModelConnections connectionsData = (ModelConnections) extraData;
 				connections = connectionsData.getAllRadii();
 				forceRingDir = connectionsData.getRingOnly();
+				Family family = connectionsData.getFamily();
+				if (family != null) twigRadius = family.getPrimaryThickness();
 			}
 
 			//Count number of connections
@@ -186,13 +190,10 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
 				//The source direction is the biggest connection from one of the 6 directions
 				Direction sourceDir = getSourceDir(coreRadius, connections);
-				if(sourceDir == null) {
-					sourceDir = Direction.DOWN;
-				}
 				int coreDir = resolveCoreDir(sourceDir);
 
 				//This is for drawing the rings on a terminating branch
-				Direction coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
+				Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
 
 				for(Direction face  : Direction.values()) {
 					//Get quads for core model
@@ -209,7 +210,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 							int idx = connDir.get3DDataValue();
 							int connRadius = connections[idx];
 							//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-							if (connRadius > 0 && (connRadius == 1 || face != connDir)) {
+							if (connRadius > 0 && (connRadius == twigRadius || face != connDir)) {
 								quadsList.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData));
 							}
 						}
@@ -234,7 +235,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
 		Block block = state.getBlock();
 		if (!(block instanceof BranchBlock)) return new ModelConnections();
-		return new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state));
+		return new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state)).setFamily(((BranchBlock) block).getFamily());
 	}
 	
 	/**
@@ -244,6 +245,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	 * @param connections an array of 6 integers, one for the radius of each connecting side. DUNSWE.
 	 * @return
 	 */
+	@Nullable
 	protected Direction getSourceDir(int coreRadius, int[] connections) {
 		int largestConnection = 0;
 		Direction sourceDir = null;
@@ -268,7 +270,8 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	 * @param dir
 	 * @return
 	 */
-	protected int resolveCoreDir(Direction dir) {
+	protected int resolveCoreDir(@Nullable Direction dir) {
+		if (dir == null) return 0;
 		return dir.get3DDataValue() >> 1;
 	}
 	

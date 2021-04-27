@@ -2,6 +2,8 @@ package com.ferreusveritas.dynamictrees.models.modeldata;
 
 import javax.annotation.Nullable;
 
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.Connections;
 
 import net.minecraft.util.Direction;
@@ -14,6 +16,7 @@ import net.minecraftforge.client.model.data.ModelProperty;
 public class ModelConnections extends Connections implements IModelData {
 
 	private Direction ringOnly = null;
+	private Family family = null;
 
 	public ModelConnections() { }
 	
@@ -32,7 +35,16 @@ public class ModelConnections extends Connections implements IModelData {
 	public ModelConnections setAllRadii (int[] radii){
 		return (ModelConnections) super.setAllRadii(radii);
 	}
-	
+
+	public ModelConnections setFamily (Family family) { this.family = family; return this; }
+	public ModelConnections setFamily (@Nullable BranchBlock branch) {
+		if (branch != null) this.family = branch.getFamily();
+		return this;
+	}
+
+	@Nullable
+	public Family getFamily () { return family; }
+
 	@Override
 	public boolean hasProperty(ModelProperty<?> prop) {
 		return false;
@@ -58,13 +70,5 @@ public class ModelConnections extends Connections implements IModelData {
 	public void setForceRing(Direction ringSide){
 		ringOnly = ringSide;
 	}
-
-//	public boolean isRootyBlockBelow() {
-//		return rootyBlockBelow;
-//	}
-//
-//	public void setRootyBlockBelow(boolean rootyBlockBelow) {
-//		this.rootyBlockBelow = rootyBlockBelow;
-//	}
 
 }

@@ -67,5 +67,7 @@ public class DarkOakLogic extends GrowthLogicKit {
 	public float getEnergy(World world, BlockPos pos, Species species, float signalEnergy) {
 		return signalEnergy * species.biomeSuitability(world, pos);
 	}
-	
+
+	@Override
+	public int getLowestBranchHeight(World world, BlockPos pos, Species species, int lowestBranchHeight) { return lowestBranchHeight; }
 }

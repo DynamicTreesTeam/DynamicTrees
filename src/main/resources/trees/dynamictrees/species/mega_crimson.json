@@ -2,9 +2,9 @@
     "type": "fungus",
     "family": "crimson",
     "tapering": 0,
-    "signal_energy": 25.0,
-    "up_probability": 7,
-    "lowest_branch_height": 20,
+    "signal_energy": 30.0,
+    "up_probability": 8,
+    "lowest_branch_height": 10,
     "growth_rate": 0.9,
     "soil_longevity": 16,
     "max_branch_radius": 20,
@@ -34,8 +34,8 @@
                 "mound_cutoff_radius": 999
             }
         },
-        "consistent_trunk",
         "clear_volume",
-        "shroomlight"
+        "shroomlight",
+        "bottom_flare"
     ]
 }

@@ -16,6 +16,7 @@ public abstract class GrowthLogicKit extends RegistryEntry<GrowthLogicKit> {
 		@Override public int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap) { return probMap; }
 		@Override public Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal) { return newDir; }
 		@Override public float getEnergy(World world, BlockPos pos, Species species, float signalEnergy) { return signalEnergy; }
+		@Override public int getLowestBranchHeight(World world, BlockPos pos, Species species, int lowestBranchHeight) { return lowestBranchHeight; }
 	};
 
 	/**
@@ -32,5 +33,7 @@ public abstract class GrowthLogicKit extends RegistryEntry<GrowthLogicKit> {
 	public abstract Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal);
 	
 	public abstract float getEnergy(World world, BlockPos pos, Species species, float signalEnergy);
+
+	public abstract int getLowestBranchHeight(World world, BlockPos pos, Species species, int lowestBranchHeight);
 	
 }

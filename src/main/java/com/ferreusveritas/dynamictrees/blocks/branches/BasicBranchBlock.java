@@ -247,7 +247,7 @@ public class BasicBranchBlock extends BranchBlock {
 		
 		DynamicLeavesBlock leaves =  species.getLeavesBlock().orElse(null);
 		if (leaves != null) {
-			if (fromRadius == 1) {// If we came from a twig then just make some leaves
+			if (fromRadius == getFamily().getPrimaryThickness()) {// If we came from a twig then just make some leaves
 				signal.success = leaves.growLeavesIfLocationIsSuitable(world, species.getLeavesProperties(), pos, 0);
 			} else {// Otherwise make a proper branch
 				return leaves.branchOut(world, pos, signal);

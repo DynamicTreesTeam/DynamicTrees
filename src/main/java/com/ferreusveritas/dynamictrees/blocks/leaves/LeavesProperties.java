@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
@@ -77,7 +78,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	 */
 	public static final TypedRegistry<LeavesProperties> REGISTRY = new TypedRegistry<>(LeavesProperties.class, NULL_PROPERTIES, new TypedRegistry.EntryType<>(CODEC));
 
-	protected static final int maxHydro = 4;
+	protected static final int maxHydro = 7;
 
 	/** The primitive (vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	protected BlockState primitiveLeaves;
@@ -297,7 +298,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return true; }
 
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-		return (fromRadius == 1 || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? 1 : 0;
+		int twigRadius = from.getFamily().getPrimaryThickness();
+		return (fromRadius == twigRadius || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? twigRadius : 0;
 	}
 
 	public boolean doRequireShears() {

@@ -2,9 +2,9 @@
     "type": "fungus",
     "family": "crimson",
     "tapering": 0,
-    "signal_energy": 14.0,
-    "up_probability": 4,
-    "lowest_branch_height": 4,
+    "signal_energy": 18.0,
+    "up_probability": 6,
+    "lowest_branch_height": 3,
     "growth_rate": 1,
     "growth_logic_kit": "nether_fungus",
     "leaves_properties": "crimson",
@@ -30,6 +30,12 @@
             }
         },
         "clear_volume",
-        "shroomlight"
+        "shroomlight",
+        {
+            "name": "bottom_flare",
+            "properties": {
+                "min_radius": 7
+            }
+        }
     ]
 }

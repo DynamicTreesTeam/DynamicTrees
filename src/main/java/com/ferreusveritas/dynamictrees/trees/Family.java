@@ -522,14 +522,14 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return MetadataCell.radiusAndMeta(radius, meta);
 	}
 
-	/** Thickness of a twig.. Should always be 1 unless the tree has no leaves(like a cactus) [default = 1] */
-	public float getPrimaryThickness() {
-		return 1.0f;
+	/** Thickness of a twig [default = 1] */
+	public int getPrimaryThickness() {
+		return 1;
 	}
 
-	/** Thickness of the branch connected to a twig(radius == 1).. This should probably always be 2 [default = 2] */
-	public float getSecondaryThickness() {
-		return 2.0f;
+	/** Thickness of the branch connected to a twig (radius == getPrimaryThickness) [default = 2] */
+	public int getSecondaryThickness() {
+		return 2;
 	}
 
 	public boolean hasStrippedBranch() {
