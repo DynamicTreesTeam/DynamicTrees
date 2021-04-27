@@ -20,6 +20,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
+import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,18 +35,19 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
 
     public static final GenFeatureProperty<Block> SHROOMLIGHT_BLOCK = GenFeatureProperty.createBlockProperty("shroomlight");
     public static final GenFeatureProperty<Float> PLACE_CHANCE = GenFeatureProperty.createFloatProperty("place_chance");
+    public static final GenFeatureProperty<Integer> MAX_COUNT = GenFeatureProperty.createIntegerProperty("max_count");
 
     private static final Direction[] HORIZONTALS = CoordUtils.HORIZONTALS;
     private static final double VANILLA_GROW_CHANCE = .005f;
 
     public ShroomlightGenFeature (ResourceLocation registryName) {
-        super(registryName, SHROOMLIGHT_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, PLACE_CHANCE);
+        super(registryName, SHROOMLIGHT_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, PLACE_CHANCE, MAX_COUNT);
     }
 
     @Override
     protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(SHROOMLIGHT_BLOCK, Blocks.SHROOMLIGHT).with(MAX_HEIGHT, 32)
-                .with(CAN_GROW_PREDICATE, (world, blockPos) -> world.getRandom().nextFloat() <= VANILLA_GROW_CHANCE).with(PLACE_CHANCE, .4f);
+                .with(CAN_GROW_PREDICATE, (world, blockPos) -> world.getRandom().nextFloat() <= VANILLA_GROW_CHANCE).with(PLACE_CHANCE, .4f).with(MAX_COUNT, 4);
     }
 
     @Override
@@ -64,7 +66,8 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
         int treeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
         Block shroomlightBlock = configuredGenFeature.get(SHROOMLIGHT_BLOCK);
 
-        List<BlockPos> validSpaces = findBranchPits(world, rootPos, treeHeight);
+        List<BlockPos> validSpaces = findBranchPits(configuredGenFeature, world, rootPos, treeHeight);
+        if (validSpaces == null) return false;
         if (validSpaces.size() > 0){
             if (worldGen){
                 for (BlockPos chosenSpace : validSpaces){
@@ -90,7 +93,9 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
     }
 
     //Like the BeeNestGenFeature, the valid places are empty blocks under branches next to the trunk.
-    private List<BlockPos> findBranchPits (IWorld world, BlockPos rootPos, int maxHeight){
+    @Nullable
+    private List<BlockPos> findBranchPits (ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, int maxHeight){
+        int existingBlocks = 0;
         List<BlockPos> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++){
             BlockPos trunkPos = rootPos.above(y);
@@ -98,6 +103,10 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
                 BlockPos sidePos = trunkPos.relative(dir);
                 if ((world.isEmptyBlock(sidePos) || world.getBlockState(sidePos).getBlock() instanceof DynamicLeavesBlock) && TreeHelper.isBranch(world.getBlockState(sidePos.above())))
                     validSpaces.add(sidePos);
+                else if (world.getBlockState(sidePos).getBlock() == configuredGenFeature.get(SHROOMLIGHT_BLOCK)) {
+                    existingBlocks ++;
+                    if (existingBlocks > configuredGenFeature.get(MAX_COUNT)) return null;
+                }
             }
         }
         return validSpaces;

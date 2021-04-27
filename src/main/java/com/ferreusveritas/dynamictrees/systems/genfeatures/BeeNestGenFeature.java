@@ -48,6 +48,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
 
     public static final GenFeatureProperty<Block> NEST_BLOCK = GenFeatureProperty.createBlockProperty("nest");
     public static final GenFeatureProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = GenFeatureProperty.createProperty("world_gen_chance", WorldGenChanceFunction.class);
+    public static final GenFeatureProperty<Integer> MAX_COUNT = GenFeatureProperty.createIntegerProperty("max_count");
 
     private static final double vanillaGenChancePlains = 0.05f;
     private static final double vanillaGenChanceFlowerForest = 0.02f;
@@ -55,7 +56,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
     private static final double vanillaGrowChance = 0.001f;
     
     public BeeNestGenFeature (ResourceLocation registryName) {
-        super(registryName, NEST_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, WORLD_GEN_CHANCE_FUNCTION);
+        super(registryName, NEST_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, WORLD_GEN_CHANCE_FUNCTION, MAX_COUNT);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST))
                 return vanillaGenChanceForest;
             return 0D;
-        });
+        }).with(MAX_COUNT, 1);
     }
 
     @Override
@@ -105,7 +106,8 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
 
         //Finds the valid places next to the trunk and under an existing branch.
         //The places are mapped to a direction list that hold the valid orientations with an air block in front
-        List<Pair<BlockPos, List<Direction>>> validSpaces = findBranchPits(world, rootPos, treeHeight);
+        List<Pair<BlockPos, List<Direction>>> validSpaces = findBranchPits(configuredGenFeature, world, rootPos, treeHeight);
+        if (validSpaces == null) return false;
         if (validSpaces.size() > 0) {
             Pair<BlockPos, List<Direction>> chosenSpace = validSpaces.get(world.getRandom().nextInt(validSpaces.size()));
             //There is always AT LEAST one valid direction, since if there were none the pos would not have been added to validSpaces
@@ -172,14 +174,15 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
     }
 
     //The valid places this genFeature looks for are empty blocks under branches next to the trunk, similar to armpits lol
-    private List<Pair<BlockPos, List<Direction>>> findBranchPits (IWorld world, BlockPos rootPos, int maxHeight) {
+    @Nullable
+    private List<Pair<BlockPos, List<Direction>>> findBranchPits (ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, int maxHeight) {
+        int existingBlocks = 0;
         List<Pair<BlockPos, List<Direction>>> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++) {
             BlockPos trunkPos = rootPos.above(y);
             for (Direction dir : CoordUtils.HORIZONTALS) {
                 BlockPos sidePos = trunkPos.relative(dir);
                 if (world.isEmptyBlock(sidePos) && TreeHelper.isBranch(world.getBlockState(sidePos.above()))) {
-
                     //the valid positions must also have a face facing towards air, otherwise bees wouldn't be able to exist the nest.
                     List<Direction> validDirs = new LinkedList<>();
                     for (Direction dir2 : CoordUtils.HORIZONTALS) {
@@ -190,6 +193,9 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
                     if (validDirs.size() > 0) {
                         validSpaces.add(Pair.of(sidePos, validDirs));
                     }
+                } else if (world.getBlockState(sidePos).getBlock() == configuredGenFeature.get(NEST_BLOCK)) {
+                    existingBlocks ++;
+                    if (existingBlocks > configuredGenFeature.get(MAX_COUNT)) return null;
                 }
             }
         }
