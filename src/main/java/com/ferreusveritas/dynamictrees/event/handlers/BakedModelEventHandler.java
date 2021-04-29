@@ -1,8 +1,7 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BranchBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.loaders.BranchBlockModelLoader;
@@ -37,8 +36,8 @@ public final class BakedModelEventHandler {
         BranchBlockBakedModel.INSTANCES.forEach(BranchBlockBakedModel::setupModels);
 
         // Put bonsai pot baked model into its model location.
-        IBakedModel flowerPotModel = event.getModelRegistry().get(new ModelResourceLocation(BonsaiPotBlock.REG_NAME, ""));
-        event.getModelRegistry().put(new ModelResourceLocation(BonsaiPotBlock.REG_NAME, ""),
+        IBakedModel flowerPotModel = event.getModelRegistry().get(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""));
+        event.getModelRegistry().put(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""),
                 new BakedModelBlockBonsaiPot(flowerPotModel));
 
         ////Highly experimental code

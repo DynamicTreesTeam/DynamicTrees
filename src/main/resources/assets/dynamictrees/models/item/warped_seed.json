@@ -1,6 +1,6 @@
 {
   "parent":"dynamictrees:item/standard_seed",
   "textures": {
-    "layer0":"block/warped_fungus"
+    "layer0":"dynamictrees:item/warped_seed"
   }
 }

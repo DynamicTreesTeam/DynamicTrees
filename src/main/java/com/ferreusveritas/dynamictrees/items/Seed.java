@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.items;
 
-import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
+import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -158,7 +158,7 @@ public class Seed extends Item implements IPlantable {
 		if (!(emptyPotBlock instanceof FlowerPotBlock) || emptyPotState != emptyPotBlock.defaultBlockState())
 			return ActionResultType.PASS;
 
-		BonsaiPotBlock bonsaiPot = this.getSpecies().getBonsaiPot();
+		PottedSaplingBlock bonsaiPot = this.getSpecies().getBonsaiPot();
 		world.setBlockAndUpdate(pos, bonsaiPot.defaultBlockState());
 
 		if (bonsaiPot.setSpecies(world, pos, bonsaiPot.defaultBlockState(), this.getSpecies()) && bonsaiPot.setPotState(world, emptyPotState, pos)) {

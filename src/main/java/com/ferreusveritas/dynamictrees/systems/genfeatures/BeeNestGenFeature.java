@@ -48,7 +48,6 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
 
     public static final GenFeatureProperty<Block> NEST_BLOCK = GenFeatureProperty.createBlockProperty("nest");
     public static final GenFeatureProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = GenFeatureProperty.createProperty("world_gen_chance", WorldGenChanceFunction.class);
-    public static final GenFeatureProperty<Integer> MAX_COUNT = GenFeatureProperty.createIntegerProperty("max_count");
 
     private static final double vanillaGenChancePlains = 0.05f;
     private static final double vanillaGenChanceFlowerForest = 0.02f;

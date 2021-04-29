@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
+import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import net.minecraft.block.*;
@@ -28,13 +28,13 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class BonsaiPotBlock extends ContainerBlock {
+public class PottedSaplingBlock extends ContainerBlock {
 
-	public static final ResourceLocation REG_NAME = DynamicTrees.resLoc("bonsai_pot");
+	public static final ResourceLocation REG_NAME = DynamicTrees.resLoc("potted_sapling");
 
 	protected static final AxisAlignedBB FLOWER_POT_AABB = new AxisAlignedBB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 
-	public BonsaiPotBlock() {
+	public PottedSaplingBlock() {
 		super(Block.Properties.of(Material.DECORATION).strength(0));
 	}
 
@@ -43,12 +43,12 @@ public class BonsaiPotBlock extends ContainerBlock {
 	//////////////////////////////
 
 	public Species getSpecies(IBlockReader world, BlockPos pos) {
-		BonsaiTileEntity bonsaiPotTE = this.getTileEntityBonsai(world, pos);
+		PottedSaplingTileEntity bonsaiPotTE = this.getTileEntityPottedSapling(world, pos);
 		return bonsaiPotTE != null ? bonsaiPotTE.getSpecies() : Species.NULL_SPECIES;
 	}
 
 	public boolean setSpecies(World world, BlockPos pos, BlockState state, Species species) {
-		BonsaiTileEntity bonsaiPotTE = this.getTileEntityBonsai(world, pos);
+		PottedSaplingTileEntity bonsaiPotTE = this.getTileEntityPottedSapling(world, pos);
 		if(bonsaiPotTE != null) {
 			bonsaiPotTE.setSpecies(species);
 			return true;
@@ -57,12 +57,12 @@ public class BonsaiPotBlock extends ContainerBlock {
 	}
 
 	public BlockState getPotState(World world, BlockPos pos) {
-		BonsaiTileEntity bonsaiPotTE = this.getTileEntityBonsai(world, pos);
+		PottedSaplingTileEntity bonsaiPotTE = this.getTileEntityPottedSapling(world, pos);
 		return bonsaiPotTE != null ? bonsaiPotTE.getPot() : Blocks.FLOWER_POT.defaultBlockState();
 	}
 
 	public boolean setPotState(World world, BlockState potState, BlockPos pos) {
-		BonsaiTileEntity bonsaiPotTE = getTileEntityBonsai(world, pos);
+		PottedSaplingTileEntity bonsaiPotTE = getTileEntityPottedSapling(world, pos);
 		if(bonsaiPotTE != null) {
 			bonsaiPotTE.setPot(potState);
 			return true;
@@ -76,14 +76,14 @@ public class BonsaiPotBlock extends ContainerBlock {
 	///////////////////////////////////////////
 
 	@Nullable
-	private BonsaiTileEntity getTileEntityBonsai (IBlockReader world, BlockPos pos) {
+	private PottedSaplingTileEntity getTileEntityPottedSapling(IBlockReader world, BlockPos pos) {
 		TileEntity tileEntity = world.getBlockEntity(pos);
-		return tileEntity instanceof BonsaiTileEntity ? (BonsaiTileEntity) tileEntity : null;
+		return tileEntity instanceof PottedSaplingTileEntity ? (PottedSaplingTileEntity) tileEntity : null;
 	}
 
 	@Override
 	public TileEntity newBlockEntity(IBlockReader worldIn) {
-		return new BonsaiTileEntity();
+		return new PottedSaplingTileEntity();
 	}
 
 
@@ -125,7 +125,7 @@ public class BonsaiPotBlock extends ContainerBlock {
 //			}
 //		}
 
-		BlockState potState = this.getTileEntityBonsai(world, pos).getPot();
+		BlockState potState = this.getTileEntityPottedSapling(world, pos).getPot();
 
 		if(potState.getBlock() == Blocks.FLOWER_POT) {
 			return new ItemStack(Items.FLOWER_POT);

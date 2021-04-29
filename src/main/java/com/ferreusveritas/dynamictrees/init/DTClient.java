@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
+import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
@@ -156,7 +156,7 @@ public class DTClient {
 		}
 		
 		// Register Bonsai Pot Colorizer
-		ModelHelper.regColorHandler(DTRegistries.BONSAI_POT, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof BonsaiPotBlock)
+		ModelHelper.regColorHandler(DTRegistries.BONSAI_POT, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof PottedSaplingBlock)
 				? DTRegistries.BONSAI_POT.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
 		
 		// ITEMS

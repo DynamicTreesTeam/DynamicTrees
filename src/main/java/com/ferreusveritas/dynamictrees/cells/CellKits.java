@@ -313,9 +313,9 @@ public class CellKits {
 		/** Typical branch with hydration 5 */
 		private final ICell branchCell = new NormalCell(8);
 
-		private final ICell sideBranchCell = new NormalCell(7);
+		private final ICell sideBranchCell = new NormalCell(2);
 
-		private final BasicSolver netherFungusSolver = new BasicSolver(new short[]{0x0817, 0x0726, 0x0635, 0x0413, 0x0312, 0x0211});
+		private final BasicSolver netherFungusSolver = new BasicSolver(new short[]{0x0817, 0x0726, 0x0635, 0x0513, 0x0312, 0x0211});
 
 		@Override
 		public ICell getCellForLeaves(int hydro) {
@@ -325,7 +325,7 @@ public class CellKits {
 		@Override
 		public ICell getCellForBranch(int radius, int meta) {
 			if (radius == 3) return branchCell;
-			else if (radius <= 5) return sideBranchCell;
+			else if (radius <= 5) return sideBranchCell; //some extra leaf blocks are added around grown branches to help close off the fungal look of the cap
 			else return CellNull.NULL_CELL;
 		}
 

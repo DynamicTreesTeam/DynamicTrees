@@ -4,6 +4,8 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -24,7 +26,7 @@ public class NetherFungusLogic extends GrowthLogicKit {
 		if (signal.isInTrunk()){
 			if (TreeHelper.isBranch(world.getBlockState(pos.above())) && !TreeHelper.isBranch(world.getBlockState(pos.above(3))))
 				probMap = new int[]{0,0,0,0,0,0};
-			else
+			else if (!species.isMegaSpecies())
 				for (Direction direction : CoordUtils.HORIZONTALS)
 					if (TreeHelper.isBranch(world.getBlockState(pos.offset(direction.getOpposite().getNormal()))))
 						probMap[direction.get3DDataValue()] = 0;

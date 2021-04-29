@@ -172,22 +172,37 @@ public class LeafClusters {
 			0, 0, 0, 0, 0,
 	}).setCenter(new BlockPos(2, 0, 2));
 
-	public static final SimpleVoxmap NETHER_FUNGUS = new SimpleVoxmap(3, 3, 3, new byte[] {
+	public static final SimpleVoxmap NETHER_FUNGUS = new SimpleVoxmap(3, 6, 3, new byte[] {
 
-			//Layer 0(Bottom)
+			//Layer 0(Droop Bottom)
+			1, 0, 1,
+			0, 0, 0,
+			1, 0, 1,
+
+			//Layer 1(Droop Middle)
+			2, 0, 2,
+			0, 0, 0,
+			2, 0, 2,
+
+			//Layer 2(Droop Top)
+			3, 0, 3,
+			0, 0, 0,
+			3, 0, 3,
+
+			//Layer 3(Cap Bottom)
 			5, 6, 5,
 			6, 7, 6,
 			5, 6, 5,
 
-			//Layer 1(Middle)
+			//Layer 4(Cap Middle)
 			6, 7, 6,
 			7, 0, 7,
 			6, 7, 6,
 
-			//Layer 2 (Top)
+			//Layer 5 (Cap Top)
 			5, 6, 5,
 			6, 7, 6,
 			5, 6, 5
 
-	}).setCenter(new BlockPos(3, 0, 3));
+	}).setCenter(new BlockPos(3, 4, 3));
 }

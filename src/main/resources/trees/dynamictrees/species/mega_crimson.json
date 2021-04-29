@@ -6,7 +6,7 @@
     "up_probability": 8,
     "lowest_branch_height": 10,
     "growth_rate": 0.9,
-    "soil_longevity": 16,
+    "soil_longevity": 8,
     "max_branch_radius": 20,
     "growth_logic_kit": "nether_fungus",
     "leaves_properties": "crimson",

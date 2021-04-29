@@ -113,6 +113,9 @@ dependencies {
     // At runtime, use Patchouli mod (for the guide book, which is Json so we don't need the API).
 //    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${config.patchouli_version}")
 
+    //At runtime use ComputerCraft for creating the growth chambers
+    runtimeOnly fg.deobf("curse.maven:cc-tweaked-282001:3236650")
+
     // Compile full Serene Seasons mod and use in runtime.
     implementation fg.deobf("curse.maven:SereneSeasons-291874:3202233")
 

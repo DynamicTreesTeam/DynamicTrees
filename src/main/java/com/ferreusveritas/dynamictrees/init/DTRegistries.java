@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
+import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
@@ -28,7 +28,7 @@ import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
-import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
+import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
@@ -87,7 +87,7 @@ public class DTRegistries {
 	public static final CocoaFruitBlock COCOA_FRUIT = new CocoaFruitBlock();
 
 	/** A bonsai pot block, which is a normal pot but for dynamic saplings. */
-	public static final BonsaiPotBlock BONSAI_POT = new BonsaiPotBlock();
+	public static final PottedSaplingBlock BONSAI_POT = new PottedSaplingBlock();
 
 	/** A trunk shell block, which is the outer block for thick branches. */
 	public static final TrunkShellBlock TRUNK_SHELL = new TrunkShellBlock();
@@ -104,7 +104,7 @@ public class DTRegistries {
 	public static void setupBlocks() {
 		RegistryHandler.addBlock(DynamicTrees.resLoc("apple_fruit"), APPLE_FRUIT);
 		RegistryHandler.addBlock(DynamicTrees.resLoc("cocoa_fruit"), COCOA_FRUIT);
-		RegistryHandler.addBlock(BonsaiPotBlock.REG_NAME, BONSAI_POT);
+		RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, BONSAI_POT);
 		RegistryHandler.addBlock(DynamicTrees.resLoc("trunk_shell"), TRUNK_SHELL);
 	}
 
@@ -143,11 +143,10 @@ public class DTRegistries {
 			if (side == Direction.DOWN){
 				BlockState branchState = world.getBlockState(pos.relative(Direction.UP));
 				BranchBlock branch = TreeHelper.getBranch(branchState);
-				if (branch != null){
+				if (branch != null)
 					return MathHelper.clamp(branch.getRadius(branchState) - 1, 1, 8);
-				} else {
+				else
 					return 8;
-				}
 			}
 			return 0;
 		});
@@ -179,9 +178,9 @@ public class DTRegistries {
 	public static final Staff STAFF = new Staff();
 
 	public static void setupItems() {
-		RegistryHandler.addItem(DynamicTrees.resLoc("dendro_potion"), DENDRO_POTION);
-		RegistryHandler.addItem(DynamicTrees.resLoc("dirt_bucket"), DIRT_BUCKET);
 		RegistryHandler.addItem(DynamicTrees.resLoc("staff"), STAFF);
+		RegistryHandler.addItem(DynamicTrees.resLoc("dirt_bucket"), DIRT_BUCKET);
+		RegistryHandler.addItem(DynamicTrees.resLoc("dendro_potion"), DENDRO_POTION);
 	}
 
 	///////////////////////////////////////////
@@ -216,19 +215,19 @@ public class DTRegistries {
 	///////////////////////////////////////////
 	
 	public static TileEntityType<SpeciesTileEntity> speciesTE;
-	public static TileEntityType<BonsaiTileEntity> bonsaiTE;
+	public static TileEntityType<PottedSaplingTileEntity> bonsaiTE;
 	
 	public static void setupTileEntities() {
 		LinkedList<RootyBlock> rootyDirts = RootyBlockHelper.generateListForRegistry(false);
 		speciesTE = TileEntityType.Builder.of(SpeciesTileEntity::new, rootyDirts.toArray(new RootyBlock[0])).build(null);
-		bonsaiTE = TileEntityType.Builder.of(BonsaiTileEntity::new, BONSAI_POT).build(null);
+		bonsaiTE = TileEntityType.Builder.of(PottedSaplingTileEntity::new, BONSAI_POT).build(null);
 	}
 	
 	@SubscribeEvent
 	public static void onTileEntitiesRegistry(final RegistryEvent.Register<TileEntityType<?>> tileEntityRegistryEvent) {
 		setupTileEntities();
 		
-		tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(BonsaiPotBlock.REG_NAME));
+		tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(PottedSaplingBlock.REG_NAME));
 		tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(DynamicTrees.resLoc("tile_entity_species")));
 	}
 	
@@ -252,6 +251,7 @@ public class DTRegistries {
 
 	public static final VoxelShape SAPLING_TRUNK = Block.box(7D, 0D, 7D, 9D, 5D, 9D);
 	public static final VoxelShape SAPLING_LEAVES = Block.box(4D, 4D, 4D, 12D, 12D, 12D);
+	public static final VoxelShape SLIM_SAPLING_LEAVES = Block.box(5D, 4D, 5D, 11D, 14D, 11D);
 	public static final VoxelShape MUSHROOM_STEM = Block.box(7D, 0D, 7D, 9D, 5D, 9D);
 	public static final VoxelShape MUSHROOM_CAP_FLAT = Block.box(4D, 5D, 4D, 12D, 8D, 12D);
 	public static final VoxelShape MUSHROOM_CAP_ROUND = Block.box(5D, 3D, 5D, 11D, 8D, 11D);
@@ -261,6 +261,7 @@ public class DTRegistries {
 	public static final VoxelShape MUSHROOM_BRIM_N = Block.box(4D, 3D, 4D, 12D, 5D, 5D);
 
 	public static final VoxelShape SAPLING = VoxelShapes.or(SAPLING_TRUNK, SAPLING_LEAVES);
+	public static final VoxelShape SLIM_SAPLING = VoxelShapes.or(SAPLING_TRUNK, SLIM_SAPLING_LEAVES);
 	public static final VoxelShape FLAT_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_FLAT);
 	public static final VoxelShape ROUND_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND);
 	public static final VoxelShape ROUND_MUSHROOM_RIM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND, MUSHROOM_BRIM_E, MUSHROOM_BRIM_W, MUSHROOM_BRIM_S, MUSHROOM_BRIM_N);
@@ -269,6 +270,7 @@ public class DTRegistries {
 		COMMON_VOXEL_SHAPES.put("empty", VoxelShapes.empty());
 		COMMON_VOXEL_SHAPES.put("block", VoxelShapes.block());
 		COMMON_VOXEL_SHAPES.put("sapling", SAPLING);
+		COMMON_VOXEL_SHAPES.put("slim_sapling", SLIM_SAPLING);
 		COMMON_VOXEL_SHAPES.put("flat_mushroom", FLAT_MUSHROOM);
 		COMMON_VOXEL_SHAPES.put("round_mushroom", ROUND_MUSHROOM);
 		COMMON_VOXEL_SHAPES.put("round_mushroom_rim", ROUND_MUSHROOM_RIM);

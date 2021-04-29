@@ -14,6 +14,9 @@ public class JungleLogic extends GrowthLogicKit {
 		super(registryName);
 	}
 
+	private static final int canopyHeight = 18;
+	private static final int canopyHeightMega = 25;
+
 	@Override
 	public int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap) {
 		
@@ -28,7 +31,7 @@ public class JungleLogic extends GrowthLogicKit {
 		probMap[2] = probMap[3] = probMap[4] = probMap[5] = 0;
 		int sideTurn = !signal.isInTrunk() || (signal.isInTrunk() && ((signal.numSteps + treeHash) % 5 == 0) && (radius > 1) ) ? 2 : 0;//Only allow turns when we aren't in the trunk(or the branch is not a twig)
 		
-		int height = 18 + ((treeHash % 7829) % 8);
+		int height = (species.isMegaSpecies()?canopyHeightMega:canopyHeight) + ((treeHash % 7829) % 8);
 		
 		if(signal.delta.getY() < height ) {
 			probMap[2 + (posHash % 4)] = sideTurn;

@@ -12,7 +12,7 @@ import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.BonsaiPotBlock;
+import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
@@ -1698,12 +1698,12 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	//////////////////////////////
 	
 	/**
-	 * Provides the {@link BonsaiPotBlock} for this Species. {@link Species} subclasses can
-	 * derive their own {@link BonsaiPotBlock} subclass if they want something custom.
+	 * Provides the {@link PottedSaplingBlock} for this Species. {@link Species} subclasses can
+	 * derive their own {@link PottedSaplingBlock} subclass if they want something custom.
 	 *
-	 * @return The {@link BonsaiPotBlock} for this {@link Species}.
+	 * @return The {@link PottedSaplingBlock} for this {@link Species}.
 	 */
-	public BonsaiPotBlock getBonsaiPot() {
+	public PottedSaplingBlock getBonsaiPot() {
 		return DTRegistries.BONSAI_POT;
 	}
 	

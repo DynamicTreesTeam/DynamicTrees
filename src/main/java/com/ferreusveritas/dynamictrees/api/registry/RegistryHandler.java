@@ -12,6 +12,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -113,8 +114,8 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
         return item;
     }
 
-    protected final Map<ResourceLocation, Block> blocks = Maps.newHashMap();
-    protected final Map<ResourceLocation, Item> items = Maps.newHashMap();
+    protected final Map<ResourceLocation, Block> blocks = new LinkedHashMap<>();
+    protected final Map<ResourceLocation, Item> items = new LinkedHashMap<>();
 
     /**
      * Instantiates a new {@link RegistryHandler} object for the given mod ID. This should

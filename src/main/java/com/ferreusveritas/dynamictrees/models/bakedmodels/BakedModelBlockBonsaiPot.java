@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
-import com.ferreusveritas.dynamictrees.tileentity.BonsaiTileEntity;
+import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -36,12 +36,12 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
         List<BakedQuad> quads = new ArrayList<>();
 
-        if (side != null || state == null || !extraData.hasProperty(BonsaiTileEntity.SPECIES) || !extraData.hasProperty(BonsaiTileEntity.POT_MIMIC)) {
+        if (side != null || state == null || !extraData.hasProperty(PottedSaplingTileEntity.SPECIES) || !extraData.hasProperty(PottedSaplingTileEntity.POT_MIMIC)) {
             return quads;
         }
 
-        final Species species = extraData.getData(BonsaiTileEntity.SPECIES);
-        final BlockState potState = extraData.getData(BonsaiTileEntity.POT_MIMIC);
+        final Species species = extraData.getData(PottedSaplingTileEntity.SPECIES);
+        final BlockState potState = extraData.getData(PottedSaplingTileEntity.POT_MIMIC);
 
         if (species == null || potState == null || !species.isValid() || !species.getSapling().isPresent()) {
             return quads;

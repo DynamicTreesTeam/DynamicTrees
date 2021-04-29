@@ -6,6 +6,7 @@
     "up_probability": 4,
     "lowest_branch_height": 3,
     "growth_rate": 1,
+    "soil_longevity": 3,
     "growth_logic_kit": "nether_fungus",
     "leaves_properties": "warped",
     "environment_factors" : {
@@ -15,7 +16,7 @@
     "perfect_biomes": { "name": "minecraft:warped_forest" },
     "primitive_sapling": "warped_fungus",
     "acceptable_soils": ["nether_soil_like", "fungus_like"],
-    "acceptable_growth_blocks": ["warped_nylium"],
+    "acceptable_growth_blocks": ["minecraft:warped_nylium", "dynamictrees:rooty_warped_nylium"],
     "mega_species": "mega_warped",
     "features": [
         "clear_volume",

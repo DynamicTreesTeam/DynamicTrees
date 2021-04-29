@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  * @author ferreusveritas
  *
  */
-public class BonsaiTileEntity extends TileEntity {
+public class PottedSaplingTileEntity extends TileEntity {
 
 	private static final String POT_MIMIC_TAG = "pot_mimic";
 	private static final String SPECIES_TAG = "species";
@@ -42,7 +42,7 @@ public class BonsaiTileEntity extends TileEntity {
 	private BlockState potState = Blocks.FLOWER_POT.defaultBlockState();
 	private Species species = Species.NULL_SPECIES;
 
-	public BonsaiTileEntity() {
+	public PottedSaplingTileEntity() {
 		super(DTRegistries.bonsaiTE);
 	}
 

@@ -34,6 +34,7 @@ public abstract class GenFeature extends RegistryEntry<GenFeature> {
     public static final GenFeatureProperty<Float> RAY_DISTANCE = GenFeatureProperty.createFloatProperty("ray_distance");
     public static final GenFeatureProperty<Integer> MAX_HEIGHT = GenFeatureProperty.createIntegerProperty("max_height");
     public static final GenFeatureProperty<CanGrowPredicate> CAN_GROW_PREDICATE = GenFeatureProperty.createProperty("can_grow_predicate", CanGrowPredicate.class);
+    public static final GenFeatureProperty<Integer> MAX_COUNT = GenFeatureProperty.createIntegerProperty("max_count");
 
     public static final GenFeature NULL_GEN_FEATURE = new GenFeature(DTTrees.NULL) {};
 
