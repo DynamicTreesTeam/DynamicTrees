@@ -46,7 +46,7 @@ public class TreeGenerator {
 	 * This is for world gen debugging.
 	 * The colors signify the different tree spawn failure modes.
 	 */
-	public enum EnumGeneratorResult {
+	public enum GeneratorResult {
 		GENERATED(DyeColor.WHITE),
 		NO_TREE(DyeColor.BLACK),
 		UNHANDLED_BIOME(DyeColor.YELLOW),
@@ -57,7 +57,7 @@ public class TreeGenerator {
 
 		private final DyeColor color;
 
-		EnumGeneratorResult(DyeColor color) {
+		GeneratorResult(DyeColor color) {
 			this.color = color;
 		}
 
@@ -71,7 +71,7 @@ public class TreeGenerator {
 		return circleProvider;
 	}
 
-	public void makeConcreteCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds) {
+	public void makeConcreteCircle(IWorld world, PoissonDisc circle, int h, GeneratorResult resultType, SafeChunkBounds safeBounds) {
 		makeConcreteCircle(world, circle, h, resultType, safeBounds, 0);
 	}
 
@@ -79,7 +79,7 @@ public class TreeGenerator {
 		return Objects.requireNonNull(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(color + "_concrete"))).defaultBlockState();
 	}
 
-	public void makeConcreteCircle(IWorld world, PoissonDisc circle, int h, EnumGeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
+	public void makeConcreteCircle(IWorld world, PoissonDisc circle, int h, GeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
 		for (int ix = -circle.radius; ix <= circle.radius; ix++) {
 			for (int iz = -circle.radius; iz <= circle.radius; iz++) {
 				if (circle.isEdge(circle.x + ix, circle.z + iz)) {
@@ -88,7 +88,7 @@ public class TreeGenerator {
 			}
 		}
 
-		if (resultType != EnumGeneratorResult.GENERATED) {
+		if (resultType != GeneratorResult.GENERATED) {
 			final BlockPos pos = new BlockPos(circle.x, h, circle.z);
 			final DyeColor color = resultType.getColor();
 			safeBounds.setBlockState(world, pos, this.getConcreteByColor(color), true);
@@ -106,22 +106,22 @@ public class TreeGenerator {
 		circle.sub(8, 8); // Move the circle back to normal coords.
 	}
 
-	public EnumGeneratorResult makeTree(ISeedReader world, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {
+	public GeneratorResult makeTree(ISeedReader world, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {
 
 		final Biome biome = world.getBiome(groundPos);
 
 		if (biomeEntry.isBlacklisted())
-			return EnumGeneratorResult.UNHANDLED_BIOME;
+			return GeneratorResult.UNHANDLED_BIOME;
 
 		if (groundPos == BlockPos.ZERO) {
-			return EnumGeneratorResult.NO_GROUND;
+			return GeneratorResult.NO_GROUND;
 		}
 
 		random.setXOR(groundPos);
 
 		final BlockState dirtState = world.getBlockState(groundPos);
 
-		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
+		GeneratorResult result = GeneratorResult.GENERATED;
 
 		final BiomePropertySelectors.ISpeciesSelector speciesSelector = biomeEntry.getSpeciesSelector();
 		final SpeciesSelection speciesSelection = speciesSelector.getSpecies(groundPos, dirtState, random);
@@ -132,19 +132,19 @@ public class TreeGenerator {
 				if (species.isAcceptableSoilForWorldgen(world, groundPos, dirtState)) {
 					if (biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
 						if (!species.generate(world.getLevel(), world, groundPos, biome, random, circle.radius, safeBounds)) {
-							result = EnumGeneratorResult.FAIL_GENERATION;
+							result = GeneratorResult.FAIL_GENERATION;
 						}
 					} else {
-						result = EnumGeneratorResult.FAIL_CHANCE;
+						result = GeneratorResult.FAIL_CHANCE;
 					}
 				} else {
-					result = EnumGeneratorResult.FAIL_SOIL;
+					result = GeneratorResult.FAIL_SOIL;
 				}
 			} else {
-				result = EnumGeneratorResult.NO_TREE;
+				result = GeneratorResult.NO_TREE;
 			}
 		} else {
-			result = EnumGeneratorResult.UNHANDLED_BIOME;
+			result = GeneratorResult.UNHANDLED_BIOME;
 		}
 
 		// Display concrete circles for testing the circle growing algorithm.
