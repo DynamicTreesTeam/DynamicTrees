@@ -313,6 +313,8 @@ public class CellKits {
 		/** Typical branch with hydration 5 */
 		private final ICell branchCell = new NormalCell(8);
 
+		private final ICell sideBranchCell = new NormalCell(2);
+
 		private final BasicSolver netherFungusSolver = new BasicSolver(new short[]{0x0817, 0x0726, 0x0635, 0x0513, 0x0312, 0x0211});
 
 		@Override
@@ -321,7 +323,11 @@ public class CellKits {
 		}
 
 		@Override
-		public ICell getCellForBranch(int radius, int meta) { return radius == 3 ? branchCell : CellNull.NULL_CELL; }
+		public ICell getCellForBranch(int radius, int meta) {
+			if (radius == 3) return branchCell;
+			else if (radius <= 5) return sideBranchCell; // Extra wart blocks are added around thinner branches to cover up exposed areas of the fungus' cap
+			return CellNull.NULL_CELL;
+		}
 
 		@Override
 		public SimpleVoxmap getLeafCluster() {
