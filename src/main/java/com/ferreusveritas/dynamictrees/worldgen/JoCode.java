@@ -365,7 +365,7 @@ public class JoCode {
 					final Direction dir = Direction.from3DDataValue(code);
 					pos = pos.relative(dir);
 					if (!disabled) {
-						disabled = this.setBlockForGeneration(world, species, pos, dir, careful);
+						disabled = this.setBlockForGeneration(world, species, pos, dir, careful, codePos + 1 == instructions.length);
 					}
 					codePos++;
 					break;
@@ -375,7 +375,7 @@ public class JoCode {
 		return codePos;
 	}
 	
-	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful) {
+	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, boolean isLast) {
 		if ((world.getBlockState(pos).canBeReplacedByLogs(world, pos)) || world.getBlockState(pos).getMaterial().isLiquid() &&
 				(!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
 			Objects.requireNonNull(species.getFamily().getBranch())
