@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.google.common.collect.Lists;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -19,7 +18,7 @@ import java.util.*;
 public class BiomePropertySelectors {
 
 	public interface IChanceSelector {
-		EnumChance getChance(Random random, @Nonnull Species species, int radius);
+		Chance getChance(Random random, @Nonnull Species species, int radius);
 	}
 
 	public interface IDensitySelector {
@@ -157,7 +156,7 @@ public class BiomePropertySelectors {
 	}
 
 
-	public enum EnumChance {
+	public enum Chance {
 		OK,
 		CANCEL,
 		UNHANDLED

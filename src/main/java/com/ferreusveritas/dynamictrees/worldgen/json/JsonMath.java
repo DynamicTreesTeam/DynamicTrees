@@ -29,13 +29,13 @@ public class JsonMath {
 	}
 	
 	private MathOperator getVariable(String name) {
-		if(EnumMathFunction.NOISE.name.equals(name)) {
+		if(MathFunction.NOISE.name.equals(name)) {
 			return new Noise();
 		} else 
-		if(EnumMathFunction.RAND.name.equals(name)) {
+		if(MathFunction.RAND.name.equals(name)) {
 			return new Rand();
 		}
-		if(EnumMathFunction.RADIUS.name.equals(name)) {
+		if(MathFunction.RADIUS.name.equals(name)) {
 			return new Radius();
 		}
 		
@@ -44,7 +44,7 @@ public class JsonMath {
 	
 	private MathOperator processElement(String key, JsonElement value) {
 
-		EnumMathFunction op = EnumMathFunction.getFunction(key);
+		MathFunction op = MathFunction.getFunction(key);
 
 		if (op == null)
 			return null;
@@ -428,7 +428,7 @@ public class JsonMath {
 		
 	}
 	
-	public enum EnumMathFunction {
+	public enum MathFunction {
 		CONST,
 		NOISE,
 		RAND,
@@ -440,19 +440,20 @@ public class JsonMath {
 		MOD,
 		MAX,
 		MIN,
+		/** {@link IfGreaterThan} */
 		IFGT,
 		SPECIES,
 		DEBUG;
 		
 		public final String name;
 		
-		private EnumMathFunction() {
+		MathFunction() {
 			this.name = toString().toLowerCase();
 		}
 
 		@Nullable
-		static EnumMathFunction getFunction(String findName) {
-			for(EnumMathFunction fun : EnumMathFunction.values()) {
+		static MathFunction getFunction(String findName) {
+			for(MathFunction fun : MathFunction.values()) {
 				if(fun.name.equals(findName)) {
 					return fun;
 				}
