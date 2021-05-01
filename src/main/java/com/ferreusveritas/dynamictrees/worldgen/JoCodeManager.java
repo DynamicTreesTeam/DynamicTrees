@@ -92,7 +92,7 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
             final Species species = TreeRegistry.findSpecies(resourceLocation);
 
             lines.forEach(line -> {
-                // Remove any whitespace and split by a comma.
+                // Remove any whitespace and split by a colon.
                 final String[] split = line.replace(" ", "").split(":");
                 this.addCode(species, Integer.parseInt(split[0]), split[1]);
             });
