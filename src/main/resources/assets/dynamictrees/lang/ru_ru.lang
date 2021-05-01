@@ -70,4 +70,11 @@ potion.persistance.description=§7Прекращает изменение дер
 potion.transform.description=§7Трансформирует дерево в §a%s §7дерево
 potion.transform.description.empty=§7Базовое зелье для зелий трансформации
 
+tooltip.seed.season.fertile_seasons=Плодородные сезоны:
+tooltip.seed.season.year_round=§dВесь год
+tooltip.seed.season.spring=§aВесна
+tooltip.seed.season.summer=§eЛето
+tooltip.seed.season.autumn=§6Осень
+tooltip.seed.season.winter=§bЗима
+
 death.attack.fallingtree=%1$s раздавлен(а) падающим деревом
