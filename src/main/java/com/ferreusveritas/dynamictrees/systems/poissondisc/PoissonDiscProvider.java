@@ -30,10 +30,11 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
 		this.radiusCoordinator = radCoord;
 	}
 	
-	public void setSeed(Long seed) {
+	public PoissonDiscProvider setSeed(Long seed) {
 		if (seed != null) {
 			this.random = new RandomXOR(seed);
 		}
+		return this;
 	}
 
 	@SuppressWarnings("unused")
