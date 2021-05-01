@@ -69,4 +69,8 @@ public final class PropertyApplierResult {
         return new PropertyApplierResult(errorMessage, warnings);
     }
 
+    public static PropertyApplierResult from(final ObjectFetchResult<?> fetchResult) {
+        return fetchResult.wasSuccessful() ? success() : failure(fetchResult.getErrorMessage());
+    }
+
 }

@@ -628,9 +628,9 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 
 		Block block = blockState.getBlock();
 
-		if(!(block instanceof DynamicLeavesBlock)) {
-			for(IConnectable connectable : vanillaConnectables) {
-				if(connectable.isConnectable(blockState)) {
+		if (!(block instanceof DynamicLeavesBlock)) {
+			for (IConnectable connectable : vanillaConnectables) {
+				if (connectable.isConnectable(blockState)) {
 					return true;
 				}
 			}

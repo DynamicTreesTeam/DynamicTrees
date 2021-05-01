@@ -70,40 +70,22 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     public void registerAppliers() {
         this.biomeDatabaseAppliers
                 .register("species", JsonElement.class, (entry, jsonElement) -> {
-                    final ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> selectorFetchResult = JsonObjectGetters.SPECIES_SELECTOR.get(jsonElement);
-
-                    if (!selectorFetchResult.wasSuccessful())
-                        return PropertyApplierResult.failure(selectorFetchResult);
-
-                    final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.REPLACE);
-                    getOperation(jsonElement).ifSuccessful(operation::set).otherwiseWarn("Error getting operation (defaulting to replace): ");
-
-                    entry.getDatabase().setSpeciesSelector(entry.getBiome(), selectorFetchResult.getValue(), operation.get());
-                    return PropertyApplierResult.success();
+                    return PropertyApplierResult.from(JsonObjectGetters.SPECIES_SELECTOR.get(jsonElement)
+                            .ifSuccessful(speciesSelector ->
+                                entry.getDatabase().setSpeciesSelector(entry.getBiome(), speciesSelector, getOperationOrWarn(jsonElement))
+                            ));
                 })
                 .register("density", JsonElement.class, (entry, jsonElement) -> {
-                    final ObjectFetchResult<BiomePropertySelectors.IDensitySelector> selectorFetchResult = JsonObjectGetters.DENSITY_SELECTOR.get(jsonElement);
-
-                    if (!selectorFetchResult.wasSuccessful())
-                        return PropertyApplierResult.failure(selectorFetchResult);
-
-                    final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.REPLACE);
-                    getOperation(jsonElement).ifSuccessful(operation::set).otherwiseWarn("Error getting operation (defaulting to replace): ");
-
-                    entry.getDatabase().setDensitySelector(entry.getBiome(), selectorFetchResult.getValue(), operation.get());
-                    return PropertyApplierResult.success();
+                    return PropertyApplierResult.from(JsonObjectGetters.DENSITY_SELECTOR.get(jsonElement)
+                            .ifSuccessful(densitySelector ->
+                                entry.getDatabase().setDensitySelector(entry.getBiome(), densitySelector, getOperationOrWarn(jsonElement))
+                            ));
                 })
                 .register("chance", JsonElement.class, (entry, jsonElement) -> {
-                    final ObjectFetchResult<BiomePropertySelectors.IChanceSelector> selectorFetchResult = JsonObjectGetters.CHANCE_SELECTOR.get(jsonElement);
-
-                    if (!selectorFetchResult.wasSuccessful())
-                        return PropertyApplierResult.failure(selectorFetchResult);
-
-                    final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.REPLACE);
-                    getOperation(jsonElement).ifSuccessful(operation::set).otherwiseWarn("Error getting operation (defaulting to replace): ");
-
-                    entry.getDatabase().setChanceSelector(entry.getBiome(), selectorFetchResult.getValue(), operation.get());
-                    return PropertyApplierResult.success();
+                    return PropertyApplierResult.from(JsonObjectGetters.CHANCE_SELECTOR.get(jsonElement)
+                            .ifSuccessful(chanceSelector ->
+                                entry.getDatabase().setChanceSelector(entry.getBiome(), chanceSelector, getOperationOrWarn(jsonElement))
+                            ));
                 })
                 .register("multipass", Boolean.class, (entry, multipass) -> {
                     if (!multipass)
@@ -125,12 +107,12 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                     final BiomeDatabase database = entry.getDatabase();
                     final Biome biome = entry.getBiome();
 
-                    database.setSpeciesSelector(biome, (pos, dirt, rnd) -> new BiomePropertySelectors.SpeciesSelection(), BiomeDatabase.Operation.REPLACE);
-                    database.setDensitySelector(biome, (rnd, nd) -> -1, BiomeDatabase.Operation.REPLACE);
-                    database.setChanceSelector(biome, (rnd, spc, rad) -> BiomePropertySelectors.EnumChance.UNHANDLED, BiomeDatabase.Operation.REPLACE);
-                    database.setForestness(biome, 0.0f);
-                    database.setIsSubterranean(biome, false);
-                    database.setMultipass(biome, pass -> (pass == 0 ? 0 : -1));
+                    database.setSpeciesSelector(biome, (pos, dirt, rnd) -> new BiomePropertySelectors.SpeciesSelection(), BiomeDatabase.Operation.REPLACE)
+                            .setDensitySelector(biome, (rnd, nd) -> -1, BiomeDatabase.Operation.REPLACE)
+                            .setChanceSelector(biome, (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED, BiomeDatabase.Operation.REPLACE)
+                            .setForestness(biome, 0.0f)
+                            .setIsSubterranean(biome, false)
+                            .setMultipass(biome, pass -> (pass == 0 ? 0 : -1));
                 });
 
         this.featureCancellationAppliers.register("namespace", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
@@ -143,18 +125,14 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     }
 
     private static ObjectFetchResult<BiomeDatabase.Operation> getOperation (final JsonElement jsonElement) {
-        final ObjectFetchResult<JsonObject> jsonObjectFetchResult = JsonObjectGetters.JSON_OBJECT.get(jsonElement);
+        return JsonObjectGetters.JSON_OBJECT.get(jsonElement)
+                .map(jsonObject -> jsonObject.has(METHOD) ? jsonObject.get(METHOD) : null).map(JsonObjectGetters.OPERATION::get)
+                // If there was no Json object or method element, default to replace.
+                .orDefault(ObjectFetchResult.success(BiomeDatabase.Operation.REPLACE));
+    }
 
-        // If there was no Json object or method element, default to replace.
-        if (!jsonObjectFetchResult.wasSuccessful() || !jsonObjectFetchResult.getValue().has(METHOD))
-            return ObjectFetchResult.success(BiomeDatabase.Operation.REPLACE);
-
-        final ObjectFetchResult<BiomeDatabase.Operation> operationFetchResult = JsonObjectGetters.OPERATION.get(jsonObjectFetchResult.getValue().get(METHOD));
-
-        if (!operationFetchResult.wasSuccessful())
-            return ObjectFetchResult.failureFromOther(operationFetchResult);
-
-        return ObjectFetchResult.success(operationFetchResult.getValue());
+    public static BiomeDatabase.Operation getOperationOrWarn(final JsonElement jsonElement) {
+        return getOperation(jsonElement).otherwiseWarn("Error getting operation (defaulting to replace): ").orDefault(BiomeDatabase.Operation.REPLACE);
     }
 
     @Override
@@ -317,6 +295,12 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         return this.blacklistedDimensions.contains(resourceLocation);
     }
 
+    /**
+     * Do nothing on load, since we don't need to set anything up on game setup here.
+     *
+     * @param resourceManager The {@link IResourceManager} object.
+     * @return A {@link CompletableFuture} that does nothing.
+     */
     @Override
     public CompletableFuture<Void> load(IResourceManager resourceManager) {
         return CompletableFuture.runAsync(() -> {});

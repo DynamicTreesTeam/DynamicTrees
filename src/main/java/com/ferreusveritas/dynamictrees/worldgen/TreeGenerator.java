@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.EnumChance;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Chance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -130,7 +130,7 @@ public class TreeGenerator {
 			final Species species = speciesSelection.getSpecies();
 			if (species.isValid()) {
 				if (species.isAcceptableSoilForWorldgen(world, groundPos, dirtState)) {
-					if (biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
+					if (biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == Chance.OK) {
 						if (!species.generate(world.getLevel(), world, groundPos, biome, random, circle.radius, safeBounds)) {
 							result = GeneratorResult.FAIL_GENERATION;
 						}

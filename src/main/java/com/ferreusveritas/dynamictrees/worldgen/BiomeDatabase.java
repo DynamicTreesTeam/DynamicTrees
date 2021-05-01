@@ -63,7 +63,7 @@ public class BiomeDatabase {
 	public static class Entry {
 		private final BiomeDatabase database;
 		private final Biome biome;
-		private IChanceSelector chanceSelector = (rnd, spc, rad) -> EnumChance.UNHANDLED;
+		private IChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
 		private IDensitySelector densitySelector = (rnd, nd) -> -1;
 		private ISpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
 		private final FeatureCancellations featureCancellations = new FeatureCancellations();
@@ -214,14 +214,14 @@ public class BiomeDatabase {
 				break;
 			case SPLICE_BEFORE:
 				entry.setChanceSelector( (rnd, spc, rad) -> {
-					EnumChance c = selector.getChance(rnd, spc, rad);
-					return c != EnumChance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
+					Chance c = selector.getChance(rnd, spc, rad);
+					return c != Chance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
 				} );
 				break;
 			case SPLICE_AFTER:
 				entry.setChanceSelector( (rnd, spc, rad) -> {
-					EnumChance c = existing.getChance(rnd, spc, rad);
-					return c != EnumChance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
+					Chance c = existing.getChance(rnd, spc, rad);
+					return c != Chance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
 				} );
 				break;
 		}

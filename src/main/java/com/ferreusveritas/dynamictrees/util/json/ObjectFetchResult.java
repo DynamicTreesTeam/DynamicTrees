@@ -107,6 +107,10 @@ public final class ObjectFetchResult<T> {
         return this;
     }
 
+    public T orDefault(final T defaultValue) {
+        return this.wasSuccessful() ? this.getValue() : defaultValue;
+    }
+
     /**
      * Gets the value. {@link #wasSuccessful()} should be checked first, as this will be null
      * if the fetch was not successful.
