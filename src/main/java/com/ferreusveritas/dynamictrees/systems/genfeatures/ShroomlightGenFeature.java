@@ -69,9 +69,13 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
         if (validSpaces == null) return false;
         if (validSpaces.size() > 0){
             if (worldGen){
+                int placed = 0;
                 for (BlockPos chosenSpace : validSpaces){
-                    if (world.getRandom().nextFloat() <= configuredGenFeature.get(PLACE_CHANCE))
+                    if (world.getRandom().nextFloat() <= configuredGenFeature.get(PLACE_CHANCE)){
                         world.setBlock(chosenSpace, shroomlightBlock.defaultBlockState(), 2);
+                        placed++;
+                        if (placed > configuredGenFeature.get(MAX_COUNT)) break;
+                    }
                 }
             } else {
                 BlockPos chosenSpace = validSpaces.get(world.getRandom().nextInt(validSpaces.size()));
