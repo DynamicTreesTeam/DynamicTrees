@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
-import com.ferreusveritas.dynamictrees.blocks.CocoaFruitBlock;
+import com.ferreusveritas.dynamictrees.blocks.DynamicCocoaBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
@@ -25,6 +25,7 @@ import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.FruitDropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
@@ -84,10 +85,10 @@ public class DTRegistries {
 	public static final FruitBlock APPLE_FRUIT = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));
 
 	/** A modified cocoa fruit block (for dynamic trees). */
-	public static final CocoaFruitBlock COCOA_FRUIT = new CocoaFruitBlock();
+	public static final DynamicCocoaBlock COCOA_FRUIT = new DynamicCocoaBlock();
 
-	/** A bonsai pot block, which is a normal pot but for dynamic saplings. */
-	public static final PottedSaplingBlock BONSAI_POT = new PottedSaplingBlock();
+	/** A potted sapling block, which is a normal pot but for dynamic saplings. */
+	public static final PottedSaplingBlock POTTED_SAPLING = new PottedSaplingBlock();
 
 	/** A trunk shell block, which is the outer block for thick branches. */
 	public static final TrunkShellBlock TRUNK_SHELL = new TrunkShellBlock();
@@ -103,8 +104,8 @@ public class DTRegistries {
 
 	public static void setupBlocks() {
 		RegistryHandler.addBlock(DynamicTrees.resLoc("apple_fruit"), APPLE_FRUIT);
-		RegistryHandler.addBlock(DynamicTrees.resLoc("cocoa_fruit"), COCOA_FRUIT);
-		RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, BONSAI_POT);
+		RegistryHandler.addBlock(DynamicTrees.resLoc("cocoa"), COCOA_FRUIT);
+		RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, POTTED_SAPLING);
 		RegistryHandler.addBlock(DynamicTrees.resLoc("trunk_shell"), TRUNK_SHELL);
 	}
 
@@ -156,12 +157,13 @@ public class DTRegistries {
 	public static void onBlocksRegistry(final RegistryEvent.Register<Block> event) {
 		final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
 
-		if (appleOak.isValid())
+		if (appleOak.isValid()){
+			appleOak.addDropCreator(new FruitDropCreator());
 			APPLE_FRUIT.setSpecies(appleOak);
-
-		for (RootyBlock rooty : RootyBlockHelper.generateListForRegistry(false, DynamicTrees.MOD_ID)){
-			event.getRegistry().register(rooty);
 		}
+
+		for (RootyBlock rooty : RootyBlockHelper.generateListForRegistry(false, DynamicTrees.MOD_ID))
+			event.getRegistry().register(rooty);
 	}
 	
 	///////////////////////////////////////////
@@ -220,7 +222,7 @@ public class DTRegistries {
 	public static void setupTileEntities() {
 		LinkedList<RootyBlock> rootyDirts = RootyBlockHelper.generateListForRegistry(false);
 		speciesTE = TileEntityType.Builder.of(SpeciesTileEntity::new, rootyDirts.toArray(new RootyBlock[0])).build(null);
-		bonsaiTE = TileEntityType.Builder.of(PottedSaplingTileEntity::new, BONSAI_POT).build(null);
+		bonsaiTE = TileEntityType.Builder.of(PottedSaplingTileEntity::new, POTTED_SAPLING).build(null);
 	}
 	
 	@SubscribeEvent

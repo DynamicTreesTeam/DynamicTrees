@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesManager;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRecipes;
 import com.ferreusveritas.dynamictrees.trees.FamilyManager;
 import com.ferreusveritas.dynamictrees.trees.SpeciesManager;
@@ -124,7 +125,8 @@ public final class DTResourceRegistries {
                     recipes.put(recipeType, new HashMap<>(currentRecipes))));
 
             // Register dirt bucket recipes.
-            DTRecipes.registerDirtBucketRecipes(recipes.get(IRecipeType.CRAFTING));
+            if (DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get())
+                DTRecipes.registerDirtBucketRecipes(recipes.get(IRecipeType.CRAFTING));
 
             // Revert each type's recipes back to immutable.
             recipes.forEach(((recipeType, currentRecipes) -> recipes.put(recipeType, ImmutableMap.copyOf(currentRecipes))));

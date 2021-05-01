@@ -34,8 +34,8 @@ import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.LeavesStickDropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.LogDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.SticksDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.LogsDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
@@ -74,10 +74,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
@@ -219,7 +216,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		this.family.addSpecies(this);
 		this.setLeavesProperties(leavesProperties.isValid() ? leavesProperties : family.getCommonLeaves());
 
-		this.addDropCreator(new LogDropCreator());
+		this.addDropCreator(new LogsDropCreator());
 	}
 
 	/**
@@ -613,7 +610,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	public Species setupStandardStickDropping (float rarity) {
-		this.addDropCreator(new LeavesStickDropCreator(this, rarity, 2));
+		this.addDropCreator(new SticksDropCreator(this, rarity, 2));
 		return this;
 	}
 
@@ -1043,7 +1040,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param soilBlockState
 	 * @return
 	 */
-	public boolean isAcceptableSoil(IWorld world, BlockPos pos, BlockState soilBlockState) {
+	public boolean isAcceptableSoil(IWorldReader world, BlockPos pos, BlockState soilBlockState) {
 		return isAcceptableSoil(soilBlockState);
 	}
 
@@ -1059,14 +1056,17 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		final boolean isAcceptableSoil = isAcceptableSoil(world, pos, soilBlockState);
 
 		// If the block is water, check the block below it is valid soil (and not water).
-		if (isAcceptableSoil && soilBlockState.getBlock() == Blocks.WATER) {
+		if (isAcceptableSoil && isWater(soilBlockState)) {
 			final BlockPos down = pos.below();
 			final BlockState downState = world.getBlockState(pos.below());
 
-			return downState.getBlock() != Blocks.WATER && this.isAcceptableSoil(world, down, downState);
+			return !isWater(downState) && this.isAcceptableSoil(world, down, downState);
 		}
 
 		return isAcceptableSoil;
+	}
+	protected boolean isWater (BlockState soilBlockState){
+		return DirtHelper.isSoilAcceptable(soilBlockState.getBlock(), DirtHelper.getSoilFlags(DirtHelper.WATER_LIKE));
 	}
 	
 	
@@ -1150,7 +1150,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			if(branch != null) {
 				int radius = branch.getRadius(branchState);
 				float rotChance = rotChance(world, endPos, world.getRandom(), radius);
-				if(branch.checkForRot(world, endPos, this, radius, world.getRandom(), rotChance, safeBounds != SafeChunkBounds.ANY) || radius != 1) {
+				if(branch.checkForRot(world, endPos, this, radius, world.getRandom(), rotChance, safeBounds != SafeChunkBounds.ANY) || radius != family.getPrimaryThickness()) {
 					if(safeBounds != SafeChunkBounds.ANY) { //worldgen
 						TreeHelper.ageVolume(world, endPos.below((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2, safeBounds);
 					}
@@ -1176,7 +1176,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return true if the branch should rot
 	 */
 	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
-		if (radius <= 1) {
+		if (radius <= family.getPrimaryThickness()) {
 			DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
 			for (Direction dir: upFirst) {
 				if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.relative(dir), 0)) {
@@ -1704,7 +1704,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return The {@link PottedSaplingBlock} for this {@link Species}.
 	 */
 	public PottedSaplingBlock getBonsaiPot() {
-		return DTRegistries.BONSAI_POT;
+		return DTRegistries.POTTED_SAPLING;
 	}
 	
 	

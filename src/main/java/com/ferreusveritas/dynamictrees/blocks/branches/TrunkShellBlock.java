@@ -139,7 +139,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 			return null;
 
 		final Block block = museState.getBlock();
-		if (block instanceof IMusable && ((IMusable) block).isMusable()) {
+		if (block instanceof IMusable && ((IMusable) block).isMusable(access, museState, musePos)) {
 			return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));
 		} else if (block instanceof TrunkShellBlock) { // If its another trunkshell, then this trunkshell is on another layer. IF they share a common direction, we return that shell's muse.
 			final Vector3i offset = ((TrunkShellBlock) block).getMuseDir(museState, musePos).getOffset();

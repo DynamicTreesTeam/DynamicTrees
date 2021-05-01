@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -594,6 +595,15 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	///////////////////////////////////////////
 	// LEAVES HANDLING
 	///////////////////////////////////////////
+
+	/**
+	 * When destroying leaves, an area is created from the branch endpoints to look for leaves blocks and destroy them.
+	 * This area is then expanded by a certain size to make sure it covers all the leaves in the canopy.
+	 * @return the expanded block bounds.
+	 */
+	public BlockBounds expandLeavesBlockBounds(BlockBounds bounds){
+		return bounds.expand(3);
+	}
 
 	public boolean isCompatibleDynamicLeaves(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 		DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);

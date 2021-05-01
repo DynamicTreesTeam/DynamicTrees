@@ -21,8 +21,7 @@ public class FindEndsNode implements INodeInspector {
 	private BlockPos last;
 	
 	public FindEndsNode() { //Array is provided for you
-		this.endPoints = new ArrayList<BlockPos>(32);
-		last = BlockPos.ZERO;
+		this(new ArrayList<>(32));
 	}
 	
 	public FindEndsNode(List<BlockPos> ends) { //Or use your own
@@ -43,8 +42,8 @@ public class FindEndsNode implements INodeInspector {
 		if(dPos.getX() * dPos.getX() + dPos.getY() * dPos.getY() + dPos.getZ() * dPos.getZ() != 1) {//This is actually the equation for distance squared. 1 squared is 1. Yay math.
 			endPoints.add(pos);
 		}
-			
-		last = pos;//We can only be in a branch on the return run 
+
+		last = pos;//We can only be in a branch on the return run
 		
 		return false;
 	}

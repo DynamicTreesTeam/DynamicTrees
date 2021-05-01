@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
@@ -13,8 +14,14 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.*;
+import com.ferreusveritas.dynamictrees.trees.specialfamilies.NetherFungusFamily;
+import com.ferreusveritas.dynamictrees.trees.specialspecies.NetherFungusSpecies;
+import com.ferreusveritas.dynamictrees.trees.specialspecies.SwampOakSpecies;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
+import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.gen.blockstateprovider.WeightedBlockStateProvider;
+import net.minecraft.world.gen.feature.Features;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -48,13 +55,13 @@ public class DTTrees {
 
 	@SubscribeEvent
 	public static void registerFamilyTypes (final TypeRegistryEvent<Family> event) {
-		event.registerType(DynamicTrees.resLoc("fungus"), FungusFamily.TYPE);
+		event.registerType(DynamicTrees.resLoc("nether_fungus"), NetherFungusFamily.TYPE);
 	}
 
 	@SubscribeEvent
 	public static void registerSpeciesTypes (final TypeRegistryEvent<Species> event) {
-		event.registerType(DynamicTrees.resLoc("fungus"), FungusSpecies.TYPE);
-		event.registerType(DynamicTrees.resLoc("dark_oak"), DarkOakSpecies.TYPE);
+		event.registerType(DynamicTrees.resLoc("nether_fungus"), NetherFungusSpecies.TYPE);
+		event.registerType(DynamicTrees.resLoc("swamp_oak"), SwampOakSpecies.TYPE);
 	}
 
 	public static final ResourceLocation NULL = resLoc("null");
@@ -86,6 +93,18 @@ public class DTTrees {
 		// Register feature cancellers.
 		FeatureCanceller.REGISTRY.postRegistryEvent();
 		FeatureCanceller.REGISTRY.lock();
+	}
+
+	public static void replaceNyliumFungiFeatures(){
+		Species crimson = TreeRegistry.findSpecies(DTTrees.CRIMSON);
+		Block crimsonSapling = crimson.getSapling().orElse(null);
+		Species warped = TreeRegistry.findSpecies(DTTrees.WARPED);
+		Block warpedSapling = warped.getSapling().orElse(null);
+		if (crimsonSapling != null && warpedSapling != null){
+			((WeightedBlockStateProvider) Features.Configs.CRIMSON_FOREST_CONFIG.stateProvider).add(crimsonSapling.defaultBlockState(), 11).add(warpedSapling.defaultBlockState(), 1);
+			((WeightedBlockStateProvider) Features.Configs.WARPED_FOREST_CONFIG.stateProvider).add(crimsonSapling.defaultBlockState(), 1).add(warpedSapling.defaultBlockState(), 13);
+		}
+
 	}
 
 	private static ResourceLocation resLoc (final String path) {

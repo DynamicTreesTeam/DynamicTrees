@@ -277,7 +277,7 @@ public class BasicBranchBlock extends BranchBlock {
 				ITreePart treepart = TreeHelper.getTreePart(deltaState);
 				if (treepart != TreeHelper.NULL_TREE_PART) {
 					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
-				} else if (world.isEmptyBlock(deltaPos) || deltaState.getBlock() == DTRegistries.TRUNK_SHELL) {
+				} else if (world.isEmptyBlock(deltaPos) || deltaState.getBlock() instanceof TrunkShellBlock) {
 					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
 				}
 			}
@@ -394,7 +394,7 @@ public class BasicBranchBlock extends BranchBlock {
 	 * Java does a pretty good job of managing the stack on its own.
 	 */
 	@Override
-	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
+	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal) {
 		// Note: fromDir will be null in the origin node
 
 		if (signal.overflow || (signal.trackVisited && signal.doTrackingVisited(pos))) {
@@ -414,7 +414,7 @@ public class BasicBranchBlock extends BranchBlock {
 						signal = treePart.analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);
 						
 						// This should only be true for the originating block when the root node is found
-						if (signal.found && signal.localRootDir == null && fromDir == null) {
+						if (signal.foundRoot && signal.localRootDir == null && fromDir == null) {
 							signal.localRootDir = dir;
 						}
 					}

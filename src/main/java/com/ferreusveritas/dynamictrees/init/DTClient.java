@@ -126,9 +126,9 @@ public class DTClient {
 	}
 
 	private static void registerRenderLayers () {
-		RenderTypeLookup.setRenderLayer(DTRegistries.BONSAI_POT, RenderType.cutoutMipped());
+		RenderTypeLookup.setRenderLayer(DTRegistries.POTTED_SAPLING, RenderType.cutoutMipped());
 
-		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof DynamicSaplingBlock || block instanceof RootyBlock)
+		ForgeRegistries.BLOCKS.getValues().stream().filter(block ->block == DTRegistries.COCOA_FRUIT || block instanceof DynamicSaplingBlock || block instanceof RootyBlock)
 				.forEach(block -> RenderTypeLookup.setRenderLayer(block, RenderType.cutoutMipped()));
 
 //		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof ThickBranchBlock)
@@ -156,8 +156,8 @@ public class DTClient {
 		}
 		
 		// Register Bonsai Pot Colorizer
-		ModelHelper.regColorHandler(DTRegistries.BONSAI_POT, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof PottedSaplingBlock)
-				? DTRegistries.BONSAI_POT.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
+		ModelHelper.regColorHandler(DTRegistries.POTTED_SAPLING, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof PottedSaplingBlock)
+				? DTRegistries.POTTED_SAPLING.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
 		
 		// ITEMS
 		

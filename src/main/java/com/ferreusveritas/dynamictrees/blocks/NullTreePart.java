@@ -60,7 +60,7 @@ public class NullTreePart implements ITreePart {
 	
 	@Override
 	public boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		return blockState.getBlock() == Blocks.BEE_NEST || blockState.getBlock() == Blocks.SHROOMLIGHT;
+		return BranchConnectables.isBlockConnectable(blockState.getBlock());
 	}
 	
 	@Override

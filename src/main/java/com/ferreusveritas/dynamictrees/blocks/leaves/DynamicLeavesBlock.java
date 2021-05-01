@@ -24,6 +24,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -242,8 +243,10 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		if (context.getEntity() == null)
 			return VoxelShapes.create(new AxisAlignedBB(0, 0.9, 0, 1, 1, 1));
 
-		if (DTConfigs.IS_LEAVES_PASSABLE.get() || this.isEntityPassable(context)){
+		if (DTConfigs.IS_LEAVES_PASSABLE.get() || this.isEntityPassable(context)) {
 			return VoxelShapes.empty();
+		} else if (DTConfigs.VANILLA_LEAVES_COLLISION.get()) {
+			return VoxelShapes.block();
 		} else {
 			return VoxelShapes.create(new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
 		}
@@ -253,10 +256,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		return isEntityPassable(context.getEntity());
 	}
 
-	public boolean isEntityPassable (Entity entity) {
-		if (entity instanceof ItemEntity)
+	public boolean isEntityPassable (@Nullable Entity entity) {
+		if (entity instanceof ProjectileEntity) //Projectiles such as arrows fly through leaves
+			return true;
+		if (entity instanceof ItemEntity) //Seed items fall through leaves
 			return ((ItemEntity)entity).getItem().getItem() instanceof Seed;
-		if (entity instanceof LivingEntity)
+		if (entity instanceof LivingEntity) //Bees fly through leaves, otherwise they get stuck :(
 			return entity instanceof BeeEntity;
 		return false;
 	}

@@ -96,39 +96,42 @@ public class TreeGenerator {
 		}
 	}
 
-	public EnumGeneratorResult makeTree(ISeedReader world, BiomeDatabase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
-
+	public void makeTrees(ISeedReader world, BiomeDatabase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
 		circle.add(8, 8); // Move the circle into the "stage".
-
 		BlockPos pos = new BlockPos(circle.x, 0, circle.z);
+		final Entry entry = biomeDataBase.getEntry(world.getBiome(pos));
+		for (BlockPos groundPos : groundFinder.findGround(entry, world, pos)){
+			makeTree(world, entry, circle, groundPos, safeBounds);
+		}
+		circle.sub(8, 8); // Move the circle back to normal coords.
+	}
 
-		final Biome biome = world.getBiome(pos);
-		final Entry entry = biomeDataBase.getEntry(biome);
+	public EnumGeneratorResult makeTree(ISeedReader world, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {
 
-		if (entry.isBlacklisted())
+		final Biome biome = world.getBiome(groundPos);
+
+		if (biomeEntry.isBlacklisted())
 			return EnumGeneratorResult.UNHANDLED_BIOME;
 
-		pos = groundFinder.findGround(entry, world, pos);
-
-		if (pos == BlockPos.ZERO) {
+		if (groundPos == BlockPos.ZERO) {
 			return EnumGeneratorResult.NO_GROUND;
 		}
 
-		random.setXOR(pos);
+		random.setXOR(groundPos);
 
-		final BlockState dirtState = world.getBlockState(pos);
+		final BlockState dirtState = world.getBlockState(groundPos);
 
 		EnumGeneratorResult result = EnumGeneratorResult.GENERATED;
 
-		final BiomePropertySelectors.ISpeciesSelector speciesSelector = entry.getSpeciesSelector();
-		final SpeciesSelection speciesSelection = speciesSelector.getSpecies(pos, dirtState, random);
+		final BiomePropertySelectors.ISpeciesSelector speciesSelector = biomeEntry.getSpeciesSelector();
+		final SpeciesSelection speciesSelection = speciesSelector.getSpecies(groundPos, dirtState, random);
 
 		if (speciesSelection.isHandled()) {
 			final Species species = speciesSelection.getSpecies();
 			if (species.isValid()) {
-				if (species.isAcceptableSoilForWorldgen(world, pos, dirtState)) {
-					if (entry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
-						if (!species.generate(world.getLevel(), world, pos, biome, random, circle.radius, safeBounds)) {
+				if (species.isAcceptableSoilForWorldgen(world, groundPos, dirtState)) {
+					if (biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == EnumChance.OK) {
+						if (!species.generate(world.getLevel(), world, groundPos, biome, random, circle.radius, safeBounds)) {
 							result = EnumGeneratorResult.FAIL_GENERATION;
 						}
 					} else {
@@ -146,10 +149,8 @@ public class TreeGenerator {
 
 		// Display concrete circles for testing the circle growing algorithm.
 		if (DTConfigs.WORLD_GEN_DEBUG.get()) {
-			this.makeConcreteCircle(world, circle, pos.getY(), result, safeBounds);
+			this.makeConcreteCircle(world, circle, groundPos.getY(), result, safeBounds);
 		}
-
-		circle.sub(8, 8); // Move the circle back to normal coords.
 
 		return result;
 	}

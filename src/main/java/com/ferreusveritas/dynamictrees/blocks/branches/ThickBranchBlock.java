@@ -199,8 +199,8 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	}
 
 	@Override
-	public boolean isMusable() {
-		return true;
+	public boolean isMusable(IBlockReader world, BlockState state, BlockPos pos) {
+		return getRadius(state) > 8;
 	}
 
 }

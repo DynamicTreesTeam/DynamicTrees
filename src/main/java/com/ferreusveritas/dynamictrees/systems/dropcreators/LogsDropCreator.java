@@ -12,9 +12,9 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Random;
 
-public class LogDropCreator extends DropCreator {
+public class LogsDropCreator extends DropCreator {
 
-	public LogDropCreator() {
+	public LogsDropCreator() {
 		super(new ResourceLocation(DynamicTrees.MOD_ID, "logs"));
 	}
 

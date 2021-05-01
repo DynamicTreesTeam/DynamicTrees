@@ -1,6 +1,6 @@
 {
     "family": "jungle",
-    "tapering": 0.35,
+    "tapering": 0.2,
     "signal_energy": 32.0,
     "up_probability": 5,
     "lowest_branch_height": 8,
@@ -35,7 +35,8 @@
         {
             "name": "roots",
             "properties": {
-                "min_trunk_radius": 9
+                "min_trunk_radius": 9,
+                "scale_factor": 18
             }
         },
         "clear_volume",

@@ -13,6 +13,8 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import com.ferreusveritas.dynamictrees.systems.*;
 
+import javax.annotation.Nullable;
+
 public interface ITreePart {
 
 	/**
@@ -83,7 +85,7 @@ public interface ITreePart {
 	 * @param signal The Mapping Signal object to gather data and/or perform operations
 	 * @return
 	 */
-	MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal);
+	MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal);
 
 	/**
 	 * Get the appropriate {@link Family} this block is used to build.

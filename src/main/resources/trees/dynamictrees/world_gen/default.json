@@ -73,8 +73,7 @@
     "apply": {
       "species" : {
         "random" : {
-          "jungle" : 1,
-          "mega_jungle" : 2
+          "jungle" : 1
         }
       },
       "density": 0.4,
@@ -209,11 +208,11 @@
     "apply": {
       "species" : {
         "random" : {
-          "crimson" : 9,
+          "crimson" : 4,
           "mega_crimson" : 1
         }
       },
-      "density": 1,
+      "density": [ 2.0, 0.3 ],
       "chance": 1.0,
       "forestness" : 1.0
     }
@@ -223,11 +222,11 @@
     "apply": {
       "species" : {
         "random" : {
-          "warped" : 9,
+          "warped" : 4,
           "mega_warped" : 1
         }
       },
-      "density": 1,
+      "density": [ 2.0, 0.3 ],
       "chance": 1.0,
       "forestness" : 1.0
     }

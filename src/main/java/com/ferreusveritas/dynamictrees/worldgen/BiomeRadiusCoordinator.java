@@ -40,7 +40,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		final Biome biome = this.world.getUncachedNoiseBiome(x + 8, 0, z + 8); // Placement is offset by +8,+8
 
 		final double noiseDensity = (this.noiseGenerator.getSurfaceNoiseValue(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
-		final double density = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(this.dimensionRegistryName).getDensity(biome).getDensity(this.world.random, noiseDensity);
+		final double density = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(this.dimensionRegistryName).getDensitySelector(biome).getDensity(this.world.random, noiseDensity);
 		final double size = ((1.0 - density) * 9); // Size is the inverse of density (gives 0 to 9)
 
 		// Oh Joy. Random can potentially start with the same number for each chunk. Let's just

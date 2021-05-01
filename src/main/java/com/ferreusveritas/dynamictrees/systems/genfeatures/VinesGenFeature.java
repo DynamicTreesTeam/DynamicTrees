@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
@@ -15,6 +14,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.*;
 import net.minecraft.state.BooleanProperty;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -124,8 +124,7 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
 		if(vineSide == null) return;
 
 		BlockState vineState = configuredGenFeature.get(BLOCK).defaultBlockState().setValue(vineSide, true);
-		this.placeVines(world, vinePos, vineState, configuredGenFeature.get(MAX_LENGTH),
-				configuredGenFeature.get(TIP_BLOCK), configuredGenFeature.get(VINE_TYPE), worldgen);
+		this.placeVines(world, vinePos, vineState, configuredGenFeature.get(MAX_LENGTH), null, configuredGenFeature.get(VINE_TYPE), worldgen);
 	}
 
     protected void addVerticalVines(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds, boolean worldgen) {
@@ -135,30 +134,27 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
 		if (!safeBounds.inBounds(vinePos, true)) return;
 
 		if (configuredGenFeature.get(VINE_TYPE) == VineType.FLOOR) {
-			vinePos = this.findTreeTop(world, vinePos);
+			vinePos = this.findGround(world, vinePos);
 		}
 
 		if (vinePos == BlockPos.ZERO) return;
 
 		this.placeVines(world, vinePos, configuredGenFeature.get(BLOCK).defaultBlockState(), configuredGenFeature.get(MAX_LENGTH),
-				configuredGenFeature.get(TIP_BLOCK), configuredGenFeature.get(VINE_TYPE), worldgen);
+				configuredGenFeature.get(TIP_BLOCK).defaultBlockState().setValue(AbstractTopPlantBlock.AGE, worldgen?25:0), configuredGenFeature.get(VINE_TYPE), worldgen);
 	}
 
 	// This is WIP (and isn't needed in the base mod anyway, as well as the fact that there's almost certainly a better way of doing this).
-	private BlockPos findTreeTop(IWorld world, BlockPos vinePos) {
+	private BlockPos findGround(IWorld world, BlockPos vinePos) {
 		BlockPos.Mutable mPos = new BlockPos.Mutable(vinePos.getX(), vinePos.getY(), vinePos.getZ());
 		do {
-			mPos.setY(mPos.getY() + 1);
-		} while (world.getBlockState(vinePos).getBlock() instanceof DynamicLeavesBlock);
-		vinePos = mPos;
+			mPos.move(Direction.DOWN);
+			if (mPos.getY() <= 0) return BlockPos.ZERO;
+		} while (world.isEmptyBlock(vinePos) || world.getBlockState(vinePos).getBlock() instanceof DynamicLeavesBlock);
 
-		if (!world.getBlockState(vinePos).isAir()) {
-			return BlockPos.ZERO;
-		}
-		return vinePos;
+		return mPos.above();
 	}
 
-	protected void placeVines(IWorld world, BlockPos vinePos, BlockState vinesState, int maxLength, @Nullable Block tipBlock, VineType vineType, boolean worldgen) {
+	protected void placeVines(IWorld world, BlockPos vinePos, BlockState vinesState, int maxLength, @Nullable BlockState tipBlock, VineType vineType, boolean worldgen) {
 		// Generate a random length for the vine.
 		int len = 1;
 		if (worldgen) len = MathHelper.clamp(world.getRandom().nextInt(maxLength) + 3, 3, maxLength);
@@ -167,7 +163,7 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
 		for (int i = 0; i < len; i++) {
 			if (world.isEmptyBlock(mPos)) {
 				// Set the current block either to a vine block or a tip block if it's set.
-				world.setBlock(mPos, (tipBlock != null && i == len - 1)?tipBlock.defaultBlockState():vinesState, 3);
+				world.setBlock(mPos, (tipBlock != null && i == len - 1)?tipBlock:vinesState, 3);
 				// Move current position down/up depending on vine type.
 				mPos.setY(mPos.getY() + (vineType != VineType.FLOOR ? - 1 : 1));
 			} else {

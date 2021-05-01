@@ -200,7 +200,7 @@ public class SurfaceRootBlock extends Block {
 	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, FluidState fluid) {
 		final BlockState upstate = world.getBlockState(pos.above());
 
-		if (upstate.getBlock() == DTRegistries.TRUNK_SHELL) {
+		if (upstate.getBlock() instanceof TrunkShellBlock) {
 			world.setBlockAndUpdate(pos, upstate);
 		}
 

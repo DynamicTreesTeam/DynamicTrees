@@ -328,7 +328,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public void rot(IWorld world, BlockPos pos) {
 		this.breakDeliberate(world, pos, DynamicTrees.DestroyMode.ROT);
 	}
-	
+
 	/**
 	 * Destroyed all leaves on the {@link BranchBlock} at the {@code cutPos} into the given {@code destroyedLeaves}
 	 * {@link Map} that can be safely destroyed without harming surrounding leaves.
@@ -347,16 +347,16 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	protected void destroyLeaves(final World world, final BlockPos cutPos, final Species species, final List<BlockPos> endPoints, final Map<BlockPos, BlockState> destroyedLeaves, final List<ItemStackPos> drops) {
 		if (world.isClientSide || endPoints.isEmpty())
 			return;
-		
-		// Make a bounding volume that holds all of the endpoints and expand the volume by 3 blocks for the leaves radius.
-		final BlockBounds bounds = new BlockBounds(endPoints).expand(3);
+
+		// Make a bounding volume that holds all of the endpoints and expand the volume for the leaves radius.
+		final BlockBounds bounds = getFamily().expandLeavesBlockBounds(new BlockBounds(endPoints));
 
 		// Create a voxmap to store the leaf destruction map.
 		final SimpleVoxmap leafMap = new SimpleVoxmap(bounds);
 
-		// For each of the endpoints add a 7x7 destruction volume around it.
+		// For each of the endpoints add an expanded destruction volume around it.
 		for (final BlockPos endPos : endPoints) {
-			for (final BlockPos leafPos : BlockPos.betweenClosed(endPos.offset(-3, -3, -3), endPos.offset(3, 3, 3)) ) {
+			for (final BlockPos leafPos : getFamily().expandLeavesBlockBounds(new BlockBounds(endPos)) ) {
 				leafMap.setVoxel(leafPos, (byte) 1); // Flag this position for destruction.
 			}
 			leafMap.setVoxel(endPos, (byte) 0); // We know that the endpoint does not have a leaves block in it because it was a branch.
@@ -364,10 +364,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 		final Family family = species.getFamily();
 		final BranchBlock familyBranch = family.getBranch();
-		final int primaryThickness = (int) family.getPrimaryThickness();
+		final int primaryThickness = family.getPrimaryThickness();
 
-		// Expand the volume yet again by 3 blocks in all directions and search for other non-destroyed endpoints.
-		for (final BlockPos findPos : bounds.expand(3)) {
+		// Expand the volume yet again in all directions and search for other non-destroyed endpoints.
+		for (final BlockPos findPos : getFamily().expandLeavesBlockBounds(bounds)) {
 			final BlockState findState = world.getBlockState(findPos);
 			if (familyBranch.getRadius(findState) == primaryThickness) { // Search for endpoints of the same tree family.
 				final Iterable<BlockPos.Mutable> leaves = species.getLeavesProperties().getCellKit().getLeafCluster().getAllNonZero();
@@ -563,6 +563,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		// LogManager.getLogger().debug("Sloppy break detected at: " + pos);
 		final BlockState toBlockState = world.getBlockState(pos);
 		final Block toBlock = toBlockState.getBlock();
+
+		if (toBlock instanceof BranchBlock) //if the toBlock is a branch it probably was probably replaced by the debug stick, therefore we do nothing
+			return;
 
 		if (toBlock == Blocks.AIR) { // Block was set to air improperly.
 			world.setBlock(pos, state, 0); // Set the block back and attempt a proper breaking.

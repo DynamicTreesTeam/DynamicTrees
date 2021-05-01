@@ -161,7 +161,7 @@ public class BiomeDatabase {
 		return getEntry(biome).chanceSelector;
 	}
 	
-	public IDensitySelector getDensity(Biome biome) {
+	public IDensitySelector getDensitySelector(Biome biome) {
 		return getEntry(biome).densitySelector;
 	}
 

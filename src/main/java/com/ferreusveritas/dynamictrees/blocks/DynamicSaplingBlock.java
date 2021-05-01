@@ -82,7 +82,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 			this.performBonemeal(worldIn, rand, pos, state);
 	}
 
-	public static boolean canSaplingStay(IWorld world, Species species, BlockPos pos) {
+	public static boolean canSaplingStay(IWorldReader world, Species species, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
 		for(Direction dir: CoordUtils.HORIZONTALS) {
 			BlockState blockState = world.getBlockState(pos.relative(dir));
@@ -95,14 +95,15 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 		//Air above and acceptable soil below
 		return world.isEmptyBlock(pos.above()) && species.isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()));
 	}
-	
-	public boolean canBlockStay(World world, BlockPos pos, BlockState state) {
+
+	@Override
+	public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
 		return canSaplingStay(world, getSpecies(), pos);
 	}
 
 	@Override
 	public void performBonemeal(@Nonnull ServerWorld world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
-		if (canBlockStay(world, pos, state)) {
+		if (canSurvive(state, world, pos)) {
 			if (getSpecies().canSaplingGrow(world, pos)){
 				getSpecies().transitionToTree(world, pos);
 			}
@@ -123,7 +124,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	
 	@Override
 	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-		if (!canBlockStay(world, pos, state)) {
+		if (!canSurvive(state, world, pos)) {
 			dropBlock(world, state, pos);
 		}
 	}

@@ -35,15 +35,14 @@ public class DTConfigs {
 	public static final ForgeConfigSpec.DoubleValue SCALE_BIOME_GROWTH_RATE;
 	public static final ForgeConfigSpec.DoubleValue DISEASE_CHANCE;
 	public static final ForgeConfigSpec.IntValue MAX_BRANCH_ROT_RADIUS;
-	public static final ForgeConfigSpec.BooleanValue ENABLE_APPLE_TREES;
 	public static final ForgeConfigSpec.DoubleValue ROOTY_BLOCK_HARDNESS_MULTIPLIER;
-	public static final ForgeConfigSpec.BooleanValue ENABLE_SWAMP_OAKS_IN_WATER;
+	public static final ForgeConfigSpec.EnumValue<DynamicTrees.SwampOakWaterState> SWAMP_OAKS_IN_WATER;
 	
 	public static final ForgeConfigSpec.BooleanValue IS_LEAVES_PASSABLE;
 	public static final ForgeConfigSpec.BooleanValue VANILLA_LEAVES_COLLISION;
 	public static final ForgeConfigSpec.BooleanValue ENABLE_BRANCH_CLIMBING;
 	public static final ForgeConfigSpec.BooleanValue CANOPY_CRASH;
-	public static final ForgeConfigSpec.EnumValue<DynamicTrees.EnumAxeDamage> AXE_DAMAGE_MODE;
+	public static final ForgeConfigSpec.EnumValue<DynamicTrees.AxeDamage> AXE_DAMAGE_MODE;
 	public static final ForgeConfigSpec.BooleanValue ENABLE_FALLING_TREES;
 	public static final ForgeConfigSpec.BooleanValue ENABLE_FALLING_TREE_DAMAGE;
 	public static final ForgeConfigSpec.DoubleValue FALLING_TREE_DAMAGE_MULTIPLIER;
@@ -53,7 +52,8 @@ public class DTConfigs {
 	public static final ForgeConfigSpec.BooleanValue ENABLE_STRIP_RADIUS_REDUCTION;
 	
 	public static final ForgeConfigSpec.BooleanValue REPLACE_VANILLA_SAPLING;
-	public static final ForgeConfigSpec.BooleanValue REPLACE_NYLIUM_FUNGI;
+	//TODO
+//	public static final ForgeConfigSpec.BooleanValue REPLACE_NYLIUM_FUNGI;
 	
 	public static final ForgeConfigSpec.BooleanValue PODZOL_GEN;
 
@@ -107,12 +107,11 @@ public class DTConfigs {
 				defineInRange("diseaseChance", 0.0f, 0.0f, 1.0f);
 		MAX_BRANCH_ROT_RADIUS = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. Set to 0 to prevent rotting").
 				defineInRange("maxBranchRotRadius", 8, 0, 24);
-		ENABLE_APPLE_TREES = SERVER_BUILDER.comment("If enabled apple trees will be generated during worldgen and oak trees will not drop apples").
-				define("enableAppleTrees", true);
 		ROOTY_BLOCK_HARDNESS_MULTIPLIER = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
 				defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
-		ENABLE_SWAMP_OAKS_IN_WATER = SERVER_BUILDER.comment("If enabled swamp oak trees will be able to generate on shallow water with mangrove-like roots").
-				define("enableSwampOaksInWater", true);
+		SWAMP_OAKS_IN_WATER = SERVER_BUILDER.comment("Options for how oak trees generate in swamps. ROOTED: Swamp oak trees will generate on shallow water with mangrove-like roots. SUNK: Swamp oak trees will generate on shallow water one block under the surface. DISABLED: Swamp oaks will not generate on water.").
+				defineEnum("swampOaksInWater", DynamicTrees.SwampOakWaterState.ROOTED);
+
 		SERVER_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("Interaction Settings").push("interaction");
@@ -124,8 +123,8 @@ public class DTConfigs {
 				define("enableBranchClimbling", true);
 		CANOPY_CRASH = SERVER_BUILDER.comment("If enabled players receive reduced fall damage on leaves at the expense of the block(s) destruction").
 				define("canopyCrash", true);
-		AXE_DAMAGE_MODE = SERVER_BUILDER.comment("Modes: 0=Standard 1 Damage, 1=By Branch/Trunk Thickness, 2=By Tree Volume").
-				defineEnum("axeDamageMode", DynamicTrees.EnumAxeDamage.THICKNESS);
+		AXE_DAMAGE_MODE = SERVER_BUILDER.comment("Damage dealt to the axe item when cutting a tree down. VANILLA: Standard 1 Damage. THICKNESS: By Branch/Trunk Thickness. VOLUME: By Tree Volume.").
+				defineEnum("axeDamageMode", DynamicTrees.AxeDamage.THICKNESS);
 		ENABLE_FALLING_TREES = SERVER_BUILDER.comment("If enabled then trees will fall over when harvested").
 				define("enableFallingTrees", true);
 		ENABLE_FALLING_TREE_DAMAGE = SERVER_BUILDER.comment("If enabled then trees will harm living entities when falling").
@@ -145,8 +144,8 @@ public class DTConfigs {
 		COMMON_BUILDER.comment("Vanilla Trees Settings").push("vanilla");
 		REPLACE_VANILLA_SAPLING = COMMON_BUILDER.comment("Right clicking with a vanilla sapling places a dynamic sapling instead.").
 				define("replaceVanillaSapling", false);
-		REPLACE_NYLIUM_FUNGI = COMMON_BUILDER.comment("Fungi that sprout from bonemealing nylium will be dynamic instead.").
-				define("replaceNyliumFungi", false);
+//		REPLACE_NYLIUM_FUNGI = COMMON_BUILDER.comment("Fungi that sprout from bonemealing nylium will be dynamic instead.").
+//				define("replaceNyliumFungi", true);
 		COMMON_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("World Generation Settings").push("world");

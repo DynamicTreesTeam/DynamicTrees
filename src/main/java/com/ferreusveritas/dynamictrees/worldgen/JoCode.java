@@ -207,7 +207,7 @@ public class JoCode {
 
 		firstBranch.analyse(treeState, world, treePos, Direction.DOWN, signal);
 
-		if (signal.found || signal.overflow) { // Something went terribly wrong.
+		if (signal.foundRoot || signal.overflow) { // Something went terribly wrong.
 			this.tryGenerateAgain(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds, worldGen, treePos, treeState, endFinder);
 			return;
 		}
@@ -257,10 +257,15 @@ public class JoCode {
 	private void tryGenerateAgain(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder) {
 		// Don't log the error if it didn't happen during world gen (so we don't fill the logs if players spam the staff in cramped positions).
 		if (worldGen) {
-			LOGGER.debug("Non-viable branch network detected during world generation @ {}", treePos);
-			LOGGER.debug("Species: {}", species);
-			LOGGER.debug("Radius: {}", radius);
-			LOGGER.debug("JoCode: {}", this);
+			if (!secondChanceRegen){
+				LOGGER.debug("Non-viable branch network detected during world generation @ {}", treePos);
+				LOGGER.debug("Species: {}", species);
+				LOGGER.debug("Radius: {}", radius);
+				LOGGER.debug("JoCode: {}", this);
+			} else {
+				LOGGER.debug("Second attempt for code {} has also failed", this);
+			}
+
 		}
 
 		// Completely blow away any improperly defined network nodes.
@@ -371,10 +376,10 @@ public class JoCode {
 	}
 	
 	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful) {
-		if (world.getBlockState(pos).canBeReplacedByLogs(world, pos) &&
+		if ((world.getBlockState(pos).canBeReplacedByLogs(world, pos)) || world.getBlockState(pos).getMaterial().isLiquid() &&
 				(!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
 			Objects.requireNonNull(species.getFamily().getBranch())
-					.setRadius(world, pos, (int)species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
+					.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
 			return false;
 		}
 		return true;

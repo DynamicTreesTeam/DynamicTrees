@@ -332,7 +332,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
+	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal) {
 		signal.run(blockState, world, pos, fromDir);//Run inspector of choice
 		
 		if (signal.root == null) {
@@ -341,7 +341,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 			signal.multiroot = true;
 		}
 
-		signal.found = true;
+		signal.foundRoot = true;
 		
 		return signal;
 	}

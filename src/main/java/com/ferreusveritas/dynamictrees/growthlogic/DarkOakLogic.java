@@ -69,5 +69,7 @@ public class DarkOakLogic extends GrowthLogicKit {
 	}
 
 	@Override
-	public int getLowestBranchHeight(World world, BlockPos pos, Species species, int lowestBranchHeight) { return lowestBranchHeight; }
+	public int getLowestBranchHeight(World world, BlockPos pos, Species species, int lowestBranchHeight) {
+		return (int) (lowestBranchHeight * species.biomeSuitability(world, pos));
+	}
 }

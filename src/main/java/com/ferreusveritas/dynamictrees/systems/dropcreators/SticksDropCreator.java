@@ -16,16 +16,16 @@ import java.util.Random;
  *
  * @author Max Hyper
  */
-public class LeavesStickDropCreator extends DropCreator {
+public class SticksDropCreator extends DropCreator {
 	ItemStack droppedItem;
 	float rarity;
 	int maxCount;
 
-	public LeavesStickDropCreator(Species species) {
+	public SticksDropCreator(Species species) {
 		this(species, 1, 2);
 	}
 
-	public LeavesStickDropCreator(Species species, float rarity, int maxCount) {
+	public SticksDropCreator(Species species, float rarity, int maxCount) {
 		super(new ResourceLocation(DynamicTrees.MOD_ID, "sticks"));
 		this.droppedItem = species.getFamily().getStick(1);
 		this.rarity = rarity;
@@ -46,9 +46,8 @@ public class LeavesStickDropCreator extends DropCreator {
 		int chance = 50;
 		if (fortune > 0) {
 			chance -= 2 << fortune;
-			if (chance < 10) {
+			if (chance < 10)
 				chance = 10;
-			}
 		}
 		if(random.nextInt((int) (chance / rarity)) == 0) {
 			ItemStack drop = droppedItem.copy();

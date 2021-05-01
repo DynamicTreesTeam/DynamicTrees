@@ -204,5 +204,5 @@ public class LeafClusters {
 			6, 7, 6,
 			5, 6, 5
 
-	}).setCenter(new BlockPos(3, 4, 3));
+	}).setCenter(new BlockPos(1, 4, 1));
 }

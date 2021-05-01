@@ -7,7 +7,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MapSignal {
 
@@ -23,22 +25,20 @@ public class MapSignal {
 	public Direction localRootDir;
 
 	public boolean overflow;
-	public boolean found;
+	public boolean foundRoot;
 
 	public MapSignal() {
 		localRootDir = null;
-		nodeInspectors = new ArrayList<INodeInspector>();
+		nodeInspectors = new ArrayList<>();
 	}
 
 	public MapSignal(INodeInspector ... nis) {
 		this();
 
-		for(INodeInspector ni: nis) {
-			nodeInspectors.add(ni);
-		}
+		nodeInspectors.addAll(Arrays.asList(nis));
 	}
 
-	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+	public boolean run(BlockState blockState, IWorld world, BlockPos pos, @Nullable Direction fromDir) {
 		for(INodeInspector inspector: nodeInspectors) {
 			inspector.run(blockState, world, pos, fromDir);
 		}

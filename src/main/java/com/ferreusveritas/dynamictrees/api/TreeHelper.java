@@ -143,7 +143,7 @@ public class TreeHelper {
 		
 		BlockState blockState = world.getBlockState(pos);
 		
-		if(blockState.getBlock() == DTRegistries.TRUNK_SHELL) {
+		if(blockState.getBlock() instanceof TrunkShellBlock) {
 			TrunkShellBlock.ShellMuse muse = ((TrunkShellBlock)blockState.getBlock()).getMuse(world, blockState, pos);
 			if(muse != null) {
 				return muse.pos;
@@ -215,7 +215,7 @@ public class TreeHelper {
 		switch(treePart.getTreePartType()) {
 			case BRANCH:
 				MapSignal signal = treePart.analyse(state, world, pos, null, new MapSignal());// Analyze entire tree network to find root node
-				if(signal.found) {
+				if(signal.foundRoot) {
 					return signal.root;
 				}
 				break;

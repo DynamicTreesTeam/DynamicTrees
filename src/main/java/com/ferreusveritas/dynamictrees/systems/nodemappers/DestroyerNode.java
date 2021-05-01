@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,9 +43,8 @@ public class DestroyerNode implements INodeInspector {
 	}
 	
 	@Override
-	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
-		if (BranchConnectables.isBlockConnectable(blockState.getBlock()) &&
-				BranchConnectables.getConnectionRadiusForBlock(blockState, world, pos, fromDir.getOpposite()) > 0){
+	public boolean run(BlockState blockState, IWorld world, BlockPos pos, @Nullable Direction fromDir) {
+		if (BranchConnectables.getConnectionRadiusForBlock(blockState, world, pos, fromDir==null?null:fromDir.getOpposite()) > 0){
 				if (player != null && world instanceof World){
 					TileEntity te = world.getBlockEntity(pos);
 					blockState.getBlock().removedByPlayer(blockState, (World) world, pos, player, true, world.getFluidState(pos));

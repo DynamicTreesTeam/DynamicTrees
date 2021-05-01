@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.util.ResourceLocation;
@@ -30,7 +31,7 @@ public class DynamicTrees {
 	public static final String SERENE_SEASONS = "sereneseasons";
 	public static final String FAST_LEAF_DECAY = "fastleafdecay";
 
-	public enum EnumAxeDamage {
+	public enum AxeDamage {
 		VANILLA,
 		THICKNESS,
 		VOLUME
@@ -43,6 +44,12 @@ public class DynamicTrees {
 		HARVEST,
 		ROT,
 		OVERFLOW
+	}
+
+	public enum SwampOakWaterState {
+		ROOTED,
+		SUNK,
+		DISABLED
 	}
 
 	public DynamicTrees() {
@@ -79,6 +86,9 @@ public class DynamicTrees {
 		DTRegistries.DENDRO_POTION.registerRecipes();
 
 		DTResourceRegistries.TREES_RESOURCE_MANAGER.setup();
+
+//		if (DTConfigs.REPLACE_NYLIUM_FUNGI.get())
+//			DTTrees.replaceNyliumFungiFeatures();
 	}
 
 	public static ResourceLocation resLoc (final String path) {

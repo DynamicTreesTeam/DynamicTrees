@@ -1,18 +1,21 @@
-package com.ferreusveritas.dynamictrees.trees;
+package com.ferreusveritas.dynamictrees.trees.specialfamilies;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
+import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 
 /**
  * @author Harley O'Connor
  */
-public final class FungusFamily extends Family {
+public final class NetherFungusFamily extends Family {
 
-    public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(FungusFamily::new);
+    public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(NetherFungusFamily::new);
 
-    public FungusFamily (ResourceLocation name) {
+    public NetherFungusFamily(ResourceLocation name) {
         super(name);
     }
 
@@ -39,4 +42,7 @@ public final class FungusFamily extends Family {
     @Override
     public boolean isFireProof() { return true; }
 
+    public BlockBounds expandLeavesBlockBounds(BlockBounds bounds){
+        return bounds.expand(1).expand(Direction.DOWN, 3);
+    }
 }

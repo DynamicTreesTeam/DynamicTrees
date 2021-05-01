@@ -13,13 +13,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A drop creator that drops apples just like Vanilla trees.
- * No longer used by any of the trees in the base mod on account of
- * the addition of the apple species.  Left for demonstration purposes
- * or in case I change my mind about something.
+ * A drop creator that drops fruit just like Vanilla apples.
  * 
  * @author ferreusveritas
- *
  */
 public class FruitDropCreator extends DropCreator {
 
@@ -36,7 +32,7 @@ public class FruitDropCreator extends DropCreator {
 		this.rarity = rarity;
 	}
 
-	public FruitDropCreator setFruitDrop (Item fruitItem){
+	public FruitDropCreator setFruitItem (Item fruitItem){
 		this.fruit = new ItemStack(fruitItem);
 		return this;
 	}
@@ -46,7 +42,16 @@ public class FruitDropCreator extends DropCreator {
 	}
 
 	@Override
+	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
+		return getFruit(dropList, random, fortune);
+	}
+
+	@Override
 	public List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
+		return getFruit(dropList, random, fortune);
+	}
+
+	private List<ItemStack> getFruit (List<ItemStack> dropList, Random random, int fortune){
 		//More fortune contrivances here.  Vanilla compatible returns.
 		int chance = 200; //1 in 200 chance of returning an "apple"
 		if (fortune > 0) {
@@ -55,7 +60,7 @@ public class FruitDropCreator extends DropCreator {
 				chance = 40;
 			}
 		}
-		
+
 		if(random.nextInt((int) (chance / getLeavesRarity())) == 0) {
 			dropList.add(fruit);
 		}

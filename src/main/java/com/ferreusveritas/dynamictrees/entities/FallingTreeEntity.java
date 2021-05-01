@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.entities;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.entities.animation.DataAnimationHandler;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
@@ -217,7 +218,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 				BlockPos pos = destroyData.getBranchRelPos(i).offset(cutPos);
 				for(Surround dir: Surround.values()) {
 					BlockPos dPos = pos.offset(dir.getOffset());
-					if(level.getBlockState(dPos).getBlock() == DTRegistries.TRUNK_SHELL) {
+					if(level.getBlockState(dPos).getBlock() instanceof TrunkShellBlock) {
 						level.removeBlock(dPos, false);
 					}
 				}

@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 import java.util.ArrayList;
 
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 
 import net.minecraft.block.BlockState;
@@ -27,12 +28,15 @@ public class CoderNode implements INodeInspector {
 	private ArrayList<Link> links;
 	
 	public CoderNode() {
-		links = new ArrayList<Link>();
+		links = new ArrayList<>();
 	}
 	
 	@Override
 	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
-		
+		//Branch connectables should not be mapped
+		if (BranchConnectables.isBlockConnectable(world.getBlockState(pos).getBlock()))
+			return false;
+
 		Link link = new Link(pos);
 		
 		//We've reached the end of a branch and we're starting again.

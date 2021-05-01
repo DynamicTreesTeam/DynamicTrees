@@ -40,7 +40,7 @@ import java.util.function.BiFunction;
 /**
  * Gen feature for bee nests. Can be fully customized with a custom predicate for natural growth
  * and with a custom function for worldgen chances.
- * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, BranchConnectables.RadiusForConnectionFunction) makeBlockConnectable}
+ * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, BranchConnectables.IRadiusForConnectionFunction) makeBlockConnectable}
  *
  * @author Max Hyper
  */

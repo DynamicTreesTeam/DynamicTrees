@@ -50,13 +50,19 @@ public class NetherFungusLogic extends GrowthLogicKit {
 		return minCapHeight;
 	}
 
+	//Weird hack for getting different heights inside the growth chamber
 	private float getHashedVariation (World world, BlockPos pos){
-		long day = world.getGameTime() / 24000L;
-		int month = (int)day / 30;//Change the hashs every in-game month
-
-		return (CoordUtils.coordHashCode(pos.above(month), 2) % heightVariation);//Vary the height energy by a psuedorandom hash function
-
+		int i;
+		for (i = heightVariation; i>1; i--)
+			if (!world.isEmptyBlock(pos.above().north(i))) break;
+		return i - 1;
 	}
+
+//	private float getHashedVariation (World world, BlockPos pos){
+//		long day = world.getGameTime() / 24000L;
+//		int month = (int)day / 30;//Change the hashs every in-game month
+//		return (CoordUtils.coordHashCode(pos.above(month), 2) % heightVariation);//Vary the height energy by a psuedorandom hash function
+//	}
 
 	@Override
 	public float getEnergy(World world, BlockPos pos, Species species, float signalEnergy) {

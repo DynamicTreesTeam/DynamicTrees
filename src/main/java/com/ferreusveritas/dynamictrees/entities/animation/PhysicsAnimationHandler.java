@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.entities.animation;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -88,7 +89,7 @@ public class PhysicsAnimationHandler implements IAnimationHandler {
 		final BlockPos pos = new BlockPos(entity.getX(), entity.getY(), entity.getZ());
 		final BlockState collState = world.getBlockState(pos);
 
-		if (!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState) && collState.getBlock() != DTRegistries.TRUNK_SHELL) {
+		if (!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState) && !(collState.getBlock() instanceof TrunkShellBlock)) {
 			if (collState.getBlock() instanceof FlowingFluidBlock) {
 				// Undo the gravity.
 				entity.setDeltaMovement(entity.getDeltaMovement().add(0, AnimationConstants.TREE_GRAVITY, 0));
