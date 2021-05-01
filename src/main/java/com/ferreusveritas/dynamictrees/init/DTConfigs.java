@@ -52,8 +52,7 @@ public class DTConfigs {
 	public static final ForgeConfigSpec.BooleanValue ENABLE_STRIP_RADIUS_REDUCTION;
 	
 	public static final ForgeConfigSpec.BooleanValue REPLACE_VANILLA_SAPLING;
-	//TODO
-//	public static final ForgeConfigSpec.BooleanValue REPLACE_NYLIUM_FUNGI;
+	public static final ForgeConfigSpec.BooleanValue REPLACE_NYLIUM_FUNGI;
 	
 	public static final ForgeConfigSpec.BooleanValue PODZOL_GEN;
 
@@ -144,8 +143,8 @@ public class DTConfigs {
 		COMMON_BUILDER.comment("Vanilla Trees Settings").push("vanilla");
 		REPLACE_VANILLA_SAPLING = COMMON_BUILDER.comment("Right clicking with a vanilla sapling places a dynamic sapling instead.").
 				define("replaceVanillaSapling", false);
-//		REPLACE_NYLIUM_FUNGI = COMMON_BUILDER.comment("Fungi that sprout from bonemealing nylium will be dynamic instead.").
-//				define("replaceNyliumFungi", true);
+		REPLACE_NYLIUM_FUNGI = COMMON_BUILDER.comment("Crimson Fungus and Warped Fungus that sprout from nylium will be dynamic instead.").
+				define("replaceNyliumFungi", true);
 		COMMON_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("World Generation Settings").push("world");

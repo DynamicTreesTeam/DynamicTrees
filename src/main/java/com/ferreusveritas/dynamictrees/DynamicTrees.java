@@ -87,8 +87,8 @@ public class DynamicTrees {
 
 		DTResourceRegistries.TREES_RESOURCE_MANAGER.setup();
 
-//		if (DTConfigs.REPLACE_NYLIUM_FUNGI.get())
-//			DTTrees.replaceNyliumFungiFeatures();
+		if (DTConfigs.REPLACE_NYLIUM_FUNGI.get())
+			DTTrees.replaceNyliumFungiFeatures();
 	}
 
 	public static ResourceLocation resLoc (final String path) {

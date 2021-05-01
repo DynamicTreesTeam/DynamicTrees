@@ -19,8 +19,12 @@ import com.ferreusveritas.dynamictrees.trees.specialspecies.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.trees.specialspecies.SwampOakSpecies;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.WeightedList;
 import net.minecraft.world.gen.blockstateprovider.WeightedBlockStateProvider;
+import net.minecraft.world.gen.feature.BlockStateProvidingFeatureConfig;
 import net.minecraft.world.gen.feature.Features;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -101,10 +105,17 @@ public class DTTrees {
 		Species warped = TreeRegistry.findSpecies(DTTrees.WARPED);
 		Block warpedSapling = warped.getSapling().orElse(null);
 		if (crimsonSapling != null && warpedSapling != null){
-			((WeightedBlockStateProvider) Features.Configs.CRIMSON_FOREST_CONFIG.stateProvider).add(crimsonSapling.defaultBlockState(), 11).add(warpedSapling.defaultBlockState(), 1);
-			((WeightedBlockStateProvider) Features.Configs.WARPED_FOREST_CONFIG.stateProvider).add(crimsonSapling.defaultBlockState(), 1).add(warpedSapling.defaultBlockState(), 13);
+			replaceFeatureConfigEntires(((WeightedBlockStateProvider) Features.Configs.CRIMSON_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
+			replaceFeatureConfigEntires(((WeightedBlockStateProvider) Features.Configs.WARPED_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
 		}
-
+	}
+	private static void replaceFeatureConfigEntires (WeightedBlockStateProvider featureConfig, Block crimsonSapling, Block warpedSapling){
+		for (WeightedList.Entry<BlockState> entry : featureConfig.weightedList.entries){
+			if (entry.data.getBlock() == Blocks.CRIMSON_FUNGUS)
+				entry.data = crimsonSapling.defaultBlockState();
+			if (entry.data.getBlock() == Blocks.WARPED_FUNGUS)
+				entry.data = warpedSapling.defaultBlockState();
+		}
 	}
 
 	private static ResourceLocation resLoc (final String path) {
