@@ -455,6 +455,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	
 	public Species setLeavesProperties(LeavesProperties leavesProperties) {
 		this.leavesProperties = leavesProperties;
+		leavesProperties.setFamily(getFamily());
 		addValidLeafBlocks(leavesProperties);
 		return this;
 	}
@@ -465,13 +466,6 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	public Optional<DynamicLeavesBlock> getLeavesBlock() {
 		return this.leavesProperties.getDynamicLeavesBlock();
-	}
-
-	public DynamicLeavesBlock createLeavesBlock(LeavesProperties leavesProperties) {
-//		DynamicLeavesBlock block = new DynamicLeavesBlock(leavesProperties);
-//		block.setRegistryName(getRegistryName() + "_leaves");
-//		LeavesPaging.addLeavesBlockForModId(block, getRegistryName().getNamespace());
-		return null;
 	}
 
 	public void addValidLeafBlocks (LeavesProperties... leaves){
