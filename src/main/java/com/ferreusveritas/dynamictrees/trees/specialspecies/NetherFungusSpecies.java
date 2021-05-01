@@ -10,6 +10,8 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -76,7 +78,8 @@ public class NetherFungusSpecies extends Species {
     }
 
     @Override
-    public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-        return super.generate(worldObj, world, rootPos, biome, random, radius, safeBounds);
+    public boolean isAcceptableSoilForWorldgen(IWorld world, BlockPos pos, BlockState soilBlockState) {
+        if (soilBlockState.getBlock() == Blocks.NETHERRACK) return true; //Soil exception for worldgen
+        return super.isAcceptableSoilForWorldgen(world, pos, soilBlockState);
     }
 }

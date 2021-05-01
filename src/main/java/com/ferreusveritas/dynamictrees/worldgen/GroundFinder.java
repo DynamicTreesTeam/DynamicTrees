@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
+import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -25,7 +26,7 @@ import java.util.List;
 public class GroundFinder implements IGroundFinder {
 
 	protected boolean isReplaceable(final IWorld world, final BlockPos pos){
-		return (world.isEmptyBlock(pos) || !world.getBlockState(pos).getMaterial().blocksMotion()) && !world.getBlockState(pos).getMaterial().isLiquid();
+		return (world.isEmptyBlock(pos) || !world.getBlockState(pos).getMaterial().blocksMotion() || world.getBlockState(pos).getBlock() instanceof DynamicSaplingBlock) && !world.getBlockState(pos).getMaterial().isLiquid();
 	}
 
 	protected boolean inRange(final BlockPos pos, final int minY, final int maxY) {
