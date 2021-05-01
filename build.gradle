@@ -152,7 +152,8 @@ java {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId = "${config.mod_name}-${config.mc_version}"
+            setArtifactId("${config.mod_name}-${config.mc_version}")
+            setVersion(config.mod_version)
 
             from components.java
 
