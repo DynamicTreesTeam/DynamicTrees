@@ -18,7 +18,7 @@ public class RandomXOR extends Random {
 	}
 	
 	public void setXOR(BlockPos pos) {
-		setXOR(((pos.getX() * 674365771) ^ (pos.getZ() * 254326997) ^ (pos.getY() * 95915635)) >> 4);
+		setXOR(((pos.getX() * 674365771) ^ (pos.getZ() * 254326997)) >> 4);
 	}
     
     public void setXOR(int xor) {
