@@ -1,3 +1,5 @@
+import org.w3c.dom.Element
+
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
@@ -28,7 +30,6 @@ repositories {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 ext.configFile = file "gradle.properties"
@@ -142,30 +143,44 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
 }
 
-task writeNewPom {
-    doLast {
-        pom {
-            project {
-                groupId config.package_group
-                artifactId "${archivesBaseName}-${config.mc_version}"
-                version config.mod_version
-            }
-        }.whenConfigured {
-            pom -> pom.dependencies.clear()
-        }.writeTo("build/libs/${archivesBaseName}-${config.mc_version}-${config.mod_version}.pom")
-    }
-}
+jar.finalizedBy('reobfJar')
 
-jar.finalizedBy('reobfJar', 'writeNewPom')
-
-artifacts {
-    archives sourcesJar
+java {
+    withSourcesJar()
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact jar
+            setArtifactId("${config.mod_name}-${config.mc_version}")
+            setVersion(config.mod_version)
+
+            from components.java
+
+            pom {
+                url = "https://github.com/ferreusveritas/${config.mod_name}"
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://mit-license.org'
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/ferreusveritas/${config.mod_name}.git"
+                    developerConnection = "scm:git:ssh://github.com/ferreusveritas/${config.mod_name}.git"
+                    url = "https://github.com/ferreusveritas/${config.mod_name}"
+                }
+            }
+
+            pom.withXml { xmlProvider ->
+                final Element element = xmlProvider.asElement();
+
+                // Clear dependencies.
+                element.getChildNodes().each { node ->
+                    if (node.getNodeName() == "dependencies")
+                        element.removeChild(node)
+                }
+            }
         }
     }
     repositories {

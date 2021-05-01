@@ -210,12 +210,19 @@ public class FalloverAnimationHandler implements IAnimationHandler {
 				entity1 -> {
 					if(entity1 instanceof LivingEntity && entity1.isPickable()) {
 						AxisAlignedBB axisalignedbb = entity1.getBoundingBox().inflate(maxRadius);
-						return axisalignedbb.contains(vec3d1) || axisalignedbb.intersects(vec3d1, vec3d2);
+						return axisalignedbb.contains(vec3d1) || intersects(axisalignedbb, vec3d1, vec3d2);
 					}
 					return false;
 				}
 		).stream().map( a -> (LivingEntity)a ).collect(Collectors.toList());
 
+	}
+
+	/**
+	 * A client side version of {@link AxisAlignedBB#intersects(Vector3d, Vector3d)}.
+	 */
+	public static boolean intersects(AxisAlignedBB axisAlignedBB, Vector3d vec3d, Vector3d otherVec3d) {
+		return axisAlignedBB.intersects(Math.min(vec3d.x, otherVec3d.x), Math.min(vec3d.y, otherVec3d.y), Math.min(vec3d.z, otherVec3d.z), Math.max(vec3d.x, otherVec3d.x), Math.max(vec3d.y, otherVec3d.y), Math.max(vec3d.z, otherVec3d.z));
 	}
 
 	@Override
