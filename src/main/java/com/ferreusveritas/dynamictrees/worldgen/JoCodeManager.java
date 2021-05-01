@@ -51,7 +51,7 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
             ResourceLocation resourceLocation = new ResourceLocation(resourceLocationIn.getNamespace(), resLocStr.substring(this.folderName.length() + 1, resLocStr.length() - TEXT_EXTENSION_LENGTH));
 
             // Only add the JoCode file if its name matches a species name.
-            if (TreeRegistry.findSpecies(resourceLocation) == Species.NULL_SPECIES)
+            if (!TreeRegistry.findSpecies(resourceLocation).isValid())
                 continue;
 
             try {
@@ -66,7 +66,8 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
                 while ((line = reader.readLine()) != null) {
                     // JoCodes should be at least 1 character (with radius number and colon too), and ignore comments (start with #).
                     if ((line.length() >= 3) && (line.charAt(0) != '#')) {
-                        lines.add(line);
+                        final int commentIndex = line.indexOf('#');
+                        lines.add(line.substring(0, commentIndex < 0 ? line.length() : commentIndex));
                     }
                 }
 
@@ -91,7 +92,8 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
             final Species species = TreeRegistry.findSpecies(resourceLocation);
 
             lines.forEach(line -> {
-                final String[] split = line.split(":");
+                // Remove any whitespace and split by a comma.
+                final String[] split = line.replace(" ", "").split(":");
                 this.addCode(species, Integer.parseInt(split[0]), split[1]);
             });
 
