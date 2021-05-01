@@ -152,20 +152,20 @@
           "apple_oak": 1
         }
       },
-      "density": [ 0.05 ],
-      "chance": 0.04
+      "chance": 0.06
     }
   },
   {
-    "__comment": "All biomes of type BiomeHills generate spruce 2/3 of the time and oak 1/3 of the time",
-    "select": { "name": "minecraft:.*mountains.*" },
+    "__comment": "All mountain biomes generate spruce 2/3 of the time and oak 1/3 of the time",
+    "select": { "name": "minecraft:.*mountain.*" },
     "apply": {
       "species" : {
         "random" : {
           "spruce" : 2,
           "oak" : 1
         }
-      }
+      },
+      "chance": 0.06
     }
   },
   {
@@ -193,6 +193,15 @@
     "apply": {
       "subterranean": true,
       "chance": 0.4
+    }
+  },
+  {
+    "__comment" : "Wooded biomes should have forest like densities. This is set last as previous biome settings might have changed this.",
+    "select": { "name": "minecraft:.*wooded.*" },
+    "apply": {
+      "density": 1,
+      "chance": 1.0,
+      "forestness" : 1.0
     }
   },
   {
