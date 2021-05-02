@@ -121,14 +121,6 @@
     }
   },
   {
-    "__comment" : "Mesa Rock(Plateau) has a chance of generating oak.  But oaks don't grow in clay so occurence is rare",
-    "select": { "name": "minecraft:.*badlands_plateau" },
-    "apply": {
-      "species" : "oak",
-      "chance": 0.5
-    }
-  },
-  {
     "__comment": "Any biome with 'birch' in the name is 100% birch",
     "select": { "name": "minecraft:.*birch.*" },
     "apply": {
@@ -196,12 +188,21 @@
     }
   },
   {
-    "__comment" : "Wooded biomes should have forest like densities. This is set last as previous biome settings might have changed this.",
+    "__comment" : "Wooded biomes should have forest like densities. This is set last as previous biome settings might have changed these settings.",
     "select": { "name": "minecraft:.*wooded.*" },
     "apply": {
       "density": 1,
       "chance": 1.0,
       "forestness" : 1.0
+    }
+  },
+
+  {
+    "__comment" : "Wooded Mesas have a chance of generating oak on the dirt patches.",
+    "select": { "name": "minecraft:wooded_badlands_plateau" },
+    "apply": {
+      "species" : "oak",
+      "chance": 0.5
     }
   },
   {

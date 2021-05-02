@@ -210,6 +210,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     }
 
     private void readPopulator (final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonElement jsonElement, final boolean readCancellerOnly) {
+        LOGGER.info("Loading JSON populator in {}", resourceLocation);
         JsonHelper.JsonElementReader.of(jsonElement).ifArrayForEach(JsonObject.class, jsonObject ->
                 this.readPopulatorSection(database, resourceLocation, jsonObject, readCancellerOnly))
                 .elseWarn("Root element of populator '" + resourceLocation + "' was not a Json array.");

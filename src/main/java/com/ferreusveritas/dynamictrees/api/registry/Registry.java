@@ -32,7 +32,7 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
     /**
      * The {@link Set} of {@link RegistryEntry} objects currently registered.
      */
-    private final Set<V> entries = Sets.newHashSet();
+    private final Set<V> entries = new LinkedHashSet<>();
 
     private final Class<V> type;
 
