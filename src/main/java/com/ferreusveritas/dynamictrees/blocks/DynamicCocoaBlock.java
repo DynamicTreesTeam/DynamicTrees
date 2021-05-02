@@ -28,8 +28,8 @@ public class DynamicCocoaBlock extends CocoaBlock {
 	* Can this block stay at this position.  Similar to canPlaceBlockAt except gets checked often with plants.
 	*/
 	public boolean canSurvive(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		BlockState logState = worldIn.getBlockState(pos.relative(state.getValue(FACING)));
-		BranchBlock branch = TreeHelper.getBranch(logState);
+		final BlockState logState = worldIn.getBlockState(pos.relative(state.getValue(FACING)));
+		final BranchBlock branch = TreeHelper.getBranch(logState);
 		return branch != null && branch.getRadius(logState) == 8 && branch.getFamily().canSupportCocoa;
 	}
 
@@ -37,4 +37,5 @@ public class DynamicCocoaBlock extends CocoaBlock {
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
 		return new ItemStack(Items.COCOA_BEANS);
 	}
+
 }

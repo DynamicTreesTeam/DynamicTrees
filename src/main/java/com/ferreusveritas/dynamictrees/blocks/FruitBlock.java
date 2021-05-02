@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.*;
@@ -23,14 +24,14 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.ForgeHooks;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import net.minecraft.block.AbstractBlock.Properties;
+import java.util.function.Supplier;
 
 @SuppressWarnings({"deprecation", "unused"})
 public class FruitBlock extends Block implements IGrowable {
@@ -59,7 +60,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
-	protected boolean bonemealable = false;//Q:Does dusting an apple with bone dust make it grow faster?  A:No.
+	protected Supplier<Boolean> canBoneMeal = DTConfigs.CAN_BONE_MEAL_APPLE::get; // Q: Does dusting an apple with bone dust make it grow faster? A: Not by default.
 	protected Vector3d itemSpawnOffset = new Vector3d(0.5, 0.6, 0.5);
 	private Species species;
 
@@ -69,13 +70,17 @@ public class FruitBlock extends Block implements IGrowable {
 				.strength(0.3f));
 	}
 
-	public FruitBlock setBonemealable(boolean bonemealable) {
-		this.bonemealable = bonemealable;
+	public FruitBlock setCanBoneMeal(boolean canBoneMeal) {
+		return this.setCanBoneMeal(() -> canBoneMeal);
+	}
+
+	public FruitBlock setCanBoneMeal(Supplier<Boolean> canBoneMeal) {
+		this.canBoneMeal = canBoneMeal;
 		return this;
 	}
 
 	public void setItemSpawnOffset (float x, float y, float z){
-		this.itemSpawnOffset = new Vector3d(Math.min(Math.max(x,0),1),Math.min(Math.max(y,0),1),Math.min(Math.max(z,0),1));
+		this.itemSpawnOffset = new Vector3d(Math.min(Math.max(x, 0) ,1), Math.min(Math.max(y, 0), 1), Math.min(Math.max(z, 0), 1));
 	}
 
 	public void setSpecies(Species species) {
@@ -94,29 +99,30 @@ public class FruitBlock extends Block implements IGrowable {
 			return;
 		}
 
-		int age = state.getValue(AGE);
-		Float season = SeasonHelper.getSeasonValue(world, pos);
+		final int age = state.getValue(AGE);
+		final Float season = SeasonHelper.getSeasonValue(world, pos);
+		final Species species = this.getSpecies();
 
-		if(season != null && getSpecies().isValid()) { //Non-Null means we are season capable
-			if(getSpecies().seasonalFruitProductionFactor(world, pos) < 0.2f) {
-				outOfSeasonAction(world, pos);//Destroy the block or similar action
+		if (season != null && species.isValid()) { // Non-Null means we are season capable.
+			if (species.seasonalFruitProductionFactor(world, pos) < 0.2f) {
+				this.outOfSeasonAction(world, pos); // Destroy the block or similar action.
 				return;
 			}
-			if(age == 0 && getSpecies().testFlowerSeasonHold(season)) {
-				return;//Keep fruit at the flower stage
+			if (age == 0 && species.testFlowerSeasonHold(season)) {
+				return; // Keep fruit at the flower stage.
 			}
 		}
 
 		if (age < 3) {
-			boolean doGrow = rand.nextFloat() < getGrowthChance(world, pos);
-			boolean eventGrow = net.minecraftforge.common.ForgeHooks.onCropsGrowPre(world, pos, state, doGrow);
-			if(season != null ? doGrow || eventGrow : eventGrow) { //Prevent a seasons mod from canceling the growth, we handle that ourselves
+			final boolean doGrow = rand.nextFloat() < this.getGrowthChance(world, pos);
+			final boolean eventGrow = ForgeHooks.onCropsGrowPre(world, pos, state, doGrow);
+			if (season != null ? doGrow || eventGrow : eventGrow) { // Prevent a seasons mod from canceling the growth, we handle that ourselves.
 				world.setBlock(pos, state.setValue(AGE, age + 1), 2);
-				net.minecraftforge.common.ForgeHooks.onCropsGrowPost(world, pos, state);
+				ForgeHooks.onCropsGrowPost(world, pos, state);
 			}
 		} else {
 			if (age == 3) {
-				switch(matureAction(world, pos, state, rand)) {
+				switch (this.matureAction(world, pos, state, rand)) {
 					case NOTHING:
 					case CUSTOM:
 						break;
@@ -162,7 +168,7 @@ public class FruitBlock extends Block implements IGrowable {
 
 	@Override
 	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (state.getValue(AGE) >= 3 ) {
+		if (state.getValue(AGE) >= 3) {
 			this.dropBlock(worldIn, state, pos);
 			return ActionResultType.SUCCESS;
 		}
@@ -206,14 +212,14 @@ public class FruitBlock extends Block implements IGrowable {
 
 	@Override
 	public boolean isBonemealSuccess(World world, Random rand, BlockPos pos, BlockState state) {
-		return bonemealable;
+		return this.canBoneMeal.get();
 	}
 
 	@Override
 	public void performBonemeal(ServerWorld world, Random rand, BlockPos pos, BlockState state) {
-		int age = state.getValue(AGE);
-		int newAge = MathHelper.clamp(age + 1, 0, 3);
-		if(newAge != age) {
+		final int age = state.getValue(AGE);
+		final int newAge = MathHelper.clamp(age + 1, 0, 3);
+		if (newAge != age) {
 			world.setBlock(pos, state.setValue(AGE, newAge), 2);
 		}
 	}
@@ -226,10 +232,10 @@ public class FruitBlock extends Block implements IGrowable {
 
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		List<ItemStack> drops = super.getDrops(state, builder);
-		if(state.getValue(AGE) >= 3) {
-			ItemStack toDrop = getFruitDrop();
-			if(!toDrop.isEmpty()) {
+		final List<ItemStack> drops = super.getDrops(state, builder);
+		if (state.getValue(AGE) >= 3) {
+			final ItemStack toDrop = getFruitDrop();
+			if (!toDrop.isEmpty()) {
 				drops.add(toDrop);
 			}
 		}
@@ -237,7 +243,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	public FruitBlock setDroppedItem(ItemStack stack) {
-		droppedFruit = stack;
+		this.droppedFruit = stack;
 		return this;
 	}
 
@@ -266,7 +272,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	public BlockState getStateForAge(int age) {
-		return defaultBlockState().setValue(AGE, age);
+		return this.defaultBlockState().setValue(AGE, age);
 	}
 
 	public int getAgeForSeasonalWorldGen(IWorld world, BlockPos pos, @Nullable Float seasonValue) {
@@ -274,9 +280,9 @@ public class FruitBlock extends Block implements IGrowable {
 			return 3;
 
 		if (this.getSpecies().testFlowerSeasonHold(seasonValue))
-			return 0; // Fruit is as the flower stage
+			return 0; // Fruit is as the flower stage.
 
-		return Math.min(world.getRandom().nextInt(6), 3); // Half the time the fruit is fully mature
+		return Math.min(world.getRandom().nextInt(6), 3); // Half the time the fruit is fully mature.
 	}
 
 }
