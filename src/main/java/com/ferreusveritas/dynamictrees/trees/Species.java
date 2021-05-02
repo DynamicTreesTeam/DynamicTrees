@@ -1646,8 +1646,19 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return true;
 	}
 
+	protected boolean alwaysShowOnWaila;
+
+	public boolean alwaysShowOnWaila() {
+		return this.alwaysShowOnWaila;
+	}
+
+	public Species alwaysShowOnWaila(final boolean alwaysShowOnWaila) {
+		this.alwaysShowOnWaila = alwaysShowOnWaila;
+		return this;
+	}
+
 	public boolean showSpeciesOnWaila (){
-		return this != getFamily().getCommonSpecies();
+		return this.alwaysShowOnWaila || this != getFamily().getCommonSpecies();
 	}
 	
 	///////////////////////////////////////////

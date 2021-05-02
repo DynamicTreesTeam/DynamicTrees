@@ -97,7 +97,8 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
 
                     species.addAcceptableSoils(acceptableSoil);
                     return PropertyApplierResult.success();
-                });
+                })
+                .register("always_show_on_waila", Boolean.class, Species::alwaysShowOnWaila);
 
         super.registerAppliers();
     }
