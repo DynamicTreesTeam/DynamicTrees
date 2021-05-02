@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.Block;
@@ -28,6 +29,7 @@ import net.minecraftforge.common.IPlantable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -143,10 +145,9 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	@Nonnull
 	@Override
 	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
-		//TODO: Deal with 1.14's new loot drop system.  For now just return a fresh array.
-		final List<ItemStack> drops = new ArrayList<>();
-		drops.add(this.getSpecies().getSeedStack(1));
-		return drops;
+		return DTConfigs.DYNAMIC_SAPLING_DROPS.get() ?
+				Collections.singletonList(this.getSpecies().getSeedStack(1)) :
+				Collections.emptyList();
 	}
 	
 	@Override

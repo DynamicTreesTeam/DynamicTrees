@@ -52,6 +52,7 @@ public class DTConfigs {
 	public static final ForgeConfigSpec.IntValue MIN_RADIUS_FOR_STRIP;
 	public static final ForgeConfigSpec.BooleanValue ENABLE_STRIP_RADIUS_REDUCTION;
 	public static final ForgeConfigSpec.BooleanValue CAN_BONE_MEAL_APPLE;
+	public static final ForgeConfigSpec.BooleanValue DYNAMIC_SAPLING_DROPS;
 	
 	public static final ForgeConfigSpec.BooleanValue REPLACE_VANILLA_SAPLING;
 	public static final ForgeConfigSpec.BooleanValue REPLACE_NYLIUM_FUNGI;
@@ -135,14 +136,16 @@ public class DTConfigs {
 				defineInRange("fallingTreeDamageMultiplier", 1.0, 0.0, 100.0);
 		DIRT_BUCKET_PLACES_DIRT = SERVER_BUILDER.comment("If enabled the Dirt Bucket will place a dirt block on right-click").
 				define("dirtBucketPlacesDirt", true);
-		SLOPPY_BREAK_DROPS = SERVER_BUILDER.comment("If enabled then improperly broken trees(not by an entity) will still drop wood.")
-				.define("sloppyBreakDrops", false);
+		SLOPPY_BREAK_DROPS = SERVER_BUILDER.comment("If enabled then improperly broken trees(not by an entity) will still drop wood.").
+				define("sloppyBreakDrops", false);
 		MIN_RADIUS_FOR_STRIP = SERVER_BUILDER.comment("The minimum radius a branch must have before its able to be stripped. 8 = Full block size. Set to 0 to disable stripping trees").
 				defineInRange("minRadiusForStrip", 6, 0, 24);
 		ENABLE_STRIP_RADIUS_REDUCTION = SERVER_BUILDER.comment("If enabled, stripping a branch will decrease its radius by one").
 				define("enableStripRadiusReduction", true);
 		CAN_BONE_MEAL_APPLE = SERVER_BUILDER.comment("If enabled, an apple fruit can be bone mealed.").
 				define("canBoneMealApple", false);
+		DYNAMIC_SAPLING_DROPS = SERVER_BUILDER.comment("If enabled, dynamic sapling blocks will drop their seed when broken.").
+				define("dynamicSaplingDrops", true);
 		SERVER_BUILDER.pop();
 		
 		COMMON_BUILDER.comment("Vanilla Trees Settings").push("vanilla");
