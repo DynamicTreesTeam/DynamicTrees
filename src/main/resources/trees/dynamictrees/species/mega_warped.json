@@ -15,7 +15,7 @@
         "wet": 0.75
     },
     "perfect_biomes": { "name": "minecraft:warped_forest" },
-    "acceptable_soils": ["nether_soil_like", "fungus_like"],
+    "acceptable_soils": ["nether_soil_like", "fungus_like", "dirt_like"],
     "acceptable_growth_blocks": ["warped_nylium"],
     "features": [
         {
