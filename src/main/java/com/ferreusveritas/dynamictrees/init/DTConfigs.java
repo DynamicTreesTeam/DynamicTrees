@@ -37,6 +37,7 @@ public class DTConfigs {
 	public static final ForgeConfigSpec.IntValue MAX_BRANCH_ROT_RADIUS;
 	public static final ForgeConfigSpec.DoubleValue ROOTY_BLOCK_HARDNESS_MULTIPLIER;
 	public static final ForgeConfigSpec.EnumValue<DynamicTrees.SwampOakWaterState> SWAMP_OAKS_IN_WATER;
+	public static final ForgeConfigSpec.IntValue BONE_MEAL_GROWTH_PULSES;
 	
 	public static final ForgeConfigSpec.BooleanValue IS_LEAVES_PASSABLE;
 	public static final ForgeConfigSpec.BooleanValue VANILLA_LEAVES_COLLISION;
@@ -111,7 +112,8 @@ public class DTConfigs {
 				defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
 		SWAMP_OAKS_IN_WATER = SERVER_BUILDER.comment("Options for how oak trees generate in swamps. ROOTED: Swamp oak trees will generate on shallow water with mangrove-like roots. SUNK: Swamp oak trees will generate on shallow water one block under the surface. DISABLED: Swamp oaks will not generate on water.").
 				defineEnum("swampOaksInWater", DynamicTrees.SwampOakWaterState.ROOTED);
-
+		BONE_MEAL_GROWTH_PULSES = SERVER_BUILDER.comment("The amount of growth pulses to send when bone meal is applied to a tree. Warning: setting values higher than 64 is not recommended other than for testing purposes. ").
+				defineInRange("boneMealGrowthPulses", 1, 1, 512);
 		SERVER_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("Interaction Settings").push("interaction");

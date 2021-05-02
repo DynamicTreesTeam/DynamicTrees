@@ -1556,7 +1556,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		
 		// Bonemeal fertilizes the soil and causes a single growth pulse
 		if (canBoneMealTree() && itemStack.getItem() == Items.BONE_MEAL) {
-			return new FertilizeSubstance().setAmount(1).setGrow(true);
+			return new FertilizeSubstance().setAmount(1).setGrow(true).setPulses(DTConfigs.BONE_MEAL_GROWTH_PULSES::get);
 		}
 		
 		// Use substance provider interface if it's available

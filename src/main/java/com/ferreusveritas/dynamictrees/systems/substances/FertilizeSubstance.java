@@ -7,20 +7,30 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+
 public class FertilizeSubstance implements ISubstanceEffect {
-	
-	int amount = 1;
-	boolean grow;
+
+	private int amount = 1;
+	private boolean grow;
+	private Supplier<Integer> pulses = () -> 1;
 	
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
 		final RootyBlock dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 
-		if (dirt != null && dirt.fertilize(world, rootPos, amount) || grow) {
+		if (dirt != null && dirt.fertilize(world, rootPos, this.amount) || this.grow) {
 			if (world.isClientSide) {
 				TreeHelper.treeParticles(world, rootPos, ParticleTypes.HAPPY_VILLAGER, 8);
 			} else {
-				if (grow) TreeHelper.growPulse(world, rootPos);
+				if (this.grow) {
+					final int pulses = this.pulses.get();
+
+					for (int i = 0; i < pulses; i++) {
+						TreeHelper.growPulse(world, rootPos);
+					}
+				}
 			}
 			return true;
 		}
@@ -53,6 +63,15 @@ public class FertilizeSubstance implements ISubstanceEffect {
 	 */
 	public FertilizeSubstance setGrow(boolean grow) {
 		this.grow = grow;
+		return this;
+	}
+
+	public FertilizeSubstance setPulses(final int pulses) {
+		return this.setPulses(() -> pulses);
+	}
+
+	public FertilizeSubstance setPulses(final Supplier<Integer> pulses) {
+		this.pulses = pulses;
 		return this;
 	}
 	

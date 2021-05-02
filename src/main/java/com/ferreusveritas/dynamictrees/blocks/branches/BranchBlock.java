@@ -147,7 +147,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	
 	@Deprecated
 	public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-		net.minecraft.item.ItemStack heldItem = player.getItemInHand(hand);
+		final ItemStack heldItem = player.getItemInHand(hand);
 		return TreeHelper.getTreePart(state).getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	}
 
