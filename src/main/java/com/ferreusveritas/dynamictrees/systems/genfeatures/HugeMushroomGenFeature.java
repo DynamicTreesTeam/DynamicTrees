@@ -224,7 +224,7 @@ public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeatur
 	}
 
 	// Whatever. It works.
-	private BlockState getMushroomStateForValue (Block mushroomBlock, BlockState stemBlock, int value, int y) {
+	protected BlockState getMushroomStateForValue(Block mushroomBlock, BlockState stemBlock, int value, int y) {
 		if (value == 10)
 			return stemBlock;
 
