@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -17,7 +17,7 @@ public final class VoxelShapeGetter implements IJsonObjectGetter<VoxelShape> {
         final ObjectFetchResult<VoxelShape> voxelShape = new ObjectFetchResult<>();
 
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(String.class, string ->
-                voxelShape.setValue(DTRegistries.COMMON_VOXEL_SHAPES.getOrDefault(string.toLowerCase(), VoxelShapes.block())))
+                voxelShape.setValue(CommonVoxelShapes.SHAPES.getOrDefault(string.toLowerCase(), VoxelShapes.block())))
                 .elseIfOfType(AxisAlignedBB.class, axisAlignedBB -> voxelShape.setValue(VoxelShapes.create(axisAlignedBB)))
                 .elseIfOfType(JsonArray.class, jsonArray -> {
                     voxelShape.setValue(VoxelShapes.empty());

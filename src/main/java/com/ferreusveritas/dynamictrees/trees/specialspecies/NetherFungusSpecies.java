@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -33,7 +34,7 @@ public class NetherFungusSpecies extends Species {
 
     public NetherFungusSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
-        this.setSaplingShape(DTRegistries.FLAT_MUSHROOM);
+        this.setSaplingShape(CommonVoxelShapes.SAPLING);
 
         addDropCreator(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")){
             @Override
@@ -66,7 +67,7 @@ public class NetherFungusSpecies extends Species {
 
     @Override
     public Species setPreReloadDefaults() {
-        return super.setPreReloadDefaults().setSaplingSound(SoundType.FUNGUS).setCanSaplingGrowNaturally(false).setSaplingShape(DTRegistries.FLAT_MUSHROOM)
+        return super.setPreReloadDefaults().setSaplingSound(SoundType.FUNGUS).setCanSaplingGrowNaturally(false).setSaplingShape(CommonVoxelShapes.FLAT_MUSHROOM)
                 .envFactor(BiomeDictionary.Type.COLD, 0.25f).envFactor(BiomeDictionary.Type.WET, 0.75f);
     }
 

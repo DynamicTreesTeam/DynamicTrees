@@ -18,10 +18,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.SpeciesNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.StateNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.BlockBounds;
-import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-import com.ferreusveritas.dynamictrees.util.Connections;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -42,6 +39,7 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.*;
 import net.minecraftforge.common.ForgeMod;
@@ -388,7 +386,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 				species.getTreeHarvestDrops(world, pos, dropList, world.random);
 				final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
 				final BlockPos relPos = imPos.subtract(cutPos);
-				world.setBlock(imPos, DTRegistries.BLOCK_STATES.AIR, 3);
+				world.setBlock(imPos, CommonBlockStates.AIR, 3);
 				destroyedLeaves.put(relPos, blockState);
 				dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)) );
 			}
@@ -570,14 +568,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		if (toBlock == Blocks.AIR) { // Block was set to air improperly.
 			world.setBlock(pos, state, 0); // Set the block back and attempt a proper breaking.
 			this.sloppyBreak(world, pos, DestroyType.VOID);
-			this.setBlockStateIgnored(world, pos, DTRegistries.BLOCK_STATES.AIR, 2); // Set back to air in case the sloppy break failed to do so.
+			this.setBlockStateIgnored(world, pos, CommonBlockStates.AIR, 2); // Set back to air in case the sloppy break failed to do so.
 			return;
 		}
 		if (toBlock == Blocks.FIRE) { // Block has burned.
 			world.setBlock(pos, state, 0); // Set the branch block back and attempt a proper breaking.
 			this.sloppyBreak(world, pos, DestroyType.FIRE); // Applies fire effects to falling branches.
 			//this.setBlockStateIgnored(world, pos, Blocks.FIRE.getDefaultState(), 2); // Disabled because the fire is too aggressive.
-			this.setBlockStateIgnored(world, pos, DTRegistries.BLOCK_STATES.AIR, 2); // Set back to air instead.
+			this.setBlockStateIgnored(world, pos, CommonBlockStates.AIR, 2); // Set back to air instead.
 			return;
 		}
 		if (!toBlock.hasTileEntity(toBlockState) && world.getBlockEntity(pos) == null) { // Block seems to be a pure BlockState based block.

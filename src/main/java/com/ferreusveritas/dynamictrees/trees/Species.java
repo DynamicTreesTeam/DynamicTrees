@@ -12,9 +12,9 @@ import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
+import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
@@ -34,9 +34,9 @@ import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.SticksDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.LogsDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.SticksDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
@@ -246,7 +246,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Override
 	public Species setPreReloadDefaults() {
-		return this.setDefaultGrowingParameters().setSaplingShape(DTRegistries.SAPLING).setSaplingSound(SoundType.GRASS);
+		return this.setDefaultGrowingParameters().setSaplingShape(CommonVoxelShapes.SAPLING).setSaplingSound(SoundType.GRASS);
 	}
 
 	/**
@@ -895,7 +895,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return false;
 	}
 
-	private VoxelShape saplingShape = DTRegistries.SAPLING;
+	private VoxelShape saplingShape = CommonVoxelShapes.SAPLING;
 
 	public VoxelShape getSaplingShape() {
 		return this.saplingShape;
@@ -1876,7 +1876,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 				Pair.of("transformable", this.transformable), Pair.of("logicKit", this.logicKit),
 				Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
 				Pair.of("dropCreatorStorage", this.dropCreatorStorage), Pair.of("megaSpecies", this.megaSpecies),
-				Pair.of("seed", this.seed), Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream().filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny().orElse(DTRegistries.BLOCK_STATES.AIR)),
+				Pair.of("seed", this.seed), Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream().filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny().orElse(CommonBlockStates.AIR)),
 				Pair.of("perfectBiomes", this.perfectBiomes), Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
 				Pair.of("genFeatures", this.genFeatures));
 	}

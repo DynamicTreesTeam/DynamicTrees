@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
@@ -60,7 +61,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
-	protected Supplier<Boolean> canBoneMeal = DTConfigs.CAN_BONE_MEAL_APPLE::get; // Q: Does dusting an apple with bone dust make it grow faster? A: Not by default.
+	protected Supplier<Boolean> canBoneMeal = () -> false; // Q: Does dusting an apple with bone dust make it grow faster? A: Not by default.
 	protected Vector3d itemSpawnOffset = new Vector3d(0.5, 0.6, 0.5);
 	private Species species;
 
@@ -127,7 +128,7 @@ public class FruitBlock extends Block implements IGrowable {
 					case CUSTOM:
 						break;
 					case DROP: this.dropBlock(world, state, pos); break;
-					case ROT: world.setBlockAndUpdate(pos, DTRegistries.BLOCK_STATES.AIR); break;
+					case ROT: world.setBlockAndUpdate(pos, CommonBlockStates.AIR); break;
 				}
 			}
 		}
@@ -151,7 +152,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	protected void outOfSeasonAction(World world, BlockPos pos) {
-		world.setBlockAndUpdate(pos, DTRegistries.BLOCK_STATES.AIR);
+		world.setBlockAndUpdate(pos, CommonBlockStates.AIR);
 	}
 
 	@Override

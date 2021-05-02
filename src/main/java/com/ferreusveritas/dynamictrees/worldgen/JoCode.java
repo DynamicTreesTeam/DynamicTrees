@@ -15,6 +15,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
@@ -317,7 +318,7 @@ public class JoCode {
 									if (TreeHelper.isLeaves(leavesState)) {
 										final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
 										if (leavesProperties.getFamily() == leavesBlock.getProperties(leavesState).getFamily()) {
-											world.setBlock(delPos, DTRegistries.BLOCK_STATES.AIR, 2);
+											world.setBlock(delPos, CommonBlockStates.AIR, 2);
 										}
 									}
 								}
@@ -326,7 +327,7 @@ public class JoCode {
 					});
 				}
 
-				world.setBlock(pos, DTRegistries.BLOCK_STATES.AIR, 2);
+				world.setBlock(pos, CommonBlockStates.AIR, 2);
 			}
 		}
 

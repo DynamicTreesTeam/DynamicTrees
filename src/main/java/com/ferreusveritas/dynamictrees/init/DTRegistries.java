@@ -6,9 +6,9 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.DynamicCocoaBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
+import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
@@ -48,8 +48,6 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.BigMushroomFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -59,9 +57,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
@@ -82,7 +78,8 @@ public class DTRegistries {
 	///////////////////////////////////////////
 
 	/** An apple fruit block. */
-	public static final FruitBlock APPLE_FRUIT = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE));
+	public static final FruitBlock APPLE_FRUIT = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE))
+			.setCanBoneMeal(DTConfigs.CAN_BONE_MEAL_APPLE::get);
 
 	/** A modified cocoa fruit block (for dynamic trees). */
 	public static final DynamicCocoaBlock COCOA_FRUIT = new DynamicCocoaBlock();
@@ -92,8 +89,6 @@ public class DTRegistries {
 
 	/** A trunk shell block, which is the outer block for thick branches. */
 	public static final TrunkShellBlock TRUNK_SHELL = new TrunkShellBlock();
-
-	public static final CommonBlockStates BLOCK_STATES = new CommonBlockStates();
 	
 	public static void setup() {
 		setupBlocks();
@@ -234,70 +229,14 @@ public class DTRegistries {
 	}
 	
 	///////////////////////////////////////////
-	// MISC
+	// WORLD GEN
 	///////////////////////////////////////////
-
-	public static final class CommonBlockStates {
-		public final BlockState AIR = Blocks.AIR.defaultBlockState();
-		public final BlockState DIRT = Blocks.DIRT.defaultBlockState();
-		public final BlockState COARSE_DIRT = Blocks.COARSE_DIRT.defaultBlockState();
-		public final BlockState SAND = Blocks.SAND.defaultBlockState();
-		public final BlockState GRASS = Blocks.GRASS.defaultBlockState();
-		public final BlockState PODZOL = Blocks.PODZOL.defaultBlockState();
-		public final BlockState RED_MUSHROOM = Blocks.RED_MUSHROOM.defaultBlockState();
-		public final BlockState BROWN_MUSHROOM = Blocks.BROWN_MUSHROOM.defaultBlockState();
-	}
-
-	/** Holds common {@link VoxelShape}s keyed by a string, allowing easy access via Json elements. */
-	public static final Map<String, VoxelShape> COMMON_VOXEL_SHAPES = new HashMap<>();
-
-	public static final VoxelShape SAPLING_TRUNK = Block.box(7D, 0D, 7D, 9D, 5D, 9D);
-	public static final VoxelShape SAPLING_LEAVES = Block.box(4D, 4D, 4D, 12D, 12D, 12D);
-	public static final VoxelShape SLIM_SAPLING_LEAVES = Block.box(5D, 4D, 5D, 11D, 14D, 11D);
-	public static final VoxelShape MUSHROOM_STEM = Block.box(7D, 0D, 7D, 9D, 5D, 9D);
-	public static final VoxelShape MUSHROOM_CAP_FLAT = Block.box(4D, 5D, 4D, 12D, 8D, 12D);
-	public static final VoxelShape MUSHROOM_CAP_ROUND = Block.box(5D, 3D, 5D, 11D, 8D, 11D);
-	public static final VoxelShape MUSHROOM_BRIM_E = Block.box(11D, 3D, 5D, 12D, 5D, 11D);
-	public static final VoxelShape MUSHROOM_BRIM_W = Block.box(4D, 3D, 5D, 5D, 5D, 11D);
-	public static final VoxelShape MUSHROOM_BRIM_S = Block.box(4D, 3D, 11D, 12D, 5D, 12D);
-	public static final VoxelShape MUSHROOM_BRIM_N = Block.box(4D, 3D, 4D, 12D, 5D, 5D);
-
-	public static final VoxelShape SAPLING = VoxelShapes.or(SAPLING_TRUNK, SAPLING_LEAVES);
-	public static final VoxelShape SLIM_SAPLING = VoxelShapes.or(SAPLING_TRUNK, SLIM_SAPLING_LEAVES);
-	public static final VoxelShape FLAT_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_FLAT);
-	public static final VoxelShape ROUND_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND);
-	public static final VoxelShape ROUND_MUSHROOM_RIM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND, MUSHROOM_BRIM_E, MUSHROOM_BRIM_W, MUSHROOM_BRIM_S, MUSHROOM_BRIM_N);
-
-	static {
-		COMMON_VOXEL_SHAPES.put("empty", VoxelShapes.empty());
-		COMMON_VOXEL_SHAPES.put("block", VoxelShapes.block());
-		COMMON_VOXEL_SHAPES.put("sapling", SAPLING);
-		COMMON_VOXEL_SHAPES.put("slim_sapling", SLIM_SAPLING);
-		COMMON_VOXEL_SHAPES.put("flat_mushroom", FLAT_MUSHROOM);
-		COMMON_VOXEL_SHAPES.put("round_mushroom", ROUND_MUSHROOM);
-		COMMON_VOXEL_SHAPES.put("round_mushroom_rim", ROUND_MUSHROOM_RIM);
-	}
 
 	public static final DynamicTreeFeature DYNAMIC_TREE_FEATURE = new DynamicTreeFeature();
 
 	@SubscribeEvent
 	public static void onFeatureRegistry (final RegistryEvent.Register<Feature<?>> event) {
 		event.getRegistry().register(DYNAMIC_TREE_FEATURE);
-	}
-
-	@SubscribeEvent
-	public static void onCellKitRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<CellKit> event) {
-		CellKits.register(event.getRegistry());
-	}
-
-	@SubscribeEvent
-	public static void onGrowthLogicKitRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GrowthLogicKit> event) {
-		GrowthLogicKits.register(event.getRegistry());
-	}
-
-	@SubscribeEvent
-	public static void onGenFeatureRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GenFeature> event) {
-		GenFeatures.register(event.getRegistry());
 	}
 
 	/** The vanilla tree canceller, which cancels any features whose config extends {@link BaseTreeFeatureConfig}. */
@@ -312,6 +251,25 @@ public class DTRegistries {
 	@SubscribeEvent
 	public static void onFeatureCancellerRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<FeatureCanceller> event) {
 		event.getRegistry().registerAll(TREE_CANCELLER, FUNGUS_CANCELLER, MUSHROOM_CANCELLER);
+	}
+
+	///////////////////////////////////////////
+	// CUSTOM TREE LOGIC
+	///////////////////////////////////////////
+
+	@SubscribeEvent
+	public static void onCellKitRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<CellKit> event) {
+		CellKits.register(event.getRegistry());
+	}
+
+	@SubscribeEvent
+	public static void onGrowthLogicKitRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GrowthLogicKit> event) {
+		GrowthLogicKits.register(event.getRegistry());
+	}
+
+	@SubscribeEvent
+	public static void onGenFeatureRegistry (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GenFeature> event) {
+		GenFeatures.register(event.getRegistry());
 	}
 
 }
