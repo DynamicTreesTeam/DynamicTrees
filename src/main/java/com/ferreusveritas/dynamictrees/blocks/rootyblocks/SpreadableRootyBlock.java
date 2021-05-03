@@ -95,7 +95,8 @@ public class SpreadableRootyBlock extends RootyBlock {
 
                     for (Map.Entry<Block, RootyBlock> entry : rootyBlocks.entrySet()){
                         if ((thatState.getBlock() == entry.getKey() || thatState.getBlock() == entry.getValue()) && world.getMaxLocalRawBrightness(pos.above()) >= requiredLight && thatStateUp.getLightBlock(world, thatPos.above()) <= 2) {
-                            world.setBlockAndUpdate(pos, entry.getValue().defaultBlockState().setValue(FERTILITY, world.getBlockState(pos).getValue(FERTILITY)));
+                            if (state.hasProperty(FERTILITY))
+                                world.setBlockAndUpdate(pos, entry.getValue().defaultBlockState().setValue(FERTILITY, state.getValue(FERTILITY)));
                             return;
                         }
                     }

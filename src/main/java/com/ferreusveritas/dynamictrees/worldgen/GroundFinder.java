@@ -46,8 +46,10 @@ public class GroundFinder implements IGroundFinder {
 		while (this.inRange(pos, 0, maxY)) {
 			while (!isReplaceable(world, pos) && this.inRange(pos, 0, maxY)) pos.move(Direction.UP, 4); // Zip up 4 blocks at a time until we hit air
 			while (isReplaceable(world, pos) && this.inRange(pos, 0, maxY)) pos.move(Direction.DOWN); // Move down 1 block at a time until we hit not-air
-			layers.add(pos.getY()); // Record this position
-			pos.move(Direction.UP, 16); // Move up 16 blocks
+			if (isReplaceable(world, pos.above(6))){ // If there is air 6 blocks above it is likely that the layer is not too cramped
+				layers.add(pos.getY()); // Record this position
+			}
+			pos.move(Direction.UP, 8); // Move up 8 blocks
 			while (isReplaceable(world, pos) && this.inRange(pos, 0, maxY)) pos.move(Direction.UP, 4); // Zip up 4 blocks at a time until we hit ground
 		}
 

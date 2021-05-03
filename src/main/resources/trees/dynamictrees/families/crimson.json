@@ -4,5 +4,6 @@
     "common_species": "crimson",
     "primitive_log": "crimson_stem",
     "primitive_stripped_log": "stripped_crimson_stem",
+    "stick": "stick",
     "max_branch_radius": 24
 }

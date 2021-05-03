@@ -4,5 +4,6 @@
     "common_species": "warped",
     "primitive_log": "warped_stem",
     "primitive_stripped_log": "stripped_warped_stem",
+    "stick": "stick",
     "max_branch_radius": 24
 }

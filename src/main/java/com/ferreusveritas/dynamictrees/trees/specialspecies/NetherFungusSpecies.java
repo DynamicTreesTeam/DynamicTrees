@@ -62,7 +62,7 @@ public class NetherFungusSpecies extends Species {
 
     @Override
     protected void setStandardSoils() {
-        this.addAcceptableSoils(DirtHelper.NETHER_SOIL_LIKE, DirtHelper.FUNGUS_LIKE);
+        this.addAcceptableSoils(DirtHelper.NETHER_SOIL_LIKE, DirtHelper.FUNGUS_LIKE, DirtHelper.DIRT_LIKE);
     }
 
     @Override
