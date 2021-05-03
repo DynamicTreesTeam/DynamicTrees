@@ -38,7 +38,7 @@ public class FutureBreak {
 		if (FUTURE_BREAKS.isEmpty())
 			return;
 
-		for (final FutureBreak futureBreak : FUTURE_BREAKS) {
+		for (final FutureBreak futureBreak : new LinkedList<>(FUTURE_BREAKS)) {
 			if (world != futureBreak.world)
 				continue;
 
