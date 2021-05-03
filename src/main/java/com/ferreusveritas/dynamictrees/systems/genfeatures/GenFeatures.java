@@ -29,7 +29,6 @@ public final class GenFeatures {
     public static final GenFeature CLEAR_VOLUME = new ClearVolumeGenFeature(regName("clear_volume"));
     public static final GenFeature BOTTOM_FLARE = new BottomFlareGenFeature(regName("bottom_flare"));
     public static final GenFeature UNDERGROWTH = new UndergrowthGenFeature(regName("undergrowth"));
-    public static final GenFeature CONSISTENT_TRUNK = new ConsistentTrunkThicknessGenFeature(regName("consistent_trunk"));
 
     public static final GenFeature PODZOL = new PodzolGenFeature(regName("podzol"));
 
@@ -49,7 +48,7 @@ public final class GenFeatures {
 
     public static void register(final Registry<GenFeature> registry) {
         registry.registerAll(FRUIT, COCOA, VINES, BEE_NEST, SHROOMLIGHT, CONIFER_TOPPER, MOUND,
-                ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH, CONSISTENT_TRUNK, PODZOL, BUSH, 
+                ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH, PODZOL, BUSH,
                 HUGE_MUSHROOM, HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE);
     }
     
