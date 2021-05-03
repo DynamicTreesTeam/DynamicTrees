@@ -318,6 +318,14 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	protected Integer colorNumber;
 	protected String colorString;
 
+	public void setColorNumber(Integer colorNumber) {
+		this.colorNumber = colorNumber;
+	}
+
+	public void setColorString(String colorString) {
+		this.colorString = colorString;
+	}
+
 	@OnlyIn(Dist.CLIENT)
 	private IBlockColor colorMultiplier;
 

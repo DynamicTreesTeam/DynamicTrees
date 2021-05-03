@@ -4,12 +4,8 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
-import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierLists;
 import com.google.gson.JsonObject;
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
 
 import java.util.function.Consumer;
 
@@ -24,6 +20,9 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
 
     @Override
     public void registerAppliers() {
+        this.loadAppliers.register("color", String.class, LeavesProperties::setColorString)
+                .register("color", Integer.class, LeavesProperties::setColorNumber);
+
         this.reloadAppliers.register("requires_shears", Boolean.class, LeavesProperties::setRequiresShears)
                 .register("cell_kit", CellKit.class, LeavesProperties::setCellKit)
                 .register("smother", Integer.class, LeavesProperties::setSmotherLeavesMax)
