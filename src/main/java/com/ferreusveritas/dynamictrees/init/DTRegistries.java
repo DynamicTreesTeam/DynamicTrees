@@ -97,7 +97,7 @@ public class DTRegistries {
 		setupItems();
 	}
 
-	public static void setupBlocks() {
+	private static void setupBlocks() {
 		RegistryHandler.addBlock(DynamicTrees.resLoc("apple_fruit"), APPLE_FRUIT);
 		RegistryHandler.addBlock(DynamicTrees.resLoc("cocoa"), COCOA_FRUIT);
 		RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, POTTED_SAPLING);
@@ -129,7 +129,7 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.END_LIKE);
 	}
 
-	public static void setupConnectables() {
+	private static void setupConnectables() {
 		BranchConnectables.makeBlockConnectable(Blocks.BEE_NEST, (state,world,pos,side)->{
 			if (side == Direction.DOWN) return 1;
 			return 0;
@@ -174,7 +174,7 @@ public class DTRegistries {
 	/** A staff, a creative tool for copying and pasting tree shapes. */
 	public static final Staff STAFF = new Staff();
 
-	public static void setupItems() {
+	private static void setupItems() {
 		RegistryHandler.addItem(DynamicTrees.resLoc("staff"), STAFF);
 		RegistryHandler.addItem(DynamicTrees.resLoc("dirt_bucket"), DIRT_BUCKET);
 		RegistryHandler.addItem(DynamicTrees.resLoc("dendro_potion"), DENDRO_POTION);
