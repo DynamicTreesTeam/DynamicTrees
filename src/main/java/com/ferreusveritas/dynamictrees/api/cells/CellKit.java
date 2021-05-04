@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.api.cells;
 
-import com.ferreusveritas.dynamictrees.cells.LeafClusters;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
+import com.ferreusveritas.dynamictrees.cells.LeafClusters;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.util.ResourceLocation;
 
@@ -40,8 +40,4 @@ public abstract class CellKit extends RegistryEntry<CellKit> {
 	/** The default hydration level of a newly created leaf block [default = 4] **/
 	public abstract int getDefaultHydration();
 
-	@Override
-	public String toString() {
-		return "CellKit{registryName=" + this.getRegistryName() + "}";
-	}
 }

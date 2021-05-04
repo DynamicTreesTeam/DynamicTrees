@@ -1862,15 +1862,6 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return CoordUtils.coordHashCode(pos, 2);
 	}
 
-	@Nullable
-	@Override
-	public String toString() {
-		if (getRegistryName() == null){
-			return null;
-		}
-		return getRegistryName().toString();
-	}
-
 	@Override
 	public String toLoadDataString() {
 		final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
@@ -1887,7 +1878,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 				Pair.of("transformable", this.transformable), Pair.of("logicKit", this.logicKit),
 				Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
 				Pair.of("dropCreatorStorage", this.dropCreatorStorage), Pair.of("megaSpecies", this.megaSpecies),
-				Pair.of("seed", this.seed), Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream().filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny().orElse(CommonBlockStates.AIR)),
+				Pair.of("seed", this.seed), Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream()
+						.filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny().orElse(CommonBlockStates.AIR)),
 				Pair.of("perfectBiomes", this.perfectBiomes), Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
 				Pair.of("genFeatures", this.genFeatures));
 	}

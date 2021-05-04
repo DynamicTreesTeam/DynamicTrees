@@ -656,11 +656,6 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	//////////////////////////////
 
 	@Override
-	public String toString() {
-		return "Family{registryName=" + this.getRegistryName() + "}";
-	}
-
-	@Override
 	public String toLoadDataString() {
 		return this.getString(Pair.of("commonLeaves", this.commonLeaves), Pair.of("maxBranchRadius", this.maxBranchRadius),
 				Pair.of("hasSurfaceRoot", this.hasSurfaceRoot), Pair.of("hasStrippedBranch", this.hasStrippedBranch));

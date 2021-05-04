@@ -120,11 +120,4 @@ public abstract class GenFeature extends RegistryEntry<GenFeature> {
         return this.getDefaultConfiguration().with(featureProperty, value);
     }
 
-    @Override
-    public String toString() {
-        return "GenFeature{" +
-                "registryName=" + this.getRegistryName() +
-                '}';
-    }
-
 }
