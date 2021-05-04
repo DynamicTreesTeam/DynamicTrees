@@ -34,7 +34,7 @@ public class JsonArrayPropertyApplier<T, V> extends JsonPropertyApplier<T, V> {
         final JsonArray jsonArray = arrayFetchResult.getValue();
 
         for (final JsonElement element : jsonArray)
-            Null.consumerIfNonnull(this.jsonApplier.applyIfShould(object, element, this.valueClass, this.jsonApplier.propertyApplier), result -> warnings.addAll(result.getWarnings()));
+            Null.consumeIfNonnull(this.jsonApplier.applyIfShould(object, element, this.valueClass, this.jsonApplier.propertyApplier), result -> warnings.addAll(result.getWarnings()));
 
         return PropertyApplierResult.success(warnings);
     }

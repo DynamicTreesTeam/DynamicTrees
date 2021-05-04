@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,7 +21,7 @@ public final class WorldGenEventHandler {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void addDynamicTrees (final BiomeLoadingEvent event) {
         event.getGeneration().addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
-                DTRegistries.DYNAMIC_TREE_FEATURE.configured(new NoFeatureConfig()));
+                DTRegistries.DYNAMIC_TREE_CONFIGURED_FEATURE);
     }
 
     /**

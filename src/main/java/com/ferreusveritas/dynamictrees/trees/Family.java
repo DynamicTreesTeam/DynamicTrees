@@ -107,7 +107,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 
 	//Misc
 	/** The stick that is returned when a whole log can't be dropped */
-	private Item stick = null;
+	private Item stick = Items.STICK;
 	/** Weather the branch can support cocoa pods on it's surface [default = false] */
 	public boolean canSupportCocoa = false;
 
@@ -396,7 +396,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	 * @return an {@link ItemStack} of sticky things
 	 */
 	public ItemStack getStick(int qty) {
-		return this.stick == null ? ItemStack.EMPTY : new ItemStack(this.stick, MathHelper.clamp(qty, 0, 64));
+		return this.stick == Items.AIR ? ItemStack.EMPTY : new ItemStack(this.stick, MathHelper.clamp(qty, 0, 64));
 	}
 
 	public void setCanSupportCocoa(boolean canSupportCocoa) {

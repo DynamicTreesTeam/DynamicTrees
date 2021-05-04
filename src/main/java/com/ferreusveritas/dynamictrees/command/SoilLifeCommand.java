@@ -18,6 +18,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.ferreusveritas.dynamictrees.command.CommandConstants.SOIL_LIFE_SUGGESTIONS;
+
 public final class SoilLifeCommand extends SubCommand {
 
     @Override
@@ -39,8 +41,7 @@ public final class SoilLifeCommand extends SubCommand {
                 rootPosArgument(context), false)))
                 .then(booleanArgument(RAW).executes(context -> executesSuccess(() -> this.getSoilLife(context.getSource(),
                         rootPosArgument(context), booleanArgument(context, RAW)))))
-                .then(Commands.argument(SOIL_LIFE, IntegerArgumentType.integer(0, 15)).suggests(((context, builder) ->
-                        ISuggestionProvider.suggest(Stream.of(0, 7, 15).map(String::valueOf).collect(Collectors.toList()), builder)))
+                .then(Commands.argument(SOIL_LIFE, IntegerArgumentType.integer(0, 15)).suggests(SOIL_LIFE_SUGGESTIONS)
                         .requires(commandSource -> commandSource.hasPermission(2)) // Setting soil life requires higher permission level.
                         .executes(context -> executesSuccess(() -> this.setSoilLife(context.getSource(), rootPosArgument(context),
                                 intArgument(context, SOIL_LIFE)))));

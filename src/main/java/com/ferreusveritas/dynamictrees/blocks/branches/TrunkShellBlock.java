@@ -196,7 +196,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 
 	@Override
 	public void onBlockExploded(BlockState state, World world, BlockPos pos, Explosion explosion) {
-		Null.consumerIfNonnull(this.getMuse(world, state, pos), muse -> muse.state.getBlock().onBlockExploded(muse.state, world, muse.pos, explosion));
+		Null.consumeIfNonnull(this.getMuse(world, state, pos), muse -> muse.state.getBlock().onBlockExploded(muse.state, world, muse.pos, explosion));
 	}
 
 	//TODO: This may not even be necessary
@@ -219,7 +219,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 		if (newState.getBlock() != Blocks.AIR)
 			return;
 
-		Null.consumerIfNonnull(this.findDetachedMuse((World) world, pos),
+		Null.consumeIfNonnull(this.findDetachedMuse((World) world, pos),
 				surround -> world.setBlock(pos, defaultBlockState().setValue(CORE_DIR, surround), 1));
 	}
 

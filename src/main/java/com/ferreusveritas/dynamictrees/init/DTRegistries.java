@@ -48,10 +48,9 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
-import net.minecraft.world.gen.feature.BigMushroomFeatureConfig;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.HugeFungusConfig;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.WorldGenRegistries;
+import net.minecraft.world.gen.feature.*;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -237,6 +236,12 @@ public class DTRegistries {
 	@SubscribeEvent
 	public static void onFeatureRegistry (final RegistryEvent.Register<Feature<?>> event) {
 		event.getRegistry().register(DYNAMIC_TREE_FEATURE);
+	}
+
+	public static final ConfiguredFeature<NoFeatureConfig, ?> DYNAMIC_TREE_CONFIGURED_FEATURE = DYNAMIC_TREE_FEATURE.configured(NoFeatureConfig.INSTANCE);
+
+	public static void registerConfiguredFeatures() {
+		Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, DynamicTrees.resLoc("dynamic_tree"), DYNAMIC_TREE_CONFIGURED_FEATURE);
 	}
 
 	/** The vanilla tree canceller, which cancels any features whose config extends {@link BaseTreeFeatureConfig}. */

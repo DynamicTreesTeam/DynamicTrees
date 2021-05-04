@@ -1,7 +1,9 @@
 package com.ferreusveritas.dynamictrees.command;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommandHelper;
+import com.ferreusveritas.dynamictrees.util.Null;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -28,28 +30,35 @@ public final class SetTreeCommand extends SubCommand {
         return 2;
     }
 
+    private static final int DEFAULT_SOIL_LIFE = 0;
+
     @Override
     public ArgumentBuilder<CommandSource, ?> registerArguments() {
         return blockPosArgument().then(speciesArgument().executes(context -> this.setTree(context.getSource(), blockPosArgument(context),
-                speciesArgument(context), JO_CODE, DEFAULT_TURNS))
+                speciesArgument(context), JO_CODE, DEFAULT_TURNS, DEFAULT_SOIL_LIFE))
                 .then(stringArgument(JO_CODE).suggests(((context, builder) -> ISuggestionProvider.suggest(speciesArgument(context).getJoCodes()
                         .stream().map(JoCode::toString).collect(Collectors.toList()), builder)))
                         .executes(context -> this.setTree(context.getSource(), blockPosArgument(context), speciesArgument(context),
-                                stringArgument(context, JO_CODE), DEFAULT_TURNS))
-                        .then(intArgument(TURNS).suggests(((context, builder) -> ISuggestionProvider.suggest(TURNS_SUGGESTIONS, builder)))
+                                stringArgument(context, JO_CODE), DEFAULT_TURNS, DEFAULT_SOIL_LIFE))
+                        .then(intArgument(TURNS).suggests(TURNS_SUGGESTIONS)
                                 .executes(context -> this.setTree(context.getSource(), blockPosArgument(context), speciesArgument(context),
-                                stringArgument(context, JO_CODE), intArgument(context, TURNS))))));
+                                        stringArgument(context, JO_CODE), intArgument(context, TURNS), DEFAULT_SOIL_LIFE))
+                                .then(intArgument(SOIL_LIFE).suggests(SOIL_LIFE_SUGGESTIONS)
+                                        .executes(context -> this.setTree(context.getSource(), blockPosArgument(context), speciesArgument(context),
+                                                stringArgument(context, JO_CODE), intArgument(context, TURNS), intArgument(context, SOIL_LIFE)))))));
     }
 
-    private int setTree(final CommandSource source, final BlockPos pos, final Species species, final String codeString, final int turns) {
+    private int setTree(final CommandSource source, final BlockPos rootPos, final Species species, final String codeString, final int turns, final int soilLife) {
         final ServerWorld world = source.getLevel();
-        final BlockPos rootPos = pos.relative(Direction.DOWN);
         final JoCode joCode = species.getJoCode(codeString).rotate(Direction.from2DDataValue((3 - (turns % 4)) + 3)).setCareful(true);
 
         source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.set_tree", CommandHelper.posComponent(rootPos),
                 species.getTextComponent(), joCode.getTextComponent()), true);
-        joCode.generate(world, world, species, rootPos, source.getLevel().getBiome(pos),
+        joCode.generate(world, world, species, rootPos, source.getLevel().getBiome(rootPos),
                         Direction.SOUTH, 8, SafeChunkBounds.ANY);
+
+        // Try to set the soil life.
+        Null.consumeIfNonnull(TreeHelper.getRooty(world.getBlockState(rootPos)), rootyBlock -> rootyBlock.setSoilLife(world, rootPos, soilLife));
 
         return 1;
     }

@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.cells.ICellSolver;
+import com.ferreusveritas.dynamictrees.api.registry.IRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 
@@ -346,7 +347,7 @@ public class CellKits {
 
 	};
 
-	public static void register(final Registry<CellKit> registry) {
+	public static void register(final IRegistry<CellKit> registry) {
 		registry.registerAll(DECIDUOUS, CONIFER, ACACIA, DARK_OAK, BARE, PALM, NETHER_FUNGUS);
 	}
 

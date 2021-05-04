@@ -1,76 +1,74 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistry;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A custom registry which can be safely unlocked at any point. Largely based off {@link ForgeRegistry}.
+ * An implementation for {@link AbstractRegistry} using a {@link ConcurrentHashMap} to
+ * store its entries.
  *
- * @param <V> The {@link RegistryEntry} type that will be registered.
  * @author Harley O'Connor
- * @see ConcurrentRegistry
+ * @see Registry
  */
-public class Registry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
+public final class ConcurrentRegistry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
+
+    private final Map<ResourceLocation, V> entries = new ConcurrentHashMap<>();
 
     /**
-     * The {@link Set} of {@link RegistryEntry} objects currently registered.
-     */
-    private final Set<V> entries = new LinkedHashSet<>();
-
-    /**
-     * Constructs a new {@link Registry} with the name being set to {@link Class#getSimpleName()}
-     * of the given {@link RegistryEntry}.
+     * Constructs a new {@link ConcurrentRegistry} with the name being set to
+     * {@link Class#getSimpleName()} of the given {@link RegistryEntry}.
      *
      * @param type The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
      */
-    public Registry(final Class<V> type, final V nullValue) {
+    public ConcurrentRegistry(final Class<V> type, final V nullValue) {
         this(type.getSimpleName(), type, nullValue);
     }
 
     /**
-     * Constructs a new {@link Registry}.
+     * Constructs a new {@link ConcurrentRegistry}.
      *
-     * @param name The {@link #name} for this {@link Registry}.
+     * @param name The {@link #name} for this {@link ConcurrentRegistry}.
      * @param type The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
      */
-    public Registry(final String name, final Class<V> type, final V nullValue) {
+    public ConcurrentRegistry(final String name, final Class<V> type, final V nullValue) {
         this(name, type, nullValue, false);
     }
 
     /**
-     * Constructs a new {@link Registry} with the name being set to {@link Class#getSimpleName()}
-     * of the given {@link RegistryEntry}.
+     * Constructs a new {@link ConcurrentRegistry} with the name being set to
+     * {@link Class#getSimpleName()} of the given {@link RegistryEntry}.
      *
      * @param type The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
      * @param clearable True if {@link #clear()} can be called to wipe the registry.
      */
-    public Registry(final Class<V> type, final V nullValue, final boolean clearable) {
+    public ConcurrentRegistry(final Class<V> type, final V nullValue, final boolean clearable) {
         this(type.getSimpleName(), type, nullValue, clearable);
     }
 
     /**
-     * Constructs a new {@link Registry}.
+     * Constructs a new {@link ConcurrentRegistry}.
      *
-     * @param name The {@link #name} for this {@link Registry}.
+     * @param name The {@link #name} for this {@link ConcurrentRegistry}.
      * @param type The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
      * @param clearable True if {@link #clear()} can be called to wipe the registry.
      */
-    public Registry(final String name, final Class<V> type, final V nullValue, final boolean clearable) {
+    public ConcurrentRegistry(final String name, final Class<V> type, final V nullValue, final boolean clearable) {
         super(name, type, nullValue, clearable);
 
         this.register(nullValue);
     }
 
     /**
-     * Registers the given {@link RegistryEntry} to this {@link Registry}.
+     * Registers the given {@link RegistryEntry} to this {@link ConcurrentRegistry}.
      *
      * <p>Note that this will throw a runtime exception if this {@link Registry} is locked, or if
      * the {@link ResourceLocation} already has a value registered, therefore {@link #isLocked()}
@@ -84,10 +82,11 @@ public class Registry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
      * @return This {@link Registry} object for chaining.
      */
     @Override
-    public final Registry<V> register(final V value) {
+    public IRegistry<V> register(V value) {
+        System.out.println(this.entries);
         this.assertValid(value);
 
-        this.entries.add(value);
+        this.entries.put(value.getRegistryName(), value);
         return this;
     }
 
@@ -99,10 +98,13 @@ public class Registry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
      * @return All {@link RegistryEntry} objects currently registered.
      */
     @Override
-    public final Set<V> getAll() {
-        return Collections.unmodifiableSet(this.entries);
+    public Set<V> getAll() {
+        return Collections.unmodifiableSet(new HashSet<>(this.entries.values()));
     }
 
+    /**
+     * Clears all {@link RegistryEntry}s currently registered in {@link #entries}.
+     */
     @Override
     protected void clearAll() {
         this.entries.clear();

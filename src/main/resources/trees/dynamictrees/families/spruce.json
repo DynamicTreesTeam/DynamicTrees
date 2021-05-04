@@ -3,7 +3,6 @@
     "common_species": "spruce",
     "primitive_log": "spruce_log",
     "primitive_stripped_log": "stripped_spruce_log",
-    "stick": "stick",
     "max_branch_radius": 24,
     "conifer_variants": true
 }

@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
@@ -8,7 +7,6 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
@@ -40,7 +38,6 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 
@@ -331,7 +328,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	@OnlyIn(Dist.CLIENT)
 	public int foliageColorMultiplier(BlockState state, IBlockDisplayReader world, BlockPos pos) {
-		if (colorMultiplier == null) return 0x00FF00FF;
+		if (colorMultiplier == null) return 0x00FF00FF; //purple if broken
 		return colorMultiplier.getColor(state, world, pos, -1);
 	}
 
@@ -349,7 +346,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 					return;
 				}
 
-				final IBlockColor blockColor = BlockColorMultipliers.find(code);
+				IBlockColor blockColor = BlockColorMultipliers.find(code);
 				if (blockColor != null) {
 					colorMultiplier = blockColor;
 					return;
