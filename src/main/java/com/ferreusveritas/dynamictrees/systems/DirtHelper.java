@@ -20,7 +20,7 @@ public class DirtHelper {
     public static final String NETHER_SOIL_LIKE = "nether_soil_like";
     public static final String END_LIKE = "end_like";
     public static final String MUD_LIKE = "mud_like";
-    public static final String HARD_CLAY_LIKE = "hard_clay_like";
+    public static final String TERRACOTTA_LIKE = "terracotta_like";
     public static final String SLIME_LIKE = "slime_like";
     public static final String FUNGUS_LIKE = "fungus_like";
 
@@ -39,7 +39,7 @@ public class DirtHelper {
         createNewAdjective(NETHER_SOIL_LIKE);
         createNewAdjective(END_LIKE);
         createNewAdjective(MUD_LIKE);
-        createNewAdjective(HARD_CLAY_LIKE);
+        createNewAdjective(TERRACOTTA_LIKE);
         createNewAdjective(SLIME_LIKE);
         createNewAdjective(FUNGUS_LIKE);
     }
