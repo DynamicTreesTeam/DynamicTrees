@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.registry.IRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 
 public class GrowthLogicKits {
@@ -11,7 +12,7 @@ public class GrowthLogicKits {
 	public static final GrowthLogicKit JUNGLE = new JungleLogic(DynamicTrees.resLoc("jungle"));
 	public static final GrowthLogicKit NETHER_FUNGUS = new NetherFungusLogic(DynamicTrees.resLoc("nether_fungus"));
 
-	public static void register(final Registry<GrowthLogicKit> registry) {
+	public static void register(final IRegistry<GrowthLogicKit> registry) {
 		registry.registerAll(DARK_OAK, CONIFER, MEGA_CONIFER, JUNGLE, NETHER_FUNGUS);
 	}
 

@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -27,7 +26,11 @@ import java.util.Map;
  */
 public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
-    public static final Registry<RegistryHandler> REGISTRY = new Registry<>(RegistryHandler.class, new RegistryHandler("null"), true);
+    /**
+     * The central registry for {@link RegistryHandler}s. Stored in a {@link ConcurrentRegistry} as
+     * these are created from the mod constructor which are called from a Stream.
+     */
+    public static final ConcurrentRegistry<RegistryHandler> REGISTRY = new ConcurrentRegistry<>(RegistryHandler.class, new RegistryHandler("null"), true);
 
     /**
      * Sets up a {@link RegistryHandler} for the given {@code modId}. This includes instantiating,
