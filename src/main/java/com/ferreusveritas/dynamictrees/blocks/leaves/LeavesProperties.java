@@ -331,6 +331,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	@OnlyIn(Dist.CLIENT)
 	public int foliageColorMultiplier(BlockState state, IBlockDisplayReader world, BlockPos pos) {
+		if (colorMultiplier == null) return 0x00FF00FF;
 		return colorMultiplier.getColor(state, world, pos, -1);
 	}
 
@@ -350,6 +351,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 				final IBlockColor blockColor = BlockColorMultipliers.find(code);
 				if (blockColor != null) {
+					colorMultiplier = blockColor;
 					return;
 				} else {
 					LogManager.getLogger().error("ColorMultiplier resource '{}' could not be found.", code);

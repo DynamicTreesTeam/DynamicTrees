@@ -321,17 +321,19 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 
 	protected Family setBranch(final BranchBlock branch) {
 		this.branch = this.setupBranch(branch, this.hasStrippedBranch);
+		this.branch.setPrimitiveLogDrops(new ItemStack(primitiveLog));
 		return this;
 	}
 
 	protected Family setStrippedBranch(final BranchBlock branch) {
 		this.strippedBranch = this.setupBranch(branch, false);
+		this.strippedBranch.setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
 		return this;
 	}
 
 	protected BranchBlock setupBranch (final BranchBlock branchBlock, final boolean canBeStripped) {
 		branchBlock.setFamily(this); // Link the branch to the tree.
-	branchBlock.setCanBeStripped(canBeStripped);
+		branchBlock.setCanBeStripped(canBeStripped);
 		this.addValidBranches(branchBlock); // Add the branch as a valid branch.
 		return branchBlock;
 	}
@@ -412,9 +414,6 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	 */
 	protected Family setPrimitiveLog(Block primitiveLog) {
 		this.primitiveLog = primitiveLog;
-
-		if (this.branch != null)
-			this.branch.setPrimitiveLogDrops(new ItemStack(primitiveLog));
 
 		return this;
 	}

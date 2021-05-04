@@ -29,8 +29,11 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
 
     @Override
     public void registerAppliers() {
-        this.appliers.register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
-                .register("max_branch_radius", Integer.class, Family::setMaxBranchRadius);
+        this.loadReloadAppliers.register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
+                .register("max_branch_radius", Integer.class, Family::setMaxBranchRadius)
+                .register("primitive_log", Block.class, Family::setPrimitiveLog)
+                .register("primitive_stripped_log", Block.class, Family::setPrimitiveStrippedLog)
+                .register("stick", Item.class, Family::setStick);
 
         this.loadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
             registryName = TreeRegistry.processResLoc(registryName);
@@ -41,10 +44,7 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
         this.reloadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
             registryName = TreeRegistry.processResLoc(registryName);
             Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setCommonSpecies, setCommonWarn(family, registryName)));
-        }).register("primitive_log", Block.class, Family::setPrimitiveLog)
-                .register("primitive_stripped_log", Block.class, Family::setPrimitiveStrippedLog)
-                .register("stick", Item.class, Family::setStick)
-                .register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
+        }).register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
                 .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa);
 
         super.registerAppliers();

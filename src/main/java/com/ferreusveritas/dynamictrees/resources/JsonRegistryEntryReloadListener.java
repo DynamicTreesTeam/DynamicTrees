@@ -91,7 +91,7 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
             if (applicationType == ApplicationType.RELOAD)
                 this.reloadAppliers.applyAll(jsonObject, registryEntry).forEachErrorWarning(errorConsumer, warningConsumer);
 
-            this.appliers.applyAll(jsonObject, registryEntry).forEachError(errorConsumer).forEachErrorWarning(errorConsumer, warningConsumer);
+            this.loadReloadAppliers.applyAll(jsonObject, registryEntry).forEachError(errorConsumer).forEachErrorWarning(errorConsumer, warningConsumer);
 
             if (applicationType == ApplicationType.RELOAD)
                 registryEntry.setPostReloadDefaults();

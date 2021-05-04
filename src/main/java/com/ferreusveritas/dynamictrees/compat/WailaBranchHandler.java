@@ -129,7 +129,7 @@ public class WailaBranchHandler implements IComponentProvider {
 		if(block instanceof BranchBlock) {
 			BranchBlock branch = (BranchBlock) block;
 			
-			// Analyze only part of the tree beyond the break point and calculate it's volume, then destroy the branches
+			// Analyze only part of the tree beyond the break point and calculate it's volume
 			NetVolumeNode volumeSum = new NetVolumeNode();
 			branch.analyse(state, world, pos, null, new MapSignal(volumeSum));
 
