@@ -213,8 +213,8 @@ public final class JsonObjectGetters {
      * giving null to the getters.
      */
     public static void registerForgeEntryGetters() {
-        BLOCK = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block", block -> block != Blocks.AIR));
-        ITEM = register(Item.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.ITEMS, "item", item -> item != Items.AIR));
+        BLOCK = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block", Blocks.AIR));
+        ITEM = register(Item.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.ITEMS, "item", Items.AIR));
         BIOME = register(Biome.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BIOMES, "biome"));
     }
 

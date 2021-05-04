@@ -3,6 +3,5 @@
     "common_species": "acacia",
     "primitive_log": "acacia_log",
     "primitive_stripped_log": "stripped_acacia_log",
-    "stick": "stick",
     "max_branch_radius": 8
 }

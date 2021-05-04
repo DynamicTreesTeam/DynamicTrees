@@ -6,6 +6,7 @@ import org.apache.logging.log4j.util.StackLocatorUtil;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -45,15 +46,8 @@ public final class ObjectFetchResult<T> {
     }
 
     public <V> ObjectFetchResult<V> map (final Function<T, V> conversionFunction, final String nullError) {
-        final ObjectFetchResult<V> mappedFetchResult = new ObjectFetchResult<V>().copyErrorsFrom(this);
-        if (this.value != null) {
-            final String previousValue = this.value.toString();
-            mappedFetchResult.value = conversionFunction.apply(this.value);
-
-            if (mappedFetchResult.value == null)
-                mappedFetchResult.setErrorMessage(nullError.replace("{previous_value}", previousValue));
-        }
-        return mappedFetchResult;
+        // The validator returns true as there is already a null check.
+        return this.map(conversionFunction, value -> true, nullError);
     }
 
     public <V> ObjectFetchResult<V> map (final Function<T, V> conversionFunction, final Predicate<V> validator, final String invalidError) {
@@ -62,7 +56,8 @@ public final class ObjectFetchResult<T> {
             final String previousValue = this.value.toString();
             final V value = conversionFunction.apply(this.value);
 
-            if (value != null && validator.test(value)) mappedFetchResult.setValue(value);
+            if (value != null && validator.test(value))
+                mappedFetchResult.setValue(value);
             else mappedFetchResult.setErrorMessage(invalidError.replace("{previous_value}", previousValue));
         }
         return mappedFetchResult;

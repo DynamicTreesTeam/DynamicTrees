@@ -3,6 +3,5 @@
     "common_species": "oak",
     "primitive_log": "oak_log",
     "primitive_stripped_log": "stripped_oak_log",
-    "stick": "stick",
     "max_branch_radius": 8
 }

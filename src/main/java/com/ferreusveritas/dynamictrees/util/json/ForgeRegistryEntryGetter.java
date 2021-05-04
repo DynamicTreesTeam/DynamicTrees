@@ -4,7 +4,9 @@ import com.google.gson.JsonElement;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 /**
@@ -17,22 +19,35 @@ public final class ForgeRegistryEntryGetter<T extends ForgeRegistryEntry<T>> imp
 
     private final IForgeRegistry<T> registry;
     private final String registryDisplayName;
+
+    @Nullable
+    private final T nullValue;
     private final Predicate<T> validator;
 
     public ForgeRegistryEntryGetter(final IForgeRegistry<T> registry, final String registryDisplayName) {
-        this(registry, registryDisplayName, Objects::nonNull);
+        this(registry, registryDisplayName, null);
     }
 
-    public ForgeRegistryEntryGetter(final IForgeRegistry<T> registry, final String registryDisplayName, final Predicate<T> validator) {
+    public ForgeRegistryEntryGetter(final IForgeRegistry<T> registry, final String registryDisplayName, @Nullable final T nullValue) {
         this.registry = registry;
         this.registryDisplayName = registryDisplayName;
-        this.validator = validator;
+        this.nullValue = nullValue;
+        this.validator = value -> value != nullValue;
     }
 
     @Override
     public ObjectFetchResult<T> get(JsonElement jsonElement) {
-        return JsonObjectGetters.RESOURCE_LOCATION.get(jsonElement).map(this.registry::getValue,
-                this.validator, "Could not find " + this.registryDisplayName + " for registry name '{previous_value}'.");
+        final AtomicBoolean intentionallyNull = new AtomicBoolean();
+        return JsonObjectGetters.RESOURCE_LOCATION.get(jsonElement).map(registryName -> {
+            // If registry name is the null value's registry name then it was intentionally the null value, so don't warn.
+            if (this.nullValue != null && Objects.equals(registryName, this.nullValue.getRegistryName())) {
+                intentionallyNull.set(true);
+                return this.nullValue;
+            }
+
+            return this.registry.getValue(registryName);
+            }, value -> intentionallyNull.get() || this.validator.test(value),
+                "Could not find " + this.registryDisplayName + " for registry name '{previous_value}'.");
     }
 
 }

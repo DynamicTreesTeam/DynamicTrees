@@ -1,5 +1,9 @@
 package com.ferreusveritas.dynamictrees.command;
 
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.ISuggestionProvider;
+
 import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,6 +55,9 @@ public final class CommandConstants {
     // Suggestions
     //////////////////////////////
 
-    public static final Collection<String> TURNS_SUGGESTIONS = Stream.of(0, 1, 2).map(String::valueOf).collect(Collectors.toList());
+    public static final SuggestionProvider<CommandSource> TURNS_SUGGESTIONS = (context, builder) ->
+            ISuggestionProvider.suggest(Stream.of(0, 1, 2).map(String::valueOf).collect(Collectors.toList()), builder);
+    public static final SuggestionProvider<CommandSource> SOIL_LIFE_SUGGESTIONS = (context, builder) ->
+            ISuggestionProvider.suggest(Stream.of(0, 7, 15).map(String::valueOf).collect(Collectors.toList()), builder);
 
 }

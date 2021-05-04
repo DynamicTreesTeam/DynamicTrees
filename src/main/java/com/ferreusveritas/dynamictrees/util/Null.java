@@ -33,7 +33,7 @@ public final class Null {
      * @return {@code true} if the given {@link Object} is {@code null};
      *         {@code false} otherwise.
      */
-    public static <T> boolean consumerIfNonnull(@Nullable final T obj, final Consumer<T> nonnullConsumer) {
+    public static <T> boolean consumeIfNonnull(@Nullable final T obj, final Consumer<T> nonnullConsumer) {
         if (!isNull(obj)) {
             nonnullConsumer.accept(obj);
             return true;

@@ -173,11 +173,15 @@ public class Registry<V extends RegistryEntry<V>> implements Iterable<V> {
     }
 
     public final boolean has(final ResourceLocation registryName) {
-        return this.entries.stream().map(RegistryEntry::getRegistryName).anyMatch(registryName::equals);
+        return this.entries.stream()
+                .map(RegistryEntry::getRegistryName)
+                .anyMatch(registryName::equals);
     }
 
     public final Optional<V> getOptional(final ResourceLocation registryName) {
-        return this.entries.stream().filter(entry -> entry.getRegistryName().equals(registryName)).findFirst();
+        return this.entries.stream()
+                .filter(entry -> entry.getRegistryName().equals(registryName))
+                .findFirst();
     }
 
     public final Optional<V> getOptional(final String registryName) {

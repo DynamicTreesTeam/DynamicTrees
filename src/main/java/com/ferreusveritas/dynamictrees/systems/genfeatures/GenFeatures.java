@@ -48,8 +48,8 @@ public final class GenFeatures {
 
     public static void register(final Registry<GenFeature> registry) {
         registry.registerAll(FRUIT, COCOA, VINES, BEE_NEST, SHROOMLIGHT, CONIFER_TOPPER, MOUND,
-                ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH, PODZOL, BUSH,
-                HUGE_MUSHROOM, HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE);
+                ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH, PODZOL, BUSH, HUGE_MUSHROOM,
+                HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE);
     }
     
 }
