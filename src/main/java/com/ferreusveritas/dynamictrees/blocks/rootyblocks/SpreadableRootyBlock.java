@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -27,17 +28,14 @@ public class SpreadableRootyBlock extends RootyBlock {
     private Item spreadItem;
     //A non-null required light will allow the blocks to spread on their own.
     //A non-null required item will allow the use of said item to spread the blocks.
-    public SpreadableRootyBlock(Block primitiveDirt, Integer requiredLight, Item requiredItem, Block ... spreadableBlocks) {
+    public SpreadableRootyBlock(Block primitiveDirt, @Nullable Integer requiredLight, @Nullable Item requiredItem, Block ... spreadableBlocks) {
         super(primitiveDirt);
         this.requiredLight = requiredLight;
         this.spreadItem = requiredItem;
         if (rootyBlocks == null){
             rootyBlocks = new HashMap<>();
             for (Block block : spreadableBlocks){
-                if (RootyBlockHelper.isBlockRegistered(block))
-                    rootyBlocks.put(block, RootyBlockHelper.getRootyBlock(block));
-                else
-                    System.err.println("Spreadable rooty dirt for "+primitiveDirt+" could not find rooty dirt for "+block+"! Make sure it is registered BEFORE this one.");
+                addSpreadableBlock(block);
             }
         }
     }
@@ -46,6 +44,16 @@ public class SpreadableRootyBlock extends RootyBlock {
     }
     public SpreadableRootyBlock(Block primitiveDirt, Item requiredItem, Block ... spreadableBlocks) {
         this(primitiveDirt, null, requiredItem, spreadableBlocks);
+    }
+
+    public void addSpreadableBlock(Block primitiveDirt) {
+        if (RootyBlockHelper.isBlockRegistered(primitiveDirt))
+            addSpreadableBlock(primitiveDirt, RootyBlockHelper.getRootyBlock(primitiveDirt));
+        else
+            System.err.println("Spreadable rooty dirt for "+primitiveDirt+" could not find rooty dirt for "+primitiveDirt+"! Make sure it is registered BEFORE adding it to this spreadable dirt.");
+    }
+    public void addSpreadableBlock(Block primitiveDirt, RootyBlock rootyBlock) {
+        rootyBlocks.put(primitiveDirt, rootyBlock);
     }
 
     @Override
