@@ -88,7 +88,7 @@ public class BranchDestructionData {
 	}
 	
 	public CompoundNBT writeToNBT(CompoundNBT tag) {
-		tag.putString("species", species.toString());
+		tag.putString("species", species.getRegistryName().toString());
 		tag.putIntArray("branchpos", destroyedBranchesRadiusPosition);
 		tag.putIntArray("branchcon", destroyedBranchesConnections);
 		tag.putIntArray("branchblock", destroyedBranchesBlockIndex);

@@ -12,12 +12,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -39,9 +42,10 @@ import javax.annotation.Nullable;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public class TrunkShellBlock extends BlockWithDynamicHardness {
+public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterLoggable {
 	
 	public static final EnumProperty<Surround> CORE_DIR = EnumProperty.create("coredir", Surround.class);
+	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
 	public static class ShellMuse {
 		public final BlockState state;
@@ -64,6 +68,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 
 	public TrunkShellBlock() {
 		super(Block.Properties.of(Material.WOOD));
+		registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
 	}
 
 	///////////////////////////////////////////
@@ -71,13 +76,16 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	///////////////////////////////////////////
 
 	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(CORE_DIR);
+		builder.add(CORE_DIR).add(WATERLOGGED);
 	}
 
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
 		if (this.getMuseUnchecked(worldIn, state, pos) == null) {
-			worldIn.removeBlock(pos, false);
+			if (state.getValue(WATERLOGGED))
+				worldIn.setBlockAndUpdate(pos, Blocks.WATER.defaultBlockState());
+			else
+				worldIn.removeBlock(pos, false);
 		}
 	}
 
@@ -237,6 +245,23 @@ public class TrunkShellBlock extends BlockWithDynamicHardness {
 	public int getFlammability(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
 		return 0; // This is the simple solution to the problem.  Maybe I'll work it out later.
 	}
+
+	@Override
+	public FluidState getFluidState(BlockState state) {
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+	}
+
+	@Override
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		if (stateIn.getValue(WATERLOGGED)) {
+			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+		}
+		return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+	}
+
+	///////////////////////////////////////////
+	// RENDERING
+	///////////////////////////////////////////
 
 	@Override
 	public BlockRenderType getRenderShape(BlockState state) {

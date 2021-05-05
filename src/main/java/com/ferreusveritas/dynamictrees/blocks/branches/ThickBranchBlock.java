@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BushBlock;
 import net.minecraft.block.material.Material;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
@@ -97,9 +98,10 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 			for (Surround dir : Surround.values()) {
 				final BlockPos dPos = pos.offset(dir.getOffset());
 				final ReplaceableState rep = repStates[dir.ordinal()];
+				final boolean replacingWater = world.getBlockState(dPos).getFluidState() == Fluids.WATER.getSource(false);
 
 				if (rep == ReplaceableState.REPLACEABLE)
-					world.setBlock(dPos, getTrunkShell().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, dir.getOpposite()), flags);
+					world.setBlock(dPos, getTrunkShell().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, dir.getOpposite()).setValue(TrunkShellBlock.WATERLOGGED, replacingWater), flags);
 			}
 			return true;
 		}
