@@ -277,7 +277,7 @@ public class Staff extends Item {
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		final Species species = getSpecies(stack);
-		tooltip.add(new StringTextComponent("Tree: ").append(species.isValid() ? new TranslationTextComponent(species.getUnlocalizedName()): new StringTextComponent("none")));
+		tooltip.add(new StringTextComponent("Tree: ").append(species.isValid() ? new StringTextComponent(species.getRegistryName().toString()): new StringTextComponent("none")));
 		tooltip.add(new StringTextComponent("Code: ").append(new StringTextComponent(TextFormatting.GOLD + this.getCode(stack))));
 	}
 
