@@ -27,7 +27,6 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -276,9 +275,8 @@ public class Staff extends Item {
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		final Species species = getSpecies(stack);
-		tooltip.add(new StringTextComponent("Tree: ").append(species.isValid() ? new StringTextComponent(species.getRegistryName().toString()): new StringTextComponent("none")));
-		tooltip.add(new StringTextComponent("Code: ").append(new StringTextComponent(TextFormatting.GOLD + this.getCode(stack))));
+		tooltip.add(new TranslationTextComponent("chat.tree_staff.species", this.getSpecies(stack).getTextComponent()));
+		tooltip.add(new TranslationTextComponent("chat.tree_staff.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
 	}
 
 	/**
