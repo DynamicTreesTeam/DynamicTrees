@@ -97,6 +97,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		@Override public Species setSeed(Seed seed) { return this; }
 		@Override public ItemStack getSeedStack(int qty) { return ItemStack.EMPTY; }
 		@Override public Species setupStandardSeedDropping() { return this; }
+		@Override public ITextComponent getTextComponent() { return this.getTextComponent("gui.none", TextFormatting.DARK_RED); }
 		@Override public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
 
@@ -324,13 +325,17 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	public ITextComponent getTextComponent() {
-		return new TranslationTextComponent(this.unlocalizedName).withStyle(style -> style.withColor(TextFormatting.AQUA)
+		return this.getTextComponent(this.getUnlocalizedName(), TextFormatting.AQUA);
+	}
+
+	protected ITextComponent getTextComponent(final String unlocalizedName, final TextFormatting colour) {
+		return new TranslationTextComponent(unlocalizedName).withStyle(style -> style.withColor(colour)
 				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-						new TranslationTextComponent("chat.species.tooltip", this.getRegistryName())))
+						new TranslationTextComponent("chat.registry_name", this.getRegistryName())))
 				.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD,
 						this.getRegistryName().toString())));
 	}
-	
+
 	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
 		this.tapering = tapering;
 		this.signalEnergy = energy;

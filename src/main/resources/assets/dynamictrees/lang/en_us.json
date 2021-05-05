@@ -50,7 +50,10 @@
   "item.dynamictrees.staff":"Woodland Staff",
   "block.dynamictrees.bonsai_pot":"Bonsai Pot",
 
-  "chat.species.tooltip": "Registry Name: %s",
+  "chat.registry_name": "Registry Name: %s",
+
+  "tooltip.tree_staff.species": "Species: %s",
+  "tooltip.tree_staff.jo_code": "JoCode: %s",
 
   "commands.dynamictrees.success.get_tree": "§aSpecies: %s §aJoCode: %s",
   "commands.dynamictrees.error.get_tree": "§cCould not find tree species at position %s.",
