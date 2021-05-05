@@ -89,6 +89,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .registerArrayApplier("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
                 .register("common_override", Species.ICommonOverride.class, Species::setCommonOverride)
                 .register("perfect_biomes", BiomeList.class, (species, biomeList) -> species.getPerfectBiomes().addAll(biomeList))
+                .registerArrayApplier("valid_leaves", LeavesProperties.class, Species::addValidLeafBlocks)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("features", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE.getClass(), Species::addGenFeature)
                 .registerArrayApplier("acceptable_soils", String.class, (species, acceptableSoil) -> {

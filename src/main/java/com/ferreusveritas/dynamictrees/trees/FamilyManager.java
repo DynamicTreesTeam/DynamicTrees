@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
@@ -46,7 +47,8 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
             registryName = TreeRegistry.processResLoc(registryName);
             Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setCommonSpecies, setCommonWarn(family, registryName)));
         }).register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
-                .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa);
+                .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa)
+                .registerArrayApplier("valid_branches", BranchBlock.class, Family::addValidBranches);
 
         super.registerAppliers();
     }
