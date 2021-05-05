@@ -187,12 +187,13 @@ public class BranchDestructionData {
 
 	@Nullable
 	public BlockState getBranchBlockState(int index) {
-		BranchBlock branch = species.getFamily().getValidBranchBlock(destroyedBranchesBlockIndex[index]);
-		if(branch != null) {
-			int radius = decodeBranchRadius(destroyedBranchesRadiusPosition[index]);
-			return branch.getStateForRadius(radius);
+		if (destroyedBranchesBlockIndex.length > 0){
+			BranchBlock branch = species.getFamily().getValidBranchBlock(destroyedBranchesBlockIndex[index]);
+			if(branch != null) {
+				int radius = decodeBranchRadius(destroyedBranchesRadiusPosition[index]);
+				return branch.getStateForRadius(radius);
+			}
 		}
-		
 		return null;
 	}
 	
