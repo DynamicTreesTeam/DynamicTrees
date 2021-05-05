@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.loading.AdvancedLogMessageAdapter;
 import net.minecraftforge.registries.ForgeRegistry;
@@ -257,12 +256,11 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     }
 
     /**
-     * Posts a {@link RegistryEvent} to the mod event bus. Note that this is posted using
-     * {@link ModLoader#postEvent(Event)} and as such should only be called during the initial
-     * loading phase.
+     * Posts a {@link RegistryEvent} to the mod event bus for any programmatic
+     * registration. Should only be called once and during game start.
      */
     @Override
-    public final void postRegistryEvent() {
+    public void postRegistryEvent() {
         ModLoader.get().postEvent(new RegistryEvent<>(this));
     }
 

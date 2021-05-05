@@ -74,13 +74,8 @@ public class DTTrees {
 	public static void newRegistry(RegistryEvent.NewRegistry event) {
 		final List<Registry<?>> registries = Arrays.asList(CellKit.REGISTRY, LeavesProperties.REGISTRY, GrowthLogicKit.REGISTRY, GenFeature.REGISTRY, Family.REGISTRY, Species.REGISTRY);
 
-		// Register all registry entry types, and then all registries.
-		registries.forEach(registry -> {
-			if (registry instanceof TypedRegistry)
-				((TypedRegistry<?>) registry).postTypeRegistryEvent();
-
-			registry.postRegistryEvent();
-		});
+		// Post registry events.
+		registries.forEach(Registry::postRegistryEvent);
 
 		DTResourceRegistries.setupTreesResourceManager();
 
