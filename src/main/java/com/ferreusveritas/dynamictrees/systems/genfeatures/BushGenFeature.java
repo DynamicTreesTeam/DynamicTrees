@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -26,9 +26,9 @@ import java.util.function.Predicate;
 
 public class BushGenFeature extends GenFeature implements IFullGenFeature, IPostGenFeature {
 
-	public static final GenFeatureProperty<Block> LOG_BLOCK = GenFeatureProperty.createBlockProperty("log");
-	public static final GenFeatureProperty<Block> LEAVES_BLOCK = GenFeatureProperty.createBlockProperty("leaves");
-	public static final GenFeatureProperty<Block> SECONDARY_LEAVES_BLOCK = GenFeatureProperty.createBlockProperty("secondary_leaves");
+	public static final ConfigurationProperty<Block> LOG_BLOCK = ConfigurationProperty.block("log");
+	public static final ConfigurationProperty<Block> LEAVES_BLOCK = ConfigurationProperty.block("leaves");
+	public static final ConfigurationProperty<Block> SECONDARY_LEAVES_BLOCK = ConfigurationProperty.block("secondary_leaves");
 
 	private Predicate<Biome> biomePredicate = i -> true;
 

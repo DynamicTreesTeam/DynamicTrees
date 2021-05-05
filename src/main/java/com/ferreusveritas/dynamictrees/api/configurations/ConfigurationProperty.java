@@ -1,29 +1,29 @@
-package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
+package com.ferreusveritas.dynamictrees.api.configurations;
 
 import com.ferreusveritas.dynamictrees.util.json.IJsonObjectGetter;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import net.minecraft.block.Block;
-import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 
 /**
- * Class for holding properties of {@link ConfiguredGenFeature} objects. Stores a property's identifier
- * and class type, handling getting {@link Object}s of type {@link T} from {@link JsonElement}s.
+ * Class for custom configuration properties that can be deserialised from a
+ * {@link JsonObject} using {@link #deserialise(JsonObject)}. Stores a property's
+ * identifier and class type, handling getting properties of type {@link T}
+ * using {@link JsonObjectGetters}s.
  *
  * @param <T> The type of the property being held.
  * @author Harley O'Connor
  */
-public class GenFeatureProperty<T> {
+public class ConfigurationProperty<T> {
 
     protected final String identifier;
     protected final Class<T> type;
 
-    protected GenFeatureProperty(String identifier, Class<T> type) {
+    protected ConfigurationProperty(String identifier, Class<T> type) {
         this.identifier = identifier;
         this.type = type;
     }
@@ -44,7 +44,7 @@ public class GenFeatureProperty<T> {
      * @return The an {@link ObjectFetchResult} for the property value, or null if it wasn't found.
      */
     @Nullable
-    public ObjectFetchResult<T> getValueFromJsonObject(JsonObject jsonObject) {
+    public ObjectFetchResult<T> deserialise(JsonObject jsonObject) {
         final JsonElement jsonElement = jsonObject.get(this.identifier);
 
         if (jsonElement == null)
@@ -60,43 +60,43 @@ public class GenFeatureProperty<T> {
     }
 
     /**
-     * Creates a new {@link GenFeatureProperty} from the identifier and class given.
+     * Creates a new {@link ConfigurationProperty} from the identifier and class given.
      *
      * @param identifier The identifier for the property.
      * @param type The {@link Class} of the value the property will store.
      * @param <T> The value the property will store.
-     * @return The new {@link GenFeatureProperty} object.
+     * @return The new {@link ConfigurationProperty} object.
      */
-    public static <T> GenFeatureProperty<T> createProperty(String identifier, Class<T> type) {
-        return new GenFeatureProperty<>(identifier, type);
+    public static <T> ConfigurationProperty<T> property(String identifier, Class<T> type) {
+        return new ConfigurationProperty<>(identifier, type);
     }
 
-    public static GenFeatureProperty<String> createStringProperty(String identifier) {
-        return createProperty(identifier, String.class);
+    public static ConfigurationProperty<String> string(String identifier) {
+        return property(identifier, String.class);
     }
 
-    public static GenFeatureProperty<Boolean> createBooleanProperty(String identifier) {
-        return createProperty(identifier, Boolean.class);
+    public static ConfigurationProperty<Boolean> bool(String identifier) {
+        return property(identifier, Boolean.class);
     }
 
-    public static GenFeatureProperty<Integer> createIntegerProperty(String identifier) {
-        return createProperty(identifier, Integer.class);
+    public static ConfigurationProperty<Integer> integer(String identifier) {
+        return property(identifier, Integer.class);
     }
 
-    public static GenFeatureProperty<Long> createLongProperty(String identifier) {
-        return createProperty(identifier, Long.class);
+    public static ConfigurationProperty<Long> longProperty(String identifier) {
+        return property(identifier, Long.class);
     }
 
-    public static GenFeatureProperty<Float> createDoubleProperty(String identifier) {
-        return createProperty(identifier, Float.class);
+    public static ConfigurationProperty<Float> doubleProperty(String identifier) {
+        return property(identifier, Float.class);
     }
 
-    public static GenFeatureProperty<Float> createFloatProperty(String identifier) {
-        return createProperty(identifier, Float.class);
+    public static ConfigurationProperty<Float> floatProperty(String identifier) {
+        return property(identifier, Float.class);
     }
 
-    public static GenFeatureProperty<Block> createBlockProperty(String identifier) {
-        return createProperty(identifier, Block.class);
+    public static ConfigurationProperty<Block> block(String identifier) {
+        return property(identifier, Block.class);
     }
 
     @Override

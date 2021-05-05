@@ -4,18 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
-import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 /**
  * This works somewhat like a loot table except much more powerful.
@@ -23,33 +17,28 @@ import net.minecraft.world.World;
  * @author ferreusveritas
  *
  */
-public class StorageDropCreator implements IDropCreatorStorage {
+public class StorageDropCreator extends DropCreator {
 	
-	private final HashMap<ResourceLocation, IDropCreator> dropCreators = new HashMap<>();
-	
-	@Override
-	public ResourceLocation getName() {
-		return new ResourceLocation(DynamicTrees.MOD_ID, "storage");
+	private final HashMap<ResourceLocation, DropCreator> dropCreators = new HashMap<>();
+
+	public StorageDropCreator() {
+		super(DynamicTrees.resLoc("storage"));
 	}
-	
-	@Override
-	public boolean addDropCreator(IDropCreator dropCreator) {
-		this.dropCreators.put(dropCreator.getName(), dropCreator);
+
+	public boolean addDropCreator(DropCreator dropCreator) {
+		this.dropCreators.put(dropCreator.getRegistryName(), dropCreator);
 		return true;
 	}
 	
-	@Override
-	public IDropCreator findDropCreator(ResourceLocation name) {
+	public DropCreator findDropCreator(ResourceLocation name) {
 		return dropCreators.get(name);
 	}
 	
-	@Override
 	public boolean remDropCreator(ResourceLocation name) {
 		return dropCreators.remove(name) != null;
 	}
 	
-	@Override
-	public Map<ResourceLocation, IDropCreator> getDropCreators() {
+	public Map<ResourceLocation, DropCreator> getDropCreators() {
 		return new HashMap<>(dropCreators);
 	}
 	
@@ -59,49 +48,58 @@ public class StorageDropCreator implements IDropCreatorStorage {
 		}
 		return dropList;
 	}
-	
+
 	@Override
-	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
-		dropList = makeDropListIfNull(dropList);
-		
-		for(IDropCreator dropCreator : dropCreators.values()) {
-			dropList = dropCreator.getHarvestDrop(world, species, leafPos, random, dropList, soilLife, fortune);
+	public <C extends DropContext> List<ItemStack> appendDrops(DropType<C> dropType, C context) {
+		for (final DropCreator dropCreator : this.dropCreators.values()) {
+			dropCreator.appendDrops(dropType, context);
 		}
-		
-		return dropList;
+
+		return context.drops();
 	}
-	
-	@Override
-	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
-		dropList = makeDropListIfNull(dropList);
-		
-		for(IDropCreator dropCreator : dropCreators.values()) {
-			dropList = dropCreator.getVoluntaryDrop(world, species, rootPos, random, dropList, soilLife);
-		}
-		
-		return dropList;
-	}
-	
-	@Override
-	public List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
-		dropList = makeDropListIfNull(dropList);
-		
-		for(IDropCreator dropCreator : dropCreators.values()) {
-			dropList = dropCreator.getLeavesDrop(access, species, breakPos, random, dropList, fortune);
-		}
-		
-		return dropList;
-	}
-	
-	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, NetVolumeNode.Volume volume) {
-		dropList = makeDropListIfNull(dropList);
-		
-		for(IDropCreator dropCreator : dropCreators.values()) {
-			dropList = dropCreator.getLogsDrop(world, species, rootPos, random, dropList, volume);
-		}
-		
-		return dropList;
-	}
+
+//	@Override
+//	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
+//		dropList = makeDropListIfNull(dropList);
+//
+//		for(DropCreator dropCreator : dropCreators.values()) {
+//			dropList = dropCreator.getHarvestDrop(world, species, leafPos, random, dropList, soilLife, fortune);
+//		}
+//
+//		return dropList;
+//	}
+//
+//	@Override
+//	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
+//		dropList = makeDropListIfNull(dropList);
+//
+//		for(DropCreator dropCreator : dropCreators.values()) {
+//			dropList = dropCreator.getVoluntaryDrop(world, species, rootPos, random, dropList, soilLife);
+//		}
+//
+//		return dropList;
+//	}
+//
+//	@Override
+//	public List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
+//		dropList = makeDropListIfNull(dropList);
+//
+//		for(IDropCreator dropCreator : dropCreators.values()) {
+//			dropList = dropCreator.getLeavesDrop(access, species, breakPos, random, dropList, fortune);
+//		}
+//
+//		return dropList;
+//	}
+//
+//	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, NetVolumeNode.Volume volume) {
+//		dropList = makeDropListIfNull(dropList);
+//
+//		for(IDropCreator dropCreator : dropCreators.values()) {
+//			dropList = dropCreator.getLogsDrop(world, species, rootPos, random, dropList, volume);
+//		}
+//
+//		return dropList;
+//	}
 
 	@Override
 	public String toString() {

@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
@@ -28,9 +28,9 @@ import java.util.List;
 
 public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPostGenFeature {
 
-	public static final GenFeatureProperty<Integer> MIN_TRUNK_RADIUS = GenFeatureProperty.createIntegerProperty("min_trunk_radius");
-	public static final GenFeatureProperty<Integer> LEVEL_LIMIT = GenFeatureProperty.createIntegerProperty("level_limit");
-	public static final GenFeatureProperty<Float> SCALE_FACTOR = GenFeatureProperty.createFloatProperty("scale_factor");
+	public static final ConfigurationProperty<Integer> MIN_TRUNK_RADIUS = ConfigurationProperty.integer("min_trunk_radius");
+	public static final ConfigurationProperty<Integer> LEVEL_LIMIT = ConfigurationProperty.integer("level_limit");
+	public static final ConfigurationProperty<Float> SCALE_FACTOR = ConfigurationProperty.floatProperty("scale_factor");
 
 	private TetraFunction<Integer, Integer, Integer, Float, Integer> scaler = (inRadius, trunkRadius, minTrunkRadius, scaleFactor) -> {
 		float scale = MathHelper.clamp(trunkRadius >= minTrunkRadius ? (trunkRadius / scaleFactor) : 0, 0, 1);

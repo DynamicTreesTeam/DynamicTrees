@@ -1,15 +1,15 @@
-package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
+package com.ferreusveritas.dynamictrees.api.configurations;
 
 /**
- * Stores the value of a {@link GenFeatureProperty}.
+ * Stores the value of a {@link ConfigurationProperty}.
  *
  * @author Harley O'Connor
  */
-public class GenFeaturePropertyValue<V> {
+public class ConfigurationPropertyValue<V> {
 
     private final V value;
 
-    public GenFeaturePropertyValue(V value) {
+    public ConfigurationPropertyValue(V value) {
         this.value = value;
     }
 

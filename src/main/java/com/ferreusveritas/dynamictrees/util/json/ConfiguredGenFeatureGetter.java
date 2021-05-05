@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.util.json;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -36,8 +36,8 @@ public final class ConfiguredGenFeatureGetter implements IJsonObjectGetter<Confi
         return configuredGenFeature;
     }
 
-    private static <T> void addProperty(final ObjectFetchResult<ConfiguredGenFeature<GenFeature>> fetchResult, final JsonObject propertiesObject, final GenFeatureProperty<T> genFeatureProperty) {
-        final ObjectFetchResult<T> propertyValueFetchResult = genFeatureProperty.getValueFromJsonObject(propertiesObject);
+    private static <T> void addProperty(final ObjectFetchResult<ConfiguredGenFeature<GenFeature>> fetchResult, final JsonObject propertiesObject, final ConfigurationProperty<T> genFeatureProperty) {
+        final ObjectFetchResult<T> propertyValueFetchResult = genFeatureProperty.deserialise(propertiesObject);
 
         if (propertyValueFetchResult == null)
             return;

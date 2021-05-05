@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -14,7 +14,7 @@ import net.minecraft.world.IWorld;
 
 public class ClearVolumeGenFeature extends GenFeature implements IPreGenFeature {
 
-	public static final GenFeatureProperty<Integer> HEIGHT = GenFeatureProperty.createIntegerProperty("height");
+	public static final ConfigurationProperty<Integer> HEIGHT = ConfigurationProperty.integer("height");
 
 	public ClearVolumeGenFeature(ResourceLocation registryName) {
 		super(registryName, HEIGHT);

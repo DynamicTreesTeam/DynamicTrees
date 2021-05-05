@@ -1,0 +1,16 @@
+{
+  "type": "normal",
+  "properties": {
+    "drops": [
+      {
+        "type": "normal",
+        "items": [
+          {
+            "id": "stick",
+            "Count": 3
+          }
+        ]
+      }
+    ]
+  }
+}

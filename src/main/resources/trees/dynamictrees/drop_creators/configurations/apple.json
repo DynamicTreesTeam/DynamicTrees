@@ -1,0 +1,14 @@
+{
+  "properties": {
+    "drops": [
+      {
+        "type": "normal",
+        "items": [
+          {
+            "id": "apple"
+          }
+        ]
+      }
+    ]
+  }
+}

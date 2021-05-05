@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -28,8 +28,8 @@ import static net.minecraft.block.HugeMushroomBlock.*;
  */
 public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeature {
 
-	public static final GenFeatureProperty<Block> MUSHROOM_BLOCK = GenFeatureProperty.createBlockProperty("mushroom");
-	public static final GenFeatureProperty<Block> STEM_BLOCK = GenFeatureProperty.createBlockProperty("stem");
+	public static final ConfigurationProperty<Block> MUSHROOM_BLOCK = ConfigurationProperty.block("mushroom");
+	public static final ConfigurationProperty<Block> STEM_BLOCK = ConfigurationProperty.block("stem");
 
 	private int height = -1;
 
@@ -37,7 +37,7 @@ public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeatur
 		super(registryName, MUSHROOM_BLOCK, STEM_BLOCK);
 	}
 
-	public HugeMushroomGenFeature(ResourceLocation registryName, GenFeatureProperty<?>... properties) {
+	public HugeMushroomGenFeature(ResourceLocation registryName, ConfigurationProperty<?>... properties) {
 		super(registryName, ArrayUtils.addAll(properties, MUSHROOM_BLOCK, STEM_BLOCK));
 	}
 

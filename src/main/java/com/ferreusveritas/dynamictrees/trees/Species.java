@@ -9,8 +9,6 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
-import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
-import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
@@ -34,10 +32,9 @@ import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.LogsDropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.SticksDropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.*;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
@@ -96,7 +93,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
 		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
-		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
+		@Override public boolean addDropCreator(DropCreator dropCreator) { return false; }
 		@Override public Species setSeed(Seed seed) { return this; }
 		@Override public ItemStack getSeedStack(int qty) { return ItemStack.EMPTY; }
 		@Override public Species setupStandardSeedDropping() { return this; }
@@ -169,7 +166,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	/** A blockState that will turn itself into this tree */
 	protected DynamicSaplingBlock saplingBlock;
 	/** A place to store what drops from the species. Similar to a loot table */
-	protected IDropCreatorStorage dropCreatorStorage = new StorageDropCreator();
+	protected StorageDropCreator dropCreatorStorage = new StorageDropCreator();
 	
 	//WorldGen
 	/** A map of environmental biome factors that change a tree's suitability */
@@ -608,7 +605,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this;
 	}
 
-	public boolean addDropCreator(IDropCreator dropCreator) {
+	public boolean addDropCreator(DropCreator dropCreator) {
 		return dropCreatorStorage.addDropCreator(dropCreator);
 	}
 	
@@ -616,7 +613,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return dropCreatorStorage.remDropCreator(dropCreatorName);
 	}
 	
-	public Map<ResourceLocation, IDropCreator> getDropCreators() {
+	public Map<ResourceLocation, DropCreator> getDropCreators() {
 		return dropCreatorStorage.getDropCreators();
 	}
 	
@@ -631,8 +628,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return
 	 */
 	public List<ItemStack> getTreeHarvestDrops(World world, BlockPos leafPos, List<ItemStack> dropList, Random random) {
-		dropList = TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.getHarvestDrop(world, this, leafPos, random, dropList, 0, 0);
-		return dropCreatorStorage.getHarvestDrop(world, this, leafPos, random, dropList, 0, 0);
+		final DropContext dropContext = new DropContext(world, leafPos, this, dropList);
+ 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(DropCreator.DropType.HARVEST, dropContext);
+		return this.dropCreatorStorage.appendDrops(DropCreator.DropType.HARVEST, dropContext);
 	}
 	
 	/**
@@ -646,8 +644,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return
 	 */
 	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, int soilLife) {
-		List<ItemStack> dropList = TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.getVoluntaryDrop(world, this, rootPos, world.random, null, soilLife);
-		return dropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.random, dropList, soilLife);
+		final DropContext dropContext = new DropContext(world, rootPos, this, new ArrayList<>(), soilLife, 0);
+		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(DropCreator.DropType.VOLUNTARY, dropContext);
+		return this.dropCreatorStorage.appendDrops(DropCreator.DropType.VOLUNTARY, dropContext);
 	}
 	
 	/**
@@ -661,9 +660,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return
 	 */
 	public List<ItemStack> getLeavesDrops(@Nullable World world, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
-		Random random = world != null ? world.random : new Random();
-		dropList = TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.getLeavesDrop(world, this, breakPos, random, dropList, fortune);
-		return dropCreatorStorage.getLeavesDrop(world, this, breakPos, random, dropList, fortune);
+		final DropContext dropContext = new DropContext(world, breakPos, this, dropList, -1, fortune);
+		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(DropCreator.DropType.LEAVES, dropContext);
+		return dropCreatorStorage.appendDrops(DropCreator.DropType.LEAVES, dropContext);
 	}
 	
 	
@@ -678,8 +677,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return
 	 */
 	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, NetVolumeNode.Volume volume, ItemStack handStack) {
-		dropList = TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.getLogsDrop(world, this, breakPos, world.random, dropList, volume);
-		return dropCreatorStorage.getLogsDrop(world, this, breakPos, world.random, dropList, volume);
+		final LogDropContext dropContext = new LogDropContext(world, breakPos, this, dropList, volume);
+		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(DropCreator.DropType.LOGS, dropContext);
+		return dropCreatorStorage.appendDrops(DropCreator.DropType.LOGS, dropContext);
 	}
 	
 	public static class LogsAndSticks {

@@ -1,89 +1,32 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
 
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.Configured;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
-import com.google.common.collect.Maps;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.ReportedException;
-
-import java.util.Map;
 
 /**
- * A configured version of a {@link GenFeature}. This is used for holding {@link GenFeatureProperty}
+ * A configured version of a {@link GenFeature}. This is used for holding {@link ConfigurationProperty}
  * objects so that {@link GenFeature} objects can be customised by different {@link Species}.
  *
  * @author Harley O'Connor
  */
-public class ConfiguredGenFeature<GF extends GenFeature> {
+public class ConfiguredGenFeature<GF extends GenFeature> extends Configured<ConfiguredGenFeature<GF>, GF> {
 
     /** A null configured gen feature. Mainly used for getting the class with the
-     * {@link GenFeature} parameter for {@link JsonObjectGetters#CONFIGURED_GEN_FEATURE_GETTER}. */
+     * {@link GenFeature} parameter for {@link JsonObjectGetters#CONFIGURED_GEN_FEATURE}. */
     public static final ConfiguredGenFeature<GenFeature> NULL_CONFIGURED_FEATURE = new ConfiguredGenFeature<>(GenFeature.NULL_GEN_FEATURE);
 
     @SuppressWarnings("unchecked")
     public static final Class<ConfiguredGenFeature<GenFeature>> NULL_CONFIGURED_FEATURE_CLASS = (Class<ConfiguredGenFeature<GenFeature>>) NULL_CONFIGURED_FEATURE.getClass();
 
-    private final GF genFeature;
-    private final Map<GenFeatureProperty<?>, GenFeaturePropertyValue<?>> properties = Maps.newHashMap();
-
     public ConfiguredGenFeature(GF genFeature) {
-        this.genFeature = genFeature;
-    }
-
-    /**
-     * Adds the given {@link GenFeatureProperty} to this {@link ConfiguredGenFeature} object's
-     * properties.
-     *
-     * @param genFeatureProperty The {@link GenFeatureProperty} to set.
-     * @param value The value to register.
-     * @param <V> The type of value to register.
-     * @return This {@link ConfiguredGenFeature} after adding the property.
-     * @throws ReportedException if the property given is not registered to the {@link GenFeature}.
-     */
-    public <V> ConfiguredGenFeature<GF> with (GenFeatureProperty<V> genFeatureProperty, V value) {
-        if (!this.genFeature.isPropertyRegistered(genFeatureProperty)) {
-            CrashReport crashReport = CrashReport.forThrowable(new IllegalArgumentException(), "Tried to add unregistered property with identifier '" + genFeatureProperty.getIdentifier() + "' and type '" + genFeatureProperty.getType() + "' to gen feature '" + this.genFeature.getRegistryName() + "'.");
-            crashReport.addCategory("Adding property to a gen feature.");
-            throw new ReportedException(crashReport);
-        }
-
-        this.properties.put(genFeatureProperty, new GenFeaturePropertyValue<>(value));
-        return this;
-    }
-
-    /**
-     * Checks if the properties contains the given {@link GenFeatureProperty}.
-     *
-     * @param genFeatureProperty The {@link GenFeatureProperty} to check for.
-     * @return True if it does, false if not.
-     */
-    public boolean has (GenFeatureProperty<?> genFeatureProperty) {
-        return this.properties.containsKey(genFeatureProperty);
-    }
-
-    /**
-     * Gets the {@link GenFeaturePropertyValue} object's value for the given {@link GenFeatureProperty}.
-     * This method expects that the feature will be set, so call <tt>has</tt> first if it is optional.
-     *
-     * @param genFeatureProperty The {@link GenFeatureProperty} to get.
-     * @param <V> The type of the property's value.
-     * @return The property's value.
-     * @throws ReportedException if the property did not exist. If a property is optional, <tt>has</tt>
-     * must be called before this method.
-     */
-    public <V> V get (GenFeatureProperty<V> genFeatureProperty) {
-        if (!this.has(genFeatureProperty)) {
-            CrashReport crashReport = CrashReport.forThrowable(new IllegalStateException(), "Tried to obtain gen feature property '" + genFeatureProperty.getIdentifier() + "' from '" + genFeature.getRegistryName() + "' that did not exist.");
-            crashReport.addCategory("Getting property from a configured gen feature.");
-            throw new ReportedException(crashReport);
-        }
-
-        return genFeatureProperty.getType().cast(this.properties.get(genFeatureProperty).getValue());
+        super(genFeature);
     }
 
     public GF getGenFeature() {
-        return genFeature;
+        return this.configurable;
     }
 
     /**
@@ -95,17 +38,9 @@ public class ConfiguredGenFeature<GF extends GenFeature> {
      * @return The duplicate {@link ConfiguredGenFeature}.
      */
     public static <GF extends GenFeature> ConfiguredGenFeature<GF> copyOf (ConfiguredGenFeature<GF> configuredGenFeature) {
-        ConfiguredGenFeature<GF> duplicateGenFeature = new ConfiguredGenFeature<>(configuredGenFeature.genFeature);
+        ConfiguredGenFeature<GF> duplicateGenFeature = new ConfiguredGenFeature<>(configuredGenFeature.configurable);
         duplicateGenFeature.properties.putAll(configuredGenFeature.properties);
         return duplicateGenFeature;
-    }
-
-    @Override
-    public String toString() {
-        return "ConfiguredGenFeature{" +
-                "genFeature=" + genFeature +
-                ", properties=" + properties +
-                '}';
     }
 
 }

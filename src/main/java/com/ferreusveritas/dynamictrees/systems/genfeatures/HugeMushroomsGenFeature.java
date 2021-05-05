@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -25,8 +25,8 @@ import java.util.Random;
  */
 public class HugeMushroomsGenFeature extends HugeMushroomGenFeature implements IPostGenFeature {
 
-	public static final GenFeatureProperty<Integer> MAX_MUSHROOMS = GenFeatureProperty.createIntegerProperty("max_mushrooms");
-	public static final GenFeatureProperty<Integer> MAX_ATTEMPTS = GenFeatureProperty.createIntegerProperty("max_attempts");
+	public static final ConfigurationProperty<Integer> MAX_MUSHROOMS = ConfigurationProperty.integer("max_mushrooms");
+	public static final ConfigurationProperty<Integer> MAX_ATTEMPTS = ConfigurationProperty.integer("max_attempts");
 
 	public HugeMushroomsGenFeature(ResourceLocation registryName) {
 		super(registryName, MAX_MUSHROOMS, MAX_ATTEMPTS);

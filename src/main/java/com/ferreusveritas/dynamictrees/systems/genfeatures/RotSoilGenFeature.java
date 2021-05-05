@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.IPostRotGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class RotSoilGenFeature extends GenFeature implements IPostRotGenFeature {
 
-    public static final GenFeatureProperty<Block> ROTTED_SOIL = GenFeatureProperty.createBlockProperty("rotted_soil");
+    public static final ConfigurationProperty<Block> ROTTED_SOIL = ConfigurationProperty.block("rotted_soil");
 
     public RotSoilGenFeature(ResourceLocation registryName) {
         super(registryName, ROTTED_SOIL);
