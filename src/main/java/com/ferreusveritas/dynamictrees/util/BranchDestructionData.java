@@ -88,7 +88,7 @@ public class BranchDestructionData {
 	}
 	
 	public CompoundNBT writeToNBT(CompoundNBT tag) {
-		tag.putString("species", species.toString());
+		tag.putString("species", species.getRegistryName().toString());
 		tag.putIntArray("branchpos", destroyedBranchesRadiusPosition);
 		tag.putIntArray("branchcon", destroyedBranchesConnections);
 		tag.putIntArray("branchblock", destroyedBranchesBlockIndex);
@@ -187,12 +187,13 @@ public class BranchDestructionData {
 
 	@Nullable
 	public BlockState getBranchBlockState(int index) {
-		BranchBlock branch = species.getFamily().getValidBranchBlock(destroyedBranchesBlockIndex[index]);
-		if(branch != null) {
-			int radius = decodeBranchRadius(destroyedBranchesRadiusPosition[index]);
-			return branch.getStateForRadius(radius);
+		if (destroyedBranchesBlockIndex.length > 0){
+			BranchBlock branch = species.getFamily().getValidBranchBlock(destroyedBranchesBlockIndex[index]);
+			if(branch != null) {
+				int radius = decodeBranchRadius(destroyedBranchesRadiusPosition[index]);
+				return branch.getStateForRadius(radius);
+			}
 		}
-		
 		return null;
 	}
 	

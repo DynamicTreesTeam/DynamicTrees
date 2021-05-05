@@ -37,7 +37,7 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
     protected final JsonPropertyApplierList<V> loadAppliers;
 
     /** Holds appliers that should only be applied on {@link net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent}
-     *  (once all registries have been initiated). */
+     *  (once all Forge registry entries have been registered). */
     protected final JsonPropertyApplierList<V> setupAppliers;
 
     /** Holds appliers that should only be applied when reloading. */

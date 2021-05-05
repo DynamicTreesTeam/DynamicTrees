@@ -126,6 +126,7 @@ public class DTRegistries {
 		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
 		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
 		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.END_LIKE);
+		DirtHelper.registerSoil(Blocks.TERRACOTTA, DirtHelper.TERRACOTTA_LIKE);
 	}
 
 	private static void setupConnectables() {
