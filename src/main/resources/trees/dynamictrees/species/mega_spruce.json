@@ -19,12 +19,7 @@
     "common_override": { "name": "minecraft:.*giant_tree_taiga.*" },
     "perfect_biomes": { "name": "minecraft:.*giant_tree_taiga.*" },
     "features" : [
-        {
-            "name": "conifer_topper",
-            "properties": {
-                "leaves_properties": "spruce"
-            }
-        },
+        "conifer_topper",
         {
             "name": "mound",
             "properties": {

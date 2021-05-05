@@ -33,8 +33,9 @@ public class ConiferTopperGenFeature extends GenFeature implements IPostGenFeatu
 	@Override
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		//Manually place the highest few blocks of the conifer since the leafCluster voxmap won't handle it
-		BlockPos highest = Collections.max(endPoints, Comparator.comparingInt(Vector3i::getY));
-		LeavesProperties leavesProperties = configuredGenFeature.get(LEAVES_PROPERTIES);
+		final BlockPos highest = Collections.max(endPoints, Comparator.comparingInt(Vector3i::getY));
+		// Fetch leaves properties property set or the default for the Species.
+		final LeavesProperties leavesProperties = configuredGenFeature.get(LEAVES_PROPERTIES).elseIfInvalid(species.getLeavesProperties());
 
 		world.setBlock(highest.above(1), leavesProperties.getDynamicLeavesState(4), 3);
 		world.setBlock(highest.above(2), leavesProperties.getDynamicLeavesState(3), 3);

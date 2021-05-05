@@ -18,12 +18,7 @@
     "primitive_sapling": "spruce_sapling",
     "mega_species": "mega_spruce",
     "features" : [
-        {
-            "name": "conifer_topper",
-            "properties": {
-                "leaves_properties": "spruce"
-            }
-        },
+        "conifer_topper",
         "podzol"
     ]
 }

@@ -77,6 +77,18 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     }
 
     /**
+     * Returns this {@link RegistryEntry} if valid, or otherwise the specified
+     * {@link RegistryEntry}.
+     *
+     * @param otherValue The value to return if this {@link RegistryEntry} is invalid.
+     * @return This {@link RegistryEntry} if it is valid; otherwise the specified one.
+     */
+    @SuppressWarnings("unchecked")
+    public final T elseIfInvalid(final T otherValue) {
+        return this.isValid() ? (T) this : otherValue;
+    }
+
+    /**
      * Calls {@link Runnable#run()} on the given {@link Runnable} if this {@link RegistryEntry}
      * is {@code invalid}.
      *
