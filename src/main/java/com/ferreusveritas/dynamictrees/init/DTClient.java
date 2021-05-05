@@ -145,14 +145,7 @@ public class DTClient {
 		
 		// Register Rooty Colorizers
 		for (RootyBlock roots : RootyBlockHelper.generateListForRegistry(false)){
-			blockColors.register((state, world, pos, tintIndex) -> {
-				switch(tintIndex) {
-					case 0: return blockColors.getColor(roots.getPrimitiveDirt().defaultBlockState(), world, pos, tintIndex);
-					case 1: return state.getBlock() instanceof RootyBlock ? roots.rootColor(state, world, pos) : white;
-					default: return white;
-				}
-			}, roots
-					);
+			blockColors.register((state, world, pos, tintIndex) -> roots.colorMultiplier(blockColors, state, world, pos, tintIndex), roots);
 		}
 		
 		// Register Bonsai Pot Colorizer

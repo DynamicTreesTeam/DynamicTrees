@@ -21,6 +21,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.PushReaction;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
@@ -36,10 +37,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
@@ -410,6 +408,15 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	///////////////////////////////////////////
 	// RENDERING
 	///////////////////////////////////////////
+
+	public int colorMultiplier (BlockColors blockColors, BlockState state, @Nullable IBlockDisplayReader world, @Nullable BlockPos pos, int tintIndex){
+		final int white = 0xFFFFFFFF;
+		switch(tintIndex) {
+			case 0: return blockColors.getColor(getPrimitiveDirt().defaultBlockState(), world, pos, tintIndex);
+			case 1: return state.getBlock() instanceof RootyBlock ? rootColor(state, world, pos) : white;
+			default: return white;
+		}
+	}
 
 	public boolean getColorFromBark(){
 		return false;
