@@ -32,7 +32,6 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ResourceLocationException;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.biome.Biome;
@@ -147,18 +146,7 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<Float> FLOAT = register(Float.class, jsonElement -> NUMBER.get(jsonElement).map(Number::floatValue));
     public static final IJsonObjectGetter<Double> DOUBLE = register(Double.class, jsonElement -> NUMBER.get(jsonElement).map(Number::doubleValue));
 
-    public static final IJsonObjectGetter<ResourceLocation> RESOURCE_LOCATION = register(ResourceLocation.class, jsonElement -> {
-        final ObjectFetchResult<String> stringFetchResult = STRING.get(jsonElement);
-
-        if (!stringFetchResult.wasSuccessful())
-            return ObjectFetchResult.failureFromOther(stringFetchResult);
-
-        try {
-            return ObjectFetchResult.success(new ResourceLocation(stringFetchResult.getValue()));
-        } catch (ResourceLocationException e) {
-            return ObjectFetchResult.failure("Json element was not a valid resource location: " + e.getMessage());
-        }
-    });
+    public static final IJsonObjectGetter<ResourceLocation> RESOURCE_LOCATION = register(ResourceLocation.class, ResourceLocationGetter.create());
 
     public static IJsonObjectGetter<Block> BLOCK;
     public static IJsonObjectGetter<Item> ITEM;
