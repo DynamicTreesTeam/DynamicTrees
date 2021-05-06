@@ -12,7 +12,6 @@ import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
 import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.*;
@@ -69,7 +68,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 		@Override public int getSmotherLeavesMax() { return 0; }
 		@Override public int getLightRequirement() { return 15; }
 		@Override public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return false; }
-	}.setRegistryName(DTTrees.NULL);
+	}.setRegistryName(DTTrees.NULL).setBlockRegistryName(DTTrees.NULL);
 
 	/**
 	 * Central registry for all {@link LeavesProperties} objects.
@@ -118,6 +117,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : CommonBlockStates.AIR;
 		this.cellKit = cellKit;
 		this.setRegistryName(registryName);
+		this.blockRegistryName = registryName;
 	}
 
 	/**
@@ -154,12 +154,35 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 		return new DynamicLeavesBlock(this, properties);
 	}
 
-	protected ResourceLocation getDynamicLeavesRegName() {
-		return ResourceLocationUtils.suffix(this.getRegistryName(), "_leaves");
+	/**
+	 * The registry name for the leaves block. This allows for built-in compatibility where
+	 * the dynamic leaves may otherwise share the same name as their regular leaves block.
+	 */
+	private ResourceLocation blockRegistryName;
+
+	/**
+	 * Gets the {@link #blockRegistryName} for this {@link LeavesProperties} object.
+	 *
+	 * @return The {@link #blockRegistryName} for this {@link LeavesProperties} object.
+	 */
+	public ResourceLocation getBlockRegistryName() {
+		return this.blockRegistryName;
+	}
+
+	/**
+	 * Sets the {@link #blockRegistryName} for this {@link LeavesProperties} object
+	 * to the specified {@code blockRegistryName}.
+	 *
+	 * @param blockRegistryName The new {@link ResourceLocation} object to set.
+	 * @return This {@link LeavesProperties} object for chaining.
+	 */
+	public LeavesProperties setBlockRegistryName(ResourceLocation blockRegistryName) {
+		this.blockRegistryName = blockRegistryName;
+		return this;
 	}
 
 	public void generateDynamicLeaves (final AbstractBlock.Properties properties) {
-		this.dynamicLeavesBlock = RegistryHandler.addBlock(this.getDynamicLeavesRegName(), this.createDynamicLeaves(properties));
+		this.dynamicLeavesBlock = RegistryHandler.addBlock(this.blockRegistryName, this.createDynamicLeaves(properties));
 		LeavesPaging.addLeavesBlockForModId(this.dynamicLeavesBlock, this.getRegistryName().getNamespace());
 	}
 	

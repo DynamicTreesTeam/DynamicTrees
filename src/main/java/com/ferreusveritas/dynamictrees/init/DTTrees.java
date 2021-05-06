@@ -5,7 +5,6 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.SolidLeavesProperties;
@@ -13,7 +12,9 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
-import com.ferreusveritas.dynamictrees.trees.*;
+import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.trees.Mushroom;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.specialfamilies.NetherFungusFamily;
 import com.ferreusveritas.dynamictrees.trees.specialspecies.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.trees.specialspecies.SwampOakSpecies;
@@ -24,7 +25,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedList;
 import net.minecraft.world.gen.blockstateprovider.WeightedBlockStateProvider;
-import net.minecraft.world.gen.feature.BlockStateProvidingFeatureConfig;
 import net.minecraft.world.gen.feature.Features;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -68,11 +68,12 @@ public class DTTrees {
 		event.registerType(DynamicTrees.resLoc("swamp_oak"), SwampOakSpecies.TYPE);
 	}
 
-	public static final ResourceLocation NULL = resLoc("null");
+	public static final ResourceLocation NULL = DynamicTrees.resLoc("null");
 
 	@SubscribeEvent
 	public static void newRegistry(RegistryEvent.NewRegistry event) {
-		final List<Registry<?>> registries = Arrays.asList(CellKit.REGISTRY, LeavesProperties.REGISTRY, GrowthLogicKit.REGISTRY, GenFeature.REGISTRY, Family.REGISTRY, Species.REGISTRY);
+		final List<Registry<?>> registries = Arrays.asList(CellKit.REGISTRY, LeavesProperties.REGISTRY,
+				GrowthLogicKit.REGISTRY, GenFeature.REGISTRY, Family.REGISTRY, Species.REGISTRY);
 
 		// Post registry events.
 		registries.forEach(Registry::postRegistryEvent);
@@ -94,27 +95,22 @@ public class DTTrees {
 		FeatureCanceller.REGISTRY.lock();
 	}
 
-	public static void replaceNyliumFungiFeatures(){
-		Species crimson = TreeRegistry.findSpecies(DTTrees.CRIMSON);
-		Block crimsonSapling = crimson.getSapling().orElse(null);
-		Species warped = TreeRegistry.findSpecies(DTTrees.WARPED);
-		Block warpedSapling = warped.getSapling().orElse(null);
-		if (crimsonSapling != null && warpedSapling != null){
-			replaceFeatureConfigEntires(((WeightedBlockStateProvider) Features.Configs.CRIMSON_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
-			replaceFeatureConfigEntires(((WeightedBlockStateProvider) Features.Configs.WARPED_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
-		}
+	public static void replaceNyliumFungiFeatures() {
+		TreeRegistry.findSpecies(CRIMSON).getSapling().ifPresent(crimsonSapling ->
+				TreeRegistry.findSpecies(WARPED).getSapling().ifPresent(warpedSapling -> {
+					replaceFeatureConfigs(((WeightedBlockStateProvider) Features.Configs.CRIMSON_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
+					replaceFeatureConfigs(((WeightedBlockStateProvider) Features.Configs.WARPED_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
+				})
+		);
 	}
-	private static void replaceFeatureConfigEntires (WeightedBlockStateProvider featureConfig, Block crimsonSapling, Block warpedSapling){
-		for (WeightedList.Entry<BlockState> entry : featureConfig.weightedList.entries){
+
+	private static void replaceFeatureConfigs(WeightedBlockStateProvider featureConfig, Block crimsonSapling, Block warpedSapling) {
+		for (final WeightedList.Entry<BlockState> entry : featureConfig.weightedList.entries) {
 			if (entry.data.getBlock() == Blocks.CRIMSON_FUNGUS)
 				entry.data = crimsonSapling.defaultBlockState();
 			if (entry.data.getBlock() == Blocks.WARPED_FUNGUS)
 				entry.data = warpedSapling.defaultBlockState();
 		}
-	}
-
-	private static ResourceLocation resLoc (final String path) {
-		return DynamicTrees.resLoc(path);
 	}
 
 }

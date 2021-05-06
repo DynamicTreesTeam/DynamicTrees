@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
+import net.minecraft.util.ResourceLocation;
 
 import java.util.function.Consumer;
 
@@ -39,6 +40,9 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
 
     @Override
     protected void preLoad(JsonObject jsonObject, LeavesProperties leavesProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
+        // If a custom block registry name was set, set and use it.
+        JsonHelper.JsonObjectReader.of(jsonObject).ifContains("block_registry_name", ResourceLocation.class, leavesProperties::setBlockRegistryName);
+
         // Generate block by default, but allow it to be turned off.
         if (JsonHelper.getOrDefault(jsonObject, "generate_block", Boolean.class, true)) {
             leavesProperties.generateDynamicLeaves(JsonHelper.getBlockProperties(jsonObject,
