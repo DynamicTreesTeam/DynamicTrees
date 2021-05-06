@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
 import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.*;
@@ -117,7 +118,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : CommonBlockStates.AIR;
 		this.cellKit = cellKit;
 		this.setRegistryName(registryName);
-		this.blockRegistryName = registryName;
+		this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
 	}
 
 	/**
@@ -179,6 +180,16 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public LeavesProperties setBlockRegistryName(ResourceLocation blockRegistryName) {
 		this.blockRegistryName = blockRegistryName;
 		return this;
+	}
+
+	/**
+	 * Returns a default suffix for {@link #blockRegistryName}. Note that this will
+	 * be overridden if the {@link #blockRegistryName} is changed in the Json.
+	 *
+	 * @return A default suffix for {@link #blockRegistryName}.
+	 */
+	protected String getBlockRegistryNameSuffix() {
+		return "_leaves";
 	}
 
 	public void generateDynamicLeaves (final AbstractBlock.Properties properties) {
