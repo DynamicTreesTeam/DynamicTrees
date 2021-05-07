@@ -100,13 +100,17 @@ public final class DTResourceRegistries {
 
     @SubscribeEvent
     public static void addReloadListeners(final AddReloadListenerEvent event) {
-        event.addListener(new ReloadTreesResources(event.getDataPackRegistries()));
+        event.addListener(new ReloadListener(event.getDataPackRegistries()));
     }
 
-    public static final class ReloadTreesResources implements IFutureReloadListener {
+    /**
+     * Listens for datapack reloads for actions such as reloading the trees resource
+     * manager and registering dirt bucket recipes.
+     */
+    public static final class ReloadListener implements IFutureReloadListener {
         private final DataPackRegistries dataPackRegistries;
 
-        public ReloadTreesResources(DataPackRegistries dataPackRegistries) {
+        public ReloadListener(DataPackRegistries dataPackRegistries) {
             this.dataPackRegistries = dataPackRegistries;
         }
 
@@ -118,7 +122,7 @@ public final class DTResourceRegistries {
             return CompletableFuture.allOf(futures)
                     .thenCompose(stage::wait)
                     .thenAcceptAsync(theVoid -> TREES_RESOURCE_MANAGER.reload(futures), gameExecutor)
-                    .thenRunAsync(this::registerDirtBucketRecipes);
+                    .thenRunAsync(this::registerDirtBucketRecipes, gameExecutor);
         }
 
         private void registerDirtBucketRecipes() {
