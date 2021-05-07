@@ -100,24 +100,35 @@ public final class DTResourceRegistries {
 
     @SubscribeEvent
     public static void addReloadListeners(final AddReloadListenerEvent event) {
-        event.addListener(new ReloadTreesResources(event.getDataPackRegistries()));
+        event.addListener(new ReloadListener(event.getDataPackRegistries()));
     }
 
-    public static final class ReloadTreesResources implements IFutureReloadListener {
+    /**
+     * Listens for datapack reloads for actions such as reloading the trees resource
+     * manager and registering dirt bucket recipes.
+     */
+    public static final class ReloadListener implements IFutureReloadListener {
         private final DataPackRegistries dataPackRegistries;
 
-        public ReloadTreesResources(DataPackRegistries dataPackRegistries) {
+        public ReloadListener(DataPackRegistries dataPackRegistries) {
             this.dataPackRegistries = dataPackRegistries;
         }
 
         @Override
         public CompletableFuture<Void> reload(IStage stage, IResourceManager resourceManager, IProfiler preparationsProfiler, IProfiler reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
-            // Reload all reload listeners in the trees resource manager.
-            return CompletableFuture.runAsync(() -> TREES_RESOURCE_MANAGER.reload(stage, backgroundExecutor, gameExecutor))
-                    .thenRunAsync(this::sendRecipeRegistryEvent);
+            final CompletableFuture<?>[] futures = TREES_RESOURCE_MANAGER.prepareReload(backgroundExecutor, gameExecutor);
+
+            // Reload all reload listeners in the trees resource manager and registers dirt bucket recipes.
+            return CompletableFuture.allOf(futures)
+                    .thenCompose(stage::wait)
+                    .thenAcceptAsync(theVoid -> TREES_RESOURCE_MANAGER.reload(futures), gameExecutor)
+                    .thenRunAsync(this::registerDirtBucketRecipes, gameExecutor);
         }
 
-        private void sendRecipeRegistryEvent() {
+        private void registerDirtBucketRecipes() {
+            if (!DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get())
+                return;
+
             final Map<IRecipeType<?>, Map<ResourceLocation, IRecipe<?>>> recipes = new HashMap<>();
 
             // Put the recipes into the new map and make each type's recipes mutable.
@@ -125,8 +136,7 @@ public final class DTResourceRegistries {
                     recipes.put(recipeType, new HashMap<>(currentRecipes))));
 
             // Register dirt bucket recipes.
-            if (DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get())
-                DTRecipes.registerDirtBucketRecipes(recipes.get(IRecipeType.CRAFTING));
+            DTRecipes.registerDirtBucketRecipes(recipes.get(IRecipeType.CRAFTING));
 
             // Revert each type's recipes back to immutable.
             recipes.forEach(((recipeType, currentRecipes) -> recipes.put(recipeType, ImmutableMap.copyOf(currentRecipes))));

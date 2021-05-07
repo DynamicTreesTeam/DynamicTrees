@@ -1,8 +1,10 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import net.minecraft.resources.*;
+import net.minecraft.resources.IResource;
+import net.minecraft.resources.IResourceManager;
+import net.minecraft.resources.IResourcePack;
+import net.minecraft.resources.SimpleResource;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 
@@ -11,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -45,6 +48,15 @@ public final class TreesResourceManager implements IResourceManager {
         this.reloadListeners.add(position, reloadListener);
     }
 
+    /**
+     * Gets the {@link #reloadListeners} for this {@link TreesResourceManager} object.
+     *
+     * @return The {@link #reloadListeners} for this {@link TreesResourceManager} object.
+     */
+    public List<ReloadListener<?>> getReloadListeners() {
+        return this.reloadListeners;
+    }
+
     public void registerJsonAppliers() {
         this.reloadListeners.stream()
                 .filter(JsonApplierReloadListener.class::isInstance)
@@ -60,8 +72,25 @@ public final class TreesResourceManager implements IResourceManager {
         this.reloadListeners.forEach(reloadListener -> reloadListener.setup(this).join());
     }
 
-    public void reload (final IFutureReloadListener.IStage stage, final Executor backgroundExecutor, final Executor gameExecutor) {
-        this.reloadListeners.forEach(reloadListener -> reloadListener.reload(stage, this, backgroundExecutor, gameExecutor).join());
+    public CompletableFuture<?>[] prepareReload(final Executor backgroundExecutor, final Executor gameExecutor) {
+        return this.reloadListeners.stream().map(reloadListener -> reloadListener.prepareReload(this, backgroundExecutor)).toArray(CompletableFuture<?>[]::new);
+    }
+
+    /**
+     * Reloads the given {@link CompletableFuture}s. These <b>must</b> be given in the same order
+     * as returned from {@link #prepareReload(Executor, Executor)}.
+     *
+     * @param futures The {@link CompletableFuture} returned from {@link #prepareReload(Executor, Executor)}.
+     */
+    public void reload(final CompletableFuture<?>[] futures) {
+        for (int i = 0; i < futures.length; i++) {
+            this.reload(this.reloadListeners.get(i), futures[i]);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> void reload(final ReloadListener<T> reloadListener, final CompletableFuture<?> future) {
+        reloadListener.reload((CompletableFuture<T>) future, this);
     }
 
     public void addResourcePack (final TreeResourcePack treeResourcePack) {

@@ -106,12 +106,13 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
     }
 
     /**
-     * Posts a {@link TypeRegistryEvent} to the mod event bus. Note that this is posted using
-     * {@link ModLoader#postEvent(Event)} and as such should only be called during the initial
-     * loading phase.
+     * Posts a {@link TypeRegistryEvent} to the mod event bus and then calls
+     * {@link super#postRegistryEvent()} to register all entries.
      */
-    public final void postTypeRegistryEvent() {
+    @Override
+    public void postRegistryEvent() {
         ModLoader.get().postEvent(new TypeRegistryEvent<>(this));
+        super.postRegistryEvent();
     }
 
     /**

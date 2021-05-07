@@ -83,7 +83,6 @@ public final class ConcurrentRegistry<V extends RegistryEntry<V>> extends Abstra
      */
     @Override
     public IRegistry<V> register(V value) {
-        System.out.println(this.entries);
         this.assertValid(value);
 
         this.entries.put(value.getRegistryName(), value);

@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.resources;
 
-import net.minecraft.resources.IFutureReloadListener;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.Util;
 
@@ -47,15 +46,25 @@ public abstract class ReloadListener<T> {
     }
 
     /**
-     * Reloads the relevant data from the resource manager given. Called from
-     * {@link DTResourceRegistries.ReloadTreesResources} on datapack reload.
+     * Prepares reload by creating a {@link CompletableFuture} that calls
+     * {@link #prepare(IResourceManager)}.
      *
      * @param resourceManager The {@link IResourceManager} object.
+     * @param backgroundExecutor The {@link Executor} to prepare files on.
      */
-    public CompletableFuture<Void> reload (final IFutureReloadListener.IStage stage, final IResourceManager resourceManager, final Executor backgroundExecutor, final Executor gameExecutor) {
-        return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), backgroundExecutor)
-                .thenCompose(stage::wait)
-                .thenAcceptAsync(preparedObject -> this.apply(preparedObject, resourceManager, ApplicationType.RELOAD), gameExecutor);
+    public CompletableFuture<T> prepareReload(final IResourceManager resourceManager, final Executor backgroundExecutor) {
+        return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), backgroundExecutor);
+    }
+
+    /**
+     * Reloads the relevant data from the prepared {@link CompletableFuture} supplied by
+     * {@link #prepareReload(IResourceManager, Executor)}.
+     *
+     * @param future The {@link CompletableFuture} created by {@link #prepareReload(IResourceManager, Executor)}.
+     * @param resourceManager The {@link IResourceManager} object.
+     */
+    public void reload(CompletableFuture<T> future, final IResourceManager resourceManager) {
+        this.apply(future.join(), resourceManager, ApplicationType.RELOAD);
     }
 
     /**

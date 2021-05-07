@@ -412,7 +412,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 	public float getPrimitiveLogs(float volumeIn, List<ItemStack> drops){
 		int numLogs = (int)volumeIn;
-		for (ItemStack stack : primitiveLogDrops){
+		for (ItemStack stack : primitiveLogDrops) {
 			int num = numLogs * stack.getCount();
 			while(num > 0) {
 				drops.add(new ItemStack(stack.getItem(), Math.min(num, 64)));
