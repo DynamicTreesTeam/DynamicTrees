@@ -2,9 +2,9 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -33,12 +33,19 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 	private Predicate<Biome> biomePredicate = i -> true;
 
 	public BushGenFeature(ResourceLocation registryName) {
-		super(registryName, LOG_BLOCK, LEAVES_BLOCK, SECONDARY_LEAVES_BLOCK);
+		super(registryName);
+	}
+
+	@Override
+	protected void registerProperties() {
+		this.register(LOG_BLOCK, LEAVES_BLOCK, SECONDARY_LEAVES_BLOCK);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(LOG_BLOCK, Blocks.OAK_LOG).with(LEAVES_BLOCK, Blocks.OAK_LEAVES)
+		return super.createDefaultConfiguration()
+				.with(LOG_BLOCK, Blocks.OAK_LOG)
+				.with(LEAVES_BLOCK, Blocks.OAK_LEAVES)
 				.with(SECONDARY_LEAVES_BLOCK, null);
 	}
 

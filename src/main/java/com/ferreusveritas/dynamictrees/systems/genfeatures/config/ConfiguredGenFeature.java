@@ -30,16 +30,14 @@ public class ConfiguredGenFeature<GF extends GenFeature> extends Configured<Conf
     }
 
     /**
-     * Copies all properties from one {@link ConfiguredGenFeature} to another. This is mainly
-     * used for making sure the default configuration isn't changed.
+     * {@inheritDoc}
      *
-     * @param configuredGenFeature The {@link ConfiguredGenFeature} to copy.
-     * @param <GF> The {@link GenFeature} type.
-     * @return The duplicate {@link ConfiguredGenFeature}.
+     * @return The copy of this {@link ConfiguredGenFeature}.
      */
-    public static <GF extends GenFeature> ConfiguredGenFeature<GF> copyOf (ConfiguredGenFeature<GF> configuredGenFeature) {
-        ConfiguredGenFeature<GF> duplicateGenFeature = new ConfiguredGenFeature<>(configuredGenFeature.configurable);
-        duplicateGenFeature.properties.putAll(configuredGenFeature.properties);
+    @Override
+    public ConfiguredGenFeature<GF> copy() {
+        final ConfiguredGenFeature<GF> duplicateGenFeature = new ConfiguredGenFeature<>(this.configurable);
+        duplicateGenFeature.properties.putAll(this.properties);
         return duplicateGenFeature;
     }
 

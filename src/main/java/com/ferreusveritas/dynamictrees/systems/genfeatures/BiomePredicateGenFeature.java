@@ -22,12 +22,20 @@ public class BiomePredicateGenFeature extends GenFeature implements IPostGenFeat
 	public static final ConfigurationProperty<ConfiguredGenFeature<GenFeature>> GEN_FEATURE = ConfigurationProperty.property("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
 
 	public BiomePredicateGenFeature(ResourceLocation registryName) {
-		super(registryName, BIOME_PREDICATE, GEN_FEATURE, ONLY_WORLD_GEN);
+		super(registryName);
+	}
+
+	@Override
+	protected void registerProperties() {
+		this.register(BIOME_PREDICATE, GEN_FEATURE, ONLY_WORLD_GEN);
 	}
 
 	@Override
 	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(BIOME_PREDICATE, i -> true).with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE).with(ONLY_WORLD_GEN, false);
+		return super.createDefaultConfiguration()
+				.with(BIOME_PREDICATE, i -> true)
+				.with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE)
+				.with(ONLY_WORLD_GEN, false);
 	}
 
 	@Override

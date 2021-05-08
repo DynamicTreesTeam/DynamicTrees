@@ -3,11 +3,11 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
@@ -40,9 +40,22 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	private final SimpleVoxmap[] rootMaps;
 
 	public RootsGenFeature(ResourceLocation registryName) {
-		super(registryName, MIN_TRUNK_RADIUS, LEVEL_LIMIT, SCALE_FACTOR);
+		super(registryName);
 
 		this.rootMaps = createRootMaps();
+	}
+
+	@Override
+	protected void registerProperties() {
+		this.register(MIN_TRUNK_RADIUS, LEVEL_LIMIT, SCALE_FACTOR);
+	}
+
+	@Override
+	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+		return super.createDefaultConfiguration()
+				.with(MIN_TRUNK_RADIUS, 13)
+				.with(LEVEL_LIMIT, 2)
+				.with(SCALE_FACTOR, 24f);
 	}
 
 	protected SimpleVoxmap[] createRootMaps() {
@@ -63,11 +76,6 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 		}
 
 		return maps;
-	}
-
-	@Override
-	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(MIN_TRUNK_RADIUS, 13).with(LEVEL_LIMIT, 2).with(SCALE_FACTOR, 24f);
 	}
 
 	@Override

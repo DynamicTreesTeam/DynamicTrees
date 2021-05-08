@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.TetraFunction;
 import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -40,7 +41,7 @@ import java.util.function.BiFunction;
 /**
  * Gen feature for bee nests. Can be fully customized with a custom predicate for natural growth
  * and with a custom function for worldgen chances.
- * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, BranchConnectables.IRadiusForConnectionFunction) makeBlockConnectable}
+ * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, TetraFunction)}
  *
  * @author Max Hyper
  */
@@ -55,43 +56,57 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
     private static final double vanillaGrowChance = 0.001f;
     
     public BeeNestGenFeature (ResourceLocation registryName) {
-        super(registryName, NEST_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, WORLD_GEN_CHANCE_FUNCTION, MAX_COUNT);
+        super(registryName);
+    }
+
+    @Override
+    protected void registerProperties() {
+        this.register(NEST_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, WORLD_GEN_CHANCE_FUNCTION, MAX_COUNT);
     }
 
     @Override
     public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-        return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos) -> {
-            if (world.getRandom().nextFloat() > vanillaGrowChance) return false;
-            // Default flower check predicate, straight from the sapling class
-            for(BlockPos blockpos : BlockPos.Mutable.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
-                if (world.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
-                    return true;
-                }
-            }
-            return false;
-        }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
-            // Default biome check chance function. Uses vanilla chances
-            RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX(), pos.getY(), pos.getZ()).getRegistryName()));
-            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
-                return vanillaGenChancePlains;
-            if (biomeKey == Biomes.FLOWER_FOREST)
-                return vanillaGenChanceFlowerForest;
-            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST))
-                return vanillaGenChanceForest;
-            return 0D;
-        }).with(MAX_COUNT, 1);
+        return super.createDefaultConfiguration()
+                .with(NEST_BLOCK, Blocks.BEE_NEST)
+                .with(MAX_HEIGHT, 32)
+                .with(CAN_GROW_PREDICATE, (world, pos) -> {
+                    if (world.getRandom().nextFloat() > vanillaGrowChance)
+                        return false;
+
+                    // Default flower check predicate, straight from the sapling class.
+                    for (BlockPos blockPos : BlockPos.Mutable.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
+                        if (world.getBlockState(blockPos).is(BlockTags.FLOWERS)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
+                    // Default biome check chance function. Uses vanilla chances.
+                    final RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX(), pos.getY(), pos.getZ()).getRegistryName()));
+
+                    if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
+                        return vanillaGenChancePlains;
+                    if (biomeKey == Biomes.FLOWER_FOREST)
+                        return vanillaGenChanceFlowerForest;
+                    if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST))
+                        return vanillaGenChanceForest;
+
+                    return 0D;
+                }).with(MAX_COUNT, 1);
     }
 
     @Override
     public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-        if (world.getRandom().nextFloat() > configuredGenFeature.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos)) return false;
+        if (world.getRandom().nextFloat() > configuredGenFeature.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos))
+            return false;
 
         return placeBeeNestInValidPlace(configuredGenFeature, world, rootPos, true);
     }
 
     @Override
     public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above())) return false;
+        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above()))
+            return false;
 
         return placeBeeNestInValidPlace(configuredGenFeature, world, rootPos, false);
     }

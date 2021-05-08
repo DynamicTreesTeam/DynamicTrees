@@ -1,11 +1,10 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.configurations.Configurable;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
-import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
@@ -26,7 +25,7 @@ import java.util.Random;
  * 
  * @author ferreusveritas
  */
-public class DropCreator extends RegistryEntry<DropCreator> implements IResettable<DropCreator>, Configurable {
+public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator, ConfiguredDropCreator<DropCreator>> implements IResettable<DropCreator> {
 
 	public static final class DropType<C extends DropContext> extends RegistryEntry<DropType<C>> {
 		public static final DropType<DropContext> NULL = new DropType<>(DTTrees.NULL);
@@ -46,14 +45,19 @@ public class DropCreator extends RegistryEntry<DropCreator> implements IResettab
 		}
 	}
 
-	public static final DropCreator NULL_DROP_CREATOR = new DropCreator(DTTrees.NULL);
+	public static final DropCreator NULL_DROP_CREATOR = new DropCreator(DTTrees.NULL) {
+		@Override protected void registerProperties() { }
+	};
 
-	public static final TypedRegistry.EntryType<DropCreator> TYPE = TypedRegistry.newType(DropCreator::new);
-
-	public static final TypedRegistry<DropCreator> REGISTRY = new TypedRegistry<>(DropCreator.class, NULL_DROP_CREATOR, TYPE);
+	public static final Registry<DropCreator> REGISTRY = new Registry<>(DropCreator.class, NULL_DROP_CREATOR);
 
 	public DropCreator(final ResourceLocation registryName) {
 		super(registryName);
+	}
+
+	@Override
+	protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
+		return new ConfiguredDropCreator<>(this);
 	}
 
 	public <C extends DropContext> List<ItemStack> appendDrops(final DropType<C> dropType, final C context) {
@@ -69,20 +73,20 @@ public class DropCreator extends RegistryEntry<DropCreator> implements IResettab
 		return context.drops();
 	}
 	
-	protected List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
-		return dropList;
+	protected List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int soilLife, int fortune) {
+		return drops;
 	}
 
-	protected List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
-		return dropList;
+	protected List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> drops, int soilLife) {
+		return drops;
 	}
 
-	protected List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
-		return dropList;
+	protected List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
+		return drops;
 	}
 
-	protected List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, NetVolumeNode.Volume volume) {
-		return dropList;
+	protected List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, NetVolumeNode.Volume volume) {
+		return drops;
 	}
 
 	@Override

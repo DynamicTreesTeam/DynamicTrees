@@ -81,6 +81,14 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
         return genFeatureProperty.getType().cast(this.properties.get(genFeatureProperty).getValue());
     }
 
+    /**
+     * Makes a copy of this {@link Configurable}, copying the {@link #configurable} reference
+     * and all {@link #properties} from this {@link Configurable}.
+     *
+     * @return The copy of this {@link Configurable}.
+     */
+    public abstract T copy();
+
     public C getConfigurable() {
         return this.configurable;
     }

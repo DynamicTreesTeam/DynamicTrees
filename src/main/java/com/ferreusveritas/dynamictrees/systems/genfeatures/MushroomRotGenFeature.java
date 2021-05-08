@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IPostRotGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
@@ -27,12 +27,20 @@ public class MushroomRotGenFeature extends GenFeature implements IPostRotGenFeat
     public static final ConfigurationProperty<Float> ALTERNATE_MUSHROOM_CHANCE = ConfigurationProperty.floatProperty("alternate_mushroom_chance");
 
     public MushroomRotGenFeature(final ResourceLocation registryName) {
-        super(registryName, MUSHROOM, ALTERNATE_MUSHROOM, ALTERNATE_MUSHROOM_CHANCE);
+        super(registryName);
+    }
+
+    @Override
+    protected void registerProperties() {
+        this.register(MUSHROOM, ALTERNATE_MUSHROOM, ALTERNATE_MUSHROOM_CHANCE);
     }
 
     @Override
     protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-        return super.createDefaultConfiguration().with(MUSHROOM, Blocks.BROWN_MUSHROOM).with(ALTERNATE_MUSHROOM, Blocks.RED_MUSHROOM).with(ALTERNATE_MUSHROOM_CHANCE, .25f);
+        return super.createDefaultConfiguration()
+                .with(MUSHROOM, Blocks.BROWN_MUSHROOM)
+                .with(ALTERNATE_MUSHROOM, Blocks.RED_MUSHROOM)
+                .with(ALTERNATE_MUSHROOM_CHANCE, .25f);
     }
 
     @Override

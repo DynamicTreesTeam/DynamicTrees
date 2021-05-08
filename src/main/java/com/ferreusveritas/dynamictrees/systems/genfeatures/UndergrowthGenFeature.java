@@ -1,13 +1,10 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import java.util.List;
-
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -19,11 +16,16 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 
+import java.util.List;
+
 public class UndergrowthGenFeature extends GenFeature implements IPostGenFeature {
 
 	public UndergrowthGenFeature(ResourceLocation registryName) {
 		super(registryName);
 	}
+
+	@Override
+	protected void registerProperties() { }
 
 	@Override
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {

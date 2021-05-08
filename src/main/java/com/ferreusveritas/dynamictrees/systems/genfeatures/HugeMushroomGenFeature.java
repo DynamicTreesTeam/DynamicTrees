@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -15,7 +15,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Random;
 
@@ -34,16 +33,19 @@ public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeatur
 	private int height = -1;
 
 	public HugeMushroomGenFeature(ResourceLocation registryName) {
-		super(registryName, MUSHROOM_BLOCK, STEM_BLOCK);
+		super(registryName);
 	}
 
-	public HugeMushroomGenFeature(ResourceLocation registryName, ConfigurationProperty<?>... properties) {
-		super(registryName, ArrayUtils.addAll(properties, MUSHROOM_BLOCK, STEM_BLOCK));
+	@Override
+	protected void registerProperties() {
+		this.register(MUSHROOM_BLOCK, STEM_BLOCK);
 	}
 
 	@Override
 	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(MUSHROOM_BLOCK, Blocks.RED_MUSHROOM_BLOCK).with(STEM_BLOCK, Blocks.MUSHROOM_STEM);
+		return super.createDefaultConfiguration()
+				.with(MUSHROOM_BLOCK, Blocks.RED_MUSHROOM_BLOCK)
+				.with(STEM_BLOCK, Blocks.MUSHROOM_STEM);
 	}
 
 	static final SimpleVoxmap BROWN_CAP;

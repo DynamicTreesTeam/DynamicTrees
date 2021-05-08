@@ -10,14 +10,14 @@ import net.minecraftforge.eventbus.api.Event;
 import java.util.List;
 
 @Cancelable
-public class SeedVoluntaryDropEvent extends Event {
+public class VoluntarySeedDropEvent extends Event {
 	
 	private final World world;
 	private final BlockPos rootPos;
 	private final Species species;
 	private final List<ItemStack> dropList;
 	
-	public SeedVoluntaryDropEvent(World world, BlockPos rootPos, Species species, List<ItemStack> dropList) {
+	public VoluntarySeedDropEvent(World world, BlockPos rootPos, Species species, List<ItemStack> dropList) {
 		this.world = world;
 		this.rootPos = rootPos;
 		this.species = species;

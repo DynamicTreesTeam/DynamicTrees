@@ -24,12 +24,18 @@ public class BottomFlareGenFeature extends GenFeature implements IPostGenFeature
 	public static final ConfigurationProperty<Integer> MIN_RADIUS = ConfigurationProperty.integer("min_radius");
 
 	public BottomFlareGenFeature(ResourceLocation registryName) {
-		super(registryName, MIN_RADIUS);
+		super(registryName);
+	}
+
+	@Override
+	protected void registerProperties() {
+		this.register(MIN_RADIUS);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(MIN_RADIUS, 6);
+		return super.createDefaultConfiguration()
+				.with(MIN_RADIUS, 6);
 	}
 
 	@Override

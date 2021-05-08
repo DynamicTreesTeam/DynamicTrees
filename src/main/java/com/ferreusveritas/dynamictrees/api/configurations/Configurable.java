@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.api.configurations;
 
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
-
 /**
  * @author Harley O'Connor
  */

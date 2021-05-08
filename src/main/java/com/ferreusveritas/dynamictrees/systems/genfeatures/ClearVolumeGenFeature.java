@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -17,12 +17,18 @@ public class ClearVolumeGenFeature extends GenFeature implements IPreGenFeature 
 	public static final ConfigurationProperty<Integer> HEIGHT = ConfigurationProperty.integer("height");
 
 	public ClearVolumeGenFeature(ResourceLocation registryName) {
-		super(registryName, HEIGHT);
+		super(registryName);
+	}
+
+	@Override
+	protected void registerProperties() {
+		this.register(HEIGHT);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(HEIGHT, 8);
+		return super.createDefaultConfiguration()
+				.with(HEIGHT, 8);
 	}
 
 	@Override

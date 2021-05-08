@@ -11,4 +11,16 @@ public final class ConfiguredDropCreator<DC extends DropCreator> extends Configu
         super(dropCreator);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return The copy of this {@link ConfiguredDropCreator}.
+     */
+    @Override
+    public ConfiguredDropCreator<DC> copy() {
+        final ConfiguredDropCreator<DC> duplicateGenFeature = new ConfiguredDropCreator<>(this.configurable);
+        duplicateGenFeature.properties.putAll(this.properties);
+        return duplicateGenFeature;
+    }
+
 }

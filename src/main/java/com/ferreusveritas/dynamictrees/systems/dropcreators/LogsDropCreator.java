@@ -19,18 +19,21 @@ public class LogsDropCreator extends DropCreator {
 	}
 
 	@Override
-	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, NetVolumeNode.Volume volume) {
+	protected void registerProperties() { }
+
+	@Override
+	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, NetVolumeNode.Volume volume) {
 		LogsAndSticks las = species.getLogsAndSticks(volume);
 
 		int numLogs = las.logs.size();
 		if(numLogs > 0) {
-			dropList.addAll(las.logs);
+			drops.addAll(las.logs);
 		}
 		int numSticks = las.sticks;
 		if(numSticks > 0) {
-			dropList.add(species.getFamily().getStick(numSticks));
+			drops.add(species.getFamily().getStick(numSticks));
 		}
-		return dropList;
+		return drops;
 	}
 
 }

@@ -63,7 +63,7 @@ public final class WeightedDrops implements Drops {
 
         this.items.forEach((stack, weight) -> {
                 if (random.nextInt((int) ((chance / weight) / this.rarity)) == 0) {
-					drops.add(stack);
+					drops.add(stack.copy());
 				}
         });
         return drops;

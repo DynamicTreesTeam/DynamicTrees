@@ -38,7 +38,12 @@ public class NetherFungusSpecies extends Species {
 
         addDropCreator(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")){
             @Override
-            public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
+            protected void registerProperties() {
+
+            }
+
+            @Override
+            public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int soilLife, int fortune) {
                 int chance = 10;
                 if (fortune > 0) {
                     chance -= 2 << fortune;
@@ -47,9 +52,9 @@ public class NetherFungusSpecies extends Species {
                 }
                 if(random.nextInt(chance) == 0) {
                     ItemStack drop = species.getLeavesProperties().getPrimitiveLeavesItemStack().copy();
-                    dropList.add(drop);
+                    drops.add(drop);
                 }
-                return dropList;
+                return drops;
             }
         });
     }

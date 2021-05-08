@@ -56,7 +56,7 @@ public final class NormalDrops implements Drops {
 
         this.items.forEach(stack -> {
             if (random.nextInt((int) (chance / this.rarity)) == 0) {
-                drops.add(stack);
+                drops.add(stack.copy());
             }
         });
         return drops;
