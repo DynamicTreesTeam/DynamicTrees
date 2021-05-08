@@ -172,8 +172,25 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
         return list.get(rand.nextInt(list.size()));
     }
 
+    /**
+     * Do nothing on load, since we don't need to set anything up on game setup here.
+     *
+     * @param resourceManager The {@link IResourceManager} object.
+     * @return A {@link CompletableFuture} that does nothing.
+     */
     @Override
     public CompletableFuture<Void> load(IResourceManager resourceManager) {
+        return CompletableFuture.runAsync(() -> {});
+    }
+
+    /**
+     * Do nothing on load, since we don't need to set anything up on game setup here.
+     *
+     * @param resourceManager The {@link IResourceManager} object.
+     * @return A {@link CompletableFuture} that does nothing.
+     */
+    @Override
+    public CompletableFuture<Void> setup(IResourceManager resourceManager) {
         return CompletableFuture.runAsync(() -> {});
     }
 

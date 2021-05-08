@@ -84,6 +84,7 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -178,7 +179,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	protected List<Biome> perfectBiomes = new ArrayList<>();
 
-	protected final List<ConfiguredGenFeature<?>> genFeatures = new ArrayList<>();
+	protected final List<ConfiguredGenFeature<GenFeature>> genFeatures = new ArrayList<>();
 
 	/** A {@link BiPredicate} that returns true if this species should override the common in the given position. */
 	protected ICommonOverride commonOverride;
@@ -1197,8 +1198,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	private void postRot(final IWorld world, final BlockPos pos, final int neighborCount, final int radius, final Random random, final boolean rapid) {
-		this.genFeatures.stream().filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IPostRotGenFeature).forEach(configuredGenFeature ->
-				((IPostRotGenFeature) configuredGenFeature.getGenFeature()).postRot(configuredGenFeature, world, pos, neighborCount, radius, random, rapid));
+		this.genFeatures.stream()
+				.filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IPostRotGenFeature)
+				.forEach(configuredGenFeature -> ((IPostRotGenFeature) configuredGenFeature.getGenFeature())
+						.postRot(configuredGenFeature, world, pos, neighborCount, radius, random, rapid));
 	}
 	
 	/**
@@ -1778,7 +1781,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param configuredGenFeature The {@link ConfiguredGenFeature} to add.
 	 * @return This {@link Species} object.
 	 */
-	public Species addGenFeature(ConfiguredGenFeature<?> configuredGenFeature) {
+	public Species addGenFeature(ConfiguredGenFeature<GenFeature> configuredGenFeature) {
 		this.genFeatures.add(configuredGenFeature);
 		return this;
 	}
@@ -1792,23 +1795,24 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * could be in the way.
 	 *
 	 * @param world The world
-	 * @param rootPos The position of {@link RootyBlock} this tree will be planted in
+	 * @param rootPosition The position of {@link RootyBlock} this tree will be planted in
 	 * @param radius The radius of the generation area
 	 * @param facing The direction the joCode will build the tree
 	 * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
 	 * @param joCode The joCode that will be used to grow the tree
 	 * @return new blockposition of root block.  BlockPos.ZERO to cancel generation
 	 */
-	public BlockPos preGeneration(IWorld world, BlockPos rootPos, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
-		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
-			GenFeature genFeature = configuredGenFeature.getGenFeature();
+	public BlockPos preGeneration(IWorld world, BlockPos rootPosition, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
+		final AtomicReference<BlockPos> rootPos = new AtomicReference<>(rootPosition);
 
-			if (!(genFeature instanceof IPreGenFeature)) continue;
+		this.genFeatures.stream()
+				.filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IPreGenFeature)
+				.forEach(cofiguredGenFeature -> rootPos.set(((IPreGenFeature) cofiguredGenFeature.getGenFeature())
+						.preGeneration(cofiguredGenFeature, world, rootPos.get(), this, radius, facing,
+								safeBounds, joCode))
+				);
 
-			rootPos = ((IPreGenFeature) genFeature).preGeneration(configuredGenFeature, world, rootPos, this, radius, facing, safeBounds, joCode);
-		}
-
-		return rootPos;
+		return rootPos.get();
 	}
 	
 	/**
@@ -1825,14 +1829,13 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param initialDirtState The blockstate of the dirt that became rooty.  Useful for matching terrain.
 	 */
 	public void postGeneration(World worldObj, IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
-		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
-			GenFeature genFeature = configuredGenFeature.getGenFeature();
-
-			if (!(genFeature instanceof IPostGenFeature)) continue;
-
-			((IPostGenFeature) genFeature).postGeneration(configuredGenFeature, world, rootPos, this, biome, radius, endPoints, safeBounds,
-					initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos), this.seasonalFruitProductionFactor(worldObj, rootPos));
-		}
+		this.genFeatures.stream()
+				.filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IPostGenFeature)
+				.forEach(configuredGenFeature -> ((IPostGenFeature) configuredGenFeature.getGenFeature())
+						.postGeneration(configuredGenFeature, world, rootPos, this, biome, radius, endPoints,
+								safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos),
+								this.seasonalFruitProductionFactor(worldObj, rootPos))
+				);
 	}
 	
 	/**

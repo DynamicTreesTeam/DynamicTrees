@@ -61,7 +61,8 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
         this.loadAppliers.register("generate_seed", Boolean.class, Species::setShouldGenerateSeed)
                 .register("generate_sapling", Boolean.class, Species::setShouldGenerateSapling);
 
-        this.reloadAppliers.register("tapering", Float.class, Species::setTapering)
+        this.reloadAppliers.register("always_show_on_waila", Boolean.class, Species::alwaysShowOnWaila)
+                .register("tapering", Float.class, Species::setTapering)
                 .register("up_probability", Integer.class, Species::setUpProbability)
                 .register("lowest_branch_height", Integer.class, Species::setLowestBranchHeight)
                 .register("signal_energy", Float.class, Species::setSignalEnergy)
@@ -91,7 +92,6 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("perfect_biomes", BiomeList.class, (species, biomeList) -> species.getPerfectBiomes().addAll(biomeList))
                 .registerArrayApplier("valid_leaves", LeavesProperties.class, Species::addValidLeafBlocks)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
-                .registerArrayApplier("features", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE.getClass(), Species::addGenFeature)
                 .registerArrayApplier("acceptable_soils", String.class, (species, acceptableSoil) -> {
                     if (DirtHelper.getSoilFlags(acceptableSoil) == 0)
                         return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
@@ -99,7 +99,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                     species.addAcceptableSoils(acceptableSoil);
                     return PropertyApplierResult.success();
                 })
-                .register("always_show_on_waila", Boolean.class, Species::alwaysShowOnWaila);
+                .registerArrayApplier("features", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE.getClass(), Species::addGenFeature);
 
         super.registerAppliers();
     }
