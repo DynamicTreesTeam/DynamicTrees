@@ -42,6 +42,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
+import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -1572,6 +1573,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			ISubstanceEffectProvider provider = (ISubstanceEffectProvider) itemStack.getItem();
 			return provider.getSubstanceEffect(itemStack);
 		}
+
+		//Tree fertilizer from the Create mod should do a bit more than bonemeal since its quite expensive to obtain.
+		//So it just does the Burgeoning potion effect
+		if (itemStack.getItem().getRegistryName().equals(new ResourceLocation("create","tree_fertilizer")))
+			return new GrowthSubstance();
 		
 		return null;
 	}
