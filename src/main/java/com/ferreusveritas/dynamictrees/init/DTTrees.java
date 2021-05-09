@@ -36,14 +36,14 @@ import java.util.List;
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTTrees {
 
-	public static ResourceLocation OAK = DynamicTrees.resLoc("oak");
-	public static ResourceLocation BIRCH = DynamicTrees.resLoc("birch");
-	public static ResourceLocation SPRUCE = DynamicTrees.resLoc("spruce");
-	public static ResourceLocation JUNGLE = DynamicTrees.resLoc("jungle");
-	public static ResourceLocation DARK_OAK = DynamicTrees.resLoc("dark_oak");
-	public static ResourceLocation ACACIA = DynamicTrees.resLoc("acacia");
-	public static ResourceLocation CRIMSON = DynamicTrees.resLoc("crimson");
-	public static ResourceLocation WARPED = DynamicTrees.resLoc("warped");
+	public static final ResourceLocation OAK = DynamicTrees.resLoc("oak");
+	public static final ResourceLocation BIRCH = DynamicTrees.resLoc("birch");
+	public static final ResourceLocation SPRUCE = DynamicTrees.resLoc("spruce");
+	public static final ResourceLocation JUNGLE = DynamicTrees.resLoc("jungle");
+	public static final ResourceLocation DARK_OAK = DynamicTrees.resLoc("dark_oak");
+	public static final ResourceLocation ACACIA = DynamicTrees.resLoc("acacia");
+	public static final ResourceLocation CRIMSON = DynamicTrees.resLoc("crimson");
+	public static final ResourceLocation WARPED = DynamicTrees.resLoc("warped");
 
 	@SubscribeEvent
 	public static void registerSpecies (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<Species> event) {
