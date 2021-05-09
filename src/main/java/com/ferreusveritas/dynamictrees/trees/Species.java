@@ -504,7 +504,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	public int leafColorMultiplier (World world, BlockPos pos) {
-		return getLeavesProperties().foliageColorMultiplier(getLeavesProperties().getDynamicLeavesState(), world, pos);
+		return getLeavesProperties().treeFallColorMultiplier(getLeavesProperties().getDynamicLeavesState(), world, pos);
 	}
 
 	///////////////////////////////////////////

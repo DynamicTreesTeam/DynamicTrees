@@ -361,6 +361,11 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	private IBlockColor colorMultiplier;
 
 	@OnlyIn(Dist.CLIENT)
+	public int treeFallColorMultiplier(BlockState state, IBlockDisplayReader world, BlockPos pos) {
+		return this.foliageColorMultiplier(state, world, pos);
+	}
+
+	@OnlyIn(Dist.CLIENT)
 	public int foliageColorMultiplier(BlockState state, IBlockDisplayReader world, BlockPos pos) {
 		if (colorMultiplier == null) return 0x00FF00FF; //purple if broken
 		return colorMultiplier.getColor(state, world, pos, -1);

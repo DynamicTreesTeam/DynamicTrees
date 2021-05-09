@@ -131,7 +131,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 						BlockState leafState = destructionData.getLeavesBlockState(index);
 						IBakedModel leavesModel = dispatcher.getBlockModel(leafState);
 						treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, leafState, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE),
-								destructionData.getLeavesProperties(index).foliageColorMultiplier(leafState, entity.level, rootPos.offset(relPos)), leafState));
+								destructionData.getLeavesProperties(index).treeFallColorMultiplier(leafState, entity.level, rootPos.offset(relPos)), leafState));
 					}
 				}
 
