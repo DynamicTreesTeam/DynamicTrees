@@ -1,12 +1,13 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
   "1.16.5": {
+    "1.16.5-0.10.0-Beta9": "Enhancements:\n+ Create's tree fertiliser now gives the same effect as a burgeoning potion.\n- Updated Spanish translation [translated by Jorgegiral].\n- Updated Mexican Spanish translation [translated by EdicionGamerYT].\nBug Fixes:\n- Fixed apple trees not spawning in world gen (due to absent JoCodes). \n- Fixed two config options having the same ID, making configuration of seed drops rates inaccessible. \n- Fixed potted sapling not having a localisation.",
     "1.16.5-0.10.0-Beta8": "Enhancements:\n+ Added rooty terracotta. \n+ Rooty blocks can now use custom colour multipliers.\n+ Added localisations for staff tooltips. \n- Updated French translation [translated by @19PixelsPlaced]\n+ The trunk shell block can now be waterlogged. \nTree Packs:\n- Improvements to how tree packs are reloaded.\n+ The registry name of the generated leaves block can be changed in the leaves properties Json via block_registry_name. \n+ Additional \"valid\" leaves can now be added to the species Json via valid_leaves. \nBug Fixes:\n- Fixed an ArrayIndexOutOfBoundsException with the tree falling animation.\n- Fixed CraftTweaker incompatibility. \n- Fixed an issue where primitive logs and sticks couldn't be found from other mods.",
     "1.16.5-0.10.0-Beta7": "Enhancements:\n- Added Polish translation. [PR from SubcarpathianSkull]\n- Added soil life argument to /dt settree.\n- Improved nether worldgen\nBug Fixes:\n- Fixed trees being unbreakable in multiplayer servers\n- Fixed crashes related to ConcurrentModificationExcpetions.\n- Fixed dynamic tree configured feature not being registered properly.",
     "1.16.5-0.10.0-Beta6": "Initial 1.16.5 beta for CF."
   },
   "promos": {
-    "1.16.5-latest": "1.16.5-0.10.0-Beta8",
-    "1.16.5-recommended": "1.16.5-0.10.0-Beta8"
+    "1.16.5-latest": "1.16.5-0.10.0-Beta9",
+    "1.16.5-recommended": "1.16.5-0.10.0-Beta9"
   }
 }
