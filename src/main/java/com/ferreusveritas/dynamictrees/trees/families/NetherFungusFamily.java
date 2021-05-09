@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.trees.specialfamilies;
+package com.ferreusveritas.dynamictrees.trees.families;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.trees.Family;
