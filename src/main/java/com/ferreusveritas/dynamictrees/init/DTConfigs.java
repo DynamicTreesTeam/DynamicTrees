@@ -78,18 +78,18 @@ public class DTConfigs {
 		final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
 		final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
 		final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
-		
+
 		SERVER_BUILDER.comment("Seed Settings").push("seeds");
 		SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
-				defineInRange("dropRate", 0.01, 0.0, 1.0);
+				defineInRange("seedDropRate", 0.01, 0.0, 1.0);
 		SEED_PLANT_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
-				defineInRange("plantRate", 1f/6f, 0.0, 1.0);
+				defineInRange("seedPlantRate", 1f/6f, 0.0, 1.0);
 		SEED_TIME_TO_LIVE = SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
 				defineInRange("timeToLive", 1200, 0, 6000);
-		SEED_ONLY_FOREST = SERVER_BUILDER.comment("If enabled then seeds will only voluntarily plant themselves in forest-like biomes").
-				define("onlyForest", true);
-		SEED_MIN_FORESTNESS = SERVER_BUILDER.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional").
-				defineInRange("dropRate", 0.0, 0.0, 1.0);
+		SEED_ONLY_FOREST = SERVER_BUILDER.comment("If enabled then seeds will only voluntarily plant themselves in forest-like biomes.").
+				define("seedOnlyForest", true);
+		SEED_MIN_FORESTNESS = SERVER_BUILDER.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional.").
+				defineInRange("seedMinForestness", 0.0, 0.0, 1.0);
 		SERVER_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("Tree Settings").push("trees");
