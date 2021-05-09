@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.util;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.AbstractIterator;
@@ -277,6 +278,10 @@ public class BranchDestructionData {
 	
 	private int decodeLeavesHydro(int encoded) {
 		return (encoded >> 24) & 0x0F;
+	}
+
+	public LeavesProperties getLeavesProperties (int index) {
+		return this.species.getValidLeavesProperties(this.destroyedLeavesBlockIndex[index]);
 	}
 
 	public BlockState getLeavesBlockState(int index) {

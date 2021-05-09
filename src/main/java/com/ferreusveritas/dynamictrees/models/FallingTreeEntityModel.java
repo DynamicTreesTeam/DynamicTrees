@@ -1,8 +1,5 @@
 package com.ferreusveritas.dynamictrees.models;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
@@ -11,7 +8,6 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.Block;
@@ -26,7 +22,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.client.model.pipeline.LightUtil;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 
@@ -55,9 +56,8 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 	}
 
 	public static int getBrightness(FallingTreeEntity entity) {
-		BranchDestructionData destructionData = entity.getDestroyData();
-		World world = entity.level;
-		// BlockState.getPackedLightmapCoords no longer a method. Temporarily using getLightValue?
+		final BranchDestructionData destructionData = entity.getDestroyData();
+		final World world = entity.level;
 		return world.getBlockState(destructionData.cutPos).getLightValue(world, destructionData.cutPos);
 	}
 
@@ -118,7 +118,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 				}
 
 				//Draw the leaves
-				HashMap<BlockPos, BlockState> leavesClusters = species.getFellingLeavesClusters(destructionData);
+				final HashMap<BlockPos, BlockState> leavesClusters = species.getFellingLeavesClusters(destructionData);
 				if (leavesClusters != null) {
 					for (Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
 						BlockState leafState = leafLoc.getValue();
@@ -131,7 +131,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 						BlockState leafState = destructionData.getLeavesBlockState(index);
 						IBakedModel leavesModel = dispatcher.getBlockModel(leafState);
 						treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, leafState, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE),
-								species.leafColorMultiplier(entity.level, rootPos.offset(relPos)), leafState));
+								destructionData.getLeavesProperties(index).foliageColorMultiplier(leafState, entity.level, rootPos.offset(relPos)), leafState));
 					}
 				}
 

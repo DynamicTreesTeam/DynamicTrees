@@ -491,6 +491,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return index;
 	}
 
+	public LeavesProperties getValidLeavesProperties (int index) {
+		return this.validLeaves.get(index);
+	}
+
 	public DynamicLeavesBlock getValidLeafBlock (int index) {
 		return (DynamicLeavesBlock) validLeaves.get(index).getDynamicLeavesState().getBlock();
 	}
