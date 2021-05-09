@@ -1,5 +1,5 @@
 {
-    "itemGroup.dynamictrees":"Dynamic Trees",
+    "itemGroup.dynamictrees": "Dynamic Trees",
 
     "block.dynamictrees.oak_branch": "Chêne Dynamique",
     "block.dynamictrees.spruce_branch": "Sapin Dynamique",
@@ -7,10 +7,10 @@
     "block.dynamictrees.jungle_branch": "Acajou Dynamique",
     "block.dynamictrees.dark_oak_branch": "Chêne Noir Dynamique",
     "block.dynamictrees.acacia_branch": "Acacia Dynamique",
-    "block.dynamictrees.crimson_branch":"Champignon Carmin Dynamique",
-    "block.dynamictrees.warped_branch":"Champignon Biscornu Dynamique",
+    "block.dynamictrees.crimson_branch": "Champignon Carmin Dynamique",
+    "block.dynamictrees.warped_branch": "Champignon Biscornu Dynamique",
 
-    "species.dynamictrees.oak":"Chêne",
+    "species.dynamictrees.oak": "Chêne",
     "species.dynamictrees.swamp_oak": "Chêne des Marais",
     "species.dynamictrees.spruce": "Sapin",
     "species.dynamictrees.mega_spruce": "Sapin Géant",
@@ -38,17 +38,17 @@
     "item.dynamictrees.crimson_seed": "Chapeau de Champignon Carmin",
     "item.dynamictrees.warped_seed": "Chapeau de Champignon Biscornu",
 
-    "item.dynamictrees.dendro_potion.biochar":"Potion Biochar",
-    "item.dynamictrees.dendro_potion.depletion":"Potion d'Épuisement",
+    "item.dynamictrees.dendro_potion.biochar": "Potion Biochar",
+    "item.dynamictrees.dendro_potion.depletion": "Potion d'Épuisement",
     "item.dynamictrees.dendro_potion.gigas": "Potion de Gigantisme",
-    "item.dynamictrees.dendro_potion.burgeoning":"Potion de Bourgeonnement",
-    "item.dynamictrees.dendro_potion.fertility":"Potion de Fertilité",
-    "item.dynamictrees.dendro_potion.persistence":"Potion de Persistance",
-    "item.dynamictrees.dendro_potion.transform":"Potion de Transformation",
+    "item.dynamictrees.dendro_potion.burgeoning": "Potion de Bourgeonnement",
+    "item.dynamictrees.dendro_potion.fertility": "Potion de Fertilité",
+    "item.dynamictrees.dendro_potion.persistence": "Potion de Persistance",
+    "item.dynamictrees.dendro_potion.transform": "Potion de Transformation",
 
-    "item.dynamictrees.dirt_bucket":"Seau de Terre",
-    "item.dynamictrees.staff":"Bâton des Bois",
-    "block.dynamictrees.bonsai_pot":"Pot pour Bonsaï",
+    "item.dynamictrees.dirt_bucket": "Seau de Terre",
+    "item.dynamictrees.staff": "Bâton des Bois",
+    "block.dynamictrees.potted_sapling": "Pousse en pot",
 
     "chat.registry_name": "Nom de Registre: %s",
 
