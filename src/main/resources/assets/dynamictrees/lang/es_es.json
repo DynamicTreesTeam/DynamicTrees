@@ -41,7 +41,7 @@
 
   "item.dynamictrees.dirt_bucket": "Cubo con Tierra",
   "item.dynamictrees.staff": "Bastón del Bosque",
-  "block.dynamictrees.potted_sapling": "Brote de Maceta",
+  "block.dynamictrees.potted_sapling": "Árbol Joven en Maceta",
 
   "chat.registry_name": "Nombre de Registro: %s",
 
