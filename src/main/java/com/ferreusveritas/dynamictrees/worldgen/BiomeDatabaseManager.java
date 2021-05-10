@@ -307,15 +307,4 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         return CompletableFuture.runAsync(() -> {});
     }
 
-    /**
-     * Do nothing on load, since we don't need to set anything up on game setup here.
-     *
-     * @param resourceManager The {@link IResourceManager} object.
-     * @return A {@link CompletableFuture} that does nothing.
-     */
-    @Override
-    public CompletableFuture<Void> setup(IResourceManager resourceManager) {
-        return CompletableFuture.runAsync(() -> {});
-    }
-
 }
