@@ -546,7 +546,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	
 	@Override
 	public int probabilityForBlock(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from) {
-		return from.getFamily().isCompatibleDynamicLeaves(blockState, blockAccess, pos) ? 2: 0;
+		return from.getFamily().isCompatibleDynamicLeaves(from.getFamily().getCommonSpecies(), blockState, blockAccess, pos) ? 2: 0;
 	}
 	
 	//////////////////////////////

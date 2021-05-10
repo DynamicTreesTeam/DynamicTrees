@@ -66,7 +66,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
 		@Override public BranchBlock getValidBranchBlock(int index) { return null; }
 		@Override public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) { return Species.NULL_SPECIES; }
-		@Override public void addConnectableVanillaLeaves(IConnectable connectable) {}
+		@Override public void addConnectable(IConnectable connectable) {}
 	};
 
 	/**
@@ -605,9 +605,10 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return bounds.expand(3);
 	}
 
-	public boolean isCompatibleDynamicLeaves(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);
-		return (leaves != null) && this == leaves.getFamily(blockState, blockAccess, pos);
+	public boolean isCompatibleDynamicLeaves(Species species, BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+		final DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);
+		return (leaves != null) && (this == leaves.getFamily(blockState, blockAccess, pos)
+				|| species.isValidLeafBlock(leaves));
 	}
 
 	public interface IConnectable {
@@ -616,15 +617,15 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 
 	LinkedList<IConnectable> vanillaConnectables = new LinkedList<>();
 
-	public void addConnectableVanillaLeaves(IConnectable connectable) {
+	public void addConnectable(IConnectable connectable) {
 		this.vanillaConnectables.add(connectable);
 	}
 
-	public void removeConnectableVanillaLeaves(IConnectable connectable) {
+	public void removeConnectable(IConnectable connectable) {
 		this.vanillaConnectables.remove(connectable);
 	}
 
-	public boolean isCompatibleVanillaLeaves(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+	public boolean isCompatibleVanillaLeaves(Species species, BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 
 		Block block = blockState.getBlock();
 
@@ -639,8 +640,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return false;
 	}
 
-	public boolean isCompatibleGenericLeaves(BlockState blockState, IWorld blockAccess, BlockPos pos) {
-		return isCompatibleDynamicLeaves(blockState, blockAccess, pos) || isCompatibleVanillaLeaves(blockState, blockAccess, pos);
+	public boolean isCompatibleGenericLeaves(final Species species, BlockState blockState, IWorld blockAccess, BlockPos pos) {
+		return this.isCompatibleDynamicLeaves(species, blockState, blockAccess, pos) || this.isCompatibleVanillaLeaves(species, blockState, blockAccess, pos);
 	}
 
 	public LeavesProperties getCommonLeaves() {

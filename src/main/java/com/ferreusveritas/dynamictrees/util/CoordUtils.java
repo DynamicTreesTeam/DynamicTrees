@@ -125,7 +125,7 @@ public final class CoordUtils {
 			if (hitPos != BlockPos.ZERO) {
 				do { // Run straight down until we hit a block that's non compatible leaves.
 					hitPos = hitPos.below();
-				} while (species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos));
+				} while (species.getFamily().isCompatibleGenericLeaves(species, world.getBlockState(hitPos), world, hitPos));
 
 				if (world.isEmptyBlock(hitPos)) { // If that block is air then we have a winner.
 					return hitPos;
@@ -164,7 +164,7 @@ public final class CoordUtils {
 			//Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks
 			final BlockPos hitPos = new BlockPos(result.getLocation());
 			if(result.getType() == RayTraceResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) {//We found a block
-				if(species.getFamily().isCompatibleGenericLeaves(world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
+				if(species.getFamily().isCompatibleGenericLeaves(species, world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
 					return result;
 				}
 			}

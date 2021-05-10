@@ -499,6 +499,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return (DynamicLeavesBlock) validLeaves.get(index).getDynamicLeavesState().getBlock();
 	}
 
+	public boolean isValidLeafBlock(final DynamicLeavesBlock leavesBlock) {
+		return this.validLeaves.stream().anyMatch(properties ->
+				properties.getDynamicLeavesBlock().orElse(null) == leavesBlock);
+	}
+
 	public int colorTreeQuads (int defaultColor, FallingTreeEntityModel.TreeQuadData treeQuad){
 		return defaultColor;
 	}

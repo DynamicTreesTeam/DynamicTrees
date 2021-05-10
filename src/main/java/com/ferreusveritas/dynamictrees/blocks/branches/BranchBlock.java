@@ -381,7 +381,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		for (final Cell cell: leafMap.getAllNonZeroCells()) {
 			final BlockPos.Mutable pos = cell.getPos();
 			final BlockState blockState = world.getBlockState(pos);
-			if (family.isCompatibleGenericLeaves(blockState, world, pos) ) {
+			if (family.isCompatibleGenericLeaves(species, blockState, world, pos) ) {
 				dropList.clear();
 				species.getTreeHarvestDrops(world, pos, dropList, world.random);
 				final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable

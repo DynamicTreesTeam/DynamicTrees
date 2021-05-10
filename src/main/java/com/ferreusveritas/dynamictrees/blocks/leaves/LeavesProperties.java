@@ -133,8 +133,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public void setPrimitiveLeaves(final Block primitiveLeaves) {
 		if (this.primitiveLeaves == null || primitiveLeaves != this.primitiveLeaves.getBlock()) {
 			this.primitiveLeaves = primitiveLeaves.defaultBlockState();
-			this.family.removeConnectableVanillaLeaves(this.primitiveLeavesConnectable);
-			this.family.addConnectableVanillaLeaves(state -> state.getBlock() == primitiveLeaves);
+			this.family.removeConnectable(this.primitiveLeavesConnectable);
+			this.family.addConnectable(state -> state.getBlock() == primitiveLeaves);
 		}
 	}
 
@@ -330,8 +330,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return true; }
 
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-		int twigRadius = from.getFamily().getPrimaryThickness();
-		return (fromRadius == twigRadius || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? twigRadius : 0;
+		final int twigRadius = from.getFamily().getPrimaryThickness();
+		return (fromRadius == twigRadius || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(from.getFamily().getCommonSpecies(), blockAccess.getBlockState(pos), blockAccess, pos) ? twigRadius : 0;
 	}
 
 	public boolean doRequireShears() {
