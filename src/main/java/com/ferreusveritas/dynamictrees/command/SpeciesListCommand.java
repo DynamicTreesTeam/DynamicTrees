@@ -14,7 +14,8 @@ public final class SpeciesListCommand extends SimpleSubCommand {
 
     @Override
     protected void execute(CommandContext<CommandSource> context) {
-        TreeRegistry.getSpeciesDirectory().forEach(r -> context.getSource().sendSuccess(new StringTextComponent(r.toString()), false));
+        TreeRegistry.getSpeciesDirectory().forEach(r ->
+                sendSuccess(context.getSource(), new StringTextComponent(r.toString())));
     }
 
 }

@@ -52,8 +52,8 @@ public final class SetTreeCommand extends SubCommand {
         final ServerWorld world = source.getLevel();
         final JoCode joCode = species.getJoCode(codeString).rotate(Direction.from2DDataValue((3 - (turns % 4)) + 3)).setCareful(true);
 
-        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.set_tree", CommandHelper.posComponent(rootPos),
-                species.getTextComponent(), joCode.getTextComponent()), true);
+        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.set_tree", CommandHelper.posComponent(rootPos),
+                species.getTextComponent(), joCode.getTextComponent()));
         joCode.generate(world, world, species, rootPos, source.getLevel().getBiome(rootPos),
                         Direction.SOUTH, 8, SafeChunkBounds.ANY);
 

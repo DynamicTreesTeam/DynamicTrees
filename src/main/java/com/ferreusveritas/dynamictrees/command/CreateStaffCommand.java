@@ -8,13 +8,11 @@ import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -65,7 +63,7 @@ public final class CreateStaffCommand extends SubCommand {
                                                                 intArgument(context, MAX_USES))))))));
     }
 
-    private int spawnStaff(final CommandSource source, final BlockPos pos, final Species species, final String code, String colour, final boolean readOnly, final int maxUses) throws CommandSyntaxException {
+    private int spawnStaff(final CommandSource source, final BlockPos pos, final Species species, final String code, String colour, final boolean readOnly, final int maxUses) {
         if (!colour.startsWith("#"))
             colour = "#" + colour;
 
@@ -81,9 +79,9 @@ public final class CreateStaffCommand extends SubCommand {
                 .setUses(wandStack, maxUses);
 
         ItemUtils.spawnItemStack(source.getLevel(), pos, wandStack, true);
-        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.create_staff", species.getTextComponent(),
-                new JoCode(code).getTextComponent(), aqua(colour), aqua(readOnly), aqua(maxUses), CommandHelper.posComponent(pos, TextFormatting.AQUA)),
-                true);
+
+        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.create_staff", species.getTextComponent(),
+                new JoCode(code).getTextComponent(), aqua(colour), aqua(readOnly), aqua(maxUses), CommandHelper.posComponent(pos, TextFormatting.AQUA)));
 
         return 1;
     }

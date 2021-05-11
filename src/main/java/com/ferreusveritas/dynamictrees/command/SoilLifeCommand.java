@@ -7,16 +7,12 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.ferreusveritas.dynamictrees.command.CommandConstants.SOIL_LIFE_SUGGESTIONS;
 
@@ -52,22 +48,22 @@ public final class SoilLifeCommand extends SubCommand {
         final int soilLife = Objects.requireNonNull(TreeHelper.getRooty(state)).getSoilLife(state, source.getLevel(), rootPos);
 
         if (raw) {
-            source.sendSuccess(new StringTextComponent(String.valueOf(soilLife)), false);
+            sendSuccess(source, new StringTextComponent(String.valueOf(soilLife)));
             return;
         }
 
-        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.get_soil_life",
+        sendSuccess(source, new TranslationTextComponent("commands.dynamictrees.success.get_soil_life",
                 CommandHelper.posComponent(rootPos, TextFormatting.AQUA),
-                CommandHelper.colour(String.valueOf(soilLife), TextFormatting.AQUA)), false);
+                CommandHelper.colour(String.valueOf(soilLife), TextFormatting.AQUA)));
     }
 
     private void setSoilLife(final CommandSource source, final BlockPos rootPos, final int soilLife) {
         final BlockState state = source.getLevel().getBlockState(rootPos);
         Objects.requireNonNull(TreeHelper.getRooty(state)).setSoilLife(source.getLevel(), rootPos, soilLife);
 
-        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.set_soil_life",
+        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.set_soil_life",
                 CommandHelper.posComponent(rootPos, TextFormatting.AQUA),
-                CommandHelper.colour(String.valueOf(soilLife), TextFormatting.AQUA)), true);
+                CommandHelper.colour(String.valueOf(soilLife), TextFormatting.AQUA)));
     }
 
 }

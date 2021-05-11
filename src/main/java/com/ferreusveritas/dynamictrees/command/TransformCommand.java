@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.WailaOther;
@@ -11,7 +10,6 @@ import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.math.BlockPos;
@@ -64,9 +62,9 @@ public final class TransformCommand extends SubCommand {
             toSpecies.placeRootyDirtBlock(world, rootPos, rootyBlock.getSoilLife(rootyState, world, rootPos));
         }
 
-        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.transform",
+        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.transform",
                 fromSpecies.getTextComponent(), CommandHelper.posComponent(rootPos, TextFormatting.AQUA),
-                toSpecies.getTextComponent()), true);
+                toSpecies.getTextComponent()));
 
         WailaOther.invalidateWailaPosition();
     }

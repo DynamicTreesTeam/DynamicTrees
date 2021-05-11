@@ -30,7 +30,7 @@ public final class SetCoordXorCommand extends SubCommand {
 
     private void setXor(final CommandSource source, final int xor) {
         CoordUtils.coordXor = xor;
-        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.set_xor", aqua(xor)), true);
+        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.set_xor", aqua(xor)));
     }
 
 }

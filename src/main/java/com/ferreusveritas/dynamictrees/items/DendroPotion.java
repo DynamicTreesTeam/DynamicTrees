@@ -17,6 +17,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
@@ -73,7 +74,9 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		}
 		
 		public ITextComponent getDescription() {
-			return new TranslationTextComponent("potion." + this.name + ".description" + (this == TRANSFORM ? ".empty" : ""));
+			return new TranslationTextComponent("potion." + this.name +
+					".description" + (this == TRANSFORM ? ".empty" : ""))
+					.withStyle(style -> style.withColor(TextFormatting.GRAY));
 		}
 	};
 
@@ -100,7 +103,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public static DendroPotionType getPotionType (ItemStack stack) {
 		return DendroPotionType.values()[stack.getOrCreateTag().getInt(INDEX_TAG_KEY)];
 	}
-	
+
+	@Nullable
 	@Override
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 		switch (getPotionType(itemStack)) {
@@ -118,11 +122,9 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public Species getTargetSpecies(ItemStack itemStack) {
 		final CompoundNBT nbtTag = itemStack.getOrCreateTag();
 
-		if (nbtTag.contains(TREE_TAG_KEY)) {
-			return TreeRegistry.findSpecies(nbtTag.getString(TREE_TAG_KEY));
-		}
-
-		return Species.NULL_SPECIES;
+		return nbtTag.contains(TREE_TAG_KEY) ?
+				TreeRegistry.findSpecies(nbtTag.getString(TREE_TAG_KEY)) :
+				Species.NULL_SPECIES;
 	}
 	
 	public ItemStack setTargetSpecies(ItemStack itemStack, Species species) {
@@ -188,7 +190,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		}
 		
 		final Species species = this.getTargetSpecies(stack);
-		tooltip.add(new TranslationTextComponent("potion.transform.description", species.getLocalizedName()));
+		tooltip.add(new TranslationTextComponent("potion.transform.description", species.getTextComponent())
+				.withStyle(style -> style.withColor(TextFormatting.GRAY)));
 	}
 	
 	public int getColor(ItemStack stack, int tint) {

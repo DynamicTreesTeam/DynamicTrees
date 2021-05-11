@@ -38,17 +38,17 @@
   "item.dynamictrees.staff":"Лесной посох",
   "block.dynamictrees.bonsai_pot":"Бонсаи горшок",
 
-  "commands.dynamictrees.repop.run": "§aПерезаполнение базы данных генератора деревьев",
+  "commands.dynamictrees.repop.run": "Перезаполнение базы данных генератора деревьев",
   "commands.dynamictrees.transform.nottransformableerror": "Вид %s не может быть трансформирован",
 
-  "potion.biochar.description": "§7Базовое зелье для зельеварения",
-  "potion.depletion.description": "§7Убирает удобрение почвы дерева",
-  "potion.gigas.description": "§7Позволяет дереву стать мега-размера",
-  "potion.burgeoning.description": "§7Быстрее вырастит дерево",
-  "potion.fertility.description": "§7Полностью удобряет почву дерева",
-  "potion.persistence.description": "§7Прекращает изменение дерева",
-  "potion.transform.description": "§7Трансформирует дерево в §a%s §7дерево",
-  "potion.transform.description.empty": "§7Базовое зелье для зелий трансформации",
+  "potion.biochar.description": "Базовое зелье для зельеварения",
+  "potion.depletion.description": "Убирает удобрение почвы дерева",
+  "potion.gigas.description": "Позволяет дереву стать мега-размера",
+  "potion.burgeoning.description": "Быстрее вырастит дерево",
+  "potion.fertility.description": "Полностью удобряет почву дерева",
+  "potion.persistence.description": "Прекращает изменение дерева",
+  "potion.transform.description": "Трансформирует дерево в %s дерево",
+  "potion.transform.description.empty": "Базовое зелье для зелий трансформации",
 
   "death.attack.falling_tree": "%1$s раздавлен(а) падающим деревом"
 }

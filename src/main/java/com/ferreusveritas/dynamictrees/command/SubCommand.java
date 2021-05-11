@@ -159,4 +159,18 @@ public abstract class SubCommand {
         return CommandHelper.colour(object, TextFormatting.DARK_RED);
     }
 
+    protected static void sendSuccess(final CommandSource source, final ITextComponent component) {
+        source.sendSuccess(component.copy().withStyle(style -> style.withColor(TextFormatting.GREEN)),
+                false);
+    }
+
+    protected static void sendSuccessAndLog(final CommandSource source, final ITextComponent component) {
+        source.sendSuccess(component.copy().withStyle(style -> style.withColor(TextFormatting.GREEN)),
+                true);
+    }
+
+    protected static void sendFailure(final CommandSource source, final ITextComponent component) {
+        source.sendFailure(component.copy().withStyle(style -> style.withColor(TextFormatting.RED)));
+    }
+
 }

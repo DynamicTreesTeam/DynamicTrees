@@ -41,14 +41,14 @@
   "commands.dynamictrees.repop.run": "Перезаповнення бази даних генератора дерев",
   "commands.dynamictrees.transform.nottransformableerror": "Вид %s не може бути трансформований",
 
-  "potion.biochar.description": "§7Базове зілля для зіллєваріння",
-  "potion.depletion.description": "§7Прибирає удобрення ґрунту дерева",
-  "potion.gigas.description": "§7Дозволяє дереву стати мега-розміру",
-  "potion.burgeoning.description": "§7Швидше виростить дерево",
-  "potion.fertility.description": "§7Повністю удобрює ґрунт дерева",
-  "potion.persistence.description": "§7Припиняє зміну дерева",
-  "potion.transform.description": "§7Трансформує дерево у §a%s §7дерево",
-  "potion.transform.description.empty": "§7Базове зілля для зіль трансформації",
+  "potion.biochar.description": "Базове зілля для зіллєваріння",
+  "potion.depletion.description": "Прибирає удобрення ґрунту дерева",
+  "potion.gigas.description": "Дозволяє дереву стати мега-розміру",
+  "potion.burgeoning.description": "Швидше виростить дерево",
+  "potion.fertility.description": "Повністю удобрює ґрунт дерева",
+  "potion.persistence.description": "Припиняє зміну дерева",
+  "potion.transform.description": "Трансформує дерево у %s дерево",
+  "potion.transform.description.empty": "Базове зілля для зіль трансформації",
 
   "death.attack.falling_tree": "%1$s розтрощений(на) падаючим деревом"
 }

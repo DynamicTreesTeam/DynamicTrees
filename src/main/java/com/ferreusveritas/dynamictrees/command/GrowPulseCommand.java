@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.util.CommandHelper;
-import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.command.CommandSource;
@@ -12,7 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,9 +43,9 @@ public final class GrowPulseCommand extends SubCommand {
         for (int i = 0; i < number; i++)
             TreeHelper.growPulse(source.getLevel(), rootPos);
 
-        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.grow_pulse",
+        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.grow_pulse",
                 CommandHelper.colour(String.valueOf(number), TextFormatting.AQUA),
-                CommandHelper.posComponent(rootPos, TextFormatting.AQUA)), true);
+                CommandHelper.posComponent(rootPos, TextFormatting.AQUA)));
     }
 
 }
