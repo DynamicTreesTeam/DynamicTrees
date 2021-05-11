@@ -20,14 +20,14 @@ public class MegaSubstance implements ISubstanceEffect{
 		final Species species = dirt.getSpecies(blockState, world, rootPos);
 		final Species megaSpecies = species.getMegaSpecies();
 
-		if(megaSpecies.isValid()) {
-			int life = dirt.getSoilLife(blockState, world, rootPos);
-			megaSpecies.placeRootyDirtBlock(world, rootPos, life);
+		if (megaSpecies.isValid()) {
+			int fertility = dirt.getFertility(blockState, world, rootPos);
+			megaSpecies.placeRootyDirtBlock(world, rootPos, fertility);
 
 			blockState = world.getBlockState(rootPos);
 			dirt = TreeHelper.getRooty(blockState);
 
-			if(dirt.getSpecies(blockState, world, rootPos) == megaSpecies) {
+			if (dirt.getSpecies(blockState, world, rootPos) == megaSpecies) {
 				TreeHelper.treeParticles(world, rootPos, ParticleTypes.DRAGON_BREATH, 8);
 				WailaOther.invalidateWailaPosition();
 				return true;

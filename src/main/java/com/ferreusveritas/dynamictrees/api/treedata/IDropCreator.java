@@ -26,11 +26,11 @@ public interface IDropCreator {
 	 * @param leafPos
 	 * @param random
 	 * @param dropList
-	 * @param soilLife
+	 * @param fertility
 	 * @param fortune
 	 * @return
 	 */
-	List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune);
+	List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int fertility, int fortune);
 
 	/**
 	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link Family} at
@@ -41,10 +41,10 @@ public interface IDropCreator {
 	 * @param rootPos
 	 * @param random
 	 * @param dropList
-	 * @param soilLife
+	 * @param fertility
 	 * @return
 	 */
-	List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife);
+	List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int fertility);
 
 	/**
 	 * Gets a {@link List} of Leaves drops.  Leaves drops are {@link ItemStack}s that result from the breaking of

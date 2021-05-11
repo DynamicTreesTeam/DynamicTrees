@@ -1,9 +1,8 @@
 package com.ferreusveritas.dynamictrees.command;
 
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
-import net.minecraft.util.text.StringTextComponent;
 
 public final class SpeciesListCommand extends SimpleSubCommand {
 
@@ -14,8 +13,8 @@ public final class SpeciesListCommand extends SimpleSubCommand {
 
     @Override
     protected void execute(CommandContext<CommandSource> context) {
-        TreeRegistry.getSpeciesDirectory().forEach(r ->
-                sendSuccess(context.getSource(), new StringTextComponent(r.toString())));
+        Species.REGISTRY.forEach(species ->
+                sendSuccess(context.getSource(), species.getTextComponent()));
     }
 
 }

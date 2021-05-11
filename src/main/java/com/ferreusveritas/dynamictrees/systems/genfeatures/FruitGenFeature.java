@@ -53,7 +53,7 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	}
 
 	@Override
-	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
+	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
 		BlockState blockState = world.getBlockState(treePos);
 		BranchBlock branch = TreeHelper.getBranch(blockState);
 

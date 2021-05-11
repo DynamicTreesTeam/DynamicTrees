@@ -56,7 +56,7 @@ public class FertilizeSubstance implements ISubstanceEffect {
 	/**
 	 * If growth is enabled then the tree will take an
 	 * update and the item will be consumed.  Regardless
-	 * of if the soil life is full.
+	 * of if it is fully fertilised.
 	 * 
 	 * @param grow
 	 * @return

@@ -35,7 +35,7 @@ public class NetherFungusSpecies extends Species {
 
         addDropCreator(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")){
             @Override
-            public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
+            public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int fertility, int fortune) {
                 int chance = 10;
                 if (fortune > 0) {
                     chance -= 2 << fortune;

@@ -25,7 +25,7 @@ public final class CommandConstants {
     public static final String GROW_PULSE = "growpulse";
     public static final String KILL_TREE = "killtree";
     public static final String SPECIES_LIST = "specieslist";
-    public static final String SOIL_LIFE = "soillife";
+    public static final String FERTILITY = "fertility";
     public static final String SET_TREE = "settree";
     public static final String ROTATE_JO_CODE = "rotatejocode";
     public static final String CREATE_STAFF = "createstaff";
@@ -57,7 +57,7 @@ public final class CommandConstants {
 
     public static final SuggestionProvider<CommandSource> TURNS_SUGGESTIONS = (context, builder) ->
             ISuggestionProvider.suggest(Stream.of(0, 1, 2).map(String::valueOf).collect(Collectors.toList()), builder);
-    public static final SuggestionProvider<CommandSource> SOIL_LIFE_SUGGESTIONS = (context, builder) ->
+    public static final SuggestionProvider<CommandSource> FERTILITY_SUGGESTIONS = (context, builder) ->
             ISuggestionProvider.suggest(Stream.of(0, 7, 15).map(String::valueOf).collect(Collectors.toList()), builder);
 
 }

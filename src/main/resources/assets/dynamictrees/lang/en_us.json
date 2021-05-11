@@ -52,16 +52,21 @@
 
   "chat.registry_name": "Registry Name: %s",
 
-  "tooltip.tree_staff.species": "Species: %s",
-  "tooltip.tree_staff.jo_code": "JoCode: %s",
+  "tooltip.dynamictrees.species": "Species: %s",
+  "tooltip.dynamictrees.fertility": "Fertility: %s",
+  "tooltip.dynamictrees.jo_code": "JoCode: %s",
+  "tooltip.dynamictrees.force_planting": "Force Planting: %s",
+  "tooltip.dynamictrees.seed_life_span": "Seed Life Span: %s",
+
+  "tooltip.dynamictrees.enabled": "Enabled",
 
   "commands.dynamictrees.success.get_tree": "Species: %s JoCode: %s",
   "commands.dynamictrees.error.get_tree": "Could not find tree species at position %s.",
   "commands.dynamictrees.success.set_tree": "Successfully set tree at position %s to species %s with JoCode %s.",
   "commands.dynamictrees.success.kill_tree": "Successfully killed tree at position %s.",
   "commands.dynamictrees.error.unknown_species": "Unknown species %s.",
-  "commands.dynamictrees.success.get_soil_life": "Soil life of tree at position %s is %s.",
-  "commands.dynamictrees.success.set_soil_life": "Successfully set soil life of tree at position %s to %s.",
+  "commands.dynamictrees.success.get_fertility": "Fertility of tree at position %s is %s.",
+  "commands.dynamictrees.success.set_fertility": "Successfully set fertility of tree at position %s to %s.",
   "commands.dynamictrees.success.grow_pulse": "Successfully sent %s growth pulses to tree at position %s.",
   "commands.dynamictrees.success.set_xor": "Successfully set coordinate Xor to %s.",
   "commands.dynamictrees.success.rotate_jo_code": "Rotated JoCode: %s",

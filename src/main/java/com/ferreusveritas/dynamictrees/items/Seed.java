@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -23,6 +24,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
@@ -210,23 +213,32 @@ public class Seed extends Item implements IPlantable {
 		
 		return ActionResultType.PASS;
 	}
+
+	public static final String LIFESPAN_TAG = "lifespan";
 	
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.appendHoverText(stack, world, tooltip, flagIn);
 		
-		if(stack.hasTag()) {
-			String joCode = getCode(stack);
-			if(!joCode.isEmpty()) {
-				tooltip.add(new StringTextComponent("Code: §6" + joCode));
+		if (stack.hasTag()) {
+			final String joCode = this.getCode(stack);
+			if (!joCode.isEmpty()) {
+				tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.jo_code", new JoCode(joCode).getTextComponent()));
 			}
-			if(hasForcePlant(stack)) {
-				tooltip.add(new StringTextComponent("Force Planting: §3Enabled"));
+			if (this.hasForcePlant(stack)) {
+				tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.force_planting",
+						new TranslationTextComponent("tooltip.dynamictrees.enabled")
+								.withStyle(style -> style.withColor(TextFormatting.DARK_AQUA)))
+				);
 			}
-			CompoundNBT nbtData = stack.getTag();
+			final CompoundNBT nbtData = stack.getTag();
 			assert nbtData != null;
-			if(nbtData.contains("lifespan")) {
-				tooltip.add(new StringTextComponent("Seed Life Span: §3" + nbtData.getInt("lifespan")));
+
+			if (nbtData.contains(LIFESPAN_TAG)) {
+				tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.seed_life_span" +
+						new StringTextComponent(String.valueOf(nbtData.getInt(LIFESPAN_TAG)))
+								.withStyle(style -> style.withColor(TextFormatting.DARK_AQUA)))
+				);
 			}
 		}
 	}

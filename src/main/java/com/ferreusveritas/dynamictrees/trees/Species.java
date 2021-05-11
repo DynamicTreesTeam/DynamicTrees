@@ -103,7 +103,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		@Override public ItemStack getSeedStack(int qty) { return ItemStack.EMPTY; }
 		@Override public Species setupStandardSeedDropping() { return this; }
 		@Override public ITextComponent getTextComponent() { return this.getTextComponent("gui.none", TextFormatting.DARK_RED); }
-		@Override public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
+		@Override public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
 
 	public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(Species::new);
@@ -658,12 +658,12 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param world
 	 * @param rootPos
 	 * @param treePos
-	 * @param soilLife
+	 * @param fertility
 	 * @return
 	 */
-	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, int soilLife) {
-		List<ItemStack> dropList = TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.getVoluntaryDrop(world, this, rootPos, world.random, null, soilLife);
-		return dropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.random, dropList, soilLife);
+	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, int fertility) {
+		List<ItemStack> dropList = TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.getVoluntaryDrop(world, this, rootPos, world.random, null, fertility);
+		return dropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.random, dropList, fertility);
 	}
 	
 	/**
@@ -726,15 +726,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param endPoints
 	 * @param rootPos
 	 * @param treePos
-	 * @param soilLife
+	 * @param fertility
 	 * @return true if seed was dropped
 	 */
-	public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife) {
+	public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
 		int tickSpeed = world.getGameRules().getInt(GameRules.RULE_RANDOMTICKING);
 		if(tickSpeed > 0) {
 			double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
 			if(world.random.nextDouble() < slowFactor) {
-				List<ItemStack> drops = getVoluntaryDrops(world, rootPos, treePos, soilLife);
+				List<ItemStack> drops = getVoluntaryDrops(world, rootPos, treePos, fertility);
 				
 				if(!drops.isEmpty() && !endPoints.isEmpty()) {
 					for(ItemStack drop: drops) {
@@ -946,19 +946,19 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	//DIRT
 	///////////////////////////////////////////
 
-	public boolean placeRootyDirtBlock(IWorld world, BlockPos rootPos, int life) {
+	public boolean placeRootyDirtBlock(IWorld world, BlockPos rootPos, int fertility) {
 		Block dirt = world.getBlockState(rootPos).getBlock();
 
 		if (!RootyBlockHelper.isBlockRegistered(dirt) && !(dirt instanceof RootyBlock)) {
 			LogManager.getLogger().warn("Rooty Dirt block NOT FOUND for soil "+ dirt.getRegistryName()); //default to dirt and print error
-			this.placeRootyDirtBlock(world, rootPos, Blocks.DIRT, life);
+			this.placeRootyDirtBlock(world, rootPos, Blocks.DIRT, fertility);
 			return false;
 		}
 
 		if (dirt instanceof RootyBlock) {
-			this.placeRootyDirtBlock(world, rootPos, (RootyBlock) dirt, life);
+			this.placeRootyDirtBlock(world, rootPos, (RootyBlock) dirt, fertility);
 		} else if (RootyBlockHelper.isBlockRegistered(dirt)) {
-			this.placeRootyDirtBlock(world, rootPos, dirt, life);
+			this.placeRootyDirtBlock(world, rootPos, dirt, fertility);
 		}
 
 		TileEntity tileEntity = world.getBlockEntity(rootPos);
@@ -970,12 +970,12 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return true;
 	}
 
-	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, Block primitiveDirt, int life) {
-		this.placeRootyDirtBlock(world, rootPos, RootyBlockHelper.getRootyBlock(primitiveDirt), life);
+	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, Block primitiveDirt, int fertility) {
+		this.placeRootyDirtBlock(world, rootPos, RootyBlockHelper.getRootyBlock(primitiveDirt), fertility);
 	}
 
-	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, RootyBlock rootyBlock, int life) {
-		world.setBlock(rootPos, rootyBlock.defaultBlockState().setValue(RootyBlock.FERTILITY, life).setValue(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(world, rootPos)), 3);
+	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, RootyBlock rootyBlock, int fertility) {
+		world.setBlock(rootPos, rootyBlock.defaultBlockState().setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(world, rootPos)), 3);
 	}
 	
 	public Species setSoilLongevity(int longevity) {
@@ -1094,33 +1094,33 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param world The world
 	 * @param rootyDirt The {@link RootyBlock} that is supporting this tree
 	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} type in the world
-	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
+	 * @param fertility The fertility of the soil. 0: Depleted -> 15: Full
 	 * @param treePos The {@link BlockPos} of the {@link Family} trunk base.
 	 * @param random A random number generator
 	 * @param natural Set this to true if this member is being used to naturally grow the tree(create drops or fruit)
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree is on)
 	 */
-	public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+	public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 		
 		//Analyze structure to gather all of the endpoints.  They will be useful for this entire update
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
 		
 		//This will prune rotted positions from the world and the end point list
-		if(handleRot(world, ends, rootPos, treePos, soilLife, SafeChunkBounds.ANY)) {
+		if(handleRot(world, ends, rootPos, treePos, fertility, SafeChunkBounds.ANY)) {
 			return false;//Last piece of tree rotted away.
 		}
 		
 		if(natural) {
 			//This will handle seed drops
-			handleVoluntaryDrops(world, ends, rootPos, treePos, soilLife);
+			handleVoluntaryDrops(world, ends, rootPos, treePos, fertility);
 			
 			//This will handle disease chance
-			if(handleDisease(world, treeBase, treePos, random, soilLife)) {
+			if(handleDisease(world, treeBase, treePos, random, fertility)) {
 				return true;//Although the tree may be diseased. The tree network is still viable.
 			}
 		}
 		
-		return grow(world, rootyDirt, rootPos, soilLife, treeBase, treePos, random, natural);
+		return grow(world, rootyDirt, rootPos, fertility, treeBase, treePos, random, natural);
 	}
 	
 	/**
@@ -1144,11 +1144,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param ends A {@link List} of {@link BlockPos}s of {@link BranchBlock} endpoints.
 	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} for this {@link Family}
 	 * @param treePos The {@link BlockPos} of the trunk base for this {@link Family}
-	 * @param soilLife The soil life of the {@link RootyBlock}
+	 * @param fertility The fertility of the {@link RootyBlock}
 	 * @param safeBounds The defined boundaries where it is safe to make block changes
 	 * @return true if last piece of tree rotted away.
 	 */
-	public boolean handleRot(IWorld world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, SafeChunkBounds safeBounds) {
+	public boolean handleRot(IWorld world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int fertility, SafeChunkBounds safeBounds) {
 		
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
 		SimpleVoxmap leafMap = getLeavesProperties().getCellKit().getLeafCluster();
@@ -1233,7 +1233,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param world The world
 	 * @param rootyDirt The {@link RootyBlock} that is supporting this tree
 	 * @param rootPos The {@link BlockPos} of the {@link RootyBlock} type in the world
-	 * @param soilLife The life of the soil. 0: Depleted -> 15: Full
+	 * @param fertility The fertility of the soil. 0: Depleted -> 15: Full
 	 * @param treePos The {@link BlockPos} of the {@link Family} trunk base.
 	 * @param random A random number generator
 	 * @param natural
@@ -1241,11 +1241,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 *      If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree is on)
 	 */
-	public boolean grow(World world, RootyBlock rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+	public boolean grow(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 		
 		float growthRate = (float) (getGrowthRate(world, rootPos) * DTConfigs.TREE_GROWTH_MULTIPLIER.get() * DTConfigs.TREE_GROWTH_FOLDING.get());
 		do {
-			if (soilLife > 0) {
+			if (fertility > 0) {
 				if (growthRate > random.nextFloat()) {
 					final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(world, rootPos), world.random);
 					boolean success = treeBase.growSignal(world, treePos, signal).success;
@@ -1253,19 +1253,19 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 					int soilLongevity = getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
 					
 					if (soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
-						rootyDirt.setSoilLife(world, rootPos, soilLife - 1);//decrement soil life
+						rootyDirt.setFertility(world, rootPos, fertility - 1);//decrement fertility
 					}
 					
 					if (signal.choked) {
-						soilLife = 0;
-						rootyDirt.setSoilLife(world, rootPos, soilLife);
+						fertility = 0;
+						rootyDirt.setFertility(world, rootPos, fertility);
 						TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new ShrinkerNode(signal.getSpecies())));
 					}
 				}
 			}
 		} while(--growthRate > 0.0f);
 		
-		return postGrow(world, rootPos, treePos, soilLife, natural);
+		return postGrow(world, rootPos, treePos, fertility, natural);
 	}
 	
 	/**
@@ -1351,19 +1351,19 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param world The world
 	 * @param rootPos The position of the rooty dirt block
 	 * @param treePos The position of the base trunk block of the tree(usually directly above the rooty dirt block)
-	 * @param soilLife The life of the soil block this tree is planted in
+	 * @param fertility The fertility of the soil block this tree is planted in
 	 * @param natural
 	 * 		If true then this member is being used to grow the tree naturally (create drops or fruit).
 	 * 		If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning.
 	 */
-	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
+	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
 		for (final ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
 			final GenFeature genFeature = configuredGenFeature.getGenFeature();
 
 			if (!(genFeature instanceof IPostGrowFeature))
 				continue;
 
-			((IPostGrowFeature) genFeature).postGrow(configuredGenFeature, world, rootPos, treePos, this, soilLife, natural);
+			((IPostGrowFeature) genFeature).postGrow(configuredGenFeature, world, rootPos, treePos, this, fertility, natural);
 		}
 
 		return true;
@@ -1378,8 +1378,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param random
 	 * @return true if the tree became diseased
 	 */
-	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int soilLife) {
-		if (soilLife == 0 && DTConfigs.DISEASE_CHANCE.get() > random.nextFloat() ) {
+	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int fertility) {
+		if (fertility == 0 && DTConfigs.DISEASE_CHANCE.get() > random.nextFloat() ) {
 			baseTreePart.analyse(world.getBlockState(treePos), world, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
 			return true;
 		}
@@ -1854,7 +1854,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 	
 	/**
-	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full life.
+	 * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full fertility.
 	 * This factor is an attempt to compensate for the problem.
 	 *
 	 * @return

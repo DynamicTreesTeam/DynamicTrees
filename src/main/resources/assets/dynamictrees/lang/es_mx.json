@@ -51,16 +51,16 @@
 
   "chat.registry_name": "Nombre de Registro: %s",
 
-  "tooltip.tree_staff.species": "Especies: %s",
-  "tooltip.tree_staff.jo_code": "JoCode: %s",
+  "tooltip.dynamictrees.species": "Especies: %s",
+  "tooltip.dynamictrees.jo_code": "JoCode: %s",
 
   "commands.dynamictrees.success.get_tree": "Especies: %s JoCode: %s",
   "commands.dynamictrees.error.get_tree": "No se pudieron encontrar especies de árboles en la posición %s.",
   "commands.dynamictrees.success.set_tree": "Se Coloco el árbol en la posición con éxito %s a las especies %s con JoCode %s.",
   "commands.dynamictrees.success.kill_tree": "Successfully killed tree at position %s.",
   "commands.dynamictrees.error.unknown_species": "Especies desconocidas %s.",
-  "commands.dynamictrees.success.get_soil_life": "Vida del suelo del árbol en su posición %s es %s.",
-  "commands.dynamictrees.success.set_soil_life": "Estableció con éxito la vida útil del suelo del árbol en su posición %s a %s.",
+  "commands.dynamictrees.success.get_fertility": "Vida del suelo del árbol en su posición %s es %s.",
+  "commands.dynamictrees.success.set_fertility": "Estableció con éxito la vida útil del suelo del árbol en su posición %s a %s.",
   "commands.dynamictrees.success.grow_pulse": "Enviado exitosamente %s pulsos de crecimiento al árbol en la posición %s.",
   "commands.dynamictrees.success.set_xor": "Establecer correctamente la coordenada X o en %s.",
   "commands.dynamictrees.success.rotate_jo_code": "JoCode girado: %s",

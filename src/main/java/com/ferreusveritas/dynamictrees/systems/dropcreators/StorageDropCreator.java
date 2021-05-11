@@ -61,22 +61,22 @@ public class StorageDropCreator implements IDropCreatorStorage {
 	}
 	
 	@Override
-	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
+	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int fertility, int fortune) {
 		dropList = makeDropListIfNull(dropList);
 		
 		for(IDropCreator dropCreator : dropCreators.values()) {
-			dropList = dropCreator.getHarvestDrop(world, species, leafPos, random, dropList, soilLife, fortune);
+			dropList = dropCreator.getHarvestDrop(world, species, leafPos, random, dropList, fertility, fortune);
 		}
 		
 		return dropList;
 	}
 	
 	@Override
-	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
+	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int fertility) {
 		dropList = makeDropListIfNull(dropList);
 		
 		for(IDropCreator dropCreator : dropCreators.values()) {
-			dropList = dropCreator.getVoluntaryDrop(world, species, rootPos, random, dropList, soilLife);
+			dropList = dropCreator.getVoluntaryDrop(world, species, rootPos, random, dropList, fertility);
 		}
 		
 		return dropList;

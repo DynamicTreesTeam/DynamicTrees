@@ -275,8 +275,8 @@ public class Staff extends Item {
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		tooltip.add(new TranslationTextComponent("tooltip.tree_staff.species", this.getSpecies(stack).getTextComponent()));
-		tooltip.add(new TranslationTextComponent("tooltip.tree_staff.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
+		tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
+		tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
 	}
 
 	/**

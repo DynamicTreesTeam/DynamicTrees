@@ -38,7 +38,7 @@ public class SticksDropCreator extends DropCreator {
 	}
 
 	@Override
-	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
+	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int fertility, int fortune) {
 		return getSticks(dropList, random, 0);
 	}
 

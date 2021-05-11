@@ -59,7 +59,7 @@ public final class TransformCommand extends SubCommand {
 
         if (rootyBlock.getSpecies(rootyState, world, rootPos) != toSpecies) {
             // Place new rooty dirt block if transforming to species that requires tile entity.
-            toSpecies.placeRootyDirtBlock(world, rootPos, rootyBlock.getSoilLife(rootyState, world, rootPos));
+            toSpecies.placeRootyDirtBlock(world, rootPos, rootyBlock.getFertility(rootyState, world, rootPos));
         }
 
         sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.transform",

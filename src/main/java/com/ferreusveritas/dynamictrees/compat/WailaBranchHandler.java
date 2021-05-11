@@ -24,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import java.util.LinkedList;
@@ -37,7 +38,7 @@ public class WailaBranchHandler implements IComponentProvider {
 
 	@Override
 	public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
-		if(WailaOther.invalid) {
+		if (WailaOther.invalid) {
 			lastPos = BlockPos.ZERO;
 			lastSpecies = Species.NULL_SPECIES;
 			lastVolume = new NetVolumeNode.Volume();
@@ -76,12 +77,12 @@ public class WailaBranchHandler implements IComponentProvider {
 		lastSpecies = species;
 		lastPos = pos;
 
-		if(species != Species.NULL_SPECIES) {
-			if(species.showSpeciesOnWaila()) {
-				tooltip.add(new StringTextComponent("Species: " + species.getLocalizedName()));
+		if (species != Species.NULL_SPECIES) {
+			if (species.showSpeciesOnWaila()) {
+				tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.species", species.getTextComponent()));
 			}
 
-			if(Minecraft.getInstance().options.advancedItemTooltips) {
+			if (Minecraft.getInstance().options.advancedItemTooltips) {
 				tooltip.add(new StringTextComponent(TextFormatting.DARK_GRAY + species.getRegistryName().toString()));
 			}
 
