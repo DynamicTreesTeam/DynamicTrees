@@ -51,6 +51,9 @@
   "block.dynamictrees.bonsai_pot":"Doniczka Bonsai",
 
   "chat.registry_name": "Nazwa Rejestru: %s",
+  
+  "tooltip.tree_staff.species": "Gatunek: %s",
+  "tooltip.tree_staff.jo_code": "JoCode: %s",
 
   "commands.dynamictrees.success.get_tree": "§aGatunek: %s §aJoCode: %s",
   "commands.dynamictrees.error.get_tree": "§cNie można znaleźć gatunków drzew na pozycji %s.",
