@@ -1,5 +1,5 @@
 {
 	"variants": {
-		"": { "model": "dynamictrees:block/oak_branch_stripped" }
+		"": { "model": "dynamictrees:block/stripped_oak_branch" }
 	}
 }

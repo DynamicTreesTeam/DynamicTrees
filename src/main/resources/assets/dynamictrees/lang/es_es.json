@@ -46,7 +46,12 @@
   "chat.registry_name": "Nombre de Registro: %s",
 
   "tooltip.dynamictrees.species": "Especies: %s",
+  "tooltip.dynamictrees.fertility": "Fertilidad: %s",
   "tooltip.dynamictrees.jo_code": "JoCode: %s",
+  "tooltip.dynamictrees.force_planting": "Forzar plantación: %s",
+  "tooltip.dynamictrees.seed_life_span": "Longitud de vida de la semilla: %s",
+
+  "tooltip.dynamictrees.enabled": "Activado",
 
   "commands.dynamictrees.success.get_tree": "Especies: %s JoCode: %s",
   "commands.dynamictrees.error.get_tree": "No se encontraron especies de árboles en la posición %s.",
