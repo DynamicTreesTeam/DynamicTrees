@@ -19,7 +19,7 @@ public class ThickBranchBlockModelLoader extends BranchBlockModelLoader {
 
     @Override
     protected String getModelTypeName() {
-        return "thick branch";
+        return "Thick Branch";
     }
 
 }

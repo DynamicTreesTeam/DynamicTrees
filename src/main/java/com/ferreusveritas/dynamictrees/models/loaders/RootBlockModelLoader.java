@@ -14,15 +14,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class RootBlockModelLoader extends BranchBlockModelLoader {
 
     @Override
-    public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
-        final JsonObject textures = this.getTexturesObject(modelContents);
-
+    public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelObject) {
+        final JsonObject textures = this.getTexturesObject(modelObject);
         return new RootBlockModelGeometry(this.getBarkResLoc(textures));
     }
 
     @Override
     protected String getModelTypeName() {
-        return "surface root";
+        return "Surface Root";
     }
 
 }
