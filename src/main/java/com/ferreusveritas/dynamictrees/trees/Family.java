@@ -180,15 +180,28 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	 *
 	 * @param world The {@link IWorld} object.
 	 * @param trunkPos The {@link BlockPos} of the trunk.
-	 * @return The {@link Species} to place.
+	 * @return The {@link Species} for the specified position.
 	 */
 	public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
+		return this.getSpeciesForLocation(world, trunkPos, this.commonSpecies);
+	}
+
+	/**
+	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
+	 * For instance Oak may use this to select a Swamp Oak species if the coordinates
+	 * are in a swamp.
+	 *
+	 * @param world The {@link IWorld} object.
+	 * @param trunkPos The {@link BlockPos} of the trunk.
+	 * @return The {@link Species} for the specified position.
+	 */
+	public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos, Species defaultSpecies) {
 		for (final Species species : this.species) {
 			if (species.shouldOverrideCommon(world, trunkPos))
 				return species;
 		}
 
-		return this.commonSpecies;
+		return defaultSpecies;
 	}
 
 	///////////////////////////////////////////

@@ -27,6 +27,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
@@ -53,25 +54,29 @@ public class Seed extends Item implements IPlantable {
 	public Species getSpecies() {
 		return species;
 	}
+
+	public Species getSpecies(final IWorld world, final BlockPos pos) {
+		return this.getSpecies().getFamily().getSpeciesForLocation(world, pos, this.getSpecies());
+	}
 	
 	@Override
 	public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
-		if(entityItem.lifespan == 6000) { //6000(5 minutes) is the default lifespan for an entity item
-			entityItem.lifespan = getTimeToLive(entityItem.getItem()) + 20;//override default lifespan with new value + 20 ticks(1 second)
-			if(entityItem.lifespan == 6000) {
-				entityItem.lifespan = 6001;//Ensure this isn't run again
+		if (entityItem.lifespan == 6000) { // 6000 (5 minutes) is the default lifespan for an entity item
+			entityItem.lifespan = getTimeToLive(entityItem.getItem()) + 20; // override default lifespan with new value + 20 ticks (1 second)
+			if (entityItem.lifespan == 6000) {
+				entityItem.lifespan = 6001; // Ensure this isn't run again
 			}
 		}
 		
-		if(entityItem.tickCount >= entityItem.lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
-			World world = entityItem.level;
-			if(!world.isClientSide) {//Server side only
-				ItemStack seedStack = entityItem.getItem();
-				BlockPos pos = new BlockPos(entityItem.blockPosition());
-				SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, getSpecies(), pos, shouldPlant(world, pos, seedStack));
+		if (entityItem.tickCount >= entityItem.lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
+			final World world = entityItem.level;
+			if (!world.isClientSide) {//Server side only
+				final ItemStack seedStack = entityItem.getItem();
+				final BlockPos pos = new BlockPos(entityItem.blockPosition());
+				final SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, this.getSpecies(world, pos), pos, this.shouldPlant(world, pos, seedStack));
 				MinecraftForge.EVENT_BUS.post(seedVolEvent);
-				if(!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {
-					doPlanting(world, pos, null, seedStack);
+				if (!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {
+					this.doPlanting(world, pos, null, seedStack);
 				}
 				seedStack.setCount(0);
 			}
@@ -81,12 +86,12 @@ public class Seed extends Item implements IPlantable {
 		return false;
 	}
 	
-	public boolean doPlanting(World world, BlockPos pos, PlayerEntity planter, ItemStack seedStack) {
-		Species species = getSpecies();
-		if(species.plantSapling(world, pos)) {//Do the planting
+	public boolean doPlanting(World world, BlockPos pos, @Nullable PlayerEntity planter, ItemStack seedStack) {
+		final Species species = this.getSpecies(world, pos);
+		if (species.plantSapling(world, pos)) { // Do the planting
 			String joCode = getCode(seedStack);
-			if(!joCode.isEmpty()) {
-				world.removeBlock(pos, false);//Remove the newly created dynamic sapling
+			if (!joCode.isEmpty()) {
+				world.removeBlock(pos, false); // Remove the newly created dynamic sapling
 				species.getJoCode(joCode).setCareful(true).generate(world, world, species, pos.below(), world.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY);
 			}
 			return true;

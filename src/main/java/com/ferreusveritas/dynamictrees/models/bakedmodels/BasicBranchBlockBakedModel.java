@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
-import com.ferreusveritas.dynamictrees.trees.Family;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -24,6 +23,7 @@ import net.minecraftforge.client.model.data.IModelData;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @OnlyIn(Dist.CLIENT)
 public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
@@ -170,16 +170,15 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
 		int[] connections = new int[] {0,0,0,0,0,0};
 		Direction forceRingDir = null;
-		int twigRadius = 1;
+		final AtomicInteger twigRadius = new AtomicInteger(1);
 
 		if (extraData instanceof ModelConnections) {
 			final ModelConnections connectionsData = (ModelConnections) extraData;
 			connections = connectionsData.getAllRadii();
 			forceRingDir = connectionsData.getRingOnly();
-			Family family = connectionsData.getFamily();
 
-			if (family != null)
-				twigRadius = family.getPrimaryThickness();
+			connectionsData.getFamily().ifValid(family ->
+					twigRadius.set(family.getPrimaryThickness()));
 		}
 
 		// Count number of connections.
@@ -213,7 +212,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 						final int idx = connDir.get3DDataValue();
 						final int connRadius = connections[idx];
 						// If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves (which are partly transparent).
-						if (connRadius > 0 && (connRadius == twigRadius || face != connDir)) {
+						if (connRadius > 0 && (connRadius == twigRadius.get() || face != connDir)) {
 							quadsList.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData));
 						}
 					}
