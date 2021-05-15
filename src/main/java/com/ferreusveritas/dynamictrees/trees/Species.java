@@ -1528,17 +1528,18 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	protected float flowerSeasonHoldMin = SeasonHelper.SPRING;
 	protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
 
-	protected float seasonalGrowthOffset = 0;
-	protected float seasonalSeedDropOffset = 0;
-	protected float seasonalFruitingOffset = 0;
+	@Nullable protected Float seasonalGrowthOffset = 0f;
+	@Nullable protected Float seasonalSeedDropOffset = 0f;
+	@Nullable protected Float seasonalFruitingOffset = 0f;
 
-	public void setSeasonalGrowthOffset (float offset){ seasonalGrowthOffset = offset; }
-	public void setSeasonalSeedDropOffset (float offset){ seasonalSeedDropOffset = offset; }
+	public void setSeasonalGrowthOffset (@Nullable Float offset){ seasonalGrowthOffset = offset; }
+	public void setSeasonalSeedDropOffset (@Nullable Float offset){ seasonalSeedDropOffset = offset; }
 	/**
 	 * The default fruiting will PEAK in the middle of summer, starting at the middle of spring and ending at the middle of fall.
-	 * this offset will move the fruiting by a factor of one season. (an offset of 2.0 will ma fruiting peak in winter)
+	 * this offset will move the fruiting by a factor of one season. (an offset of 2.0 will ma fruiting peak in winter).
+	 * set to null for it to be all year round
 	 */
-	public void setSeasonalFruitingOffset (float offset){ seasonalFruitingOffset = offset; }
+	public void setSeasonalFruitingOffset (@Nullable Float offset){ seasonalFruitingOffset = offset; }
 
 	/**
 	 * Pulls data from the {@link com.ferreusveritas.dynamictrees.compat.seasons.SeasonManager} to determine
@@ -1549,15 +1550,18 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return Factor from 0.0 (no growth) to 1.0 (full growth).
 	 */
 	public float seasonalGrowthFactor(World world, BlockPos rootPos) {
-		return DTConfigs.ENABLE_SEASONAL_GROWTH_FACTOR.get() ? SeasonHelper.globalSeasonalGrowthFactor(world, rootPos, -seasonalGrowthOffset) : 1.0f;
+		return DTConfigs.ENABLE_SEASONAL_GROWTH_FACTOR.get() && seasonalGrowthOffset != null ?
+				SeasonHelper.globalSeasonalGrowthFactor(world, rootPos, -seasonalGrowthOffset) : 1.0f;
 	}
 
 	public float seasonalSeedDropFactor(World world, BlockPos pos) {
-		return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() ? SeasonHelper.globalSeasonalSeedDropFactor(world, pos, -seasonalSeedDropOffset) : 1.0f;
+		return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() && seasonalSeedDropOffset != null ?
+				SeasonHelper.globalSeasonalSeedDropFactor(world, pos, -seasonalSeedDropOffset) : 1.0f;
 	}
 
 	public float seasonalFruitProductionFactor(World world, BlockPos pos) {
-		return DTConfigs.ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR.get() ? SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, -seasonalFruitingOffset,false) : 1.0f;
+		return DTConfigs.ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR.get() && seasonalFruitingOffset != null ?
+				SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, -seasonalFruitingOffset,false) : 1.0f;
 	}
 
 	/**
@@ -1575,12 +1579,18 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		if (!FruitBlock.getFruitBlocksForSpecies(this).isEmpty()) {
 			int seasonFlags = 0;
 			for (int i = 0; i < 4; i++) {
-				final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
-				final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i +  seasonEnd  - seasonalFruitingOffset) * 64.0f), 0), true);
+				boolean isValidSeason = false;
+				if (seasonalFruitingOffset != null){
+					final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
+					final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i +  seasonEnd  - seasonalFruitingOffset) * 64.0f), 0), true);
+					if (Math.min(prod1, prod2) > threshold)
+						isValidSeason = true;
 
-				if (Math.min(prod1, prod2) > threshold) {
+				} else isValidSeason = true;
+
+				if (isValidSeason)
 					seasonFlags |= 1 << i;
-				}
+
 			}
 			return seasonFlags;
 		}
@@ -1603,6 +1613,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	public boolean testFlowerSeasonHold(Float seasonValue) {
+		if (seasonalFruitingOffset == null) return false;
 		return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin + seasonalFruitingOffset, flowerSeasonHoldMax + seasonalFruitingOffset);
 	}
 
