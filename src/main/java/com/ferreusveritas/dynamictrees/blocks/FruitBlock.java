@@ -1,8 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
 import net.minecraft.block.*;
@@ -34,6 +32,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import static com.ferreusveritas.dynamictrees.util.ShapeUtils.createFruitShape;
+
 @SuppressWarnings({"deprecation", "unused"})
 public class FruitBlock extends Block implements IGrowable {
 
@@ -44,11 +44,14 @@ public class FruitBlock extends Block implements IGrowable {
 		CUSTOM
 	}
 
-	protected static final AxisAlignedBB[] FRUIT_AABB = new AxisAlignedBB[] {
-			new AxisAlignedBB(7/16.0, 1f, 7/16.0, 9/16.0, 15/16.0, 9/16.0),
-			new AxisAlignedBB(7/16.0, 1f, 7/16.0, 9/16.0, 14/16.0, 9/16.0),
-			new AxisAlignedBB(6/16.0, 1f, 6/16.0, 10/16.0, 12/16.0, 10/16.0),
-			new AxisAlignedBB(6/16.0, 15/16.0, 6/16.0, 10/16.0, 11/16.0, 10/16.0)
+	/**
+	 * Default shapes for the apple fruit, each element is the shape for each growth stage.
+	 */
+	protected AxisAlignedBB[] FRUIT_AABB = new AxisAlignedBB[] {
+			createFruitShape(1,1,0, 16),
+			createFruitShape(1,2,0, 16),
+			createFruitShape(2.5f,5,0),
+			createFruitShape(2.5f,5,1.25f)
 	};
 	
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
@@ -257,6 +260,13 @@ public class FruitBlock extends Block implements IGrowable {
 	///////////////////////////////////////////
 	// BOUNDARIES
 	///////////////////////////////////////////
+
+	public void setShape(int stage, AxisAlignedBB boundingBox){
+		FRUIT_AABB[stage] = boundingBox;
+	}
+	public void setShape(AxisAlignedBB[] boundingBox){
+		FRUIT_AABB = boundingBox;
+	}
 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
