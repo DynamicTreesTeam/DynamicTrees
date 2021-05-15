@@ -1530,7 +1530,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	protected float seasonalGrowthOffset = 0;
 	protected float seasonalSeedDropOffset = 0;
-	protected float seasonalFruitingOffset = 1;
+	protected float seasonalFruitingOffset = 0;
 
 	public void setSeasonalGrowthOffset (float offset){ seasonalGrowthOffset = offset; }
 	public void setSeasonalSeedDropOffset (float offset){ seasonalSeedDropOffset = offset; }
