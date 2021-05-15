@@ -269,11 +269,13 @@ public class FruitBlock extends Block implements IGrowable {
 	// BOUNDARIES
 	///////////////////////////////////////////
 
-	public void setShape(int stage, AxisAlignedBB boundingBox){
+	public FruitBlock setShape(int stage, AxisAlignedBB boundingBox){
 		FRUIT_AABB[stage] = boundingBox;
+		return this;
 	}
-	public void setShape(AxisAlignedBB[] boundingBox){
+	public FruitBlock setShape(AxisAlignedBB[] boundingBox){
 		FRUIT_AABB = boundingBox;
+		return this;
 	}
 
 	@Override
