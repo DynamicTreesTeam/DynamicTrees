@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.util.json;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
+import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
@@ -167,7 +168,10 @@ public final class JsonObjectGetters {
 
     public static final IJsonObjectGetter<Seed> SEED = register(Seed.class, jsonElement -> ITEM.get(jsonElement).mapIfValid(item -> item instanceof Seed, "Item '{value}' is not a seed.", item -> (Seed) item));
 
-    public static final IJsonObjectGetter<BranchBlock> BRANCH = register(BranchBlock.class, jsonElement -> BLOCK.get(jsonElement).mapIfValid(block -> block instanceof BranchBlock, "Block '{value}' is not a branch.", block -> (BranchBlock) block));
+    public static final IJsonObjectGetter<BranchBlock> BRANCH = register(BranchBlock.class, jsonElement -> BLOCK.get(jsonElement)
+            .mapIfValid(block -> block instanceof BranchBlock, "Block '{value}' is not a branch.", block -> (BranchBlock) block));
+    public static final IJsonObjectGetter<FruitBlock> FRUIT = register(FruitBlock.class, jsonElement -> BLOCK.get(jsonElement)
+            .mapIfValid(block -> block instanceof FruitBlock, "Block '{value}' is not a fruit.", block -> (FruitBlock) block));
 
     // Random enum getters.
     public static final IJsonObjectGetter<VinesGenFeature.VineType> VINE_TYPE = register(VinesGenFeature.VineType.class, new EnumGetter<>(VinesGenFeature.VineType.class));
