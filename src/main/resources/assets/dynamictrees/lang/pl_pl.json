@@ -51,14 +51,17 @@
   "block.dynamictrees.bonsai_pot":"Doniczka Bonsai",
 
   "chat.registry_name": "Nazwa Rejestru: %s",
+  
+  "tooltip.tree_staff.species": "Gatunek: %s",
+  "tooltip.tree_staff.jo_code": "JoCode: %s",
 
   "commands.dynamictrees.success.get_tree": "§aGatunek: %s §aJoCode: %s",
   "commands.dynamictrees.error.get_tree": "§cNie można znaleźć gatunków drzew na pozycji %s.",
   "commands.dynamictrees.success.set_tree": "§aPomyślnie ustawiono drzewo na pozycji %s §ado gatunków %s §az JoCode %s§a.",
   "commands.dynamictrees.success.kill_tree": "§aPomyślnie zabito drzewo na pozycji %s.",
   "commands.dynamictrees.error.unknown_species": "§cNieznany gatunek %s§c.",
-  "commands.dynamictrees.success.get_fertility": "§aŻycie w glebie drzewa na pozycji %s §ajest %s§a.",
-  "commands.dynamictrees.success.set_fertility": "§aPomyślnie ustawiono życie gleby drzewa na pozycji %s §ado %s§a.",
+  "commands.dynamictrees.success.get_soil_life": "§aŻycie w glebie drzewa na pozycji %s §ajest %s§a.",
+  "commands.dynamictrees.success.set_soil_life": "§aPomyślnie ustawiono życie gleby drzewa na pozycji %s §ado %s§a.",
   "commands.dynamictrees.success.grow_pulse": "§aPomyślnie wysłane %s§a impulsy wzrostu na drzewo na pozycji %s§a.",
   "commands.dynamictrees.success.set_xor": "§aPomyślnie ustawiono współrzędne Xlub do %s§a.",
   "commands.dynamictrees.success.rotate_jo_code": "§aObrócony JoCode: %s",

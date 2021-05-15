@@ -1,14 +1,13 @@
 package com.ferreusveritas.dynamictrees.models.modeldata;
 
-import javax.annotation.Nullable;
-
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.Connections;
-
 import net.minecraft.util.Direction;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
+
+import javax.annotation.Nullable;
 
 /**
  * Extension of {@link Connections} to implement {@link IModelData}, so connections can be transferred to the baked model.
@@ -16,7 +15,7 @@ import net.minecraftforge.client.model.data.ModelProperty;
 public class ModelConnections extends Connections implements IModelData {
 
 	private Direction ringOnly = null;
-	private Family family = null;
+	private Family family = Family.NULL_FAMILY;
 
 	public ModelConnections() { }
 	
@@ -42,7 +41,6 @@ public class ModelConnections extends Connections implements IModelData {
 		return this;
 	}
 
-	@Nullable
 	public Family getFamily () { return family; }
 
 	@Override
