@@ -28,13 +28,13 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	public static final GenFeatureProperty<FruitBlock> FRUIT_BLOCK = GenFeatureProperty.createProperty("fruit_block", FruitBlock.class);
 
 	public FruitGenFeature(ResourceLocation registryName) {
-		super(registryName, FRUIT_BLOCK, VERTICAL_SPREAD, QUANTITY, RAY_DISTANCE, FRUITING_RADIUS, PLACE_CHANCE);
+		super(registryName, FRUIT_BLOCK, VERTICAL_SPREAD, QUANTITY, FRUITING_RADIUS, PLACE_CHANCE);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
-				.with(VERTICAL_SPREAD, 30f).with(QUANTITY, 4).with(RAY_DISTANCE, 5f).with(FRUITING_RADIUS, 8).with(PLACE_CHANCE, 1f);
+				.with(VERTICAL_SPREAD, 30f).with(QUANTITY, 4).with(FRUITING_RADIUS, 8).with(PLACE_CHANCE, 1f);
 	}
 
     @Override
