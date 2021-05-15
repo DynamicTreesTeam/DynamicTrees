@@ -57,7 +57,8 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 		BranchBlock branch = TreeHelper.getBranch(blockState);
 
 		if(branch != null && branch.getRadius(blockState) >= configuredGenFeature.get(FRUITING_RADIUS) && natural) {
-			if (species.seasonalFruitProductionFactor(world, rootPos) > world.random.nextFloat()) {
+			float fruitingFactor = species.seasonalFruitProductionFactor(world, rootPos);
+			if (fruitingFactor > configuredGenFeature.get(FRUIT_BLOCK).getMinimumSeasonalValue() && fruitingFactor > world.random.nextFloat()) {
 				FindEndsNode endFinder = new FindEndsNode();
 				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 				List<BlockPos> endPoints = endFinder.getEnds();

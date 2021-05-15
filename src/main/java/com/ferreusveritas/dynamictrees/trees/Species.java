@@ -1522,8 +1522,23 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	// SEASONAL
 	//////////////////////////////
 
+	/**
+	 * default flower holding is relative to the flowering offset, but default is first half of spring
+	 */
 	protected float flowerSeasonHoldMin = SeasonHelper.SPRING;
 	protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
+
+	protected float seasonalGrowthOffset = 0;
+	protected float seasonalSeedDropOffset = 0;
+	protected float seasonalFruitingOffset = 1;
+
+	public void setSeasonalGrowthOffset (float offset){ seasonalGrowthOffset = offset; }
+	public void setSeasonalSeedDropOffset (float offset){ seasonalSeedDropOffset = offset; }
+	/**
+	 * The default fruiting will PEAK in the middle of summer, starting at the middle of spring and ending at the middle of fall.
+	 * this offset will move the fruiting by a factor of one season. (an offset of 2.0 will ma fruiting peak in winter)
+	 */
+	public void setSeasonalFruitingOffset (float offset){ seasonalFruitingOffset = offset; }
 
 	/**
 	 * Pulls data from the {@link com.ferreusveritas.dynamictrees.compat.seasons.SeasonManager} to determine
@@ -1534,15 +1549,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return Factor from 0.0 (no growth) to 1.0 (full growth).
 	 */
 	public float seasonalGrowthFactor(World world, BlockPos rootPos) {
-		return DTConfigs.ENABLE_SEASONAL_GROWTH_FACTOR.get() ? SeasonHelper.globalSeasonalGrowthFactor(world, rootPos) : 1.0f;
+		return DTConfigs.ENABLE_SEASONAL_GROWTH_FACTOR.get() ? SeasonHelper.globalSeasonalGrowthFactor(world, rootPos, -seasonalGrowthOffset) : 1.0f;
 	}
 
 	public float seasonalSeedDropFactor(World world, BlockPos pos) {
-		return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() ? SeasonHelper.globalSeasonalSeedDropFactor(world, pos) : 1.0f;
+		return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() ? SeasonHelper.globalSeasonalSeedDropFactor(world, pos, -seasonalSeedDropOffset) : 1.0f;
 	}
 
 	public float seasonalFruitProductionFactor(World world, BlockPos pos) {
-		return DTConfigs.ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR.get() ? SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, false) : 1.0f;
+		return DTConfigs.ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR.get() ? SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, -seasonalFruitingOffset,false) : 1.0f;
 	}
 
 	/**
@@ -1553,17 +1568,17 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * Values are OR'ed together for the return
 	 */
 	public int getSeasonalTooltipFlags(final World world) {
-		final float seasonStart = 0.167f;
-		final float seasonEnd = 0.833f;
+		final float seasonStart = 1f/6;
+		final float seasonEnd = 1 - 1f/6;
 		final float threshold = 0.75f;
 
-		if (FruitBlock.getFruitBlockForSpecies(this) != null) {
+		if (!FruitBlock.getFruitBlocksForSpecies(this).isEmpty()) {
 			int seasonFlags = 0;
 			for (int i = 0; i < 4; i++) {
-				final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonStart) * 64.0f), 0), true);
-				final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonEnd  ) * 64.0f), 0), true);
+				final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
+				final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i +  seasonEnd  - seasonalFruitingOffset) * 64.0f), 0), true);
 
-				if (Math.min(prod1, prod2) >= threshold) {
+				if (Math.min(prod1, prod2) > threshold) {
 					seasonFlags |= 1 << i;
 				}
 			}
@@ -1577,8 +1592,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * When seasons are active allow a seasonal time range where fruit growth does
 	 * not progress past the flower stage. This allows for a flowery spring time.
 	 *
-	 * @param min The minimum season value.
-	 * @param max The maximum season value.
+	 * @param min The minimum season value relative to the fruiting offset.
+	 * @param max The maximum season value relative to the fruiting offset.
 	 * @return This {@link Species} object for chaining.
 	 */
 	public Species setFlowerSeasonHold(float min, float max) {
@@ -1588,7 +1603,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	public boolean testFlowerSeasonHold(Float seasonValue) {
-		return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin, flowerSeasonHoldMax);
+		return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin + seasonalFruitingOffset, flowerSeasonHoldMax + seasonalFruitingOffset);
 	}
 
 

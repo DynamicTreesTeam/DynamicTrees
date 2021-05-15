@@ -25,11 +25,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.ferreusveritas.dynamictrees.util.ShapeUtils.createFruitShape;
@@ -56,11 +54,11 @@ public class FruitBlock extends Block implements IGrowable {
 	
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
 
-	private static final Map<Species, FruitBlock> SPECIES_FRUIT_MAP = new HashMap<>();
+	private static final Map<Species, Set<FruitBlock>> SPECIES_FRUIT_MAP = new HashMap<>();
 
-	@Nullable
-	public static FruitBlock getFruitBlockForSpecies(Species species) {
-		return SPECIES_FRUIT_MAP.getOrDefault(species, null);
+	@Nonnull
+	public static Set<FruitBlock> getFruitBlocksForSpecies(Species species) {
+		return SPECIES_FRUIT_MAP.getOrDefault(species, new HashSet<>());
 	}
 
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
@@ -88,12 +86,22 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	public void setSpecies(Species species) {
-		SPECIES_FRUIT_MAP.put(species, this);
+		if (SPECIES_FRUIT_MAP.containsKey(species))
+			SPECIES_FRUIT_MAP.get(species).add(this);
+		else {
+			Set<FruitBlock> set = new HashSet<>();
+			set.add(this);
+			SPECIES_FRUIT_MAP.put(species, set);
+		}
 		this.species = species;
 	}
 
 	public Species getSpecies() {
 		return this.species == null ? Species.NULL_SPECIES : this.species;
+	}
+
+	public float getMinimumSeasonalValue (){
+		return 0.3f;
 	}
 
 	@Override
@@ -108,7 +116,7 @@ public class FruitBlock extends Block implements IGrowable {
 		final Species species = this.getSpecies();
 
 		if (season != null && species.isValid()) { // Non-Null means we are season capable.
-			if (species.seasonalFruitProductionFactor(world, pos) < 0.2f) {
+			if (species.seasonalFruitProductionFactor(world, pos) < getMinimumSeasonalValue()) {
 				this.outOfSeasonAction(world, pos); // Destroy the block or similar action.
 				return;
 			}
