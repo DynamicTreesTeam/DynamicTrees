@@ -35,6 +35,8 @@ public abstract class GenFeature extends RegistryEntry<GenFeature> {
     public static final GenFeatureProperty<Integer> MAX_HEIGHT = GenFeatureProperty.createIntegerProperty("max_height");
     public static final GenFeatureProperty<CanGrowPredicate> CAN_GROW_PREDICATE = GenFeatureProperty.createProperty("can_grow_predicate", CanGrowPredicate.class);
     public static final GenFeatureProperty<Integer> MAX_COUNT = GenFeatureProperty.createIntegerProperty("max_count");
+    public static final GenFeatureProperty<Integer> FRUITING_RADIUS = GenFeatureProperty.createIntegerProperty("fruiting_radius");
+    public static final GenFeatureProperty<Float> PLACE_CHANCE = GenFeatureProperty.createFloatProperty("place_chance");
 
     public static final GenFeature NULL_GEN_FEATURE = new GenFeature(DTTrees.NULL) {};
 

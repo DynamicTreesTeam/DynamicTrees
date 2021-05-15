@@ -19,15 +19,15 @@ import java.util.Random;
  */
 public class RotSoilGenFeature extends GenFeature implements IPostRotGenFeature {
 
-    public static final GenFeatureProperty<Block> ROTTED_SOIL = GenFeatureProperty.createBlockProperty("rotted_soil");
+    public static final GenFeatureProperty<Block> ROTTEN_SOIL = GenFeatureProperty.createBlockProperty("rotten_soil");
 
     public RotSoilGenFeature(ResourceLocation registryName) {
-        super(registryName, ROTTED_SOIL);
+        super(registryName, ROTTEN_SOIL);
     }
 
     @Override
     protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-        return super.createDefaultConfiguration().with(ROTTED_SOIL, Blocks.DIRT);
+        return super.createDefaultConfiguration().with(ROTTEN_SOIL, Blocks.DIRT);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class RotSoilGenFeature extends GenFeature implements IPostRotGenFeature 
         if (!TreeHelper.isRooty(world.getBlockState(pos.below())))
             return;
 
-        world.setBlock(pos.below(), configuredGenFeature.get(ROTTED_SOIL).defaultBlockState(), 3); // Change rooty dirt to rotted soil.
+        world.setBlock(pos.below(), configuredGenFeature.get(ROTTEN_SOIL).defaultBlockState(), 3); // Change rooty dirt to rotted soil.
     }
 
 }

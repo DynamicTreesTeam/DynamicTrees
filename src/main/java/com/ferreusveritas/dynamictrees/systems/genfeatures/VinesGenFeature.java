@@ -46,7 +46,6 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
 	public static final GenFeatureProperty<Block> BLOCK = GenFeatureProperty.createBlockProperty("block");
 	public static final GenFeatureProperty<Block> TIP_BLOCK = GenFeatureProperty.createBlockProperty("tip_block");
 	public static final GenFeatureProperty<VineType> VINE_TYPE = GenFeatureProperty.createProperty("vine_type", VineType.class);
-	public static final GenFeatureProperty<Integer> FRUITING_RADIUS = GenFeatureProperty.createIntegerProperty("fruiting_radius");
 
 	public VinesGenFeature(ResourceLocation registryName) {
 		super(registryName, QUANTITY, MAX_LENGTH, VERTICAL_SPREAD, RAY_DISTANCE, BLOCK, TIP_BLOCK, VINE_TYPE, FRUITING_RADIUS);

@@ -26,16 +26,15 @@ import java.util.List;
 public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPostGenFeature {
 
 	public static final GenFeatureProperty<FruitBlock> FRUIT_BLOCK = GenFeatureProperty.createProperty("fruit_block", FruitBlock.class);
-	public static final GenFeatureProperty<Integer> FRUITING_RADIUS = GenFeatureProperty.createIntegerProperty("fruiting_radius");
 
 	public FruitGenFeature(ResourceLocation registryName) {
-		super(registryName, FRUIT_BLOCK, VERTICAL_SPREAD, QUANTITY, RAY_DISTANCE, FRUITING_RADIUS);
+		super(registryName, FRUIT_BLOCK, VERTICAL_SPREAD, QUANTITY, RAY_DISTANCE, FRUITING_RADIUS, PLACE_CHANCE);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration().with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
-				.with(VERTICAL_SPREAD, 30f).with(QUANTITY, 4).with(RAY_DISTANCE, 5f).with(FRUITING_RADIUS, 8);
+				.with(VERTICAL_SPREAD, 30f).with(QUANTITY, 4).with(RAY_DISTANCE, 5f).with(FRUITING_RADIUS, 8).with(PLACE_CHANCE, 1f);
 	}
 
     @Override
@@ -77,12 +76,12 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 
 	protected void addFruit(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds, Float seasonValue) {
 		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
-		if(fruitPos != BlockPos.ZERO) {
-			if (!enableHash || ((CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0) ) {
+		if(fruitPos != BlockPos.ZERO &&
+			!enableHash || ((CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0) &&
+			world.getRandom().nextFloat() <= configuredGenFeature.get(PLACE_CHANCE)) {
 				FruitBlock fruitBlock = configuredGenFeature.get(FRUIT_BLOCK);
 				BlockState setState = fruitBlock.getStateForAge(worldGen ? fruitBlock.getAgeForSeasonalWorldGen(world, fruitPos, seasonValue) : 0);
 				world.setBlock(fruitPos, setState, 3);
-			}
 		}
 	}
 

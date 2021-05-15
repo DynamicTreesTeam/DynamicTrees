@@ -34,7 +34,6 @@ import java.util.List;
 public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
     public static final GenFeatureProperty<Block> SHROOMLIGHT_BLOCK = GenFeatureProperty.createBlockProperty("shroomlight");
-    public static final GenFeatureProperty<Float> PLACE_CHANCE = GenFeatureProperty.createFloatProperty("place_chance");
 
     private static final Direction[] HORIZONTALS = CoordUtils.HORIZONTALS;
     private static final double VANILLA_GROW_CHANCE = .005f;
