@@ -195,7 +195,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	 * @param trunkPos The {@link BlockPos} of the trunk.
 	 * @return The {@link Species} for the specified position.
 	 */
-	public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos, Species defaultSpecies) {
+	public Species getSpeciesForLocation(IBlockReader world, BlockPos trunkPos, Species defaultSpecies) {
 		for (final Species species : this.species) {
 			if (species.shouldOverrideCommon(world, trunkPos))
 				return species;
