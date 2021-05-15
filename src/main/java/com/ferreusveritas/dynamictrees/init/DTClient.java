@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
@@ -128,7 +129,7 @@ public class DTClient {
 	private static void registerRenderLayers () {
 		RenderTypeLookup.setRenderLayer(DTRegistries.POTTED_SAPLING, RenderType.cutoutMipped());
 
-		ForgeRegistries.BLOCKS.getValues().stream().filter(block ->block == DTRegistries.COCOA_FRUIT || block instanceof DynamicSaplingBlock || block instanceof RootyBlock)
+		ForgeRegistries.BLOCKS.getValues().stream().filter(block ->block == DTRegistries.COCOA_FRUIT || block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof FruitBlock)
 				.forEach(block -> RenderTypeLookup.setRenderLayer(block, RenderType.cutoutMipped()));
 
 //		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof ThickBranchBlock)
