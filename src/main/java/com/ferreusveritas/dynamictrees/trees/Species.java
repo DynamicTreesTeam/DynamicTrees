@@ -95,7 +95,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		@Override public Optional<Seed> getSeed() { return Optional.empty(); }
 		@Override public Family getFamily() { return Family.NULL_FAMILY; }
 		@Override public boolean isTransformable() { return false; }
-		@Override public boolean plantSapling(IWorld world, BlockPos pos) { return false; }
+		@Override public boolean plantSapling(IWorld world, BlockPos pos, boolean locationOverride) { return false; }
 		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
 		@Override public boolean addDropCreator(IDropCreator dropCreator) { return false; }
@@ -450,11 +450,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		this.commonOverride = commonOverride;
 	}
 
-	public boolean shouldOverrideCommon(final IWorld world, final BlockPos trunkPos) {
+	public boolean shouldOverrideCommon(final IBlockReader world, final BlockPos trunkPos) {
 		return this.hasCommonOverride() && this.commonOverride.test(world, trunkPos);
 	}
 
-	public interface ICommonOverride extends BiPredicate<IWorld, BlockPos> {}
+	public interface ICommonOverride extends BiPredicate<IBlockReader, BlockPos> {}
 
 	///////////////////////////////////////////
 	//LEAVES
@@ -823,6 +823,31 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	public Optional<DynamicSaplingBlock> getSapling() {
 		return Optional.ofNullable(saplingBlock);
 	}
+
+	/**
+	 * Returns the {@link Species} override for the specified {@link BlockPos} in the
+	 * specified {@link World} if {@link #shouldUseLocationOverride()}, or returns
+	 * {@code this} {@link Species} otherwise.
+	 *
+	 * @param world The {@link IWorld} to check for the override in.
+	 * @param pos The {@link BlockPos} to check.
+	 * @return The relevant {@link Species} override or {@code this} {@link Species}.
+	 */
+	public Species selfOrLocationOverride(final IBlockReader world, BlockPos pos) {
+		return this.shouldUseLocationOverride() ? this.getFamily().getSpeciesForLocation(world, pos, this)
+				: this;
+	}
+
+	/**
+	 * Returns {@code true} if the location override should be used for this
+	 * {@link Species} if available.
+	 *
+	 * @return {@code true} if the location override should be used if available,
+	 * 		   {@code false} otherwise.
+	 */
+	public boolean shouldUseLocationOverride() {
+		return !this.getSapling().isPresent() || this.isCommonSpecies();
+	}
 	
 	/**
 	 * Checks surroundings and places a dynamic sapling block.
@@ -831,10 +856,12 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param pos
 	 * @return true if the planting was successful
 	 */
-	public boolean plantSapling(IWorld world, BlockPos pos) {
-		if(saplingBlock != null) {
+	public boolean plantSapling(IWorld world, BlockPos pos, boolean locationOverride) {
+		final DynamicSaplingBlock sapling = this.saplingBlock != null ? this.saplingBlock :
+				locationOverride ? this.getFamily().getCommonSpecies().saplingBlock : null;
+		if (sapling != null) {
 			if(world.getBlockState(pos).getMaterial().isReplaceable() && DynamicSaplingBlock.canSaplingStay(world, this, pos)) {
-				world.setBlock(pos, saplingBlock.defaultBlockState(), 3);
+				world.setBlock(pos, sapling.defaultBlockState(), 3);
 				return true;
 			}
 		}

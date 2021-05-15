@@ -27,7 +27,6 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
@@ -55,10 +54,6 @@ public class Seed extends Item implements IPlantable {
 		return species;
 	}
 
-	public Species getSpecies(final IWorld world, final BlockPos pos) {
-		return this.getSpecies().getFamily().getSpeciesForLocation(world, pos, this.getSpecies());
-	}
-	
 	@Override
 	public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
 		if (entityItem.lifespan == 6000) { // 6000 (5 minutes) is the default lifespan for an entity item
@@ -73,7 +68,7 @@ public class Seed extends Item implements IPlantable {
 			if (!world.isClientSide) {//Server side only
 				final ItemStack seedStack = entityItem.getItem();
 				final BlockPos pos = new BlockPos(entityItem.blockPosition());
-				final SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, this.getSpecies(world, pos), pos, this.shouldPlant(world, pos, seedStack));
+				final SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, this.getSpecies().selfOrLocationOverride(world, pos), pos, this.shouldPlant(world, pos, seedStack));
 				MinecraftForge.EVENT_BUS.post(seedVolEvent);
 				if (!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {
 					this.doPlanting(world, pos, null, seedStack);
@@ -87,8 +82,8 @@ public class Seed extends Item implements IPlantable {
 	}
 	
 	public boolean doPlanting(World world, BlockPos pos, @Nullable PlayerEntity planter, ItemStack seedStack) {
-		final Species species = this.getSpecies(world, pos);
-		if (species.plantSapling(world, pos)) { // Do the planting
+		final Species species = this.getSpecies().selfOrLocationOverride(world, pos);
+		if (species.plantSapling(world, pos, this.getSpecies() != species)) { // Do the planting
 			String joCode = getCode(seedStack);
 			if (!joCode.isEmpty()) {
 				world.removeBlock(pos, false); // Remove the newly created dynamic sapling

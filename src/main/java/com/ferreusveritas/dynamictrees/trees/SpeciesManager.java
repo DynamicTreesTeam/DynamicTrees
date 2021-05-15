@@ -21,6 +21,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.IWorldReader;
 import net.minecraftforge.common.BiomeDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,7 +56,10 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
             if (!biomePredicateFetchResult.wasSuccessful())
                 return ObjectFetchResult.failureFromOther(biomePredicateFetchResult);
 
-            return ObjectFetchResult.success((world, pos) -> biomePredicateFetchResult.getValue().test(world.getBiome(pos)));
+            return ObjectFetchResult.success((world, pos) ->
+                world instanceof IWorldReader &&
+                        biomePredicateFetchResult.getValue().test(((IWorldReader) world).getBiome(pos))
+            );
         });
 
         this.loadAppliers.register("generate_seed", Boolean.class, Species::setShouldGenerateSeed)

@@ -22,13 +22,16 @@ public class VanillaSaplingEventHandler {
 		if (!(event.getWorld() instanceof World) || !TreeRegistry.SAPLING_REPLACERS.containsKey(state))
 			return;
 
-		final Species species = TreeRegistry.SAPLING_REPLACERS.get(state);
 		final World world = (World) event.getWorld();
 		final BlockPos pos = event.getPos();
+		final Species targetSpecies = TreeRegistry.SAPLING_REPLACERS.get(state);
+
+		// If we should be overriding for this location, then correct the species to the override.
+		final Species species = targetSpecies.selfOrLocationOverride(world, pos);
 
 		world.removeBlock(pos, false); // Remove the block so the plantTree function won't automatically fail.
 
-		if (!species.plantSapling(world, pos)) { // If it fails then give a seed back to the player.
+		if (!species.plantSapling(world, pos, targetSpecies != species)) { // If it fails then give a seed back to the player.
 			ItemUtils.spawnItemStack(world, pos, species.getSeedStack(1));
 		}
 	}
@@ -43,7 +46,8 @@ public class VanillaSaplingEventHandler {
 			return;
 
 		final World world = ((World) iWorld);
-		final Species species = TreeRegistry.SAPLING_REPLACERS.get(blockState);
+		final Species species = TreeRegistry.SAPLING_REPLACERS.get(blockState)
+				.selfOrLocationOverride(world, pos);
 
 		world.removeBlock(pos, false); // Remove the block so the plantTree function won't automatically fail.
 		event.setResult(Event.Result.DENY);
