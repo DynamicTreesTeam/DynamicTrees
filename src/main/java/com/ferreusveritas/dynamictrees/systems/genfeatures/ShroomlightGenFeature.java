@@ -56,7 +56,7 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
 
     @Override
     public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above())) return false;
+        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above()) || fertility == 0) return false;
 
         return placeShroomlightsInValidPlace(configuredGenFeature, world, rootPos, false);
     }
