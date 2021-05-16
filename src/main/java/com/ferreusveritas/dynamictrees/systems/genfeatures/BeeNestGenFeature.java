@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProp
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.TetraFunction;
 import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -40,7 +41,7 @@ import java.util.function.BiFunction;
 /**
  * Gen feature for bee nests. Can be fully customized with a custom predicate for natural growth
  * and with a custom function for worldgen chances.
- * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, BranchConnectables.IRadiusForConnectionFunction) makeBlockConnectable}
+ * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, TetraFunction)}  makeBlockConnectable}
  *
  * @author Max Hyper
  */
@@ -91,7 +92,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
 
     @Override
     public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above())) return false;
+        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above()) || fertility == 0) return false;
 
         return placeBeeNestInValidPlace(configuredGenFeature, world, rootPos, false);
     }

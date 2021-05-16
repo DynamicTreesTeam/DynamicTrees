@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProp
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.TetraFunction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * Gen feature for shroomlight but works for any block.
  * Can be fully customized with a custom predicate for natural growth.
- * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, BranchConnectables.IRadiusForConnectionFunction) makeBlockConnectable}
+ * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, TetraFunction)}  makeBlockConnectable}
  *
  * @author Max Hyper
  */
