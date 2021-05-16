@@ -22,7 +22,7 @@ public class WailaRootyHandler implements IComponentProvider {
 
 		final RootyBlock rooty = (RootyBlock) state.getBlock();
 		final int fertility = rooty.getFertility(state, accessor.getWorld(), accessor.getPosition());
-		tooltip.add(new TranslationTextComponent("tooltip.fertility",
+		tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.fertility",
 				MathHelper.floor(fertility * 100 / 15f) + "%"));
 	}
 }
