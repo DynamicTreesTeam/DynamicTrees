@@ -161,7 +161,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 			}
 		}
 	}
-	
+
+	public boolean appearanceChangesWithHydro (){ return false; }
+
 	@Override
 	public int age(IWorld world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
 		final LeavesProperties leavesProperties = getProperties(state);
@@ -178,7 +180,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 			if (oldHydro != newHydro) { // Only update if the hydro has changed. A little performance gain.
 				// We do not use the 0x02 flag(update client) for performance reasons.  The clients do not need to know the hydration level of the leaves blocks as it.
 				// does not affect appearance or behavior.  For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
-				world.setBlock(pos, leavesProperties.getDynamicLeavesState(newHydro), 4);
+				world.setBlock(pos, leavesProperties.getDynamicLeavesState(newHydro), appearanceChangesWithHydro() ? 2 : 4);
 			}
 		}
 		
