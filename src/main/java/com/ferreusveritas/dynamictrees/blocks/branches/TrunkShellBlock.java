@@ -188,6 +188,11 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
 	}
 
 	@Override
+	public void neighborChanged(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean p_220069_6_) {
+		this.getMuse(world, pos);
+	}
+
+	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
 		return Null.applyIfNonnull(this.getMuse(reader, state, pos), muse -> VoxelShapes.create(muse.state.getShape(reader, muse.pos).bounds().move(muse.museOffset)), VoxelShapes.empty());
 	}
