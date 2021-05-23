@@ -536,14 +536,25 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return MetadataCell.radiusAndMeta(radius, meta);
 	}
 
+	private int primaryThickness = 1;
+	private int secondaryThickness = 2;
+
+	public void setPrimaryThickness (int primaryThickness){
+		this.primaryThickness = primaryThickness;
+	}
+
+	public void setSecondaryThickness (int secondaryThickness){
+		this.secondaryThickness = secondaryThickness;
+	}
+
 	/** Thickness of a twig [default = 1] */
 	public int getPrimaryThickness() {
-		return 1;
+		return primaryThickness;
 	}
 
 	/** Thickness of the branch connected to a twig (radius == getPrimaryThickness) [default = 2] */
 	public int getSecondaryThickness() {
-		return 2;
+		return secondaryThickness;
 	}
 
 	public boolean hasStrippedBranch() {

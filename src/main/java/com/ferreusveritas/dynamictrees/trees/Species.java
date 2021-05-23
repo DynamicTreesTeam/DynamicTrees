@@ -83,6 +83,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -1251,7 +1252,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return The chance this will postRot. 0.0(never) -> 1.0(always)
 	 */
 	public float rotChance(IWorld world, BlockPos pos, Random rand, int radius) {
-		return 0.3f + ((8 - radius) * 0.1f);// Thicker branches take longer to postRot
+		if (radius == 0) return 0;
+		return 0.3f + ((1f / radius));// Thicker branches take longer to postRot
 	}
 	
 	/**
@@ -1312,8 +1314,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return logicKit;
 	}
 
+
+	private boolean canBoneMealTree = true;
+
+	public void setCanBoneMealTree (boolean canBoneMealTree) {
+		this.canBoneMealTree = canBoneMealTree;
+	}
+
 	public boolean canBoneMealTree() {
-		return true;
+		return canBoneMealTree;
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.IAgeable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
@@ -49,6 +50,7 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -238,13 +240,17 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		if (context.getEntity() == null)
 			return VoxelShapes.create(new AxisAlignedBB(0, 0.9, 0, 1, 1, 1));
 
-		if (DTConfigs.IS_LEAVES_PASSABLE.get() || this.isEntityPassable(context)) {
+		if (isLeavesPassable() || this.isEntityPassable(context)) {
 			return VoxelShapes.empty();
 		} else if (DTConfigs.VANILLA_LEAVES_COLLISION.get()) {
 			return VoxelShapes.block();
 		} else {
 			return VoxelShapes.create(new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
 		}
+	}
+
+	protected boolean isLeavesPassable (){
+		return DTConfigs.IS_LEAVES_PASSABLE.get() || ModList.get().isLoaded(DynamicTrees.PASSABLE_FOLIAGE);
 	}
 
 	public boolean isEntityPassable(ISelectionContext context){
@@ -307,7 +313,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	
 	@Override
 	public void entityInside(BlockState state, World world, BlockPos pos, Entity entity) {
-		if (DTConfigs.IS_LEAVES_PASSABLE.get() || isEntityPassable(entity)) {
+		if (isLeavesPassable() || isEntityPassable(entity)) {
 			super.entityInside(state, world, pos, entity);
 		} else {
 			if (entity.getDeltaMovement().y < 0.0D && entity.fallDistance < 2.0f) {

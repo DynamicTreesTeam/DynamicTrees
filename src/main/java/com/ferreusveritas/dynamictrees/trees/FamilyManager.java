@@ -44,9 +44,11 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
 
         this.reloadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
             registryName = TreeRegistry.processResLoc(registryName);
-            Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setCommonSpecies, setCommonWarn(family, registryName)));
+            Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setupCommonSpecies, setCommonWarn(family, registryName)));
         }).register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
-                .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa);
+                .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa)
+                .register("primary_thickness", Integer.class, Family::setPrimaryThickness)
+                .register("secondary_thickness", Integer.class, Family::setSecondaryThickness);
 
         super.registerAppliers();
     }

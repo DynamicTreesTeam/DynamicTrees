@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -107,8 +108,8 @@ public class DTConfigs {
 				defineInRange("scaleBiomeGrowthRate", 0.5f, 0.0f, 1.0f);
 		DISEASE_CHANCE = SERVER_BUILDER.comment("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days").
 				defineInRange("diseaseChance", 0.0f, 0.0f, 1.0f);
-		MAX_BRANCH_ROT_RADIUS = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. Set to 0 to prevent rotting").
-				defineInRange("maxBranchRotRadius", 8, 0, 24);
+		MAX_BRANCH_ROT_RADIUS = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. 24 = Full 3x3 thick size. Set to 0 to prevent rotting").
+				defineInRange("maxBranchRotRadius", 7, 0, ThickBranchBlock.MAX_RADIUS_TICK);
 		ROOTY_BLOCK_HARDNESS_MULTIPLIER = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
 				defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
 		SWAMP_OAKS_IN_WATER = SERVER_BUILDER.comment("Options for how oak trees generate in swamps. ROOTED: Swamp oak trees will generate on shallow water with mangrove-like roots. SUNK: Swamp oak trees will generate on shallow water one block under the surface. DISABLED: Swamp oaks will not generate on water.").
