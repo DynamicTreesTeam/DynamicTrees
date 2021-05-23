@@ -29,23 +29,20 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
 
     @Override
     public void registerAppliers() {
-        this.loadReloadAppliers.register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
+        this.loadReloadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
+            registryName = TreeRegistry.processResLoc(registryName);
+            Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setupCommonSpecies, setCommonWarn(family, registryName))); })
+                .register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
                 .register("max_branch_radius", Integer.class, Family::setMaxBranchRadius);
 
         this.setupAppliers.register("primitive_log", Block.class, Family::setPrimitiveLog)
                 .register("primitive_stripped_log", Block.class, Family::setPrimitiveStrippedLog)
                 .register("stick", Item.class, Family::setStick);
 
-        this.loadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
-            registryName = TreeRegistry.processResLoc(registryName);
-            Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setupCommonSpecies, setCommonWarn(family, registryName)));
-        }).register("generate_surface_root", Boolean.class, Family::setHasSurfaceRoot)
+        this.loadAppliers.register("generate_surface_root", Boolean.class, Family::setHasSurfaceRoot)
                 .register("generate_stripped_branch", Boolean.class, Family::setHasStrippedBranch);
 
-        this.reloadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
-            registryName = TreeRegistry.processResLoc(registryName);
-            Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setupCommonSpecies, setCommonWarn(family, registryName)));
-        }).register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
+        this.reloadAppliers.register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
                 .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa)
                 .register("primary_thickness", Integer.class, Family::setPrimaryThickness)
                 .register("secondary_thickness", Integer.class, Family::setSecondaryThickness);
