@@ -162,7 +162,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		}
 	}
 
-	public boolean appearanceChangesWithHydro (){ return false; }
+	public boolean appearanceChangesWithHydro (int oldHydro, int newHydro){ return false; }
 
 	@Override
 	public int age(IWorld world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
@@ -178,14 +178,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 			return -1; // Leaves were destroyed.
 		} else {
 			if (oldHydro != newHydro) { // Only update if the hydro has changed. A little performance gain.
-				// We do not use the 0x02 flag(update client) for performance reasons.  The clients do not need to know the hydration level of the leaves blocks as it.
-				// does not affect appearance or behavior.  For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
-				world.setBlock(pos, leavesProperties.getDynamicLeavesState(newHydro), appearanceChangesWithHydro() ? 2 : 4);
+				// We do not use the 0x02 flag(update client) for performance reasons.  The clients do not need to know the hydration level of the leaves blocks as it
+				// does not affect appearance or behavior, unless appearanceChangesWithHydro.  For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
+				world.setBlock(pos, getLeavesBlockStateForPlacement(world, pos, leavesProperties.getDynamicLeavesState(newHydro), oldHydro, worldGen), appearanceChangesWithHydro(oldHydro, newHydro) ? 2 : 4);
 			}
 		}
-		
-		final NewLeavesPropertiesHandler newLeavesHander = getNewLeavesPropertiesHandler(world, pos, state, newHydro, worldGen);
-		
+
 		// We should do this even if the hydro is only 1.  Since there could be adjacent branch blocks that could use a leaves block
 		for (Direction dir: Direction.values()) { // Go on all 6 sides of this block
 			if (newHydro > 1 || rand.nextInt(4) == 0 ) { // we'll give it a 1 in 4 chance to grow leaves if hydro is low to help performance
@@ -193,7 +191,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 				if (safeBounds.inBounds(offpos, true) && isLocationSuitableForNewLeaves(world, leavesProperties, offpos)) { // Attempt to grow new leaves
 					int hydro = getHydrationLevelFromNeighbors(world, offpos, leavesProperties);
 					if (hydro > 0) {
-						world.setBlock(offpos, newLeavesHander.getLeaves(world, offpos, leavesProperties.getDynamicLeavesState(hydro)), 2); // Removed Notify Neighbors Flag for performance
+						world.setBlock(offpos, getLeavesBlockStateForPlacement(world, offpos, leavesProperties.getDynamicLeavesState(hydro), 0, worldGen), 2); // Removed Notify Neighbors Flag for performance
 					}
 				}
 			}
@@ -201,24 +199,19 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		
 		return newHydro; // Leaves were not destroyed
 	}
-	
+
 	/**
 	 * Provides a method to add custom leaves properties besides the normal
-	 * hydro.  Currently used by flowering oak in the BoP add-on
-	 *
+	 * hydro.
 	 * @param world The world
 	 * @param pos Position of the new leaves blck
-	 * @param state The original state of the leaves block before aging occured
-	 * @param newHydro The new calculated hydration value of the leaves
+	 * @param leavesStateWithHydro The state of the leaves with the hydro applied
+	 * @param oldHydro the hydro value of the leaves before the palcement. Will be 0 if its a new leaf
 	 * @param worldGen true if this is happening during worldgen
 	 * @return A provider for adding more blockstate properties
 	 */
-	protected NewLeavesPropertiesHandler getNewLeavesPropertiesHandler(IWorld world, BlockPos pos, BlockState state, int newHydro, boolean worldGen) {
-		return (w, p, l) -> l; // By default just pass the blockState along
-	}
-	
-	protected interface NewLeavesPropertiesHandler {
-		BlockState getLeaves(IWorld world, BlockPos pos, BlockState leavesStateWithHydro);
+	protected BlockState getLeavesBlockStateForPlacement(IWorld world, BlockPos pos, BlockState leavesStateWithHydro, int oldHydro, boolean worldGen){
+		return leavesStateWithHydro; //by default just pass the blockstate along
 	}
 
 	@Override
@@ -344,7 +337,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	public boolean growLeavesIfLocationIsSuitable(IWorld world, LeavesProperties leavesProp, BlockPos pos, int hydro) {
 		hydro = hydro == 0 ? leavesProp.getCellKit().getDefaultHydration() : hydro;
 		if (isLocationSuitableForNewLeaves(world, leavesProp, pos)) {
-			world.setBlock(pos, leavesProp.getDynamicLeavesState(hydro), 2); // Removed Notify Neighbors Flag for performance.
+			world.setBlock(pos, getLeavesBlockStateForPlacement(world, pos, leavesProp.getDynamicLeavesState(hydro), 0, false), 2); // Removed Notify Neighbors Flag for performance.
 			return true;
 		}
 		return false;
