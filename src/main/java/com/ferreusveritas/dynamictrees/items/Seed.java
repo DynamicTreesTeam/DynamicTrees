@@ -120,11 +120,12 @@ public class Seed extends Item implements IPlantable {
 		
 		return plantChance > world.random.nextFloat();
 	}
-	
+
 	public boolean hasForcePlant(ItemStack seedStack) {
 		boolean forcePlant = false;
 		if(seedStack.hasTag()) {
 			CompoundNBT nbtData = seedStack.getTag();
+			assert nbtData != null;
 			forcePlant = nbtData.getBoolean("forceplant");
 		}
 		return forcePlant;
@@ -165,7 +166,7 @@ public class Seed extends Item implements IPlantable {
 		world.setBlockAndUpdate(pos, bonsaiPot.defaultBlockState());
 
 		if (bonsaiPot.setSpecies(world, pos, bonsaiPot.defaultBlockState(), this.getSpecies()) && bonsaiPot.setPotState(world, emptyPotState, pos)) {
-			context.getItemInHand().shrink(1);
+			if (context.getPlayer() != null && !context.getPlayer().isCreative()) context.getItemInHand().shrink(1);
 			return ActionResultType.SUCCESS;
 		}
 
@@ -183,7 +184,7 @@ public class Seed extends Item implements IPlantable {
 		}
 		
 		if (facing == Direction.UP) {//Ensure this seed is only used on the top side of a block
-			if (context.getPlayer().mayUseItemAt(pos, facing, context.getItemInHand()) && context.getPlayer().mayUseItemAt(pos.above(), facing, context.getItemInHand())) {//Ensure permissions to edit block
+			if (context.getPlayer() != null && context.getPlayer().mayUseItemAt(pos, facing, context.getItemInHand()) && context.getPlayer().mayUseItemAt(pos.above(), facing, context.getItemInHand())) {//Ensure permissions to edit block
 				if(doPlanting(context.getLevel(), pos.above(), context.getPlayer(), context.getItemInHand())) {
 					context.getItemInHand().shrink(1);
 					return ActionResultType.SUCCESS;
