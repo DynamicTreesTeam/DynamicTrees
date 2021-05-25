@@ -1217,21 +1217,17 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 		if (radius <= family.getPrimaryThickness()) {
-			if (getLeavesProperties().hasDynamicLeavesBlock()){
-				DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
-				for (Direction dir: upFirst) {
-					if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.relative(dir), 0)) {
-						return false;
-					}
-				}
-			}
+			if (!getLeavesProperties().hasDynamicLeavesBlock()) return false;
+			DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
+			for (Direction dir: upFirst)
+				if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.relative(dir), 0))
+					return false;
 		}
 		
 		if (rapid || (DTConfigs.MAX_BRANCH_ROT_RADIUS.get() != 0 && radius <= DTConfigs.MAX_BRANCH_ROT_RADIUS.get())) {
 			BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
-			if (branch != null) {
+			if (branch != null)
 				branch.rot(world, pos);
-			}
 			this.postRot(world, pos, neighborCount, radius, random, rapid);
 			return true;
 		}

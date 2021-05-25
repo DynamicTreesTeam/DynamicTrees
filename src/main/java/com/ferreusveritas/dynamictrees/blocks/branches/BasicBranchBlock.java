@@ -327,11 +327,12 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 	
 	// This is only so effective because the center of the player must be inside the block that contains the tree trunk.
-	// The result is that only thin branches and trunks can be climbed
+	// The result is that only thin branches and trunks can be climbed.
+	// We do not check if the radius is over 3 since some mods can modify this, and allow you to climb on contact.
 	
 	@Override
 	public boolean isLadder(BlockState state, IWorldReader world, BlockPos pos, LivingEntity entity) {
-		return DTConfigs.ENABLE_BRANCH_CLIMBING.get() && getRadius(state) <= 3 && entity instanceof PlayerEntity;
+		return DTConfigs.ENABLE_BRANCH_CLIMBING.get() && entity instanceof PlayerEntity && getFamily().branchIsLadder();
 	}
 	
 	@Nonnull

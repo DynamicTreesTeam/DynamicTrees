@@ -583,6 +583,16 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return this.validBranches.get(index);
 	}
 
+	private boolean branchIsLadder = true;
+
+	public void setBranchIsLadder (boolean branchIsLadder) {
+		this.branchIsLadder = branchIsLadder;
+	}
+
+	public boolean branchIsLadder (){
+		return branchIsLadder;
+	}
+
 	///////////////////////////////////////////
 	// SURFACE ROOTS
 	///////////////////////////////////////////
