@@ -200,23 +200,21 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public LeavesProperties setDynamicLeavesState(BlockState state) {
 		//Cache all the blockStates to speed up worldgen
 		dynamicLeavesBlockHydroStates[0] = Blocks.AIR.defaultBlockState();
-		for(int i = 1; i <= maxHydro; i++) {
+		for(int i = 1; i <= maxHydro; i++)
 			dynamicLeavesBlockHydroStates[i] = state.setValue(DynamicLeavesBlock.DISTANCE, i);
-		}
-		
 		return this;
 	}
-	
+
 	public BlockState getDynamicLeavesState() {
-		return dynamicLeavesBlockHydroStates[maxHydro];
+		return getDynamicLeavesState(maxHydro);
 	}
-	
+
 	public BlockState getDynamicLeavesState(int hydro) {
-		return dynamicLeavesBlockHydroStates[MathHelper.clamp(hydro, 0, maxHydro)];
+		return Optional.ofNullable(dynamicLeavesBlockHydroStates[MathHelper.clamp(hydro, 0, maxHydro)])
+				.orElse(Blocks.AIR.defaultBlockState());
 	}
 
 	public boolean hasDynamicLeavesBlock() {
-		if (getDynamicLeavesState() == null) return false;
 		return getDynamicLeavesState().getBlock() instanceof DynamicLeavesBlock;
 	}
 
