@@ -94,6 +94,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	protected int smotherLeavesMax = 4;
 	protected int lightRequirement = 13;
+	protected float tickMultiplier = 1f;
 	protected boolean connectAnyRadius = false;
 
 	/**
@@ -262,7 +263,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	 * Gets the smother leaves max - the maximum amount of leaves in a stack before the
 	 * bottom-most leaf block dies. Can beset to zero to disable smothering. [default = 4]
 	 *
-	 * @return The smother leaves max.
+	 * @return the smother leaves max.
 	 */
 	public int getSmotherLeavesMax() {
 		return this.smotherLeavesMax;
@@ -275,7 +276,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	/**
 	 * Gets the minimum amount of light necessary for a leaves block to be created. [default = 13]
 	 *
-	 * @return The minimum light requirement.
+	 * @return the minimum light requirement.
 	 */
 	public int getLightRequirement() {
 		return this.lightRequirement;
@@ -284,6 +285,16 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public void setLightRequirement(int lightRequirement) {
 		this.lightRequirement = lightRequirement;
 	}
+
+	/**
+	 * Gets the multiplier for tick attempts for the leaves block.
+	 * Set to 0 to prevent the leaves block from ticking completely. [default = 1.0]
+	 *
+	 * @return the multiplier for the block tick rate
+	 */
+	public float getTickMultiplier() { return this.tickMultiplier; }
+
+	public void setTickMultiplier(float tickMultiplier) { this.tickMultiplier = tickMultiplier; }
 
 	/**
 	 * Gets the {@link CellKit}, which is for leaves automata.
