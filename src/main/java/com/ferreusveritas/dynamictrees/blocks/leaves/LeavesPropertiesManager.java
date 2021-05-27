@@ -31,7 +31,7 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
                 .register("fire_spread", Integer.class, LeavesProperties::setFireSpreadSpeed)
                 .register("flammability", Integer.class, LeavesProperties::setFlammability)
                 .register("connect_any_radius", Boolean.class, LeavesProperties::setConnectAnyRadius)
-                .register("tick_multiplier", Float.class, LeavesProperties::setTickMultiplier);
+                .register("does_tick", Boolean.class, LeavesProperties::setDoesTick);
 
         // Primitive leaves are needed both client and server (so cannot be done on setup).
         this.setupAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves);

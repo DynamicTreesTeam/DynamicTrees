@@ -94,7 +94,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	protected int smotherLeavesMax = 4;
 	protected int lightRequirement = 13;
-	protected float tickMultiplier = 1f;
+	protected boolean doesTick = true;
 	protected boolean connectAnyRadius = false;
 
 	/**
@@ -292,9 +292,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	 *
 	 * @return the multiplier for the block tick rate
 	 */
-	public float getTickMultiplier() { return this.tickMultiplier; }
+	public boolean getDoesTick() { return this.doesTick; }
 
-	public void setTickMultiplier(float tickMultiplier) { this.tickMultiplier = tickMultiplier; }
+	public void setDoesTick(boolean tickMultiplier) { this.doesTick = tickMultiplier; }
 
 	/**
 	 * Gets the {@link CellKit}, which is for leaves automata.
@@ -336,7 +336,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	 * @param rand A {@link Random} object.
 	 * @return return true to allow the normal DynamicLeavesBlock update to occur
 	 */
-	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return true; }
+	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return getDoesTick(); }
 
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		final int twigRadius = from.getFamily().getPrimaryThickness();

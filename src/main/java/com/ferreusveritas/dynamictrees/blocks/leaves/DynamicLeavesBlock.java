@@ -131,7 +131,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		if (rand.nextInt(DTConfigs.TREE_GROWTH_FOLDING.get()) != 0)
 			return;
 
-		double attempts = getTickAttempts(state, worldIn, pos, rand);
+		double attempts = DTConfigs.TREE_GROWTH_FOLDING.get() * DTConfigs.TREE_GROWTH_MULTIPLIER.get();
 
 		if (attempts >= 1.0f || rand.nextFloat() < attempts)
 			doTick(worldIn, pos, state, rand);
@@ -149,10 +149,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 					((DynamicLeavesBlock) dState.getBlock()).doTick(worldIn, dPos, dState, rand);
 			}
 		}
-	}
-
-	protected double getTickAttempts (BlockState state, ServerWorld worldIn, BlockPos pos, Random rand){
-		return DTConfigs.TREE_GROWTH_FOLDING.get() * DTConfigs.TREE_GROWTH_MULTIPLIER.get() * getProperties(state).getTickMultiplier();
 	}
 
 	@Override
