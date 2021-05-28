@@ -156,7 +156,7 @@ public class LeafClusters {
 			2, 3, 2,
 			1, 2, 1
 			
-	}).setCenter(new BlockPos(3, 0, 3));
+	}).setCenter(new BlockPos(1, 0, 1));
 	
 	public static final SimpleVoxmap BUSH = new SimpleVoxmap(5, 2, 5, new byte[] {
 			0, 1, 1, 1, 0,
