@@ -408,7 +408,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	public static void spawnItemAsEntity(World worldIn, BlockPos pos, ItemStack stack) {
 		if (!worldIn.isClientSide && !stack.isEmpty() && worldIn.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
 			ItemEntity entityitem = new ItemEntity(worldIn, (double)pos.getX() + 0.5F, (double)pos.getY() + 0.5F, (double)pos.getZ() + 0.5F, stack);
-			entityitem.lerpMotion(0,0,0);
+			entityitem.setDeltaMovement(0,0,0);
 			entityitem.setDefaultPickUpDelay();
 			worldIn.addFreshEntity(entityitem);
 		}
