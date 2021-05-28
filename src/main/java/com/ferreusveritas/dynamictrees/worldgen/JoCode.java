@@ -165,10 +165,6 @@ public class JoCode {
 	public void generate(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
 		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
-		// If the family doesn't have a branch then don't attempt growth.
-		if (species.getFamily().getBranch() == null)
-			return;
-
 		// A Tree generation boundary radius is at least 2 and at most 8.
 		radius = MathHelper.clamp(radius, 2, 8);
 		

@@ -128,8 +128,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	
 	@Override
 	public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		if (rand == null) rand = BACKUP_RAND;
-
 		if (rand.nextInt(DTConfigs.TREE_GROWTH_FOLDING.get()) != 0)
 			return;
 
@@ -170,11 +168,14 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	public int age(IWorld world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
 		final LeavesProperties leavesProperties = getProperties(state);
 		final int oldHydro = state.getValue(DynamicLeavesBlock.DISTANCE);
+
+		if (!getProperties(state).getDoesTick()) return oldHydro;
+
 		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		
 		// Check hydration level.  Dry leaves are dead leaves.
 		final int newHydro = getHydrationLevelFromNeighbors(world, pos, leavesProperties);
-		
+
 		if (newHydro == 0 || (!worldGen && !hasAdequateLight(state, world, leavesProperties, pos))) { // Light doesn't work right during worldgen so we'll just disable it during worldgen for now.
 			world.removeBlock(pos, false); // No water, no light .. no leaves.
 			return -1; // Leaves were destroyed.

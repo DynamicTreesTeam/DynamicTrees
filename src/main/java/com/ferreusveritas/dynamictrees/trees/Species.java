@@ -83,7 +83,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
-import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -497,7 +496,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	public DynamicLeavesBlock getValidLeafBlock (int index) {
-		return (DynamicLeavesBlock) validLeaves.get(index).getDynamicLeavesState().getBlock();
+		LeavesProperties properties = getValidLeavesProperties(index);
+		if (!properties.hasDynamicLeavesBlock()) return null;
+		return (DynamicLeavesBlock) properties.getDynamicLeavesState().getBlock();
 	}
 
 	public boolean isValidLeafBlock(final DynamicLeavesBlock leavesBlock) {
@@ -923,14 +924,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		//Ensure planting conditions are right
 		Family family = getFamily();
 		if(world.isEmptyBlock(pos.above()) && isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()))) {
-			family.getBranch().setRadius(world, pos, (int)family.getPrimaryThickness(), null);//set to a single branch with 1 radius
+			family.getBranch().setRadius(world, pos, family.getPrimaryThickness(), null);//set to a single branch with 1 radius
 			world.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
 			placeRootyDirtBlock(world, pos.below(), 15);//Set to fully fertilized rooty dirt underneath
 			
 			if (doesRequireTileEntity(world, pos)) {
 				SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
 				world.setBlockEntity(pos.below(), speciesTE);
-				speciesTE.setSpecies(this);
+				if (speciesTE != null)
+					speciesTE.setSpecies(this);
 			}
 			
 			return true;
@@ -1215,19 +1217,17 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 		if (radius <= family.getPrimaryThickness()) {
+			if (!getLeavesProperties().hasDynamicLeavesBlock()) return false;
 			DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
-			for (Direction dir: upFirst) {
-				if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.relative(dir), 0)) {
+			for (Direction dir: upFirst)
+				if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.relative(dir), 0))
 					return false;
-				}
-			}
 		}
 		
 		if (rapid || (DTConfigs.MAX_BRANCH_ROT_RADIUS.get() != 0 && radius <= DTConfigs.MAX_BRANCH_ROT_RADIUS.get())) {
 			BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
-			if (branch != null) {
+			if (branch != null)
 				branch.rot(world, pos);
-			}
 			this.postRot(world, pos, neighborCount, radius, random, rapid);
 			return true;
 		}

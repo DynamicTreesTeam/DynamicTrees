@@ -38,6 +38,7 @@ import net.minecraftforge.common.ToolType;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
@@ -303,10 +304,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	 */
 	protected BranchBlock createBranchBlock() {
 		final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(this.getProperties()) : new BasicBranchBlock(this.getProperties());
-
 		if (this.isFireProof())
 			branch.setFireSpreadSpeed(0).setFlammability(0);
-
 		return branch;
 	}
 
@@ -354,8 +353,9 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return this;
 	}
 
-	@Nullable
+	@Nonnull
 	public BranchBlock getBranch() {
+		if (branch == null) throw new UnsupportedOperationException("getBranch() for Family "+getRegistryName()+" was called too early!");
 		return branch;
 	}
 
@@ -581,6 +581,16 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	@Nullable
 	public BranchBlock getValidBranchBlock (int index) {
 		return this.validBranches.get(index);
+	}
+
+	private boolean branchIsLadder = true;
+
+	public void setBranchIsLadder (boolean branchIsLadder) {
+		this.branchIsLadder = branchIsLadder;
+	}
+
+	public boolean branchIsLadder (){
+		return branchIsLadder;
 	}
 
 	///////////////////////////////////////////

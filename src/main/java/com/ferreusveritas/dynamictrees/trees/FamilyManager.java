@@ -45,7 +45,8 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
         this.reloadAppliers.register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
                 .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa)
                 .register("primary_thickness", Integer.class, Family::setPrimaryThickness)
-                .register("secondary_thickness", Integer.class, Family::setSecondaryThickness);
+                .register("secondary_thickness", Integer.class, Family::setSecondaryThickness)
+                .register("branch_is_ladder", Boolean.class, Family::setBranchIsLadder);
 
         super.registerAppliers();
     }

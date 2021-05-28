@@ -94,6 +94,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	protected int smotherLeavesMax = 4;
 	protected int lightRequirement = 13;
+	protected boolean doesTick = true;
 	protected boolean connectAnyRadius = false;
 
 	/**
@@ -200,23 +201,21 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public LeavesProperties setDynamicLeavesState(BlockState state) {
 		//Cache all the blockStates to speed up worldgen
 		dynamicLeavesBlockHydroStates[0] = Blocks.AIR.defaultBlockState();
-		for(int i = 1; i <= maxHydro; i++) {
+		for(int i = 1; i <= maxHydro; i++)
 			dynamicLeavesBlockHydroStates[i] = state.setValue(DynamicLeavesBlock.DISTANCE, i);
-		}
-		
 		return this;
 	}
-	
+
 	public BlockState getDynamicLeavesState() {
-		return dynamicLeavesBlockHydroStates[maxHydro];
+		return getDynamicLeavesState(maxHydro);
 	}
-	
+
 	public BlockState getDynamicLeavesState(int hydro) {
-		return dynamicLeavesBlockHydroStates[MathHelper.clamp(hydro, 0, maxHydro)];
+		return Optional.ofNullable(dynamicLeavesBlockHydroStates[MathHelper.clamp(hydro, 0, maxHydro)])
+				.orElse(Blocks.AIR.defaultBlockState());
 	}
 
 	public boolean hasDynamicLeavesBlock() {
-		if (getDynamicLeavesState() == null) return false;
 		return getDynamicLeavesState().getBlock() instanceof DynamicLeavesBlock;
 	}
 
@@ -264,7 +263,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	 * Gets the smother leaves max - the maximum amount of leaves in a stack before the
 	 * bottom-most leaf block dies. Can beset to zero to disable smothering. [default = 4]
 	 *
-	 * @return The smother leaves max.
+	 * @return the smother leaves max.
 	 */
 	public int getSmotherLeavesMax() {
 		return this.smotherLeavesMax;
@@ -277,7 +276,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	/**
 	 * Gets the minimum amount of light necessary for a leaves block to be created. [default = 13]
 	 *
-	 * @return The minimum light requirement.
+	 * @return the minimum light requirement.
 	 */
 	public int getLightRequirement() {
 		return this.lightRequirement;
@@ -286,6 +285,16 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public void setLightRequirement(int lightRequirement) {
 		this.lightRequirement = lightRequirement;
 	}
+
+	/**
+	 * Gets the multiplier for tick attempts for the leaves block.
+	 * Set to 0 to prevent the leaves block from ticking completely. [default = 1.0]
+	 *
+	 * @return the multiplier for the block tick rate
+	 */
+	public boolean getDoesTick() { return this.doesTick; }
+
+	public void setDoesTick(boolean tickMultiplier) { this.doesTick = tickMultiplier; }
 
 	/**
 	 * Gets the {@link CellKit}, which is for leaves automata.
@@ -327,7 +336,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	 * @param rand A {@link Random} object.
 	 * @return return true to allow the normal DynamicLeavesBlock update to occur
 	 */
-	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return true; }
+	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return getDoesTick(); }
 
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		final int twigRadius = from.getFamily().getPrimaryThickness();
