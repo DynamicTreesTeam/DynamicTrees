@@ -191,13 +191,13 @@ public class FruitBlock extends Block implements IGrowable {
 	private void dropBlock(World worldIn, BlockState state, BlockPos pos) {
 		worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
 		if (state.getValue(AGE) >= 3) {
-			worldIn.addFreshEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, this.getFruitDrop()));
+			worldIn.addFreshEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, this.getFruitDrop(fruitDropCount(state, worldIn, pos))));
 		}
 	}
 
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return this.getFruitDrop();
+		return this.getFruitDrop(1);
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class FruitBlock extends Block implements IGrowable {
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		final List<ItemStack> drops = super.getDrops(state, builder);
 		if (state.getValue(AGE) >= 3) {
-			final ItemStack toDrop = getFruitDrop();
+			final ItemStack toDrop = getFruitDrop(fruitDropCount(state, builder.getLevel(), BlockPos.ZERO));
 			if (!toDrop.isEmpty()) {
 				drops.add(toDrop);
 			}
@@ -260,10 +260,16 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	//Override this for a custom item drop
-	public ItemStack getFruitDrop() {
-		return droppedFruit.copy();
+	public ItemStack getFruitDrop(int count) {
+		ItemStack stack = droppedFruit.copy();
+		stack.setCount(count);
+		return stack;
 	}
 
+	//pos could be BlockPos.ZERO
+	protected int fruitDropCount (BlockState state, World world, BlockPos pos){
+		return 1;
+	}
 
 	///////////////////////////////////////////
 	// BOUNDARIES
