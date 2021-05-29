@@ -169,9 +169,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		final LeavesProperties leavesProperties = getProperties(state);
 		final int oldHydro = state.getValue(DynamicLeavesBlock.DISTANCE);
 
-		if (!getProperties(state).getDoesTick()) return oldHydro;
-
 		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
+
+		if (!getProperties(state).getDoesAge(worldGen, state)) return oldHydro;
 		
 		// Check hydration level.  Dry leaves are dead leaves.
 		final int newHydro = getHydrationLevelFromNeighbors(world, pos, leavesProperties);
@@ -213,7 +213,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	 * @param worldGen true if this is happening during worldgen
 	 * @return A provider for adding more blockstate properties
 	 */
-	protected BlockState getLeavesBlockStateForPlacement(IWorld world, BlockPos pos, BlockState leavesStateWithHydro, int oldHydro, boolean worldGen){
+	public BlockState getLeavesBlockStateForPlacement(IWorld world, BlockPos pos, BlockState leavesStateWithHydro, int oldHydro, boolean worldGen){
 		return leavesStateWithHydro; //by default just pass the blockstate along
 	}
 
