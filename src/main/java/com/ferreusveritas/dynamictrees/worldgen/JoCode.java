@@ -484,12 +484,12 @@ public class JoCode {
 		}
 		
 		//Smallest Base64 encoder ever.
-		String code = "";
+		StringBuilder code = new StringBuilder();
 		for(int b = 0; b < instructions.size(); b+=2) {
-			code += BASE_64.charAt(instructions.get(b) << 3 | instructions.get(b + 1));
+			code.append(BASE_64.charAt(instructions.get(b) << 3 | instructions.get(b + 1)));
 		}
 		
-		return code;
+		return code.toString();
 	}
 	
 	static public byte[] decode(String code) {
@@ -555,12 +555,12 @@ public class JoCode {
 		}
 		
 		public byte[] compile() {
-			byte array[] = new byte[instructions.size()];
+			byte[] array = new byte[instructions.size()];
 			Iterator<Byte> i = instructions.iterator();
 			
 			int pos = 0;
 			while(i.hasNext()) {
-				array[pos++] = i.next().byteValue();
+				array[pos++] = i.next();
 			}
 			
 			return array;
