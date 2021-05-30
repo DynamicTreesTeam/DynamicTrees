@@ -28,7 +28,7 @@ public final class GetTreeCommand extends SubCommand {
     private static final String CODE_RAW = "code_raw";
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().executes(context -> this.getTree(context.getSource(), blockPosArgument(context), false))
                 .then(booleanArgument(CODE_RAW).executes(context -> this.getTree(context.getSource(), blockPosArgument(context),
                         booleanArgument(context, CODE_RAW))));

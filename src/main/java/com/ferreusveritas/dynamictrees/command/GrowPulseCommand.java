@@ -31,7 +31,7 @@ public final class GrowPulseCommand extends SubCommand {
     private static final Collection<String> NUMBER_SUGGESTIONS = Stream.of(1, 4, 8, 16, 32, 64).map(String::valueOf).collect(Collectors.toList());
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().executes(context -> executesSuccess(() -> this.sendGrowPulse(context.getSource(), rootPosArgument(context), 1)))
                 .then(Commands.argument(NUMBER, IntegerArgumentType.integer(1)).suggests(((context, builder) -> ISuggestionProvider.suggest(NUMBER_SUGGESTIONS, builder)))
                         .executes(context -> executesSuccess(() -> this.sendGrowPulse(context.getSource(), rootPosArgument(context), intArgument(context, NUMBER)))));

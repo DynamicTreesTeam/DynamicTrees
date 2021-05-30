@@ -35,7 +35,7 @@ public final class TransformCommand extends SubCommand {
     }
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().then(transformableSpeciesArgument().executes(context -> executesSuccess(() ->
                 this.transformSpecies(context.getSource(), rootPosArgument(context), speciesArgument(context)))));
     }

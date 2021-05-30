@@ -29,7 +29,7 @@ public final class CreateTransformPotionCommand extends SubCommand {
     }
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().then(transformableSpeciesArgument().executes(context -> this.spawnTransformPotion(context.getSource(),
                 blockPosArgument(context), speciesArgument(context))));
     }

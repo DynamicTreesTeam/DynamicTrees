@@ -23,7 +23,7 @@ public final class RotateJoCodeCommand extends SubCommand {
     }
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return stringArgument(JO_CODE, Collections.singleton(DEFAULT_JO_CODE)).then(intArgument(TURNS).suggests(TURNS_SUGGESTIONS))
                 .executes(context -> executesSuccess(() ->
                         this.rotateJoCode(context.getSource(), stringArgument(context, JO_CODE), intArgument(context, TURNS))));

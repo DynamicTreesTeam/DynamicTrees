@@ -43,6 +43,7 @@ public final class CommandConstants {
     public static final String JO_CODE = "jo_code";
     public static final String TURNS = "turns";
     public static final String SPECIES = "species";
+    public static final String RAW = "raw";
 
     //////////////////////////////
     // Argument Defaults

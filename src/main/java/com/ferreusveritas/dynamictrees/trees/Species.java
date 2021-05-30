@@ -73,8 +73,6 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.util.text.event.ClickEvent;
-import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -102,7 +100,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		@Override public Species setSeed(Seed seed) { return this; }
 		@Override public ItemStack getSeedStack(int qty) { return ItemStack.EMPTY; }
 		@Override public Species setupStandardSeedDropping() { return this; }
-		@Override public ITextComponent getTextComponent() { return this.getTextComponent("gui.none", TextFormatting.DARK_RED); }
+		@Override public ITextComponent getTextComponent() { return this.formatComponent(new TranslationTextComponent("gui.none"), TextFormatting.DARK_RED); }
 		@Override public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) { return false; }
 	};
 
@@ -329,16 +327,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this.unlocalizedName;
 	}
 
+	@Override
 	public ITextComponent getTextComponent() {
-		return this.getTextComponent(this.getUnlocalizedName(), TextFormatting.AQUA);
-	}
-
-	protected ITextComponent getTextComponent(final String unlocalizedName, final TextFormatting colour) {
-		return new TranslationTextComponent(unlocalizedName).withStyle(style -> style.withColor(colour)
-				.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-						new TranslationTextComponent("chat.registry_name", this.getRegistryName())))
-				.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD,
-						this.getRegistryName().toString())));
+		return this.formatComponent(new TranslationTextComponent(this.getUnlocalizedName()), TextFormatting.AQUA);
 	}
 
 	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {

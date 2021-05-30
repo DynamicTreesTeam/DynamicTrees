@@ -15,6 +15,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import java.util.Objects;
 
 import static com.ferreusveritas.dynamictrees.command.CommandConstants.FERTILITY_SUGGESTIONS;
+import static com.ferreusveritas.dynamictrees.command.CommandConstants.RAW;
 
 public final class FertilityCommand extends SubCommand {
 
@@ -29,10 +30,9 @@ public final class FertilityCommand extends SubCommand {
     }
 
     private static final String FERTILITY = CommandConstants.FERTILITY;
-    private static final String RAW = "raw";
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().executes(context -> executesSuccess(() -> this.getFertility(context.getSource(),
                 rootPosArgument(context), false)))
                 .then(booleanArgument(RAW).executes(context -> executesSuccess(() -> this.getFertility(context.getSource(),

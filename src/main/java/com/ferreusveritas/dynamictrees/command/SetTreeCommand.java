@@ -33,7 +33,7 @@ public final class SetTreeCommand extends SubCommand {
     private static final int DEFAULT_FERTILITY = 0;
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().then(speciesArgument().executes(context -> this.setTree(context.getSource(), blockPosArgument(context),
                 speciesArgument(context), JO_CODE, DEFAULT_TURNS, DEFAULT_FERTILITY))
                 .then(stringArgument(JO_CODE).suggests(((context, builder) -> ISuggestionProvider.suggest(speciesArgument(context).getJoCodes()
