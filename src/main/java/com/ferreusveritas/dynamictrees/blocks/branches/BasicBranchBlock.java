@@ -252,9 +252,38 @@ public class BasicBranchBlock extends BranchBlock {
 			} else {// Otherwise make a proper branch
 				return leaves.branchOut(world, pos, signal);
 			}
+		} else {
+			//If the leaves block is null, the branch grows directly without checking for leaves requirements
+			if (isNextToBranch(world, pos, signal.dir.getOpposite())){
+				signal.success = false;
+				return signal;
+			}
+			setRadius(world, pos, getFamily().getPrimaryThickness(), null);
+			signal.radius = getFamily().getSecondaryThickness();
+			signal.success = true;
 		}
 		return signal;
 	}
+
+
+
+//	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal) {
+//		Direction originDir = signal.dir.getOpposite(); // Direction this signal originated from
+//
+//		CactusThickness trunk;
+//		if (signal.getSpecies() instanceof CactusSpecies){
+//			trunk = ((CactusSpecies) signal.getSpecies()).thicknessForBranchPlaced(world, pos, true);
+//		} else trunk = CactusThickness.BRANCH;
+//
+//		if (originDir.getAxis() != Direction.Axis.Y && (world.getBlockState(pos.above()).getBlock() == this || world.getBlockState(pos.below()).getBlock() == this)) {
+//			signal.success = false;
+//			return signal;
+//		}
+//
+//		signal.success = world.setBlock(pos, this.stateDefinition.any().setValue(TRUNK_TYPE, trunk).setValue(ORIGIN, originDir), 2);
+//		signal.radius = getCactusRadius(trunk);
+//		return signal;
+//	}
 	
 	@Override
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {

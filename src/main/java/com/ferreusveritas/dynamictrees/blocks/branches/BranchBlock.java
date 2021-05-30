@@ -141,6 +141,17 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		return support & 0xf;
 	}
 
+	public static boolean isNextToBranch (World world, BlockPos pos, Direction originDir){
+		for(Direction dir: Direction.values()) {
+			if(!dir.equals(originDir)) {
+				if(TreeHelper.isBranch(world.getBlockState(pos.relative(dir)))) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////

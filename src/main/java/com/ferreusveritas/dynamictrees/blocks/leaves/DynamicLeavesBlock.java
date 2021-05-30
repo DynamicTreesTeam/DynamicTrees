@@ -514,15 +514,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		}
 		
 		//Check to see if there's neighboring branches and abort if there's any found.
-		Direction originDir = signal.dir.getOpposite();
-		
-		for(Direction dir: Direction.values()) {
-			if(!dir.equals(originDir)) {
-				if(TreeHelper.isBranch(world.getBlockState(pos.relative(dir)))) {
-					signal.success = false;
-					return signal;
-				}
-			}
+		if (BranchBlock.isNextToBranch(world, pos, signal.dir.getOpposite())){
+			signal.success = false;
+			return signal;
 		}
 		
 		boolean hasLeaves = false;
