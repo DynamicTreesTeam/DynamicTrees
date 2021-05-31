@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.compat;
+package com.ferreusveritas.dynamictrees.compat.waila;
 
 public class WailaOther {
 	

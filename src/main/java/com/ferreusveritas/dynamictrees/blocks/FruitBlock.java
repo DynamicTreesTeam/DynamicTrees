@@ -245,12 +245,14 @@ public class FruitBlock extends Block implements IGrowable {
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		final List<ItemStack> drops = super.getDrops(state, builder);
+
 		if (state.getValue(AGE) >= 3) {
 			final ItemStack toDrop = getFruitDrop(fruitDropCount(state, builder.getLevel(), BlockPos.ZERO));
 			if (!toDrop.isEmpty()) {
 				drops.add(toDrop);
 			}
 		}
+
 		return drops;
 	}
 

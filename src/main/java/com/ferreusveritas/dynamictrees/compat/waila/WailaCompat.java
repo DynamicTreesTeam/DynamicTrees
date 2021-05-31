@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.compat;
+package com.ferreusveritas.dynamictrees.compat.waila;
 
 import com.ferreusveritas.dynamictrees.blocks.DynamicCocoaBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
@@ -25,4 +25,5 @@ public class WailaCompat implements IWailaPlugin {
 		registrar.registerComponentProvider(new WailaCocoaHandler(), TooltipPosition.BODY, DynamicCocoaBlock.class);
 		registrar.registerComponentProvider(new WailaRootyWaterHandler(), TooltipPosition.HEAD, RootyWaterBlock.class);
 	}
+
 }

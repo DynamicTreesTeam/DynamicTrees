@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.compat;
+package com.ferreusveritas.dynamictrees.compat.waila;
 
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import mcp.mobius.waila.api.IComponentProvider;
