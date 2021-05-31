@@ -199,7 +199,7 @@
 
   {
     "__comment" : "Wooded Mesas have a chance of generating oak on the dirt patches.",
-    "select": { "name": "minecraft:wooded_badlands_plateau" },
+    "select": { "name": "minecraft:.*wooded_badlands_plateau" },
     "apply": {
       "species" : "oak",
       "chance": 0.5
