@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import com.ferreusveritas.dynamictrees.event.handlers.BakedModelEventHandler;
-import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.BlockModel;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.util.ResourceLocation;
@@ -23,9 +23,11 @@ import java.util.List;
  */
 public abstract class BranchBlockBakedModel implements IDynamicBakedModel {
 
-    /** A list of {@link BranchBlockBakedModel} instances, so that {@link #setupModels} can be
-     * called in {@link BakedModelEventHandler}. */
-    public static List<BranchBlockBakedModel> INSTANCES = new ArrayList<>();
+    /**
+     * A list of {@link BranchBlockBakedModel} instances, so that {@link #setupModels} can be
+     * called in {@link BakedModelEventHandler}.
+     */
+    public static final List<BranchBlockBakedModel> INSTANCES = new ArrayList<>();
 
     protected final BlockModel blockModel;
 

@@ -34,6 +34,7 @@ public final class BakedModelEventHandler {
     public static void onModelBake(ModelBakeEvent event) {
         // Setup branch baked models (bakes cores and sleeves).
         BranchBlockBakedModel.INSTANCES.forEach(BranchBlockBakedModel::setupModels);
+        BranchBlockBakedModel.INSTANCES.clear();
 
         // Put bonsai pot baked model into its model location.
         IBakedModel flowerPotModel = event.getModelRegistry().get(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""));
