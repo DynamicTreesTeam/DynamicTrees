@@ -350,8 +350,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	}
 
 	public AbstractBlock.Properties getDefaultBlockProperties(final Material material, final MaterialColor materialColor) {
-		return AbstractBlock.Properties.of(material, materialColor).strength(0.2F).requiresCorrectToolForDrops()
-				.randomTicks().sound(SoundType.GRASS).noOcclusion().isValidSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
+		return AbstractBlock.Properties.of(material, materialColor).strength(0.2F).randomTicks()
+				.sound(SoundType.GRASS).noOcclusion().isValidSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
 				.isSuffocating((s, r, p) -> false).isViewBlocking((s, r, p) -> false);
 	}
 

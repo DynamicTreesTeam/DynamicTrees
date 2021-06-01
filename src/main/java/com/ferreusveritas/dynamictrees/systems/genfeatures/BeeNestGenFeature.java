@@ -72,7 +72,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
             return false;
         }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
             // Default biome check chance function. Uses vanilla chances
-            RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX(), pos.getY(), pos.getZ()).getRegistryName()));
+            RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).getRegistryName()));
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
                 return vanillaGenChancePlains;
             if (biomeKey == Biomes.FLOWER_FOREST)

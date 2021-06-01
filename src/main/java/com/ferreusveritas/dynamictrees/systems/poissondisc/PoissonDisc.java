@@ -224,11 +224,11 @@ public class PoissonDisc extends Vec2i {
 	}
 	
 	/**
-	* Sets the arc masking for the circle depending on which 9set chunk it's in.
-	* 
-	* @param chunkXStart starting position on the X axis in blocks
-	* @param chunkZStart starting position on the Z axis in blocks
-	*/
+	 * Sets the arc masking for the circle depending on which 9set chunk it's in.
+	 *
+	 * @param chunkXStart starting position on the X axis in blocks
+	 * @param chunkZStart starting position on the Z axis in blocks
+	 */
 	public void edgeMask(int chunkXStart, int chunkZStart) {
 		
 		int x = this.x - chunkXStart + 16;

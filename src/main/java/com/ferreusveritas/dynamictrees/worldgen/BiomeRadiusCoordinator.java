@@ -38,7 +38,9 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		}
 
 		final double scale = 128; // Effectively scales up the noisemap
-		final Biome biome = this.world.getBiome(new BlockPos(x + 8, 0, z + 8)); // Placement is offset by +8,+8
+//		System.out.println((x + 8) + " " + (z + 8) + " Dim Reg Name: " + this.dimRegName + " Biome Manager: " + this.world.getBiomeManager() + " Area Loaded: " + this.world.isAreaLoaded(new BlockPos(x + 8, 0, z + 8), 1));
+		final Biome biome = this.world.getUncachedNoiseBiome((x + 8) >> 2, 0, (z + 8) >> 2); // Placement is offset by +8,+8
+//		System.out.println("Got biome: " + biome.getRegistryName() + " Uncached Noise Biome: " + this.world.getUncachedNoiseBiome((x + 8) >> 2, 0, (z + 8) >> 2).getRegistryName());
 
 		final double noiseDensity = (this.noiseGenerator.getSurfaceNoiseValue(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
 		final double density = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(this.dimRegName).getDensitySelector(biome).getDensity(this.world.getRandom(), noiseDensity);
@@ -58,7 +60,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		this.pass = pass;
 
 		if (pass == 0) {
-			final Biome biome = this.world.getUncachedNoiseBiome((chunkX << 4) + 8, 0, (chunkZ << 4) + 8); // Aim at center of chunk
+			final Biome biome = this.world.getUncachedNoiseBiome(((chunkX << 4) + 8) >> 2, 0, ((chunkZ << 4) + 8) >> 2); // Aim at center of chunk
 			this.chunkMultipass = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(this.dimRegName).getMultipass(biome);
 		}
 
