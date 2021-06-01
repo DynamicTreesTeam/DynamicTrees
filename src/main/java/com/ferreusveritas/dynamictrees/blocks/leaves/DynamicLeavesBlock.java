@@ -32,6 +32,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShearsItem;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
+import net.minecraft.loot.LootTables;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.Direction;
@@ -61,8 +62,6 @@ import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeable, IRayTraceCollision {
-
-	protected static final Random BACKUP_RAND = new Random();
 	
 	public LeavesProperties properties = LeavesProperties.NULL_PROPERTIES;
 
@@ -597,6 +596,10 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+		// If a loot table has been added load those drops instead (until drop creators).
+		if (builder.getLevel().getServer().getLootTables().getIds().contains(this.getLootTable()))
+			return super.getDrops(state, builder);
+
 		final List<ItemStack> ret = new ArrayList<>();
 		final Entity entity = builder.getOptionalParameter(LootParameters.THIS_ENTITY);
 		final PlayerEntity player = entity instanceof PlayerEntity ? (PlayerEntity) entity : null;

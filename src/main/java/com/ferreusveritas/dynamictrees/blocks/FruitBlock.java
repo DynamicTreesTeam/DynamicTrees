@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
@@ -52,7 +53,7 @@ public class FruitBlock extends Block implements IGrowable {
 			createFruitShape(2.5f,5,1.25f)
 	};
 	
-	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
+	public static final IntegerProperty AGE = BlockStateProperties.AGE_3;
 
 	private static final Map<Species, Set<FruitBlock>> SPECIES_FRUIT_MAP = new HashMap<>();
 
@@ -244,10 +245,14 @@ public class FruitBlock extends Block implements IGrowable {
 
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		final List<ItemStack> drops = super.getDrops(state, builder);
+		// If a loot table has been added load those drops instead (until drop creators).
+		if (builder.getLevel().getServer().getLootTables().getIds().contains(this.getLootTable()))
+			return super.getDrops(state, builder);
+
+		final List<ItemStack> drops = new ArrayList<>();
 
 		if (state.getValue(AGE) >= 3) {
-			final ItemStack toDrop = getFruitDrop(fruitDropCount(state, builder.getLevel(), BlockPos.ZERO));
+			final ItemStack toDrop = this.getFruitDrop(fruitDropCount(state, builder.getLevel(), BlockPos.ZERO));
 			if (!toDrop.isEmpty()) {
 				drops.add(toDrop);
 			}
