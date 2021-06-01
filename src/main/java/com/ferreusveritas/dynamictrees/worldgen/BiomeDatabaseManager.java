@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.IResourceManager;
@@ -99,6 +100,24 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                             default: return -1; // A negative number means to terminate.
                         }
                     });
+                })
+                .register("multipass", JsonObject.class, (entry, multipass) -> {
+                    final Map<Integer, Integer> passMap = Maps.newHashMap();
+
+                    for (final Map.Entry<String, JsonElement> passEntry : multipass.entrySet()) {
+                        try {
+                            final int pass = Integer.parseInt(passEntry.getKey());
+                            final int radius = JsonObjectGetters.INTEGER.get(passEntry.getValue()).orDefault(-1);
+
+                            // Terminate when radius is -1.
+                            if (radius == -1)
+                                break;
+
+                            passMap.put(pass, radius);
+                        } catch (NumberFormatException ignored) { }
+                    }
+
+                    entry.getDatabase().setMultipass(entry.getBiome(), pass -> passMap.getOrDefault(pass, -1));
                 })
                 .register("blacklist", Boolean.class, BiomeDatabase.Entry::setBlacklisted)
                 .register("forestness", Float.class, BiomeDatabase.Entry::setForestness)
