@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -180,6 +181,16 @@ public class JsonHelper {
 		public <T> JsonElementReader elseIfOfType (final Class<T> typeClass, final Consumer<T> consumer) {
 			if (!this.read)
 				this.ifOfType(typeClass, consumer);
+			return this;
+		}
+
+		public <T> JsonElementReader elseIfEquals(final T value, final Consumer<T> consumer) {
+			if (!this.read)
+				JsonObjectGetters.getObjectGetter((Class<T>) value.getClass()).get(this.jsonElement)
+						.ifSuccessful(obj -> {
+							if (Objects.equals(obj, value))
+								consumer.accept(obj);
+						});
 			return this;
 		}
 

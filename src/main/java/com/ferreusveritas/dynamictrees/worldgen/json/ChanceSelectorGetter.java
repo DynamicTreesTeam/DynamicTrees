@@ -19,11 +19,10 @@ public final class ChanceSelectorGetter implements IJsonBiomeDatabaseObjectGette
 
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(JsonObject.class, jsonObject -> chanceSelector.copyFrom(this.readChanceSelector(jsonObject)))
                 .elseIfOfType(Float.class, chance -> chanceSelector.setValue(createSimpleChanceSelector(chance)))
-                .elseIfOfType(String.class, str -> {
-                    if (this.isDefault(str))
-                        chanceSelector.setValue((rnd, spc, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ?
-                                BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL);
-                }).elseUnsupportedError(chanceSelector::setErrorMessage);
+                .elseIfEquals("standard", str ->
+                    chanceSelector.setValue((rnd, spc, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ?
+                            BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL)
+                ).elseUnsupportedError(chanceSelector::setErrorMessage);
 
         return chanceSelector;
     }

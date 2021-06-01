@@ -4,6 +4,7 @@
     "select": { "name": "minecraft:.*" },
     "apply": {
       "species" : "oak",
+      "density": 0,
       "chance" : "standard"
     }
   },
@@ -32,9 +33,15 @@
           "birch" : 1
         }
       },
-      "density": 1,
+      "density": [ 1 ],
       "chance": 1.0,
       "forestness" : 1.0
+    }
+  },
+  {
+    "select": "minecraft:flower_forest",
+    "apply": {
+      "density": [ 0.6 ]
     }
   },
   {
@@ -56,7 +63,7 @@
     "select": { "type": "swamp", "name": "minecraft:.*" },
     "apply": {
       "species" : "swamp_oak",
-      "density": 0.2 ,
+      "density": [ 0.2 ],
       "chance": 0.75
     }
   },
@@ -64,8 +71,13 @@
     "select": { "type": "savanna", "name": "minecraft:.*" },
     "apply": {
       "species" : "acacia",
-      "density": 0.01,
-      "chance": 0.2
+      "density": [ 0.1 ]
+    }
+  },
+  {
+    "select": { "name": "minecraft:shattered_savanna.*" },
+    "apply": {
+      "density": [ 0.2 ]
     }
   },
   {
@@ -76,9 +88,14 @@
           "jungle" : 1
         }
       },
-      "density": 0.4,
-      "chance": 1.0,
+      "density": [ 5 ],
       "forestness" : 1.0
+    }
+  },
+  {
+    "select": { "name": "minecraft:.*jungle_edge" },
+    "apply": {
+      "density": [ 0.2 ]
     }
   },
   {
@@ -102,6 +119,7 @@
     "select": { "type": "coniferous", "name": "minecraft:.*" },
     "apply": {
       "species" : "spruce",
+      "density": [ 1 ],
       "chance": 1
     }
   },
@@ -144,6 +162,7 @@
           "apple_oak": 1
         }
       },
+      "density": 0,
       "chance": 0.05
     }
   },
@@ -157,6 +176,7 @@
           "oak" : 1
         }
       },
+      "density": [ 0.3 ],
       "chance": 0.05
     }
   },
@@ -191,7 +211,7 @@
     "__comment" : "Wooded biomes should have forest like densities. This is set last as previous biome settings might have changed these settings.",
     "select": { "name": "minecraft:.*wooded.*" },
     "apply": {
-      "density": 1,
+      "density": [ 1 ],
       "chance": 1.0,
       "forestness" : 1.0
     }
@@ -202,6 +222,7 @@
     "select": { "name": "minecraft:.*wooded_badlands_plateau" },
     "apply": {
       "species" : "oak",
+      "density": [ 0.5 ],
       "chance": 0.5
     }
   },
