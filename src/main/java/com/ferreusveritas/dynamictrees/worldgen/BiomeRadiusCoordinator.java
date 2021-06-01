@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SharedSeedRandom;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
@@ -38,9 +37,7 @@ public class BiomeRadiusCoordinator implements IRadiusCoordinator {
 		}
 
 		final double scale = 128; // Effectively scales up the noisemap
-//		System.out.println((x + 8) + " " + (z + 8) + " Dim Reg Name: " + this.dimRegName + " Biome Manager: " + this.world.getBiomeManager() + " Area Loaded: " + this.world.isAreaLoaded(new BlockPos(x + 8, 0, z + 8), 1));
 		final Biome biome = this.world.getUncachedNoiseBiome((x + 8) >> 2, 0, (z + 8) >> 2); // Placement is offset by +8,+8
-//		System.out.println("Got biome: " + biome.getRegistryName() + " Uncached Noise Biome: " + this.world.getUncachedNoiseBiome((x + 8) >> 2, 0, (z + 8) >> 2).getRegistryName());
 
 		final double noiseDensity = (this.noiseGenerator.getSurfaceNoiseValue(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
 		final double density = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(this.dimRegName).getDensitySelector(biome).getDensity(this.world.getRandom(), noiseDensity);
