@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeRadiusCoordinator;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -17,8 +18,8 @@ public class UniversalPoissonDiscProvider {
 
 	private final Map<ResourceLocation, IPoissonDiscProvider> providerMap = new HashMap<>();
 
-	protected IPoissonDiscProvider createCircleProvider(ServerWorld world) {
-		final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(TreeGenerator.getTreeGenerator(), world);
+	protected IPoissonDiscProvider createCircleProvider(ServerWorld world, IWorld iWorld) {
+		final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(TreeGenerator.getTreeGenerator(), world.dimension().getRegistryName(), iWorld);
 		final PoissonDiscProvider candidate = new PoissonDiscProvider(radiusCoordinator);
 		candidate.setSeed(world.getSeed());
 		final PoissonDiscProviderCreateEvent poissonDiscProviderCreateEvent = new PoissonDiscProviderCreateEvent(world, candidate);
@@ -26,12 +27,12 @@ public class UniversalPoissonDiscProvider {
 		return poissonDiscProviderCreateEvent.getPoissonDiscProvider();
 	}
 
-	public IPoissonDiscProvider getProvider(ServerWorld world) {
-		return this.providerMap.computeIfAbsent(world.dimension().location(), k -> createCircleProvider(world));
+	public IPoissonDiscProvider getProvider(ServerWorld world, IWorld iWorld) {
+		return this.providerMap.computeIfAbsent(world.dimension().location(), k -> createCircleProvider(world, iWorld));
 	}
 
-	public List<PoissonDisc> getPoissonDiscs(ServerWorld world, ChunkPos chunkPos) {
-		final IPoissonDiscProvider provider = getProvider(world);
+	public List<PoissonDisc> getPoissonDiscs(ServerWorld world, IWorld iWorld, ChunkPos chunkPos) {
+		final IPoissonDiscProvider provider = getProvider(world, iWorld);
 		return provider.getPoissonDiscs(chunkPos.x, 0, chunkPos.z);
 	}
 
@@ -40,15 +41,15 @@ public class UniversalPoissonDiscProvider {
 	}
 
 	public void setChunkPoissonData(ServerWorld world, ChunkPos chunkPos, byte[] circleData) {
-		this.getProvider(world).setChunkPoissonData(chunkPos.x, 0, chunkPos.z, circleData);
+		this.getProvider(world, world).setChunkPoissonData(chunkPos.x, 0, chunkPos.z, circleData);
 	}
 
 	public byte[] getChunkPoissonData(ServerWorld world, ChunkPos chunkPos) {
-		return this.getProvider(world).getChunkPoissonData(chunkPos.x, 0, chunkPos.z);
+		return this.getProvider(world, world).getChunkPoissonData(chunkPos.x, 0, chunkPos.z);
 	}
 
 	public void unloadChunkPoissonData(ServerWorld world, ChunkPos chunkPos) {
-		this.getProvider(world).unloadChunkPoissonData(chunkPos.x, 0, chunkPos.z);
+		this.getProvider(world, world).unloadChunkPoissonData(chunkPos.x, 0, chunkPos.z);
 	}
 
 }
