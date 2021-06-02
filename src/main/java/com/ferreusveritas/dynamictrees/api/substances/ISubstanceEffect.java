@@ -27,7 +27,7 @@ public interface ISubstanceEffect {
 	 * @param deltaTicks
 	 * @return true to stay alive. false to kill effector
 	 */
-	boolean update(World world, BlockPos rootPos, int deltaTicks);
+	default boolean update(World world, BlockPos rootPos, int deltaTicks, int fertility) {return false;}
 	
 	/**
 	 * Get the name of the effect.  Used to compare existing effects in the environment.

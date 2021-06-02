@@ -77,7 +77,7 @@ public class LingeringEffectorEntity extends Entity {
 			BlockState blockState = level.getBlockState(blockPos);
 
 			if(blockState.getBlock() instanceof RootyBlock) {
-				if(!effect.update(level, blockPos, tickCount)) {
+				if(!effect.update(level, blockPos, tickCount, blockState.getValue(RootyBlock.FERTILITY))) {
 					kill();
 				}
 			} else {

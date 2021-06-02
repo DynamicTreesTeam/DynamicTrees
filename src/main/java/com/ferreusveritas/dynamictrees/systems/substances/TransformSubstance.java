@@ -40,12 +40,7 @@ public class TransformSubstance implements ISubstanceEffect {
 
 		return false;
 	}
-	
-	@Override
-	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
-		return false;
-	}
-	
+
 	@Override
 	public String getName() {
 		return "transform";
