@@ -52,7 +52,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
 
     private static final double vanillaGenChancePlains = 0.05f;
     private static final double vanillaGenChanceFlowerForest = 0.02f;
-    private static final double vanillaGenChanceForest = 0.002f;
+    private static final double vanillaGenChanceForest = 0.0005f;
     private static final double vanillaGrowChance = 0.001f;
     
     public BeeNestGenFeature (ResourceLocation registryName) {
