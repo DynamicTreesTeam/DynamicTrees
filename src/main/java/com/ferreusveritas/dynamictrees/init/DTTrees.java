@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.*;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.leaves.PalmLeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.SolidLeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
@@ -16,6 +17,7 @@ import com.ferreusveritas.dynamictrees.trees.Mushroom;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.families.NetherFungusFamily;
 import com.ferreusveritas.dynamictrees.trees.species.NetherFungusSpecies;
+import com.ferreusveritas.dynamictrees.trees.species.PalmSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.SwampOakSpecies;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import net.minecraft.block.Block;
@@ -58,6 +60,7 @@ public class DTTrees {
 	public static void registerLeavesPropertiesTypes (final TypeRegistryEvent<LeavesProperties> event) {
 		event.registerType(DynamicTrees.resLoc("solid"), SolidLeavesProperties.TYPE);
 		event.registerType(DynamicTrees.resLoc("wart"), WartProperties.TYPE);
+		event.registerType(DynamicTrees.resLoc("palm"), PalmLeavesProperties.TYPE);
 	}
 
 	@SubscribeEvent
@@ -69,6 +72,7 @@ public class DTTrees {
 	public static void registerSpeciesTypes (final TypeRegistryEvent<Species> event) {
 		event.registerType(DynamicTrees.resLoc("nether_fungus"), NetherFungusSpecies.TYPE);
 		event.registerType(DynamicTrees.resLoc("swamp_oak"), SwampOakSpecies.TYPE);
+		event.registerType(DynamicTrees.resLoc("palm"), PalmSpecies.TYPE);
 	}
 
 	@SubscribeEvent
