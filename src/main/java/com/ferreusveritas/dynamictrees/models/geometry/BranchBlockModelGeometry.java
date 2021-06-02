@@ -1,7 +1,10 @@
 package com.ferreusveritas.dynamictrees.models.geometry;
 
+import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BasicBranchBlockBakedModel;
+import com.ferreusveritas.dynamictrees.models.bakedmodels.ThickBranchBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.loaders.BranchBlockModelLoader;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.AtlasTexture;
@@ -13,10 +16,7 @@ import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,13 +32,21 @@ import java.util.stream.Collectors;
 @OnlyIn(Dist.CLIENT)
 public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModelGeometry> {
 
-    protected final List<ResourceLocation> textures = new ArrayList<>();
+    protected final Set<ResourceLocation> textures = new HashSet<>();
     protected final ResourceLocation barkResLoc;
     protected final ResourceLocation ringsResLoc;
+    protected final boolean forceThickness;
 
-    public BranchBlockModelGeometry(@Nullable final ResourceLocation barkResLoc, @Nullable final ResourceLocation ringsResLoc) {
+    protected ResourceLocation familyResLoc;
+    protected Family family;
+
+    protected ResourceLocation thickRingsResLoc;
+
+    public BranchBlockModelGeometry(@Nullable final ResourceLocation barkResLoc, @Nullable final ResourceLocation ringsResLoc, @Nullable final ResourceLocation familyResLoc, final boolean forceThickness) {
         this.barkResLoc = barkResLoc;
         this.ringsResLoc = ringsResLoc;
+        this.familyResLoc = familyResLoc;
+        this.forceThickness = forceThickness;
 
         this.addTextures(barkResLoc, ringsResLoc);
     }
@@ -59,13 +67,41 @@ public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModel
 
     @Override
     public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform, ItemOverrideList overrides, ResourceLocation modelLocation) {
-        return new BasicBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc);
+        if (!this.useThickModel(this.setFamily(modelLocation)))
+            return new BasicBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc);
+        else {
+            return new ThickBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc, this.thickRingsResLoc);
+        }
+    }
+
+    private ResourceLocation setFamilyResLoc(final ResourceLocation modelResLoc) {
+        if (this.familyResLoc == null) {
+            this.familyResLoc = new ResourceLocation(modelResLoc.getNamespace(), modelResLoc.getPath().replace("block/", "").replace("_branch", "").replace("stripped_", ""));
+        }
+        return this.familyResLoc;
+    }
+
+    private Family setFamily(final ResourceLocation modelResLoc) {
+        if (this.family == null) {
+            this.family = Family.REGISTRY.get(this.setFamilyResLoc(modelResLoc));
+        }
+        return this.family;
+    }
+
+    private boolean useThickModel(final Family family) {
+        return this.forceThickness || family.isThick();
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation, IUnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-        return this.textures.stream().map(resourceLocation -> new RenderMaterial(AtlasTexture.LOCATION_BLOCKS, resourceLocation))
+        if (this.thickRingsResLoc == null && this.useThickModel(this.setFamily(new ResourceLocation(owner.getModelName())))) {
+            this.thickRingsResLoc = ThickRingTextureManager.addRingTextureLocation(this.ringsResLoc);
+            this.addTextures(this.thickRingsResLoc);
+        }
+
+        return this.textures.stream()
+                .map(resourceLocation -> new RenderMaterial(AtlasTexture.LOCATION_BLOCKS, resourceLocation))
                 .collect(Collectors.toList());
     }
 

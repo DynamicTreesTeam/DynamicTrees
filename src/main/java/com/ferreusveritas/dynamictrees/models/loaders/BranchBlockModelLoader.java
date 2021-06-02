@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.models.loaders;
 
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
@@ -13,6 +14,8 @@ import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.annotation.Nullable;
 
 /**
  * Loads a branch block model from a Json file, with useful warnings when things aren't found.
@@ -37,7 +40,10 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
     @Override
     public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelObject) {
         final JsonObject textures = this.getTexturesObject(modelObject);
-        return this.getModelGeometry(this.getBarkResLoc(textures), this.getRingsResLoc(textures));
+        final ResourceLocation familyResLoc = this.getResLoc(modelObject);
+
+        return this.getModelGeometry(this.getBarkResLoc(textures), this.getRingsResLoc(textures),
+                familyResLoc == null ? null : TreeRegistry.processResLoc(familyResLoc));
     }
 
     protected JsonObject getTexturesObject (final JsonObject modelContents) {
@@ -53,6 +59,15 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
 
     protected ResourceLocation getRingsResLoc (final JsonObject textureObject) {
         return this.getTextureLocation(textureObject, RINGS);
+    }
+
+    @Nullable
+    protected ResourceLocation getResLoc(final JsonObject object) {
+        try {
+            return this.getResLocOrThrow(this.getOrThrow(object, "family"));
+        } catch (final RuntimeException e) {
+            return null;
+        }
     }
 
     protected ResourceLocation getTextureLocation (final JsonObject textureObject, final String textureElement) {
@@ -102,8 +117,9 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
      * @return The {@link IModelGeometry} object.
      */
     protected BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc,
-                                                         final ResourceLocation ringsResLoc) {
-        return new BranchBlockModelGeometry(barkResLoc, ringsResLoc);
+                                                         final ResourceLocation ringsResLoc,
+                                                         @Nullable final ResourceLocation familyResLoc) {
+        return new BranchBlockModelGeometry(barkResLoc, ringsResLoc, familyResLoc, false);
     }
 
 }

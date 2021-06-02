@@ -1,10 +1,11 @@
 package com.ferreusveritas.dynamictrees.models.loaders;
 
 import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
-import com.ferreusveritas.dynamictrees.models.geometry.ThickBranchBlockModelGeometry;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nullable;
 
 /**
  * @author Harley O'Connor
@@ -13,8 +14,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ThickBranchBlockModelLoader extends BranchBlockModelLoader {
 
     @Override
-    public BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
-        return new ThickBranchBlockModelGeometry(barkResLoc, ringsResLoc);
+    protected BranchBlockModelGeometry getModelGeometry(ResourceLocation barkResLoc, ResourceLocation ringsResLoc, @Nullable ResourceLocation familyResLoc) {
+        return new BranchBlockModelGeometry(barkResLoc, ringsResLoc, familyResLoc, true);
     }
 
     @Override
