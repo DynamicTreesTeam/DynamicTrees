@@ -18,12 +18,17 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
 
     private static final IVoidPropertyApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeString) ->
             biomeList.removeIf(biome -> {
-                        Set<BiomeDictionary.Type> biomeTypes = BiomeDictionary.getTypes(RegistryKey.create(ForgeRegistries.Keys.BIOMES, biome.getRegistryName()));
+                        final Set<BiomeDictionary.Type> biomeTypes = BiomeDictionary.getTypes(RegistryKey.create(ForgeRegistries.Keys.BIOMES, biome.getRegistryName()));
                         if (typeString.toCharArray()[0] == '!')
                             return biomeTypes.stream().anyMatch(type -> type.toString().toLowerCase().matches(typeString.substring(1).toLowerCase()));
                          else
                             return biomeTypes.stream().noneMatch(type -> type.toString().toLowerCase().matches(typeString.toLowerCase()));
                     }
+            );
+
+    private static final IVoidPropertyApplier<BiomeList, String> CATEGORY_APPLIER = (biomeList, categoryString) ->
+            biomeList.removeIf(biome ->
+                biome.getBiomeCategory().toString().toLowerCase().matches(categoryString.toLowerCase())
             );
 
     private static final IVoidPropertyApplier<BiomeList, String> NAME_APPLIER = (biomeList, nameString) ->
@@ -34,6 +39,7 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
     public BiomeListGetter() {
         this.appliers.register("type", String.class, TYPE_APPLIER)
                 .registerArrayApplier("types", String.class, TYPE_APPLIER)
+                .register("category", String.class, CATEGORY_APPLIER)
                 .register("name", String.class, NAME_APPLIER)
                 .registerArrayApplier("names", String.class, NAME_APPLIER);
     }
