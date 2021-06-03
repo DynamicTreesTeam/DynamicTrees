@@ -28,7 +28,7 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
 
     private static final IVoidPropertyApplier<BiomeList, String> CATEGORY_APPLIER = (biomeList, categoryString) ->
             biomeList.removeIf(biome ->
-                biome.getBiomeCategory().toString().toLowerCase().matches(categoryString.toLowerCase())
+                !biome.getBiomeCategory().toString().toLowerCase().matches(categoryString.toLowerCase())
             );
 
     private static final IVoidPropertyApplier<BiomeList, String> NAME_APPLIER = (biomeList, nameString) ->
