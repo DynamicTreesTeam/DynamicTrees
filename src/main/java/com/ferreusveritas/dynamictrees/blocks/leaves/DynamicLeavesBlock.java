@@ -32,7 +32,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShearsItem;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
-import net.minecraft.loot.LootTables;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.Direction;
@@ -579,9 +578,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	}
 
 	public boolean shouldDrop(BlockState state, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		if (!state.requiresCorrectToolForDrops())
-			return true;
-
 		final ItemStack stack = player.getMainHandItem();
 		final Item item = stack.getItem();
 
