@@ -50,18 +50,14 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 		return species;
 	}
 
-	public Species getSpecies(IBlockReader world, BlockPos pos) {
-		return this.getSpecies().selfOrLocationOverride(world, pos);
-	}
-
 	@Override
 	public boolean isValidBonemealTarget(@Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
-		return this.getSpecies(world, pos).canSaplingConsumeBoneMeal((World) world, pos);
+		return this.getSpecies().canSaplingConsumeBoneMeal((World) world, pos);
 	}
 	
 	@Override
 	public boolean isBonemealSuccess(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
-		return this.getSpecies(world, pos).canSaplingGrowAfterBoneMeal(world, rand, pos);
+		return this.getSpecies().canSaplingGrowAfterBoneMeal(world, rand, pos);
 	}
 	
 	///////////////////////////////////////////
@@ -70,17 +66,17 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	@Override
 	public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
-		return this.getSpecies(world, pos).saplingFireSpread();
+		return this.getSpecies().saplingFireSpread();
 	}
 
 	@Override
 	public int getFlammability(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
-		return this.getSpecies(world, pos).saplingFlammability();
+		return this.getSpecies().saplingFlammability();
 	}
 
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		if (this.getSpecies(worldIn, pos).canSaplingGrowNaturally(worldIn, pos))
+		if (this.getSpecies().canSaplingGrowNaturally(worldIn, pos))
 			this.performBonemeal(worldIn, rand, pos, state);
 	}
 
@@ -100,13 +96,13 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	@Override
 	public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
-		return canSaplingStay(world, this.getSpecies(world, pos), pos);
+		return canSaplingStay(world, this.getSpecies(), pos);
 	}
 
 	@Override
 	public void performBonemeal(@Nonnull ServerWorld world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
 		if (this.canSurvive(state, world, pos)) {
-			final Species species = this.getSpecies(world, pos);
+			final Species species = this.getSpecies();
 			if (species.canSaplingGrow(world, pos)){
 				species.transitionToTree(world, pos);
 			}
@@ -117,7 +113,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	
 	@Override
 	public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-		return this.getSpecies(world, pos).getSaplingSound();
+		return this.getSpecies().getSaplingSound();
 	}
 	
 	///////////////////////////////////////////
@@ -140,7 +136,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	@Nonnull
 	@Override
 	public ItemStack getCloneItemStack(IBlockReader worldIn, BlockPos pos, BlockState state) {
-		return this.getSpecies(worldIn, pos).getSeedStack(1);
+		return this.getSpecies().getSeedStack(1);
 	}
 	
 	@Nonnull
@@ -157,7 +153,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return this.getSpecies(world, pos).getSeedStack(1);
+		return this.getSpecies().getSeedStack(1);
 	}
 
 
@@ -168,7 +164,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	@Nonnull
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader access, BlockPos pos, ISelectionContext context) {
-		return this.getSpecies(access, pos).getSaplingShape();
+		return this.getSpecies().getSaplingShape();
 	}
 	
 	///////////////////////////////////////////
@@ -177,7 +173,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	@Override
 	public BlockState getPlant(IBlockReader world, BlockPos pos) {
-		return this.getSpecies(world, pos).getSapling().get().defaultBlockState();
+		return this.defaultBlockState();
 	}
 	
 }
