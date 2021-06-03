@@ -233,6 +233,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		this.genFeatures.clear();
 		this.acceptableBlocksForGrowth.clear();
 		this.primitiveSaplingItems.clear();
+		this.perfectBiomes.clear();
 
 		this.clearAcceptableSoils();
 

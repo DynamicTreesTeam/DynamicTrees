@@ -95,9 +95,9 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
 
             if (applicationType == ApplicationType.RELOAD)
                 registryEntry.setPostReloadDefaults();
-            else this.postLoad(jsonObject, registryEntry, errorConsumer, warningConsumer);
 
             if (newEntry) {
+                this.postLoad(jsonObject, registryEntry, errorConsumer, warningConsumer);
                 this.registry.register(registryEntry);
                 LOGGER.debug("Loaded and registered {}: {}.", this.registryName, registryEntry.toLoadDataString());
             } else {

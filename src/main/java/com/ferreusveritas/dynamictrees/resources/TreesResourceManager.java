@@ -109,7 +109,7 @@ public final class TreesResourceManager implements IResourceManager {
         if (resources.size() < 1)
             throw new FileNotFoundException("Could not find path '" + resourceLocationIn + "' in any tree packs.");
 
-        return this.getResources(resourceLocationIn).get(resources.size() - 1);
+        return resources.get(0);
     }
 
     @Override
@@ -147,9 +147,14 @@ public final class TreesResourceManager implements IResourceManager {
 
     @Override
     public Collection<ResourceLocation> listResources(String path, Predicate<String> filter) {
-        return this.resourcePacks.stream().map(resourcePack -> resourcePack.getResourceNamespaces().stream()
-                .map(namespace -> resourcePack.getResources(null, namespace, path, Integer.MAX_VALUE, filter))
-                .flatMap(Collection::stream).collect(Collectors.toSet())).flatMap(Collection::stream).collect(Collectors.toSet());
+        return this.resourcePacks.stream()
+                .map(
+                        resourcePack -> resourcePack.getResourceNamespaces().stream()
+                                .map(namespace -> resourcePack.getResources(null, namespace, path, Integer.MAX_VALUE, filter))
+                                .flatMap(Collection::stream)
+                                .collect(Collectors.toSet())
+                ).flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
     @Override

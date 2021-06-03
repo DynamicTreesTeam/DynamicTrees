@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +59,7 @@ public abstract class MultiJsonReloadListener<V> extends JsonApplierReloadListen
 
                     map.computeIfAbsent(resourceLocation, l -> Lists.newArrayList()).add(jsonElement);
                 });
+                Collections.reverse(map.get(resourceLocation));
             } catch (IllegalArgumentException | IOException | JsonParseException e) {
                 LOGGER.error("Couldn't parse data file {} from {}", resourceLocation, resourceLocationIn, e);
             }
