@@ -23,9 +23,9 @@ public class GrowthSubstance implements ISubstanceEffect {
 	public boolean update(World world, BlockPos rootPos, int deltaTicks, int fertility) {
 		
 		if (fertility <= 0)
-			return false; //no more fertility
+			return false; // No more fertility.
 
-		if ((deltaTicks % ticksPerPulse) == 0){
+		if ((deltaTicks % ticksPerPulse) == 0) {
 			if (world.isClientSide)
 				TreeHelper.rootParticles(world, rootPos, Direction.UP, ParticleTypes.EFFECT, 1);
 			else
@@ -44,10 +44,5 @@ public class GrowthSubstance implements ISubstanceEffect {
 	public boolean isLingering() {
 		return true;
 	}
-	
-//	public GrowthSubstance setDuration(int duration) {
-//		this.duration = duration;
-//		return this;
-//	}
-	
+
 }

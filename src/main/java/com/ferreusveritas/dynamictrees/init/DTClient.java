@@ -183,7 +183,7 @@ public class DTClient {
 	}
 	
 	private static void registerJsonColorMultipliers() {
-		//Register programmable custom block color providers for LeavesPropertiesJson
+		// Register programmable custom block color providers for LeavesPropertiesJson
 		BlockColorMultipliers.register("birch", (state, worldIn,  pos, tintIndex) -> FoliageColors.getBirchColor());
 		BlockColorMultipliers.register("spruce", (state, worldIn,  pos, tintIndex) -> FoliageColors.getEvergreenColor());
 	}

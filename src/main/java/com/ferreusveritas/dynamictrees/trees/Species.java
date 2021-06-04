@@ -851,10 +851,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return true if the planting was successful
 	 */
 	public boolean plantSapling(IWorld world, BlockPos pos, boolean locationOverride) {
-		final DynamicSaplingBlock sapling = this.shouldUseLocationOverride() ?
-				this.getFamily().getSpeciesForLocation(world, pos).getSapling()
-						.orElse(this.getCommonSpecies().saplingBlock)
-				: this.saplingBlock;
+		final DynamicSaplingBlock sapling = this.getSapling().orElse(this.getCommonSpecies().saplingBlock);
 
 		if (sapling == null || !world.getBlockState(pos).getMaterial().isReplaceable() ||
 				!DynamicSaplingBlock.canSaplingStay(world, this, pos)) {

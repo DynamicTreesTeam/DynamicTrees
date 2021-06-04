@@ -137,34 +137,34 @@ public final class CoordUtils {
 	}
 	
 	@Nullable
-	public static RayTraceResult branchRayTrace(IWorld world, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance, SafeChunkBounds safeBounds) {
-		treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ());//Make the tree pos level with the branch pos
+	public static BlockRayTraceResult branchRayTrace(IWorld world, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance, SafeChunkBounds safeBounds) {
+		treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ()); // Make the tree pos level with the branch pos.
 
 		Vector3d vOut = new Vector3d(branchPos.getX() - treePos.getX(), 0, branchPos.getZ() - treePos.getZ());
 
-		if(vOut.equals(Vector3d.ZERO)) {
+		if (vOut.equals(Vector3d.ZERO)) {
 			vOut = new Vector3d(1, 0, 0);
 			spreadHor = 180;
 		}
 
-		float deltaYaw = (world.getRandom().nextFloat() * spreadHor * 2) - spreadHor;
-		float deltaPitch = (world.getRandom().nextFloat() * -spreadVer);// must be greater than -90 degrees(and less than 90) for the tangent function.
-		vOut = vOut.normalize(). //Normalize to unit vector
-				add(0, Math.tan(Math.toRadians(deltaPitch)), 0). //Pitch the angle downward by 0 to spreadVer degrees
-				normalize(). //Re-normalize to unit vector
-				yRot((float) Math.toRadians(deltaYaw)). //Vary the yaw by +/- spreadHor
-				scale(distance); //Vary the view distance
+		final float deltaYaw = (world.getRandom().nextFloat() * spreadHor * 2) - spreadHor;
+		final float deltaPitch = (world.getRandom().nextFloat() * -spreadVer); // Must be greater than -90 degrees(and less than 90) for the tangent function.
+		vOut = vOut.normalize(). // Normalize to unit vector.
+				add(0, Math.tan(Math.toRadians(deltaPitch)), 0). // Pitch the angle downward by 0 to spreadVer degrees.
+				normalize(). // Re-normalize to unit vector.
+				yRot((float) Math.toRadians(deltaYaw)). // Vary the yaw by +/- spreadHor.
+				scale(distance); // Vary the view distance.
 
-		Vector3d branchVec = new Vector3d(branchPos.getX(), branchPos.getY(), branchPos.getZ()).add(0.5, 0.5, 0.5);//Get the vector of the middle of the branch block
-		Vector3d vantageVec = branchVec.add(vOut);//Make a vantage point to look at the branch
-		BlockPos vantagePos = new BlockPos(vantageVec);//Convert Vector to BlockPos for testing
+		final Vector3d branchVec = new Vector3d(branchPos.getX(), branchPos.getY(), branchPos.getZ()).add(0.5, 0.5, 0.5); // Get the vector of the middle of the branch block.
+		final Vector3d vantageVec = branchVec.add(vOut); // Make a vantage point to look at the branch.
+		final BlockPos vantagePos = new BlockPos(vantageVec); // Convert Vector to BlockPos for testing.
 
-		if(!safeBounds.inBounds(vantagePos, false) || world.isEmptyBlock(vantagePos)) {//The observing block must be in free space
-			RayTraceResult result = rayTraceBlocks(world, new CustomRayTraceContext(vantageVec, branchVec, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE), safeBounds);
-			//Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks
+		if (!safeBounds.inBounds(vantagePos, false) || world.isEmptyBlock(vantagePos)) { // The observing block must be in free space.
+			final BlockRayTraceResult result = rayTraceBlocks(world, new CustomRayTraceContext(vantageVec, branchVec, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE), safeBounds);
+			// Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks.
 			final BlockPos hitPos = new BlockPos(result.getLocation());
-			if(result.getType() == RayTraceResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) {//We found a block
-				if(species.getFamily().isCompatibleGenericLeaves(species, world.getBlockState(hitPos), world, hitPos)) {//Test if it's the right kind of leaves for the species
+			if (result.getType() == RayTraceResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) { // We found a block.
+				if (species.getFamily().isCompatibleGenericLeaves(species, world.getBlockState(hitPos), world, hitPos)) { // Test if it's the right kind of leaves for the species.
 					return result;
 				}
 			}
