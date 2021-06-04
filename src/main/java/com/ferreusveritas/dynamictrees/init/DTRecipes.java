@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.client.util.RecipeBookCategories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -10,7 +9,6 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapelessRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -21,7 +19,6 @@ import java.util.stream.Stream;
  *
  * @author Harley O'Connor
  */
-@Mod.EventBusSubscriber
 public final class DTRecipes {
 
     public static void registerDirtBucketRecipes(final Map<ResourceLocation, IRecipe<?>> craftingRecipes) {
