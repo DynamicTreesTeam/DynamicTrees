@@ -1,6 +1,5 @@
 {
   "primitive_leaves": "minecraft:spruce_leaves",
-  "color": "@spruce",
   "smother": 3,
   "cell_kit": "dynamictrees:conifer"
 }
