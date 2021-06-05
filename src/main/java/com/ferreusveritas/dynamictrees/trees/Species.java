@@ -1659,7 +1659,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		
 		if (effect != null) {
 			boolean applied = effect.apply(world, rootPos);
-			if (effect.isLingering()) {
+			if (applied && effect.isLingering()) {
 				world.addFreshEntity(new LingeringEffectorEntity(world, rootPos, effect));
 				return true;
 			} else return applied;

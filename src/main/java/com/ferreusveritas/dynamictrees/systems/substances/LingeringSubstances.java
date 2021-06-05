@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * Holds lingering {@link ISubstanceEffect} classes and a {@link Supplier} to instantiate them with.
  * Stored in a {@link LinkedHashMap} so that {@link com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity}
- * can send the relevant substance index in a packet.
+ * can send the relevant substance as an index in a packet.
  *
  * @author Harley O'Connor
  */
