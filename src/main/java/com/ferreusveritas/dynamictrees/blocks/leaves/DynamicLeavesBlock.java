@@ -237,7 +237,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		// This is for blocks that check the shape, for example snow.
 		if (context.getEntity() == null)
-			return VoxelShapes.create(new AxisAlignedBB(0, 0.9, 0, 1, 1, 1));
+			return VoxelShapes.block();
 
 		if (isLeavesPassable() || this.isEntityPassable(context)) {
 			return VoxelShapes.empty();
