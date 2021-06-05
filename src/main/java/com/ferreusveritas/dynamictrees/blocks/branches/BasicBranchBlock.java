@@ -10,7 +10,6 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -119,7 +118,7 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
-		return isSameTree(branch) ? BasicBranchBlock.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
+		return isSameTree(branch) && !this.isStrippedBranch() ? BasicBranchBlock.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
 	}
 	
 	@Override
@@ -206,9 +205,10 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
-		Family thisTree = getFamily();
-		
-		if (leavesProperties.getFamily() == thisTree) {// The requesting leaves must match the tree for hydration to occur
+		final Family thisTree = getFamily();
+
+		// The requesting leaves must match the tree for hydration to occur, and the branch must not be stripped.
+		if (leavesProperties.getFamily() == thisTree && !this.isStrippedBranch()) {
 			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);
 			int radius = MetadataCell.getRadius(radiusAndMeta);
 			int metadata = MetadataCell.getMeta(radiusAndMeta);
@@ -243,11 +243,11 @@ public class BasicBranchBlock extends BranchBlock {
 	}
 	
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
-		Species species = signal.getSpecies();
+		final Species species = signal.getSpecies();
 		
-		DynamicLeavesBlock leaves =  species.getLeavesBlock().orElse(null);
+		final DynamicLeavesBlock leaves = species.getLeavesBlock().orElse(null);
 		if (leaves != null) {
-			if (fromRadius == getFamily().getPrimaryThickness()) {// If we came from a twig then just make some leaves
+			if (!this.isStrippedBranch() && fromRadius == getFamily().getPrimaryThickness()) {// If we came from a twig (and we're not a stripped branch) then just make some leaves
 				signal.success = leaves.growLeavesIfLocationIsSuitable(world, species.getLeavesProperties(), pos, 0);
 			} else {// Otherwise make a proper branch
 				return leaves.branchOut(world, pos, signal);
@@ -287,66 +287,66 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
-		
-		if (signal.step()) {// This is always placed at the beginning of every growSignal function
-			
-			BlockState currBlockState = world.getBlockState(pos);
-			Species species = signal.getSpecies();
-			boolean inTrunk = signal.isInTrunk();
-			
-			Direction originDir = signal.dir.getOpposite();// Direction this signal originated from
-			Direction targetDir = species.selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
-			signal.doTurn(targetDir);
-			
-			{
-				BlockPos deltaPos = pos.relative(targetDir);
-				BlockState deltaState = world.getBlockState(deltaPos);
-				
-				// Pass grow signal to next block in path
-				ITreePart treepart = TreeHelper.getTreePart(deltaState);
-				if (treepart != TreeHelper.NULL_TREE_PART) {
-					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
-				} else if (world.isEmptyBlock(deltaPos) || deltaState.getBlock() instanceof TrunkShellBlock) {
-					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
-				}
+		// This is always placed at the beginning of every growSignal function
+		if (!signal.step())
+			return signal;
+
+		final BlockState currBlockState = world.getBlockState(pos);
+		final Species species = signal.getSpecies();
+		final boolean inTrunk = signal.isInTrunk();
+
+		final Direction originDir = signal.dir.getOpposite();// Direction this signal originated from
+		final Direction targetDir = species.selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
+		signal.doTurn(targetDir);
+
+		{
+			final BlockPos deltaPos = pos.relative(targetDir);
+			final BlockState deltaState = world.getBlockState(deltaPos);
+
+			// Pass grow signal to next block in path
+			final ITreePart treepart = TreeHelper.getTreePart(deltaState);
+			if (treepart != TreeHelper.NULL_TREE_PART) {
+				signal = treepart.growSignal(world, deltaPos, signal);// Recurse
+			} else if (world.isEmptyBlock(deltaPos) || deltaState.getBlock() instanceof TrunkShellBlock) {
+				signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
 			}
-			
-			// Calculate Branch Thickness based on neighboring branches
-			float areaAccum = signal.radius * signal.radius;// Start by accumulating the branch we just came from
-			
-			for (Direction dir : Direction.values()) {
-				if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
-					BlockPos deltaPos = pos.relative(dir);
-					
-					// If it is decided to implement a special block(like a squirrel hole, tree
-					// swing, rotting, burned or infested branch, etc) then this new block could be
-					// derived from BlockBranch and this works perfectly. Should even work with
-					// tileEntity blocks derived from BlockBranch.
-					BlockState blockState = world.getBlockState(deltaPos);
-					ITreePart treepart = TreeHelper.getTreePart(blockState);
-					if (isSameTree(treepart)) {
-						int branchRadius = treepart.getRadius(blockState);
-						areaAccum += branchRadius * branchRadius;
-					}
-				}
-			}
-			
-			//Only continue to set radii if the tree growth isn't choked out
-			if(!signal.choked) {
-				// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
-				int maxRadius = inTrunk ? species.getMaxBranchRadius() : Math.min(species.getMaxBranchRadius(), MAX_RADIUS);
-				
-				// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
-				// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-				signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
-				int targetRadius = (int) Math.floor(signal.radius);
-				int setRad = setRadius(world, pos, targetRadius, originDir);
-				if(setRad < targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
-					signal.choked = true; //If something is in the way then it means that the tree growth is choked
+		}
+
+		// Calculate Branch Thickness based on neighboring branches
+		float areaAccum = signal.radius * signal.radius;// Start by accumulating the branch we just came from
+
+		for (Direction dir : Direction.values()) {
+			if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
+				BlockPos deltaPos = pos.relative(dir);
+
+				// If it is decided to implement a special block(like a squirrel hole, tree
+				// swing, rotting, burned or infested branch, etc) then this new block could be
+				// derived from BlockBranch and this works perfectly. Should even work with
+				// tileEntity blocks derived from BlockBranch.
+				BlockState blockState = world.getBlockState(deltaPos);
+				ITreePart treepart = TreeHelper.getTreePart(blockState);
+				if (isSameTree(treepart)) {
+					int branchRadius = treepart.getRadius(blockState);
+					areaAccum += branchRadius * branchRadius;
 				}
 			}
 		}
-		
+
+		//Only continue to set radii if the tree growth isn't choked out
+		if(!signal.choked) {
+			// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
+			int maxRadius = inTrunk ? species.getMaxBranchRadius() : Math.min(species.getMaxBranchRadius(), MAX_RADIUS);
+
+			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
+			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
+			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
+			int targetRadius = (int) Math.floor(signal.radius);
+			int setRad = setRadius(world, pos, targetRadius, originDir);
+			if(setRad < targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
+				signal.choked = true; //If something is in the way then it means that the tree growth is choked
+			}
+		}
+
 		return signal;
 	}
 

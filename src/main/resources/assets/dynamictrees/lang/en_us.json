@@ -45,6 +45,8 @@
   "item.dynamictrees.dendro_potion.fertility": "Potion of Fertility",
   "item.dynamictrees.dendro_potion.persistence": "Potion of Persistence",
   "item.dynamictrees.dendro_potion.transform": "Potion of Transformation",
+  "item.dynamictrees.dendro_potion.harvest": "Potion of Harvest",
+  "item.dynamictrees.dendro_potion.denuding": "Potion of Denuding",
 
   "item.dynamictrees.dirt_bucket": "Dirt Bucket",
   "item.dynamictrees.staff": "Woodland Staff",
@@ -86,6 +88,8 @@
   "potion.persistence.description": "Stops tree from changing",
   "potion.transform.description": "Transform a tree into a %s tree",
   "potion.transform.description.empty": "Base tree potion for brewing transformations",
+  "potion.harvest.description": "Speeds up fruit production",
+  "potion.denuding.description": "Removes all bark and leaves from a tree",
 
   "death.attack.falling_tree": "%1$s was crushed by a falling tree",
 

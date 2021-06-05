@@ -107,6 +107,10 @@ public class FruitBlock extends Block implements IGrowable {
 
 	@Override
 	public void tick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
+		this.doTick(state, world, pos, rand);
+	}
+
+	public void doTick(BlockState state, World world, BlockPos pos, Random rand) {
 		if (this.shouldBlockDrop(world, pos, state)) {
 			this.dropBlock(world, state, pos);
 			return;

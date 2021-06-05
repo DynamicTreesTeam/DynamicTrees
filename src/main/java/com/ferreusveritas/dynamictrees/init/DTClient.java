@@ -217,6 +217,7 @@ public class DTClient {
 	public static void spawnParticles(World world, BasicParticleType particleType, BlockPos pos, int numParticles, Random random) {
 		spawnParticles(world, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, random);
 	}
+
 	public static void spawnParticles(IWorld world, BasicParticleType particleType, int x, int y, int z, int numParticles, Random random) {
 		for (int i1 = 0; i1 < numParticles; ++i1) {
 			double mx = random.nextGaussian() * 0.02D;
@@ -225,9 +226,10 @@ public class DTClient {
 			DTClient.spawnParticle(world, particleType, x + random.nextFloat(), (double)y + (double)random.nextFloat(), (double)z + random.nextFloat(), mx, my, mz);
 		}
 	}
+
 	/** Not strictly necessary. But adds a little more isolation to the server for particle effects */
 	public static void spawnParticle(IWorld world, BasicParticleType particleType, double x, double y, double z, double mx, double my, double mz) {
-		if(world.isClientSide()) {
+		if (world.isClientSide()) {
 			world.addParticle(particleType, x, y, z, mx, my, mz);
 		}
 	}

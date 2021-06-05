@@ -257,15 +257,15 @@ public class TreeHelper {
 	 * @param num
 	 */
 	public static void treeParticles(World world, BlockPos rootPos, BasicParticleType type, int num) {
-		if(world.isClientSide) {
+		if (world.isClientSide) {
 			startAnalysisFromRoot(world, rootPos, new MapSignal(new TwinkleNode(type, num)));
 		}
 	}
 
 	public static void rootParticles(World world, BlockPos rootPos, Direction offset, BasicParticleType type, int num) {
-		if(world.isClientSide) {
-			if(world.isClientSide() && world.getBlockState(rootPos).getBlock() instanceof RootyBlock) {
-				BlockPos particlePos = rootPos.offset(offset.getNormal());
+		if (world.isClientSide) {
+			if (world.isClientSide() && world.getBlockState(rootPos).getBlock() instanceof RootyBlock) {
+				final BlockPos particlePos = rootPos.offset(offset.getNormal());
 				DTClient.spawnParticles(world, type, particlePos.getX(), particlePos.getY(), particlePos.getZ(), num, world.getRandom());
 			}
 		}

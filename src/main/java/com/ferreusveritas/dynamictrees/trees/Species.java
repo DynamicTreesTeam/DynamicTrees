@@ -1858,6 +1858,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this.genFeatures.size() > 0;
 	}
 
+	public List<ConfiguredGenFeature<GenFeature>> getGenFeatures() {
+		return this.genFeatures;
+	}
+
 	/**
 	 * Allows the tree to prepare the area for planting.  For thick tree this may include removing blocks around the trunk that
 	 * could be in the way.

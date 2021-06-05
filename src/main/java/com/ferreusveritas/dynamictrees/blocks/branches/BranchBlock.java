@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity.DestroyType;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.DestroyerNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.SpeciesNode;
@@ -38,8 +37,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.*;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.*;
 import net.minecraftforge.common.ForgeMod;
@@ -108,7 +107,11 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public boolean isSameTree(@Nullable final BranchBlock branch) {
 		return branch != null && this.getFamily() == branch.getFamily();
 	}
-	
+
+	public boolean isStrippedBranch () {
+		return this.getFamily().hasStrippedBranch() && this.getFamily().getStrippedBranch() == this;
+	}
+
 	@Override
 	public abstract int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius);
 	
@@ -182,8 +185,16 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		final int radius = this.getRadius(state);
 		this.damageAxe(player, heldItem, radius / 2, new NetVolumeNode.Volume((radius * radius * 64) / 2), false);
 
+		this.stripBranch(state, world, pos, radius);
+	}
+
+	public void stripBranch (BlockState state, IWorld world, BlockPos pos) {
+		this.stripBranch(state, world, pos, this.getRadius(state));
+	}
+
+	public void stripBranch (BlockState state, IWorld world, BlockPos pos, int radius) {
 		assert this.getFamily().getStrippedBranch() != null;
-		this.getFamily().getStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get()?1:0)), null);
+		this.getFamily().getStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get() ? 1 : 0)), null);
 	}
 
 	@Override
@@ -353,7 +364,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param drops A {@link List} for collecting the {@link ItemStack}s and their {@link BlockPos} relative to
 	 *              the cut {@link BlockPos}.
 	 */
-	protected void destroyLeaves(final World world, final BlockPos cutPos, final Species species, final List<BlockPos> endPoints, final Map<BlockPos, BlockState> destroyedLeaves, final List<ItemStackPos> drops) {
+	public void destroyLeaves(final World world, final BlockPos cutPos, final Species species, final List<BlockPos> endPoints, final Map<BlockPos, BlockState> destroyedLeaves, final List<ItemStackPos> drops) {
 		if (world.isClientSide || endPoints.isEmpty())
 			return;
 
