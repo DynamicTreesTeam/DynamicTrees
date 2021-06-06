@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
 import net.minecraft.util.Direction;
@@ -63,7 +63,7 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 							else
 								if(block == Blocks.DIRT || block == Blocks.GRASS) {//Convert grass or dirt to podzol
 									if(world.getBrightness(LightType.SKY, offPos.above()) <= darkThreshold) {
-										world.setBlockAndUpdate(offPos, CommonBlockStates.PODZOL);
+										world.setBlockAndUpdate(offPos, BlockStates.PODZOL);
 									} else {
 										spreadPodzol(world, pos);
 									}
@@ -85,7 +85,7 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 			podzolish += (testBlock == Blocks.PODZOL) ? 1 : 0;
 			podzolish += testBlock instanceof RootyBlock ? 1 : 0;
 			if(podzolish >= 3) {
-				world.setBlockAndUpdate(pos, CommonBlockStates.PODZOL);
+				world.setBlockAndUpdate(pos, BlockStates.PODZOL);
 				break;
 			}
 		}

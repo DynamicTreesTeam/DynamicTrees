@@ -6,9 +6,9 @@ import net.minecraft.block.Blocks;
 /**
  * @author Harley O'Connor
  */
-public final class CommonBlockStates {
+public final class BlockStates {
 
-    private CommonBlockStates () { }
+    private BlockStates() { }
 
     public static final BlockState AIR = Blocks.AIR.defaultBlockState();
     public static final BlockState DIRT = Blocks.DIRT.defaultBlockState();

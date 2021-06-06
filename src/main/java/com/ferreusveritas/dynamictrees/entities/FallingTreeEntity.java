@@ -12,14 +12,13 @@ import com.ferreusveritas.dynamictrees.models.IModelTracker;
 import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Iterables;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
@@ -202,7 +201,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		for(BlockPos absPos: Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES))) {
 			BlockState state = level.getBlockState(absPos);
 			if(TreeHelper.isTreePart(state)) {
-				level.setBlock(absPos, CommonBlockStates.AIR, 0);////The client needs to set it's blocks to air
+				level.setBlock(absPos, BlockStates.AIR, 0);////The client needs to set it's blocks to air
 				renderBounds.union(absPos);//Expand the re-render volume to include this block
 			}
 		}

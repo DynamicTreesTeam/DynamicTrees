@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -52,17 +53,25 @@ public class TransformNode implements INodeInspector {
 	private static final int TEST_LEAVES_RADIUS = 3;
 	
 	public void transformSurroundingLeaves(IWorld world, BlockPos twigPos) {
-		if (!world.isClientSide()) {
-			BlockPos.betweenClosedStream(twigPos.offset(-TEST_LEAVES_RADIUS, -TEST_LEAVES_RADIUS, -TEST_LEAVES_RADIUS), twigPos.offset(TEST_LEAVES_RADIUS, TEST_LEAVES_RADIUS, TEST_LEAVES_RADIUS)).forEach(leavesPos -> {
-				if (fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) != 0) {//We're only interested in where leaves could possibly be
-					BlockState state = world.getBlockState(leavesPos);
-					if (fromSpecies.getFamily().isCompatibleGenericLeaves(this.fromSpecies, state, world, leavesPos)) {
-						int hydro = state.getBlock() instanceof DynamicLeavesBlock ? state.getValue(DynamicLeavesBlock.DISTANCE) : 2;
-						world.setBlock(leavesPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro), 3);
-					}
-				}
-			});
-		}
+		if (world.isClientSide())
+			return;
+
+		final SimpleVoxmap leafCluster = this.fromSpecies.getLeavesProperties().getCellKit().getLeafCluster();
+		final int xBound = leafCluster.getLenX();
+		final int yBound = leafCluster.getLenY();
+		final int zBound = leafCluster.getLenZ();
+
+		BlockPos.betweenClosedStream(twigPos.offset(-xBound, -yBound, -zBound), twigPos.offset(xBound, yBound, zBound)).forEach(testPos -> {
+			// We're only interested in where leaves could possibly be.
+			if (this.fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, testPos) == 0)
+				return;
+
+			final BlockState state = world.getBlockState(testPos);
+			if (fromSpecies.getFamily().isCompatibleGenericLeaves(this.fromSpecies, state, world, testPos)) {
+				final int hydro = state.getBlock() instanceof DynamicLeavesBlock ? state.getValue(DynamicLeavesBlock.DISTANCE) : 2;
+				world.setBlock(testPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro), 3);
+			}
+		});
 	}
 	
 }

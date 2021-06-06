@@ -1197,7 +1197,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	static private final Direction[] upFirst = {Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 	
 	/**
-	 * Handle rotting branches
+	 * Handles rotting branches.
 	 *
 	 * @param world The world
 	 * @param pos The {@link BlockPos}.
@@ -1205,15 +1205,21 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param radius The radius of the branch
 	 * @param random Access to a random number generator
 	 * @param rapid True if this rot is happening under a generation scenario as opposed to natural tree updates
+	 * @param growLeaves {@code true} if this rot should attempt to grow leaves first.
 	 * @return true if the branch should rot
 	 */
-	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
-		if (radius <= family.getPrimaryThickness()) {
-			if (!getLeavesProperties().hasDynamicLeavesBlock()) return false;
-			DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
-			for (Direction dir: upFirst)
-				if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.relative(dir), 0))
+	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid, boolean growLeaves) {
+		if (growLeaves && radius <= family.getPrimaryThickness()) {
+			if (!getLeavesProperties().hasDynamicLeavesBlock())
+				return false;
+
+			final DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
+
+			for (Direction dir: upFirst) {
+				if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.relative(dir), 0)) {
 					return false;
+				}
+			}
 		}
 		
 		if (rapid || (DTConfigs.MAX_BRANCH_ROT_RADIUS.get() != 0 && radius <= DTConfigs.MAX_BRANCH_ROT_RADIUS.get())) {
@@ -1224,6 +1230,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			return true;
 		}
 		
+		return false;
+	}
+
+	/**
+	 * @deprecated No longe in use due to extra parameter. Use/override
+	 * 			   {@link #rot(IWorld, BlockPos, int, int, Random, boolean, boolean)} instead.
+	 */
+	@Deprecated
+	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 		return false;
 	}
 
@@ -1959,7 +1974,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 				Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
 				Pair.of("dropCreatorStorage", this.dropCreatorStorage), Pair.of("megaSpecies", this.megaSpecies),
 				Pair.of("seed", this.seed), Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream()
-						.filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny().orElse(CommonBlockStates.AIR)),
+						.filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny().orElse(BlockStates.AIR)),
 				Pair.of("perfectBiomes", this.perfectBiomes), Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
 				Pair.of("genFeatures", this.genFeatures));
 	}

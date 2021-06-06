@@ -3,11 +3,9 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.BlockBounds;
-import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -50,20 +48,23 @@ public class DenuderNode implements INodeInspector {
         return false;
     }
 
-    private static final int TEST_LEAVES_RADIUS = 3;
-
     public void removeSurroundingLeaves(IWorld world, BlockPos twigPos) {
         if (world.isClientSide())
             return;
 
-        BlockPos.betweenClosedStream(twigPos.offset(-TEST_LEAVES_RADIUS, -TEST_LEAVES_RADIUS, -TEST_LEAVES_RADIUS), twigPos.offset(TEST_LEAVES_RADIUS, TEST_LEAVES_RADIUS, TEST_LEAVES_RADIUS)).forEach(leavesPos -> {
+        final SimpleVoxmap leafCluster = this.species.getLeavesProperties().getCellKit().getLeafCluster();
+        final int xBound = leafCluster.getLenX();
+        final int yBound = leafCluster.getLenY();
+        final int zBound = leafCluster.getLenZ();
+
+        BlockPos.betweenClosedStream(twigPos.offset(-xBound, -yBound, -zBound), twigPos.offset(xBound, yBound, zBound)).forEach(testPos -> {
             // We're only interested in where leaves could possibly be.
-            if (this.species.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, leavesPos) == 0)
+            if (leafCluster.getVoxel(twigPos, testPos) == 0)
                 return;
 
-            final BlockState state = world.getBlockState(leavesPos);
-            if (this.family.isCompatibleGenericLeaves(this.species, state, world, leavesPos)) {
-                world.setBlock(leavesPos, CommonBlockStates.AIR, 3);
+            final BlockState state = world.getBlockState(testPos);
+            if (this.family.isCompatibleGenericLeaves(this.species, state, world, testPos)) {
+                world.setBlock(testPos, BlockStates.AIR, 3);
             }
         });
     }

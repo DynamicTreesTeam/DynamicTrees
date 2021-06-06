@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
@@ -12,7 +11,7 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
-import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -118,7 +117,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	
 	public LeavesProperties(@Nullable final BlockState primitiveLeaves, final CellKit cellKit, final ResourceLocation registryName) {
 		this.family = Family.NULL_FAMILY;
-		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : CommonBlockStates.AIR;
+		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : BlockStates.AIR;
 		this.cellKit = cellKit;
 		this.setRegistryName(registryName);
 		this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());

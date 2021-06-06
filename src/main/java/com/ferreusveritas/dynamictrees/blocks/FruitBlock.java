@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
@@ -144,7 +144,7 @@ public class FruitBlock extends Block implements IGrowable {
 					case CUSTOM:
 						break;
 					case DROP: this.dropBlock(world, state, pos); break;
-					case ROT: world.setBlockAndUpdate(pos, CommonBlockStates.AIR); break;
+					case ROT: world.setBlockAndUpdate(pos, BlockStates.AIR); break;
 				}
 			}
 		}
@@ -168,7 +168,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	protected void outOfSeasonAction(World world, BlockPos pos) {
-		world.setBlockAndUpdate(pos, CommonBlockStates.AIR);
+		world.setBlockAndUpdate(pos, BlockStates.AIR);
 	}
 
 	@Override

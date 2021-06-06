@@ -17,7 +17,7 @@ import java.util.Random;
 public interface IPostRotGenFeature {
 
     /**
-     * Executed from {@link Species#rot(IWorld, BlockPos, int, int, Random, boolean)}, allowing actions
+     * Executed from {@link Species#rot(IWorld, BlockPos, int, int, Random, boolean, boolean)}, allowing actions
      * after the tree has rotted.
      *
      * @param configuredGenFeature The {@link ConfiguredGenFeature} generating this.

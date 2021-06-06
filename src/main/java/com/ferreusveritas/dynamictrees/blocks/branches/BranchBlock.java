@@ -408,7 +408,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 				species.getTreeHarvestDrops(world, pos, dropList, world.random);
 				final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
 				final BlockPos relPos = imPos.subtract(cutPos);
-				world.setBlock(imPos, CommonBlockStates.AIR, 3);
+				world.setBlock(imPos, BlockStates.AIR, 3);
 				destroyedLeaves.put(relPos, blockState);
 				dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)) );
 			}
@@ -590,14 +590,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		if (toBlock == Blocks.AIR) { // Block was set to air improperly.
 			world.setBlock(pos, state, 0); // Set the block back and attempt a proper breaking.
 			this.sloppyBreak(world, pos, DestroyType.VOID);
-			this.setBlockStateIgnored(world, pos, CommonBlockStates.AIR, 2); // Set back to air in case the sloppy break failed to do so.
+			this.setBlockStateIgnored(world, pos, BlockStates.AIR, 2); // Set back to air in case the sloppy break failed to do so.
 			return;
 		}
 		if (toBlock == Blocks.FIRE) { // Block has burned.
 			world.setBlock(pos, state, 0); // Set the branch block back and attempt a proper breaking.
 			this.sloppyBreak(world, pos, DestroyType.FIRE); // Applies fire effects to falling branches.
 			//this.setBlockStateIgnored(world, pos, Blocks.FIRE.getDefaultState(), 2); // Disabled because the fire is too aggressive.
-			this.setBlockStateIgnored(world, pos, CommonBlockStates.AIR, 2); // Set back to air instead.
+			this.setBlockStateIgnored(world, pos, BlockStates.AIR, 2); // Set back to air instead.
 			return;
 		}
 		if (!toBlock.hasTileEntity(toBlockState) && world.getBlockEntity(pos) == null) { // Block seems to be a pure BlockState based block.

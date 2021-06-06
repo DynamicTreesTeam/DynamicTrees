@@ -9,13 +9,12 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CoderNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.CustomBlockTags;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -316,7 +315,7 @@ public class JoCode {
 									if (TreeHelper.isLeaves(leavesState)) {
 										final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
 										if (leavesProperties.getFamily() == leavesBlock.getProperties(leavesState).getFamily()) {
-											world.setBlock(delPos, CommonBlockStates.AIR, 2);
+											world.setBlock(delPos, BlockStates.AIR, 2);
 										}
 									}
 								}
@@ -325,7 +324,7 @@ public class JoCode {
 					});
 				}
 
-				world.setBlock(pos, CommonBlockStates.AIR, 2);
+				world.setBlock(pos, BlockStates.AIR, 2);
 			}
 		}
 

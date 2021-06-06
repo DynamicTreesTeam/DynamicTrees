@@ -151,7 +151,7 @@ public class BasicBranchBlock extends BranchBlock {
 			}
 		}
 		
-		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, rand, rapid);// Unreinforced branches are destroyed
+		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, rand, rapid, !this.isStrippedBranch());// Unreinforced branches are destroyed
 		
 		if(rapid && didRot) {// Speedily postRot back dead branches if this block rotted
 			for (Direction dir : Direction.values()) {// The logic here is that if this block rotted then
@@ -265,31 +265,16 @@ public class BasicBranchBlock extends BranchBlock {
 		return signal;
 	}
 
-
-
-//	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal) {
-//		Direction originDir = signal.dir.getOpposite(); // Direction this signal originated from
-//
-//		CactusThickness trunk;
-//		if (signal.getSpecies() instanceof CactusSpecies){
-//			trunk = ((CactusSpecies) signal.getSpecies()).thicknessForBranchPlaced(world, pos, true);
-//		} else trunk = CactusThickness.BRANCH;
-//
-//		if (originDir.getAxis() != Direction.Axis.Y && (world.getBlockState(pos.above()).getBlock() == this || world.getBlockState(pos.below()).getBlock() == this)) {
-//			signal.success = false;
-//			return signal;
-//		}
-//
-//		signal.success = world.setBlock(pos, this.stateDefinition.any().setValue(TRUNK_TYPE, trunk).setValue(ORIGIN, originDir), 2);
-//		signal.radius = getCactusRadius(trunk);
-//		return signal;
-//	}
-	
 	@Override
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
 		// This is always placed at the beginning of every growSignal function
 		if (!signal.step())
 			return signal;
+
+		if (this.isStrippedBranch()) {
+			signal.choked = true;
+			return signal;
+		}
 
 		final BlockState currBlockState = world.getBlockState(pos);
 		final Species species = signal.getSpecies();
