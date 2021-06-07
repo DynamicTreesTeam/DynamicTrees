@@ -271,11 +271,6 @@ public class BasicBranchBlock extends BranchBlock {
 		if (!signal.step())
 			return signal;
 
-		if (this.isStrippedBranch()) {
-			signal.choked = true;
-			return signal;
-		}
-
 		final BlockState currBlockState = world.getBlockState(pos);
 		final Species species = signal.getSpecies();
 		final boolean inTrunk = signal.isInTrunk();

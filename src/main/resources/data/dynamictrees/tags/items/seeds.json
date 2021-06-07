@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "dynamictrees:oak_seed",
+    "dynamictrees:apple_oak_seed",
+    "dynamictrees:spruce_seed",
+    "dynamictrees:birch_seed",
+    "dynamictrees:jungle_seed",
+    "dynamictrees:acacia_seed",
+    "dynamictrees:dark_oak_seed"
+  ]
+}
