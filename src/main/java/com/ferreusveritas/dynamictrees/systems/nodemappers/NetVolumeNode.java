@@ -42,7 +42,7 @@ public class NetVolumeNode implements INodeInspector {
 
 		public void addVolume (int volume, int branch) {
 			if (branchVolumes.containsKey(branch)){
-				branchVolumes.computeIfPresent(branch, (b,v)->v+volume);
+				branchVolumes.computeIfPresent(branch, (b,v) -> v + volume);
 			} else {
 				branchVolumes.put(branch, volume);
 			}
@@ -50,7 +50,7 @@ public class NetVolumeNode implements INodeInspector {
 		}
 
 		public void multiplyVolume (double multiplier) {
-			branchVolumes.forEach((a,b)-> b = (int)(b*multiplier));
+			branchVolumes.replaceAll((a, b) -> (int) (b * multiplier));
 		}
 
 		public int[] getRawVolumesArray(){
