@@ -117,9 +117,4 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
 		}
 	}
 
-	@Override
-	public boolean shouldRenderAtSqrDistance(double p_70112_1_) {
-		return false;
-	}
-
 }

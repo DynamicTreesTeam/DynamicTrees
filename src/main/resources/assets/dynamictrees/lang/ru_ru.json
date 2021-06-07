@@ -1,12 +1,12 @@
 {
   "itemGroup.dynamictrees": "Динамические деревья",
 
-  "block.dynamictrees.oak_branch":"Ствол дуба",
-  "block.dynamictrees.spruce_branch":"Ствол дуба ели",
-  "block.dynamictrees.birch_branch":"Ствол берёзы",
-  "block.dynamictrees.jungle_branch":"Ствол дерева джунглей",
-  "block.dynamictrees.dark_oak_branch":"Ствол тёмного дуба",
-  "block.dynamictrees.acacia_branch":"Ствол акации",
+  "block.dynamictrees.oak_branch": "Ствол дуба",
+  "block.dynamictrees.spruce_branch": "Ствол дуба ели",
+  "block.dynamictrees.birch_branch": "Ствол берёзы",
+  "block.dynamictrees.jungle_branch": "Ствол дерева джунглей",
+  "block.dynamictrees.dark_oak_branch": "Ствол тёмного дуба",
+  "block.dynamictrees.acacia_branch": "Ствол акации",
   "block.dynamictrees.crimson_branch": "Багровый грибок",
   "block.dynamictrees.warped_branch": "Warped грибок",
 
@@ -26,13 +26,13 @@
   "species.dynamictrees.warped": "Искажённый",
   "species.dynamictrees.mega_warped": "Мега искажённый",
 
-  "item.dynamictrees.oak_seed":"Жёлудь дуба",
-  "item.dynamictrees.spruce_seed":"Еловая шишка",
-  "item.dynamictrees.birch_seed":"Березовая сережка",
-  "item.dynamictrees.jungle_seed":"Джунглевый стручок",
-  "item.dynamictrees.dark_oak_seed":"Жёлудь тёмного дуба",
-  "item.dynamictrees.acacia_seed":"Семя акации",
-  "item.dynamictrees.apple_oak_seed":"Яблочное зёрнышко",
+  "item.dynamictrees.oak_seed": "Жёлудь дуба",
+  "item.dynamictrees.spruce_seed": "Еловая шишка",
+  "item.dynamictrees.birch_seed": "Березовая сережка",
+  "item.dynamictrees.jungle_seed": "Джунглевый стручок",
+  "item.dynamictrees.dark_oak_seed": "Жёлудь тёмного дуба",
+  "item.dynamictrees.acacia_seed": "Семя акации",
+  "item.dynamictrees.apple_oak_seed": "Яблочное зёрнышко",
   "item.dynamictrees.crimson_seed": "Багровая шляпка",
   "item.dynamictrees.warped_seed": "Искажённая шляпка",
 
@@ -44,8 +44,8 @@
   "item.dynamictrees.dendro_potion.persistence": "Зелье глубокого сна",
   "item.dynamictrees.dendro_potion.transform": "Зелье трансформации",
 
-  "item.dynamictrees.dirt_bucket":"Ведро грязи",
-  "item.dynamictrees.staff":"Лесной посох",
+  "item.dynamictrees.dirt_bucket": "Ведро грязи",
+  "item.dynamictrees.staff": "Лесной посох",
   "block.dynamictrees.potted_sapling": "Саженец в горшке",
 
   "chat.registry_name": "Имя в реестре: %s",

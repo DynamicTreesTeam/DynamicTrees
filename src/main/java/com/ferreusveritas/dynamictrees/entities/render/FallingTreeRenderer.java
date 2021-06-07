@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.entities.render;
 
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
-import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree;
+import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModelTrackerCache;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -32,19 +32,19 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 	public void render(FallingTreeEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
 		super.render(entity, entityYaw, partialTicks, matrixStack, buffer, packedLight);
 
-		if(!entity.isClientBuilt() || !entity.shouldRender()) {
+		if (!entity.isClientBuilt() || !entity.shouldRender()) {
 			return;
 		}
 
 		this.entityRenderDispatcher.textureManager.bind(this.getTextureLocation(entity));
 
-		FallingTreeEntityModel treeModel = ModelTrackerCacheEntityFallingTree.getModel(entity);
+		final FallingTreeEntityModel treeModel = FallingTreeEntityModelTrackerCache.getModel(entity);
 
 		matrixStack.pushPose();
 
-		IVertexBuilder vertexBuilder = buffer.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity)));
+		final IVertexBuilder vertexBuilder = buffer.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity)));
 
-//		if(entity.onFire) {
+//		if (entity.onFire) {
 //			renderFire(matrixStack, vertexBuilder);
 //		}
 

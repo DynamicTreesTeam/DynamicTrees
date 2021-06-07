@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @OnlyIn(Dist.CLIENT)
-public class ModelTrackerCacheEntityFallingTree {
+public class FallingTreeEntityModelTrackerCache {
 	
 	public static Map<Integer, FallingTreeEntityModel> modelMap = new ConcurrentHashMap<>();
 	

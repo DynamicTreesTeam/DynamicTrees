@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.models.IModelTracker;
-import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree;
+import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModelTrackerCache;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
@@ -350,7 +350,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void modelCleanup() {
-		ModelTrackerCacheEntityFallingTree.cleanupModels(level, this);
+		FallingTreeEntityModelTrackerCache.cleanupModels(level, this);
 	}
 	
 	public void handleMotion() {
