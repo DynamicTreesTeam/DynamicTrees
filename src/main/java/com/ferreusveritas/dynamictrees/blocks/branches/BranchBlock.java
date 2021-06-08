@@ -123,6 +123,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 *
 	 * @param world The world
 	 * @param pos The branch block position
+	 * @param fertility The fertility of the tree.
 	 * @param radius The radius of the branch that's the subject of rotting
 	 * @param rand A random number generator for convenience
 	 * @param rapid If true then unsupported branch postRot will occur regardless of chance value.
@@ -130,7 +131,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * 		True if this postRot is happening under a generation scenario as opposed to natural tree updates
 	 * @return true if the branch was destroyed because of postRot
 	 */
-	public abstract boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid);
+	public abstract boolean checkForRot(IWorld world, BlockPos pos, Species species, int fertility, int radius, Random rand, float chance, boolean rapid);
 	
 	public static int setSupport(int branches, int leaves) {
 		return ((branches & 0xf) << 4) | (leaves & 0xf);

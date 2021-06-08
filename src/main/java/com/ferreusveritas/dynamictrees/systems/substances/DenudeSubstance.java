@@ -13,6 +13,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**
+ * An {@link ISubstanceEffect} that "denudes" the tree. This involves stripping all
+ * branches and removing all leaves.
+ *
  * @author Harley O'Connor
  */
 public class DenudeSubstance implements ISubstanceEffect {
@@ -28,8 +31,12 @@ public class DenudeSubstance implements ISubstanceEffect {
         final Species species = dirt.getSpecies(rootState, world, rootPos);
         final Family family = species.getFamily();
 
+        // If the family doesn't have a stripped branch the substance can't be applied.
         if (!family.hasStrippedBranch())
             return false;
+
+        // Set fertility to zero so the leaves won't grow back.
+        dirt.setFertility(world, rootPos, 0);
 
         if (world.isClientSide) {
             TreeHelper.treeParticles(world, rootPos, ParticleTypes.ASH, 8);

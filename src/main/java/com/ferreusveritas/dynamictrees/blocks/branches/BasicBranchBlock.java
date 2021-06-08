@@ -118,7 +118,7 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
-		return isSameTree(branch) && !this.isStrippedBranch() ? BasicBranchBlock.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
+		return isSameTree(branch) ? BasicBranchBlock.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
 	}
 	
 	@Override
@@ -132,7 +132,7 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 
 	@Override
-	public boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid) {
+	public boolean checkForRot(IWorld world, BlockPos pos, Species species, int fertility, int radius, Random rand, float chance, boolean rapid) {
 		
 		if( !rapid && (chance == 0.0f || rand.nextFloat() > chance) ) {
 			return false;//Bail out if not in rapid mode and the postRot chance fails
@@ -151,14 +151,14 @@ public class BasicBranchBlock extends BranchBlock {
 			}
 		}
 		
-		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, rand, rapid, !this.isStrippedBranch());// Unreinforced branches are destroyed
+		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, fertility, rand, rapid, fertility > 0 && !this.isStrippedBranch()); // Unreinforced branches are destroyed.
 		
-		if(rapid && didRot) {// Speedily postRot back dead branches if this block rotted
+		if (rapid && didRot) {// Speedily postRot back dead branches if this block rotted
 			for (Direction dir : Direction.values()) {// The logic here is that if this block rotted then
 				BlockPos neighPos = pos.relative(dir);// the neighbors might be rotted too.
 				BlockState neighState = world.getBlockState(neighPos);
-				if(neighState.getBlock() == this) { // Only check blocks logs that are the same as this one
-					checkForRot(world, neighPos, species, getRadius(neighState), rand, 1.0f, true);
+				if (neighState.getBlock() == this) { // Only check blocks logs that are the same as this one
+					this.checkForRot(world, neighPos, species, fertility, getRadius(neighState), rand, 1.0f, true);
 				}
 			}
 		}
@@ -208,7 +208,7 @@ public class BasicBranchBlock extends BranchBlock {
 		final Family thisTree = getFamily();
 
 		// The requesting leaves must match the tree for hydration to occur, and the branch must not be stripped.
-		if (leavesProperties.getFamily() == thisTree && !this.isStrippedBranch()) {
+		if (leavesProperties.getFamily() == thisTree) {
 			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);
 			int radius = MetadataCell.getRadius(radiusAndMeta);
 			int metadata = MetadataCell.getMeta(radiusAndMeta);
@@ -247,7 +247,7 @@ public class BasicBranchBlock extends BranchBlock {
 		
 		final DynamicLeavesBlock leaves = species.getLeavesBlock().orElse(null);
 		if (leaves != null) {
-			if (!this.isStrippedBranch() && fromRadius == getFamily().getPrimaryThickness()) {// If we came from a twig (and we're not a stripped branch) then just make some leaves
+			if (fromRadius == getFamily().getPrimaryThickness()) {// If we came from a twig (and we're not a stripped branch) then just make some leaves
 				signal.success = leaves.growLeavesIfLocationIsSuitable(world, species.getLeavesProperties(), pos, 0);
 			} else {// Otherwise make a proper branch
 				return leaves.branchOut(world, pos, signal);

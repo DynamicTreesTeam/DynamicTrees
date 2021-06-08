@@ -1182,11 +1182,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			if(branch != null) {
 				int radius = branch.getRadius(branchState);
 				float rotChance = rotChance(world, endPos, world.getRandom(), radius);
-				if(branch.checkForRot(world, endPos, this, radius, world.getRandom(), rotChance, safeBounds != SafeChunkBounds.ANY) || radius != family.getPrimaryThickness()) {
-					if(safeBounds != SafeChunkBounds.ANY) { //worldgen
+				if (branch.checkForRot(world, endPos, this, fertility, radius, world.getRandom(), rotChance, safeBounds != SafeChunkBounds.ANY) || radius != family.getPrimaryThickness()) {
+					if (safeBounds != SafeChunkBounds.ANY) { // worldgen
 						TreeHelper.ageVolume(world, endPos.below((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2, safeBounds);
 					}
-					iter.remove();//Prune out the rotted end points so we don't spawn fruit from them.
+					iter.remove(); // Prune out the rotted end points so we don't spawn fruit from them.
 				}
 			}
 		}
@@ -1203,12 +1203,13 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param pos The {@link BlockPos}.
 	 * @param neighborCount Count of neighbors reinforcing this block
 	 * @param radius The radius of the branch
+	 * @param fertility The fertility of the tree.
 	 * @param random Access to a random number generator
 	 * @param rapid True if this rot is happening under a generation scenario as opposed to natural tree updates
 	 * @param growLeaves {@code true} if this rot should attempt to grow leaves first.
 	 * @return true if the branch should rot
 	 */
-	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid, boolean growLeaves) {
+	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
 		if (growLeaves && radius <= family.getPrimaryThickness()) {
 			if (!getLeavesProperties().hasDynamicLeavesBlock())
 				return false;
@@ -1226,7 +1227,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
 			if (branch != null)
 				branch.rot(world, pos);
-			this.postRot(world, pos, neighborCount, radius, random, rapid);
+			this.postRot(world, pos, neighborCount, radius, fertility, random, rapid);
 			return true;
 		}
 		
@@ -1235,18 +1236,18 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	/**
 	 * @deprecated No longe in use due to extra parameter. Use/override
-	 * 			   {@link #rot(IWorld, BlockPos, int, int, Random, boolean, boolean)} instead.
+	 * 			   {@link #rot(IWorld, BlockPos, int, int, int, Random, boolean, boolean)} instead.
 	 */
 	@Deprecated
 	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
 		return false;
 	}
 
-	private void postRot(final IWorld world, final BlockPos pos, final int neighborCount, final int radius, final Random random, final boolean rapid) {
+	public void postRot(final IWorld world, final BlockPos pos, final int neighborCount, final int radius, final int fertility, final Random random, final boolean rapid) {
 		this.genFeatures.stream()
 				.filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IPostRotGenFeature)
 				.forEach(configuredGenFeature -> ((IPostRotGenFeature) configuredGenFeature.getGenFeature())
-						.postRot(configuredGenFeature, world, pos, neighborCount, radius, random, rapid));
+						.postRot(configuredGenFeature, world, pos, neighborCount, radius, fertility, random, rapid));
 	}
 	
 	/**

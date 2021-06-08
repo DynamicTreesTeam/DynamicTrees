@@ -31,7 +31,7 @@ public class RotSoilGenFeature extends GenFeature implements IPostRotGenFeature 
     }
 
     @Override
-    public void postRot(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
+    public void postRot(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid) {
         if (!TreeHelper.isRooty(world.getBlockState(pos.below())))
             return;
 
