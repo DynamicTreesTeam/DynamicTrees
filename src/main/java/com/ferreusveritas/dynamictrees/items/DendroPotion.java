@@ -43,8 +43,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		FERTILITY(  4, false, "fertility",   0x4ad400, Items.COD),
 		PERSISTENCE(5, false, "persistence", 0x389aff, Items.BLUE_ORCHID),
 		TRANSFORM(  6, true, "transform",   0x7fb8a4, Items.PRISMARINE_CRYSTALS),
-		HARVEST(7, true, "harvest", 0xe7c164, Items.GOLDEN_APPLE),
-		DENUDING(8, true, "denuding", 0xa47e46, Items.IRON_AXE);
+		HARVEST(7, false, "harvest", 0xe7c164, Items.GOLDEN_APPLE),
+		DENUDING(8, false, "denuding", 0xa47e46, Items.IRON_AXE);
 		
 		private final int index;
 		private final boolean active;
