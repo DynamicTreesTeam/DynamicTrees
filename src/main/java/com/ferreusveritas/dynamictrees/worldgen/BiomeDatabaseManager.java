@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.events.AddFeatureCancellersEvent;
 import com.ferreusveritas.dynamictrees.api.events.PopulateDefaultDatabaseEvent;
 import com.ferreusveritas.dynamictrees.api.events.PopulateDimensionalDatabaseEvent;
@@ -10,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.resources.MultiJsonReloadListener;
+import com.ferreusveritas.dynamictrees.resources.TreesResourceManager;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
@@ -17,7 +17,6 @@ import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.IResourceManager;
@@ -25,16 +24,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * Manages {@link BiomeDatabase} objects, reading from tree packs. Main instance stored in
@@ -155,7 +153,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, List<JsonElement>> preparedObject, IResourceManager resourceManager, ApplicationType applicationType) {
+    protected void apply(Map<ResourceLocation, List<JsonElement>> preparedObject, TreesResourceManager resourceManager, ApplicationType applicationType) {
         if (applicationType == ApplicationType.SETUP) {
             // Ensure default database is reset.
             this.defaultDatabase = new BiomeDatabase();
@@ -164,11 +162,9 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
             if (!DTConfigs.WORLD_GEN.get())
                 return;
 
-            final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
-            MinecraftForge.EVENT_BUS.post(addFeatureCancellersEvent);
+            MinecraftForge.EVENT_BUS.post(new AddFeatureCancellersEvent(this.defaultDatabase));
 
-            preparedObject.entrySet().stream().filter(this::isDefaultPopulator).forEach(defaultPopulator ->
-                    defaultPopulator.getValue().forEach(jsonElement -> this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), jsonElement, true)));
+            this.readDefaultPopulators(preparedObject.entrySet().stream().filter(this::isDefaultPopulator).collect(Collectors.toList()), true);
             return;
         }
 
@@ -181,38 +177,29 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         if (!DTConfigs.WORLD_GEN.get())
             return;
 
-        final Event addFeatureCancellersEvent = new AddFeatureCancellersEvent(this.defaultDatabase);
-        MinecraftForge.EVENT_BUS.post(addFeatureCancellersEvent);
+        MinecraftForge.EVENT_BUS.post(new AddFeatureCancellersEvent(this.defaultDatabase));
+        MinecraftForge.EVENT_BUS.post(new PopulateDefaultDatabaseEvent(this.defaultDatabase));
 
-        final Event populateDefaultDatabaseEvent = new PopulateDefaultDatabaseEvent(this.defaultDatabase);
-        MinecraftForge.EVENT_BUS.post(populateDefaultDatabaseEvent);
+        // Read the default populators.
+        this.readDefaultPopulators(preparedObject.entrySet().stream().filter(this::isDefaultPopulator).collect(Collectors.toList()), false);
 
-        {
-            final ResourceLocation defaultPopulator = DynamicTrees.resLoc(DEFAULT_POPULATOR);
+        final List<Map.Entry<ResourceLocation, List<JsonElement>>> dimensionalPopulators =
+                preparedObject.entrySet().stream().filter(entry -> !this.isDefaultPopulator(entry)).collect(Collectors.toList());
 
-            // It's important we do our populator first, or we override others.
-            for (JsonElement populatorElement : preparedObject.getOrDefault(defaultPopulator, Collections.emptyList())) {
-                this.readPopulator(this.defaultDatabase, defaultPopulator, populatorElement, false);
-            }
+        MinecraftForge.EVENT_BUS.post(new PopulateDimensionalDatabaseEvent(this.dimensionDatabases, this.defaultDatabase));
 
-            preparedObject.remove(defaultPopulator);
-        }
-
-        // Read other default populators.
-        preparedObject.entrySet().stream().filter(this::isDefaultPopulator).forEach(defaultPopulator ->
-                defaultPopulator.getValue().forEach(jsonElement -> this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), jsonElement, false)));
-
-        final Event populateDimensionalDatabaseEvent = new PopulateDimensionalDatabaseEvent(this.dimensionDatabases, this.defaultDatabase);
-        MinecraftForge.EVENT_BUS.post(populateDimensionalDatabaseEvent);
-
-        preparedObject.entrySet().stream().filter(entry -> !this.isDefaultPopulator(entry)).forEach(dimensionalPopulator -> {
+        // Reads all dimensional populators added by base DT/add-ons first.
+        dimensionalPopulators.forEach(dimensionalPopulator -> {
             final BiomeDatabase dimensionalDatabase = BiomeDatabase.copyOf(this.defaultDatabase);
-
             this.dimensionDatabases.put(dimensionalPopulator.getKey(), dimensionalDatabase);
 
-            dimensionalPopulator.getValue().forEach(jsonElement ->
-                    this.readPopulator(dimensionalDatabase, dimensionalPopulator.getKey(), jsonElement, false));
+            this.readPopulator(dimensionalDatabase, dimensionalPopulator.getKey(), dimensionalPopulator.getValue().get(0), false);
+            dimensionalPopulator.getValue().remove(0);
         });
+
+        // Read any dimensional populators added by tree packs after.
+        dimensionalPopulators.forEach(dimensionalPopulator -> dimensionalPopulator.getValue().forEach(jsonElement ->
+                this.readPopulator(this.dimensionDatabases.get(dimensionalPopulator.getKey()), dimensionalPopulator.getKey(), jsonElement, false)));
 
         // Blacklist certain dimensions according to the config.
         DTConfigs.DIMENSION_BLACKLIST.get().forEach(resourceLocationString -> {
@@ -224,12 +211,24 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         });
     }
 
+    private void readDefaultPopulators(final List<Map.Entry<ResourceLocation, List<JsonElement>>> defaultPopulators, final boolean readCancellerOnly) {
+        // Reads all populators added by base DT/add-ons first.
+        defaultPopulators.forEach(defaultPopulator -> {
+            this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), defaultPopulator.getValue().get(0), readCancellerOnly);
+            defaultPopulator.getValue().remove(0);
+        });
+
+        // Read any populators added by tree packs after.
+        defaultPopulators.forEach(defaultPopulator -> defaultPopulator.getValue().forEach(jsonElement ->
+                this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), jsonElement, readCancellerOnly)));
+    }
+
     private boolean isDefaultPopulator (final Map.Entry<ResourceLocation, List<JsonElement>> entry) {
         return entry.getKey().getPath().equals(DEFAULT_POPULATOR);
     }
 
     private void readPopulator (final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonElement jsonElement, final boolean readCancellerOnly) {
-        LOGGER.debug("Loading Json biome populator '{}'.", resourceLocation);
+        LOGGER.debug("Loading Json biome populator '{}'. Debug: \n{}", resourceLocation, jsonElement);
         JsonHelper.JsonElementReader.of(jsonElement).ifArrayForEach(JsonObject.class, jsonObject ->
                 this.readPopulatorSection(database, resourceLocation, jsonObject, readCancellerOnly))
                 .elseWarn("Root element of populator '" + resourceLocation + "' was not a Json array.");
@@ -289,6 +288,12 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                     currentFeatureCancellations.copyFrom(featureCancellations);
                 });
             });
+        } else {
+            // If we detect a canceller in a dimensional database, log a warning.
+            reader.ifContains(CANCELLERS, JsonObject.class, cancellerObject -> {
+                LOGGER.warn("Feature canceller entry found in biome database for dimension '{}'! " +
+                        "It will be ignored as feature cancellers only work in the default populator.", resourceLocation);
+            });
         }
     }
 
@@ -322,7 +327,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
      * @return A {@link CompletableFuture} that does nothing.
      */
     @Override
-    public CompletableFuture<Void> load(IResourceManager resourceManager) {
+    public CompletableFuture<Void> load(TreesResourceManager resourceManager) {
         return CompletableFuture.runAsync(() -> {});
     }
 

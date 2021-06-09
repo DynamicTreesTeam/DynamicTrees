@@ -5,7 +5,6 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * An abstract extension of {@link JsonReloadListener} implementing {@link ReloadListener#apply(Object, IResourceManager, ApplicationType)}
+ * An abstract extension of {@link JsonReloadListener} implementing {@link ReloadListener#apply(Object, TreesResourceManager, ApplicationType)}
  * for {@link RegistryEntry} (and {@link IResettable}) objects to be loaded, setup, and registered from Json.
  *
  * @param <V> The type of the {@link RegistryEntry}.
@@ -39,7 +38,7 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> preparedObject, IResourceManager resourceManager, ApplicationType applicationType) {
+    protected void apply(Map<ResourceLocation, JsonElement> preparedObject, TreesResourceManager resourceManager, ApplicationType applicationType) {
         // Only unlock the registry on reload.
         if (applicationType == ApplicationType.RELOAD)
             this.registry.unlock();

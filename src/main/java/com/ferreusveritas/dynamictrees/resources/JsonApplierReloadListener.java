@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.IResourceManager;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 
@@ -17,7 +16,7 @@ import java.util.function.Consumer;
  * An abstract extension of {@link ReloadListener} that stores {@link JsonPropertyApplierList}
  * of type {@link V}.
  *
- * @param <T> The type of {@link Object} returned by {@link #prepare(IResourceManager)}.
+ * @param <T> The type of {@link Object} returned by {@link ReloadListener#prepare(TreesResourceManager)}.
  * @param <V> The type of {@link Object} the {@link JsonPropertyApplierList} objects are applying to.
  * @author Harley O'Connor
  */

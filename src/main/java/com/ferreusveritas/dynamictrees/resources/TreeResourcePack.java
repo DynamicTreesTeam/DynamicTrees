@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.resources;
 
+import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.google.common.base.Joiner;
 import net.minecraft.resources.ResourcePack;
 import net.minecraft.resources.ResourcePackFileNotFoundException;
@@ -35,7 +36,7 @@ public class TreeResourcePack extends ResourcePack {
     @Override
     public InputStream getResource(@Nullable ResourcePackType type, ResourceLocation location) throws IOException {
         final Path path = this.getPath(location.getNamespace(), location.getPath());
-        if(!Files.exists(path))
+        if (!Files.exists(path))
             throw new FileNotFoundException("Could not find tree resource for path '" + path + "'.");
         return Files.newInputStream(path, StandardOpenOption.READ);
     }
@@ -68,7 +69,7 @@ public class TreeResourcePack extends ResourcePack {
                     // It is VERY IMPORTANT that we do not rely on Path.toString as this is inconsistent between operating systems
                     // Join the path names ourselves to force forward slashes
                     .map(path -> new ResourceLocation(namespace, Joiner.on('/').join(path)))
-                    .collect(Collectors.toList());
+                    .collect(CommonCollectors.toAlternateLinkedSet());
         } catch (IOException e) {
             return Collections.emptyList();
         }
@@ -88,7 +89,7 @@ public class TreeResourcePack extends ResourcePack {
                     .filter(path -> path.getNameCount() > 0) // skip the root entry
                     .map(p -> p.toString().replaceAll("/$","")) // remove the trailing slash, if present
                     .filter(s -> !s.isEmpty()) // filter empty strings, otherwise empty strings default to minecraft in ResourceLocations
-                    .collect(Collectors.toSet());
+                    .collect(CommonCollectors.toLinkedSet());
         } catch (IOException e) {
             return Collections.emptySet();
         }

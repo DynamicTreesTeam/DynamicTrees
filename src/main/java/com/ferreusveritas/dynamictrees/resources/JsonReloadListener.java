@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.resources;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -28,8 +27,9 @@ public abstract class JsonReloadListener<V> extends JsonApplierReloadListener<Ma
     }
 
     @Override
-    protected Map<ResourceLocation, JsonElement> prepare(final IResourceManager resourceManager) {
-        final Map<ResourceLocation, JsonElement> map = Maps.newHashMap();
+    protected Map<ResourceLocation, JsonElement> prepare(final TreesResourceManager resourceManager) {
+        // Create map as a linked hash map so it remembers the order in which they are put.
+        final Map<ResourceLocation, JsonElement> map = Maps.newLinkedHashMap();
         int i = this.folderName.length() + 1;
 
         for (ResourceLocation resourceLocationIn : resourceManager.listResources(this.folderName, (fileName) -> fileName.endsWith(JSON_EXTENSION))) {
