@@ -1,6 +1,7 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
   "1.16.5": {
+    "1.16.5-0.10.0-Beta16": "Bug Fixes:\n- Fixed tree pack loading order.",
     "1.16.5-0.10.0-Beta15": "Enhancements:\n+ The burgeoning potion now fills fertility when used and persists until fertility depletes instead of running on a timer.\n+ Bone meal now restores two points of fertility on application.\n+ Added many new custom tags and better integration with vanilla tags. Details can be found here: https://github.com/ferreusveritas/DynamicTrees/wiki/Tags.\nChanges:\n- Disabled persistence and fertility potions, will be removed entirely in the next version.\n- Beehives are now slightly rarer in forests.\nTechnical Changes:\n- Certain species location overrides will now require a separate sapling block to function (to fix crash with Minecolonies).\n- Json biome selectors can now filter biomes by their category.\n- Json block property appliers can edit the light block property to make blocks like leaves emit light.\n- Branch model loaders now automatically default to a thick branch model if the family's maximum branch radius is greater than 8.\n- Added Palm species type, leaves properties, and growth logic (for add-ons to access, there are no palm trees in base DT).\nBug Fixes:\n- Fixed crash with Minecolonies.\n- Fixed harvest multiplier being ineffectual to log drops.\n- Fixed dynamic leaves dropping primitive leaves when broken without shears.\n- Fixed dynamic birch leaves colours not being changed by serene seasons.",
     "1.16.5-0.10.0-Beta14": "Bug Fixes:\n- Fixed density selectors - forests should now be as dense as they were in 1.12. \n- Fixed trees not spawning in modified wooded badlands.\n- Fixed loot tables support for certain blocks (temporary until drop creators are made). \n- Fixed not clearing model caches which caused a memory leak.",
     "1.16.5-0.10.0-Beta13": "Enhancements:\n- Added config option for whether or not the player can bone meal a tree.\nBug Fixes:\n- Fixed commands not being registered on server reload, meaning they would disappear. \n- Fixed trunk shell hardness bug. \n- Fixed trunk shell not disappearing on neighbour update.\n- Fixed potted dynamic sapling consuming items in creative mode. \n- Fixed bug where tree generation would be cancelled by grass or ferns. ",
@@ -13,7 +14,7 @@
     "1.16.5-0.10.0-Beta6": "Initial 1.16.5 beta for CF."
   },
   "promos": {
-    "1.16.5-latest": "1.16.5-0.10.0-Beta15",
-    "1.16.5-recommended": "1.16.5-0.10.0-Beta15"
+    "1.16.5-latest": "1.16.5-0.10.0-Beta16",
+    "1.16.5-recommended": "1.16.5-0.10.0-Beta16"
   }
 }
