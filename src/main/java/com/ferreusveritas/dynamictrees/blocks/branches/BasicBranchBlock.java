@@ -151,7 +151,7 @@ public class BasicBranchBlock extends BranchBlock {
 			}
 		}
 		
-		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, fertility, rand, rapid, fertility > 0 && !this.isStrippedBranch()); // Unreinforced branches are destroyed.
+		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, fertility, rand, rapid, fertility > 0); // Unreinforced branches are destroyed.
 		
 		if (rapid && didRot) {// Speedily postRot back dead branches if this block rotted
 			for (Direction dir : Direction.values()) {// The logic here is that if this block rotted then

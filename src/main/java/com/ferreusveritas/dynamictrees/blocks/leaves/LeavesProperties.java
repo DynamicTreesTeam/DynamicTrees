@@ -208,7 +208,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	}
 
 	public BlockState getDynamicLeavesState() {
-		return getDynamicLeavesState(maxHydro);
+		return getDynamicLeavesState(getCellKit().getDefaultHydration());
 	}
 
 	public BlockState getDynamicLeavesState(int hydro) {
