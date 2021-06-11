@@ -465,7 +465,11 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return logs;
 	}
 
-	public boolean isFireProof () { return false; }
+	private boolean isFireProof = false;
+
+	public boolean isFireProof () { return isFireProof; }
+
+	public void setIsFireProof(boolean isFireProof) { this.isFireProof = isFireProof; }
 
 	public SoundType getBranchSoundType (BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
 		return this.getDefaultBranchSoundType();

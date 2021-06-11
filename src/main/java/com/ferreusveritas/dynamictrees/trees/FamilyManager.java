@@ -37,7 +37,8 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
 
         this.setupAppliers.register("primitive_log", Block.class, Family::setPrimitiveLog)
                 .register("primitive_stripped_log", Block.class, Family::setPrimitiveStrippedLog)
-                .register("stick", Item.class, Family::setStick);
+                .register("stick", Item.class, Family::setStick)
+                .register("fire_proof", Boolean.class, Family::setIsFireProof);
 
         this.loadAppliers.register("generate_surface_root", Boolean.class, Family::setHasSurfaceRoot)
                 .register("generate_stripped_branch", Boolean.class, Family::setHasStrippedBranch);
