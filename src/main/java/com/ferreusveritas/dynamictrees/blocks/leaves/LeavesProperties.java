@@ -323,6 +323,15 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 		}
 	}
 
+	private boolean canGrowOnGround = false;
+	public void setCanGrowOnGround(boolean canGrowOnGround){
+		this.canGrowOnGround = canGrowOnGround;
+	}
+
+	public boolean canGrowOnGround(){
+		return canGrowOnGround;
+	}
+
 	/**
 	 * Gets the {@link CellKit}, which is for leaves automata.
 	 *

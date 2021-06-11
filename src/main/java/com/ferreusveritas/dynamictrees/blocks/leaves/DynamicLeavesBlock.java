@@ -367,7 +367,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		final BlockState belowBlockState = world.getBlockState(pos.below());
 		
 		// Prevent leaves from growing on the ground or above liquids.
-		if ((belowBlockState.canOcclude() && !TreeHelper.isBranch(belowBlockState) && !(belowBlockState.getBlock() instanceof LeavesBlock)) || belowBlockState.getBlock() instanceof FlowingFluidBlock)
+		if (!leavesProperties.canGrowOnGround() && ((belowBlockState.canOcclude() && !TreeHelper.isBranch(belowBlockState) && !(belowBlockState.getBlock() instanceof LeavesBlock)) || belowBlockState.getBlock() instanceof FlowingFluidBlock))
 			return false;
 		
 		// Help to grow into double tall grass and ferns in a more natural way.
