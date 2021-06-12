@@ -17,6 +17,8 @@ jobs:
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         stale-issue-message: 'Stale issue message'
-        stale-pr-message: 'Stale pull request message'
         stale-issue-label: 'no-issue-activity'
+        exempt-issue-labels: 'enhancement,stale exempt'
+        stale-pr-message: 'Stale pull request message'
         stale-pr-label: 'no-pr-activity'
+        exempt-pr-labels: 'stale exempt'
