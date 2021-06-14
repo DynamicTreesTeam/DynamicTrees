@@ -84,7 +84,7 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
 	@Override
 	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
 		int fruitingRadius = configuredGenFeature.get(FRUITING_RADIUS);
-		if (fruitingRadius < 0) return false;
+		if (fruitingRadius < 0 || fertility < 1) return false;
 		BlockState blockState = world.getBlockState(treePos);
 		BranchBlock branch = TreeHelper.getBranch(blockState);
 
