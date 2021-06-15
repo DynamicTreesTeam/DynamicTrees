@@ -29,7 +29,7 @@ public abstract class GrowthLogicKit extends RegistryEntry<GrowthLogicKit> {
 		this.setRegistryName(registryName);
 	}
 
-	public Direction selectNewDirection(World world, BlockPos pos, BranchBlock branch, GrowSignal signal) { return null; }
+	public Direction selectNewDirection(World world, BlockPos pos, Species species, BranchBlock branch, GrowSignal signal) { return null; }
 
 	public abstract int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap);
 	
