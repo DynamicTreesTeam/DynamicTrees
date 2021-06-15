@@ -78,6 +78,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("transformable", Boolean.class, Species::setTransformable)
                 .register("growth_logic_kit", GrowthLogicKit.class, Species::setGrowthLogicKit)
                 .register("leaves_properties", LeavesProperties.class, Species::setLeavesProperties)
+                .register("world_gen_leaf_map_height", Integer.class, Species::setWorldGenLeafMapHeight)
                 .register("environment_factors", JsonObject.class, (species, jsonObject) ->
                         this.environmentFactorAppliers.applyAll(jsonObject, species).forEach(failureMessage -> LOGGER.warn("Error applying environment factor for species '{}': {}", species.getRegistryName(), failureMessage)))
                 .register("seed_drop_rarity", Float.class, Species::setupStandardSeedDropping)

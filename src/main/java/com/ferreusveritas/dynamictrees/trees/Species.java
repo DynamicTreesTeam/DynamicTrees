@@ -1956,9 +1956,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	public float getWorldGenTaperingFactor() {
 		return 1.5f;
 	}
-	
+
+	private int worldGenLeafMapHeight = 32;
+
 	public int getWorldGenLeafMapHeight() {
-		return 32;
+		return worldGenLeafMapHeight;
+	}
+
+	public void setWorldGenLeafMapHeight (int worldGenLeafMapHeight){
+		this.worldGenLeafMapHeight = worldGenLeafMapHeight;
 	}
 	
 	public int getWorldGenAgeIterations() {
