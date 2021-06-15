@@ -557,6 +557,19 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this;
 	}
 
+	private String seedName = null;
+
+	public ResourceLocation getSeedName(){
+		if (seedName == null)
+			return ResourceLocationUtils.suffix(getRegistryName(), "_seed");
+		else
+			return new ResourceLocation(getRegistryName().getNamespace(), seedName);
+	}
+
+	public void setSeedName(String name){
+		seedName = name;
+	}
+
 	/**
 	 * Generates and registers a {@link Seed} item for this species. Note that
 	 * it will only be generated if {@link #shouldGenerateSeed} is {@code true}.
@@ -565,7 +578,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public Species generateSeed() {
 		return !this.shouldGenerateSeed() || this.seed != null ? this :
-				this.setSeed(RegistryHandler.addItem(ResourceLocationUtils.suffix(this.getRegistryName(), "_seed"), new Seed(this)));
+				this.setSeed(RegistryHandler.addItem(getSeedName(), new Seed(this)));
 	}
 
 	/**
@@ -944,9 +957,16 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this;
 	}
 
+	private String saplingName = null;
 	//This is used to load the sapling model
 	public ResourceLocation getSaplingRegName() {
-		return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
+		if (saplingName == null)
+			return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
+		else
+			return new ResourceLocation(getRegistryName().getNamespace(), saplingName);
+	}
+	public void setSaplingName (String name){
+		saplingName = name;
 	}
 	
 	public int saplingColorMultiplier(BlockState state, IBlockDisplayReader access, BlockPos pos, int tintIndex) {

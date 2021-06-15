@@ -63,7 +63,9 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
         });
 
         this.loadAppliers.register("generate_seed", Boolean.class, Species::setShouldGenerateSeed)
-                .register("generate_sapling", Boolean.class, Species::setShouldGenerateSapling);
+                .register("generate_sapling", Boolean.class, Species::setShouldGenerateSapling)
+                .register("sapling_name", String.class, Species::setSaplingName)
+                .register("seed_name", String.class, Species::setSeedName);
 
         this.reloadAppliers.register("always_show_on_waila", Boolean.class, Species::alwaysShowOnWaila)
                 .register("tapering", Float.class, Species::setTapering)
