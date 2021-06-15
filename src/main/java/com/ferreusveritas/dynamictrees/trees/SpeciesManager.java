@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
+import net.minecraft.block.ComposterBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -26,6 +27,8 @@ import net.minecraftforge.common.BiomeDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -40,6 +43,8 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
      * (based on {@link net.minecraftforge.common.BiomeManager.BiomeType}).
      */
     private final JsonPropertyApplierList<Species> environmentFactorAppliers = new JsonPropertyApplierList<>(Species.class);
+
+    private final Map<Species, Float> composterChances = new HashMap<>();
 
     public SpeciesManager() {
         super(Species.REGISTRY, JsonApplierRegistryEvent.SPECIES);
@@ -88,6 +93,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                     Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(processedRegName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '" + species + "' as Species '" + processedRegName + "' was not found.")));
                 })
                 .register("seed", Seed.class, Species::setSeed)
+                .register("seed_composter_chance", Float.class, this.composterChances::put)
                 .register("sapling_grows_naturally", Boolean.class, Species::setCanSaplingGrowNaturally)
                 .register("sapling_sound", SoundType.class, Species::setSaplingSound)
                 .register("sapling_shape", VoxelShape.class, Species::setSaplingShape)
@@ -115,6 +121,21 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
     protected void postLoad(JsonObject jsonObject, Species species, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
         // Generates seeds and saplings if should.
         species.generateSeed().generateSapling();
+    }
+
+    @Override
+    protected void preReload(JsonObject jsonObject, Species species, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
+        this.composterChances.put(species, species.defaultSeedComposterChance());
+    }
+
+    @Override
+    protected void postReload(JsonObject jsonObject, Species registryEntry, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
+        this.composterChances.forEach((species, chance) -> {
+            if (species.getSeed().isPresent() && chance > 0) {
+                ComposterBlock.add(chance, species.getSeed().get());
+            }
+        });
+        this.composterChances.clear();
     }
 
 }

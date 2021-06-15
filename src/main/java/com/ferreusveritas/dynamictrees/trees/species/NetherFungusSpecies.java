@@ -80,4 +80,10 @@ public class NetherFungusSpecies extends Species {
         if (soilBlockState.getBlock() == Blocks.NETHERRACK) return true; //Soil exception for worldgen
         return super.isAcceptableSoilForWorldgen(world, pos, soilBlockState);
     }
+
+    @Override
+    public float defaultSeedComposterChance() {
+        return 0.65f;
+    }
+
 }
