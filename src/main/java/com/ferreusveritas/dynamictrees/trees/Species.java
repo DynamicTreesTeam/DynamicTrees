@@ -1835,7 +1835,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 *
 	 * @return The {@link PottedSaplingBlock} for this {@link Species}.
 	 */
-	public PottedSaplingBlock getBonsaiPot() {
+	public PottedSaplingBlock getPottedSapling() {
 		return DTRegistries.POTTED_SAPLING;
 	}
 	

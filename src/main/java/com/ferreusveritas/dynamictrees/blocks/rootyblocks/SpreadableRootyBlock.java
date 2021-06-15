@@ -74,7 +74,9 @@ public class SpreadableRootyBlock extends RootyBlock {
                         int blockInt = worldIn.random.nextInt(foundBlocks.size());
                         worldIn.setBlock(pos, rootyBlocks.get(foundBlocks.get(blockInt)).defaultBlockState(), 3);
                     }
-                    if (!player.isCreative()) handStack.shrink(1);
+                    if (!player.abilities.instabuild) {
+                        handStack.shrink(1);
+                    }
                     DTClient.spawnParticles(worldIn, ParticleTypes.HAPPY_VILLAGER, pos.above(),2 + worldIn.random.nextInt(5), worldIn.random);
                     return ActionResultType.SUCCESS;
                 }
