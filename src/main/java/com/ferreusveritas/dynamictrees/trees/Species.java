@@ -1367,6 +1367,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return The selected {@link Direction}.
 	 */
 	public Direction selectNewDirection(World world, BlockPos pos, BranchBlock branch, GrowSignal signal) {
+		Direction growthLogicDir = getGrowthLogicKit().selectNewDirection(world, pos, branch, signal);
+		if (growthLogicDir != null) return growthLogicDir; //if the growth logic kit overrides selectNewDirection, use that
+
 		Direction originDir = signal.dir.getOpposite();
 		
 		// prevent branches on the ground
