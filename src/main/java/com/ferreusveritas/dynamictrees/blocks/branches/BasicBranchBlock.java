@@ -384,7 +384,7 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 	
 	protected int getMaxSignalDepth() {
-		return 32;
+		return getFamily().getMaxSignalDepth();
 	}
 	
 	/**

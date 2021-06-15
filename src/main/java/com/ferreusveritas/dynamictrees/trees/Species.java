@@ -1751,26 +1751,27 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	/**
 	 * The Waila body is the part of the Waila display that shows the species and log/stick count
-	 *
+	 * This does not have a Tree Pack implementation as coding is required for it to be useful
 	 * @return true if the tree uses the default Waila body display. False if it has a custom one (disabling DT's display)
 	 */
 	public boolean useDefaultWailaBody (){
 		return true;
 	}
 
-	protected boolean alwaysShowOnWaila;
+	/**
+	 * If left null, the showSpeciesOnWaila will depend on the species being the common species
+	 * Otherwise, setting to true or false will force the waila to display or to not display.
+	 */
+	protected Boolean alwaysShowOnWaila = null;
 
-	public boolean alwaysShowOnWaila() {
-		return this.alwaysShowOnWaila;
-	}
-
-	public Species alwaysShowOnWaila(final boolean alwaysShowOnWaila) {
+	public Species setAlwaysShowOnWaila(final boolean alwaysShowOnWaila) {
 		this.alwaysShowOnWaila = alwaysShowOnWaila;
 		return this;
 	}
 
 	public boolean showSpeciesOnWaila (){
-		return this.alwaysShowOnWaila || this != getFamily().getCommonSpecies();
+		if (alwaysShowOnWaila == null) return this != getFamily().getCommonSpecies();
+		return this.alwaysShowOnWaila;
 	}
 	
 	///////////////////////////////////////////

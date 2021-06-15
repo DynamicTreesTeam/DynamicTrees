@@ -47,7 +47,8 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
                 .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa)
                 .register("primary_thickness", Integer.class, Family::setPrimaryThickness)
                 .register("secondary_thickness", Integer.class, Family::setSecondaryThickness)
-                .register("branch_is_ladder", Boolean.class, Family::setBranchIsLadder);
+                .register("branch_is_ladder", Boolean.class, Family::setBranchIsLadder)
+                .register("max_signal_depth", Integer.class, Family::setMaxSignalDepth);
 
         super.registerAppliers();
     }

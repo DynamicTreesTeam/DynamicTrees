@@ -597,6 +597,12 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return branchIsLadder;
 	}
 
+	private int maxSignalDepth = 32;
+	public int getMaxSignalDepth() {
+		return maxSignalDepth;
+	}
+	public void setMaxSignalDepth(int maxSignalDepth) { this.maxSignalDepth = maxSignalDepth; }
+
 	///////////////////////////////////////////
 	// SURFACE ROOTS
 	///////////////////////////////////////////
