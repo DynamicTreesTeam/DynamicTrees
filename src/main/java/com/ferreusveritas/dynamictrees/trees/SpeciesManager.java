@@ -67,7 +67,12 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
             );
         });
 
-        this.loadAppliers.register("use_seed_of_other_species", ResourceLocation.class, Species::setOtherSpeciesForSeed)
+        this.loadAppliers.register("use_seed_of_other_species", ResourceLocation.class, (species, registryName) -> {
+                    final ResourceLocation processedRegName = TreeRegistry.processResLoc(registryName);
+                    species.setShouldGenerateSeed(false);
+                    species.setShouldGenerateSapling(false);
+                    Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(processedRegName, species::setOtherSpeciesForSeed, () -> LOGGER.warn("Could not set seed of other species for '" + species + "' as Species '" + processedRegName + "' was not found.")));
+                })
                 .register("generate_seed", Boolean.class, Species::setShouldGenerateSeed)
                 .register("generate_sapling", Boolean.class, Species::setShouldGenerateSapling)
                 .register("sapling_name", String.class, Species::setSaplingName)
