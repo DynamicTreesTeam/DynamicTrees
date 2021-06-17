@@ -19,6 +19,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -154,19 +155,29 @@ public class Seed extends Item implements IPlantable {
 	}
 
 	public ActionResultType onItemUseFlowerPot(ItemUseContext context) {
-		World world = context.getLevel();
-		BlockPos pos = context.getClickedPos();
-		BlockState emptyPotState = world.getBlockState(pos);
-		Block emptyPotBlock = emptyPotState.getBlock();
+		final World world = context.getLevel();
+		final BlockPos pos = context.getClickedPos();
+		final BlockState emptyPotState = world.getBlockState(pos);
+		final Block emptyPotBlock = emptyPotState.getBlock();
 
-		if (!(emptyPotBlock instanceof FlowerPotBlock) || emptyPotState != emptyPotBlock.defaultBlockState())
+		if (!(emptyPotBlock instanceof FlowerPotBlock) || emptyPotState != emptyPotBlock.defaultBlockState() ||
+				((FlowerPotBlock) emptyPotBlock).getContent() != Blocks.AIR) {
 			return ActionResultType.PASS;
+		}
 
-		PottedSaplingBlock bonsaiPot = this.getSpecies().getBonsaiPot();
-		world.setBlockAndUpdate(pos, bonsaiPot.defaultBlockState());
+		final PottedSaplingBlock pottingSapling = this.getSpecies().getPottedSapling();
+		world.setBlockAndUpdate(pos, pottingSapling.defaultBlockState());
 
-		if (bonsaiPot.setSpecies(world, pos, bonsaiPot.defaultBlockState(), this.getSpecies()) && bonsaiPot.setPotState(world, emptyPotState, pos)) {
-			if (context.getPlayer() != null && !context.getPlayer().isCreative()) context.getItemInHand().shrink(1);
+		if (pottingSapling.setSpecies(world, pos, pottingSapling.defaultBlockState(), this.getSpecies()) && pottingSapling.setPotState(world, emptyPotState, pos)) {
+			final PlayerEntity player = context.getPlayer();
+
+			if (player != null) {
+				context.getPlayer().awardStat(Stats.POT_FLOWER);
+				if (!context.getPlayer().abilities.instabuild) {
+					context.getItemInHand().shrink(1);
+				}
+			}
+
 			return ActionResultType.SUCCESS;
 		}
 
@@ -198,7 +209,7 @@ public class Seed extends Item implements IPlantable {
 	@Override
 	public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
 		// Handle flower pot interaction (flower pot cancels on item use so this must be done first).
-		if(onItemUseFlowerPot(context) == ActionResultType.SUCCESS) {
+		if (onItemUseFlowerPot(context) == ActionResultType.SUCCESS) {
 			return ActionResultType.SUCCESS;
 		}
 

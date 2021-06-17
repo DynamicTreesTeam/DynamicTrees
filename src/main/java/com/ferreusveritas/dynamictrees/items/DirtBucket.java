@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -54,14 +55,14 @@ public class DirtBucket extends Item {
 				if (!world.mayInteract(player, pos)) {
 					return new ActionResult<>(ActionResultType.FAIL, itemStack);
 				} else {
-					final boolean isReplacable = world.getBlockState(pos).getMaterial().isReplaceable();
-					final BlockPos workingPos = isReplacable && blockRayTraceResult.getDirection() == Direction.UP ? pos : pos.relative(blockRayTraceResult.getDirection());
+					final boolean isReplaceable = world.getBlockState(pos).getMaterial().isReplaceable();
+					final BlockPos workingPos = isReplaceable && blockRayTraceResult.getDirection() == Direction.UP ? pos : pos.relative(blockRayTraceResult.getDirection());
 					
 					if (!player.mayUseItemAt(workingPos, blockRayTraceResult.getDirection(), itemStack)) {
 						return new ActionResult<>(ActionResultType.FAIL, itemStack);
 					} else if (this.tryPlaceContainedDirt(player, world, workingPos)) {
-						//						player.addStat(Stats.BLOCK_USED.getObjectUseStats(this));
-						return !player.isCreative() ? new ActionResult<>(ActionResultType.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult<>(ActionResultType.SUCCESS, itemStack);
+						player.awardStat(Stats.ITEM_USED.get(this));
+						return !player.abilities.instabuild ? new ActionResult<>(ActionResultType.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult<>(ActionResultType.SUCCESS, itemStack);
 					} else {
 						return new ActionResult<>(ActionResultType.FAIL, itemStack);
 					}

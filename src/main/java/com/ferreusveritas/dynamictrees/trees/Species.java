@@ -275,6 +275,17 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this;
 	}
 
+	/**
+	 * Gets the default chance to use for the {@link #seed} for the
+	 * {@link net.minecraft.block.ComposterBlock}.
+	 *
+	 * @return The default chance for the compostable {@link Seed} to be
+	 * 		   successfully composted.
+	 */
+	public float defaultSeedComposterChance() {
+		return 0.3f;
+	}
+
 	public Family getFamily() {
 		return family;
 	}
@@ -1855,7 +1866,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 *
 	 * @return The {@link PottedSaplingBlock} for this {@link Species}.
 	 */
-	public PottedSaplingBlock getBonsaiPot() {
+	public PottedSaplingBlock getPottedSapling() {
 		return DTRegistries.POTTED_SAPLING;
 	}
 	

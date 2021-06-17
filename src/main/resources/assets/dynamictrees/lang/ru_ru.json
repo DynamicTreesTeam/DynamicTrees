@@ -25,6 +25,8 @@
   "species.dynamictrees.mega_crimson": "Мега багровый",
   "species.dynamictrees.warped": "Искажённый",
   "species.dynamictrees.mega_warped": "Мега искажённый",
+  "species.dynamictrees.red_mushroom": "Красный гриб",
+  "species.dynamictrees.brown_mushroom": "Коричневый гриб",
 
   "item.dynamictrees.oak_seed": "Жёлудь дуба",
   "item.dynamictrees.spruce_seed": "Еловая шишка",
@@ -43,6 +45,8 @@
   "item.dynamictrees.dendro_potion.fertility": "Зелье плодородия",
   "item.dynamictrees.dendro_potion.persistence": "Зелье глубокого сна",
   "item.dynamictrees.dendro_potion.transform": "Зелье трансформации",
+  "item.dynamictrees.dendro_potion.harvest": "Зелье урожая",
+  "item.dynamictrees.dendro_potion.denuding": "Зелье оголения",
 
   "item.dynamictrees.dirt_bucket": "Ведро грязи",
   "item.dynamictrees.staff": "Лесной посох",
@@ -79,6 +83,8 @@
   "potion.persistence.description": "Прекращает изменение дерева",
   "potion.transform.description": "Трансформирует дерево в %s дерево",
   "potion.transform.description.empty": "Базовое зелье для зелий трансформации",
+  "potion.harvest.description": "Ускоряет созревание фруктов",
+  "potion.denuding.description": "Удаляет всю кору и листья с дерева",
 
   "death.attack.falling_tree": "%1$s раздавлен(а) падающим деревом",
   
