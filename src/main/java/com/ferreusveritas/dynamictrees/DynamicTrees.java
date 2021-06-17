@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.data.BlockTagsProvider;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.data.ItemTagsProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -105,11 +106,13 @@ public final class DynamicTrees {
 	}
 
 	public static void gatherTagGenerators(final String modId, final GatherDataEvent event) {
-		final BlockTagsProvider blockTagsProvider = new DTBlockTagsProvider(event.getGenerator(), modId, event.getExistingFileHelper());
-		final ItemTagsProvider itemTagsProvider = new DTItemTagsProvider(event.getGenerator(), MOD_ID, blockTagsProvider, event.getExistingFileHelper());
+		final DataGenerator generator = event.getGenerator();
 
-		event.getGenerator().addProvider(blockTagsProvider);
-		event.getGenerator().addProvider(itemTagsProvider);
+		final BlockTagsProvider blockTagsProvider = new DTBlockTagsProvider(generator, modId, event.getExistingFileHelper());
+		final ItemTagsProvider itemTagsProvider = new DTItemTagsProvider(generator, modId, blockTagsProvider, event.getExistingFileHelper());
+
+		generator.addProvider(blockTagsProvider);
+		generator.addProvider(itemTagsProvider);
 	}
 
 	public static ResourceLocation resLoc (final String path) {
