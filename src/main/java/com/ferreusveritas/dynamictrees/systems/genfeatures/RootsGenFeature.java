@@ -146,7 +146,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 			return true;
 
 		Material material = placeState.getMaterial();
-		return material.isReplaceable() && material != Material.WATER && material != Material.LAVA;
+		return material.isReplaceable() && material != Material.LAVA;
 	}
 
 	public RootsGenFeature setScaler(TetraFunction<Integer, Integer, Integer, Float, Integer> scaler) {

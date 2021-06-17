@@ -46,7 +46,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 
 	@Override
 	public void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(RADIUS_DOUBLE);
+		builder.add(RADIUS_DOUBLE).add(WATERLOGGED);
 	}
 
 	///////////////////////////////////////////

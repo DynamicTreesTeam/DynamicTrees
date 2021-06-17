@@ -2,12 +2,14 @@ package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -58,10 +60,11 @@ public class DestroyerNode implements INodeInspector {
 		BranchBlock branch = TreeHelper.getBranch(blockState);
 		
 		if(branch != null && species.getFamily() == branch.getFamily()) {
+			boolean waterlogged = blockState.hasProperty(BlockStateProperties.WATERLOGGED) && blockState.getValue(BlockStateProperties.WATERLOGGED);
 			if(branch.getRadius(blockState) == species.getFamily().getPrimaryThickness()) {
 				endPoints.add(pos);
 			}
-			world.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);//Destroy the branch and notify the client
+			world.setBlock(pos, waterlogged ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState(), 2);//Destroy the branch and notify the client
 		}
 		
 		return true;

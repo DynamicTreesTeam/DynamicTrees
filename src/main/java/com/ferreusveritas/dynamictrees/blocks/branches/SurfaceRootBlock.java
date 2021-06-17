@@ -5,17 +5,16 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.RootConnections;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -35,13 +34,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("deprecation")
-public class SurfaceRootBlock extends Block {
+public class SurfaceRootBlock extends Block implements IWaterLoggable {
 	
 	public static final int MAX_RADIUS = 8;
 	
 	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, MAX_RADIUS);
-
 	public static final BooleanProperty GROUNDED = BooleanProperty.create("grounded");
+	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
 	private final Family family;
 
@@ -85,7 +84,7 @@ public class SurfaceRootBlock extends Block {
 
 	@Override
 	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(RADIUS, GROUNDED);
+		builder.add(RADIUS, GROUNDED, WATERLOGGED);
 	}
 
 	public int getRadius(BlockState blockState) {
@@ -93,12 +92,13 @@ public class SurfaceRootBlock extends Block {
 	}
 
 	public int setRadius(IWorld world, BlockPos pos, int radius, int flags) {
-		world.setBlock(pos, this.getStateForRadius(radius), flags);
+		boolean replacingWater = world.getBlockState(pos).getFluidState() == Fluids.WATER.getSource(false);
+		world.setBlock(pos, this.getStateForRadius(radius).setValue(WATERLOGGED, replacingWater), flags);
 		return radius;
 	}
 
 	public BlockState getStateForRadius(int radius) {
-		return this.defaultBlockState().setValue(RADIUS, MathHelper.clamp(radius, 0, getMaxRadius()));
+		return this.defaultBlockState().setValue(RADIUS, MathHelper.clamp(radius, 0, getMaxRadius())).setValue(WATERLOGGED, false);
 	}
 
 	public int getMaxRadius() {
@@ -109,6 +109,22 @@ public class SurfaceRootBlock extends Block {
 		return radius * 2;
 	}
 
+	///////////////////////////////////////////
+	// WATER LOGGING
+	///////////////////////////////////////////
+
+	@Override
+	public FluidState getFluidState(BlockState state) {
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+	}
+
+	@Override
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		if (stateIn.getValue(WATERLOGGED)) {
+			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+		}
+		return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+	}
 
 	///////////////////////////////////////////
 	// RENDERING

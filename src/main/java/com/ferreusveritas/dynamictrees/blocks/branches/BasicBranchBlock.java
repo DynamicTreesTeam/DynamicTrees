@@ -19,8 +19,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -39,15 +44,18 @@ import javax.annotation.Nullable;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public class BasicBranchBlock extends BranchBlock {
+public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
 	
 	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, MAX_RADIUS);
+	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
 	/** Stores a cache of the {@link BlockState}s for rapid lookup. Created by {@link #createBranchStates(IntegerProperty, int)}. */
 	protected final BlockState[] branchStates;
 	
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
+
+	private final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
 
 	public BasicBranchBlock(Material material) {
 		this(AbstractBlock.Properties.of(material).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
@@ -74,7 +82,7 @@ public class BasicBranchBlock extends BranchBlock {
 	 * @return The {@code array} cache of {@link BlockState}s.
 	 */
 	public BlockState[] createBranchStates(final IntegerProperty radiusProperty, final int maxRadius) {
-		this.registerDefaultState(this.stateDefinition.any().setValue(radiusProperty, 1));
+		this.registerDefaultState(this.stateDefinition.any().setValue(radiusProperty, 1).setValue(WATERLOGGED, false));
 
 		final BlockState[] branchStates = new BlockState[maxRadius + 1];
 
@@ -109,7 +117,7 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 	
 	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(RADIUS);
+		builder.add(RADIUS).add(WATERLOGGED);
 	}
 	
 	///////////////////////////////////////////
@@ -165,8 +173,30 @@ public class BasicBranchBlock extends BranchBlock {
 		
 		return didRot;
 	}
-	
-	
+
+	///////////////////////////////////////////
+	// WATER LOGGING
+	///////////////////////////////////////////
+
+	@Override
+	public FluidState getFluidState(BlockState state) {
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+	}
+
+	@Override
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		if (stateIn.getValue(WATERLOGGED)) {
+			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+		}
+		return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+	}
+
+	@Override
+	public boolean canPlaceLiquid(IBlockReader world, BlockPos pos, BlockState state, Fluid fluid) {
+		if (getRadius(state) > maxRadiusForWaterLogging) return false;
+		return IWaterLoggable.super.canPlaceLiquid(world, pos, state, fluid);
+	}
+
 	///////////////////////////////////////////
 	// PHYSICAL PROPERTIES
 	///////////////////////////////////////////
@@ -226,7 +256,9 @@ public class BasicBranchBlock extends BranchBlock {
 	@Override
 	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
 		destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
-		world.setBlock(pos, getStateForRadius(radius), flags);
+		boolean replacingWater = world.getBlockState(pos).getFluidState() == Fluids.WATER.getSource(false);
+		boolean setWaterlogged = replacingWater && radius <= maxRadiusForWaterLogging;
+		world.setBlock(pos, getStateForRadius(radius).setValue(WATERLOGGED, setWaterlogged), flags);
 		destroyMode = DynamicTrees.DestroyMode.SLOPPY;
 		return radius;
 	}
@@ -338,10 +370,12 @@ public class BasicBranchBlock extends BranchBlock {
 	// This is only so effective because the center of the player must be inside the block that contains the tree trunk.
 	// The result is that only thin branches and trunks can be climbed.
 	// We do not check if the radius is over 3 since some mods can modify this, and allow you to climb on contact.
-	
 	@Override
 	public boolean isLadder(BlockState state, IWorldReader world, BlockPos pos, LivingEntity entity) {
-		return DTConfigs.ENABLE_BRANCH_CLIMBING.get() && entity instanceof PlayerEntity && getFamily().branchIsLadder();
+		return DTConfigs.ENABLE_BRANCH_CLIMBING.get() &&
+				entity instanceof PlayerEntity &&
+				getFamily().branchIsLadder() &&
+				(!state.hasProperty(WATERLOGGED) || !state.getValue(WATERLOGGED));
 	}
 	
 	@Nonnull

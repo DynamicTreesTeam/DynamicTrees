@@ -11,6 +11,7 @@ import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
@@ -81,7 +82,8 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
 
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
-		if (this.getMuseUnchecked(worldIn, state, pos) == null) {
+		ShellMuse muse = this.getMuseUnchecked(worldIn, state, pos);
+		if (!isValid(muse)) {
 			if (state.getValue(WATERLOGGED))
 				worldIn.setBlockAndUpdate(pos, Blocks.WATER.defaultBlockState());
 			else
@@ -168,14 +170,18 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
 		final ShellMuse muse = this.getMuseUnchecked(access, state, pos);
 
 		// Check the muse for validity.
-		if (muse == null || muse.getRadius() <= 8) {
-			this.scheduleForClearing(access, pos);
+		if (!isValid(muse)) {
+			this.scheduleUpdateTick(access, pos);
 		}
 
 		return muse;
 	}
 
-	public void scheduleForClearing(IBlockReader access, BlockPos pos) {
+	protected boolean isValid (@Nullable ShellMuse muse){
+		return muse != null && muse.getRadius() > 8;
+	}
+
+	public void scheduleUpdateTick(IBlockReader access, BlockPos pos) {
 		if (!(access instanceof World) || !((World) access).isClientSide())
 			return;
 
@@ -251,6 +257,20 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
 		return 0; // This is the simple solution to the problem.  Maybe I'll work it out later.
 	}
 
+	public boolean isFullBlockShell (IBlockReader world, BlockPos pos){
+		return isFullBlockShell(getMuse(world, pos));
+	}
+	public boolean isFullBlockShell (@Nullable ShellMuse muse){
+		return muse != null && isFullBlockShell(muse.getRadius());
+	}
+	public boolean isFullBlockShell (int radius){
+		return (radius - 8) % 16 == 0;
+	}
+
+	///////////////////////////////////////////
+	// WATER LOGGING
+	///////////////////////////////////////////
+
 	@Override
 	public FluidState getFluidState(BlockState state) {
 		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
@@ -262,6 +282,16 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
 			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
 		}
 		return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+	}
+
+	@Override
+	public boolean canPlaceLiquid(IBlockReader world, BlockPos pos, BlockState state, Fluid fluid) {
+		if (isFullBlockShell(world, pos)) return false;
+		return IWaterLoggable.super.canPlaceLiquid(world, pos, state, fluid);
+	}
+
+	protected boolean isWaterLogged (BlockState state){
+		return state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED);
 	}
 
 	///////////////////////////////////////////
