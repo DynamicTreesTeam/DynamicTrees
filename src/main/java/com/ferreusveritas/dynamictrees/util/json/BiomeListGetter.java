@@ -27,12 +27,22 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
             );
 
     private static final IVoidPropertyApplier<BiomeList, String> CATEGORY_APPLIER = (biomeList, categoryString) ->
-            biomeList.removeIf(biome ->
-                !biome.getBiomeCategory().toString().toLowerCase().matches(categoryString.toLowerCase())
-            );
+            biomeList.removeIf(biome -> {
+                final String biomeName = biome.getRegistryName().toString();
+                if (categoryString.toCharArray()[0] == '!')
+                    return biomeName.toLowerCase().matches(categoryString.substring(1).toLowerCase());
+                else
+                    return !biomeName.toLowerCase().matches(categoryString.toLowerCase());
+            });
 
     private static final IVoidPropertyApplier<BiomeList, String> NAME_APPLIER = (biomeList, nameString) ->
-            biomeList.removeIf(biome -> !biome.getRegistryName().toString().matches(nameString.toLowerCase()));
+            biomeList.removeIf(biome -> {
+                final String biomeName = biome.getRegistryName().toString();
+                if (nameString.toCharArray()[0] == '!')
+                    return biomeName.matches(nameString.substring(1).toLowerCase());
+                else
+                    return !biomeName.matches(nameString.toLowerCase());
+            });
 
     private final JsonPropertyApplierList<BiomeList> appliers = new JsonPropertyApplierList<>(BiomeList.class);
 

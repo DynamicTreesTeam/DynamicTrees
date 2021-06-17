@@ -62,7 +62,8 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
             );
         });
 
-        this.loadAppliers.register("generate_seed", Boolean.class, Species::setShouldGenerateSeed)
+        this.loadAppliers.register("use_seed_of_other_species", ResourceLocation.class, Species::setOtherSpeciesForSeed)
+                .register("generate_seed", Boolean.class, Species::setShouldGenerateSeed)
                 .register("generate_sapling", Boolean.class, Species::setShouldGenerateSapling)
                 .register("sapling_name", String.class, Species::setSaplingName)
                 .register("seed_name", String.class, Species::setSeedName);

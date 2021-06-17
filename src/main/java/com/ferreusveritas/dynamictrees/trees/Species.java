@@ -509,7 +509,19 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	///////////////////////////////////////////
 	//SEEDS
 	///////////////////////////////////////////
-	
+
+	private ResourceLocation otherSpeciesForSeed = null;
+
+	public void setOtherSpeciesForSeed (ResourceLocation otherSpecies){
+		otherSpeciesForSeed = otherSpecies;
+		setShouldGenerateSeed(false);
+		setShouldGenerateSapling(false);
+	}
+
+	public boolean hasSeedFromOtherSpecies(){
+		return otherSpeciesForSeed != null && Species.REGISTRY.has(otherSpeciesForSeed);
+	}
+
 	/**
 	 * Get an ItemStack of the species {@link Seed} with the supplied quantity.
 	 *
@@ -517,7 +529,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return An {@link ItemStack} with the {@link Seed} inside.
 	 */
 	public ItemStack getSeedStack(int qty) {
-		return this.hasSeed() ? new ItemStack(this.seed, qty) : !this.isCommonSpecies() ? this.family.getCommonSpecies().getSeedStack(qty) : ItemStack.EMPTY;
+		return this.hasSeed() ?
+				new ItemStack(this.seed, qty) :
+				( hasSeedFromOtherSpecies() ?
+						Species.REGISTRY.get(otherSpeciesForSeed).getSeedStack(qty) :
+						( !this.isCommonSpecies() ?
+								this.family.getCommonSpecies().getSeedStack(qty) :
+								ItemStack.EMPTY
+						)
+				);
 	}
 	
 	public boolean hasSeed() {
@@ -525,7 +545,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 	
 	public Optional<Seed> getSeed() {
-		return !this.hasSeed() ? !this.isCommonSpecies() ? this.family.getCommonSpecies().getSeed() : Optional.empty() : Optional.of(this.seed);
+		return this.hasSeed() ?
+				Optional.of(this.seed) :
+				( hasSeedFromOtherSpecies() ?
+						Species.REGISTRY.get(otherSpeciesForSeed).getSeed():
+						( !this.isCommonSpecies() ?
+								this.family.getCommonSpecies().getSeed() :
+								Optional.empty()
+						)
+				);
 	}
 
 	/**
@@ -1230,18 +1258,21 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return true if the branch should rot
 	 */
 	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
-		if (growLeaves && radius <= family.getPrimaryThickness()) {
+		if (radius <= family.getPrimaryThickness()){
 			if (!getLeavesProperties().hasDynamicLeavesBlock())
 				return false;
 
-			final DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
+			if (growLeaves) {
+				final DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
 
-			for (Direction dir: upFirst) {
-				if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.relative(dir), 0)) {
-					return false;
+				for (Direction dir: upFirst) {
+					if (leaves.growLeavesIfLocationIsSuitable(world, getLeavesProperties(), pos.relative(dir), 0)) {
+						return false;
+					}
 				}
 			}
 		}
+
 		
 		if (rapid || (DTConfigs.MAX_BRANCH_ROT_RADIUS.get() != 0 && radius <= DTConfigs.MAX_BRANCH_ROT_RADIUS.get())) {
 			BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
