@@ -20,6 +20,8 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -60,6 +62,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.tags.ITag;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -2028,6 +2031,14 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public int coordHashCode(BlockPos pos) {
 		return CoordUtils.coordHashCode(pos, 2);
+	}
+
+	public List<ITag.INamedTag<Block>> defaultSaplingTags() {
+		return Collections.singletonList(DTBlockTags.SAPLINGS);
+	}
+
+	public List<ITag.INamedTag<Item>> defaultSeedTags() {
+		return Collections.singletonList(DTItemTags.SEEDS);
 	}
 
 	@Override

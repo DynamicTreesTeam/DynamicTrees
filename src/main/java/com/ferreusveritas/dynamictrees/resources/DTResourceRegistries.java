@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.resources;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesManager;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRecipes;
+import com.ferreusveritas.dynamictrees.data.DTRecipes;
 import com.ferreusveritas.dynamictrees.trees.FamilyManager;
 import com.ferreusveritas.dynamictrees.trees.SpeciesManager;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabaseManager;

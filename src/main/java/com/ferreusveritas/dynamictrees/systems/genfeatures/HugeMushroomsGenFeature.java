@@ -10,10 +10,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -41,16 +43,17 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature implements I
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 		
-		if (endPoints.isEmpty() || !worldGen) return false;
+		if (endPoints.isEmpty() || !worldGen)
+			return false;
 	
-		BlockPos lowest = Collections.min(endPoints, (a, b) -> a.getY() - b.getY());
+		BlockPos lowest = Collections.min(endPoints, Comparator.comparingInt(Vector3i::getY));
 		
 		Random rand = world.getRandom();
 		
 		int success = 0;
 		
-		if(radius >= 5) {
-			for(int tries = 0; tries < configuredGenFeature.get(MAX_ATTEMPTS); tries++) {
+		if (radius >= 5) {
+			for (int tries = 0; tries < configuredGenFeature.get(MAX_ATTEMPTS); tries++) {
 				
 				float angle = (float) (rand.nextFloat() * Math.PI * 2);
 				int xOff = (int) (MathHelper.sin(angle) * (radius - 1));
@@ -60,13 +63,13 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature implements I
 				
 				mushPos = CoordUtils.findGround(world, new BlockPos(mushPos)).above();
 				
-				if(safeBounds.inBounds(mushPos, true)) {
+				if (safeBounds.inBounds(mushPos, true)) {
 					int maxHeight = lowest.getY() - mushPos.getY();
-					if(maxHeight >= 2) {
+					if (maxHeight >= 2) {
 						int height = MathHelper.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
 						
-						if(this.setHeight(height).generate(configuredGenFeature, world, mushPos.below(), species, biome, rand, radius, safeBounds)) {
-							if(++success >= configuredGenFeature.get(MAX_MUSHROOMS)) {
+						if (this.setHeight(height).generate(configuredGenFeature, world, mushPos.below(), species, biome, rand, radius, safeBounds)) {
+							if (++success >= configuredGenFeature.get(MAX_MUSHROOMS)) {
 								return true;
 							}
 						}

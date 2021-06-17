@@ -43,7 +43,9 @@ public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeatur
 
 	@Override
 	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(MUSHROOM_BLOCK, Blocks.RED_MUSHROOM_BLOCK).with(STEM_BLOCK, Blocks.MUSHROOM_STEM);
+		return super.createDefaultConfiguration()
+				.with(MUSHROOM_BLOCK, Blocks.RED_MUSHROOM_BLOCK)
+				.with(STEM_BLOCK, Blocks.MUSHROOM_STEM);
 	}
 
 	static final SimpleVoxmap BROWN_CAP;

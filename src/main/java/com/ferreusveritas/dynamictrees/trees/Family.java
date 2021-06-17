@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.compat.waila.WailaOther;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -24,6 +25,7 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -359,9 +361,17 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return branch;
 	}
 
+	public Optional<BranchBlock> getBranchOptional() {
+		return Optional.ofNullable(this.branch);
+	}
+
 	@Nullable
 	public BranchBlock getStrippedBranch() {
 		return strippedBranch;
+	}
+
+	public Optional<BranchBlock> getStrippedBranchOptional() {
+		return Optional.ofNullable(strippedBranch);
 	}
 
 	public Item getBranchItem() {
@@ -695,6 +705,16 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	public void setCommonLeaves (LeavesProperties properties) {
 		this.commonLeaves = properties;
 		properties.setFamily(this);
+	}
+
+	public List<ITag.INamedTag<Block>> defaultBranchTags() {
+		return this.isFireProof ? Collections.singletonList(DTBlockTags.BRANCHES) :
+				Collections.singletonList(DTBlockTags.BRANCHES_THAT_BURN);
+	}
+
+	public List<ITag.INamedTag<Block>> defaultStrippedBranchTags() {
+		return this.isFireProof ? Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES) :
+				Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN);
 	}
 
 	//////////////////////////////
