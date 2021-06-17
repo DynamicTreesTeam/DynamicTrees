@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
@@ -23,6 +24,7 @@ import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -38,9 +40,8 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.List;
 
 /**
  * This class provides a means of holding individual properties
@@ -385,6 +386,10 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	public void setRequiresShears(boolean requiresShears) {
 		this.requiresShears = requiresShears;
+	}
+
+	public List<ITag.INamedTag<Block>> defaultLeavesTags() {
+		return Collections.singletonList(DTBlockTags.LEAVES);
 	}
 
 	///////////////////////////////////////////

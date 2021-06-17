@@ -56,8 +56,8 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
-            // For Serene Seasons as it uses Mixins.
-            properties 'mixin.env.disableRefMap' : 'true'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             mods {
                 dynamictrees {
@@ -72,6 +72,9 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+
             mods {
                 dynamictrees {
                     source sourceSets.main
@@ -84,6 +87,9 @@ minecraft {
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             args '--mod', 'dynamictrees', '--all', '--output', file('src/generated/resources/')
 
@@ -111,7 +117,7 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${config.mc_version}:${config.jei_version}")
 
     // At runtime, use Patchouli mod (for the guide book, which is Json so we don't need the API).
-//    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${config.patchouli_version}")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${config.patchouli_version}")
 
     //At runtime use ComputerCraft for creating the growth chambers
     runtimeOnly fg.deobf("curse.maven:cc-tweaked-282001:3236650")

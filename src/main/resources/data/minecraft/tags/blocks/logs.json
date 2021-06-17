@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "#dynamictrees:branches"
+    "#dynamictrees:branches",
+    "#dynamictrees:stripped_branches"
   ]
 }

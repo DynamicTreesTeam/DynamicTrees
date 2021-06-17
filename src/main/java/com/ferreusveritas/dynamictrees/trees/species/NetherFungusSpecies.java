@@ -3,22 +3,28 @@ package com.ferreusveritas.dynamictrees.trees.species;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.BiomeDictionary;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -84,6 +90,16 @@ public class NetherFungusSpecies extends Species {
     @Override
     public float defaultSeedComposterChance() {
         return 0.65f;
+    }
+
+    @Override
+    public List<ITag.INamedTag<Block>> defaultSaplingTags() {
+        return Collections.singletonList(DTBlockTags.FUNGUS_CAPS);
+    }
+
+    @Override
+    public List<ITag.INamedTag<Item>> defaultSeedTags() {
+        return Collections.singletonList(DTItemTags.FUNGUS_CAPS);
     }
 
 }

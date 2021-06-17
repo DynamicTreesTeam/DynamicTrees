@@ -15,7 +15,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
-import com.ferreusveritas.dynamictrees.util.CustomBlockTags;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
@@ -376,7 +376,7 @@ public class JoCode {
 	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
 		if (((world.getBlockState(pos).canBeReplacedByLogs(world, pos)) ||
 				world.getBlockState(pos).getMaterial().isLiquid() ||
-				world.getBlockState(pos).getBlock().is(CustomBlockTags.FOLIAGE) ||
+				world.getBlockState(pos).getBlock().is(DTBlockTags.FOLIAGE) ||
 				world.getBlockState(pos).getBlock().is(BlockTags.FLOWERS)) &&
 				(!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
 			Objects.requireNonNull(species.getFamily().getBranch())

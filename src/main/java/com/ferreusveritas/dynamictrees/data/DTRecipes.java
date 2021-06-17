@@ -1,5 +1,6 @@
-package com.ferreusveritas.dynamictrees.init;
+package com.ferreusveritas.dynamictrees.data;
 
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
