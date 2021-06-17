@@ -46,6 +46,7 @@ public class SurfaceRootBlock extends Block implements IWaterLoggable {
 
 	public SurfaceRootBlock(Family family) {
 		this(Material.WOOD, family);
+		registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
 	}
 
 	public SurfaceRootBlock(Material material, Family family) {
@@ -98,7 +99,7 @@ public class SurfaceRootBlock extends Block implements IWaterLoggable {
 	}
 
 	public BlockState getStateForRadius(int radius) {
-		return this.defaultBlockState().setValue(RADIUS, MathHelper.clamp(radius, 0, getMaxRadius())).setValue(WATERLOGGED, false);
+		return this.defaultBlockState().setValue(RADIUS, MathHelper.clamp(radius, 0, getMaxRadius()));
 	}
 
 	public int getMaxRadius() {
