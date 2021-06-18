@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
-import com.ferreusveritas.dynamictrees.trees.Family;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -24,16 +23,18 @@ import net.minecraftforge.client.model.data.IModelData;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @OnlyIn(Dist.CLIENT)
 public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
 	protected TextureAtlasSprite barkTexture;
+	protected TextureAtlasSprite ringsTexture;
 
-	//74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway.
+	// 74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway.
 	private final IBakedModel[][] sleeves = new IBakedModel[6][7];
-	private final IBakedModel[][] cores = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-	private final IBakedModel[] rings = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
+	private final IBakedModel[][] cores = new IBakedModel[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
+	private final IBakedModel[] rings = new IBakedModel[8]; // 8 Cores with the ring textures on all 6 sides.
 
 	public BasicBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
 		super(modelResLoc, barkResLoc, ringsResLoc);
@@ -42,7 +43,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	@Override
 	public void setupModels () {
 		this.barkTexture = ModelUtils.getTexture(this.barkResLoc);
-		TextureAtlasSprite ringTexture = ModelUtils.getTexture(this.ringsResLoc);
+		this.ringsTexture = ModelUtils.getTexture(this.ringsResLoc);
 
 		for(int i = 0; i < 8; i++) {
 			int radius = i + 1;
@@ -55,7 +56,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 			cores[1][i] = bakeCore(radius, Axis.Z, barkTexture); //NORTH<->SOUTH
 			cores[2][i] = bakeCore(radius, Axis.X, barkTexture); //WEST<->EAST
 
-			rings[i] = bakeCore(radius, Axis.Y, ringTexture);
+			rings[i] = bakeCore(radius, Axis.Y, this.ringsTexture);
 		}
 	}
 
@@ -157,72 +158,70 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	@Nonnull
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
+		if (state == null || side != null)
+			return Collections.emptyList();
 
-		if (state != null && side == null) {
+		final List<BakedQuad> quadsList = new ArrayList<>(24);
 
-			List<BakedQuad> quadsList = new ArrayList<>(24);
-			
-			int coreRadius = getRadius(state);
+		final int coreRadius = getRadius(state);
 
-			if (coreRadius > 8) return Collections.emptyList();
+		if (coreRadius > 8)
+			return Collections.emptyList();
 
-			int[] connections = new int[] {0,0,0,0,0,0};
-			Direction forceRingDir = null;
-			int twigRadius = 1;
+		int[] connections = new int[] {0,0,0,0,0,0};
+		Direction forceRingDir = null;
+		final AtomicInteger twigRadius = new AtomicInteger(1);
 
-			if (extraData instanceof ModelConnections){
-				ModelConnections connectionsData = (ModelConnections) extraData;
-				connections = connectionsData.getAllRadii();
-				forceRingDir = connectionsData.getRingOnly();
-				Family family = connectionsData.getFamily();
-				if (family != null) twigRadius = family.getPrimaryThickness();
-			}
+		if (extraData instanceof ModelConnections) {
+			final ModelConnections connectionsData = (ModelConnections) extraData;
+			connections = connectionsData.getAllRadii();
+			forceRingDir = connectionsData.getRingOnly();
 
-			//Count number of connections
-			int numConnections = 0;
-			for(int i: connections) {
-				numConnections += (i != 0) ? 1: 0;
-			}
-
-			if (numConnections == 0 && forceRingDir != null){
-				quadsList.addAll(rings[coreRadius-1].getQuads(state, forceRingDir, rand, extraData));
-			} else {
-
-				//The source direction is the biggest connection from one of the 6 directions
-				Direction sourceDir = getSourceDir(coreRadius, connections);
-				int coreDir = resolveCoreDir(sourceDir);
-
-				//This is for drawing the rings on a terminating branch
-				Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
-
-				for(Direction face  : Direction.values()) {
-					//Get quads for core model
-					if(coreRadius != connections[face.get3DDataValue()]) {
-						if((coreRingDir == null || coreRingDir != face)) {
-							quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand, extraData));
-						} else {
-							quadsList.addAll(rings[coreRadius-1].getQuads(state, face, rand, extraData));
-						}
-					}
-					//Get quads for sleeves models
-					if (coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
-						for (Direction connDir : Direction.values()) {
-							int idx = connDir.get3DDataValue();
-							int connRadius = connections[idx];
-							//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-							if (connRadius > 0 && (connRadius == twigRadius || face != connDir)) {
-								quadsList.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData));
-							}
-						}
-					}
-
-				}
-			}
-
-			return quadsList;
+			connectionsData.getFamily().ifValid(family ->
+					twigRadius.set(family.getPrimaryThickness()));
 		}
 
-		return Collections.emptyList();
+		// Count number of connections.
+		int numConnections = 0;
+		for (int i: connections) {
+			numConnections += (i != 0) ? 1: 0;
+		}
+
+		if (numConnections == 0 && forceRingDir != null) {
+			quadsList.addAll(rings[coreRadius-1].getQuads(state, forceRingDir, rand, extraData));
+		} else {
+			// The source direction is the biggest connection from one of the 6 directions.
+			final Direction sourceDir = getSourceDir(coreRadius, connections);
+			final int coreDir = resolveCoreDir(sourceDir);
+
+			// This is for drawing the rings on a terminating branch.
+			final Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
+
+			for (Direction face  : Direction.values()) {
+				// Get quads for core model.
+				if (coreRadius != connections[face.get3DDataValue()]) {
+					if ((coreRingDir == null || coreRingDir != face)) {
+						quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, face, rand, extraData));
+					} else {
+						quadsList.addAll(rings[coreRadius-1].getQuads(state, face, rand, extraData));
+					}
+				}
+				// Get quads for sleeves models.
+				if (coreRadius != 8) { // Special case for r!=8.. If it's a solid block so it has no sleeves.
+					for (Direction connDir : Direction.values()) {
+						final int idx = connDir.get3DDataValue();
+						final int connRadius = connections[idx];
+						// If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves (which are partly transparent).
+						if (connRadius > 0 && (connRadius == twigRadius.get() || face != connDir)) {
+							quadsList.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData));
+						}
+					}
+				}
+
+			}
+		}
+
+		return quadsList;
 	}
 	
 	
@@ -233,9 +232,13 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 	@Nonnull
 	@Override
 	public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
-		Block block = state.getBlock();
-		if (!(block instanceof BranchBlock)) return new ModelConnections();
-		return new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state)).setFamily(((BranchBlock) block).getFamily());
+		final Block block = state.getBlock();
+
+		if (!(block instanceof BranchBlock))
+			return new ModelConnections();
+
+		return new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state))
+				.setFamily(((BranchBlock) block).getFamily());
 	}
 	
 	/**

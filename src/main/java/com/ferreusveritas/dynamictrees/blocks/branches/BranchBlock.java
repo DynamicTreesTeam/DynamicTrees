@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity.DestroyType;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.DestroyerNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.SpeciesNode;
@@ -38,8 +37,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.*;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.*;
 import net.minecraftforge.common.ForgeMod;
@@ -108,7 +107,11 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	public boolean isSameTree(@Nullable final BranchBlock branch) {
 		return branch != null && this.getFamily() == branch.getFamily();
 	}
-	
+
+	public boolean isStrippedBranch () {
+		return this.getFamily().hasStrippedBranch() && this.getFamily().getStrippedBranch() == this;
+	}
+
 	@Override
 	public abstract int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius);
 	
@@ -120,6 +123,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 *
 	 * @param world The world
 	 * @param pos The branch block position
+	 * @param fertility The fertility of the tree.
 	 * @param radius The radius of the branch that's the subject of rotting
 	 * @param rand A random number generator for convenience
 	 * @param rapid If true then unsupported branch postRot will occur regardless of chance value.
@@ -127,7 +131,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * 		True if this postRot is happening under a generation scenario as opposed to natural tree updates
 	 * @return true if the branch was destroyed because of postRot
 	 */
-	public abstract boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid);
+	public abstract boolean checkForRot(IWorld world, BlockPos pos, Species species, int fertility, int radius, Random rand, float chance, boolean rapid);
 	
 	public static int setSupport(int branches, int leaves) {
 		return ((branches & 0xf) << 4) | (leaves & 0xf);
@@ -139,6 +143,17 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	
 	public static int getLeavesSupport(int support) {
 		return support & 0xf;
+	}
+
+	public static boolean isNextToBranch (World world, BlockPos pos, Direction originDir){
+		for(Direction dir: Direction.values()) {
+			if(!dir.equals(originDir)) {
+				if(TreeHelper.isBranch(world.getBlockState(pos.relative(dir)))) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	///////////////////////////////////////////
@@ -171,8 +186,16 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		final int radius = this.getRadius(state);
 		this.damageAxe(player, heldItem, radius / 2, new NetVolumeNode.Volume((radius * radius * 64) / 2), false);
 
+		this.stripBranch(state, world, pos, radius);
+	}
+
+	public void stripBranch (BlockState state, IWorld world, BlockPos pos) {
+		this.stripBranch(state, world, pos, this.getRadius(state));
+	}
+
+	public void stripBranch (BlockState state, IWorld world, BlockPos pos, int radius) {
 		assert this.getFamily().getStrippedBranch() != null;
-		this.getFamily().getStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get()?1:0)), null);
+		this.getFamily().getStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get() ? 1 : 0)), null);
 	}
 
 	@Override
@@ -342,7 +365,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param drops A {@link List} for collecting the {@link ItemStack}s and their {@link BlockPos} relative to
 	 *              the cut {@link BlockPos}.
 	 */
-	protected void destroyLeaves(final World world, final BlockPos cutPos, final Species species, final List<BlockPos> endPoints, final Map<BlockPos, BlockState> destroyedLeaves, final List<ItemStackPos> drops) {
+	public void destroyLeaves(final World world, final BlockPos cutPos, final Species species, final List<BlockPos> endPoints, final Map<BlockPos, BlockState> destroyedLeaves, final List<ItemStackPos> drops) {
 		if (world.isClientSide || endPoints.isEmpty())
 			return;
 
@@ -381,12 +404,12 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		for (final Cell cell: leafMap.getAllNonZeroCells()) {
 			final BlockPos.Mutable pos = cell.getPos();
 			final BlockState blockState = world.getBlockState(pos);
-			if (family.isCompatibleGenericLeaves(blockState, world, pos) ) {
+			if (family.isCompatibleGenericLeaves(species, blockState, world, pos) ) {
 				dropList.clear();
 				species.getTreeHarvestDrops(world, pos, dropList, world.random);
 				final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
 				final BlockPos relPos = imPos.subtract(cutPos);
-				world.setBlock(imPos, CommonBlockStates.AIR, 3);
+				world.setBlock(imPos, BlockStates.AIR, 3);
 				destroyedLeaves.put(relPos, blockState);
 				dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)) );
 			}
@@ -568,14 +591,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		if (toBlock == Blocks.AIR) { // Block was set to air improperly.
 			world.setBlock(pos, state, 0); // Set the block back and attempt a proper breaking.
 			this.sloppyBreak(world, pos, DestroyType.VOID);
-			this.setBlockStateIgnored(world, pos, CommonBlockStates.AIR, 2); // Set back to air in case the sloppy break failed to do so.
+			this.setBlockStateIgnored(world, pos, BlockStates.AIR, 2); // Set back to air in case the sloppy break failed to do so.
 			return;
 		}
 		if (toBlock == Blocks.FIRE) { // Block has burned.
 			world.setBlock(pos, state, 0); // Set the branch block back and attempt a proper breaking.
 			this.sloppyBreak(world, pos, DestroyType.FIRE); // Applies fire effects to falling branches.
 			//this.setBlockStateIgnored(world, pos, Blocks.FIRE.getDefaultState(), 2); // Disabled because the fire is too aggressive.
-			this.setBlockStateIgnored(world, pos, CommonBlockStates.AIR, 2); // Set back to air instead.
+			this.setBlockStateIgnored(world, pos, BlockStates.AIR, 2); // Set back to air instead.
 			return;
 		}
 		if (!toBlock.hasTileEntity(toBlockState) && world.getBlockEntity(pos) == null) { // Block seems to be a pure BlockState based block.

@@ -52,9 +52,9 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
 
     private static final double vanillaGenChancePlains = 0.05f;
     private static final double vanillaGenChanceFlowerForest = 0.02f;
-    private static final double vanillaGenChanceForest = 0.002f;
+    private static final double vanillaGenChanceForest = 0.0005f;
     private static final double vanillaGrowChance = 0.001f;
-    
+
     public BeeNestGenFeature (ResourceLocation registryName) {
         super(registryName);
     }
@@ -66,33 +66,26 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
 
     @Override
     public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-        return super.createDefaultConfiguration()
-                .with(NEST_BLOCK, Blocks.BEE_NEST)
-                .with(MAX_HEIGHT, 32)
-                .with(CAN_GROW_PREDICATE, (world, pos) -> {
-                    if (world.getRandom().nextFloat() > vanillaGrowChance)
-                        return false;
-
-                    // Default flower check predicate, straight from the sapling class.
-                    for (BlockPos blockPos : BlockPos.Mutable.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
-                        if (world.getBlockState(blockPos).is(BlockTags.FLOWERS)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
-                    // Default biome check chance function. Uses vanilla chances.
-                    final RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX(), pos.getY(), pos.getZ()).getRegistryName()));
-
-                    if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
-                        return vanillaGenChancePlains;
-                    if (biomeKey == Biomes.FLOWER_FOREST)
-                        return vanillaGenChanceFlowerForest;
-                    if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST))
-                        return vanillaGenChanceForest;
-
-                    return 0D;
-                }).with(MAX_COUNT, 1);
+        return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos) -> {
+            if (world.getRandom().nextFloat() > vanillaGrowChance) return false;
+            // Default flower check predicate, straight from the sapling class
+            for(BlockPos blockpos : BlockPos.Mutable.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
+                if (world.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
+                    return true;
+                }
+            }
+            return false;
+        }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
+            // Default biome check chance function. Uses vanilla chances
+            RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).getRegistryName()));
+            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
+                return vanillaGenChancePlains;
+            if (biomeKey == Biomes.FLOWER_FOREST)
+                return vanillaGenChanceFlowerForest;
+            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST))
+                return vanillaGenChanceForest;
+            return 0D;
+        }).with(MAX_COUNT, 1);
     }
 
     @Override
@@ -104,9 +97,8 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
     }
 
     @Override
-    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above()))
-            return false;
+    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
+        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above()) || fertility == 0) return false;
 
         return placeBeeNestInValidPlace(configuredGenFeature, world, rootPos, false);
     }

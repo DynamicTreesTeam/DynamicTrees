@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.util;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.AbstractIterator;
@@ -279,6 +280,10 @@ public class BranchDestructionData {
 		return (encoded >> 24) & 0x0F;
 	}
 
+	public LeavesProperties getLeavesProperties (int index) {
+		return this.species.getValidLeavesProperties(this.destroyedLeavesBlockIndex[index]);
+	}
+
 	public BlockState getLeavesBlockState(int index) {
 		DynamicLeavesBlock leaves = species.getValidLeafBlock(destroyedLeavesBlockIndex[index]);
 		if(leaves != null) {
@@ -380,13 +385,13 @@ public class BranchDestructionData {
 	// Generic
 	///////////////////////////////////////////////////////////
 	
-	private int encodeRelBlockPos(BlockPos relPos) {
+	public static int encodeRelBlockPos(BlockPos relPos) {
 		return	(((relPos.getX() + 64) & 0xFF) << 16) |
 				(((relPos.getY() + 64) & 0xFF) << 8) |
 				(((relPos.getZ() + 64) & 0xFF)) ;
 	}
 	
-	private BlockPos decodeRelPos(int encoded) {
+	public static BlockPos decodeRelPos(int encoded) {
 		return new BlockPos(
 				(((encoded >> 16) & 0xFF) - 64),
 				(((encoded >> 8) & 0xFF) - 64),

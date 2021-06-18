@@ -22,7 +22,7 @@ import java.util.Random;
 /**
  * This exists solely to aid in the creation of a cleaner anonymous class.
  * All of the members in this class act as pass-thrus by default.
- * 
+ *
  * @author ferreusveritas
  */
 public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator, ConfiguredDropCreator<DropCreator>> implements IResettable<DropCreator> {
@@ -72,7 +72,7 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 
 		return context.drops();
 	}
-	
+
 	protected List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int soilLife, int fortune) {
 		return drops;
 	}

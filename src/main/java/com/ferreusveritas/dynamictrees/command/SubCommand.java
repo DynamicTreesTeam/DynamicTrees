@@ -5,10 +5,12 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.ferreusveritas.dynamictrees.util.ThrowableRunnable;
+import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -27,6 +29,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -61,8 +64,15 @@ public abstract class SubCommand {
     protected abstract int getPermissionLevel ();
 
     public ArgumentBuilder<CommandSource, ?> register() {
-        return Commands.literal(this.getName()).requires(commandSource -> commandSource.hasPermission(this.getPermissionLevel()))
-                .then(this.registerArguments());
+        final LiteralArgumentBuilder<CommandSource> argumentBuilder = Commands.literal(this.getName())
+                .requires(commandSource -> commandSource.hasPermission(this.getPermissionLevel()));
+
+        this.registerArguments().forEach(argumentBuilder::then);
+        return argumentBuilder;
+    }
+
+    protected List<ArgumentBuilder<CommandSource, ?>> registerArguments() {
+        return Lists.newArrayList(this.registerArgument());
     }
 
     /**
@@ -70,7 +80,7 @@ public abstract class SubCommand {
      *
      * @return The {@link ArgumentBuilder} created.
      */
-    public abstract ArgumentBuilder<CommandSource, ?> registerArguments();
+    public abstract ArgumentBuilder<CommandSource, ?> registerArgument();
 
     protected static int executesSuccess(final ThrowableRunnable<CommandSyntaxException> executeRunnable) throws CommandSyntaxException {
         executeRunnable.run();
@@ -157,6 +167,20 @@ public abstract class SubCommand {
 
     protected static ITextComponent darkRed(final Object object) {
         return CommandHelper.colour(object, TextFormatting.DARK_RED);
+    }
+
+    protected static void sendSuccess(final CommandSource source, final ITextComponent component) {
+        source.sendSuccess(component.copy().withStyle(style -> style.withColor(TextFormatting.GREEN)),
+                false);
+    }
+
+    protected static void sendSuccessAndLog(final CommandSource source, final ITextComponent component) {
+        source.sendSuccess(component.copy().withStyle(style -> style.withColor(TextFormatting.GREEN)),
+                true);
+    }
+
+    protected static void sendFailure(final CommandSource source, final ITextComponent component) {
+        source.sendFailure(component.copy().withStyle(style -> style.withColor(TextFormatting.RED)));
     }
 
 }

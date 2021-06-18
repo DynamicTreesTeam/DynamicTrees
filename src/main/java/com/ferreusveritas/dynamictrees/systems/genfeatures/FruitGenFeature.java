@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
+import com.ferreusveritas.dynamictrees.api.IFruitGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -10,6 +9,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -23,10 +23,9 @@ import net.minecraft.world.biome.Biome;
 
 import java.util.List;
 
-public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPostGenFeature {
+public class FruitGenFeature extends GenFeature implements IFruitGenFeature {
 
 	public static final ConfigurationProperty<FruitBlock> FRUIT_BLOCK = ConfigurationProperty.property("fruit_block", FruitBlock.class);
-	public static final ConfigurationProperty<Integer> FRUITING_RADIUS = ConfigurationProperty.integer("fruiting_radius");
 
 	public FruitGenFeature(ResourceLocation registryName) {
 		super(registryName);
@@ -39,22 +38,18 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration()
-				.with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
-				.with(VERTICAL_SPREAD, 30f)
-				.with(QUANTITY, 4)
-				.with(RAY_DISTANCE, 5f)
-				.with(FRUITING_RADIUS, 8);
+		return super.createDefaultConfiguration().with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
+				.with(VERTICAL_SPREAD, 30f).with(QUANTITY, 4).with(FRUITING_RADIUS, 8).with(PLACE_CHANCE, 1f);
 	}
 
     @Override
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-		if(!endPoints.isEmpty()) {
+		if (!endPoints.isEmpty()) {
 			int qty = configuredGenFeature.get(QUANTITY);
 			qty *= seasonFruitProductionFactor;
-			for(int i = 0; i < qty; i++) {
-				BlockPos endPoint = endPoints.get(world.getRandom().nextInt(endPoints.size()));
-				addFruit(configuredGenFeature, world, species, rootPos.above(), endPoint, true, false, safeBounds, seasonValue);
+			for (int i = 0; i < qty; i++) {
+				final BlockPos endPoint = endPoints.get(world.getRandom().nextInt(endPoints.size()));
+				this.addFruit(configuredGenFeature, world, species, rootPos.above(), endPoint, true, false, safeBounds, seasonValue);
 			}
 			return true;
 		}
@@ -62,20 +57,21 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	}
 
 	@Override
-	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-		BlockState blockState = world.getBlockState(treePos);
-		BranchBlock branch = TreeHelper.getBranch(blockState);
+	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
+		final BlockState blockState = world.getBlockState(treePos);
+		final BranchBlock branch = TreeHelper.getBranch(blockState);
 
-		if(branch != null && branch.getRadius(blockState) >= configuredGenFeature.get(FRUITING_RADIUS) && natural) {
-			if (species.seasonalFruitProductionFactor(world, rootPos) > world.random.nextFloat()) {
-				FindEndsNode endFinder = new FindEndsNode();
+		if (branch != null && branch.getRadius(blockState) >= configuredGenFeature.get(FRUITING_RADIUS) && natural) {
+			final float fruitingFactor = species.seasonalFruitProductionFactor(world, rootPos);
+			if (fruitingFactor > configuredGenFeature.get(FRUIT_BLOCK).getMinimumSeasonalValue() && fruitingFactor > world.random.nextFloat()) {
+				final FindEndsNode endFinder = new FindEndsNode();
 				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
-				List<BlockPos> endPoints = endFinder.getEnds();
+				final List<BlockPos> endPoints = endFinder.getEnds();
 				int qty = configuredGenFeature.get(QUANTITY);
 				if (!endPoints.isEmpty()) {
 					for (int i = 0; i < qty; i++) {
-						BlockPos endPoint = endPoints.get(world.random.nextInt(endPoints.size()));
-						addFruit(configuredGenFeature, world, species, rootPos.above(), endPoint, false, true, SafeChunkBounds.ANY, SeasonHelper.getSeasonValue(world, rootPos));
+						final BlockPos endPoint = endPoints.get(world.random.nextInt(endPoints.size()));
+						this.addFruit(configuredGenFeature, world, species, rootPos.above(), endPoint, false, true, SafeChunkBounds.ANY, SeasonHelper.getSeasonValue(world, rootPos));
 					}
 				}
 			}
@@ -85,13 +81,13 @@ public class FruitGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	}
 
 	protected void addFruit(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds, Float seasonValue) {
-		BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
-		if(fruitPos != BlockPos.ZERO) {
-			if (!enableHash || ((CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0) ) {
-				FruitBlock fruitBlock = configuredGenFeature.get(FRUIT_BLOCK);
-				BlockState setState = fruitBlock.getStateForAge(worldGen ? fruitBlock.getAgeForSeasonalWorldGen(world, fruitPos, seasonValue) : 0);
-				world.setBlock(fruitPos, setState, 3);
-			}
+		final BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
+		if (fruitPos != BlockPos.ZERO &&
+				(!enableHash || ((CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0)) &&
+				world.getRandom().nextFloat() <= configuredGenFeature.get(PLACE_CHANCE)) {
+			FruitBlock fruitBlock = configuredGenFeature.get(FRUIT_BLOCK);
+			BlockState setState = fruitBlock.getStateForAge(worldGen ? fruitBlock.getAgeForSeasonalWorldGen(world, fruitPos, seasonValue) : 0);
+			world.setBlock(fruitPos, setState, 3);
 		}
 	}
 

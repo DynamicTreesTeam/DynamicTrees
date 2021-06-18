@@ -24,6 +24,7 @@ public final class JsonPropertyApplierLists {
             .register("resistance", Float.class, (properties, resistance) -> properties.strength(properties.destroyTime, resistance))
             .registerIfTrueApplier("zero_hardness_and_resistance", AbstractBlock.Properties::instabreak)
             .register("hardness_and_resistance", Float.class, AbstractBlock.Properties::strength)
+            .register("light", Integer.class, (properties, light) -> properties.lightLevel(state -> light))
             .registerIfTrueApplier("tick_randomly", AbstractBlock.Properties::randomTicks)
             .registerIfTrueApplier("variable_opacity", AbstractBlock.Properties::dynamicShape)
             .registerIfTrueApplier("no_drops", AbstractBlock.Properties::noDrops)

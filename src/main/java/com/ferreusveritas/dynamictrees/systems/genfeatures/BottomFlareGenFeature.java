@@ -39,8 +39,8 @@ public class BottomFlareGenFeature extends GenFeature implements IPostGenFeature
 	}
 
 	@Override
-	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-		if(soilLife > 0) {
+	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
+		if(fertility > 0) {
 			this.flareBottom(configuredGenFeature, world, rootPos, species);
 			return true;
 		}

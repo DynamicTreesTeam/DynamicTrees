@@ -7,11 +7,12 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
-import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -23,6 +24,7 @@ import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -38,8 +40,8 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.List;
 
 /**
  * This class provides a means of holding individual properties
@@ -94,6 +96,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	protected int smotherLeavesMax = 4;
 	protected int lightRequirement = 13;
+	protected leafAges doesAge = leafAges.YES;
 	protected boolean connectAnyRadius = false;
 
 	/**
@@ -115,7 +118,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	
 	public LeavesProperties(@Nullable final BlockState primitiveLeaves, final CellKit cellKit, final ResourceLocation registryName) {
 		this.family = Family.NULL_FAMILY;
-		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : CommonBlockStates.AIR;
+		this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : BlockStates.AIR;
 		this.cellKit = cellKit;
 		this.setRegistryName(registryName);
 		this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
@@ -133,8 +136,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public void setPrimitiveLeaves(final Block primitiveLeaves) {
 		if (this.primitiveLeaves == null || primitiveLeaves != this.primitiveLeaves.getBlock()) {
 			this.primitiveLeaves = primitiveLeaves.defaultBlockState();
-			this.family.removeConnectableVanillaLeaves(this.primitiveLeavesConnectable);
-			this.family.addConnectableVanillaLeaves(state -> state.getBlock() == primitiveLeaves);
+			this.family.removeConnectable(this.primitiveLeavesConnectable);
+			this.family.addConnectable(state -> state.getBlock() == primitiveLeaves);
 		}
 	}
 
@@ -200,23 +203,21 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public LeavesProperties setDynamicLeavesState(BlockState state) {
 		//Cache all the blockStates to speed up worldgen
 		dynamicLeavesBlockHydroStates[0] = Blocks.AIR.defaultBlockState();
-		for(int i = 1; i <= maxHydro; i++) {
+		for(int i = 1; i <= maxHydro; i++)
 			dynamicLeavesBlockHydroStates[i] = state.setValue(DynamicLeavesBlock.DISTANCE, i);
-		}
-		
 		return this;
 	}
-	
+
 	public BlockState getDynamicLeavesState() {
-		return dynamicLeavesBlockHydroStates[maxHydro];
+		return getDynamicLeavesState(getCellKit().getDefaultHydration());
 	}
-	
+
 	public BlockState getDynamicLeavesState(int hydro) {
-		return dynamicLeavesBlockHydroStates[MathHelper.clamp(hydro, 0, maxHydro)];
+		return Optional.ofNullable(dynamicLeavesBlockHydroStates[MathHelper.clamp(hydro, 0, maxHydro)])
+				.orElse(Blocks.AIR.defaultBlockState());
 	}
 
 	public boolean hasDynamicLeavesBlock() {
-		if (getDynamicLeavesState() == null) return false;
 		return getDynamicLeavesState().getBlock() instanceof DynamicLeavesBlock;
 	}
 
@@ -264,7 +265,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	 * Gets the smother leaves max - the maximum amount of leaves in a stack before the
 	 * bottom-most leaf block dies. Can beset to zero to disable smothering. [default = 4]
 	 *
-	 * @return The smother leaves max.
+	 * @return the smother leaves max.
 	 */
 	public int getSmotherLeavesMax() {
 		return this.smotherLeavesMax;
@@ -277,7 +278,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	/**
 	 * Gets the minimum amount of light necessary for a leaves block to be created. [default = 13]
 	 *
-	 * @return The minimum light requirement.
+	 * @return the minimum light requirement.
 	 */
 	public int getLightRequirement() {
 		return this.lightRequirement;
@@ -285,6 +286,51 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	public void setLightRequirement(int lightRequirement) {
 		this.lightRequirement = lightRequirement;
+	}
+
+	protected enum leafAges {
+		YES (true, true),
+		WORLDGEN_ONLY (true, false),
+		GROWTH_ONLY (false, true),
+		NO (false, false);
+
+		boolean ageWorldgen,ageGrowth;
+		leafAges (boolean ageWorgen, boolean ageGrowth){
+			this.ageWorldgen = ageWorgen;
+			this.ageGrowth = ageGrowth;
+		}
+		public boolean getDoesAge (boolean worldgen){
+			if (worldgen) return ageWorldgen;
+			else return ageGrowth;
+		}
+	}
+
+	/**
+	 * If the leaves block should tick and age.
+	 * Set to false for leaves for dead trees [default = true]
+	 *
+	 * @param worldgen if its trying to age during worldgen.
+	 * @return the multiplier for the block tick rate
+	 */
+	public boolean getDoesAge(boolean worldgen, BlockState state) {
+		return this.doesAge.getDoesAge(worldgen);
+	}
+
+	public void setDoesAge(String doesAge) {
+		try {
+			this.doesAge = leafAges.valueOf(doesAge.toUpperCase());
+		} catch (IllegalArgumentException e){
+			System.err.println("does_age value for leaves "+this+" is not valid. Options are: "+ Arrays.toString(leafAges.values()));
+		}
+	}
+
+	private boolean canGrowOnGround = false;
+	public void setCanGrowOnGround(boolean canGrowOnGround){
+		this.canGrowOnGround = canGrowOnGround;
+	}
+
+	public boolean canGrowOnGround(){
+		return canGrowOnGround;
 	}
 
 	/**
@@ -313,8 +359,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	}
 
 	public AbstractBlock.Properties getDefaultBlockProperties(final Material material, final MaterialColor materialColor) {
-		return AbstractBlock.Properties.of(material, materialColor).strength(0.2F).requiresCorrectToolForDrops()
-				.randomTicks().sound(SoundType.GRASS).noOcclusion().isValidSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
+		return AbstractBlock.Properties.of(material, materialColor).strength(0.2F).randomTicks()
+				.sound(SoundType.GRASS).noOcclusion().isValidSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
 				.isSuffocating((s, r, p) -> false).isViewBlocking((s, r, p) -> false);
 	}
 
@@ -327,11 +373,11 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	 * @param rand A {@link Random} object.
 	 * @return return true to allow the normal DynamicLeavesBlock update to occur
 	 */
-	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return true; }
+	public boolean updateTick(World worldIn, BlockPos pos, BlockState state, Random rand) { return getDoesAge(false, state); }
 
 	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-		int twigRadius = from.getFamily().getPrimaryThickness();
-		return (fromRadius == twigRadius || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(blockAccess.getBlockState(pos), blockAccess, pos) ? twigRadius : 0;
+		final int twigRadius = from.getFamily().getPrimaryThickness();
+		return (fromRadius == twigRadius || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(from.getFamily().getCommonSpecies(), blockAccess.getBlockState(pos), blockAccess, pos) ? twigRadius : 0;
 	}
 
 	public boolean doRequireShears() {
@@ -340,6 +386,10 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	public void setRequiresShears(boolean requiresShears) {
 		this.requiresShears = requiresShears;
+	}
+
+	public List<ITag.INamedTag<Block>> defaultLeavesTags() {
+		return Collections.singletonList(DTBlockTags.LEAVES);
 	}
 
 	///////////////////////////////////////////
@@ -359,6 +409,11 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 	@OnlyIn(Dist.CLIENT)
 	private IBlockColor colorMultiplier;
+
+	@OnlyIn(Dist.CLIENT)
+	public int treeFallColorMultiplier(BlockState state, IBlockDisplayReader world, BlockPos pos) {
+		return this.foliageColorMultiplier(state, world, pos);
+	}
 
 	@OnlyIn(Dist.CLIENT)
 	public int foliageColorMultiplier(BlockState state, IBlockDisplayReader world, BlockPos pos) {

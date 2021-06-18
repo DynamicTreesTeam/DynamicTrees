@@ -10,14 +10,11 @@ import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart.TreePartType;
 
 public class NullTreePart implements ITreePart {
 	
@@ -42,8 +39,8 @@ public class NullTreePart implements ITreePart {
 			if (rad > 0) return rad;
 		}
 		//Twigs connect to Vanilla leaves
-		if(fromRadius == 1) {
-			return from.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1: 0;
+		if (fromRadius == 1) {
+			return from.getFamily().isCompatibleVanillaLeaves(from.getFamily().getCommonSpecies(), blockState, blockAccess, pos) ? 1: 0;
 		}
 		return 0;
 	}

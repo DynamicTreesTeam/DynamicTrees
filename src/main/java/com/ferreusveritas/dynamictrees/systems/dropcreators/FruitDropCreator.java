@@ -14,7 +14,7 @@ import java.util.Random;
 
 /**
  * A drop creator that drops fruit just like Vanilla apples.
- * 
+ *
  * @author ferreusveritas
  */
 public class FruitDropCreator extends DropCreator {

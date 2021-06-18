@@ -9,17 +9,16 @@ import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.models.IModelTracker;
-import com.ferreusveritas.dynamictrees.models.ModelTrackerCacheEntityFallingTree;
+import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModelTrackerCache;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Iterables;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
@@ -202,7 +201,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 		for(BlockPos absPos: Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES))) {
 			BlockState state = level.getBlockState(absPos);
 			if(TreeHelper.isTreePart(state)) {
-				level.setBlock(absPos, CommonBlockStates.AIR, 0);////The client needs to set it's blocks to air
+				level.setBlock(absPos, BlockStates.AIR, 0);////The client needs to set it's blocks to air
 				renderBounds.union(absPos);//Expand the re-render volume to include this block
 			}
 		}
@@ -351,7 +350,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void modelCleanup() {
-		ModelTrackerCacheEntityFallingTree.cleanupModels(level, this);
+		FallingTreeEntityModelTrackerCache.cleanupModels(level, this);
 	}
 	
 	public void handleMotion() {
@@ -408,7 +407,7 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 	public static void spawnItemAsEntity(World worldIn, BlockPos pos, ItemStack stack) {
 		if (!worldIn.isClientSide && !stack.isEmpty() && worldIn.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
 			ItemEntity entityitem = new ItemEntity(worldIn, (double)pos.getX() + 0.5F, (double)pos.getY() + 0.5F, (double)pos.getZ() + 0.5F, stack);
-			entityitem.lerpMotion(0,0,0);
+			entityitem.setDeltaMovement(0,0,0);
 			entityitem.setDefaultPickUpDelay();
 			worldIn.addFreshEntity(entityitem);
 		}

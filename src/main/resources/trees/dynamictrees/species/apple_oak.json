@@ -27,11 +27,6 @@
         }
     ],
     "features" : [
-        {
-            "name": "fruit",
-            "properties": {
-                "ray_distance": 4
-            }
-        }
+        "fruit"
     ]
 }

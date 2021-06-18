@@ -28,7 +28,7 @@ public final class GetTreeCommand extends SubCommand {
     private static final String CODE_RAW = "code_raw";
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().executes(context -> this.getTree(context.getSource(), blockPosArgument(context), false))
                 .then(booleanArgument(CODE_RAW).executes(context -> this.getTree(context.getSource(), blockPosArgument(context),
                         booleanArgument(context, CODE_RAW))));
@@ -40,13 +40,15 @@ public final class GetTreeCommand extends SubCommand {
         return TreeHelper.getBestGuessSpecies(world, pos).ifValidElse(species -> {
             final Optional<JoCode> joCode = TreeHelper.getJoCode(world, pos);
 
-            if (codeRaw)
-                source.sendSuccess(new StringTextComponent(joCode.map(JoCode::toString).orElse("?")), false);
-            else source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.get_tree",
-                    species.getTextComponent(), joCode.map(JoCode::getTextComponent)
-                    .orElse(new StringTextComponent("?"))), false);
-        }, () -> source.sendFailure(new TranslationTextComponent("commands.dynamictrees.error.get_tree",
-                            CommandHelper.posComponent(pos).copy().withStyle(style -> style.withColor(TextFormatting.DARK_RED))))
+            if (codeRaw) {
+                sendSuccess(source, new StringTextComponent(joCode.map(JoCode::toString).orElse("?")));
+            } else {
+                sendSuccess(source, new TranslationTextComponent("commands.dynamictrees.success.get_tree",
+                        species.getTextComponent(), joCode.map(JoCode::getTextComponent)
+                        .orElse(new StringTextComponent("?"))));
+            }
+        }, () -> sendFailure(source, new TranslationTextComponent("commands.dynamictrees.error.get_tree",
+                CommandHelper.posComponent(pos).copy().withStyle(style -> style.withColor(TextFormatting.DARK_RED))))
         ) ? 1 : 0;
     }
 

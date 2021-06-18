@@ -10,7 +10,6 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -20,8 +19,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -40,15 +44,18 @@ import javax.annotation.Nullable;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public class BasicBranchBlock extends BranchBlock {
+public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
 	
 	protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, MAX_RADIUS);
+	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
 	/** Stores a cache of the {@link BlockState}s for rapid lookup. Created by {@link #createBranchStates(IntegerProperty, int)}. */
 	protected final BlockState[] branchStates;
 	
 	private int flammability = 5; // Mimic vanilla logs
 	private int fireSpreadSpeed = 5; // Mimic vanilla logs
+
+	private final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
 
 	public BasicBranchBlock(Material material) {
 		this(AbstractBlock.Properties.of(material).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
@@ -75,7 +82,7 @@ public class BasicBranchBlock extends BranchBlock {
 	 * @return The {@code array} cache of {@link BlockState}s.
 	 */
 	public BlockState[] createBranchStates(final IntegerProperty radiusProperty, final int maxRadius) {
-		this.registerDefaultState(this.stateDefinition.any().setValue(radiusProperty, 1));
+		this.registerDefaultState(this.stateDefinition.any().setValue(radiusProperty, 1).setValue(WATERLOGGED, false));
 
 		final BlockState[] branchStates = new BlockState[maxRadius + 1];
 
@@ -110,7 +117,7 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 	
 	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(RADIUS);
+		builder.add(RADIUS).add(WATERLOGGED);
 	}
 	
 	///////////////////////////////////////////
@@ -133,7 +140,7 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 
 	@Override
-	public boolean checkForRot(IWorld world, BlockPos pos, Species species, int radius, Random rand, float chance, boolean rapid) {
+	public boolean checkForRot(IWorld world, BlockPos pos, Species species, int fertility, int radius, Random rand, float chance, boolean rapid) {
 		
 		if( !rapid && (chance == 0.0f || rand.nextFloat() > chance) ) {
 			return false;//Bail out if not in rapid mode and the postRot chance fails
@@ -152,22 +159,44 @@ public class BasicBranchBlock extends BranchBlock {
 			}
 		}
 		
-		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, rand, rapid);// Unreinforced branches are destroyed
+		boolean didRot = species.rot(world, pos, neigh & 0x0F, radius, fertility, rand, rapid, fertility > 0); // Unreinforced branches are destroyed.
 		
-		if(rapid && didRot) {// Speedily postRot back dead branches if this block rotted
+		if (rapid && didRot) {// Speedily postRot back dead branches if this block rotted
 			for (Direction dir : Direction.values()) {// The logic here is that if this block rotted then
 				BlockPos neighPos = pos.relative(dir);// the neighbors might be rotted too.
 				BlockState neighState = world.getBlockState(neighPos);
-				if(neighState.getBlock() == this) { // Only check blocks logs that are the same as this one
-					checkForRot(world, neighPos, species, getRadius(neighState), rand, 1.0f, true);
+				if (neighState.getBlock() == this) { // Only check blocks logs that are the same as this one
+					this.checkForRot(world, neighPos, species, fertility, getRadius(neighState), rand, 1.0f, true);
 				}
 			}
 		}
 		
 		return didRot;
 	}
-	
-	
+
+	///////////////////////////////////////////
+	// WATER LOGGING
+	///////////////////////////////////////////
+
+	@Override
+	public FluidState getFluidState(BlockState state) {
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+	}
+
+	@Override
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		if (stateIn.getValue(WATERLOGGED)) {
+			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+		}
+		return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+	}
+
+	@Override
+	public boolean canPlaceLiquid(IBlockReader world, BlockPos pos, BlockState state, Fluid fluid) {
+		if (getRadius(state) > maxRadiusForWaterLogging) return false;
+		return IWaterLoggable.super.canPlaceLiquid(world, pos, state, fluid);
+	}
+
 	///////////////////////////////////////////
 	// PHYSICAL PROPERTIES
 	///////////////////////////////////////////
@@ -206,9 +235,10 @@ public class BasicBranchBlock extends BranchBlock {
 	
 	@Override
 	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
-		Family thisTree = getFamily();
-		
-		if (leavesProperties.getFamily() == thisTree) {// The requesting leaves must match the tree for hydration to occur
+		final Family thisTree = getFamily();
+
+		// The requesting leaves must match the tree for hydration to occur, and the branch must not be stripped.
+		if (leavesProperties.getFamily() == thisTree) {
 			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);
 			int radius = MetadataCell.getRadius(radiusAndMeta);
 			int metadata = MetadataCell.getMeta(radiusAndMeta);
@@ -226,7 +256,9 @@ public class BasicBranchBlock extends BranchBlock {
 	@Override
 	public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
 		destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
-		world.setBlock(pos, getStateForRadius(radius), flags);
+		boolean replacingWater = world.getBlockState(pos).getFluidState() == Fluids.WATER.getSource(false);
+		boolean setWaterlogged = replacingWater && radius <= maxRadiusForWaterLogging;
+		world.setBlock(pos, getStateForRadius(radius).setValue(WATERLOGGED, setWaterlogged), flags);
 		destroyMode = DynamicTrees.DestroyMode.SLOPPY;
 		return radius;
 	}
@@ -243,81 +275,90 @@ public class BasicBranchBlock extends BranchBlock {
 	}
 	
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
-		Species species = signal.getSpecies();
+		final Species species = signal.getSpecies();
 		
-		DynamicLeavesBlock leaves =  species.getLeavesBlock().orElse(null);
+		final DynamicLeavesBlock leaves = species.getLeavesBlock().orElse(null);
 		if (leaves != null) {
-			if (fromRadius == getFamily().getPrimaryThickness()) {// If we came from a twig then just make some leaves
+			if (fromRadius == getFamily().getPrimaryThickness()) {// If we came from a twig (and we're not a stripped branch) then just make some leaves
 				signal.success = leaves.growLeavesIfLocationIsSuitable(world, species.getLeavesProperties(), pos, 0);
 			} else {// Otherwise make a proper branch
 				return leaves.branchOut(world, pos, signal);
 			}
+		} else {
+			//If the leaves block is null, the branch grows directly without checking for leaves requirements
+			if (isNextToBranch(world, pos, signal.dir.getOpposite())){
+				signal.success = false;
+				return signal;
+			}
+			setRadius(world, pos, getFamily().getPrimaryThickness(), null);
+			signal.radius = getFamily().getSecondaryThickness();
+			signal.success = true;
 		}
 		return signal;
 	}
-	
+
 	@Override
 	public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
-		
-		if (signal.step()) {// This is always placed at the beginning of every growSignal function
-			
-			BlockState currBlockState = world.getBlockState(pos);
-			Species species = signal.getSpecies();
-			boolean inTrunk = signal.isInTrunk();
-			
-			Direction originDir = signal.dir.getOpposite();// Direction this signal originated from
-			Direction targetDir = species.selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
-			signal.doTurn(targetDir);
-			
-			{
-				BlockPos deltaPos = pos.relative(targetDir);
-				BlockState deltaState = world.getBlockState(deltaPos);
-				
-				// Pass grow signal to next block in path
-				ITreePart treepart = TreeHelper.getTreePart(deltaState);
-				if (treepart != TreeHelper.NULL_TREE_PART) {
-					signal = treepart.growSignal(world, deltaPos, signal);// Recurse
-				} else if (world.isEmptyBlock(deltaPos) || deltaState.getBlock() instanceof TrunkShellBlock) {
-					signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
-				}
+		// This is always placed at the beginning of every growSignal function
+		if (!signal.step())
+			return signal;
+
+		final BlockState currBlockState = world.getBlockState(pos);
+		final Species species = signal.getSpecies();
+		final boolean inTrunk = signal.isInTrunk();
+
+		final Direction originDir = signal.dir.getOpposite();// Direction this signal originated from
+		final Direction targetDir = species.selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
+		signal.doTurn(targetDir);
+
+		{
+			final BlockPos deltaPos = pos.relative(targetDir);
+			final BlockState deltaState = world.getBlockState(deltaPos);
+
+			// Pass grow signal to next block in path
+			final ITreePart treepart = TreeHelper.getTreePart(deltaState);
+			if (treepart != TreeHelper.NULL_TREE_PART) {
+				signal = treepart.growSignal(world, deltaPos, signal);// Recurse
+			} else if (world.isEmptyBlock(deltaPos) || deltaState.getBlock() instanceof TrunkShellBlock) {
+				signal = growIntoAir(world, deltaPos, signal, getRadius(currBlockState));
 			}
-			
-			// Calculate Branch Thickness based on neighboring branches
-			float areaAccum = signal.radius * signal.radius;// Start by accumulating the branch we just came from
-			
-			for (Direction dir : Direction.values()) {
-				if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
-					BlockPos deltaPos = pos.relative(dir);
-					
-					// If it is decided to implement a special block(like a squirrel hole, tree
-					// swing, rotting, burned or infested branch, etc) then this new block could be
-					// derived from BlockBranch and this works perfectly. Should even work with
-					// tileEntity blocks derived from BlockBranch.
-					BlockState blockState = world.getBlockState(deltaPos);
-					ITreePart treepart = TreeHelper.getTreePart(blockState);
-					if (isSameTree(treepart)) {
-						int branchRadius = treepart.getRadius(blockState);
-						areaAccum += branchRadius * branchRadius;
-					}
-				}
-			}
-			
-			//Only continue to set radii if the tree growth isn't choked out
-			if(!signal.choked) {
-				// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
-				int maxRadius = inTrunk ? species.getMaxBranchRadius() : Math.min(species.getMaxBranchRadius(), MAX_RADIUS);
-				
-				// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
-				// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-				signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
-				int targetRadius = (int) Math.floor(signal.radius);
-				int setRad = setRadius(world, pos, targetRadius, originDir);
-				if(setRad < targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
-					signal.choked = true; //If something is in the way then it means that the tree growth is choked
+		}
+
+		// Calculate Branch Thickness based on neighboring branches
+		float areaAccum = signal.radius * signal.radius;// Start by accumulating the branch we just came from
+
+		for (Direction dir : Direction.values()) {
+			if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
+				BlockPos deltaPos = pos.relative(dir);
+
+				// If it is decided to implement a special block(like a squirrel hole, tree
+				// swing, rotting, burned or infested branch, etc) then this new block could be
+				// derived from BlockBranch and this works perfectly. Should even work with
+				// tileEntity blocks derived from BlockBranch.
+				BlockState blockState = world.getBlockState(deltaPos);
+				ITreePart treepart = TreeHelper.getTreePart(blockState);
+				if (isSameTree(treepart)) {
+					int branchRadius = treepart.getRadius(blockState);
+					areaAccum += branchRadius * branchRadius;
 				}
 			}
 		}
-		
+
+		//Only continue to set radii if the tree growth isn't choked out
+		if(!signal.choked) {
+			// Ensure that side branches are not thicker than the size of a block.  Also enforce species max thickness
+			int maxRadius = inTrunk ? species.getMaxBranchRadius() : Math.min(species.getMaxBranchRadius(), MAX_RADIUS);
+
+			// The new branch should be the square root of all of the sums of the areas of the branches coming into it.
+			// But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
+			signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
+			int targetRadius = (int) Math.floor(signal.radius);
+			int setRad = setRadius(world, pos, targetRadius, originDir);
+			if(setRad < targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
+				signal.choked = true; //If something is in the way then it means that the tree growth is choked
+			}
+		}
+
 		return signal;
 	}
 
@@ -327,11 +368,14 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 	
 	// This is only so effective because the center of the player must be inside the block that contains the tree trunk.
-	// The result is that only thin branches and trunks can be climbed
-	
+	// The result is that only thin branches and trunks can be climbed.
+	// We do not check if the radius is over 3 since some mods can modify this, and allow you to climb on contact.
 	@Override
 	public boolean isLadder(BlockState state, IWorldReader world, BlockPos pos, LivingEntity entity) {
-		return DTConfigs.ENABLE_BRANCH_CLIMBING.get() && getRadius(state) <= 3 && entity instanceof PlayerEntity;
+		return DTConfigs.ENABLE_BRANCH_CLIMBING.get() &&
+				entity instanceof PlayerEntity &&
+				getFamily().branchIsLadder() &&
+				(!state.hasProperty(WATERLOGGED) || !state.getValue(WATERLOGGED));
 	}
 	
 	@Nonnull
@@ -374,7 +418,7 @@ public class BasicBranchBlock extends BranchBlock {
 	///////////////////////////////////////////
 	
 	protected int getMaxSignalDepth() {
-		return 32;
+		return getFamily().getMaxSignalDepth();
 	}
 	
 	/**

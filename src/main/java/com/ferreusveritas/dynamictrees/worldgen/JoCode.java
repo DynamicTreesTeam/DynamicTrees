@@ -9,19 +9,20 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CoderNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -164,10 +165,6 @@ public class JoCode {
 	 */
 	public void generate(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
 		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
-
-		// If the family doesn't have a branch then don't attempt growth.
-		if (species.getFamily().getBranch() == null)
-			return;
 
 		// A Tree generation boundary radius is at least 2 and at most 8.
 		radius = MathHelper.clamp(radius, 2, 8);
@@ -318,7 +315,7 @@ public class JoCode {
 									if (TreeHelper.isLeaves(leavesState)) {
 										final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
 										if (leavesProperties.getFamily() == leavesBlock.getProperties(leavesState).getFamily()) {
-											world.setBlock(delPos, CommonBlockStates.AIR, 2);
+											world.setBlock(delPos, BlockStates.AIR, 2);
 										}
 									}
 								}
@@ -327,7 +324,7 @@ public class JoCode {
 					});
 				}
 
-				world.setBlock(pos, CommonBlockStates.AIR, 2);
+				world.setBlock(pos, BlockStates.AIR, 2);
 			}
 		}
 
@@ -376,8 +373,11 @@ public class JoCode {
 		return codePos;
 	}
 	
-	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, boolean isLast) {
-		if ((world.getBlockState(pos).canBeReplacedByLogs(world, pos)) || world.getBlockState(pos).getMaterial().isLiquid() &&
+	protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
+		if (((world.getBlockState(pos).canBeReplacedByLogs(world, pos)) ||
+				world.getBlockState(pos).getMaterial().isLiquid() ||
+				world.getBlockState(pos).getBlock().is(DTBlockTags.FOLIAGE) ||
+				world.getBlockState(pos).getBlock().is(BlockTags.FLOWERS)) &&
 				(!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
 			Objects.requireNonNull(species.getFamily().getBranch())
 					.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
@@ -452,7 +452,7 @@ public class JoCode {
 			return;
 		
 		for (BlockPos.Mutable top : leafMap.getTops() ) {
-			if (world.getUncachedNoiseBiome(rootPos.getX(), rootPos.getY(), rootPos.getZ()).shouldSnow(world, rootPos)) {
+			if (world.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).shouldSnow(world, rootPos)) {
 				final BlockPos.Mutable iPos = new BlockPos.Mutable(top.getX(), top.getY(), top.getZ());
 				int yOffset = 0;
 
@@ -483,12 +483,12 @@ public class JoCode {
 		}
 		
 		//Smallest Base64 encoder ever.
-		String code = "";
+		StringBuilder code = new StringBuilder();
 		for(int b = 0; b < instructions.size(); b+=2) {
-			code += BASE_64.charAt(instructions.get(b) << 3 | instructions.get(b + 1));
+			code.append(BASE_64.charAt(instructions.get(b) << 3 | instructions.get(b + 1)));
 		}
 		
-		return code;
+		return code.toString();
 	}
 	
 	static public byte[] decode(String code) {
@@ -554,12 +554,12 @@ public class JoCode {
 		}
 		
 		public byte[] compile() {
-			byte array[] = new byte[instructions.size()];
+			byte[] array = new byte[instructions.size()];
 			Iterator<Byte> i = instructions.iterator();
 			
 			int pos = 0;
 			while(i.hasNext()) {
-				array[pos++] = i.next().byteValue();
+				array[pos++] = i.next();
 			}
 			
 			return array;

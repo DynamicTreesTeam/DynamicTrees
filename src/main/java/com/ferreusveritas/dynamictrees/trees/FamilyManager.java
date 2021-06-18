@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
@@ -30,25 +29,26 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
 
     @Override
     public void registerAppliers() {
-        this.loadReloadAppliers.register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
+        this.loadReloadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
+            registryName = TreeRegistry.processResLoc(registryName);
+            Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setupCommonSpecies, setCommonWarn(family, registryName))); })
+                .register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
                 .register("max_branch_radius", Integer.class, Family::setMaxBranchRadius);
 
         this.setupAppliers.register("primitive_log", Block.class, Family::setPrimitiveLog)
                 .register("primitive_stripped_log", Block.class, Family::setPrimitiveStrippedLog)
                 .register("stick", Item.class, Family::setStick);
 
-        this.loadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
-            registryName = TreeRegistry.processResLoc(registryName);
-            Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setupCommonSpecies, setCommonWarn(family, registryName)));
-        }).register("generate_surface_root", Boolean.class, Family::setHasSurfaceRoot)
-                .register("generate_stripped_branch", Boolean.class, Family::setHasStrippedBranch);
+        this.loadAppliers.register("generate_surface_root", Boolean.class, Family::setHasSurfaceRoot)
+                .register("generate_stripped_branch", Boolean.class, Family::setHasStrippedBranch)
+                .register("fire_proof", Boolean.class, Family::setIsFireProof);
 
-        this.reloadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
-            registryName = TreeRegistry.processResLoc(registryName);
-            Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setCommonSpecies, setCommonWarn(family, registryName)));
-        }).register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
+        this.reloadAppliers.register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
                 .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa)
-                .registerArrayApplier("valid_branches", BranchBlock.class, Family::addValidBranches);
+                .register("primary_thickness", Integer.class, Family::setPrimaryThickness)
+                .register("secondary_thickness", Integer.class, Family::setSecondaryThickness)
+                .register("branch_is_ladder", Boolean.class, Family::setBranchIsLadder)
+                .register("max_signal_depth", Integer.class, Family::setMaxSignalDepth);
 
         super.registerAppliers();
     }

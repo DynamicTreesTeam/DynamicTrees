@@ -29,7 +29,7 @@ public final class CreateTransformPotionCommand extends SubCommand {
     }
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().then(transformableSpeciesArgument().executes(context -> this.spawnTransformPotion(context.getSource(),
                 blockPosArgument(context), speciesArgument(context))));
     }
@@ -45,8 +45,8 @@ public final class CreateTransformPotionCommand extends SubCommand {
         dendroPotion.setTargetSpecies(dendroPotionStack, species); // Tell it to set the target tree to the selected family.
 
         ItemUtils.spawnItemStack(source.getLevel(), pos, dendroPotionStack, true); // Spawn potion in the world.
-        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.create_transform_potion",
-                species.getTextComponent(), CommandHelper.posComponent(pos, TextFormatting.AQUA)), true);
+        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.create_transform_potion",
+                species.getTextComponent(), CommandHelper.posComponent(pos, TextFormatting.AQUA)));
 
         return 1;
     }

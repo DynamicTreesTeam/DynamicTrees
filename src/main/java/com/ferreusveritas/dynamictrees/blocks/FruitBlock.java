@@ -1,10 +1,8 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.CommonBlockStates;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.ItemEntity;
@@ -13,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
@@ -27,12 +26,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Supplier;
+
+import static com.ferreusveritas.dynamictrees.util.ShapeUtils.createFruitShape;
 
 @SuppressWarnings({"deprecation", "unused"})
 public class FruitBlock extends Block implements IGrowable {
@@ -44,20 +43,23 @@ public class FruitBlock extends Block implements IGrowable {
 		CUSTOM
 	}
 
-	protected static final AxisAlignedBB[] FRUIT_AABB = new AxisAlignedBB[] {
-			new AxisAlignedBB(7/16.0, 1f, 7/16.0, 9/16.0, 15/16.0, 9/16.0),
-			new AxisAlignedBB(7/16.0, 1f, 7/16.0, 9/16.0, 14/16.0, 9/16.0),
-			new AxisAlignedBB(6/16.0, 1f, 6/16.0, 10/16.0, 12/16.0, 10/16.0),
-			new AxisAlignedBB(6/16.0, 15/16.0, 6/16.0, 10/16.0, 11/16.0, 10/16.0)
+	/**
+	 * Default shapes for the apple fruit, each element is the shape for each growth stage.
+	 */
+	protected AxisAlignedBB[] FRUIT_AABB = new AxisAlignedBB[] {
+			createFruitShape(1,1,0, 16),
+			createFruitShape(1,2,0, 16),
+			createFruitShape(2.5f,5,0),
+			createFruitShape(2.5f,5,1.25f)
 	};
 	
-	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
+	public static final IntegerProperty AGE = BlockStateProperties.AGE_3;
 
-	private static final Map<Species, FruitBlock> SPECIES_FRUIT_MAP = new HashMap<>();
+	private static final Map<Species, Set<FruitBlock>> SPECIES_FRUIT_MAP = new HashMap<>();
 
-	@Nullable
-	public static FruitBlock getFruitBlockForSpecies(Species species) {
-		return SPECIES_FRUIT_MAP.getOrDefault(species, null);
+	@Nonnull
+	public static Set<FruitBlock> getFruitBlocksForSpecies(Species species) {
+		return SPECIES_FRUIT_MAP.getOrDefault(species, new HashSet<>());
 	}
 
 	protected ItemStack droppedFruit = ItemStack.EMPTY;
@@ -85,7 +87,13 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	public void setSpecies(Species species) {
-		SPECIES_FRUIT_MAP.put(species, this);
+		if (SPECIES_FRUIT_MAP.containsKey(species))
+			SPECIES_FRUIT_MAP.get(species).add(this);
+		else {
+			Set<FruitBlock> set = new HashSet<>();
+			set.add(this);
+			SPECIES_FRUIT_MAP.put(species, set);
+		}
 		this.species = species;
 	}
 
@@ -93,8 +101,16 @@ public class FruitBlock extends Block implements IGrowable {
 		return this.species == null ? Species.NULL_SPECIES : this.species;
 	}
 
+	public float getMinimumSeasonalValue (){
+		return 0.3f;
+	}
+
 	@Override
 	public void tick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
+		this.doTick(state, world, pos, rand);
+	}
+
+	public void doTick(BlockState state, World world, BlockPos pos, Random rand) {
 		if (this.shouldBlockDrop(world, pos, state)) {
 			this.dropBlock(world, state, pos);
 			return;
@@ -105,7 +121,7 @@ public class FruitBlock extends Block implements IGrowable {
 		final Species species = this.getSpecies();
 
 		if (season != null && species.isValid()) { // Non-Null means we are season capable.
-			if (species.seasonalFruitProductionFactor(world, pos) < 0.2f) {
+			if (species.seasonalFruitProductionFactor(world, pos) < getMinimumSeasonalValue()) {
 				this.outOfSeasonAction(world, pos); // Destroy the block or similar action.
 				return;
 			}
@@ -128,7 +144,7 @@ public class FruitBlock extends Block implements IGrowable {
 					case CUSTOM:
 						break;
 					case DROP: this.dropBlock(world, state, pos); break;
-					case ROT: world.setBlockAndUpdate(pos, CommonBlockStates.AIR); break;
+					case ROT: world.setBlockAndUpdate(pos, BlockStates.AIR); break;
 				}
 			}
 		}
@@ -152,7 +168,7 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	protected void outOfSeasonAction(World world, BlockPos pos) {
-		world.setBlockAndUpdate(pos, CommonBlockStates.AIR);
+		world.setBlockAndUpdate(pos, BlockStates.AIR);
 	}
 
 	@Override
@@ -180,13 +196,13 @@ public class FruitBlock extends Block implements IGrowable {
 	private void dropBlock(World worldIn, BlockState state, BlockPos pos) {
 		worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
 		if (state.getValue(AGE) >= 3) {
-			worldIn.addFreshEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, this.getFruitDrop()));
+			worldIn.addFreshEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, this.getFruitDrop(fruitDropCount(state, worldIn, pos))));
 		}
 	}
 
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return this.getFruitDrop();
+		return this.getFruitDrop(1);
 	}
 
 	/**
@@ -233,13 +249,19 @@ public class FruitBlock extends Block implements IGrowable {
 
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		final List<ItemStack> drops = super.getDrops(state, builder);
+		// If a loot table has been added load those drops instead (until drop creators).
+		if (builder.getLevel().getServer().getLootTables().getIds().contains(this.getLootTable()))
+			return super.getDrops(state, builder);
+
+		final List<ItemStack> drops = new ArrayList<>();
+
 		if (state.getValue(AGE) >= 3) {
-			final ItemStack toDrop = getFruitDrop();
+			final ItemStack toDrop = this.getFruitDrop(fruitDropCount(state, builder.getLevel(), BlockPos.ZERO));
 			if (!toDrop.isEmpty()) {
 				drops.add(toDrop);
 			}
 		}
+
 		return drops;
 	}
 
@@ -249,14 +271,29 @@ public class FruitBlock extends Block implements IGrowable {
 	}
 
 	//Override this for a custom item drop
-	public ItemStack getFruitDrop() {
-		return droppedFruit.copy();
+	public ItemStack getFruitDrop(int count) {
+		ItemStack stack = droppedFruit.copy();
+		stack.setCount(count);
+		return stack;
 	}
 
+	//pos could be BlockPos.ZERO
+	protected int fruitDropCount (BlockState state, World world, BlockPos pos){
+		return 1;
+	}
 
 	///////////////////////////////////////////
 	// BOUNDARIES
 	///////////////////////////////////////////
+
+	public FruitBlock setShape(int stage, AxisAlignedBB boundingBox){
+		FRUIT_AABB[stage] = boundingBox;
+		return this;
+	}
+	public FruitBlock setShape(AxisAlignedBB[] boundingBox){
+		FRUIT_AABB = boundingBox;
+		return this;
+	}
 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {

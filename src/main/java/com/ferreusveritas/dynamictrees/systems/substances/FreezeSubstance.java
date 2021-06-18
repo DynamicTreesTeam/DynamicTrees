@@ -24,18 +24,13 @@ public class FreezeSubstance implements ISubstanceEffect {
  				TreeHelper.treeParticles(world, rootPos, ParticleTypes.FIREWORK, 8);
  			} else {
  				dirt.startAnalysis(world, rootPos, new MapSignal(new FreezerNode(species)));
- 				dirt.fertilize(world, rootPos, -15);//destroy the soil life so it can no longer grow
+ 				dirt.fertilize(world, rootPos, -15); // Destroy the fertility so it can no longer grow.
  			}
  			return true;
  		}
 		return false;
 	}
-	
-	@Override
-	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
-		return false;
-	}
-	
+
 	@Override
 	public String getName() {
 		return "freeze";

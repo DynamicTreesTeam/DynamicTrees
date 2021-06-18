@@ -9,21 +9,23 @@ import com.ferreusveritas.dynamictrees.systems.substances.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.DendroBrewingRecipe;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmptiable {
@@ -34,33 +36,39 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public static final String TREE_TAG_KEY = "target";
 
 	public enum DendroPotionType {
-		BIOCHAR(    0, true, "biochar",     0x27231c),
-		DEPLETION(  1, true, "depletion",	  0x76be6d),
-		GIGAS( 2, true, "gigas",  0xe3901d),
-		BURGEONING( 3, true, "burgeoning",  0xa9bebe),
-		FERTILITY(  4, true, "fertility",   0x4ad400),
-		PERSISTENCE(5, true, "persistence", 0x389aff),
-		TRANSFORM(  6, true, "transform",   0x7fb8a4);
+		BIOCHAR(    0, true, "biochar",     0x27231c, Items.CHARCOAL),
+		DEPLETION(  1, true, "depletion",	  0x76be6d, Items.SLIME_BALL),
+		GIGAS( 2, true, "gigas",  0xe3901d, Items.PUMPKIN_SEEDS),
+		BURGEONING( 3, true, "burgeoning",  0xa9bebe, Items.GHAST_TEAR),
+		FERTILITY(  4, false, "fertility",   0x4ad400, Items.COD),
+		PERSISTENCE(5, false, "persistence", 0x389aff, Items.BLUE_ORCHID),
+		TRANSFORM(  6, true, "transform",   0x7fb8a4, Items.PRISMARINE_CRYSTALS),
+		HARVEST(7, false, "harvest", 0xe7c164, Items.GOLDEN_APPLE),
+		DENUDING(8, false, "denuding", 0xa47e46, Items.IRON_AXE);
 		
 		private final int index;
 		private final boolean active;
 		private final String name;
 		private final int color;
+		private final ItemStack ingredient;
 
-		DendroPotionType(int index, boolean active, String name, int color) {
+		DendroPotionType(int index, boolean active, String name, int color, Item ingredient) {
+			this(index, active, name, color, new ItemStack(ingredient));
+		}
+
+		DendroPotionType(int index, boolean active, String name, int color, ItemStack ingredient) {
 			this.index = index;
 			this.active = active;
 			this.name = name;
 			this.color = color;
+			this.ingredient = ingredient;
 		}
-		
-		PotionItem p;
-		
+
 		public int getIndex() {
 			return index;
 		}
 		
-		public boolean getActive() {
+		public boolean isActive() {
 			return active;
 		}
 		
@@ -71,9 +79,15 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		public int getColor() {
 			return color;
 		}
+
+		public ItemStack getIngredient() {
+			return this.ingredient;
+		}
 		
 		public ITextComponent getDescription() {
-			return new TranslationTextComponent("potion." + this.name + ".description" + (this == TRANSFORM ? ".empty" : ""));
+			return new TranslationTextComponent("potion." + this.name +
+					".description" + (this == TRANSFORM ? ".empty" : ""))
+					.withStyle(style -> style.withColor(TextFormatting.GRAY));
 		}
 	};
 
@@ -90,7 +104,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public void fillItemCategory(final ItemGroup group, final NonNullList<ItemStack> items) {
 		if (this.allowdedIn(group)) {
 			for (final DendroPotionType potion : DendroPotionType.values()) {
-				if (potion.getActive()) {
+				if (potion.isActive()) {
 					items.add(this.applyIndexTag(new ItemStack(this, 1), potion.getIndex()));
 				}
 			}
@@ -100,7 +114,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public static DendroPotionType getPotionType (ItemStack stack) {
 		return DendroPotionType.values()[stack.getOrCreateTag().getInt(INDEX_TAG_KEY)];
 	}
-	
+
+	@Nullable
 	@Override
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 		switch (getPotionType(itemStack)) {
@@ -112,17 +127,17 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			case FERTILITY: return new FertilizeSubstance().setAmount(15);
 			case PERSISTENCE: return new FreezeSubstance();
 			case TRANSFORM: return new TransformSubstance(this.getTargetSpecies(itemStack));
+			case HARVEST: return new HarvestSubstance();
+			case DENUDING: return new DenudeSubstance();
 		}
 	}
 	
 	public Species getTargetSpecies(ItemStack itemStack) {
 		final CompoundNBT nbtTag = itemStack.getOrCreateTag();
 
-		if (nbtTag.contains(TREE_TAG_KEY)) {
-			return TreeRegistry.findSpecies(nbtTag.getString(TREE_TAG_KEY));
-		}
-
-		return Species.NULL_SPECIES;
+		return nbtTag.contains(TREE_TAG_KEY) ?
+				TreeRegistry.findSpecies(nbtTag.getString(TREE_TAG_KEY)) :
+				Species.NULL_SPECIES;
 	}
 	
 	public ItemStack setTargetSpecies(ItemStack itemStack, Species species) {
@@ -133,13 +148,16 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public void registerRecipes() {
 		final ItemStack awkwardStack = PotionUtils.setPotion(new ItemStack(Items.POTION), Potion.byName("awkward"));
 
-		Collections.addAll(brewingRecipes, this.getRecipe(awkwardStack, new ItemStack(Items.CHARCOAL), this.getPotionStack(DendroPotionType.BIOCHAR)),
-				this.getRecipe(Items.SLIME_BALL, DendroPotionType.DEPLETION),
-				this.getRecipe(Items.PUMPKIN_SEEDS, DendroPotionType.GIGAS),
-				this.getRecipe(Items.GHAST_TEAR, DendroPotionType.BURGEONING),
-				this.getRecipe(Items.COD, DendroPotionType.FERTILITY),
-				this.getRecipe(Blocks.BLUE_ORCHID, DendroPotionType.PERSISTENCE),
-				this.getRecipe(Items.PRISMARINE_CRYSTALS, DendroPotionType.TRANSFORM));
+		brewingRecipes.add(this.getRecipe(awkwardStack, new ItemStack(Items.CHARCOAL), this.getPotionStack(DendroPotionType.BIOCHAR)));
+
+		for (int i = 1; i < DendroPotionType.values().length; i++) {
+			final DendroPotionType type = DendroPotionType.values()[i];
+
+			if (!type.isActive())
+				continue;
+
+			brewingRecipes.add(this.getRecipe(type.getIngredient(), type));
+		}
 
 		for (Species species : TreeRegistry.getPotionTransformableSpecies()) {
 			brewingRecipes.add(new DendroBrewingRecipe(this.getPotionStack(DendroPotionType.TRANSFORM), species.getSeedStack(1),
@@ -188,7 +206,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		}
 		
 		final Species species = this.getTargetSpecies(stack);
-		tooltip.add(new TranslationTextComponent("potion.transform.description", species.getLocalizedName()));
+		tooltip.add(new TranslationTextComponent("potion.transform.description", species.getTextComponent())
+				.withStyle(style -> style.withColor(TextFormatting.GRAY)));
 	}
 	
 	public int getColor(ItemStack stack, int tint) {

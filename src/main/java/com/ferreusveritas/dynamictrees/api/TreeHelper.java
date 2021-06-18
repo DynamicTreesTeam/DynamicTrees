@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.TwinkleNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -256,8 +257,17 @@ public class TreeHelper {
 	 * @param num
 	 */
 	public static void treeParticles(World world, BlockPos rootPos, BasicParticleType type, int num) {
-		if(world.isClientSide) {
+		if (world.isClientSide) {
 			startAnalysisFromRoot(world, rootPos, new MapSignal(new TwinkleNode(type, num)));
+		}
+	}
+
+	public static void rootParticles(World world, BlockPos rootPos, Direction offset, BasicParticleType type, int num) {
+		if (world.isClientSide) {
+			if (world.isClientSide() && world.getBlockState(rootPos).getBlock() instanceof RootyBlock) {
+				final BlockPos particlePos = rootPos.offset(offset.getNormal());
+				DTClient.spawnParticles(world, type, particlePos.getX(), particlePos.getY(), particlePos.getZ(), num, world.getRandom());
+			}
 		}
 	}
 	

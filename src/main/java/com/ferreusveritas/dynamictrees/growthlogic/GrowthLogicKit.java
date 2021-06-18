@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -27,6 +28,8 @@ public abstract class GrowthLogicKit extends RegistryEntry<GrowthLogicKit> {
 	public GrowthLogicKit(final ResourceLocation registryName) {
 		this.setRegistryName(registryName);
 	}
+
+	public Direction selectNewDirection(World world, BlockPos pos, Species species, BranchBlock branch, GrowSignal signal) { return null; }
 
 	public abstract int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap);
 	

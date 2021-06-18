@@ -57,7 +57,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
      * for things to be run once all registries are "final" (at least for the time being). Note
      * that these will be cleared after use (every time the registry is locked).
      */
-    protected final List<Runnable> onLockRunnables = new ArrayList<>();
+    protected final List<Runnable> onLockRunnables = new LinkedList<>();
 
     /**
      * Comparator for sorting the {@link RegistryEntry} objects by their registry names (in natural order).

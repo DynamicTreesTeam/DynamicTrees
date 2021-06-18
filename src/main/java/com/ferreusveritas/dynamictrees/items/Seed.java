@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -18,11 +19,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
@@ -50,25 +54,25 @@ public class Seed extends Item implements IPlantable {
 	public Species getSpecies() {
 		return species;
 	}
-	
+
 	@Override
 	public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
-		if(entityItem.lifespan == 6000) { //6000(5 minutes) is the default lifespan for an entity item
-			entityItem.lifespan = getTimeToLive(entityItem.getItem()) + 20;//override default lifespan with new value + 20 ticks(1 second)
-			if(entityItem.lifespan == 6000) {
-				entityItem.lifespan = 6001;//Ensure this isn't run again
+		if (entityItem.lifespan == 6000) { // 6000 (5 minutes) is the default lifespan for an entity item
+			entityItem.lifespan = getTimeToLive(entityItem.getItem()) + 20; // override default lifespan with new value + 20 ticks (1 second)
+			if (entityItem.lifespan == 6000) {
+				entityItem.lifespan = 6001; // Ensure this isn't run again
 			}
 		}
 		
-		if(entityItem.tickCount >= entityItem.lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
-			World world = entityItem.level;
-			if(!world.isClientSide) {//Server side only
-				ItemStack seedStack = entityItem.getItem();
-				BlockPos pos = new BlockPos(entityItem.blockPosition());
-				SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, getSpecies(), pos, shouldPlant(world, pos, seedStack));
+		if (entityItem.tickCount >= entityItem.lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
+			final World world = entityItem.level;
+			if (!world.isClientSide) {//Server side only
+				final ItemStack seedStack = entityItem.getItem();
+				final BlockPos pos = new BlockPos(entityItem.blockPosition());
+				final SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, this.getSpecies().selfOrLocationOverride(world, pos), pos, this.shouldPlant(world, pos, seedStack));
 				MinecraftForge.EVENT_BUS.post(seedVolEvent);
-				if(!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {
-					doPlanting(world, pos, null, seedStack);
+				if (!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {
+					this.doPlanting(world, pos, null, seedStack);
 				}
 				seedStack.setCount(0);
 			}
@@ -78,12 +82,12 @@ public class Seed extends Item implements IPlantable {
 		return false;
 	}
 	
-	public boolean doPlanting(World world, BlockPos pos, PlayerEntity planter, ItemStack seedStack) {
-		Species species = getSpecies();
-		if(species.plantSapling(world, pos)) {//Do the planting
+	public boolean doPlanting(World world, BlockPos pos, @Nullable PlayerEntity planter, ItemStack seedStack) {
+		final Species species = this.getSpecies().selfOrLocationOverride(world, pos);
+		if (species.plantSapling(world, pos, this.getSpecies() != species)) { // Do the planting
 			String joCode = getCode(seedStack);
-			if(!joCode.isEmpty()) {
-				world.removeBlock(pos, false);//Remove the newly created dynamic sapling
+			if (!joCode.isEmpty()) {
+				world.removeBlock(pos, false); // Remove the newly created dynamic sapling
 				species.getJoCode(joCode).setCareful(true).generate(world, world, species, pos.below(), world.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY);
 			}
 			return true;
@@ -117,11 +121,12 @@ public class Seed extends Item implements IPlantable {
 		
 		return plantChance > world.random.nextFloat();
 	}
-	
+
 	public boolean hasForcePlant(ItemStack seedStack) {
 		boolean forcePlant = false;
 		if(seedStack.hasTag()) {
 			CompoundNBT nbtData = seedStack.getTag();
+			assert nbtData != null;
 			forcePlant = nbtData.getBoolean("forceplant");
 		}
 		return forcePlant;
@@ -150,19 +155,29 @@ public class Seed extends Item implements IPlantable {
 	}
 
 	public ActionResultType onItemUseFlowerPot(ItemUseContext context) {
-		World world = context.getLevel();
-		BlockPos pos = context.getClickedPos();
-		BlockState emptyPotState = world.getBlockState(pos);
-		Block emptyPotBlock = emptyPotState.getBlock();
+		final World world = context.getLevel();
+		final BlockPos pos = context.getClickedPos();
+		final BlockState emptyPotState = world.getBlockState(pos);
+		final Block emptyPotBlock = emptyPotState.getBlock();
 
-		if (!(emptyPotBlock instanceof FlowerPotBlock) || emptyPotState != emptyPotBlock.defaultBlockState())
+		if (!(emptyPotBlock instanceof FlowerPotBlock) || emptyPotState != emptyPotBlock.defaultBlockState() ||
+				((FlowerPotBlock) emptyPotBlock).getContent() != Blocks.AIR) {
 			return ActionResultType.PASS;
+		}
 
-		PottedSaplingBlock bonsaiPot = this.getSpecies().getBonsaiPot();
-		world.setBlockAndUpdate(pos, bonsaiPot.defaultBlockState());
+		final PottedSaplingBlock pottingSapling = this.getSpecies().getPottedSapling();
+		world.setBlockAndUpdate(pos, pottingSapling.defaultBlockState());
 
-		if (bonsaiPot.setSpecies(world, pos, bonsaiPot.defaultBlockState(), this.getSpecies()) && bonsaiPot.setPotState(world, emptyPotState, pos)) {
-			context.getItemInHand().shrink(1);
+		if (pottingSapling.setSpecies(world, pos, pottingSapling.defaultBlockState(), this.getSpecies()) && pottingSapling.setPotState(world, emptyPotState, pos)) {
+			final PlayerEntity player = context.getPlayer();
+
+			if (player != null) {
+				context.getPlayer().awardStat(Stats.POT_FLOWER);
+				if (!context.getPlayer().abilities.instabuild) {
+					context.getItemInHand().shrink(1);
+				}
+			}
+
 			return ActionResultType.SUCCESS;
 		}
 
@@ -180,7 +195,7 @@ public class Seed extends Item implements IPlantable {
 		}
 		
 		if (facing == Direction.UP) {//Ensure this seed is only used on the top side of a block
-			if (context.getPlayer().mayUseItemAt(pos, facing, context.getItemInHand()) && context.getPlayer().mayUseItemAt(pos.above(), facing, context.getItemInHand())) {//Ensure permissions to edit block
+			if (context.getPlayer() != null && context.getPlayer().mayUseItemAt(pos, facing, context.getItemInHand()) && context.getPlayer().mayUseItemAt(pos.above(), facing, context.getItemInHand())) {//Ensure permissions to edit block
 				if(doPlanting(context.getLevel(), pos.above(), context.getPlayer(), context.getItemInHand())) {
 					context.getItemInHand().shrink(1);
 					return ActionResultType.SUCCESS;
@@ -194,7 +209,7 @@ public class Seed extends Item implements IPlantable {
 	@Override
 	public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
 		// Handle flower pot interaction (flower pot cancels on item use so this must be done first).
-		if(onItemUseFlowerPot(context) == ActionResultType.SUCCESS) {
+		if (onItemUseFlowerPot(context) == ActionResultType.SUCCESS) {
 			return ActionResultType.SUCCESS;
 		}
 
@@ -210,23 +225,32 @@ public class Seed extends Item implements IPlantable {
 		
 		return ActionResultType.PASS;
 	}
+
+	public static final String LIFESPAN_TAG = "lifespan";
 	
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		super.appendHoverText(stack, world, tooltip, flagIn);
 		
-		if(stack.hasTag()) {
-			String joCode = getCode(stack);
-			if(!joCode.isEmpty()) {
-				tooltip.add(new StringTextComponent("Code: §6" + joCode));
+		if (stack.hasTag()) {
+			final String joCode = this.getCode(stack);
+			if (!joCode.isEmpty()) {
+				tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.jo_code", new JoCode(joCode).getTextComponent()));
 			}
-			if(hasForcePlant(stack)) {
-				tooltip.add(new StringTextComponent("Force Planting: §3Enabled"));
+			if (this.hasForcePlant(stack)) {
+				tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.force_planting",
+						new TranslationTextComponent("tooltip.dynamictrees.enabled")
+								.withStyle(style -> style.withColor(TextFormatting.DARK_AQUA)))
+				);
 			}
-			CompoundNBT nbtData = stack.getTag();
+			final CompoundNBT nbtData = stack.getTag();
 			assert nbtData != null;
-			if(nbtData.contains("lifespan")) {
-				tooltip.add(new StringTextComponent("Seed Life Span: §3" + nbtData.getInt("lifespan")));
+
+			if (nbtData.contains(LIFESPAN_TAG)) {
+				tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.seed_life_span" +
+						new StringTextComponent(String.valueOf(nbtData.getInt(LIFESPAN_TAG)))
+								.withStyle(style -> style.withColor(TextFormatting.DARK_AQUA)))
+				);
 			}
 		}
 	}

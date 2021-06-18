@@ -12,7 +12,8 @@ import java.util.function.Supplier;
 
 public class FertilizeSubstance implements ISubstanceEffect {
 
-	private int amount = 1;
+	private int amount = 2;
+	private boolean displayParticles = true;
 	private boolean grow;
 	private Supplier<Integer> pulses = () -> 1;
 	
@@ -21,7 +22,7 @@ public class FertilizeSubstance implements ISubstanceEffect {
 		final RootyBlock dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 
 		if (dirt != null && dirt.fertilize(world, rootPos, this.amount) || this.grow) {
-			if (world.isClientSide) {
+			if (displayParticles && world.isClientSide) {
 				TreeHelper.treeParticles(world, rootPos, ParticleTypes.HAPPY_VILLAGER, 8);
 			} else {
 				if (this.grow) {
@@ -37,12 +38,7 @@ public class FertilizeSubstance implements ISubstanceEffect {
 
 		return false;
 	}
-	
-	@Override
-	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
-		return false;
-	}
-	
+
 	@Override
 	public String getName() {
 		return "fertilize";
@@ -56,7 +52,7 @@ public class FertilizeSubstance implements ISubstanceEffect {
 	/**
 	 * If growth is enabled then the tree will take an
 	 * update and the item will be consumed.  Regardless
-	 * of if the soil life is full.
+	 * of if it is fully fertilised.
 	 * 
 	 * @param grow
 	 * @return
@@ -68,6 +64,11 @@ public class FertilizeSubstance implements ISubstanceEffect {
 
 	public FertilizeSubstance setPulses(final int pulses) {
 		return this.setPulses(() -> pulses);
+	}
+
+	public FertilizeSubstance setDisplayParticles (boolean displayParticles) {
+		this.displayParticles = displayParticles;
+		return this;
 	}
 
 	public FertilizeSubstance setPulses(final Supplier<Integer> pulses) {

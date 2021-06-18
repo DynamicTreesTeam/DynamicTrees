@@ -3,10 +3,10 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
-import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.registry.*;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.leaves.PalmLeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.SolidLeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
@@ -15,9 +15,10 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Mushroom;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.specialfamilies.NetherFungusFamily;
-import com.ferreusveritas.dynamictrees.trees.specialspecies.NetherFungusSpecies;
-import com.ferreusveritas.dynamictrees.trees.specialspecies.SwampOakSpecies;
+import com.ferreusveritas.dynamictrees.trees.families.NetherFungusFamily;
+import com.ferreusveritas.dynamictrees.trees.species.NetherFungusSpecies;
+import com.ferreusveritas.dynamictrees.trees.species.PalmSpecies;
+import com.ferreusveritas.dynamictrees.trees.species.SwampOakSpecies;
 import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -30,20 +31,24 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTTrees {
 
-	public static ResourceLocation OAK = DynamicTrees.resLoc("oak");
-	public static ResourceLocation BIRCH = DynamicTrees.resLoc("birch");
-	public static ResourceLocation SPRUCE = DynamicTrees.resLoc("spruce");
-	public static ResourceLocation JUNGLE = DynamicTrees.resLoc("jungle");
-	public static ResourceLocation DARK_OAK = DynamicTrees.resLoc("dark_oak");
-	public static ResourceLocation ACACIA = DynamicTrees.resLoc("acacia");
-	public static ResourceLocation CRIMSON = DynamicTrees.resLoc("crimson");
-	public static ResourceLocation WARPED = DynamicTrees.resLoc("warped");
+	public static final ResourceLocation NULL = DynamicTrees.resLoc("null");
+
+	public static final ResourceLocation OAK = DynamicTrees.resLoc("oak");
+	public static final ResourceLocation BIRCH = DynamicTrees.resLoc("birch");
+	public static final ResourceLocation SPRUCE = DynamicTrees.resLoc("spruce");
+	public static final ResourceLocation JUNGLE = DynamicTrees.resLoc("jungle");
+	public static final ResourceLocation DARK_OAK = DynamicTrees.resLoc("dark_oak");
+	public static final ResourceLocation ACACIA = DynamicTrees.resLoc("acacia");
+	public static final ResourceLocation CRIMSON = DynamicTrees.resLoc("crimson");
+	public static final ResourceLocation WARPED = DynamicTrees.resLoc("warped");
 
 	@SubscribeEvent
 	public static void registerSpecies (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<Species> event) {
@@ -55,6 +60,7 @@ public class DTTrees {
 	public static void registerLeavesPropertiesTypes (final TypeRegistryEvent<LeavesProperties> event) {
 		event.registerType(DynamicTrees.resLoc("solid"), SolidLeavesProperties.TYPE);
 		event.registerType(DynamicTrees.resLoc("wart"), WartProperties.TYPE);
+		event.registerType(DynamicTrees.resLoc("palm"), PalmLeavesProperties.TYPE);
 	}
 
 	@SubscribeEvent
@@ -66,14 +72,15 @@ public class DTTrees {
 	public static void registerSpeciesTypes (final TypeRegistryEvent<Species> event) {
 		event.registerType(DynamicTrees.resLoc("nether_fungus"), NetherFungusSpecies.TYPE);
 		event.registerType(DynamicTrees.resLoc("swamp_oak"), SwampOakSpecies.TYPE);
+		event.registerType(DynamicTrees.resLoc("palm"), PalmSpecies.TYPE);
 	}
-
-	public static final ResourceLocation NULL = DynamicTrees.resLoc("null");
 
 	@SubscribeEvent
 	public static void newRegistry(RegistryEvent.NewRegistry event) {
-		final List<Registry<?>> registries = Arrays.asList(CellKit.REGISTRY, LeavesProperties.REGISTRY,
-				GrowthLogicKit.REGISTRY, GenFeature.REGISTRY, Family.REGISTRY, Species.REGISTRY);
+		final List<Registry<?>> registries = Registries.REGISTRIES.stream()
+				.filter(registry -> registry instanceof Registry)
+				.map(registry -> (Registry<?>) registry)
+				.collect(Collectors.toList());
 
 		// Post registry events.
 		registries.forEach(Registry::postRegistryEvent);

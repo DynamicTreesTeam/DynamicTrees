@@ -2,14 +2,10 @@ package com.ferreusveritas.dynamictrees.resources;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,11 +33,11 @@ public abstract class MultiJsonReloadListener<V> extends JsonApplierReloadListen
     }
 
     @Override
-    protected Map<ResourceLocation, List<JsonElement>> prepare(final IResourceManager resourceManager) {
-        final Map<ResourceLocation, List<JsonElement>> map = Maps.newHashMap();
-        int i = folderName.length() + 1;
+    protected Map<ResourceLocation, List<JsonElement>> prepare(final TreesResourceManager resourceManager) {
+        final Map<ResourceLocation, List<JsonElement>> map = Maps.newLinkedHashMap();
+        final int i = folderName.length() + 1;
 
-        for(ResourceLocation resourceLocationIn : resourceManager.listResources(this.folderName, (fileName) -> fileName.endsWith(JSON_EXTENSION))) {
+        for (ResourceLocation resourceLocationIn : resourceManager.resourcesAsRegularSet(this.folderName, (fileName) -> fileName.endsWith(JSON_EXTENSION))) {
             final String resourcePath = resourceLocationIn.getPath();
             final ResourceLocation resourceLocation = new ResourceLocation(resourceLocationIn.getNamespace(),
                     resourcePath.substring(i, resourcePath.length() - JSON_EXTENSION_LENGTH));

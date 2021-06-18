@@ -1,6 +1,6 @@
 {
     "family": "birch",
-    "tapering": 0.02,
+    "tapering": 0.05,
     "signal_energy": 24,
     "up_probability": 7,
     "lowest_branch_height": 7,

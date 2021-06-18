@@ -13,12 +13,12 @@ import net.minecraft.util.ResourceLocation;
 
 /**
  * This works somewhat like a loot table except much more powerful.
- * 
+ *
  * @author ferreusveritas
  *
  */
 public class StorageDropCreator extends DropCreator {
-	
+
 	private final HashMap<ResourceLocation, DropCreator> dropCreators = new HashMap<>();
 
 	public StorageDropCreator() {
@@ -29,19 +29,19 @@ public class StorageDropCreator extends DropCreator {
 		this.dropCreators.put(dropCreator.getRegistryName(), dropCreator);
 		return true;
 	}
-	
+
 	public DropCreator findDropCreator(ResourceLocation name) {
 		return dropCreators.get(name);
 	}
-	
+
 	public boolean remDropCreator(ResourceLocation name) {
 		return dropCreators.remove(name) != null;
 	}
-	
+
 	public Map<ResourceLocation, DropCreator> getDropCreators() {
 		return new HashMap<>(dropCreators);
 	}
-	
+
 	private List<ItemStack> makeDropListIfNull(List<ItemStack> dropList) {
 		if(dropList == null) {
 			dropList = new ArrayList<>();

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -78,18 +79,18 @@ public class DTConfigs {
 		final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
 		final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
 		final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
-		
+
 		SERVER_BUILDER.comment("Seed Settings").push("seeds");
 		SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
-				defineInRange("dropRate", 0.01, 0.0, 1.0);
+				defineInRange("seedDropRate", 0.01, 0.0, 1.0);
 		SEED_PLANT_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
-				defineInRange("plantRate", 1f/6f, 0.0, 1.0);
+				defineInRange("seedPlantRate", 1f/6f, 0.0, 1.0);
 		SEED_TIME_TO_LIVE = SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
 				defineInRange("timeToLive", 1200, 0, 6000);
-		SEED_ONLY_FOREST = SERVER_BUILDER.comment("If enabled then seeds will only voluntarily plant themselves in forest-like biomes").
-				define("onlyForest", true);
-		SEED_MIN_FORESTNESS = SERVER_BUILDER.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional").
-				defineInRange("dropRate", 0.0, 0.0, 1.0);
+		SEED_ONLY_FOREST = SERVER_BUILDER.comment("If enabled then seeds will only voluntarily plant themselves in forest-like biomes.").
+				define("seedOnlyForest", true);
+		SEED_MIN_FORESTNESS = SERVER_BUILDER.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional.").
+				defineInRange("seedMinForestness", 0.0, 0.0, 1.0);
 		SERVER_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("Tree Settings").push("trees");
@@ -107,8 +108,8 @@ public class DTConfigs {
 				defineInRange("scaleBiomeGrowthRate", 0.5f, 0.0f, 1.0f);
 		DISEASE_CHANCE = SERVER_BUILDER.comment("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days").
 				defineInRange("diseaseChance", 0.0f, 0.0f, 1.0f);
-		MAX_BRANCH_ROT_RADIUS = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. Set to 0 to prevent rotting").
-				defineInRange("maxBranchRotRadius", 8, 0, 24);
+		MAX_BRANCH_ROT_RADIUS = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. 24 = Full 3x3 thick size. Set to 0 to prevent rotting").
+				defineInRange("maxBranchRotRadius", 7, 0, ThickBranchBlock.MAX_RADIUS_TICK);
 		ROOTY_BLOCK_HARDNESS_MULTIPLIER = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
 				defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
 		SWAMP_OAKS_IN_WATER = SERVER_BUILDER.comment("Options for how oak trees generate in swamps. ROOTED: Swamp oak trees will generate on shallow water with mangrove-like roots. SUNK: Swamp oak trees will generate on shallow water one block under the surface. DISABLED: Swamp oaks will not generate on water.").

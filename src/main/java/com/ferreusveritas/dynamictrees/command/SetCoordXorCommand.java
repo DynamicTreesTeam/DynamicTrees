@@ -23,14 +23,14 @@ public final class SetCoordXorCommand extends SubCommand {
     private static final String XOR = "xor";
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return intArgument(XOR).suggests(((context, builder) -> ISuggestionProvider.suggest(Collections.singletonList("0"), builder)))
                 .executes(context -> executesSuccess(() -> this.setXor(context.getSource(), intArgument(context, XOR))));
     }
 
     private void setXor(final CommandSource source, final int xor) {
         CoordUtils.coordXor = xor;
-        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.set_xor", aqua(xor)), true);
+        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.set_xor", aqua(xor)));
     }
 
 }

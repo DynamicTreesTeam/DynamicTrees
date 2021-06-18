@@ -12,6 +12,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 public final class HexColorArgument implements ArgumentType<String> {
@@ -39,7 +40,7 @@ public final class HexColorArgument implements ArgumentType<String> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return ISuggestionProvider.suggest(Arrays.asList("00FFFF"), builder);
+        return ISuggestionProvider.suggest(Collections.singletonList("00FFFF"), builder);
     }
 
 }

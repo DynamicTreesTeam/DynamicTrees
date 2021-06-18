@@ -33,7 +33,11 @@ public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     public RootyWaterBlock(Block primitiveDirt) {
-        super(Properties.copy(primitiveDirt).randomTicks(), "rooty_"+ primitiveDirt.getRegistryName().getPath(), primitiveDirt);
+        this(Properties.copy(primitiveDirt).randomTicks(), "rooty_"+ primitiveDirt.getRegistryName().getPath(), primitiveDirt);
+    }
+
+    public RootyWaterBlock (Properties properties, String name, Block primitiveDirt){
+        super(properties, name, primitiveDirt);
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, true));
     }
 

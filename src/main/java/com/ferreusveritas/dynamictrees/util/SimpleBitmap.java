@@ -3,19 +3,19 @@ package com.ferreusveritas.dynamictrees.util;
 import javax.annotation.Nullable;
 
 /**
-* A simple bitmap that favors speed over safety.  Consider yourself disclaimed.
-* 
-* @author ferreusveritas
-*/
+ * A simple bitmap that favors speed over safety.  Consider yourself disclaimed.
+ *
+ * @author ferreusveritas
+ */
 public class SimpleBitmap {
 	
 	private final int h;
 	private final int w;
 	private int[] bits;
 	
-	public boolean touched;//useful for ruling out entire layers for the voxelmap 
+	public boolean touched; // Useful for ruling out entire layers for the VoxelMap.
 	
-	//Not thread safe at all but whatevers.
+	// Not thread safe at all but whatevers.
 	private static int dstOffsety;
 	private static int srcOffsety;
 	private static int runH;
@@ -28,7 +28,7 @@ public class SimpleBitmap {
 		this.w = net.minecraft.util.math.MathHelper.clamp(w, 1, 32);
 		this.h = Math.max(1, h);
 		this.bits = new int[this.h];
-		touched = false;
+		this.touched = false;
 	}
 	
 	/**
@@ -38,17 +38,18 @@ public class SimpleBitmap {
 	*/
 	public SimpleBitmap(final int w, final int h, @Nullable final int[] bits) {
 		this(w, h);
-		if(bits != null) {
+		if (bits != null) {
 			int size = Math.min(bits.length, this.h);
-			if (size >= 0) System.arraycopy(bits, 0, this.bits, 0, size);
+			if (size >= 0)
+				System.arraycopy(bits, 0, this.bits, 0, size);
 		}
-		touched = true;
+		this.touched = true;
 	}
 	
 	public SimpleBitmap(SimpleBitmap bmp) {
 		this(bmp.w, bmp.h);
 		System.arraycopy(bmp.bits, 0, this.bits, 0, this.bits.length);
-		touched = bmp.touched;
+		this.touched = bmp.touched;
 	}
 	
 	public int[] getBits() {
@@ -64,23 +65,23 @@ public class SimpleBitmap {
 	}
 	
 	public SimpleBitmap clear() {
-		bits = new int[h];
-		touched = false;
+		this.bits = new int[h];
+		this.touched = false;
 		return this;
 	}
 	
 	public boolean isColliding(int relX, int relY, SimpleBitmap src) {
-		if(prepBlit(relX, relY, src)) {
-			if(relX < 0) {
+		if (prepBlit(relX, relY, src)) {
+			if (relX < 0) {
 				relX = -relX;
-				while(runH-- > 0) {
-					if(((this.bits[dstOffsety++] << relX) & src.getBits()[srcOffsety++]) != 0) {
+				while (runH-- > 0) {
+					if (((this.bits[dstOffsety++] << relX) & src.getBits()[srcOffsety++]) != 0) {
 						return true;
 					}
 				}
 			} else {		
-				while(runH-- > 0) {
-					if((this.bits[dstOffsety++] & (src.getBits()[srcOffsety++] << relX)) != 0) {
+				while (runH-- > 0) {
+					if ((this.bits[dstOffsety++] & (src.getBits()[srcOffsety++] << relX)) != 0) {
 						return true;
 					}
 				}
@@ -89,15 +90,15 @@ public class SimpleBitmap {
 		return false;
 	}
 	
-	public void BlitOr(int relX, int relY, SimpleBitmap src) {
-		if(prepBlit(relX, relY, src)) {
-			if(relX < 0) {
+	public void blitOr(int relX, int relY, SimpleBitmap src) {
+		if (prepBlit(relX, relY, src)) {
+			if (relX < 0) {
 				relX = -relX;
-				while(runH-- > 0) {
+				while (runH-- > 0) {
 					this.bits[dstOffsety++] |= (src.getBits()[srcOffsety++] >>> relX);
 				}
 			} else {		
-				while(runH-- > 0) {
+				while (runH-- > 0) {
 					this.bits[dstOffsety++] |= (src.getBits()[srcOffsety++] << relX);
 				}
 			}
@@ -105,15 +106,15 @@ public class SimpleBitmap {
 		}
 	}
 	
-	public void BlitSub(int relX, int relY, SimpleBitmap src) {
-		if(prepBlit(relX, relY, src)) {
-			if(relX < 0) {
+	public void blitSub(int relX, int relY, SimpleBitmap src) {
+		if (prepBlit(relX, relY, src)) {
+			if (relX < 0) {
 				relX = -relX;
-				while(runH-- > 0) {
+				while (runH-- > 0) {
 					this.bits[dstOffsety++] &= ~(src.getBits()[srcOffsety++] >>> relX);
 				}
 			} else {		
-				while(runH-- > 0) {
+				while (runH-- > 0) {
 					this.bits[dstOffsety++] &= ~(src.getBits()[srcOffsety++] << relX);
 				}
 			}
@@ -122,14 +123,14 @@ public class SimpleBitmap {
 	}
 	
 	public void blitAnd(int relX, int relY, SimpleBitmap src) {
-		if(prepBlit(relX, relY, src)) {
-			if(relX < 0) {
+		if (prepBlit(relX, relY, src)) {
+			if (relX < 0) {
 				relX = -relX;
-				while(runH-- > 0) {
+				while (runH-- > 0) {
 					this.bits[dstOffsety++] &= (src.getBits()[srcOffsety++] >>> relX);
 				}
 			} else {		
-				while(runH-- > 0) {
+				while (runH-- > 0) {
 					this.bits[dstOffsety++] &= ~(src.getBits()[srcOffsety++] << relX);
 				}
 			}
@@ -140,11 +141,11 @@ public class SimpleBitmap {
 	
 	private boolean prepBlit(int relX, int relY, SimpleBitmap src) {
 
-		if(relX <= -src.w || relX >= this.w || relY <= -src.h || relY >= this.h || (!touched && !src.touched)) {
+		if (relX <= -src.w || relX >= this.w || relY <= -src.h || relY >= this.h || (!touched && !src.touched)) {
 			return false;
 		}
 		
-		if(relY >= 0) {
+		if (relY >= 0) {
 			dstOffsety = relY;
 			srcOffsety = 0;
 		} else {

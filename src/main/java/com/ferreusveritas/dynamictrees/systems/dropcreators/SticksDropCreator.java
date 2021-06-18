@@ -43,8 +43,8 @@ public class SticksDropCreator extends DropCreator {
 	}
 
 	@Override
-	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int soilLife, int fortune) {
-		return getSticks(drops, random, 0);
+	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int fertility, int fortune) {
+		return getSticks(dropList, random, 0);
 	}
 
 	private List<ItemStack> getSticks (List<ItemStack> dropList, Random random, int fortune){
@@ -61,5 +61,5 @@ public class SticksDropCreator extends DropCreator {
 		}
 		return dropList;
 	}
-	
+
 }

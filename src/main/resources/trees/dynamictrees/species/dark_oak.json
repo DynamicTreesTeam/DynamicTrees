@@ -43,7 +43,7 @@
         {
             "name": "rot_soil",
             "properties": {
-                "rotted_soil": "podzol"
+                "rotten_soil": "podzol"
             }
         },
         {

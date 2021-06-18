@@ -1,8 +1,10 @@
 package com.ferreusveritas.dynamictrees.models.loaders;
 
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
@@ -35,74 +37,75 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) { }
 
-    @Nullable
     @Override
-    public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
-        final JsonObject textures = this.getTexturesObject(modelContents);
+    public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelObject) {
+        final JsonObject textures = this.getTexturesObject(modelObject);
+        final ResourceLocation familyResLoc = this.getResLoc(modelObject);
 
-        if (textures == null)
-            return null;
-
-        final ResourceLocation barkResLoc = this.getBarkResLoc(textures);
-        final ResourceLocation ringsResLoc = this.getRingsResLoc(textures);
-
-        if (barkResLoc == null || ringsResLoc == null)
-            return null;
-
-        return this.getModelGeometry(barkResLoc, ringsResLoc);
+        return this.getModelGeometry(this.getBarkResLoc(textures), this.getRingsResLoc(textures),
+                familyResLoc == null ? null : TreeRegistry.processResLoc(familyResLoc));
     }
 
-    @Nullable
     protected JsonObject getTexturesObject (final JsonObject modelContents) {
-        if (!modelContents.get(TEXTURES).isJsonObject()) {
-            LOGGER.warn("Skipped loading {} block model as it did not have a Json object with identifier '{}'.", this.getModelTypeName(), TEXTURES);
-            return null;
-        }
+        if (!modelContents.has(TEXTURES) || !modelContents.get(TEXTURES).isJsonObject())
+            this.throwRequiresElement(TEXTURES, "Json Object");
 
         return modelContents.getAsJsonObject(TEXTURES);
     }
 
-    @Nullable
-    protected ResourceLocation getBarkResLoc (final JsonObject texturesContents) {
-        final String resLocStr = this.getOrWarn(texturesContents, BARK, TEXTURES);
-        return resLocStr != null ? this.getResLoc(resLocStr) : null;
+    protected ResourceLocation getBarkResLoc (final JsonObject textureObject) {
+        return this.getTextureLocation(textureObject, BARK);
+    }
+
+    protected ResourceLocation getRingsResLoc (final JsonObject textureObject) {
+        return this.getTextureLocation(textureObject, RINGS);
     }
 
     @Nullable
-    protected ResourceLocation getRingsResLoc (final JsonObject texturesContents) {
-        final String resLocStr = this.getOrWarn(texturesContents, RINGS, TEXTURES);
-        return resLocStr != null ? this.getResLoc(resLocStr) : null;
+    protected ResourceLocation getResLoc(final JsonObject object) {
+        try {
+            return this.getResLocOrThrow(this.getOrThrow(object, "family"));
+        } catch (final RuntimeException e) {
+            return null;
+        }
     }
 
-    @Nullable
-    private String getOrWarn(final JsonObject jsonObject, final String identifier, final String jsonObjectName) {
-        if (jsonObject.get(identifier) == null) {
-            LOGGER.warn("Skipping loading {} block model as identifier '{}' not found in Json object '{}'.", this.getModelTypeName(), identifier, jsonObjectName);
-            return null;
+    protected ResourceLocation getTextureLocation (final JsonObject textureObject, final String textureElement) {
+        try {
+            return this.getResLocOrThrow(this.getOrThrow(textureObject, textureElement));
+        } catch (final RuntimeException e) {
+            LOGGER.error("{} missing or did not have valid \"{}\" texture location element, using missing " +
+                    "texture.", this.getModelTypeName(), textureElement);
+            return MissingTextureSprite.getLocation();
         }
-        if (!jsonObject.get(identifier).isJsonPrimitive() || !jsonObject.get(identifier).getAsJsonPrimitive().isString()) {
-            LOGGER.warn("Skipping loading {} block model as identifier '{}' was not a string in Json object '{}'.", this.getModelTypeName(), identifier, jsonObjectName);
-            return null;
-        }
+    }
+
+    protected String getOrThrow(final JsonObject jsonObject, final String identifier) {
+        if (jsonObject.get(identifier) == null || !jsonObject.get(identifier).isJsonPrimitive() ||
+                !jsonObject.get(identifier).getAsJsonPrimitive().isString())
+            this.throwRequiresElement(identifier, "String");
 
         return jsonObject.get(identifier).getAsString();
+    }
+
+    protected void throwRequiresElement (final String element, final String expectedType) {
+        throw new RuntimeException(this.getModelTypeName() + " requires a valid \"" + element + "\" element of " +
+                "type " + expectedType + ".");
+    }
+
+    protected ResourceLocation getResLocOrThrow(final String resLocStr) {
+        try {
+            return new ResourceLocation(resLocStr);
+        } catch (ResourceLocationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * @return The type of model the class is loading. Useful for warnings when using sub-classes.
      */
     protected String getModelTypeName () {
-        return "branch";
-    }
-
-    @Nullable
-    private ResourceLocation getResLoc(final String resLocStr) {
-        try {
-            return new ResourceLocation(resLocStr);
-        } catch (ResourceLocationException e) {
-            LOGGER.warn("Skipped loading {} block model as resource location could not be created from string: {}", this.getModelTypeName(), e.getMessage());
-        }
-        return null;
+        return "Branch";
     }
 
     /**
@@ -113,8 +116,10 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
      * @param ringsResLoc The {@link ResourceLocation} object for the rings.
      * @return The {@link IModelGeometry} object.
      */
-    protected BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc, final ResourceLocation ringsResLoc) {
-        return new BranchBlockModelGeometry(barkResLoc, ringsResLoc);
+    protected BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc,
+                                                         final ResourceLocation ringsResLoc,
+                                                         @Nullable final ResourceLocation familyResLoc) {
+        return new BranchBlockModelGeometry(barkResLoc, ringsResLoc, familyResLoc, false);
     }
 
 }

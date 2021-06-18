@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.resources;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesManager;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRecipes;
+import com.ferreusveritas.dynamictrees.data.DTRecipes;
 import com.ferreusveritas.dynamictrees.trees.FamilyManager;
 import com.ferreusveritas.dynamictrees.trees.SpeciesManager;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabaseManager;
@@ -26,6 +26,7 @@ import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 import net.minecraftforge.forgespi.locating.IModFile;
 import org.apache.logging.log4j.LogManager;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -62,18 +63,31 @@ public final class DTResourceRegistries {
 
         TREES_RESOURCE_MANAGER.registerJsonAppliers(); // Register any Json appliers reload listeners.
 
+        // Register all mod tree packs. Gets the mods in an ordered list so that add-ons will come after DT.
+        // This means that add-ons will take priority over DT.
         ModList.get().getMods().forEach(modInfo -> {
             final String modId = modInfo.getModId();
             final IModFile modFile = ModList.get().getModFileById(modId).getFile();
 
-            if (modId.equals(DynamicTrees.MOD_ID) || !modFile.getLocator().isValid(modFile))
+            if (!modFile.getLocator().isValid(modFile))
                 return;
 
             registerModTreePack(modFile);
         });
 
         // Add dynamic trees last so other add-ons take priority.
-        registerModTreePack(ModList.get().getModFileById(DynamicTrees.MOD_ID).getFile());
+//        registerModTreePack(ModList.get().getModFileById(DynamicTrees.MOD_ID).getFile());
+
+        final File mainTreeFolder = new File("trees/");
+
+        // Create the trees folder if it doesn't already exist, warn if failed.
+        if (!mainTreeFolder.exists() && !mainTreeFolder.mkdir()) {
+            LogManager.getLogger().error("Failed to create main 'trees' folder in your Minecraft directory.");
+            return;
+        }
+
+        // Create a resource pack and add to the resource pack list (last so the user's modifications take priority).
+        TREES_RESOURCE_MANAGER.addResourcePack(new TreeResourcePack(mainTreeFolder.toPath().toAbsolutePath()));
 
         LogManager.getLogger().debug("Successfully loaded " + TREES_RESOURCE_MANAGER.listPacks().count() + " tree packs.");
     }

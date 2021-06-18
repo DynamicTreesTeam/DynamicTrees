@@ -66,7 +66,7 @@ public class MoundGenFeature extends GenFeature implements IPreGenFeature, IPost
 			BlockState initialUnderState = world.getBlockState(rootPos.below());
 			
 			if(initialUnderState.getMaterial() == Material.AIR || (initialUnderState.getMaterial() != Material.DIRT && initialUnderState.getMaterial() != Material.STONE)) {
-				Biome biome = world.getUncachedNoiseBiome(rootPos.getX(), rootPos.getY(), rootPos.getZ());
+				Biome biome = world.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2);
 				initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
 			}
 			

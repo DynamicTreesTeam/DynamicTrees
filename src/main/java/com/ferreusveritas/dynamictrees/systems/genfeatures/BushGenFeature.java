@@ -92,9 +92,11 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 				for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
 					leafPos.set( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
 					if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getMaterial().isReplaceable()) {
-						world.setBlock(leafPos, ((configuredGenFeature.get(SECONDARY_LEAVES_BLOCK) == null || random.nextInt(4) != 0) ?
-								configuredGenFeature.get(LEAVES_BLOCK) : configuredGenFeature.get(SECONDARY_LEAVES_BLOCK))
-								.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true), 3);
+						Block leaf = ((configuredGenFeature.get(SECONDARY_LEAVES_BLOCK) == null || random.nextInt(4) != 0) ?
+								configuredGenFeature.get(LEAVES_BLOCK) : configuredGenFeature.get(SECONDARY_LEAVES_BLOCK));
+						BlockState leafState = leaf.defaultBlockState();
+						if (leaf instanceof LeavesBlock)  leafState = leafState.setValue(LeavesBlock.PERSISTENT, true);
+						world.setBlock(leafPos, leafState, 3);
 					}
 				}
 			}

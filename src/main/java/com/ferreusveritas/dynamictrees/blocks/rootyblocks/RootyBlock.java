@@ -143,7 +143,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 				BlockPos treePos = rootPos.relative(getTrunkDirection(world, rootPos));
 				ITreePart treeBase = TreeHelper.getTreePart(world.getBlockState(treePos));
 				if(treeBase != TreeHelper.NULL_TREE_PART) {
-					viable = species.update(world, this, rootPos, getSoilLife(rootyState, world, rootPos), treeBase, treePos, random, natural);
+					viable = species.update(world, this, rootPos, getFertility(rootyState, world, rootPos), treeBase, treePos, random, natural);
 				}
 			}
 			
@@ -227,7 +227,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	@Override
 	public int getAnalogOutputSignal(BlockState blockState, World world, BlockPos pos) {
-		return getSoilLife(blockState, world, pos);
+		return getFertility(blockState, world, pos);
 	}
 	
 	@Override
@@ -257,25 +257,25 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		super.onBlockExploded(state, world, pos, explosion);
 	}
 	
-	public int getSoilLife(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+	public int getFertility(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 		return blockState.getValue(FERTILITY);
 	}
 	
-	public void setSoilLife(World world, BlockPos rootPos, int life) {
-		Species species = getSpecies(world.getBlockState(rootPos), world, rootPos);
-		BlockState currentState = world.getBlockState(rootPos);
-		world.setBlock(rootPos, currentState.setValue(FERTILITY, MathHelper.clamp(life, 0, 15)), 3);
-		world.updateNeighborsAt(rootPos, this);//Notify all neighbors of NSEWUD neighbors(for comparator)
-		setSpecies(world, rootPos, species);
-		
+	public void setFertility(World world, BlockPos rootPos, int fertility) {
+		final BlockState currentState = world.getBlockState(rootPos);
+		final Species species = this.getSpecies(currentState, world, rootPos);
+
+		world.setBlock(rootPos, currentState.setValue(FERTILITY, MathHelper.clamp(fertility, 0, 15)), 3);
+		world.updateNeighborsAt(rootPos, this); // Notify all neighbors of NSEWUD neighbors (for comparator).
+		this.setSpecies(world, rootPos, species);
 	}
 	
 	public boolean fertilize(World world, BlockPos pos, int amount) {
-		int soilLife = getSoilLife(world.getBlockState(pos), world, pos);
-		if((soilLife == 0 && amount < 0) || (soilLife == 15 && amount > 0)) {
+		int fertility = this.getFertility(world.getBlockState(pos), world, pos);
+		if((fertility == 0 && amount < 0) || (fertility == 15 && amount > 0)) {
 			return false;//Already maxed out
 		}
-		setSoilLife(world, pos, soilLife + amount);
+		setFertility(world, pos, fertility + amount);
 		return true;
 	}
 	

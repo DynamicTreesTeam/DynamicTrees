@@ -152,7 +152,7 @@ public class DTRegistries {
 	public static void onBlocksRegistry(final RegistryEvent.Register<Block> event) {
 		final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
 
-		if (appleOak.isValid()){
+		if (appleOak.isValid()) {
 			appleOak.addDropCreator(new FruitDropCreator());
 			APPLE_FRUIT.setSpecies(appleOak);
 		}
@@ -194,9 +194,8 @@ public class DTRegistries {
 			.setCustomClientFactory((spawnEntity, world) -> new FallingTreeEntity(world))
 			.build(FALLING_TREE_ID);
 	public static final EntityType<LingeringEffectorEntity> LINGERING_EFFECTOR = EntityType.Builder.<LingeringEffectorEntity>of(LingeringEffectorEntity::new, EntityClassification.MISC)
-			// Giving it growth substance works for now as it's the only lingering substance, however this should be changed in the future.
 			.setCustomClientFactory((spawnEntity, world) ->
-					new LingeringEffectorEntity(world, new BlockPos(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), new GrowthSubstance()))
+					new LingeringEffectorEntity(world, new BlockPos(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), null))
 			.build(LINGERING_EFFECTOR_ID);
 
 	@SubscribeEvent

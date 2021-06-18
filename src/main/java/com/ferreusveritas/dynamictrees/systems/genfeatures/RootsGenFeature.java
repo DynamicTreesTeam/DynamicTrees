@@ -91,10 +91,10 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	}
 
 	@Override
-	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
+	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
 		int trunkRadius = TreeHelper.getRadius(world, treePos);
 
-		if(soilLife > 0 && trunkRadius >= configuredGenFeature.get(MIN_TRUNK_RADIUS)) {
+		if(fertility > 0 && trunkRadius >= configuredGenFeature.get(MIN_TRUNK_RADIUS)) {
 			Surround surr = Surround.values()[world.random.nextInt(8)];
 			BlockPos dPos = treePos.offset(surr.getOffset());
 			if(world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
@@ -154,7 +154,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 			return true;
 
 		Material material = placeState.getMaterial();
-		return material.isReplaceable() && material != Material.WATER && material != Material.LAVA;
+		return material.isReplaceable() && material != Material.LAVA;
 	}
 
 	public RootsGenFeature setScaler(TetraFunction<Integer, Integer, Integer, Float, Integer> scaler) {

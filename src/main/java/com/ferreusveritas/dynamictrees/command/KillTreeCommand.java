@@ -24,7 +24,7 @@ public final class KillTreeCommand extends SubCommand {
     }
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().executes(context -> executesSuccess(() -> this.killTree(context.getSource(), rootPosArgument(context))));
     }
 
@@ -32,8 +32,8 @@ public final class KillTreeCommand extends SubCommand {
         final World world = source.getLevel();
 
         Objects.requireNonNull(TreeHelper.getRooty(world.getBlockState(rootPos))).destroyTree(world, rootPos);
-        source.sendSuccess(new TranslationTextComponent("commands.dynamictrees.success.kill_tree",
-                CommandHelper.posComponent(rootPos, TextFormatting.AQUA)), true);
+        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.kill_tree",
+                CommandHelper.posComponent(rootPos, TextFormatting.AQUA)));
     }
 
 }

@@ -20,7 +20,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -28,12 +27,9 @@ import net.minecraftforge.common.IPlantable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import net.minecraft.block.AbstractBlock.Properties;
 
 @SuppressWarnings("deprecation")
 public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable {
@@ -53,15 +49,15 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	public Species getSpecies() {
 		return species;
 	}
-	
+
 	@Override
 	public boolean isValidBonemealTarget(@Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
-		return getSpecies().canSaplingConsumeBoneMeal((World) world, pos);
+		return this.getSpecies().canSaplingConsumeBoneMeal((World) world, pos);
 	}
 	
 	@Override
 	public boolean isBonemealSuccess(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
-		return getSpecies().canSaplingGrowAfterBoneMeal(world, rand, pos);
+		return this.getSpecies().canSaplingGrowAfterBoneMeal(world, rand, pos);
 	}
 	
 	///////////////////////////////////////////
@@ -70,12 +66,12 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	@Override
 	public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
-		return getSpecies().saplingFireSpread();
+		return this.getSpecies().saplingFireSpread();
 	}
 
 	@Override
 	public int getFlammability(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
-		return getSpecies().saplingFlammability();
+		return this.getSpecies().saplingFlammability();
 	}
 
 	@Override
@@ -86,7 +82,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	public static boolean canSaplingStay(IWorldReader world, Species species, BlockPos pos) {
 		//Ensure there are no adjacent branches or other saplings
-		for(Direction dir: CoordUtils.HORIZONTALS) {
+		for (Direction dir: CoordUtils.HORIZONTALS) {
 			BlockState blockState = world.getBlockState(pos.relative(dir));
 			Block block = blockState.getBlock();
 			if(TreeHelper.isBranch(block) || block instanceof DynamicSaplingBlock) {
@@ -100,17 +96,18 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	@Override
 	public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
-		return canSaplingStay(world, getSpecies(), pos);
+		return canSaplingStay(world, this.getSpecies(), pos);
 	}
 
 	@Override
 	public void performBonemeal(@Nonnull ServerWorld world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
-		if (canSurvive(state, world, pos)) {
-			if (getSpecies().canSaplingGrow(world, pos)){
-				getSpecies().transitionToTree(world, pos);
+		if (this.canSurvive(state, world, pos)) {
+			final Species species = this.getSpecies();
+			if (species.canSaplingGrow(world, pos)){
+				species.transitionToTree(world, pos);
 			}
 		} else {
-			dropBlock(world, state, pos);
+			this.dropBlock(world, state, pos);
 		}
 	}
 	
@@ -126,8 +123,8 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	
 	@Override
 	public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-		if (!canSurvive(state, world, pos)) {
-			dropBlock(world, state, pos);
+		if (!this.canSurvive(state, world, pos)) {
+			this.dropBlock(world, state, pos);
 		}
 	}
 	
@@ -139,12 +136,16 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	@Nonnull
 	@Override
 	public ItemStack getCloneItemStack(IBlockReader worldIn, BlockPos pos, BlockState state) {
-		return getSpecies().getSeedStack(1);
+		return this.getSpecies().getSeedStack(1);
 	}
 	
 	@Nonnull
 	@Override
 	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
+		// If a loot table has been added load those drops instead (until drop creators).
+		if (builder.getLevel().getServer().getLootTables().getIds().contains(this.getLootTable()))
+			return super.getDrops(state, builder);
+
 		return DTConfigs.DYNAMIC_SAPLING_DROPS.get() ?
 				Collections.singletonList(this.getSpecies().getSeedStack(1)) :
 				Collections.emptyList();
@@ -152,7 +153,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return getSpecies().getSeedStack(1);
+		return this.getSpecies().getSeedStack(1);
 	}
 
 
@@ -163,7 +164,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 	@Nonnull
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader access, BlockPos pos, ISelectionContext context) {
-		return getSpecies().getSaplingShape();
+		return this.getSpecies().getSaplingShape();
 	}
 	
 	///////////////////////////////////////////
@@ -172,7 +173,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 	@Override
 	public BlockState getPlant(IBlockReader world, BlockPos pos) {
-		return species.getSapling().get().defaultBlockState();
+		return this.defaultBlockState();
 	}
 	
 }

@@ -11,7 +11,8 @@ import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
-import com.ferreusveritas.dynamictrees.compat.WailaOther;
+import com.ferreusveritas.dynamictrees.compat.waila.WailaOther;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -24,6 +25,7 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -38,6 +40,7 @@ import net.minecraftforge.common.ToolType;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
@@ -66,7 +69,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		@Override public ItemStack getStick(int qty) { return ItemStack.EMPTY; }
 		@Override public BranchBlock getValidBranchBlock(int index) { return null; }
 		@Override public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) { return Species.NULL_SPECIES; }
-		@Override public void addConnectableVanillaLeaves(IConnectable connectable) {}
+		@Override public void addConnectable(IConnectable connectable) {}
 	};
 
 	/**
@@ -180,15 +183,28 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	 *
 	 * @param world The {@link IWorld} object.
 	 * @param trunkPos The {@link BlockPos} of the trunk.
-	 * @return The {@link Species} to place.
+	 * @return The {@link Species} for the specified position.
 	 */
 	public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
+		return this.getSpeciesForLocation(world, trunkPos, this.commonSpecies);
+	}
+
+	/**
+	 * This is only used by Rooty Dirt to get the appropriate species for this tree.
+	 * For instance Oak may use this to select a Swamp Oak species if the coordinates
+	 * are in a swamp.
+	 *
+	 * @param world The {@link IWorld} object.
+	 * @param trunkPos The {@link BlockPos} of the trunk.
+	 * @return The {@link Species} for the specified position.
+	 */
+	public Species getSpeciesForLocation(IBlockReader world, BlockPos trunkPos, Species defaultSpecies) {
 		for (final Species species : this.species) {
 			if (species.shouldOverrideCommon(world, trunkPos))
 				return species;
 		}
 
-		return this.commonSpecies;
+		return defaultSpecies;
 	}
 
 	///////////////////////////////////////////
@@ -290,10 +306,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	 */
 	protected BranchBlock createBranchBlock() {
 		final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(this.getProperties()) : new BasicBranchBlock(this.getProperties());
-
 		if (this.isFireProof())
 			branch.setFireSpreadSpeed(0).setFlammability(0);
-
 		return branch;
 	}
 
@@ -341,14 +355,23 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return this;
 	}
 
-	@Nullable
+	@Nonnull
 	public BranchBlock getBranch() {
+		if (branch == null) throw new UnsupportedOperationException("getBranch() for Family "+getRegistryName()+" was called too early!");
 		return branch;
+	}
+
+	public Optional<BranchBlock> getBranchOptional() {
+		return Optional.ofNullable(this.branch);
 	}
 
 	@Nullable
 	public BranchBlock getStrippedBranch() {
 		return strippedBranch;
+	}
+
+	public Optional<BranchBlock> getStrippedBranchOptional() {
+		return Optional.ofNullable(strippedBranch);
 	}
 
 	public Item getBranchItem() {
@@ -452,7 +475,11 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return logs;
 	}
 
-	public boolean isFireProof () { return false; }
+	private boolean isFireProof = false;
+
+	public boolean isFireProof () { return isFireProof; }
+
+	public void setIsFireProof(boolean isFireProof) { this.isFireProof = isFireProof; }
 
 	public SoundType getBranchSoundType (BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
 		return this.getDefaultBranchSoundType();
@@ -523,14 +550,25 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return MetadataCell.radiusAndMeta(radius, meta);
 	}
 
+	private int primaryThickness = 1;
+	private int secondaryThickness = 2;
+
+	public void setPrimaryThickness (int primaryThickness){
+		this.primaryThickness = primaryThickness;
+	}
+
+	public void setSecondaryThickness (int secondaryThickness){
+		this.secondaryThickness = secondaryThickness;
+	}
+
 	/** Thickness of a twig [default = 1] */
 	public int getPrimaryThickness() {
-		return 1;
+		return primaryThickness;
 	}
 
 	/** Thickness of the branch connected to a twig (radius == getPrimaryThickness) [default = 2] */
 	public int getSecondaryThickness() {
-		return 2;
+		return secondaryThickness;
 	}
 
 	public boolean hasStrippedBranch() {
@@ -558,6 +596,22 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	public BranchBlock getValidBranchBlock (int index) {
 		return this.validBranches.get(index);
 	}
+
+	private boolean branchIsLadder = true;
+
+	public void setBranchIsLadder (boolean branchIsLadder) {
+		this.branchIsLadder = branchIsLadder;
+	}
+
+	public boolean branchIsLadder (){
+		return branchIsLadder;
+	}
+
+	private int maxSignalDepth = 32;
+	public int getMaxSignalDepth() {
+		return maxSignalDepth;
+	}
+	public void setMaxSignalDepth(int maxSignalDepth) { this.maxSignalDepth = maxSignalDepth; }
 
 	///////////////////////////////////////////
 	// SURFACE ROOTS
@@ -605,9 +659,10 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return bounds.expand(3);
 	}
 
-	public boolean isCompatibleDynamicLeaves(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);
-		return (leaves != null) && this == leaves.getFamily(blockState, blockAccess, pos);
+	public boolean isCompatibleDynamicLeaves(Species species, BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+		final DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);
+		return (leaves != null) && (this == leaves.getFamily(blockState, blockAccess, pos)
+				|| species.isValidLeafBlock(leaves));
 	}
 
 	public interface IConnectable {
@@ -616,15 +671,15 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 
 	LinkedList<IConnectable> vanillaConnectables = new LinkedList<>();
 
-	public void addConnectableVanillaLeaves(IConnectable connectable) {
+	public void addConnectable(IConnectable connectable) {
 		this.vanillaConnectables.add(connectable);
 	}
 
-	public void removeConnectableVanillaLeaves(IConnectable connectable) {
+	public void removeConnectable(IConnectable connectable) {
 		this.vanillaConnectables.remove(connectable);
 	}
 
-	public boolean isCompatibleVanillaLeaves(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+	public boolean isCompatibleVanillaLeaves(Species species, BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 
 		Block block = blockState.getBlock();
 
@@ -639,8 +694,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 		return false;
 	}
 
-	public boolean isCompatibleGenericLeaves(BlockState blockState, IWorld blockAccess, BlockPos pos) {
-		return isCompatibleDynamicLeaves(blockState, blockAccess, pos) || isCompatibleVanillaLeaves(blockState, blockAccess, pos);
+	public boolean isCompatibleGenericLeaves(final Species species, BlockState blockState, IWorld blockAccess, BlockPos pos) {
+		return this.isCompatibleDynamicLeaves(species, blockState, blockAccess, pos) || this.isCompatibleVanillaLeaves(species, blockState, blockAccess, pos);
 	}
 
 	public LeavesProperties getCommonLeaves() {
@@ -650,6 +705,16 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 	public void setCommonLeaves (LeavesProperties properties) {
 		this.commonLeaves = properties;
 		properties.setFamily(this);
+	}
+
+	public List<ITag.INamedTag<Block>> defaultBranchTags() {
+		return this.isFireProof ? Collections.singletonList(DTBlockTags.BRANCHES) :
+				Collections.singletonList(DTBlockTags.BRANCHES_THAT_BURN);
+	}
+
+	public List<ITag.INamedTag<Block>> defaultStrippedBranchTags() {
+		return this.isFireProof ? Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES) :
+				Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN);
 	}
 
 	//////////////////////////////

@@ -23,6 +23,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
@@ -49,18 +50,17 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 	public void setupModels() {
 		super.setupModels();
 
-		final TextureAtlasSprite ringsTexture = ModelUtils.getTexture(this.ringsResLoc);
 		TextureAtlasSprite thickRingsTexture = ModelUtils.getTexture(this.thickRingsResLoc);
 
 		//if (isTextureNull(thickRingsTexture)){
-			//thickRingsTexture = ThickRingTextureManager.uploader.getTextureAtlas().getSprite(thickRingsResLoc);
-			//thickRingsTexture = ModelUtils.getTexture(thickRingsResLoc, ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE);
+		//thickRingsTexture = ThickRingTextureManager.uploader.getTextureAtlas().getSprite(thickRingsResLoc);
+		//thickRingsTexture = ModelUtils.getTexture(thickRingsResLoc, ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE);
 
-			if (isTextureNull(thickRingsTexture)){
-				thickRingsTexture = ringsTexture;
-			}
+		if (isTextureNull(thickRingsTexture)){
+			thickRingsTexture = this.ringsTexture;
+		}
 		//}
-		
+
 		for (int i = 0; i < ThickBranchBlock.MAX_RADIUS_TICK -ThickBranchBlock.MAX_RADIUS; i++) {
 			int radius = i + ThickBranchBlock.MAX_RADIUS + 1;
 			trunksBark[i] = bakeTrunkBark(radius, this.barkTexture, true);
@@ -153,6 +153,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 		return builder.build();
 	}
 
+	@Nonnull
 	@Override
 	public List<BakedQuad> getQuads(@Nullable final BlockState state, @Nullable final Direction side, final Random rand, final IModelData extraData) {
 		if (state == null || side != null) return Collections.emptyList();
@@ -175,7 +176,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 			connections = connectionsData.getAllRadii();
 			forceRingDir = connectionsData.getRingOnly();
 			Family family = connectionsData.getFamily();
-			if (family != null) twigRadius = family.getPrimaryThickness();
+			if (family.isValid()) twigRadius = family.getPrimaryThickness();
 		}
 
 		//Count number of connections

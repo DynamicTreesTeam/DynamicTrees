@@ -33,8 +33,7 @@ import java.util.List;
  */
 public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    public static final ConfigurationProperty<Block> SHROOMLIGHT_BLOCK = ConfigurationProperty.block("shroomlight");
-    public static final ConfigurationProperty<Float> PLACE_CHANCE = ConfigurationProperty.floatProperty("place_chance");
+    public static final GenFeatureProperty<Block> SHROOMLIGHT_BLOCK = GenFeatureProperty.createBlockProperty("shroomlight");
 
     private static final Direction[] HORIZONTALS = CoordUtils.HORIZONTALS;
     private static final double VANILLA_GROW_CHANCE = .005f;
@@ -65,8 +64,8 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
     }
 
     @Override
-    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int soilLife, boolean natural) {
-        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above())) return false;
+    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
+        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above()) || fertility == 0) return false;
 
         return placeShroomlightsInValidPlace(configuredGenFeature, world, rootPos, false);
     }

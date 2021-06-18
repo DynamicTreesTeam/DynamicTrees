@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import net.minecraft.client.renderer.culling.ClippingHelper;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 
@@ -23,7 +24,7 @@ public class LingeringEffectorRenderer extends EntityRenderer<LingeringEffectorE
 
     @Override
     public ResourceLocation getTextureLocation(LingeringEffectorEntity entity) {
-        return null;
+        return MissingTextureSprite.getLocation();
     }
 
     public static class Factory implements IRenderFactory<LingeringEffectorEntity> {

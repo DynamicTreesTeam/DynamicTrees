@@ -30,6 +30,8 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
     public static final ConfigurationProperty<Integer> MAX_HEIGHT = ConfigurationProperty.integer("max_height");
     public static final ConfigurationProperty<CanGrowPredicate> CAN_GROW_PREDICATE = ConfigurationProperty.property("can_grow_predicate", CanGrowPredicate.class);
     public static final ConfigurationProperty<Integer> MAX_COUNT = ConfigurationProperty.integer("max_count");
+    public static final GenFeatureProperty<Integer> FRUITING_RADIUS = GenFeatureProperty.createIntegerProperty("fruiting_radius");
+    public static final GenFeatureProperty<Float> PLACE_CHANCE = GenFeatureProperty.createFloatProperty("place_chance");
 
     public static final GenFeature NULL_GEN_FEATURE = new GenFeature(DTTrees.NULL) {
         @Override

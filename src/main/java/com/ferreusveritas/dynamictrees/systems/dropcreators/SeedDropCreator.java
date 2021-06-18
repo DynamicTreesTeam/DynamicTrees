@@ -15,41 +15,41 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
 public class SeedDropCreator extends DropCreator {
-	
+
 	protected final float rarity;
 	protected ItemStack customSeed = ItemStack.EMPTY;
-	
+
 	public SeedDropCreator() {
 		this(1.0f);
 	}
-	
+
 	public SeedDropCreator(float rarity) {
 		super(new ResourceLocation(DynamicTrees.MOD_ID, "seed"));
 		this.rarity = rarity;
 	}
-	
+
 	//Set a custom seed if for some reason the tree should not drop its own seed
 	//Example: Tree A drops seeds of tree B
 	public SeedDropCreator setCustomSeedDrop (ItemStack fruitItem){
 		this.customSeed = fruitItem;
 		return this;
 	}
-	
+
 	//Provided for customization via override
 	protected float getHarvestRarity() {
 		return rarity;
 	}
-	
+
 	//Provided for customization via override
 	protected float getVoluntaryRarity() {
 		return rarity;
 	}
-	
+
 	//Provided for customization via override
 	protected float getLeavesRarity() {
 		return rarity;
 	}
-	
+
 	//Allows for overriding species seed drop if a custom seed is set.
 	protected ItemStack getSeedStack(Species species){
 		if (customSeed.isEmpty()){
@@ -73,32 +73,28 @@ public class SeedDropCreator extends DropCreator {
 		}
 		return drops;
 	}
-	
+
 	@Override
-	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> drops, int soilLife) {
-		if (this.getVoluntaryRarity() * DTConfigs.SEED_DROP_RATE.get() * species.seasonalSeedDropFactor(world, rootPos) <= random.nextFloat())
-			return drops;
-
-		drops.add(this.getSeedStack(species));
-
-		// Send voluntary seed drop event.
-		final VoluntarySeedDropEvent seedDropEvent = new VoluntarySeedDropEvent(world, rootPos, species, drops);
-		MinecraftForge.EVENT_BUS.post(seedDropEvent);
-
-		if (seedDropEvent.isCanceled()) {
-			drops.clear();
+	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int fertility) {
+		if(getVoluntaryRarity() * DTConfigs.SEED_DROP_RATE.get() * species.seasonalSeedDropFactor(world, rootPos) > random.nextFloat()) {
+			dropList.add(getSeedStack(species));
+			SeedVoluntaryDropEvent seedDropEvent = new SeedVoluntaryDropEvent(world, rootPos, species, dropList);
+			MinecraftForge.EVENT_BUS.post(seedDropEvent);
+			if(seedDropEvent.isCanceled()) {
+				dropList.clear();
+			}
 		}
 
 		return drops;
 	}
-	
+
 	@Override
 	public List<ItemStack> getLeavesDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
 		int chance = 20; //See BlockLeaves#getSaplingDropChance(state);
 		//Hokey fortune stuff here to match Vanilla logic.
 		if (fortune > 0) {
 			chance -= 2 << fortune;
-			if (chance < 10) { 
+			if (chance < 10) {
 				chance = 10;
 			}
 		}
@@ -114,8 +110,8 @@ public class SeedDropCreator extends DropCreator {
 				drops.add(this.getSeedStack(species));
 			}
 		}
-		
+
 		return drops;
 	}
-	
+
 }

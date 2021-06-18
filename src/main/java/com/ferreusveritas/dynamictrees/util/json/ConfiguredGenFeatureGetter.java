@@ -42,7 +42,8 @@ public final class ConfiguredGenFeatureGetter implements IJsonObjectGetter<Confi
         if (propertyValueFetchResult == null)
             return;
 
-        propertyValueFetchResult.ifSuccessful(value -> fetchResult.getValue().with(genFeatureProperty, value)).otherwise(fetchResult::addWarning);
+        propertyValueFetchResult.ifSuccessful(value -> fetchResult.getValue().with(genFeatureProperty, value))
+                .otherwise(fetchResult::addWarning);
     }
 
 }

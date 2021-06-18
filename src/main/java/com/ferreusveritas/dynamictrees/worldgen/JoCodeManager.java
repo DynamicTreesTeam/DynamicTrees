@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.resources.ReloadListener;
+import com.ferreusveritas.dynamictrees.resources.TreesResourceManager;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.resources.IResource;
 import net.minecraft.resources.IResourceManager;
@@ -42,7 +43,7 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
 
     @Nonnull
     @Override
-    protected Map<ResourceLocation, List<String>> prepare(final IResourceManager resourceManager) {
+    protected Map<ResourceLocation, List<String>> prepare(final TreesResourceManager resourceManager) {
         final Map<ResourceLocation, List<String>> joCodeFiles = new HashMap<>();
 
         for (ResourceLocation resourceLocationIn : resourceManager.listResources(this.folderName,
@@ -85,7 +86,7 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
     }
 
     @Override
-    protected void apply(final Map<ResourceLocation, List<String>> preparedObject, final IResourceManager resourceManager, ApplicationType applicationType) {
+    protected void apply(final Map<ResourceLocation, List<String>> preparedObject, final TreesResourceManager resourceManager, ApplicationType applicationType) {
         this.joCodes.clear();
 
         preparedObject.forEach((resourceLocation, lines) -> {
@@ -172,8 +173,25 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
         return list.get(rand.nextInt(list.size()));
     }
 
+    /**
+     * Do nothing on load, since we don't need to set anything up on game setup here.
+     *
+     * @param resourceManager The {@link IResourceManager} object.
+     * @return A {@link CompletableFuture} that does nothing.
+     */
     @Override
-    public CompletableFuture<Void> load(IResourceManager resourceManager) {
+    public CompletableFuture<Void> load(TreesResourceManager resourceManager) {
+        return CompletableFuture.runAsync(() -> {});
+    }
+
+    /**
+     * Do nothing on load, since we don't need to set anything up on game setup here.
+     *
+     * @param resourceManager The {@link IResourceManager} object.
+     * @return A {@link CompletableFuture} that does nothing.
+     */
+    @Override
+    public CompletableFuture<Void> setup(TreesResourceManager resourceManager) {
         return CompletableFuture.runAsync(() -> {});
     }
 

@@ -2,6 +2,8 @@ package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockTagsProvider;
+import com.ferreusveritas.dynamictrees.data.provider.DTItemTagsProvider;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -9,6 +11,9 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
+import net.minecraft.data.BlockTagsProvider;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.ItemTagsProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,10 +23,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(DynamicTrees.MOD_ID)
-public class DynamicTrees {
+public final class DynamicTrees {
 
 	public static final String MOD_ID = "dynamictrees";
 	public static final String NAME = "Dynamic Trees";
@@ -30,6 +36,7 @@ public class DynamicTrees {
 	public static final String FORGE = "forge";
 	public static final String SERENE_SEASONS = "sereneseasons";
 	public static final String FAST_LEAF_DECAY = "fastleafdecay";
+	public static final String PASSABLE_FOLIAGE = "passablefoliage";
 
 	public enum AxeDamage {
 		VANILLA,
@@ -70,6 +77,7 @@ public class DynamicTrees {
 
 		modEventBus.addListener(this::clientSetup);
 		modEventBus.addListener(this::onCommonSetup);
+		modEventBus.addListener(this::gatherData);
 
 		EventHandlers.registerCommon();
 		CompatHandler.init();
@@ -91,6 +99,20 @@ public class DynamicTrees {
 			DTTrees.replaceNyliumFungiFeatures();
 
 		event.enqueueWork(DTRegistries::registerConfiguredFeatures);
+	}
+
+	public void gatherData(final GatherDataEvent event) {
+		gatherTagGenerators(MOD_ID, event);
+	}
+
+	public static void gatherTagGenerators(final String modId, final GatherDataEvent event) {
+		final DataGenerator generator = event.getGenerator();
+
+		final BlockTagsProvider blockTagsProvider = new DTBlockTagsProvider(generator, modId, event.getExistingFileHelper());
+		final ItemTagsProvider itemTagsProvider = new DTItemTagsProvider(generator, modId, blockTagsProvider, event.getExistingFileHelper());
+
+		generator.addProvider(blockTagsProvider);
+		generator.addProvider(itemTagsProvider);
 	}
 
 	public static ResourceLocation resLoc (final String path) {

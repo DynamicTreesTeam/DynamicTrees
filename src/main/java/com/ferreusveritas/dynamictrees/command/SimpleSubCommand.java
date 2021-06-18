@@ -41,7 +41,7 @@ public abstract class SimpleSubCommand extends SubCommand {
 
     @Override
     @SuppressWarnings("all") // This is never used so we just return null.
-    public ArgumentBuilder<CommandSource, ?> registerArguments() {
+    public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return null;
     }
 
