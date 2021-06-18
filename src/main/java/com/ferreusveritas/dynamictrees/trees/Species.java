@@ -524,16 +524,14 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	//SEEDS
 	///////////////////////////////////////////
 
-	private ResourceLocation otherSpeciesForSeed = null;
+	private Species otherSpeciesForSeed = null;
 
-	public void setOtherSpeciesForSeed (ResourceLocation otherSpecies){
+	public void setOtherSpeciesForSeed (Species otherSpecies){
 		otherSpeciesForSeed = otherSpecies;
-		setShouldGenerateSeed(false);
-		setShouldGenerateSapling(false);
 	}
 
 	public boolean hasSeedFromOtherSpecies(){
-		return otherSpeciesForSeed != null && Species.REGISTRY.has(otherSpeciesForSeed);
+		return otherSpeciesForSeed != null;
 	}
 
 	/**
@@ -546,7 +544,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this.hasSeed() ?
 				new ItemStack(this.seed, qty) :
 				( hasSeedFromOtherSpecies() ?
-						Species.REGISTRY.get(otherSpeciesForSeed).getSeedStack(qty) :
+						otherSpeciesForSeed.getSeedStack(qty) :
 						( !this.isCommonSpecies() ?
 								this.family.getCommonSpecies().getSeedStack(qty) :
 								ItemStack.EMPTY
@@ -562,7 +560,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this.hasSeed() ?
 				Optional.of(this.seed) :
 				( hasSeedFromOtherSpecies() ?
-						Species.REGISTRY.get(otherSpeciesForSeed).getSeed():
+						otherSpeciesForSeed.getSeed():
 						( !this.isCommonSpecies() ?
 								this.family.getCommonSpecies().getSeed() :
 								Optional.empty()
