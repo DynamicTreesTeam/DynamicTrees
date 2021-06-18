@@ -159,18 +159,24 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
 		return mPos.above();
 	}
 
-	protected void placeVines(IWorld world, BlockPos vinePos, BlockState vinesState, int maxLength, @Nullable BlockState tipBlock, VineType vineType, boolean worldgen) {
+	protected void placeVines(IWorld world, BlockPos vinePos, BlockState vinesState, int maxLength, @Nullable BlockState tipState, VineType vineType, boolean worldgen) {
 		// Generate a random length for the vine.
 		final int len = worldgen ? MathHelper.clamp(world.getRandom().nextInt(maxLength) + 3, 3, maxLength) : 1;
 		final BlockPos.Mutable mPos = new BlockPos.Mutable(vinePos.getX(), vinePos.getY(), vinePos.getZ());
 
+		BlockState tip = tipState == null ? vinesState : tipState;
+
 		for (int i = 0; i < len; i++) {
 			if (world.isEmptyBlock(mPos)) {
 				// Set the current block either to a vine block or a tip block if it's set.
-				world.setBlock(mPos, (tipBlock != null && i == len - 1) ? tipBlock : vinesState, 3);
+				world.setBlock(mPos, (i == len - 1) ? tip : vinesState, 3);
 				// Move current position down/up depending on vine type.
-				mPos.setY(mPos.getY() + (vineType != VineType.FLOOR ? -1 : 1));
+				mPos.setY(mPos.getY() + (vineType == VineType.FLOOR ? 1 : -1));
 			} else {
+				if (i > 0 && vineType != VineType.SIDE){
+					mPos.setY(mPos.getY() + (vineType == VineType.FLOOR ? -1 : 1)); //if the vine is cut short set the tip on the last block
+					world.setBlock(mPos, tip, 3);
+				}
 				break;
 			}
 		}
