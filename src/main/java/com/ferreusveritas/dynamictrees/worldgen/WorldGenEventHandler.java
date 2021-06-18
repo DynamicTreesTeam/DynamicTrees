@@ -5,10 +5,14 @@ import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.DecoratedFeatureConfig;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Handles events relating to world gen, including adding {@link DynamicTreeFeature} objects to
@@ -41,16 +45,17 @@ public final class WorldGenEventHandler {
         if (biomeResLoc == null)
             return;
 
-        // Loop through all vegetal features and remove if found to contain trees.
-        event.getGeneration().getFeatures(GenerationStage.Decoration.VEGETAL_DECORATION).removeIf(configuredFeatureSupplier -> {
-            final BiomePropertySelectors.FeatureCancellations featureCancellations = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDefaultDatabase().getEntry(biomeResLoc).getFeatureCancellations();
+        final BiomePropertySelectors.FeatureCancellations featureCancellations = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDefaultDatabase().getEntry(biomeResLoc).getFeatureCancellations();
 
-            for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {
-                if (featureCanceller.shouldCancel(configuredFeatureSupplier.get(), featureCancellations))
-                    return true;
-            }
+        featureCancellations.getStages().forEach(stage -> {
+            event.getGeneration().getFeatures(stage).removeIf(configuredFeatureSupplier -> {
+                for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {
+                    if (featureCanceller.shouldCancel(configuredFeatureSupplier.get(), featureCancellations))
+                        return true;
+                }
 
-            return false;
+                return false;
+            });
         });
     }
 

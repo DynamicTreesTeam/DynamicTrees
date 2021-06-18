@@ -1,14 +1,13 @@
 {
   "replace": false,
   "values": [
-    "dynamictrees:birch_seed",
-    "dynamictrees:jungle_seed",
-    "dynamictrees:dark_oak_seed",
-    "dynamictrees:spruce_seed",
+    "#dynamictrees:fungus_caps",
     "dynamictrees:acacia_seed",
-    "dynamictrees:crimson_seed",
-    "dynamictrees:oak_seed",
+    "dynamictrees:spruce_seed",
     "dynamictrees:apple_oak_seed",
-    "dynamictrees:warped_seed"
+    "dynamictrees:dark_oak_seed",
+    "dynamictrees:jungle_seed",
+    "dynamictrees:birch_seed",
+    "dynamictrees:oak_seed"
   ]
 }

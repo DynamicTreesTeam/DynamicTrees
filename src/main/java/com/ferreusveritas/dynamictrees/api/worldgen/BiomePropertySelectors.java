@@ -2,12 +2,16 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.google.common.collect.Sets;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.GenerationStage;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Random;
 
 /**
  * Provides the forest density for a given biome.
@@ -30,8 +34,9 @@ public class BiomePropertySelectors {
 	}
 
 	public static final class FeatureCancellations {
-		private final Collection<String> namespaces = new HashSet<>();
-		private final Collection<FeatureCanceller> featureCancellers = new HashSet<>();
+		private final Collection<String> namespaces = Sets.newHashSet();
+		private final Collection<FeatureCanceller> featureCancellers = Sets.newHashSet();
+		private final Collection<GenerationStage.Decoration> stages = Sets.newHashSet();
 
 		public void putNamespace (final String namespace) {
 			this.namespaces.add(namespace);
@@ -45,19 +50,36 @@ public class BiomePropertySelectors {
 			this.featureCancellers.add(featureCanceller);
 		}
 
+		public void putStage(final GenerationStage.Decoration stage) {
+			this.stages.add(stage);
+		}
+
+		public void putDefaultStagesIfEmpty() {
+			if (this.stages.size() < 1) {
+				this.stages.add(GenerationStage.Decoration.VEGETAL_DECORATION);
+			}
+		}
+
 		public void copyFrom(final FeatureCancellations featureCancellations) {
 			this.namespaces.addAll(featureCancellations.namespaces);
 			this.featureCancellers.addAll(featureCancellations.featureCancellers);
+			this.stages.addAll(featureCancellations.stages);
 		}
 
 		public void reset() {
 			this.namespaces.clear();
 			this.featureCancellers.clear();
+			this.stages.clear();
 		}
 
 		public Collection<FeatureCanceller> getFeatureCancellers () {
 			return this.featureCancellers;
 		}
+
+		public Collection<GenerationStage.Decoration> getStages() {
+			return this.stages;
+		}
+
 	}
 
 	/**

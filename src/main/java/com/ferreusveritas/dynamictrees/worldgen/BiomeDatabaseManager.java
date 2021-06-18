@@ -23,6 +23,7 @@ import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -135,7 +136,9 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         this.featureCancellationAppliers.register("namespace", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
                 .registerArrayApplier("namespaces", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
                 .register("type", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller)
-                .registerArrayApplier("types", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller);
+                .registerArrayApplier("types", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller)
+                .register("stage", GenerationStage.Decoration.class, BiomePropertySelectors.FeatureCancellations::putStage)
+                .registerArrayApplier("stages", GenerationStage.Decoration.class, BiomePropertySelectors.FeatureCancellations::putStage);
 
         this.postApplierEvent(this.biomeDatabaseAppliers, "entry_appliers");
         this.postApplierEvent(this.featureCancellationAppliers, "feature_cancellations");
@@ -274,6 +277,8 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
 
                 this.featureCancellationAppliers.applyAll(cancellerObject, featureCancellations)
                         .forEach(failureResult -> LOGGER.error("Error whilst applying feature cancellations in '{}' populator: {}", resourceLocation, failureResult.getErrorMessage()));
+
+                featureCancellations.putDefaultStagesIfEmpty();
 
                 final AtomicReference<BiomeDatabase.Operation> operation = new AtomicReference<>(BiomeDatabase.Operation.SPLICE_AFTER);
                 JsonHelper.JsonObjectReader.of(jsonObject).ifContains(METHOD, BiomeDatabase.Operation.class, operation::set)

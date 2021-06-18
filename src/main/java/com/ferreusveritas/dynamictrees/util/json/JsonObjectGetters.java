@@ -36,6 +36,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
@@ -175,7 +176,8 @@ public final class JsonObjectGetters {
 
     // Random enum getters.
     public static final IJsonObjectGetter<VinesGenFeature.VineType> VINE_TYPE = register(VinesGenFeature.VineType.class, new EnumGetter<>(VinesGenFeature.VineType.class));
-    public static final IJsonObjectGetter<BiomeDatabase.Operation> OPERATION = new EnumGetter<>(BiomeDatabase.Operation.class);
+    public static final IJsonObjectGetter<BiomeDatabase.Operation> OPERATION = register(BiomeDatabase.Operation.class, new EnumGetter<>(BiomeDatabase.Operation.class));
+    public static final IJsonObjectGetter<GenerationStage.Decoration> DECORATION_STAGE = register(GenerationStage.Decoration.class, new EnumGetter<>(GenerationStage.Decoration.class));
 
     public static final IJsonObjectGetter<BiomeList> BIOME_LIST = register(BiomeList.class, new BiomeListGetter());
     public static final IJsonObjectGetter<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement -> {

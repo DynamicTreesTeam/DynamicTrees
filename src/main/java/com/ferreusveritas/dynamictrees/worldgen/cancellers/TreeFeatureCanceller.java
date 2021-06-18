@@ -28,10 +28,10 @@ public class TreeFeatureCanceller<T extends IFeatureConfig> extends FeatureCance
 
         final IFeatureConfig featureConfig = ((DecoratedFeatureConfig) configuredFeature.config).feature.get().config;
 
-            /*  The following code removes vanilla trees from the biome's generator.
-                There may be some problems as MultipleRandomFeatures can store other features too,
-                so these are currently removed from world gen too. The list is immutable so they can't be removed individually,
-                but one (unclean) solution may be to add the non-tree features back to the generator. */
+        /*  The following code removes vanilla trees from the biome's generator.
+            There may be some problems as MultipleRandomFeatures can store other features too,
+            so these are currently removed from world gen too. The list is immutable so they can't be removed individually,
+            but one (unclean) solution may be to add the non-tree features back to the generator. */
 
         if (featureConfig instanceof MultipleRandomFeatureConfig) {
             // Removes configuredFeature if it contains trees.

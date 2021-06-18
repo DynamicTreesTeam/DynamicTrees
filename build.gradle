@@ -102,6 +102,10 @@ minecraft {
     }
 }
 
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+}
+
 dependencies {
     // Not sure if we need this one, what is a "forge" anyway?
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
