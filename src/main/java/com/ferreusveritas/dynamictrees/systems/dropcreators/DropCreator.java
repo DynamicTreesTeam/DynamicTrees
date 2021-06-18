@@ -62,9 +62,9 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 
 	public <C extends DropContext> List<ItemStack> appendDrops(final DropType<C> dropType, final C context) {
 		if (dropType == DropType.HARVEST)
-			this.getHarvestDrop(context.world(), context.species(), context.pos(), context.random(), context.drops(), context.soilLife(), context.fortune());
+			this.getHarvestDrop(context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fertility(), context.fortune());
 		else if (dropType == DropType.VOLUNTARY)
-			this.getVoluntaryDrop(context.world(), context.species(), context.pos(), context.random(), context.drops(), context.soilLife());
+			this.getVoluntaryDrop(context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fertility());
 		else if (dropType == DropType.LEAVES)
 			this.getLeavesDrop(context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fortune());
 		else if (dropType == DropType.LOGS)
@@ -73,11 +73,11 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 		return context.drops();
 	}
 
-	protected List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int soilLife, int fortune) {
+	protected List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
 		return drops;
 	}
 
-	protected List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> drops, int soilLife) {
+	protected List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> drops, int fertility) {
 		return drops;
 	}
 

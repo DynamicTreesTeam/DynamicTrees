@@ -45,7 +45,7 @@ public class FruitDropCreator extends DropCreator {
 	protected void registerProperties() { }
 
 	@Override
-	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int soilLife, int fortune) {
+	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
 		return getFruit(drops, random, fortune);
 	}
 

@@ -38,7 +38,7 @@ public class PalmSpecies extends Species {
     }
 
     @Override
-    public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int soilLife, boolean natural) {
+    public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
         BlockState trunkBlockState = world.getBlockState(treePos);
         BranchBlock branch = TreeHelper.getBranch(trunkBlockState);
         if (branch == null) return false;
@@ -55,7 +55,7 @@ public class PalmSpecies extends Species {
         if (radius != 0)
             branch.setRadius(world, treePos, radius + 1, null);
 
-        return super.postGrow(world, rootPos, treePos, soilLife, natural);
+        return super.postGrow(world, rootPos, treePos, fertility, natural);
     }
 
     public boolean transitionToTree(World world, BlockPos pos) {

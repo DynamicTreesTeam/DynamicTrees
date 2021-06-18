@@ -46,7 +46,7 @@ public class NetherFungusSpecies extends Species {
             }
 
             @Override
-            public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int soilLife, int fortune) {
+            public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
                 int chance = 10;
                 if (fortune > 0) {
                     chance -= 2 << fortune;

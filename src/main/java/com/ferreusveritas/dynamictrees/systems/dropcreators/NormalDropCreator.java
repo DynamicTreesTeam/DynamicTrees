@@ -37,12 +37,12 @@ public final class NormalDropCreator extends DropCreator {
     }
 
     @Override
-    public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int soilLife, int fortune) {
+    public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
         return this.dropsMap.get(DropType.HARVEST).appendDrops(drops, random, fortune);
     }
 
     @Override
-    public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> drops, int soilLife) {
+    public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> drops, int fertility) {
         return this.dropsMap.get(DropType.VOLUNTARY).appendDrops(drops, random, 0);
     }
 

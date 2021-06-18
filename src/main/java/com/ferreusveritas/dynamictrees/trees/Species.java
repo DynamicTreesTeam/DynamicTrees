@@ -706,8 +706,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param fertility
 	 * @return
 	 */
-	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, int soilLife) {
-		final DropContext dropContext = new DropContext(world, rootPos, this, new ArrayList<>(), soilLife, 0);
+	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, int fertility) {
+		final DropContext dropContext = new DropContext(world, rootPos, this, new ArrayList<>(), fertility, 0);
 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(DropCreator.DropType.VOLUNTARY, dropContext);
 		return this.dropCreatorStorage.appendDrops(DropCreator.DropType.VOLUNTARY, dropContext);
 	}
