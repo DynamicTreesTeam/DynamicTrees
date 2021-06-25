@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    public static final GenFeatureProperty<Block> SHROOMLIGHT_BLOCK = GenFeatureProperty.createBlockProperty("shroomlight");
+    public static final ConfigurationProperty<Block> SHROOMLIGHT_BLOCK = ConfigurationProperty.block("shroomlight");
 
     private static final Direction[] HORIZONTALS = CoordUtils.HORIZONTALS;
     private static final double VANILLA_GROW_CHANCE = .005f;

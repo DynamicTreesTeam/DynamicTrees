@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.command;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
+import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -10,6 +12,7 @@ import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.server.ServerWorld;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -38,10 +41,11 @@ public final class GrowPulseCommand extends SubCommand {
     }
 
     private void sendGrowPulse(final CommandSource source, final BlockPos rootPos, final int number) {
-        // TODO: Make a custom packet so we can display grow pulse particles on client.
+        final ISubstanceEffect substanceEffect = new GrowthSubstance(number, 1);
+        final ServerWorld level = source.getLevel();
 
-        for (int i = 0; i < number; i++)
-            TreeHelper.growPulse(source.getLevel(), rootPos);
+        substanceEffect.apply(source.getLevel(), rootPos);
+        level.addFreshEntity(new LingeringEffectorEntity(level, rootPos, substanceEffect));
 
         sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.grow_pulse",
                 CommandHelper.colour(String.valueOf(number), TextFormatting.AQUA),

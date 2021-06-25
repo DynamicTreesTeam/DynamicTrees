@@ -22,7 +22,7 @@ public class LogsDropCreator extends DropCreator {
 	protected void registerProperties() { }
 
 	@Override
-	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, NetVolumeNode.Volume volume) {
+	public List<ItemStack> getLogsDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, NetVolumeNode.Volume volume) {
 		LogsAndSticks las = species.getLogsAndSticks(volume);
 
 		int numLogs = las.logs.size();

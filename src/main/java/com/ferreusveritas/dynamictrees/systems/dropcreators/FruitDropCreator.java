@@ -23,7 +23,7 @@ public class FruitDropCreator extends DropCreator {
 	public ItemStack fruit = new ItemStack(Items.APPLE);
 	protected final float rarity;
 
-	public FruitDropCreator(){
+	public FruitDropCreator() {
 		this(1.0f);
 	}
 
@@ -45,12 +45,12 @@ public class FruitDropCreator extends DropCreator {
 	protected void registerProperties() { }
 
 	@Override
-	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
+	public List<ItemStack> getHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
 		return getFruit(drops, random, fortune);
 	}
 
 	@Override
-	public List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
+	public List<ItemStack> getLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
 		return getFruit(drops, random, fortune);
 	}
 

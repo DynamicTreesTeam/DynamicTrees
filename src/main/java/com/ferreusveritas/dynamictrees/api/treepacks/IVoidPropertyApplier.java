@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
-import java.util.List;
-
 /**
  * An implementation of {@link IPropertyApplier} that assumes the application was
  * successful, calling {@link IVoidPropertyApplier#applySuccessful(Object, Object)}

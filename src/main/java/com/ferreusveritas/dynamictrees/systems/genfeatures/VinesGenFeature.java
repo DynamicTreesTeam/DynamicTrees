@@ -41,10 +41,10 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
 
 	protected final BooleanProperty[] sideVineStates = new BooleanProperty[] {null, null, VineBlock.NORTH, VineBlock.SOUTH, VineBlock.WEST, VineBlock.EAST};
 
-	public static final GenFeatureProperty<Integer> MAX_LENGTH = GenFeatureProperty.createIntegerProperty("max_length");
-	public static final GenFeatureProperty<Block> BLOCK = GenFeatureProperty.createBlockProperty("block");
-	public static final GenFeatureProperty<Block> TIP_BLOCK = GenFeatureProperty.createBlockProperty("tip_block");
-	public static final GenFeatureProperty<VineType> VINE_TYPE = GenFeatureProperty.createProperty("vine_type", VineType.class);
+	public static final ConfigurationProperty<Integer> MAX_LENGTH = ConfigurationProperty.integer("max_length");
+	public static final ConfigurationProperty<Block> BLOCK = ConfigurationProperty.block("block");
+	public static final ConfigurationProperty<Block> TIP_BLOCK = ConfigurationProperty.block("tip_block");
+	public static final ConfigurationProperty<VineType> VINE_TYPE = ConfigurationProperty.property("vine_type", VineType.class);
 
 	public VinesGenFeature(ResourceLocation registryName) {
 		super(registryName);

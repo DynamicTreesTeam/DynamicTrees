@@ -8,6 +8,8 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
@@ -32,6 +34,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.loot.LootSerializers;
+import net.minecraft.loot.LootTable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -162,10 +166,12 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT = register(GrowthLogicKit.class, new RegistryEntryGetter<>(GrowthLogicKit.REGISTRY));
     public static final IJsonObjectGetter<GenFeature> GEN_FEATURE = register(GenFeature.class, new RegistryEntryGetter<>(GenFeature.REGISTRY));
     public static final IJsonObjectGetter<Family> FAMILY = register(Family.class, new RegistryEntryGetter<>(Family.REGISTRY));
+    public static final IJsonObjectGetter<DropCreator> DROP_CREATOR = register(DropCreator.class, new RegistryEntryGetter<>(DropCreator.REGISTRY));
     public static final IJsonObjectGetter<Species> SPECIES = register(Species.class, new RegistryEntryGetter<>(Species.REGISTRY));
     public static final IJsonObjectGetter<FeatureCanceller> FEATURE_CANCELLER = register(FeatureCanceller.class, new RegistryEntryGetter<>(FeatureCanceller.REGISTRY));
 
-    public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGenFeatureGetter());
+    public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGetter<>("Gen Feature", GenFeature.class));
+    public static final IJsonObjectGetter<ConfiguredDropCreator<DropCreator>> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, new ConfiguredGetter<>("Drop Creator", DropCreator.class));
 
     public static final IJsonObjectGetter<Seed> SEED = register(Seed.class, jsonElement -> ITEM.get(jsonElement).mapIfValid(item -> item instanceof Seed, "Item '{value}' is not a seed.", item -> (Seed) item));
 
@@ -204,6 +210,10 @@ public final class JsonObjectGetters {
 
     public static final IJsonObjectGetter<ToolType> TOOL_TYPE = register(ToolType.class, jsonElement ->
             STRING.get(jsonElement).map(TOOL_TYPES::get, "Could not get tool type from '{previous_value}'."));
+
+    public static final IJsonObjectGetter<LootTable> LOOT_TABLE = register(LootTable.class, jsonElement -> {
+        return JSON_OBJECT.get(jsonElement).map(obj -> LootSerializers.createLootTableSerializer().create().fromJson(obj, LootTable.class));
+    });
 
     /**
      * Registers {@link ForgeRegistryEntryGetter} objects. This should be called after the registries are initiated to avoid

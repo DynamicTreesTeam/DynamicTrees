@@ -189,7 +189,7 @@ public class DTConfigs {
 //		CLIENT_BUILDER.pop();
 		
 		SERVER_BUILDER.comment("Debug Settings").push("debug");
-		WORLD_GEN_DEBUG = SERVER_BUILDER.comment("Enable to mark tree spawn locations with wool circles.").
+		WORLD_GEN_DEBUG = SERVER_BUILDER.comment("Enable to mark tree spawn locations with concrete circles.").
 				define("debug", false);
 		SERVER_BUILDER.pop();
 		

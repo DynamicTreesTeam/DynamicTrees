@@ -63,7 +63,7 @@ public class SeedDropCreator extends DropCreator {
 	protected void registerProperties() { }
 
 	@Override
-	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
+	public List<ItemStack> getHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
 		float rarity = getHarvestRarity();
 		rarity *= (fortune + 1) / 64f;
 		rarity *= Math.min(species.seasonalSeedDropFactor(world, leafPos) + 0.15f, 1.0);
@@ -75,21 +75,21 @@ public class SeedDropCreator extends DropCreator {
 	}
 
 	@Override
-	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int fertility) {
-		if(getVoluntaryRarity() * DTConfigs.SEED_DROP_RATE.get() * species.seasonalSeedDropFactor(world, rootPos) > random.nextFloat()) {
+	public List<ItemStack> getVoluntaryDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int fertility) {
+		if (this.getVoluntaryRarity() * DTConfigs.SEED_DROP_RATE.get() * species.seasonalSeedDropFactor(world, rootPos) > random.nextFloat()) {
 			dropList.add(getSeedStack(species));
-			SeedVoluntaryDropEvent seedDropEvent = new SeedVoluntaryDropEvent(world, rootPos, species, dropList);
+			VoluntarySeedDropEvent seedDropEvent = new VoluntarySeedDropEvent(world, rootPos, species, dropList);
 			MinecraftForge.EVENT_BUS.post(seedDropEvent);
 			if(seedDropEvent.isCanceled()) {
 				dropList.clear();
 			}
 		}
 
-		return drops;
+		return dropList;
 	}
 
 	@Override
-	public List<ItemStack> getLeavesDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
+	public List<ItemStack> getLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
 		int chance = 20; //See BlockLeaves#getSaplingDropChance(state);
 		//Hokey fortune stuff here to match Vanilla logic.
 		if (fortune > 0) {

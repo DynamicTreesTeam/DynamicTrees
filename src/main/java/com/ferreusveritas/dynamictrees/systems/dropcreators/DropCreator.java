@@ -60,32 +60,32 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 		return new ConfiguredDropCreator<>(this);
 	}
 
-	public <C extends DropContext> List<ItemStack> appendDrops(final DropType<C> dropType, final C context) {
+	public <C extends DropContext> List<ItemStack> appendDrops(final ConfiguredDropCreator<DropCreator> configuration, final DropType<C> dropType, final C context) {
 		if (dropType == DropType.HARVEST)
-			this.getHarvestDrop(context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fertility(), context.fortune());
+			this.getHarvestDrops(configuration, context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fertility(), context.fortune());
 		else if (dropType == DropType.VOLUNTARY)
-			this.getVoluntaryDrop(context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fertility());
+			this.getVoluntaryDrops(configuration, context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fertility());
 		else if (dropType == DropType.LEAVES)
-			this.getLeavesDrop(context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fortune());
+			this.getLeavesDrops(configuration, context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fortune());
 		else if (dropType == DropType.LOGS)
-			this.getLogsDrop(context.world(), context.species(), context.pos(), context.random(), context.drops(), ((LogDropContext) context).volume());
+			this.getLogsDrops(configuration, context.world(), context.species(), context.pos(), context.random(), context.drops(), ((LogDropContext) context).volume());
 
 		return context.drops();
 	}
 
-	protected List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
+	protected List<ItemStack> getHarvestDrops(final ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
 		return drops;
 	}
 
-	protected List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> drops, int fertility) {
+	protected List<ItemStack> getVoluntaryDrops(final ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos rootPos, Random random, List<ItemStack> drops, int fertility) {
 		return drops;
 	}
 
-	protected List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
+	protected List<ItemStack> getLeavesDrops(final ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
 		return drops;
 	}
 
-	protected List<ItemStack> getLogsDrop(World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, NetVolumeNode.Volume volume) {
+	protected List<ItemStack> getLogsDrops(final ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, NetVolumeNode.Volume volume) {
 		return drops;
 	}
 

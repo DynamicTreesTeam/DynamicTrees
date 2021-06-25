@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.configurations;
 
+import java.util.Set;
+
 /**
  * @author Harley O'Connor
  */
@@ -13,5 +15,10 @@ public interface Configurable {
      * @return {@code true} if it is registered, {@code false} if not.
      */
     boolean isPropertyRegistered(ConfigurationProperty<?> property);
+
+
+    Set<ConfigurationProperty<?>> getRegisteredProperties();
+
+    Configured<?, ?> getDefaultConfiguration();
 
 }

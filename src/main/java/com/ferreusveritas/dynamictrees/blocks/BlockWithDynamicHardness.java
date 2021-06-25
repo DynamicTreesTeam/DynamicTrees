@@ -64,8 +64,6 @@ public abstract class BlockWithDynamicHardness extends Block {
             return getHardness(worldIn, pos);
         }
 
-
-
     }
 
 }

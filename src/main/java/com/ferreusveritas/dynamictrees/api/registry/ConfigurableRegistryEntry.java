@@ -76,6 +76,7 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
      * @return The {@link Set} of {@link ConfigurationProperty} for this
      *         {@link ConfigurableRegistryEntry}.
      */
+    @Override
     public Set<ConfigurationProperty<?>> getRegisteredProperties() {
         return Collections.unmodifiableSet(this.properties);
     }
@@ -87,6 +88,7 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
      *
      * @return The {@link #defaultConfiguration}.
      */
+    @Override
     public C getDefaultConfiguration() {
         return this.defaultConfiguration.copy();
     }

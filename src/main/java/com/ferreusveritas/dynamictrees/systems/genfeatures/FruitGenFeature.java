@@ -9,7 +9,6 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -33,13 +32,17 @@ public class FruitGenFeature extends GenFeature implements IFruitGenFeature {
 
 	@Override
 	protected void registerProperties() {
-		this.register(FRUIT_BLOCK, VERTICAL_SPREAD, QUANTITY, RAY_DISTANCE, FRUITING_RADIUS);
+		this.register(FRUIT_BLOCK, VERTICAL_SPREAD, QUANTITY, RAY_DISTANCE, FRUITING_RADIUS, PLACE_CHANCE);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
-				.with(VERTICAL_SPREAD, 30f).with(QUANTITY, 4).with(FRUITING_RADIUS, 8).with(PLACE_CHANCE, 1f);
+		return super.createDefaultConfiguration()
+				.with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
+				.with(VERTICAL_SPREAD, 30f)
+				.with(QUANTITY, 4)
+				.with(FRUITING_RADIUS, 8)
+				.with(PLACE_CHANCE, 1f);
 	}
 
     @Override
