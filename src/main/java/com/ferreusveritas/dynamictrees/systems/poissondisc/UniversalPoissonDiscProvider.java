@@ -10,13 +10,13 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class UniversalPoissonDiscProvider {
 
-	private final Map<ResourceLocation, IPoissonDiscProvider> providerMap = new HashMap<>();
+	private final Map<ResourceLocation, IPoissonDiscProvider> providerMap = new ConcurrentHashMap<>();
 
 	protected IPoissonDiscProvider createCircleProvider(ServerWorld world, IWorld iWorld) {
 		final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(TreeGenerator.getTreeGenerator(), world.dimension().location(), iWorld);
