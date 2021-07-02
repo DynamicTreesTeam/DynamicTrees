@@ -26,7 +26,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -113,7 +112,7 @@ public class Staff extends Item {
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
 		if(species.isValid() && species.isAcceptableSoil(world, pos, state)) {
-			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, world, species, pos, world.getBiome(pos), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY);
+			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, world, species, pos, world.getBiome(pos), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY, false);
 			if(hasMaxUses(heldStack)) {
 				if(decUses(heldStack)) {
 					heldStack.shrink(1);//If the player is in creative this will have no effect.

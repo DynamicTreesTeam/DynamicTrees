@@ -1899,7 +1899,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		if (!DTResourceRegistries.JO_CODE_MANAGER.getCodes(this).isEmpty()) {
 			final JoCode code = DTResourceRegistries.JO_CODE_MANAGER.getRandomCode(this, radius, random);
 			if (code != null) {
-				code.generate(worldObj, world,this, rootPos, biome, facing, radius, safeBounds);
+				code.generate(worldObj, world,this, rootPos, biome, facing, radius, safeBounds, false);
 				return true;
 			}
 		}

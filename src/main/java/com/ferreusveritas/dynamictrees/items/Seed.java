@@ -88,7 +88,7 @@ public class Seed extends Item implements IPlantable {
 			String joCode = getCode(seedStack);
 			if (!joCode.isEmpty()) {
 				world.removeBlock(pos, false); // Remove the newly created dynamic sapling
-				species.getJoCode(joCode).setCareful(true).generate(world, world, species, pos.below(), world.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY);
+				species.getJoCode(joCode).setCareful(true).generate(world, world, species, pos.below(), world.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY, false);
 			}
 			return true;
 		}

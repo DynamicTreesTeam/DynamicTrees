@@ -14,12 +14,7 @@ public class SimpleBitmap {
 	private int[] bits;
 	
 	public boolean touched; // Useful for ruling out entire layers for the VoxelMap.
-	
-	// Not thread safe at all but whatevers.
-	private static int dstOffsety;
-	private static int srcOffsety;
-	private static int runH;
-	
+
 	/**
 	* @param w Width not to exceed 32
 	* @param h Height 
@@ -71,91 +66,130 @@ public class SimpleBitmap {
 	}
 	
 	public boolean isColliding(int relX, int relY, SimpleBitmap src) {
-		if (prepBlit(relX, relY, src)) {
-			if (relX < 0) {
-				relX = -relX;
-				while (runH-- > 0) {
-					if (((this.bits[dstOffsety++] << relX) & src.getBits()[srcOffsety++]) != 0) {
-						return true;
-					}
-				}
-			} else {		
-				while (runH-- > 0) {
-					if ((this.bits[dstOffsety++] & (src.getBits()[srcOffsety++] << relX)) != 0) {
-						return true;
-					}
+		final BlitPreparationResult result = this.prepBlit(relX, relY, src);
+		if (!result.success) {
+			return false;
+		}
+
+		if (relX < 0) {
+			relX = -relX;
+			while (result.runH-- > 0) {
+				if (((this.bits[result.dstOffsetY++] << relX) & src.getBits()[result.srcOffsetY++]) != 0) {
+					return true;
 				}
 			}
-		}		
+		} else {
+			while (result.runH-- > 0) {
+				if ((this.bits[result.dstOffsetY++] & (src.getBits()[result.srcOffsetY++] << relX)) != 0) {
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 	
 	public void blitOr(int relX, int relY, SimpleBitmap src) {
-		if (prepBlit(relX, relY, src)) {
-			if (relX < 0) {
-				relX = -relX;
-				while (runH-- > 0) {
-					this.bits[dstOffsety++] |= (src.getBits()[srcOffsety++] >>> relX);
-				}
-			} else {		
-				while (runH-- > 0) {
-					this.bits[dstOffsety++] |= (src.getBits()[srcOffsety++] << relX);
-				}
-			}
-			touched = true;
+		final BlitPreparationResult result = this.prepBlit(relX, relY, src);
+		if (!result.success) {
+			return;
 		}
+
+		if (relX < 0) {
+			relX = -relX;
+			while (result.runH-- > 0) {
+				this.bits[result.dstOffsetY++] |= (src.getBits()[result.srcOffsetY++] >>> relX);
+			}
+		} else {
+			while (result.runH-- > 0) {
+				this.bits[result.dstOffsetY++] |= (src.getBits()[result.srcOffsetY++] << relX);
+			}
+		}
+		touched = true;
 	}
 	
 	public void blitSub(int relX, int relY, SimpleBitmap src) {
-		if (prepBlit(relX, relY, src)) {
-			if (relX < 0) {
-				relX = -relX;
-				while (runH-- > 0) {
-					this.bits[dstOffsety++] &= ~(src.getBits()[srcOffsety++] >>> relX);
-				}
-			} else {		
-				while (runH-- > 0) {
-					this.bits[dstOffsety++] &= ~(src.getBits()[srcOffsety++] << relX);
-				}
-			}
-			touched = true;
+		final BlitPreparationResult result = this.prepBlit(relX, relY, src);
+		if (!result.success) {
+			return;
 		}
+
+		if (relX < 0) {
+			relX = -relX;
+			while (result.runH-- > 0) {
+				this.bits[result.dstOffsetY++] &= ~(src.getBits()[result.srcOffsetY++] >>> relX);
+			}
+		} else {
+			while (result.runH-- > 0) {
+				this.bits[result.dstOffsetY++] &= ~(src.getBits()[result.srcOffsetY++] << relX);
+			}
+		}
+		touched = true;
 	}
 	
 	public void blitAnd(int relX, int relY, SimpleBitmap src) {
-		if (prepBlit(relX, relY, src)) {
-			if (relX < 0) {
-				relX = -relX;
-				while (runH-- > 0) {
-					this.bits[dstOffsety++] &= (src.getBits()[srcOffsety++] >>> relX);
-				}
-			} else {		
-				while (runH-- > 0) {
-					this.bits[dstOffsety++] &= ~(src.getBits()[srcOffsety++] << relX);
-				}
-			}
-			touched = true;
+		final BlitPreparationResult result = this.prepBlit(relX, relY, src);
+		if (!result.success) {
+			return;
 		}
-		
+
+		if (relX < 0) {
+			relX = -relX;
+			while (result.runH-- > 0) {
+				this.bits[result.dstOffsetY++] &= (src.getBits()[result.srcOffsetY++] >>> relX);
+			}
+		} else {
+			while (result.runH-- > 0) {
+				this.bits[result.dstOffsetY++] &= ~(src.getBits()[result.srcOffsetY++] << relX);
+			}
+		}
+		touched = true;
 	}
 	
-	private boolean prepBlit(int relX, int relY, SimpleBitmap src) {
+	private BlitPreparationResult prepBlit(int relX, int relY, SimpleBitmap src) {
 
 		if (relX <= -src.w || relX >= this.w || relY <= -src.h || relY >= this.h || (!touched && !src.touched)) {
-			return false;
+			return BlitPreparationResult.failure();
 		}
+
+		final int dstOffsetY;
+		final int srcOffsetY;
 		
 		if (relY >= 0) {
-			dstOffsety = relY;
-			srcOffsety = 0;
+			dstOffsetY = relY;
+			srcOffsetY = 0;
 		} else {
-			dstOffsety = 0;
-			srcOffsety = -relY;
+			dstOffsetY = 0;
+			srcOffsetY = -relY;
 		}
 		
-		runH = Math.min(this.h - dstOffsety, Math.min(src.h, this.h - relY) - srcOffsety);
+		final int runH = Math.min(this.h - dstOffsetY, Math.min(src.h, this.h - relY) - srcOffsetY);
 		
-		return true;
+		return BlitPreparationResult.success(dstOffsetY, srcOffsetY, runH);
+	}
+
+	private static final class BlitPreparationResult {
+		private static final BlitPreparationResult FAILURE = new BlitPreparationResult(false, 0, 0, 0);
+
+		private final boolean success;
+		private int dstOffsetY;
+		private int srcOffsetY;
+		private int runH;
+
+		public BlitPreparationResult(boolean success, int dstOffsetY, int srcOffsetY, int runH) {
+			this.success = success;
+			this.dstOffsetY = dstOffsetY;
+			this.srcOffsetY = srcOffsetY;
+			this.runH = runH;
+		}
+
+		private static BlitPreparationResult failure() {
+			return FAILURE;
+		}
+
+		private static BlitPreparationResult success(int dstOffsetY, int srcOffsetY, int runH) {
+			return new BlitPreparationResult(true, dstOffsetY, srcOffsetY, runH);
+		}
+
 	}
 	
 	/**
