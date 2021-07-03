@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-public final class HexColorArgument implements ArgumentType<String> {
+public final class HexColorArgument implements ArgumentType<Integer> {
 
     public static final DynamicCommandExceptionType COLOR_INVALID = new DynamicCommandExceptionType(colourString -> new TranslationTextComponent("argument.color.invalid", colourString));
 
@@ -23,19 +23,22 @@ public final class HexColorArgument implements ArgumentType<String> {
         return new HexColorArgument();
     }
 
-    public static String getHexString(final CommandContext<?> context, final String name) {
-        return context.getArgument(name, String.class);
+    public static int getHexCode(final CommandContext<?> context, final String name) {
+        return context.getArgument(name, Integer.class);
     }
 
     @Override
-    public String parse(StringReader reader) throws CommandSyntaxException {
+    public Integer parse(StringReader reader) throws CommandSyntaxException {
         final String in = reader.readString();
+        final int colour;
 
-        try { Color.decode((in.startsWith("#") ? "" : "#") + in).getRGB(); } catch (NumberFormatException e) {
+        try {
+            colour = Color.decode((in.startsWith("#") ? "" : "#") + in).getRGB();
+        } catch (NumberFormatException e) {
             throw COLOR_INVALID.create(in);
         }
 
-        return in;
+        return colour;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
+import com.ferreusveritas.dynamictrees.command.DTArgumentTypes;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockTagsProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemTagsProvider;
@@ -28,6 +29,10 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(DynamicTrees.MOD_ID)
 public final class DynamicTrees {
+
+	static {
+		DTArgumentTypes.register();
+	}
 
 	public static final String MOD_ID = "dynamictrees";
 	public static final String NAME = "Dynamic Trees";

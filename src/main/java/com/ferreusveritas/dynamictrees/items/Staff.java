@@ -35,9 +35,11 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.List;
 
+import static net.minecraftforge.common.util.Constants.NBT.TAG_STRING;
+
 /**
  * Try the following in a command block to demonstrate the extra tag functionality.
- * /give @p dynamictrees:staff{color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",read_only:1,tree:"dynamictrees:birch",max_uses:16,display:{Name:'[{"text":"Name","italic":false}]'}}
+ * {@code /give @p dynamictrees:staff{color:0x88FF00,code:"OUiVpPzkbtJ9uSRPbZP",read_only:1,tree:"dynamictrees:birch",max_uses:16,display:{Name:'[{"text":"Name","italic":false}]'}}}
  */
 public class Staff extends Item {
 	
@@ -217,18 +219,18 @@ public class Staff extends Item {
 	}
 	
 	public int getColor(ItemStack itemStack, int tint) {
-		final CompoundNBT nbt = itemStack.getOrCreateTag();
+		final CompoundNBT tag = itemStack.getOrCreateTag();
 
 		if (tint == 0) {
 			int color = 0x005b472f; // Original brown wood color
 			
 			Species species = getSpecies(itemStack);
 			
-			if (nbt.contains(HANDLE)) {
+			if (tag.contains(HANDLE)) {
 				try {
-					color = Color.decode(nbt.getString(HANDLE)).getRGB();
+					color = Color.decode(tag.getString(HANDLE)).getRGB();
 				} catch (NumberFormatException e) {
-					nbt.remove(HANDLE);
+					tag.remove(HANDLE);
 				}
 			}
 			else if (species.isValid()) {
@@ -239,23 +241,41 @@ public class Staff extends Item {
 		} else if (tint == 1) {
 			int color = 0x0000FFFF; // Cyan crystal like Radagast the Brown's staff.
 
-			if (nbt.contains(COLOR)) {
-				try {
-					color = Color.decode(nbt.getString(COLOR)).getRGB();
-				} catch (NumberFormatException e) {
-					nbt.remove(COLOR);
+			if (tag.contains(COLOR)) {
+				// Convert legacy string tag to int tag if tag type is String.
+				if (tag.getTagType(COLOR) == TAG_STRING) {
+					this.tryConvertLegacyTag(tag);
 				}
+				color = tag.getInt(COLOR);
 			}
 
 			return color;
 		}
 		
 		
-		return 0xFFFFFFFF;//white
+		return 0xFFFFFFFF; // white
+	}
+
+	/**
+	 * The {@link #COLOR} tag used to store a Hex String, such as {@code #FFFFFF}, but was
+	 * recently changed to store an int instead. This attempts to convert the legacy tag
+	 * to an int.
+	 *
+	 * @param tag The {@link CompoundNBT} tag containing the {@link #COLOR} string.
+	 * @deprecated This will no longer be necessary in 1.17.
+	 */
+	@Deprecated
+	private void tryConvertLegacyTag(final CompoundNBT tag) {
+		final String color = tag.getString(COLOR);
+		tag.remove(COLOR);
+
+		try {
+			tag.putInt(COLOR, Color.decode(color).getRGB());
+		} catch (final NumberFormatException ignored) {}
 	}
 	
-	public Staff setColor(ItemStack itemStack, String colStr) {
-		itemStack.getOrCreateTag().putString(COLOR, colStr);
+	public Staff setColor(ItemStack itemStack, int color) {
+		itemStack.getOrCreateTag().putInt(COLOR, color);
 		return this;
 	}
 	
