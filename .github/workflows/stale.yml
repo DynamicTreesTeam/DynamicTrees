@@ -16,9 +16,9 @@ jobs:
     - uses: actions/stale@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        stale-issue-message: 'Stale issue message'
+        stale-issue-message: 'This issue has gone stale due to it having no activity for 60 days. Is this still a problem?'
         stale-issue-label: 'no-issue-activity'
         exempt-issue-labels: 'enhancement,stale exempt'
-        stale-pr-message: 'Stale pull request message'
+        stale-pr-message: 'This issue PR has gone stale due to it having no activity for 60 days. Is this still required?'
         stale-pr-label: 'no-pr-activity'
         exempt-pr-labels: 'stale exempt'
