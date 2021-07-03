@@ -29,8 +29,8 @@ public abstract class SimpleSubCommand extends SubCommand {
 
     /**
      * Default implementation returns {@code 0}, since commands which take no
-     * arguments are likely to be things like {@link SpeciesListCommand} which
-     * needn't require permissions.
+     * arguments are likely to be printing non-sensitive data which needn't
+     * require permissions.
      *
      * @return A permission level of {@code 0}.
      */

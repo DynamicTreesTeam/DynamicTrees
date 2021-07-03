@@ -1,5 +1,9 @@
 import org.w3c.dom.Element
 
+String property(String name) {
+    return project.getProperty(name)
+}
+
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
@@ -31,21 +35,14 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
 
-ext.configFile = file "gradle.properties"
-configFile.withReader {
-    def prop = new Properties()
-    prop.load(it)
-    ext.config = new ConfigSlurper().parse prop
-}
-
-version = "${config.mc_version}-${config.mod_version}"
-group = config.package_group
-archivesBaseName = config.mod_name
+version = "${property("modName")}-${property("modVersion")}"
+group = property("group")
+archivesBaseName = property("modName")
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 minecraft {
-    mappings channel: 'official', version: config.mc_version
+    mappings channel: 'official', version: property("mcVersion")
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -58,6 +55,16 @@ minecraft {
 
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+
+            if (project.hasProperty('mcUuid')) {
+                args '--uuid', property('mcUuid')
+            }
+            if (project.hasProperty('mcUsername')) {
+                args '--username', property('mcUsername')
+            }
+            if (project.hasProperty('mcAccessToken')) {
+                args '--accessToken', property('mcAccessToken')
+            }
 
             mods {
                 dynamictrees {
@@ -108,20 +115,20 @@ sourceSets.main.resources {
 
 dependencies {
     // Not sure if we need this one, what is a "forge" anyway?
-    minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
+    minecraft "net.minecraftforge:forge:${property("mcVersion")}-${property("forgeVersion")}"
 
     // Compile Hwyla API, but don't include in runtime.
-    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${config.hwyla_version}:api")
+    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api")
     // At runtime, use the full Hwyla mod.
-    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${config.hwyla_version}")
+    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}")
 
     // Compile JEI API, but don't include in runtime.
-    compileOnly fg.deobf("mezz.jei:jei-${config.mc_version}:${config.jei_version}:api")
+    compileOnly fg.deobf("mezz.jei:jei-${property("mcVersion")}:${property("jeiVersion")}:api")
     // At runtime, use the full JEI mod.
-    runtimeOnly fg.deobf("mezz.jei:jei-${config.mc_version}:${config.jei_version}")
+    runtimeOnly fg.deobf("mezz.jei:jei-${property("mcVersion")}:${property("jeiVersion")}")
 
     // At runtime, use Patchouli mod (for the guide book, which is Json so we don't need the API).
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${config.patchouli_version}")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}")
 
     //At runtime use ComputerCraft for creating the growth chambers
     runtimeOnly fg.deobf("curse.maven:cc-tweaked-282001:3236650")
@@ -130,7 +137,7 @@ dependencies {
     implementation fg.deobf("curse.maven:SereneSeasons-291874:3202233")
 
     // At runtime, use suggestion provider fix mod.
-    runtimeOnly fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${config.mc_version}-${config.suggestion_provider_fix_version}")
+    runtimeOnly fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${property("mcVersion")}-${property("suggestionProviderFixVersion")}")
 }
 
 jar {
@@ -140,7 +147,7 @@ jar {
                 "Specification-Vendor": "ferreusveritas",
                 "Specification-Version": "1",
                 "Implementation-Title": project.name,
-                "Implementation-Version": "${version}",
+                "Implementation-Version": project.version,
                 "Implementation-Vendor" :"ferreusveritas",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
@@ -161,13 +168,13 @@ java {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            setArtifactId("${config.mod_name}-${config.mc_version}")
-            setVersion(config.mod_version)
+            setArtifactId("${property("modName")}-${property("mcVersion")}")
+            setVersion(property("modVersion"))
 
             from components.java
 
             pom {
-                url = "https://github.com/ferreusveritas/${config.mod_name}"
+                url = "https://github.com/ferreusveritas/${property("modName")}"
                 licenses {
                     license {
                         name = 'MIT'
@@ -175,9 +182,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = "scm:git:git://github.com/ferreusveritas/${config.mod_name}.git"
-                    developerConnection = "scm:git:ssh://github.com/ferreusveritas/${config.mod_name}.git"
-                    url = "https://github.com/ferreusveritas/${config.mod_name}"
+                    connection = "scm:git:git://github.com/ferreusveritas/${property("modName")}.git"
+                    developerConnection = "scm:git:ssh://github.com/ferreusveritas/${property("modName")}.git"
+                    url = "https://github.com/ferreusveritas/${property("modName")}"
                 }
             }
 
