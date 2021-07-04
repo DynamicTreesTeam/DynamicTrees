@@ -35,14 +35,18 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
 
-version = "${property("modName")}-${property("modVersion")}"
+String modName = property("modName")
+String modVersion = property("modVersion")
+String mcVersion = property("mcVersion")
+
+version = "${modName}-${modVersion}"
 group = property("group")
-archivesBaseName = property("modName")
+archivesBaseName = modName
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 minecraft {
-    mappings channel: 'official', version: property("mcVersion")
+    mappings channel: 'official', version: mcVersion
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -115,7 +119,7 @@ sourceSets.main.resources {
 
 dependencies {
     // Not sure if we need this one, what is a "forge" anyway?
-    minecraft "net.minecraftforge:forge:${property("mcVersion")}-${property("forgeVersion")}"
+    minecraft "net.minecraftforge:forge:${mcVersion}-${property("forgeVersion")}"
 
     // Compile Hwyla API, but don't include in runtime.
     compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api")
@@ -123,9 +127,9 @@ dependencies {
     runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}")
 
     // Compile JEI API, but don't include in runtime.
-    compileOnly fg.deobf("mezz.jei:jei-${property("mcVersion")}:${property("jeiVersion")}:api")
+    compileOnly fg.deobf("mezz.jei:jei-${mcVersion}:${property("jeiVersion")}:api")
     // At runtime, use the full JEI mod.
-    runtimeOnly fg.deobf("mezz.jei:jei-${property("mcVersion")}:${property("jeiVersion")}")
+    runtimeOnly fg.deobf("mezz.jei:jei-${mcVersion}:${property("jeiVersion")}")
 
     // At runtime, use Patchouli mod (for the guide book, which is Json so we don't need the API).
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}")
@@ -137,7 +141,7 @@ dependencies {
     implementation fg.deobf("curse.maven:SereneSeasons-291874:3202233")
 
     // At runtime, use suggestion provider fix mod.
-    runtimeOnly fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${property("mcVersion")}-${property("suggestionProviderFixVersion")}")
+    runtimeOnly fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${mcVersion}-${property("suggestionProviderFixVersion")}")
 }
 
 jar {
@@ -168,13 +172,13 @@ java {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            setArtifactId("${property("modName")}-${property("mcVersion")}")
-            setVersion(property("modVersion"))
+            setArtifactId("${modName}-${mcVersion}")
+            setVersion(modVersion)
 
             from components.java
 
             pom {
-                url = "https://github.com/ferreusveritas/${property("modName")}"
+                url = "https://github.com/ferreusveritas/${modName}"
                 licenses {
                     license {
                         name = 'MIT'
@@ -182,9 +186,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = "scm:git:git://github.com/ferreusveritas/${property("modName")}.git"
-                    developerConnection = "scm:git:ssh://github.com/ferreusveritas/${property("modName")}.git"
-                    url = "https://github.com/ferreusveritas/${property("modName")}"
+                    connection = "scm:git:git://github.com/ferreusveritas/${modName}.git"
+                    developerConnection = "scm:git:ssh://github.com/ferreusveritas/${modName}.git"
+                    url = "https://github.com/ferreusveritas/${modName}"
                 }
             }
 
