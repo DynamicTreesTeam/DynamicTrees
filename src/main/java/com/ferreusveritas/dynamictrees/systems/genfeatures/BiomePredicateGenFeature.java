@@ -17,7 +17,6 @@ import java.util.List;
 
 public class BiomePredicateGenFeature extends GenFeature implements IPostGenFeature {
 
-	public static final GenFeatureProperty<BiomePredicate> BIOME_PREDICATE = GenFeatureProperty.createProperty("biome_predicate", BiomePredicate.class);
 	public static final GenFeatureProperty<Boolean> ONLY_WORLD_GEN = GenFeatureProperty.createBooleanProperty("only_world_gen");
 	public static final GenFeatureProperty<ConfiguredGenFeature<GenFeature>> GEN_FEATURE = GenFeatureProperty.createProperty("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
 

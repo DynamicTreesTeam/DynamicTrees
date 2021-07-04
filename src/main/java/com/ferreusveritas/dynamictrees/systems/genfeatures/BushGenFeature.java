@@ -22,7 +22,6 @@ import net.minecraft.world.biome.Biome;
 
 import java.util.List;
 import java.util.Random;
-import java.util.function.Predicate;
 
 public class BushGenFeature extends GenFeature implements IFullGenFeature, IPostGenFeature {
 
@@ -30,21 +29,17 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 	public static final GenFeatureProperty<Block> LEAVES_BLOCK = GenFeatureProperty.createBlockProperty("leaves");
 	public static final GenFeatureProperty<Block> SECONDARY_LEAVES_BLOCK = GenFeatureProperty.createBlockProperty("secondary_leaves");
 
-	private Predicate<Biome> biomePredicate = i -> true;
-
 	public BushGenFeature(ResourceLocation registryName) {
-		super(registryName, LOG_BLOCK, LEAVES_BLOCK, SECONDARY_LEAVES_BLOCK);
+		super(registryName, LOG_BLOCK, LEAVES_BLOCK, SECONDARY_LEAVES_BLOCK, BIOME_PREDICATE);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(LOG_BLOCK, Blocks.OAK_LOG).with(LEAVES_BLOCK, Blocks.OAK_LEAVES)
+		return super.createDefaultConfiguration()
+				.with(BIOME_PREDICATE, i -> true)
+				.with(LOG_BLOCK, Blocks.OAK_LOG)
+				.with(LEAVES_BLOCK, Blocks.OAK_LEAVES)
 				.with(SECONDARY_LEAVES_BLOCK, null);
-	}
-
-	public BushGenFeature setBiomePredicate(Predicate<Biome> biomePredicate) {
-		this.biomePredicate = biomePredicate;
-		return this;
 	}
 
 	@Override
@@ -55,7 +50,7 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 
 	@Override
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-		if(safeBounds != SafeChunkBounds.ANY && biomePredicate.test(biome)) {
+		if (safeBounds != SafeChunkBounds.ANY && configuredGenFeature.get(BIOME_PREDICATE).test(biome)) {
 			this.commonGen(configuredGenFeature, world, rootPos, species, world.getRandom(), radius, safeBounds);
 			return true;
 		}
@@ -63,7 +58,11 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 	}
 
 	protected void commonGen(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Random random, int radius, SafeChunkBounds safeBounds) {
-		if (radius <= 2) return;
+		if (radius <= 2) {
+			return;
+		}
+
+		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
 		Vector3d vTree = new Vector3d(rootPos.getX(), rootPos.getY(), rootPos.getZ()).add(0.5, 0.5, 0.5);
 
@@ -71,13 +70,16 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 			int rad = MathHelper.clamp(random.nextInt(radius - 2) + 2, 2, radius - 1);
 			Vector3d v = vTree.add(new Vector3d(1, 0, 0).scale(rad).yRot((float) (random.nextFloat() * Math.PI * 2)));
 			BlockPos vPos = new BlockPos(v);
-			if (!safeBounds.inBounds(vPos, true)) continue;
 
-			BlockPos pos = CoordUtils.findGround(world, vPos);
-			BlockState soilBlockState = world.getBlockState(pos);
+			if (!safeBounds.inBounds(vPos, true)) {
+				continue;
+			}
 
-			pos = pos.above();
-			if (!world.getBlockState(pos).getMaterial().isLiquid() && species.isAcceptableSoil(world, pos, soilBlockState)) {
+			final BlockPos groundPos = CoordUtils.findWorldSurface(world, vPos, worldGen);
+			final BlockState soilBlockState = world.getBlockState(groundPos);
+
+			final BlockPos pos = groundPos.above();
+			if (!world.getBlockState(groundPos).getMaterial().isLiquid() && species.isAcceptableSoil(world, groundPos, soilBlockState)) {
 				world.setBlock(pos, configuredGenFeature.get(LOG_BLOCK).defaultBlockState(), 3);
 
 				SimpleVoxmap leafMap = LeafClusters.BUSH;
