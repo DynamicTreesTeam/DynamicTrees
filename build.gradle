@@ -14,6 +14,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
+}
+
 repositories {
     maven {
         name 'LDTTeam - Modding'
@@ -29,6 +33,7 @@ repositories {
         url "https://harleyoconnor.com/maven"
     }
 }
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -168,6 +173,34 @@ java {
     withSourcesJar()
 }
 
+curseforge {
+    if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
+        apiKey = property("curseApiKey")
+
+        project {
+            id = '252818'
+
+            addGameVersion '1.16.4'
+            addGameVersion mcVersion
+
+            changelog = file('build/changelog.md')
+            changelogType = 'markdown'
+            releaseType = property("curseFileType")
+
+            addArtifact sourcesJar
+
+            mainArtifact(jar) {
+                relations {
+                    optionalDependency 'dynamictreesplus'
+                    optionalDependency 'chunk-saving-fix'
+                }
+            }
+        }
+    } else {
+        project.logger.log(LogLevel.WARN, "API Key and file type for CurseForge not detected; uploading will be disabled.")
+    }
+}
+
 tasks.withType(GenerateModuleMetadata) {
     enabled = false
 }
@@ -186,6 +219,21 @@ publishing {
                     license {
                         name = 'MIT'
                         url = 'https://mit-license.org'
+                    }
+                }
+                developers {
+                    developer {
+                        id = "ferreusveritas"
+                        name = "Ferreus Veritas"
+                    }
+                    developer {
+                        id = "supermassimo"
+                        name = "Max Hyper"
+                    }
+                    developer {
+                        id = "Harleyoc1"
+                        name = "Harley O'Connor"
+                        email = "Harleyoc1@gmail.com"
                     }
                 }
                 scm {
