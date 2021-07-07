@@ -168,6 +168,10 @@ java {
     withSourcesJar()
 }
 
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -205,6 +209,18 @@ publishing {
     repositories {
         maven {
             url "file:///${project.projectDir}/mcmodsrepo"
+        }
+        if (project.hasProperty("harleyOConnorMavenUsername") && project.hasProperty("harleyOConnorMavenPassword")) {
+            maven {
+                name = "HarleyOConnorMaven"
+                url = uri("https://harleyoconnor.com/maven")
+                credentials {
+                    username = property("harleyOConnorMavenUsername")
+                    password = property("harleyOConnorMavenPassword")
+                }
+            }
+        } else {
+            project.logger.log(LogLevel.WARN, "Credentials for maven not detected; it will be disabled.")
         }
     }
 }
