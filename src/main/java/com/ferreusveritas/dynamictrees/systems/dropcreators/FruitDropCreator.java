@@ -1,14 +1,12 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * A drop creator that drops fruit just like Vanilla apples.
@@ -17,53 +15,46 @@ import java.util.Random;
  */
 public class FruitDropCreator extends DropCreator {
 
-	public static final FruitDropCreator instance = new FruitDropCreator();
-	public ItemStack fruit = new ItemStack(Items.APPLE);
-	protected final float rarity;
+	public static final ConfigurationProperty<ItemStack> FRUIT = ConfigurationProperty.property("fruit", ItemStack.class);
 
-	public FruitDropCreator() {
-		this(1.0f);
-	}
-
-	public FruitDropCreator(float rarity) {
-		super(new ResourceLocation(DynamicTrees.MOD_ID, "apple"));
-		this.rarity = rarity;
-	}
-
-	public FruitDropCreator setFruitItem (Item fruitItem){
-		this.fruit = new ItemStack(fruitItem);
-		return this;
-	}
-
-	protected float getLeavesRarity() {
-		return rarity;
+	public FruitDropCreator(ResourceLocation registryName) {
+		super(registryName);
 	}
 
 	@Override
-	protected void registerProperties() { }
+	protected void registerProperties() {
+		this.register(FRUIT, RARITY);
+	}
+
+	@Override
+	protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
+		return super.createDefaultConfiguration()
+				.with(FRUIT, new ItemStack(Items.APPLE))
+				.with(RARITY, 1f);
+	}
 
 	@Override
 	public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-		this.appendFruit(context.drops(), context.random(), context.fortune());
+		this.appendFruit(context.drops(), configuration, context);
 	}
 
 	@Override
 	public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-		this.appendFruit(context.drops(), context.random(), context.fortune());
+		this.appendFruit(context.drops(), configuration, context);
 	}
 
-	private void appendFruit(List<ItemStack> dropList, Random random, int fortune){
+	private void appendFruit(List<ItemStack> dropList, ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
 		// More fortune contrivances here.  Vanilla compatible returns.
 		int chance = 200; // 1 in 200 chance of returning an "apple"
-		if (fortune > 0) {
-			chance -= 10 << fortune;
+		if (context.fortune() > 0) {
+			chance -= 10 << context.fortune();
 			if (chance < 40) {
 				chance = 40;
 			}
 		}
 
-		if (random.nextInt((int) (chance / getLeavesRarity())) == 0) {
-			dropList.add(fruit);
+		if (context.random().nextInt((int) (chance / configuration.get(RARITY))) == 0) {
+			dropList.add(configuration.get(FRUIT));
 		}
 	}
 

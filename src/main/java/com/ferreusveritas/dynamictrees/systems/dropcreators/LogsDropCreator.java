@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
@@ -8,8 +7,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class LogsDropCreator extends DropCreator {
 
-	public LogsDropCreator() {
-		super(new ResourceLocation(DynamicTrees.MOD_ID, "logs"));
+	public LogsDropCreator(ResourceLocation registryName) {
+		super(registryName);
 	}
 
 	@Override

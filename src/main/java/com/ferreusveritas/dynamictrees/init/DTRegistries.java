@@ -25,10 +25,9 @@ import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.FruitDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
-import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -153,7 +152,7 @@ public class DTRegistries {
 		final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
 
 		if (appleOak.isValid()) {
-			appleOak.addDropCreator(new FruitDropCreator());
+			appleOak.addDropCreator(DropCreators.FRUIT);
 			APPLE_FRUIT.setSpecies(appleOak);
 		}
 

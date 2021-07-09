@@ -5,6 +5,7 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.ReportedException;
 
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * A configured version of a {@link Configurable}. This is used for holding
@@ -62,23 +63,28 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
      * {@link ConfigurationProperty}. This method expects that the feature will be set, so
      * call {@link #has(ConfigurationProperty)} first if it is optional.
      *
-     * @param genFeatureProperty The {@link ConfigurationProperty} to get.
+     * @param property The {@link ConfigurationProperty} to get.
      * @param <V> The type of the property's value.
      * @return The property's value.
      * @throws ReportedException If the property did not exist. If a property is optional.
      *                           {@link #has(ConfigurationProperty)} should be checked before
      *                           calling this.
      */
-    public <V> V get (ConfigurationProperty<V> genFeatureProperty) {
-        if (!this.has(genFeatureProperty)) {
+    public <V> V get (ConfigurationProperty<V> property) {
+        if (!this.has(property)) {
             final CrashReport crashReport = CrashReport.forThrowable(new IllegalStateException(), "Tried to obtain " +
-                    "gen feature property '" + genFeatureProperty.getIdentifier() + "' from '" + this.configurable + "' " +
+                    "gen feature property '" + property.getIdentifier() + "' from '" + this.configurable + "' " +
                     "that did not exist.");
             crashReport.addCategory("Getting property from a configured gen feature.");
             throw new ReportedException(crashReport);
         }
 
-        return genFeatureProperty.getType().cast(this.properties.get(genFeatureProperty).getValue());
+        return property.getType().cast(this.properties.get(property).getValue());
+    }
+
+    public <V> V getOrInvalidDefault(ConfigurationProperty<V> property, Predicate<V> validator, V invalidDefault) {
+        final V setProperty = this.get(property);
+        return validator.test(setProperty) ? setProperty : invalidDefault;
     }
 
     /**

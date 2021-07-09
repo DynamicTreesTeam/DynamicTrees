@@ -220,7 +220,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		this.family.addSpecies(this);
 		this.setLeavesProperties(leavesProperties.isValid() ? leavesProperties : family.getCommonLeaves());
 
-		this.addDropCreator(new LogsDropCreator());
+		this.addDropCreator(DropCreators.LOGS);
 	}
 
 	/**
@@ -667,7 +667,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	public Species setupStandardStickDropping (float rarity) {
-		this.addDropCreator(new SticksDropCreator(this, rarity, 2));
+		this.addDropCreator(DropCreators.STICKS);
 		return this;
 	}
 
@@ -692,13 +692,13 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	public List<ItemStack> getHarvestDrops(final World world, BlockPos leafPos, List<ItemStack> drops, Random random) {
 		this.dropCreators.forEach(dropCreator -> dropCreator.getConfigurable()
-				.appendDrops(dropCreator, DropCreator.DropType.HARVEST, new DropContext(world, leafPos, this, drops)));
+				.appendHarvestDrops(dropCreator, new DropContext(world, leafPos, this, drops)));
 		return drops;
 	}
 
 	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, List<ItemStack> drops, int fertility) {
 		this.dropCreators.forEach(dropCreator -> dropCreator.getConfigurable()
-				.appendDrops(dropCreator, DropCreator.DropType.HARVEST, new DropContext(world, rootPos, this, drops)));
+				.appendVoluntaryDrops(dropCreator, new DropContext(world, rootPos, this, drops)));
 		return drops;
 	}
 
@@ -714,8 +714,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public List<ItemStack> getTreeHarvestDrops(World world, BlockPos leafPos, List<ItemStack> dropList, Random random) {
 		final DropContext dropContext = new DropContext(world, leafPos, this, dropList);
- 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(null, DropCreator.DropType.HARVEST, dropContext);
-		return this.dropCreatorStorage.appendDrops(null, DropCreator.DropType.HARVEST, dropContext);
+ 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendHarvestDrops(null, dropContext);
+		this.dropCreatorStorage.appendHarvestDrops(null, dropContext);
+		return dropContext.drops();
 	}
 
 	/**
@@ -729,8 +730,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, int fertility) {
 		final DropContext dropContext = new DropContext(world, rootPos, this, new ArrayList<>(), fertility, 0);
-		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(null, DropCreator.DropType.VOLUNTARY, dropContext);
-		return this.dropCreatorStorage.appendDrops(null, DropCreator.DropType.VOLUNTARY, dropContext);
+		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendVoluntaryDrops(null, dropContext);
+		this.dropCreatorStorage.appendLeavesDrops(null, dropContext);
+		return dropContext.drops();
 	}
 
 	/**
@@ -745,8 +747,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public List<ItemStack> getLeavesDrops(@Nullable World world, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
 		final DropContext dropContext = new DropContext(world, breakPos, this, dropList, -1, fortune);
-		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(null, DropCreator.DropType.LEAVES, dropContext);
-		return dropCreatorStorage.appendDrops(null, DropCreator.DropType.LEAVES, dropContext);
+		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendLeavesDrops(null, dropContext);
+		dropCreatorStorage.appendLeavesDrops(null, dropContext);
+		return dropContext.drops();
 	}
 
 
@@ -762,8 +765,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, NetVolumeNode.Volume volume, ItemStack handStack) {
 		final LogDropContext dropContext = new LogDropContext(world, breakPos, this, dropList, volume);
-		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(null, DropCreator.DropType.LOGS, dropContext);
-		return dropCreatorStorage.appendDrops(null, DropCreator.DropType.LOGS, dropContext);
+		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendLogDrops(null, dropContext);
+		dropCreatorStorage.appendLogDrops(null, dropContext);
+		return dropContext.drops();
 	}
 
 	public static class LogsAndSticks {

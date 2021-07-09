@@ -51,7 +51,7 @@ public final class NormalDrops implements Drops {
     }
 
     @Override
-    public List<ItemStack> appendDrops(List<ItemStack> drops, Random random, int fortune) {
+    public void appendDrops(List<ItemStack> drops, Random random, int fortune) {
         final int chance = this.getChance(fortune, this.baseChance);
 
         this.items.forEach(stack -> {
@@ -59,7 +59,6 @@ public final class NormalDrops implements Drops {
                 drops.add(stack.copy());
             }
         });
-        return drops;
     }
 
 }

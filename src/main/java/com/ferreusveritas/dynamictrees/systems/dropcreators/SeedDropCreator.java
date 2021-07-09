@@ -11,7 +11,6 @@ import net.minecraftforge.common.MinecraftForge;
 
 public class SeedDropCreator extends DropCreator {
 
-	public static final ConfigurationProperty<Float> RARITY = ConfigurationProperty.floatProperty("rarity");
 	public static final ConfigurationProperty<Float> HARVEST_RARITY = ConfigurationProperty.floatProperty("harvest_rarity");
 	public static final ConfigurationProperty<Float> VOLUNTARY_RARITY = ConfigurationProperty.floatProperty("voluntary_rarity");
 	public static final ConfigurationProperty<Float> LEAVES_RARITY = ConfigurationProperty.floatProperty("leaves_rarity");

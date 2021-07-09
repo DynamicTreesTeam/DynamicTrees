@@ -22,6 +22,8 @@ import java.util.List;
  */
 public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator, ConfiguredDropCreator<DropCreator>> implements IResettable<DropCreator> {
 
+	public static final ConfigurationProperty<Float> RARITY = ConfigurationProperty.floatProperty("rarity");
+
 	public static final class DropType<C extends DropContext> extends RegistryEntry<DropType<C>> {
 		public static final DropType<DropContext> NULL = new DropType<>(DTTrees.NULL);
 
@@ -68,13 +70,13 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 		return context.drops();
 	}
 
-	protected void appendHarvestDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) { }
+	public void appendHarvestDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) { }
 
-	protected void appendVoluntaryDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) { }
+	public void appendVoluntaryDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) { }
 
-	protected void appendLeavesDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) { }
+	public void appendLeavesDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) { }
 
-	protected void appendLogDrops(final ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) { }
+	public void appendLogDrops(final ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) { }
 
 	@Override
 	public boolean isPropertyRegistered(ConfigurationProperty<?> property) {

@@ -1,13 +1,9 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-
-import java.util.List;
-import java.util.Random;
 
 /**
  * A drop creator for the sticks that can be harvested from leaves.
@@ -16,47 +12,49 @@ import java.util.Random;
  * @author Max Hyper
  */
 public class SticksDropCreator extends DropCreator {
-	ItemStack droppedItem;
-	float rarity;
-	int maxCount;
 
-	public SticksDropCreator(Species species) {
-		this(species, 1, 2);
-	}
+	public static final ConfigurationProperty<ItemStack> STICKS = ConfigurationProperty.property("sticks", ItemStack.class);
+	public static final ConfigurationProperty<Integer> MAX_COUNT = ConfigurationProperty.integer("max_count");
 
-	public SticksDropCreator(Species species, float rarity, int maxCount) {
-		super(new ResourceLocation(DynamicTrees.MOD_ID, "sticks"));
-		this.droppedItem = species.getFamily().getStick(1);
-		this.rarity = rarity;
-		this.maxCount = Math.max(1, maxCount);
+	public SticksDropCreator(ResourceLocation registryName) {
+		super(registryName);
 	}
 
 	@Override
 	protected void registerProperties() {
+		this.register(STICKS, RARITY, MAX_COUNT);
+	}
 
+	@Override
+	protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
+		return super.createDefaultConfiguration()
+				.with(STICKS, ItemStack.EMPTY)
+				.with(RARITY, 1f)
+				.with(MAX_COUNT, 2);
 	}
 
 	@Override
 	public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-		this.appendSticks(context.drops(), context.random(), context.fortune());
+		this.appendSticks(configuration, context);
 	}
 
 	@Override
 	public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-		this.appendSticks(context.drops(), context.random(), 0);
+		this.appendSticks(configuration, context);
 	}
 
-	private void appendSticks(List<ItemStack> dropList, Random random, int fortune){
+	private void appendSticks(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
 		int chance = 50;
-		if (fortune > 0) {
-			chance -= 2 << fortune;
+		if (context.fortune() > 0) {
+			chance -= 2 << context.fortune();
 			if (chance < 10)
 				chance = 10;
 		}
-		if (random.nextInt((int) (chance / rarity)) == 0) {
-			ItemStack drop = droppedItem.copy();
-			drop.setCount(1 + random.nextInt(maxCount));
-			dropList.add(drop);
+		if (context.random().nextInt((int) (chance / configuration.get(RARITY))) == 0) {
+			final ItemStack drop = configuration.getOrInvalidDefault(STICKS, stick -> stick != ItemStack.EMPTY,
+					context.species().getSeedStack(1)).copy();
+			drop.setCount(1 + context.random().nextInt(configuration.get(MAX_COUNT)));
+			context.drops().add(drop);
 		}
 	}
 

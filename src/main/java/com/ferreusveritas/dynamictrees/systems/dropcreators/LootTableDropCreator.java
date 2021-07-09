@@ -40,8 +40,8 @@ public final class LootTableDropCreator extends DropCreator {
     }
 
     @Override
-    protected void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration,
-                                      DropContext context) {
+    public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration,
+                                   DropContext context) {
         context.drops().addAll(configuration.get(HARVEST_TABLE).getRandomItems(new LootContext.Builder((ServerWorld) context.world())
                 .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
                 .withParameter(DTLootParameters.SPECIES, context.species())
@@ -51,7 +51,7 @@ public final class LootTableDropCreator extends DropCreator {
     }
 
     @Override
-    protected void appendVoluntaryDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendVoluntaryDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
         context.drops().addAll(configuration.get(VOLUNTARY_TABLE).getRandomItems(new LootContext.Builder((ServerWorld) context.world())
                 .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
                 .withParameter(DTLootParameters.SPECIES, context.species())
@@ -60,7 +60,7 @@ public final class LootTableDropCreator extends DropCreator {
     }
 
     @Override
-    protected void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
         context.drops().addAll(configuration.get(LEAVES_TABLE).getRandomItems(new LootContext.Builder(((ServerWorld) context.world()))
                 .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
                 .withParameter(DTLootParameters.SPECIES, context.species())
@@ -69,7 +69,7 @@ public final class LootTableDropCreator extends DropCreator {
     }
 
     @Override
-    protected void appendLogDrops(ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) {
+    public void appendLogDrops(ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) {
         context.drops().addAll(configuration.get(LOGS_TABLE).getRandomItems(new LootContext.Builder((ServerWorld) context.world())
                 .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
                 .withParameter(DTLootParameters.SPECIES, context.species())
