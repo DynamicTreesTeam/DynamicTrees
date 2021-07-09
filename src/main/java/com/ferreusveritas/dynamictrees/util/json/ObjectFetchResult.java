@@ -6,7 +6,6 @@ import org.apache.logging.log4j.util.StackLocatorUtil;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;

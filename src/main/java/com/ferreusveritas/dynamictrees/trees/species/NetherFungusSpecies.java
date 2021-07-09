@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -22,12 +23,10 @@ import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Harley O'Connor
@@ -47,18 +46,17 @@ public class NetherFungusSpecies extends Species {
             }
 
             @Override
-            public List<ItemStack> getHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
+            public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
                 int chance = 10;
-                if (fortune > 0) {
-                    chance -= 2 << fortune;
+                if (context.fortune() > 0) {
+                    chance -= 2 << context.fortune();
                     if (chance < 10)
                         chance = 5;
                 }
-                if(random.nextInt(chance) == 0) {
-                    ItemStack drop = species.getLeavesProperties().getPrimitiveLeavesItemStack().copy();
-                    drops.add(drop);
+                if (context.random().nextInt(chance) == 0) {
+                    ItemStack drop = context.species().getLeavesProperties().getPrimitiveLeavesItemStack().copy();
+                    context.drops().add(drop);
                 }
-                return drops;
             }
         });
     }

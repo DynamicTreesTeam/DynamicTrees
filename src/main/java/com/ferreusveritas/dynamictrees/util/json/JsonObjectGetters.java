@@ -27,12 +27,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootSerializers;
 import net.minecraft.loot.LootTable;
@@ -157,6 +159,9 @@ public final class JsonObjectGetters {
     public static IJsonObjectGetter<Block> BLOCK;
     public static IJsonObjectGetter<Item> ITEM;
     public static IJsonObjectGetter<Biome> BIOME;
+
+    // TODO: Read json object for quantity and NBT.
+    public static IJsonObjectGetter<ItemStack> ITEM_STACK = register(ItemStack.class, jsonElement -> ITEM.get(jsonElement).map(ItemStack::new));
 
     public static final IJsonObjectGetter<AxisAlignedBB> AXIS_ALIGNED_BB = register(AxisAlignedBB.class, new AxisAlignedBBGetter());
     public static final IJsonObjectGetter<VoxelShape> VOXEL_SHAPE = register(VoxelShape.class, new VoxelShapeGetter());

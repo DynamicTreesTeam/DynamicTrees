@@ -1,13 +1,11 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.Random;
@@ -45,18 +43,18 @@ public class FruitDropCreator extends DropCreator {
 	protected void registerProperties() { }
 
 	@Override
-	public List<ItemStack> getHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
-		return getFruit(drops, random, fortune);
+	public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+		this.appendFruit(context.drops(), context.random(), context.fortune());
 	}
 
 	@Override
-	public List<ItemStack> getLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
-		return getFruit(drops, random, fortune);
+	public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+		this.appendFruit(context.drops(), context.random(), context.fortune());
 	}
 
-	private List<ItemStack> getFruit (List<ItemStack> dropList, Random random, int fortune){
-		//More fortune contrivances here.  Vanilla compatible returns.
-		int chance = 200; //1 in 200 chance of returning an "apple"
+	private void appendFruit(List<ItemStack> dropList, Random random, int fortune){
+		// More fortune contrivances here.  Vanilla compatible returns.
+		int chance = 200; // 1 in 200 chance of returning an "apple"
 		if (fortune > 0) {
 			chance -= 10 << fortune;
 			if (chance < 40) {
@@ -64,10 +62,9 @@ public class FruitDropCreator extends DropCreator {
 			}
 		}
 
-		if(random.nextInt((int) (chance / getLeavesRarity())) == 0) {
+		if (random.nextInt((int) (chance / getLeavesRarity())) == 0) {
 			dropList.add(fruit);
 		}
-		return dropList;
 	}
 
 }

@@ -639,12 +639,12 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * Typically called in the constructor
 	 */
 	public Species setupStandardSeedDropping() {
-		addDropCreator(new SeedDropCreator());
+		this.addDropCreator(DropCreators.SEED.getDefaultConfiguration());
 		return this;
 	}
 
 	public Species setupStandardSeedDropping(float rarity) {
-		addDropCreator(new SeedDropCreator(rarity));
+		this.addDropCreator(DropCreators.SEED.with(SeedDropCreator.RARITY, rarity));
 		return this;
 	}
 
@@ -653,12 +653,12 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * for a custom seed item.
 	 */
 	public Species setupCustomSeedDropping(ItemStack customSeed) {
-		addDropCreator(new SeedDropCreator().setCustomSeedDrop(customSeed));
+		this.addDropCreator(DropCreators.SEED.with(SeedDropCreator.SEED, customSeed));
 		return this;
 	}
 
 	public Species setupCustomSeedDropping(ItemStack customSeed, float rarity) {
-		addDropCreator(new SeedDropCreator(rarity).setCustomSeedDrop(customSeed));
+		this.addDropCreator(DropCreators.SEED.with(SeedDropCreator.SEED, customSeed).with(SeedDropCreator.RARITY, rarity));
 		return this;
 	}
 

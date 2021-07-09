@@ -1,11 +1,10 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.Random;
@@ -38,28 +37,27 @@ public class SticksDropCreator extends DropCreator {
 	}
 
 	@Override
-	public List<ItemStack> getLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
-		return getSticks(drops, random, fortune);
+	public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+		this.appendSticks(context.drops(), context.random(), context.fortune());
 	}
 
 	@Override
-	public List<ItemStack> getHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int fertility, int fortune) {
-		return getSticks(dropList, random, 0);
+	public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+		this.appendSticks(context.drops(), context.random(), 0);
 	}
 
-	private List<ItemStack> getSticks (List<ItemStack> dropList, Random random, int fortune){
+	private void appendSticks(List<ItemStack> dropList, Random random, int fortune){
 		int chance = 50;
 		if (fortune > 0) {
 			chance -= 2 << fortune;
 			if (chance < 10)
 				chance = 10;
 		}
-		if(random.nextInt((int) (chance / rarity)) == 0) {
+		if (random.nextInt((int) (chance / rarity)) == 0) {
 			ItemStack drop = droppedItem.copy();
 			drop.setCount(1 + random.nextInt(maxCount));
 			dropList.add(drop);
 		}
-		return dropList;
 	}
 
 }

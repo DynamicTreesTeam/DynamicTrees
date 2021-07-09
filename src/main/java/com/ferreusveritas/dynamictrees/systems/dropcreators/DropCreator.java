@@ -8,16 +8,11 @@ import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * This exists solely to aid in the creation of a cleaner anonymous class.
@@ -62,32 +57,24 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 
 	public <C extends DropContext> List<ItemStack> appendDrops(final ConfiguredDropCreator<DropCreator> configuration, final DropType<C> dropType, final C context) {
 		if (dropType == DropType.HARVEST)
-			this.getHarvestDrops(configuration, context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fertility(), context.fortune());
+			this.appendHarvestDrops(configuration, context);
 		else if (dropType == DropType.VOLUNTARY)
-			this.getVoluntaryDrops(configuration, context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fertility());
+			this.appendVoluntaryDrops(configuration, context);
 		else if (dropType == DropType.LEAVES)
-			this.getLeavesDrops(configuration, context.world(), context.species(), context.pos(), context.random(), context.drops(), context.fortune());
+			this.appendLeavesDrops(configuration, context);
 		else if (dropType == DropType.LOGS)
-			this.getLogsDrops(configuration, context.world(), context.species(), context.pos(), context.random(), context.drops(), ((LogDropContext) context).volume());
+			this.appendLogDrops(configuration, (LogDropContext) context);
 
 		return context.drops();
 	}
 
-	protected List<ItemStack> getHarvestDrops(final ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
-		return drops;
-	}
+	protected void appendHarvestDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) { }
 
-	protected List<ItemStack> getVoluntaryDrops(final ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos rootPos, Random random, List<ItemStack> drops, int fertility) {
-		return drops;
-	}
+	protected void appendVoluntaryDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) { }
 
-	protected List<ItemStack> getLeavesDrops(final ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
-		return drops;
-	}
+	protected void appendLeavesDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) { }
 
-	protected List<ItemStack> getLogsDrops(final ConfiguredDropCreator<DropCreator> configuration, World world, Species species, BlockPos breakPos, Random random, List<ItemStack> drops, NetVolumeNode.Volume volume) {
-		return drops;
-	}
+	protected void appendLogDrops(final ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) { }
 
 	@Override
 	public boolean isPropertyRegistered(ConfigurationProperty<?> property) {

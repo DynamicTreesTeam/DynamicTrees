@@ -3,19 +3,13 @@ package com.ferreusveritas.dynamictrees.systems.dropcreators;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.data.DTLootParameterSets;
 import com.ferreusveritas.dynamictrees.data.DTLootParameters;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
-import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.item.ItemStack;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
 import net.minecraft.loot.LootTable;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-
-import java.util.List;
-import java.util.Random;
 
 /**
  * @author Harley O'Connor
@@ -46,48 +40,41 @@ public final class LootTableDropCreator extends DropCreator {
     }
 
     @Override
-    protected List<ItemStack> getHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species,
-                                              BlockPos leafPos, Random random, List<ItemStack> drops, int fertility, int fortune) {
-        drops.addAll(configuration.get(HARVEST_TABLE).getRandomItems(new LootContext.Builder((ServerWorld) world)
-                .withParameter(LootParameters.BLOCK_STATE, world.getBlockState(leafPos))
-                .withParameter(DTLootParameters.SPECIES, species)
-                .withParameter(DTLootParameters.FERTILITY, fertility)
-                .withParameter(DTLootParameters.FORTUNE, fortune)
+    protected void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration,
+                                      DropContext context) {
+        context.drops().addAll(configuration.get(HARVEST_TABLE).getRandomItems(new LootContext.Builder((ServerWorld) context.world())
+                .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
+                .withParameter(DTLootParameters.SPECIES, context.species())
+                .withParameter(DTLootParameters.FERTILITY, context.fertility())
+                .withParameter(DTLootParameters.FORTUNE, context.fortune())
                 .create(DTLootParameterSets.HARVEST)));
-        return drops;
     }
 
     @Override
-    protected List<ItemStack> getVoluntaryDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species,
-                                                BlockPos rootPos, Random random, List<ItemStack> drops, int fertility) {
-        drops.addAll(configuration.get(VOLUNTARY_TABLE).getRandomItems(new LootContext.Builder((ServerWorld) world)
-                .withParameter(LootParameters.BLOCK_STATE, world.getBlockState(rootPos))
-                .withParameter(DTLootParameters.SPECIES, species)
-                .withParameter(DTLootParameters.FERTILITY, fertility)
+    protected void appendVoluntaryDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+        context.drops().addAll(configuration.get(VOLUNTARY_TABLE).getRandomItems(new LootContext.Builder((ServerWorld) context.world())
+                .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
+                .withParameter(DTLootParameters.SPECIES, context.species())
+                .withParameter(DTLootParameters.FERTILITY, context.fertility())
                 .create(DTLootParameterSets.VOLUNTARY)));
-        return drops;
     }
 
     @Override
-    protected List<ItemStack> getLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species,
-                                             BlockPos breakPos, Random random, List<ItemStack> drops, int fortune) {
-        drops.addAll(configuration.get(LEAVES_TABLE).getRandomItems(new LootContext.Builder(((ServerWorld) world))
-                .withParameter(LootParameters.BLOCK_STATE, world.getBlockState(breakPos))
-                .withParameter(DTLootParameters.SPECIES, species)
-                .withParameter(DTLootParameters.FORTUNE, fortune)
+    protected void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+        context.drops().addAll(configuration.get(LEAVES_TABLE).getRandomItems(new LootContext.Builder(((ServerWorld) context.world()))
+                .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
+                .withParameter(DTLootParameters.SPECIES, context.species())
+                .withParameter(DTLootParameters.FORTUNE, context.fortune())
                 .create(DTLootParameterSets.LEAVES)));
-        return drops;
     }
 
     @Override
-    protected List<ItemStack> getLogsDrops(ConfiguredDropCreator<DropCreator> configuration, World world, Species species,
-                                           BlockPos breakPos, Random random, List<ItemStack> drops, NetVolumeNode.Volume volume) {
-        drops.addAll(configuration.get(LOGS_TABLE).getRandomItems(new LootContext.Builder((ServerWorld) world)
-                .withParameter(LootParameters.BLOCK_STATE, world.getBlockState(breakPos))
-                .withParameter(DTLootParameters.SPECIES, species)
-                .withParameter(DTLootParameters.LOGS_AND_STICKS, species.getLogsAndSticks(volume))
+    protected void appendLogDrops(ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) {
+        context.drops().addAll(configuration.get(LOGS_TABLE).getRandomItems(new LootContext.Builder((ServerWorld) context.world())
+                .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
+                .withParameter(DTLootParameters.SPECIES, context.species())
+                .withParameter(DTLootParameters.LOGS_AND_STICKS, context.species().getLogsAndSticks(context.volume()))
                 .create(DTLootParameterSets.LOGS)));
-        return drops;
     }
 
 }
