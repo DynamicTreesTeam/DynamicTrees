@@ -18,6 +18,7 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.BlockParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
@@ -265,6 +266,11 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
 	}
 	public boolean isFullBlockShell (int radius){
 		return (radius - 8) % 16 == 0;
+	}
+
+	@Override
+	public boolean isPathfindable(BlockState state, IBlockReader world, BlockPos pos, PathType pathType) {
+		return false;
 	}
 
 	///////////////////////////////////////////
