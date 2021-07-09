@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.util.BiomePredicate;
 import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
 import net.minecraft.util.ResourceLocation;
 
@@ -32,6 +33,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
     public static final ConfigurationProperty<Integer> MAX_COUNT = ConfigurationProperty.integer("max_count");
     public static final ConfigurationProperty<Integer> FRUITING_RADIUS = ConfigurationProperty.integer("fruiting_radius");
     public static final ConfigurationProperty<Float> PLACE_CHANCE = ConfigurationProperty.floatProperty("place_chance");
+    public static final ConfigurationProperty<BiomePredicate> BIOME_PREDICATE = ConfigurationProperty.property("biome_predicate", BiomePredicate.class);
 
     public static final GenFeature NULL_GEN_FEATURE = new GenFeature(DTTrees.NULL) {
         @Override

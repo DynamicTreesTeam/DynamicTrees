@@ -80,11 +80,10 @@ public class SeedDropCreator extends DropCreator {
 			dropList.add(getSeedStack(species));
 			VoluntarySeedDropEvent seedDropEvent = new VoluntarySeedDropEvent(world, rootPos, species, dropList);
 			MinecraftForge.EVENT_BUS.post(seedDropEvent);
-			if(seedDropEvent.isCanceled()) {
+			if (seedDropEvent.isCanceled()) {
 				dropList.clear();
 			}
 		}
-
 		return dropList;
 	}
 

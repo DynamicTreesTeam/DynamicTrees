@@ -18,6 +18,7 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.*;
+import net.minecraft.world.gen.Heightmap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -302,18 +303,25 @@ public final class CoordUtils {
 	 * @param startPos The starting position
 	 * @return The position of the top solid block
 	 */
-	public static BlockPos findGround(IWorld world, BlockPos startPos) {
-		BlockPos.Mutable pos = new BlockPos.Mutable(startPos.getX(), startPos.getY(), startPos.getZ());
-		
-		//Rise up until we are no longer in a solid block
-		while(world.getBlockState(pos).canOcclude()) {
-			pos.set(pos.getX(), pos.getY() + 1, pos.getZ());
-		}
-		//Dive down until we are again
-		while(!world.getBlockState(pos).canOcclude() && pos.getY() > 50) {
-			pos.set(pos.getX(), pos.getY() - 1, pos.getZ());
-		}
-		return pos;
+	public static BlockPos findWorldSurface(IWorld world, BlockPos startPos, boolean worldGen) {
+		return new BlockPos(
+				startPos.getX(),
+				world.getHeight(worldGen ? Heightmap.Type.WORLD_SURFACE_WG : Heightmap.Type.WORLD_SURFACE,
+						startPos.getX(), startPos.getZ()) - 1,
+				startPos.getZ()
+		);
+
+//		BlockPos.Mutable pos = new BlockPos.Mutable(startPos.getX(), startPos.getY(), startPos.getZ());
+//
+//		//Rise up until we are no longer in a solid block
+//		while(world.getBlockState(pos).canOcclude()) {
+//			pos.set(pos.getX(), pos.getY() + 1, pos.getZ());
+//		}
+//		//Dive down until we are again
+//		while(!world.getBlockState(pos).canOcclude() && pos.getY() > 50) {
+//			pos.set(pos.getX(), pos.getY() - 1, pos.getZ());
+//		}
+//		return pos;
 	}
 
 	//Some ready made not terrible prime hash factors

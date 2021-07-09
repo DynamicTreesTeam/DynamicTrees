@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
+import java.awt.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,7 +39,7 @@ public final class CreateStaffCommand extends SubCommand {
     private static final String READ_ONLY = "readOnly";
     private static final String MAX_USES = "maxUses";
 
-    private static final String DEFAULT_COLOUR = "00FFFF";
+    private static final int DEFAULT_COLOUR = 0x00FFFF;
     private static final boolean DEFAULT_READ_ONLY = false;
     private static final int DEFAULT_MAX_USES = 64;
 
@@ -52,21 +53,18 @@ public final class CreateStaffCommand extends SubCommand {
                                 .executes(context -> this.spawnStaff(context.getSource(), blockPosArgument(context), speciesArgument(context),
                                         stringArgument(context, JO_CODE), DEFAULT_COLOUR, DEFAULT_READ_ONLY, DEFAULT_MAX_USES))
                                 .then(Commands.argument(COLOR, HexColorArgument.hex()).executes(context -> this.spawnStaff(context.getSource(), blockPosArgument(context),
-                                        speciesArgument(context), stringArgument(context, JO_CODE), HexColorArgument.getHexString(context, COLOR), DEFAULT_READ_ONLY,
+                                        speciesArgument(context), stringArgument(context, JO_CODE), HexColorArgument.getHexCode(context, COLOR), DEFAULT_READ_ONLY,
                                         DEFAULT_MAX_USES))
                                         .then(Commands.argument(READ_ONLY, BoolArgumentType.bool()).executes(context -> this.spawnStaff(context.getSource(), blockPosArgument(context),
-                                                speciesArgument(context), stringArgument(context, JO_CODE), HexColorArgument.getHexString(context, COLOR),
+                                                speciesArgument(context), stringArgument(context, JO_CODE), HexColorArgument.getHexCode(context, COLOR),
                                                 BoolArgumentType.getBool(context, READ_ONLY), DEFAULT_MAX_USES))
                                                 .then(intArgument(MAX_USES).suggests(((context, builder) -> ISuggestionProvider.suggest(Stream.of(1, 3, 32, 64, 128).map(String::valueOf).collect(Collectors.toList()), builder)))
                                                         .executes(context -> this.spawnStaff(context.getSource(), blockPosArgument(context), speciesArgument(context),
-                                                                stringArgument(context, JO_CODE), HexColorArgument.getHexString(context, COLOR), BoolArgumentType.getBool(context, READ_ONLY),
+                                                                stringArgument(context, JO_CODE), HexColorArgument.getHexCode(context, COLOR), BoolArgumentType.getBool(context, READ_ONLY),
                                                                 intArgument(context, MAX_USES))))))));
     }
 
-    private int spawnStaff(final CommandSource source, final BlockPos pos, final Species species, final String code, String colour, final boolean readOnly, final int maxUses) {
-        if (!colour.startsWith("#"))
-            colour = "#" + colour;
-
+    private int spawnStaff(final CommandSource source, final BlockPos pos, final Species species, final String code, final int colour, final boolean readOnly, final int maxUses) {
         final Staff staff = DTRegistries.STAFF;
 
         final ItemStack wandStack = new ItemStack(staff, 1);
@@ -81,7 +79,7 @@ public final class CreateStaffCommand extends SubCommand {
         ItemUtils.spawnItemStack(source.getLevel(), pos, wandStack, true);
 
         sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.create_staff", species.getTextComponent(),
-                new JoCode(code).getTextComponent(), aqua(colour), aqua(readOnly), aqua(maxUses), CommandHelper.posComponent(pos, TextFormatting.AQUA)));
+                new JoCode(code).getTextComponent(), aqua(String.format("#%08X", colour)), aqua(readOnly), aqua(maxUses), CommandHelper.posComponent(pos, TextFormatting.AQUA)));
 
         return 1;
     }

@@ -69,7 +69,7 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature implements I
 				
 				BlockPos mushPos = rootPos.offset(xOff, 0, zOff);
 				
-				mushPos = CoordUtils.findGround(world, new BlockPos(mushPos)).above();
+				mushPos = CoordUtils.findWorldSurface(world, new BlockPos(mushPos), worldGen).above();
 				
 				if (safeBounds.inBounds(mushPos, true)) {
 					int maxHeight = lowest.getY() - mushPos.getY();

@@ -10,19 +10,19 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UniversalPoissonDiscProvider {
 
-	private final Map<ResourceLocation, IPoissonDiscProvider> providerMap = new HashMap<>();
+	private final Map<ResourceLocation, IPoissonDiscProvider> providerMap = new ConcurrentHashMap<>();
 
 	protected IPoissonDiscProvider createCircleProvider(ServerWorld world, IWorld iWorld) {
-		final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(TreeGenerator.getTreeGenerator(), world.dimension().location(), iWorld);
-		final PoissonDiscProvider candidate = new PoissonDiscProvider(radiusCoordinator);
-		candidate.setSeed(world.getSeed());
-		final PoissonDiscProviderCreateEvent poissonDiscProviderCreateEvent = new PoissonDiscProviderCreateEvent(world, candidate);
+		final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(TreeGenerator.getTreeGenerator(),
+				world.dimension().location(), iWorld);
+		final PoissonDiscProviderCreateEvent poissonDiscProviderCreateEvent = new PoissonDiscProviderCreateEvent(world,
+				new PoissonDiscProvider(radiusCoordinator).setSeed(world.getSeed()));
 		MinecraftForge.EVENT_BUS.post(poissonDiscProviderCreateEvent);
 		return poissonDiscProviderCreateEvent.getPoissonDiscProvider();
 	}

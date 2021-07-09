@@ -211,7 +211,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * @param worldIn The {@link IBlockReader} instance.
 	 * @param pos The {@link BlockPos} of the {@link BranchBlock}.
 	 * @param type The {@link PathType} to check.
-	 * @return {@code false} to prevent mobs from getting stuck in ranches.
+	 * @return {@code false} to prevent mobs from getting stuck in branches.
 	 */
 	@Override
 	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {

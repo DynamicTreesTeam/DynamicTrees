@@ -52,9 +52,6 @@ public class JoCode {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	/** Ensures second chance regen doesn't recurse too far. */
-	public static boolean secondChanceRegen = false;
-	
 	private static final String BASE_64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	protected static final byte FORK_CODE = 6;
 	protected static final byte RETURN_CODE = 7;
@@ -156,14 +153,14 @@ public class JoCode {
 	
 	/**
 	 * Generate a tree from this {@link JoCode} instruction list.
-	 *
-	 * @param world The {@link World} instance.
+	 *  @param world The {@link World} instance.
 	 * @param rootPosIn The position of what will become the {@link com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock}.
 	 * @param biome The {@link Biome} at {@code rootPosIn}.
 	 * @param facing The {@link Direction} of the tree.
 	 * @param radius The radius constraint.
+	 * @param secondChanceRegen Ensures second chance regen doesn't recurse too far.
 	 */
-	public void generate(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds) {
+	public void generate(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
 		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
 		// A Tree generation boundary radius is at least 2 and at most 8.
@@ -206,7 +203,7 @@ public class JoCode {
 		firstBranch.analyse(treeState, world, treePos, Direction.DOWN, signal);
 
 		if (signal.foundRoot || signal.overflow) { // Something went terribly wrong.
-			this.tryGenerateAgain(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds, worldGen, treePos, treeState, endFinder);
+			this.tryGenerateAgain(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds, worldGen, treePos, treeState, endFinder, secondChanceRegen);
 			return;
 		}
 
@@ -252,7 +249,7 @@ public class JoCode {
 		this.addSnow(leafMap, world, rootPos, biome);
 	}
 
-	private void tryGenerateAgain(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder) {
+	private void tryGenerateAgain(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder, boolean secondChanceRegen) {
 		// Don't log the error if it didn't happen during world gen (so we don't fill the logs if players spam the staff in cramped positions).
 		if (worldGen) {
 			if (!secondChanceRegen){
@@ -271,10 +268,8 @@ public class JoCode {
 
 		// Now that everything is clear we may as well regenerate the tree that screwed everything up.
 		if (!secondChanceRegen) {
-			secondChanceRegen = true;
-			this.generate(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds);
+			this.generate(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds, true);
 		}
-		secondChanceRegen = false;
 	}
 
 	/** Attempt to clean up fused trees that have multiple root blocks by simply destroying them both messily */

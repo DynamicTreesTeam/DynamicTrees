@@ -83,6 +83,7 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
@@ -1908,18 +1909,27 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return true if tree was generated. false otherwise.
 	 */
 	public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-		for (ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
-			final GenFeature genFeature = configuredGenFeature.getGenFeature();
-			if (genFeature instanceof IFullGenFeature) {
-				return ((IFullGenFeature) genFeature).generate(configuredGenFeature, world, rootPos, this, biome, random, radius, safeBounds);
-			}
+		final AtomicBoolean fullGen = new AtomicBoolean(false);
+		final AtomicBoolean fullGenReturn = new AtomicBoolean(false);
+
+		this.genFeatures.stream()
+				.filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IFullGenFeature)
+				.findFirst()
+				.ifPresent(configuredGenFeature -> {
+					fullGen.set(true);
+					fullGenReturn.set(((IFullGenFeature) configuredGenFeature.getGenFeature())
+							.generate(configuredGenFeature, world, rootPos, this, biome, random, radius, safeBounds));
+				});
+
+		if (fullGen.get()) {
+			return fullGenReturn.get();
 		}
 
 		final Direction facing = CoordUtils.getRandomDir(random);
 		if (!DTResourceRegistries.JO_CODE_MANAGER.getCodes(this).isEmpty()) {
 			final JoCode code = DTResourceRegistries.JO_CODE_MANAGER.getRandomCode(this, radius, random);
 			if (code != null) {
-				code.generate(worldObj, world,this, rootPos, biome, facing, radius, safeBounds);
+				code.generate(worldObj, world,this, rootPos, biome, facing, radius, safeBounds, false);
 				return true;
 			}
 		}
