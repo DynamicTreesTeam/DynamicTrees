@@ -18,6 +18,7 @@ import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.DirtHelper;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
@@ -33,9 +34,7 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
-import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.LogsDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SticksDropCreator;
@@ -1032,7 +1031,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	public boolean placeRootyDirtBlock(IWorld world, BlockPos rootPos, int fertility) {
 		Block dirt = world.getBlockState(rootPos).getBlock();
 
-		if (!RootyBlockHelper.isBlockRegistered(dirt) && !(dirt instanceof RootyBlock)) {
+		if (!DirtHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock)) {
 			LogManager.getLogger().warn("Rooty Dirt block NOT FOUND for soil "+ dirt.getRegistryName()); //default to dirt and print error
 			this.placeRootyDirtBlock(world, rootPos, Blocks.DIRT, fertility);
 			return false;
@@ -1040,7 +1039,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 		if (dirt instanceof RootyBlock) {
 			this.placeRootyDirtBlock(world, rootPos, (RootyBlock) dirt, fertility);
-		} else if (RootyBlockHelper.isBlockRegistered(dirt)) {
+		} else if (DirtHelper.isSoilRegistered(dirt)) {
 			this.placeRootyDirtBlock(world, rootPos, dirt, fertility);
 		}
 
@@ -1054,7 +1053,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, Block primitiveDirt, int fertility) {
-		this.placeRootyDirtBlock(world, rootPos, RootyBlockHelper.getRootyBlock(primitiveDirt), fertility);
+		RootyBlock rootyBlock = DirtHelper.getProperties(primitiveDirt).getDynamicSoilBlock();
+		if (rootyBlock != null)
+			this.placeRootyDirtBlock(world, rootPos, rootyBlock, fertility);
 	}
 
 	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, RootyBlock rootyBlock, int fertility) {

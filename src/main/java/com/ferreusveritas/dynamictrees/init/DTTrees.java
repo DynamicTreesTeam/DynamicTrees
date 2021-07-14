@@ -9,6 +9,10 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.PalmLeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.SolidLeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.DirtHelper;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableRootyBlock;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
@@ -23,6 +27,7 @@ import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedList;
 import net.minecraft.world.gen.blockstateprovider.WeightedBlockStateProvider;
@@ -57,6 +62,35 @@ public class DTTrees {
 	}
 
 	@SubscribeEvent
+	public static void registerSoilProperties (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<SoilProperties> event) {
+		event.getRegistry().registerAll(
+				DirtHelper.registerSoil(DynamicTrees.resLoc("grass_block"),Blocks.GRASS_BLOCK, DirtHelper.DIRT_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("mycelium"),Blocks.MYCELIUM, DirtHelper.DIRT_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("dirt"),Blocks.DIRT, DirtHelper.DIRT_LIKE, new SpreadableRootyBlock(Blocks.DIRT, 9, Blocks.GRASS_BLOCK, Blocks.MYCELIUM)),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("coarse_dirt"),Blocks.COARSE_DIRT, DirtHelper.DIRT_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("podzol"),Blocks.PODZOL, DirtHelper.DIRT_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("farmland"),Blocks.FARMLAND, DirtHelper.DIRT_LIKE, Blocks.DIRT),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("sand"),Blocks.SAND, DirtHelper.SAND_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("red_sand"),Blocks.RED_SAND, DirtHelper.SAND_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("gravel"),Blocks.GRAVEL, DirtHelper.GRAVEL_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("water"),Blocks.WATER, DirtHelper.WATER_LIKE, new RootyWaterBlock(Blocks.WATER)),
+				DirtHelper.registerSoil(null,Blocks.MYCELIUM, DirtHelper.FUNGUS_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("crimson_nylium"),Blocks.CRIMSON_NYLIUM, DirtHelper.FUNGUS_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("warped_nylium"),Blocks.WARPED_NYLIUM, DirtHelper.FUNGUS_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("netherrack"),Blocks.NETHERRACK, DirtHelper.NETHER_LIKE, new SpreadableRootyBlock(Blocks.NETHERRACK, Items.BONE_MEAL, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM)),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("soul_sand"),Blocks.SOUL_SAND, DirtHelper.NETHER_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("soul_soil"),Blocks.SOUL_SOIL, DirtHelper.NETHER_LIKE),
+				DirtHelper.registerSoil(null,Blocks.CRIMSON_NYLIUM, DirtHelper.NETHER_LIKE),
+				DirtHelper.registerSoil(null,Blocks.WARPED_NYLIUM, DirtHelper.NETHER_LIKE),
+				DirtHelper.registerSoil(null,Blocks.SOUL_SOIL, DirtHelper.NETHER_SOIL_LIKE),
+				DirtHelper.registerSoil(null,Blocks.CRIMSON_NYLIUM, DirtHelper.NETHER_SOIL_LIKE),
+				DirtHelper.registerSoil(null,Blocks.WARPED_NYLIUM, DirtHelper.NETHER_SOIL_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("end_stone"),Blocks.END_STONE, DirtHelper.END_LIKE),
+				DirtHelper.registerSoil(DynamicTrees.resLoc("terracotta"),Blocks.TERRACOTTA, DirtHelper.TERRACOTTA_LIKE)
+		);
+	}
+
+	@SubscribeEvent
 	public static void registerLeavesPropertiesTypes (final TypeRegistryEvent<LeavesProperties> event) {
 		event.registerType(DynamicTrees.resLoc("solid"), SolidLeavesProperties.TYPE);
 		event.registerType(DynamicTrees.resLoc("wart"), WartProperties.TYPE);
@@ -73,6 +107,11 @@ public class DTTrees {
 		event.registerType(DynamicTrees.resLoc("nether_fungus"), NetherFungusSpecies.TYPE);
 		event.registerType(DynamicTrees.resLoc("swamp_oak"), SwampOakSpecies.TYPE);
 		event.registerType(DynamicTrees.resLoc("palm"), PalmSpecies.TYPE);
+	}
+
+	@SubscribeEvent
+	public static void registerSoilPropertiesTypes (final TypeRegistryEvent<SoilProperties> event) {
+
 	}
 
 	@SubscribeEvent

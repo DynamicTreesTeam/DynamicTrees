@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPropertiesManager;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilPropertiesManager;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.data.DTRecipes;
 import com.ferreusveritas.dynamictrees.trees.FamilyManager;
@@ -53,9 +54,11 @@ public final class DTResourceRegistries {
     public static final SpeciesManager SPECIES_MANAGER = new SpeciesManager();
     public static final JoCodeManager JO_CODE_MANAGER = new JoCodeManager();
     public static final BiomeDatabaseManager BIOME_DATABASE_MANAGER = new BiomeDatabaseManager();
+    public static final SoilPropertiesManager SOIL_PROPERTIES_MANAGER = new SoilPropertiesManager();
+
 
     public static void setupTreesResourceManager () {
-        TREES_RESOURCE_MANAGER.addReloadListeners(LEAVES_PROPERTIES_MANAGER, FAMILY_MANAGER, SPECIES_MANAGER, JO_CODE_MANAGER, BIOME_DATABASE_MANAGER);
+        TREES_RESOURCE_MANAGER.addReloadListeners(LEAVES_PROPERTIES_MANAGER, FAMILY_MANAGER, SPECIES_MANAGER, JO_CODE_MANAGER, BIOME_DATABASE_MANAGER, SOIL_PROPERTIES_MANAGER);
 
         // Create and fire event so add-ons can register load listeners for custom tree resources.
         final AddTreesLoadListenerEvent addLoadListenerEvent = new AddTreesLoadListenerEvent(TREES_RESOURCE_MANAGER);

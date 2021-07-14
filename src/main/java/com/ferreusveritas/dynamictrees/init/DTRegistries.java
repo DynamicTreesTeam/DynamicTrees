@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyWaterBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableRootyBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
@@ -23,12 +24,10 @@ import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
-import com.ferreusveritas.dynamictrees.systems.DirtHelper;
-import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.FruitDropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
-import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.DirtHelper;
 import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -56,7 +55,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.LinkedList;
+import java.util.Objects;
 
 @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
@@ -91,7 +90,6 @@ public class DTRegistries {
 	
 	public static void setup() {
 		setupBlocks();
-		setUpSoils();
 		setupConnectables();
 		setupItems();
 	}
@@ -101,32 +99,6 @@ public class DTRegistries {
 		RegistryHandler.addBlock(DynamicTrees.resLoc("cocoa"), COCOA_FRUIT);
 		RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, POTTED_SAPLING);
 		RegistryHandler.addBlock(DynamicTrees.resLoc("trunk_shell"), TRUNK_SHELL);
-	}
-
-	private static void setUpSoils() {
-		DirtHelper.registerSoil(Blocks.GRASS_BLOCK, DirtHelper.DIRT_LIKE);
-		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.DIRT_LIKE);
-		DirtHelper.registerSoil(Blocks.DIRT, DirtHelper.DIRT_LIKE, new SpreadableRootyBlock(Blocks.DIRT, 9, Blocks.GRASS_BLOCK, Blocks.MYCELIUM));
-		DirtHelper.registerSoil(Blocks.COARSE_DIRT, DirtHelper.DIRT_LIKE);
-		DirtHelper.registerSoil(Blocks.PODZOL, DirtHelper.DIRT_LIKE);
-		DirtHelper.registerSoil(Blocks.FARMLAND, DirtHelper.DIRT_LIKE, Blocks.DIRT);
-		DirtHelper.registerSoil(Blocks.SAND, DirtHelper.SAND_LIKE);
-		DirtHelper.registerSoil(Blocks.RED_SAND, DirtHelper.SAND_LIKE);
-		DirtHelper.registerSoil(Blocks.GRAVEL, DirtHelper.GRAVEL_LIKE);
-		DirtHelper.registerSoil(Blocks.WATER, DirtHelper.WATER_LIKE, new RootyWaterBlock(Blocks.WATER));
-		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.FUNGUS_LIKE);
-		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.FUNGUS_LIKE);
-		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.FUNGUS_LIKE);
-		DirtHelper.registerSoil(Blocks.NETHERRACK, DirtHelper.NETHER_LIKE, new SpreadableRootyBlock(Blocks.NETHERRACK, Items.BONE_MEAL, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM));
-		DirtHelper.registerSoil(Blocks.SOUL_SAND, DirtHelper.NETHER_LIKE);
-		DirtHelper.registerSoil(Blocks.SOUL_SOIL, DirtHelper.NETHER_LIKE);
-		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHER_LIKE);
-		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHER_LIKE);
-		DirtHelper.registerSoil(Blocks.SOUL_SOIL, DirtHelper.NETHER_SOIL_LIKE);
-		DirtHelper.registerSoil(Blocks.CRIMSON_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
-		DirtHelper.registerSoil(Blocks.WARPED_NYLIUM, DirtHelper.NETHER_SOIL_LIKE);
-		DirtHelper.registerSoil(Blocks.END_STONE, DirtHelper.END_LIKE);
-		DirtHelper.registerSoil(Blocks.TERRACOTTA, DirtHelper.TERRACOTTA_LIKE);
 	}
 
 	private static void setupConnectables() {
@@ -156,9 +128,6 @@ public class DTRegistries {
 			appleOak.addDropCreator(new FruitDropCreator());
 			APPLE_FRUIT.setSpecies(appleOak);
 		}
-
-		for (RootyBlock rooty : RootyBlockHelper.generateListForRegistry(false, DynamicTrees.MOD_ID))
-			event.getRegistry().register(rooty);
 	}
 	
 	///////////////////////////////////////////
@@ -214,8 +183,8 @@ public class DTRegistries {
 	public static TileEntityType<PottedSaplingTileEntity> bonsaiTE;
 	
 	public static void setupTileEntities() {
-		LinkedList<RootyBlock> rootyDirts = RootyBlockHelper.generateListForRegistry(false);
-		speciesTE = TileEntityType.Builder.of(SpeciesTileEntity::new, rootyDirts.toArray(new RootyBlock[0])).build(null);
+		RootyBlock[] rootyBlocks = SoilProperties.REGISTRY.getAll().stream().map(SoilProperties::getDynamicSoilBlock).filter(Objects::nonNull).distinct().toArray(RootyBlock[]::new);
+		speciesTE = TileEntityType.Builder.of(SpeciesTileEntity::new, rootyBlocks).build(null);
 		bonsaiTE = TileEntityType.Builder.of(PottedSaplingTileEntity::new, POTTED_SAPLING).build(null);
 	}
 	

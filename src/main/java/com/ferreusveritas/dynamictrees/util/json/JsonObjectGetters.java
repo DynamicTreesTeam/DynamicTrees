@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
@@ -164,6 +165,7 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<Family> FAMILY = register(Family.class, new RegistryEntryGetter<>(Family.REGISTRY));
     public static final IJsonObjectGetter<Species> SPECIES = register(Species.class, new RegistryEntryGetter<>(Species.REGISTRY));
     public static final IJsonObjectGetter<FeatureCanceller> FEATURE_CANCELLER = register(FeatureCanceller.class, new RegistryEntryGetter<>(FeatureCanceller.REGISTRY));
+    public static final IJsonObjectGetter<SoilProperties> SOIL_PROPERTIES = register(SoilProperties.class, new RegistryEntryGetter<>(SoilProperties.REGISTRY));
 
     public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGenFeatureGetter());
 

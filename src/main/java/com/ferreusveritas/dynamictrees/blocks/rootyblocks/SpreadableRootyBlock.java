@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.init.DTClient;
-import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,7 +22,7 @@ import java.util.*;
  */
 public class SpreadableRootyBlock extends RootyBlock {
 
-    private Map<Block, RootyBlock> rootyBlocks;
+    private Map<Block, SoilProperties> rootyBlocks;
     private Integer requiredLight;
     private Item spreadItem;
     //A non-null required light will allow the blocks to spread on their own.
@@ -47,13 +46,13 @@ public class SpreadableRootyBlock extends RootyBlock {
     }
 
     public void addSpreadableBlock(Block primitiveDirt) {
-        if (RootyBlockHelper.isBlockRegistered(primitiveDirt))
-            addSpreadableBlock(primitiveDirt, RootyBlockHelper.getRootyBlock(primitiveDirt));
+        if (DirtHelper.isSoilRegistered(primitiveDirt))
+            addSpreadableBlock(primitiveDirt, DirtHelper.getProperties(primitiveDirt));
         else
             System.err.println("Spreadable rooty dirt for "+primitiveDirt+" could not find rooty dirt for "+primitiveDirt+"! Make sure it is registered BEFORE adding it to this spreadable dirt.");
     }
-    public void addSpreadableBlock(Block primitiveDirt, RootyBlock rootyBlock) {
-        rootyBlocks.put(primitiveDirt, rootyBlock);
+    public void addSpreadableBlock(Block primitiveDirt, SoilProperties soilProperties) {
+        rootyBlocks.put(primitiveDirt, soilProperties);
     }
 
     @Override
@@ -72,7 +71,9 @@ public class SpreadableRootyBlock extends RootyBlock {
                 if (foundBlocks.size() > 0){
                     if (!worldIn.isClientSide()){
                         int blockInt = worldIn.random.nextInt(foundBlocks.size());
-                        worldIn.setBlock(pos, rootyBlocks.get(foundBlocks.get(blockInt)).defaultBlockState(), 3);
+                        RootyBlock rootyBlock = rootyBlocks.get(foundBlocks.get(blockInt)).getDynamicSoilBlock();
+                        if (rootyBlock != null)
+                            worldIn.setBlock(pos, rootyBlock.defaultBlockState(), 3);
                     }
                     if (!player.abilities.instabuild) {
                         handStack.shrink(1);
@@ -103,10 +104,11 @@ public class SpreadableRootyBlock extends RootyBlock {
                     BlockState thatStateUp = world.getBlockState(thatPos.above());
                     BlockState thatState = world.getBlockState(thatPos);
 
-                    for (Map.Entry<Block, RootyBlock> entry : rootyBlocks.entrySet()){
-                        if ((thatState.getBlock() == entry.getKey() || thatState.getBlock() == entry.getValue()) && world.getMaxLocalRawBrightness(pos.above()) >= requiredLight && thatStateUp.getLightBlock(world, thatPos.above()) <= 2) {
+                    for (Map.Entry<Block, SoilProperties> entry : rootyBlocks.entrySet()){
+                        RootyBlock block = entry.getValue().getDynamicSoilBlock();
+                        if (block != null && (thatState.getBlock() == entry.getKey() || thatState.getBlock() == block) && world.getMaxLocalRawBrightness(pos.above()) >= requiredLight && thatStateUp.getLightBlock(world, thatPos.above()) <= 2) {
                             if (state.hasProperty(FERTILITY))
-                                world.setBlockAndUpdate(pos, entry.getValue().defaultBlockState().setValue(FERTILITY, state.getValue(FERTILITY)));
+                                world.setBlockAndUpdate(pos, block.defaultBlockState().setValue(FERTILITY, state.getValue(FERTILITY)));
                             return;
                         }
                     }
