@@ -5,10 +5,10 @@ import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
@@ -112,7 +112,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (species, acceptableSoil) -> {
-                    if (DirtHelper.getSoilFlags(acceptableSoil) == 0)
+                    if (SoilHelper.getSoilFlags(acceptableSoil) == 0)
                         return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
 
                     species.addAcceptableSoils(acceptableSoil);

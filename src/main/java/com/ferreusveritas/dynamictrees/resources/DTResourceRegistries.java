@@ -50,15 +50,15 @@ public final class DTResourceRegistries {
     public static final TreesResourceManager TREES_RESOURCE_MANAGER = new TreesResourceManager();
 
     public static final LeavesPropertiesManager LEAVES_PROPERTIES_MANAGER = new LeavesPropertiesManager();
+    public static final SoilPropertiesManager SOIL_PROPERTIES_MANAGER = new SoilPropertiesManager();
     public static final FamilyManager FAMILY_MANAGER = new FamilyManager();
     public static final SpeciesManager SPECIES_MANAGER = new SpeciesManager();
     public static final JoCodeManager JO_CODE_MANAGER = new JoCodeManager();
     public static final BiomeDatabaseManager BIOME_DATABASE_MANAGER = new BiomeDatabaseManager();
-    public static final SoilPropertiesManager SOIL_PROPERTIES_MANAGER = new SoilPropertiesManager();
 
 
     public static void setupTreesResourceManager () {
-        TREES_RESOURCE_MANAGER.addReloadListeners(LEAVES_PROPERTIES_MANAGER, FAMILY_MANAGER, SPECIES_MANAGER, JO_CODE_MANAGER, BIOME_DATABASE_MANAGER, SOIL_PROPERTIES_MANAGER);
+        TREES_RESOURCE_MANAGER.addReloadListeners(LEAVES_PROPERTIES_MANAGER, SOIL_PROPERTIES_MANAGER, FAMILY_MANAGER, SPECIES_MANAGER, JO_CODE_MANAGER, BIOME_DATABASE_MANAGER);
 
         // Create and fire event so add-ons can register load listeners for custom tree resources.
         final AddTreesLoadListenerEvent addLoadListenerEvent = new AddTreesLoadListenerEvent(TREES_RESOURCE_MANAGER);

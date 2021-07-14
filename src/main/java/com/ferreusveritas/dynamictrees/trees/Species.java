@@ -18,7 +18,7 @@ import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.DirtHelper;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
@@ -1031,7 +1031,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	public boolean placeRootyDirtBlock(IWorld world, BlockPos rootPos, int fertility) {
 		Block dirt = world.getBlockState(rootPos).getBlock();
 
-		if (!DirtHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock)) {
+		if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock)) {
 			LogManager.getLogger().warn("Rooty Dirt block NOT FOUND for soil "+ dirt.getRegistryName()); //default to dirt and print error
 			this.placeRootyDirtBlock(world, rootPos, Blocks.DIRT, fertility);
 			return false;
@@ -1039,7 +1039,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 		if (dirt instanceof RootyBlock) {
 			this.placeRootyDirtBlock(world, rootPos, (RootyBlock) dirt, fertility);
-		} else if (DirtHelper.isSoilRegistered(dirt)) {
+		} else if (SoilHelper.isSoilRegistered(dirt)) {
 			this.placeRootyDirtBlock(world, rootPos, dirt, fertility);
 		}
 
@@ -1053,7 +1053,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, Block primitiveDirt, int fertility) {
-		RootyBlock rootyBlock = DirtHelper.getProperties(primitiveDirt).getDynamicSoilBlock();
+		RootyBlock rootyBlock = SoilHelper.getProperties(primitiveDirt).getDynamicSoilBlock();
 		if (rootyBlock != null)
 			this.placeRootyDirtBlock(world, rootPos, rootyBlock, fertility);
 	}
@@ -1084,7 +1084,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	public Species addAcceptableSoils(String ... soilTypes) {
-		soilTypeFlags |= DirtHelper.getSoilFlags(soilTypes);
+		soilTypeFlags |= SoilHelper.getSoilFlags(soilTypes);
 		return this;
 	}
 
@@ -1105,7 +1105,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * later time.
 	 */
 	protected void setStandardSoils() {
-		addAcceptableSoils(DirtHelper.DIRT_LIKE);
+		addAcceptableSoils(SoilHelper.DIRT_LIKE);
 	}
 
 	public boolean hasAcceptableSoil () {
@@ -1121,7 +1121,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @return
 	 */
 	public boolean isAcceptableSoil(BlockState soilBlockState) {
-		return DirtHelper.isSoilAcceptable(soilBlockState.getBlock(), soilTypeFlags);
+		return SoilHelper.isSoilAcceptable(soilBlockState.getBlock(), soilTypeFlags);
 	}
 
 	/**
@@ -1160,7 +1160,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return isAcceptableSoil;
 	}
 	protected boolean isWater (BlockState soilBlockState){
-		return DirtHelper.isSoilAcceptable(soilBlockState.getBlock(), DirtHelper.getSoilFlags(DirtHelper.WATER_LIKE));
+		return SoilHelper.isSoilAcceptable(soilBlockState.getBlock(), SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE));
 	}
 	
 	
@@ -1470,7 +1470,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
 		for (final ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
-			final GenFeature genFeature = configuredGenFeature.getGenFeature();
+			final GenFeature genFeature = (GenFeature) configuredGenFeature.getGenFeature();
 
 			if (!(genFeature instanceof IPostGrowFeature))
 				continue;

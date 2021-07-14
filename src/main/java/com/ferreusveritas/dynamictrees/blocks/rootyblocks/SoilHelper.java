@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -10,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DirtHelper {
+public class SoilHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -54,54 +52,65 @@ public class DirtHelper {
         return adjectiveMap.getOrDefault(adjName, 0);
     }
 
-    public static SoilProperties registerSoil(SoilProperties properties, String adjName) {
+    public static void addSoilPropertiesToMap(SoilProperties properties){
         if (!dirtMap.containsKey(properties.getPrimitiveSoilBlock()))
             dirtMap.put(properties.getPrimitiveSoilBlock(), properties);
-        return registerSoil(properties.getRegistryName(), properties.getPrimitiveSoilBlock(), adjName);
     }
 
-    public static SoilProperties registerSoil(ResourceLocation name, Block block, String adjName, RootyBlock generatedRootyBlock) {
-        if (dirtMap.containsKey(block)){
-            LogManager.getLogger().warn("Attempted to register " + generatedRootyBlock + " as the rooty block of " + block + " but it already had " + dirtMap.get(block));
+    public static void registerSoil(SoilProperties properties, String adjName) {
+        addSoilPropertiesToMap(properties);
+        registerSoil(properties.getRegistryName(), properties.getPrimitiveSoilBlock(), adjName);
+    }
+
+    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, String adjName, RootyBlock generatedRootyBlock) {
+        if (dirtMap.containsKey(soilBlock)){
+            LogManager.getLogger().warn("Attempted to register " + generatedRootyBlock + " as the rooty block of " + soilBlock + " but it already had " + dirtMap.get(soilBlock));
             return SoilProperties.NULL_PROPERTIES;
         } else {
-            SoilProperties properties = new SoilProperties(block, name,0,false);
+            SoilProperties properties = new SoilProperties(soilBlock, name,0,false);
             properties.setDynamicSoilBlock(generatedRootyBlock);
-            dirtMap.put(block, properties);
-            return registerSoil(name, block, adjName);
+            dirtMap.put(soilBlock, properties);
+            return registerSoil(name, soilBlock, adjName);
         }
     }
 
     //Crude way of creating a substitute where two blocks will point to the same soil properties.
     //Avoid if possible.
-    public static void addSoilSubstitute(Block block, Block fakeSubstitute) {
-        if (!dirtMap.containsKey(fakeSubstitute)){
-            LOGGER.error("Attempted to use " + fakeSubstitute + " as a rooty block substitute for " + block + " but it had not been registered.");
+    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, Block substituteBlock) {
+        if (!dirtMap.containsKey(substituteBlock)){
+            LOGGER.error("Attempted to use " + substituteBlock + " as a rooty block substitute for " + soilBlock + " but it had not been registered.");
         }
-        dirtMap.put(block, dirtMap.get(fakeSubstitute));
+        SoilProperties substituteProperties = dirtMap.get(substituteBlock);
+        RootyBlock substituteSoilBlock = substituteProperties.getDynamicSoilBlock();
+        if (substituteSoilBlock == null)
+            return SoilProperties.NULL_PROPERTIES;
+        SoilProperties properties = new SoilProperties(soilBlock, name, substituteProperties.soilFlags, false);
+        properties.setDynamicSoilBlock(substituteSoilBlock);
+        dirtMap.put(soilBlock, properties);
+        return properties;
     }
 
-    public static void addSoilTag(Block block, String adjName) {
-        registerSoil(null, block, adjName);
+    public static void addSoilTag(Block primitiveBlock, String adjName) {
+        registerSoil(null, primitiveBlock, adjName);
     }
-    public static SoilProperties registerSoil(ResourceLocation name, Block block, String adjName) {
+    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, String adjName) {
         if(adjectiveMap.containsKey(adjName)) {
             int flag = adjectiveMap.get(adjName);
-            return registerSoil(name, block, flag);
+            return registerSoil(name, soilBlock, flag);
         } else {
-            LOGGER.error("Adjective \"" + adjName + "\" not found while registering soil block: " + block);
+            LOGGER.error("Adjective \"" + adjName + "\" not found while registering soil block: " + soilBlock);
             return SoilProperties.NULL_PROPERTIES;
         }
     }
 
-    public static SoilProperties registerSoil(ResourceLocation name, Block block, int adjFlag) {
-        return dirtMap.compute(block, (bl, prop) -> (prop == null) ? new SoilProperties(block, name, adjFlag, true) : prop.addSoilFlags(adjFlag));
+    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, int adjFlag) {
+        return dirtMap.compute(soilBlock, (bl, prop) -> (prop == null) ? new SoilProperties(soilBlock, name, adjFlag, true) : prop.addSoilFlags(adjFlag));
     }
 
-    public static boolean isSoilAcceptable(Block block, int soilFlags) {
-        if (block instanceof RootyBlock)
-            block = ((RootyBlock) block).getPrimitiveSoilBlock();
-        return (dirtMap.getOrDefault(block, SoilProperties.NULL_PROPERTIES).getSoilFlags() & soilFlags) != 0;
+    public static boolean isSoilAcceptable(Block soilBlock, int soilFlags) {
+        if (soilBlock instanceof RootyBlock)
+            soilBlock = ((RootyBlock) soilBlock).getPrimitiveSoilBlock();
+        return (dirtMap.getOrDefault(soilBlock, SoilProperties.NULL_PROPERTIES).getSoilFlags() & soilFlags) != 0;
     }
 
     public static boolean isSoilRegistered(Block block){

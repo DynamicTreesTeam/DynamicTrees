@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.DirtHelper;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
@@ -145,7 +145,7 @@ public class DTClient {
 		final BlockColors blockColors = Minecraft.getInstance().getBlockColors();
 		
 		// Register Rooty Colorizers
-		for (RootyBlock roots : DirtHelper.getRootyBlocksList()){
+		for (RootyBlock roots : SoilHelper.getRootyBlocksList()){
 			blockColors.register((state, world, pos, tintIndex) -> roots.colorMultiplier(blockColors, state, world, pos, tintIndex), roots);
 		}
 		

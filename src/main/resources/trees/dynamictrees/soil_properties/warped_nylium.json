@@ -1,0 +1,4 @@
+{
+  "primitive_soil": "warped_nylium",
+  "acceptable_soils": [ "fungus_like", "nether_like", "nether_soil_like" ]
+}

@@ -1,0 +1,4 @@
+{
+  "primitive_soil": "podzol",
+  "acceptable_soils": [ "dirt_like" ]
+}

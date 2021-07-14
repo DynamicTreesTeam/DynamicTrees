@@ -18,16 +18,16 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
 
     @Override
     public void registerAppliers() {
-        this.reloadAppliers.registerArrayApplier("acceptable_soils", String.class, (soilProperties, acceptableSoil) -> {
-            if (DirtHelper.getSoilFlags(acceptableSoil) == 0)
-                return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
+        this.loadReloadAppliers.registerArrayApplier("acceptable_soils", String.class, (soilProperties, acceptableSoil) -> {
+            if (SoilHelper.getSoilFlags(acceptableSoil) == 0)
+                SoilHelper.createNewAdjective(acceptableSoil);
 
-            DirtHelper.registerSoil(soilProperties, acceptableSoil);
+            SoilHelper.registerSoil(soilProperties, acceptableSoil);
             return PropertyApplierResult.success();
         });
+ //       .register("properties", JsonObject.class, SoilProperties::setRootyBlockProperties);
 
-        // Primitive soil blocks are needed both client and server (so cannot be done on setup).
-        this.setupAppliers.register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
+        this.loadAppliers.register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
 
         super.registerAppliers();
     }
@@ -39,18 +39,16 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
                 ResourceLocationGetter.create(soilProperties.getRegistryName().getNamespace()).get(jsonElement)
                         .ifSuccessful(soilProperties::setBlockRegistryName)
         );
-
-        // dont generate block if the there is a substitute.
-        if (!jsonObject.has("substitute_soil"))
-            soilProperties.generateDynamicSoil();
-
     }
 
     @Override
     protected void postLoad(JsonObject jsonObject, SoilProperties soilProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
         //set the substitute soil if one exists and is valid
+        // dont generate block if the there is a substitute.
         SoilProperties substitute = JsonHelper.getOrDefault(jsonObject, "substitute_soil", SoilProperties.class, SoilProperties.NULL_PROPERTIES);
         if (substitute != SoilProperties.NULL_PROPERTIES)
             soilProperties.setDynamicSoilBlock(substitute.dynamicSoilBlock);
+        else
+            soilProperties.generateDynamicSoil();
     }
 }

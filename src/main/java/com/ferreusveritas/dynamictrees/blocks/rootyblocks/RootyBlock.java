@@ -79,19 +79,27 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		super(Properties.copy(primitiveDirt).randomTicks());
 		registerDefaultState(defaultBlockState().setValue(FERTILITY, 0).setValue(IS_VARIANT, false));
 	}
-	
+
 	///////////////////////////////////////////
-	// BLOCKSTATES
+	// SOIL PROPERTIES
 	///////////////////////////////////////////
 
 	public SoilProperties getSoilProperties(){
 		return this.properties;
 	}
 
+	public void setSoilProperties (SoilProperties properties){
+		this.properties = properties;
+	}
+
 	public Block getPrimitiveSoilBlock() {
 		return properties.getPrimitiveSoilBlock();
 	}
-	
+
+	///////////////////////////////////////////
+	// BLOCKSTATES
+	///////////////////////////////////////////
+
 	@Override
 	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FERTILITY).add(IS_VARIANT);
