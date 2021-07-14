@@ -41,11 +41,7 @@ public class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
         }
 
         public RootyWaterBlock (Block primitiveDirt){
-            this(primitiveDirt, Objects.requireNonNull(primitiveDirt.getRegistryName()));
-        }
-
-        public RootyWaterBlock (Block primitiveDirt, ResourceLocation name){
-            super(primitiveDirt, name);
+            super(primitiveDirt);
             registerDefaultState(defaultBlockState().setValue(WATERLOGGED, true));
         }
 

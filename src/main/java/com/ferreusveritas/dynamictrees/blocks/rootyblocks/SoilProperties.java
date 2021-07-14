@@ -45,10 +45,10 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
     //used for null soil properties
     protected SoilProperties() { }
     //used for Dirt Helper registrations only
-    protected SoilProperties (final Block primitiveBlock, ResourceLocation name, Integer soilFlags){
+    protected SoilProperties (final Block primitiveBlock, ResourceLocation name, Integer soilFlags, boolean generate){
         this(primitiveBlock, name);
         this.soilFlags = soilFlags;
-        REGISTRY.register(this);
+        if (generate) generateDynamicSoil();
     }
 
     public SoilProperties (final ResourceLocation registryName){
@@ -58,7 +58,6 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
         this.primitiveSoilBlock = primitiveBlock != null ? primitiveBlock : Blocks.AIR;
         this.setRegistryName(registryName);
         this.blockRegistryName = ResourceLocationUtils.prefix(registryName, this.getBlockRegistryNamePrefix());
-
     }
 
     public Block getPrimitiveSoilBlock(){

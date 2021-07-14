@@ -55,6 +55,8 @@ public class DirtHelper {
     }
 
     public static SoilProperties registerSoil(SoilProperties properties, String adjName) {
+        if (!dirtMap.containsKey(properties.getPrimitiveSoilBlock()))
+            dirtMap.put(properties.getPrimitiveSoilBlock(), properties);
         return registerSoil(properties.getRegistryName(), properties.getPrimitiveSoilBlock(), adjName);
     }
 
@@ -63,7 +65,7 @@ public class DirtHelper {
             LogManager.getLogger().warn("Attempted to register " + generatedRootyBlock + " as the rooty block of " + block + " but it already had " + dirtMap.get(block));
             return SoilProperties.NULL_PROPERTIES;
         } else {
-            SoilProperties properties = new SoilProperties(block, name,0);
+            SoilProperties properties = new SoilProperties(block, name,0,false);
             properties.setDynamicSoilBlock(generatedRootyBlock);
             dirtMap.put(block, properties);
             return registerSoil(name, block, adjName);
@@ -72,17 +74,16 @@ public class DirtHelper {
 
     //Crude way of creating a substitute where two blocks will point to the same soil properties.
     //Avoid if possible.
-    public static SoilProperties registerSoil(ResourceLocation name, Block block, String adjName, Block fakeSubstitute) {
-        SoilProperties properties;
+    public static void addSoilSubstitute(Block block, Block fakeSubstitute) {
         if (!dirtMap.containsKey(fakeSubstitute)){
             LOGGER.error("Attempted to use " + fakeSubstitute + " as a rooty block substitute for " + block + " but it had not been registered.");
-            registerSoil(name, fakeSubstitute, adjName);
         }
-        properties = dirtMap.get(fakeSubstitute);
-        dirtMap.put(block, properties);
-        return properties;
+        dirtMap.put(block, dirtMap.get(fakeSubstitute));
     }
 
+    public static void addSoilTag(Block block, String adjName) {
+        registerSoil(null, block, adjName);
+    }
     public static SoilProperties registerSoil(ResourceLocation name, Block block, String adjName) {
         if(adjectiveMap.containsKey(adjName)) {
             int flag = adjectiveMap.get(adjName);
@@ -94,7 +95,7 @@ public class DirtHelper {
     }
 
     public static SoilProperties registerSoil(ResourceLocation name, Block block, int adjFlag) {
-        return dirtMap.compute(block, (bl, prop) -> (prop == null) ? new SoilProperties(block, name, adjFlag) : prop.addSoilFlags(adjFlag));
+        return dirtMap.compute(block, (bl, prop) -> (prop == null) ? new SoilProperties(block, name, adjFlag, true) : prop.addSoilFlags(adjFlag));
     }
 
     public static boolean isSoilAcceptable(Block block, int soilFlags) {
