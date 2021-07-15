@@ -6,16 +6,8 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeaturePropertyValue;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
-import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.Block;
@@ -23,7 +15,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
-import java.util.Map;
 
 public class SoilProperties extends RegistryEntry<SoilProperties> implements IResettable<SoilProperties> {
 

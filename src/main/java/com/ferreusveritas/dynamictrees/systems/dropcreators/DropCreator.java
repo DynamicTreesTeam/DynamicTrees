@@ -78,9 +78,4 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 
 	public void appendLogDrops(final ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) { }
 
-	@Override
-	public boolean isPropertyRegistered(ConfigurationProperty<?> property) {
-		return false;
-	}
-
 }

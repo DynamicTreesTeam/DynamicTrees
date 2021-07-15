@@ -38,7 +38,7 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
     public <V> T with (ConfigurationProperty<V> genFeatureProperty, V value) {
         if (!this.configurable.isPropertyRegistered(genFeatureProperty)) {
             final CrashReport crashReport = CrashReport.forThrowable(new IllegalArgumentException(), "Tried to add " +
-                    "unregistered property with identifier' " + genFeatureProperty.getIdentifier() + "' and type '" +
+                    "unregistered property with identifier '" + genFeatureProperty.getIdentifier() + "' and type '" +
                     genFeatureProperty.getType() + "' configurable '" + this.configurable + "'.");
             crashReport.addCategory("Adding property to a gen feature.");
             throw new ReportedException(crashReport);

@@ -2,8 +2,6 @@ package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.init.DTClient;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeaturePropertyValue;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
