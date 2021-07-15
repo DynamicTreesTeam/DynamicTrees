@@ -2,16 +2,14 @@ package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.*;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.PalmLeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.SolidLeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.*;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Mushroom;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -23,6 +21,7 @@ import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedList;
 import net.minecraft.world.gen.blockstateprovider.WeightedBlockStateProvider;
@@ -31,8 +30,6 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +54,14 @@ public class DTTrees {
 	}
 
 	@SubscribeEvent
+	public static void registerSoilProperties (final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<SoilProperties> event) {
+		event.getRegistry().registerAll(
+				SoilHelper.registerSoil(DynamicTrees.resLoc("dirt"),Blocks.DIRT, SoilHelper.DIRT_LIKE, new SpreadableSoilProperties.SpreadableRootyBlock(Blocks.DIRT, 9, Blocks.GRASS_BLOCK, Blocks.MYCELIUM)),
+				SoilHelper.registerSoil(DynamicTrees.resLoc("netherrack"),Blocks.NETHERRACK, SoilHelper.NETHER_LIKE, new SpreadableSoilProperties.SpreadableRootyBlock(Blocks.NETHERRACK, Items.BONE_MEAL, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM))
+		);
+	}
+
+	@SubscribeEvent
 	public static void registerLeavesPropertiesTypes (final TypeRegistryEvent<LeavesProperties> event) {
 		event.registerType(DynamicTrees.resLoc("solid"), SolidLeavesProperties.TYPE);
 		event.registerType(DynamicTrees.resLoc("wart"), WartProperties.TYPE);
@@ -73,6 +78,12 @@ public class DTTrees {
 		event.registerType(DynamicTrees.resLoc("nether_fungus"), NetherFungusSpecies.TYPE);
 		event.registerType(DynamicTrees.resLoc("swamp_oak"), SwampOakSpecies.TYPE);
 		event.registerType(DynamicTrees.resLoc("palm"), PalmSpecies.TYPE);
+	}
+
+	@SubscribeEvent
+	public static void registerSoilPropertiesTypes (final TypeRegistryEvent<SoilProperties> event) {
+		event.registerType(DynamicTrees.resLoc("water"), WaterSoilProperties.TYPE);
+		event.registerType(DynamicTrees.resLoc("spreadable"), SpreadableSoilProperties.TYPE);
 	}
 
 	@SubscribeEvent

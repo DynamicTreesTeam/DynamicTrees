@@ -47,10 +47,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 /**
  * A version of Rooty Dirt block that holds on to a species with a TileEntity.
@@ -70,26 +67,39 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	
 	public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
 	public static final BooleanProperty IS_VARIANT = BooleanProperty.create("is_variant");
-	private final Block primitiveDirt;
-	
+
+	private SoilProperties properties = SoilProperties.NULL_PROPERTIES;
+
+	public RootyBlock(SoilProperties soilProperties) {
+		this(soilProperties.primitiveSoilBlock);
+		properties = soilProperties;
+	}
+
 	public RootyBlock(Block primitiveDirt) {
-		this(Properties.copy(primitiveDirt).randomTicks(), "rooty_"+ primitiveDirt.getRegistryName().getPath(), primitiveDirt); //ModLoadingContext.get().getActiveNamespace();
-	}
-	public RootyBlock (Properties properties, String name, Block primitiveDirt){
-		super(properties);
-		setRegistryName(new ResourceLocation(ModLoadingContext.get().getActiveNamespace(),name));
+		super(Properties.copy(primitiveDirt).randomTicks());
 		registerDefaultState(defaultBlockState().setValue(FERTILITY, 0).setValue(IS_VARIANT, false));
-		this.primitiveDirt = primitiveDirt;
 	}
-	
+
+	///////////////////////////////////////////
+	// SOIL PROPERTIES
+	///////////////////////////////////////////
+
+	public SoilProperties getSoilProperties(){
+		return this.properties;
+	}
+
+	public void setSoilProperties (SoilProperties properties){
+		this.properties = properties;
+	}
+
+	public Block getPrimitiveSoilBlock() {
+		return properties.getPrimitiveSoilBlock();
+	}
+
 	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
-	
-	public Block getPrimitiveDirt () {
-		return primitiveDirt;
-	}
-	
+
 	@Override
 	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FERTILITY).add(IS_VARIANT);
@@ -165,12 +175,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	 * @return
 	 */
 	public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
-		return this.primitiveDirt.defaultBlockState();
+		return getPrimitiveSoilBlock().defaultBlockState();
 	}
 
 	/**
 	 * Forces the {@link RootyBlock} to decay if it's there, turning it back to
-	 * its {@link #primitiveDirt}. Custom decay logic is also supported, see
+	 * its primitive soil block. Custom decay logic is also supported, see
 	 * {@link ICustomRootDecay} for details.
 	 *
 	 * @param world The {@link World} instance.
@@ -190,7 +200,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 			return;
 
 		final Biome biome = world.getBiome(rootPos);
-		final BlockState primitiveDirt = this.getPrimitiveDirt().defaultBlockState();
+		final BlockState primitiveDirt = this.getPrimitiveSoilBlock().defaultBlockState();
 
 		final BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
 		final BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnderMaterial();
@@ -207,17 +217,17 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	@Nonnull
 	@Override
 	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
-		return primitiveDirt.defaultBlockState().getDrops(builder);
+		return getPrimitiveSoilBlock().defaultBlockState().getDrops(builder);
 	}
 	
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return primitiveDirt.getPickBlock(primitiveDirt.defaultBlockState(), target, world, pos, player);
+		return getPrimitiveSoilBlock().getPickBlock(getPrimitiveSoilBlock().defaultBlockState(), target, world, pos, player);
 	}
 
 	@Override
 	public float getHardness(IBlockReader worldIn, BlockPos pos) {
-		return (float) (primitiveDirt.defaultBlockState().getDestroySpeed(worldIn, pos) * DTConfigs.ROOTY_BLOCK_HARDNESS_MULTIPLIER.get());
+		return (float) (getPrimitiveSoilBlock().defaultBlockState().getDestroySpeed(worldIn, pos) * DTConfigs.ROOTY_BLOCK_HARDNESS_MULTIPLIER.get());
 	}
 
 	@Override
@@ -412,7 +422,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	public int colorMultiplier (BlockColors blockColors, BlockState state, @Nullable IBlockDisplayReader world, @Nullable BlockPos pos, int tintIndex){
 		final int white = 0xFFFFFFFF;
 		switch(tintIndex) {
-			case 0: return blockColors.getColor(getPrimitiveDirt().defaultBlockState(), world, pos, tintIndex);
+			case 0: return blockColors.getColor(getPrimitiveSoilBlock().defaultBlockState(), world, pos, tintIndex);
 			case 1: return state.getBlock() instanceof RootyBlock ? rootColor(state, world, pos) : white;
 			default: return white;
 		}
