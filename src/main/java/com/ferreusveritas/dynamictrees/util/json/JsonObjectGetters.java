@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.ConfiguredSoilProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
@@ -180,8 +179,7 @@ public final class JsonObjectGetters {
 
     public static final IJsonObjectGetter<List<SoilProperties>> SOIL_PROPERTIES_LIST = register(ListGetter.getListClass(SoilProperties.class), new ListGetter<>(SOIL_PROPERTIES));
 
-    public static final IJsonObjectGetter<ConfiguredSoilProperties<SoilProperties>> CONFIGURED_SOIL_PROPERTIES = register(ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES_CLASS, new ConfiguredGetter<>("Soil Properties", SoilProperties.class));
-    public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGetter<>("Gen Feature", GenFeature.class));
+     public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGetter<>("Gen Feature", GenFeature.class));
     public static final IJsonObjectGetter<ConfiguredDropCreator<DropCreator>> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, new ConfiguredGetter<>("Drop Creator", DropCreator.class));
 
     public static final IJsonObjectGetter<Seed> SEED = register(Seed.class, jsonElement -> ITEM.get(jsonElement).mapIfValid(item -> item instanceof Seed, "Item '{value}' is not a seed.", item -> (Seed) item));

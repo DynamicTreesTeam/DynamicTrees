@@ -10,6 +10,9 @@ import net.minecraft.block.Block;
 
 import java.util.function.Consumer;
 
+/**
+ * @author Max Hyper
+ */
 public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilProperties> {
 
     public SoilPropertiesManager() {
@@ -28,16 +31,13 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
 
         this.loadAppliers.register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
 
-        this.loadReloadAppliers.register("properties", JsonObject.class,
-                (prop, jsonObj) -> SoilProperties.REGISTRY.runOnNextLock(()->prop.setProperties(jsonObj)));
-
         super.registerAppliers();
     }
 
     @Override
     protected void preLoad(JsonObject jsonObject, SoilProperties soilProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
         // the soil is added to the soil map
-
+        SoilHelper.addSoilPropertiesToMap(soilProperties);
 
         // If a custom block registry name was set, set and use it.
         JsonHelper.JsonObjectReader.of(jsonObject).ifContains("block_registry_name", jsonElement ->

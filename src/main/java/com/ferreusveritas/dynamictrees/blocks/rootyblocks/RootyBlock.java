@@ -66,12 +66,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
 	public static final BooleanProperty IS_VARIANT = BooleanProperty.create("is_variant");
 
-	private final Block primitiveSoil;
+	private final SoilProperties properties;
 	//private ConfiguredSoilProperties<SoilProperties> configuredProperties = ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES;
 
-	public RootyBlock(Block primitiveDirt) {
-		super(Properties.copy(primitiveDirt).randomTicks());
-		primitiveSoil = primitiveDirt;
+	public RootyBlock(SoilProperties properties) {
+		super(Properties.copy(properties.primitiveSoilBlock).randomTicks());
+		this.properties = properties;
 		registerDefaultState(defaultBlockState().setValue(FERTILITY, 0).setValue(IS_VARIANT, false));
 	}
 
@@ -79,16 +79,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	// SOIL PROPERTIES
 	///////////////////////////////////////////
 
-	protected ConfiguredSoilProperties<SoilProperties> getConfiguration (){
-		return SoilHelper.getConfiguredProperties(primitiveSoil);
-	}
-
 	public SoilProperties getSoilProperties(){
-		return getConfiguration().getConfigurable();
+		return properties;
 	}
 
 	public Block getPrimitiveSoilBlock() {
-		return primitiveSoil;
+		return properties.getPrimitiveSoilBlock();
 	}
 
 	///////////////////////////////////////////

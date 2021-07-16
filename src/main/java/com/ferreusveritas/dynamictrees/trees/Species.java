@@ -502,7 +502,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	public DynamicLeavesBlock getValidLeafBlock (int index) {
 		LeavesProperties properties = getValidLeavesProperties(index);
-		if (!properties.hasDynamicLeavesBlock()) return null;
+		if (!properties.getDynamicLeavesBlock().isPresent()) return null;
 		return (DynamicLeavesBlock) properties.getDynamicLeavesState().getBlock();
 	}
 
@@ -1077,7 +1077,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, Block primitiveDirt, int fertility) {
-		RootyBlock rootyBlock = SoilHelper.getConfiguredProperties(primitiveDirt).getConfigurable().getDynamicSoilBlock();
+		RootyBlock rootyBlock = SoilHelper.getProperties(primitiveDirt).getDynamicSoilBlock();
 		if (rootyBlock != null)
 			this.placeRootyDirtBlock(world, rootPos, rootyBlock, fertility);
 	}
@@ -1297,7 +1297,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
 		if (radius <= family.getPrimaryThickness()){
-			if (!getLeavesProperties().hasDynamicLeavesBlock())
+			if (!getLeavesProperties().getDynamicLeavesBlock().isPresent())
 				return false;
 
 			if (growLeaves) {

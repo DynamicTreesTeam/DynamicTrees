@@ -1,14 +1,19 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
-import com.ferreusveritas.dynamictrees.api.configurations.Configured;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * @author Max Hyper
+ */
 public class SoilHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -26,7 +31,7 @@ public class SoilHelper {
     public static final String FUNGUS_LIKE = "fungus_like";
 
     private static final Map<String, Integer> adjectiveMap;
-    private static final Map<Block, ConfiguredSoilProperties<SoilProperties>> dirtMap;
+    private static final Map<Block, SoilProperties> dirtMap;
 
     static {
         adjectiveMap = new HashMap<>();
@@ -53,14 +58,13 @@ public class SoilHelper {
         return adjectiveMap.getOrDefault(adjName, 0);
     }
 
-    public static void addSoilPropertiesToMap(ConfiguredSoilProperties<SoilProperties> configured){
-        if (!dirtMap.containsKey(configured.getConfigurable().getPrimitiveSoilBlock()))
-            dirtMap.put(configured.getConfigurable().getPrimitiveSoilBlock(), configured.getConfigurable().getDefaultConfiguration());
+    public static void addSoilPropertiesToMap(SoilProperties properties){
+        if (!dirtMap.containsKey(properties.getPrimitiveSoilBlock()))
+            dirtMap.put(properties.getPrimitiveSoilBlock(), properties);
     }
 
     public static void registerSoil(SoilProperties properties, String... adjNames) {
-        ConfiguredSoilProperties<SoilProperties> configured = new ConfiguredSoilProperties<>(properties);
-        addSoilPropertiesToMap(configured);
+        addSoilPropertiesToMap(properties);
         registerSoil(properties.getRegistryName(), properties.getPrimitiveSoilBlock(), adjNames);
     }
 //    public static ConfiguredSoilProperties<SoilProperties> registerSoil(ConfiguredSoilProperties<SoilProperties> configuredSoilProperties) {
@@ -93,39 +97,39 @@ public class SoilHelper {
 //    public static void addSoilTag(Block primitiveBlock, String adjName) {
 //        registerSoil(null, primitiveBlock, adjName);
 //    }
-    public static ConfiguredSoilProperties<SoilProperties> registerSoil(ResourceLocation name, Block soilBlock, String... adjNames) {
+    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, String... adjNames) {
         int flag = 0;
         for (String adjName : adjNames){
             if(adjectiveMap.containsKey(adjName)) {
                 flag |= adjectiveMap.get(adjName);
             } else {
                 LOGGER.error("Adjective \"" + adjName + "\" not found while registering soil block: " + soilBlock);
-                return ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES;
+                return SoilProperties.NULL_SOIL_PROPERTIES;
             }
         }
         return registerSoil(name, soilBlock, flag);
     }
 
-    public static ConfiguredSoilProperties<SoilProperties> registerSoil(ResourceLocation name, Block soilBlock, int adjFlag) {
-        return dirtMap.compute(soilBlock, (bl, prop) -> (prop == null) ? new ConfiguredSoilProperties<>(new SoilProperties(soilBlock, name, adjFlag, true)) : prop.addSoilFlags(adjFlag));
+    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, int adjFlag) {
+        return dirtMap.compute(soilBlock, (bl, prop) -> (prop == null) ? new SoilProperties(soilBlock, name, adjFlag, true) : prop.addSoilFlags(adjFlag));
     }
 
     public static boolean isSoilAcceptable(Block soilBlock, int soilFlags) {
         if (soilBlock instanceof RootyBlock)
             soilBlock = ((RootyBlock) soilBlock).getPrimitiveSoilBlock();
-        return (dirtMap.getOrDefault(soilBlock, ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES).getConfigurable().getSoilFlags() & soilFlags) != 0;
+        return (dirtMap.getOrDefault(soilBlock, SoilProperties.NULL_SOIL_PROPERTIES).getSoilFlags() & soilFlags) != 0;
     }
 
     public static boolean isSoilRegistered(Block block){
         return dirtMap.containsKey(block);
     }
 
-    public static ConfiguredSoilProperties<SoilProperties> getConfiguredProperties(Block block){
-        return dirtMap.getOrDefault(block, ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES);
+    public static SoilProperties getProperties(Block block){
+        return dirtMap.getOrDefault(block, SoilProperties.NULL_SOIL_PROPERTIES);
     }
 
     public static Set<RootyBlock> getRootyBlocksList (){
-        return dirtMap.values().stream().map(Configured::getConfigurable).map(SoilProperties::getDynamicSoilBlock).filter(Objects::nonNull).collect(Collectors.toSet());
+        return dirtMap.values().stream().map(SoilProperties::getDynamicSoilBlock).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     public static int getSoilFlags(String ... types) {

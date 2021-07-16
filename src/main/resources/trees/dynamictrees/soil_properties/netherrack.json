@@ -2,8 +2,7 @@
   "type": "spreadable",
   "primitive_soil": "netherrack",
   "acceptable_soils": [ "nether_like" ],
-  "properties": {
-    "spread_item": "bone_meal",
-    "spreadable_soils": [ "crimson_nylium", "warped_nylium" ]
-  }
+
+  "spread_item": "bone_meal",
+  "spreadable_soils": [ "crimson_nylium", "warped_nylium" ]
 }

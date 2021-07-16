@@ -28,6 +28,9 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
+/**
+ * @author Max Hyper
+ */
 public class WaterSoilProperties extends SoilProperties {
 
     public static final TypedRegistry.EntryType<SoilProperties> TYPE = TypedRegistry.newType(WaterSoilProperties::new);
@@ -38,7 +41,7 @@ public class WaterSoilProperties extends SoilProperties {
 
     @Override
     protected RootyBlock createDynamicSoil() {
-        return new RootyWaterBlock(getPrimitiveSoilBlock());
+        return new RootyWaterBlock(this);
     }
 
     public static class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
@@ -46,8 +49,8 @@ public class WaterSoilProperties extends SoilProperties {
         protected static final AxisAlignedBB WATER_ROOTS_AABB = new AxisAlignedBB(0.1, 0.0, 0.1, 0.9, 1.0, 0.9);
         public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-        public RootyWaterBlock (Block primitiveDirt){
-            super(primitiveDirt);
+        public RootyWaterBlock (SoilProperties properties){
+            super(properties);
             registerDefaultState(defaultBlockState().setValue(WATERLOGGED, true));
         }
 

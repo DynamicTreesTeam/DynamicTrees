@@ -28,51 +28,56 @@ public class SpreadableSoilProperties extends SoilProperties{
 
     public static final TypedRegistry.EntryType<SoilProperties> TYPE = TypedRegistry.newType(SpreadableSoilProperties::new);
 
-    public static final ConfigurationProperty<Integer> REQUIRED_LIGHT = ConfigurationProperty.integer("required_light");
-    public static final ConfigurationProperty<Item> SPREAD_ITEM = ConfigurationProperty.item("spread_item");
-    public static final ConfigurationProperty<List<SoilProperties>> SPREADABLE_SOILS = ConfigurationProperty.property("spreadable_soils", ListGetter.getListClass(SoilProperties.class));
+    private Integer required_light = null;
+    private Item spread_item = null;
+    private List<SoilProperties> spreadable_soils = new LinkedList<>();
 
+    public void setRequiredLight (Integer light){
+        this.required_light = light;
+    }
+    public void setSpreadItem (Item item){
+        this.spread_item = item;
+    }
+    public void setSpreadableSoils (List<SoilProperties> soils){
+        this.spreadable_soils = soils;
+    }
 
     public SpreadableSoilProperties (final ResourceLocation registryName){
         super(null, registryName);
     }
 
     @Override
-    protected void registerProperties() {
-        register(REQUIRED_LIGHT, SPREAD_ITEM, SPREADABLE_SOILS);
-    }
-
-    @Override
-    protected ConfiguredSoilProperties<SoilProperties> createDefaultConfiguration() {
-        return super.createDefaultConfiguration().with(REQUIRED_LIGHT, null).with(SPREAD_ITEM, null).with(SPREADABLE_SOILS, new LinkedList<>());
-    }
-
-    @Override
     protected RootyBlock createDynamicSoil() {
-        return new SpreadableRootyBlock(getPrimitiveSoilBlock());
+        return new SpreadableRootyBlock(this);
     }
 
     public static class SpreadableRootyBlock extends RootyBlock {
 
-        public SpreadableRootyBlock(Block primitiveSoil){
-            super(primitiveSoil);
+        public SpreadableRootyBlock(SpreadableSoilProperties properties){
+            super(properties);
+        }
+
+        @Override
+        public SpreadableSoilProperties getSoilProperties() {
+            return (SpreadableSoilProperties) super.getSoilProperties();
         }
 
         @Nullable
         private RootyBlock getRootyBlock (Block block){
-            return SoilHelper.getConfiguredProperties(block).getConfigurable().getDynamicSoilBlock();
+            return SoilHelper.getProperties(block).getDynamicSoilBlock();
         }
 
         @Override
         public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-            if (getConfiguration().get(SPREAD_ITEM) != null){
+            SpreadableSoilProperties properties = getSoilProperties();
+            if (properties.spread_item != null){
                 ItemStack handStack = player.getItemInHand(handIn);
-                if (handStack.getItem().equals(getConfiguration().get(SPREAD_ITEM))){
+                if (handStack.getItem().equals(properties.spread_item)){
                     List<Block> foundBlocks = new LinkedList<>();
 
                     for(BlockPos blockpos : BlockPos.betweenClosed(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))) {
                         Block block = worldIn.getBlockState(blockpos).getBlock();
-                        if (getConfiguration().get(SPREADABLE_SOILS).stream().anyMatch(prop->prop.getPrimitiveSoilBlock()==block))
+                        if (properties.spreadable_soils.stream().anyMatch(prop->prop.getPrimitiveSoilBlock()==block))
                             foundBlocks.add(block);
                     }
                     if (foundBlocks.size() > 0){
@@ -96,11 +101,12 @@ public class SpreadableSoilProperties extends SoilProperties{
         @Override
         public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
             super.randomTick(state, world, pos, random);
+            SpreadableSoilProperties properties = getSoilProperties();
             //this is a similar behaviour to vanilla grass spreading but inverted to be handled by the dirt block
-            if (!world.isClientSide && getConfiguration().get(REQUIRED_LIGHT) != null)
+            if (!world.isClientSide && properties.required_light != null)
             {
                 if (!world.isAreaLoaded(pos, 3)) return; // Forge: prevent loading unloaded chunks when checking neighbor's light and spreading
-                if (world.getMaxLocalRawBrightness(pos.above()) >= getConfiguration().get(REQUIRED_LIGHT))
+                if (world.getMaxLocalRawBrightness(pos.above()) >= properties.required_light)
                 {
                     for (int i = 0; i < 4; ++i)
                     {
@@ -111,9 +117,9 @@ public class SpreadableSoilProperties extends SoilProperties{
                         BlockState thatStateUp = world.getBlockState(thatPos.above());
                         BlockState thatState = world.getBlockState(thatPos);
 
-                        for (SoilProperties properties : getConfiguration().get(SPREADABLE_SOILS)){
-                            RootyBlock block = properties.getDynamicSoilBlock();
-                            if (block != null && (thatState.getBlock() == properties.getPrimitiveSoilBlock() || thatState.getBlock() == block) && world.getMaxLocalRawBrightness(pos.above()) >= getConfiguration().get(REQUIRED_LIGHT) && thatStateUp.getLightBlock(world, thatPos.above()) <= 2) {
+                        for (SoilProperties spreadable : properties.spreadable_soils){
+                            RootyBlock block = spreadable.getDynamicSoilBlock();
+                            if (block != null && (thatState.getBlock() == spreadable.getPrimitiveSoilBlock() || thatState.getBlock() == block) && world.getMaxLocalRawBrightness(pos.above()) >= properties.required_light && thatStateUp.getLightBlock(world, thatPos.above()) <= 2) {
                                 if (state.hasProperty(FERTILITY))
                                     world.setBlockAndUpdate(pos, block.defaultBlockState().setValue(FERTILITY, state.getValue(FERTILITY)));
                                 return;

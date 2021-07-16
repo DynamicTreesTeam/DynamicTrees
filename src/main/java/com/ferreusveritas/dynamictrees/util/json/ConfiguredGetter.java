@@ -32,9 +32,7 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
                 .ifFailed(configured::setErrorMessage)
                 .elseIfOfType(JsonObject.class, jsonObject ->
                     JsonHelper.JsonObjectReader.of(jsonObject).ifContains("name", configurableClass, configurable -> configured.setValue((T) configurable.getDefaultConfiguration()))
-                            .ifContains("properties", JsonObject.class, propertiesObject -> {
-                                setProperties(configured, propertiesObject);
-                            })
+                            .ifContains("properties", JsonObject.class, propertiesObject -> setProperties(configured, propertiesObject))
                 );
 
         final C configurable = configured.getValue().getConfigurable();

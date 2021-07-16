@@ -23,7 +23,7 @@ public class ListGetter<T> implements IJsonObjectGetter<List<T>> {
     }
 
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unchecked"})
-    public static <T> Class<? extends List<T>> getListClass (Class<T> c){
+    public static <T> Class<List<T>> getListClass (Class<T> c){
         List<T> instance = new LinkedList<>();
         return (Class<List<T>>) instance.getClass();
     }
