@@ -45,6 +45,11 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 		public void appendDrops(ConfiguredDropCreator<DropCreator> configuration, C context) {
 			this.appendDropConsumer.accept(configuration.getConfigurable(), configuration, context);
 		}
+
+		@SuppressWarnings("unchecked")
+		public static Class<DropType<DropContext>> getGenericClass() {
+			return (Class<DropType<DropContext>>) NULL.getClass();
+		}
 	}
 
 	public static final DropCreator NULL_DROP_CREATOR = new DropCreator(DTTrees.NULL) {
