@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.registry.IRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEvent;
 
 /**
@@ -15,8 +16,8 @@ public final class DropCreators {
     public static final DropCreator STICKS = new SticksDropCreator(DynamicTrees.resLoc("sticks"));
     public static final DropCreator LOGS = new LogsDropCreator(DynamicTrees.resLoc("logs"));
 
-    public void register(final RegistryEvent<DropCreator> event) {
-        event.getRegistry().registerAll(NORMAL, LOOT_TABLE, SEED, FRUIT, STICKS, LOGS);
+    public static void register(final IRegistry<DropCreator> registry) {
+        registry.registerAll(NORMAL, LOOT_TABLE, SEED, FRUIT, STICKS, LOGS);
     }
 
 }

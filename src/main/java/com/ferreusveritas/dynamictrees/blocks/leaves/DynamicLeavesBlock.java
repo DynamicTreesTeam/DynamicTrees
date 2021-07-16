@@ -56,10 +56,7 @@ import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @SuppressWarnings("deprecation")
 public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeable, IRayTraceCollision {
@@ -614,7 +611,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 		final Species species = this.getExactSpecies(builder.getLevel(), builderBlockPos, getProperties(state));
 		return species.getDrops(
 				DropCreator.DropType.LEAVES,
-				new DropContext(builder.getLevel(), builderBlockPos, species, ret, -1, fortuneLevel)
+				new DropContext(builder.getLevel(), builderBlockPos, species, ret,
+						Optional.ofNullable(builder.getOptionalParameter(LootParameters.TOOL)).orElse(ItemStack.EMPTY),
+						-1, fortuneLevel)
 		);
 	}
 	

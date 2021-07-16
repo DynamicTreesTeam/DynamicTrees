@@ -13,16 +13,31 @@ import java.util.function.Consumer;
 public final class DTLootParameterSets {
 
     public static final LootParameterSet HARVEST = register("harvest", builder ->
-            builder.required(LootParameters.BLOCK_STATE).required(DTLootParameters.SPECIES).required(DTLootParameters.FERTILITY).required(DTLootParameters.FORTUNE));
+            builder.required(LootParameters.BLOCK_STATE)
+                    .required(DTLootParameters.SPECIES)
+                    .required(DTLootParameters.FERTILITY)
+                    .required(DTLootParameters.FORTUNE)
+    );
 
     public static final LootParameterSet VOLUNTARY = register("voluntary", builder ->
-            builder.required(LootParameters.BLOCK_STATE).required(DTLootParameters.SPECIES).required(DTLootParameters.FERTILITY));
+            builder.required(LootParameters.BLOCK_STATE)
+                    .required(DTLootParameters.SPECIES)
+                    .required(DTLootParameters.FERTILITY)
+    );
 
     public static final LootParameterSet LEAVES = register("leaves", builder ->
-            builder.required(LootParameters.BLOCK_STATE).required(DTLootParameters.SPECIES).required(DTLootParameters.FORTUNE));
+            builder.required(LootParameters.BLOCK_STATE)
+                    .required(LootParameters.TOOL)
+                    .required(DTLootParameters.SPECIES)
+                    .required(DTLootParameters.FORTUNE)
+    );
 
     public static final LootParameterSet LOGS = register("logs", builder ->
-            builder.required(LootParameters.BLOCK_STATE).required(DTLootParameters.SPECIES).required(DTLootParameters.LOGS_AND_STICKS));
+            builder.required(LootParameters.BLOCK_STATE)
+                    .required(LootParameters.TOOL)
+                    .required(DTLootParameters.SPECIES)
+                    .required(DTLootParameters.LOGS_AND_STICKS)
+    );
 
     private static LootParameterSet register(String path, Consumer<LootParameterSet.Builder> builderConsumer) {
         final LootParameterSet.Builder builder = new LootParameterSet.Builder();

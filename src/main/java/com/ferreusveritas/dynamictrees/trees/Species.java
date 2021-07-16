@@ -803,7 +803,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			if(world.random.nextDouble() < slowFactor) {
 				final List<ItemStack> drops = this.getDrops(
 						DropCreator.DropType.VOLUNTARY,
-						new DropContext(world, rootPos, this, new LinkedList<>(), fertility, 0)
+						new DropContext(world, world.random, rootPos, this, new LinkedList<>(), fertility, 0)
 				);
 
 				if(!drops.isEmpty() && !endPoints.isEmpty()) {

@@ -19,7 +19,7 @@ public class ConfigurationPropertyValue<V> {
 
     @Override
     public String toString() {
-        return "GenFeaturePropertyValue{" +
+        return "ConfigurationPropertyValue{" +
                 "value=" + value +
                 '}';
     }

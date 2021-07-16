@@ -409,7 +409,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 			final BlockState blockState = world.getBlockState(pos);
 			if (family.isCompatibleGenericLeaves(species, blockState, world, pos) ) {
 				dropList.clear();
-				species.getDrops(DropCreator.DropType.HARVEST, new DropContext(world, pos, species, dropList));
+				species.getDrops(
+						DropCreator.DropType.HARVEST,
+						new DropContext(world, pos, species, dropList)
+				);
 				final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
 				final BlockPos relPos = imPos.subtract(cutPos);
 				world.setBlock(imPos, BlockStates.AIR, 3);
@@ -435,7 +438,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 		volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
 		return species.getDrops(
 				DropCreator.DropType.LOGS,
-				new LogDropContext(world, pos, species, new ArrayList<>(), volume)
+				new LogDropContext(world, pos, species, new ArrayList<>(), volume, handStack)
 		);
 	}
 

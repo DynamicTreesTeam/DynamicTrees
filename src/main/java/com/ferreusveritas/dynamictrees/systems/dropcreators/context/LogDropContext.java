@@ -15,8 +15,8 @@ public class LogDropContext extends DropContext {
 
     private final NetVolumeNode.Volume volume;
 
-    public LogDropContext(World world, BlockPos pos, Species species, List<ItemStack> dropList, NetVolumeNode.Volume volume) {
-        super(world, pos, species, dropList);
+    public LogDropContext(World world, BlockPos pos, Species species, List<ItemStack> dropList, NetVolumeNode.Volume volume, ItemStack tool) {
+        super(world, pos, species, dropList, tool, -1, 0);
         this.volume = volume;
     }
 

@@ -23,19 +23,25 @@ public class DropContext {
     private final Species species;
     private final List<ItemStack> dropList;
 
+    private final ItemStack tool;
     private final int fertility;
     private final int fortune;
 
     public DropContext(@Nullable World world, BlockPos pos, Species species, List<ItemStack> dropList) {
-        this(world, pos, species, dropList, -1, 0);
+        this(world, pos, species, dropList, ItemStack.EMPTY, -1, 0);
     }
 
-    public DropContext(@Nullable World world, BlockPos pos, Species species, List<ItemStack> dropList, int fertility, int fortune) {
+    public DropContext(World world, Random random, BlockPos pos, Species species, List<ItemStack> dropList, int fertility, int fortune) {
+        this(world, pos, species, dropList, ItemStack.EMPTY, fertility, fortune);
+    }
+
+    public DropContext(@Nullable World world, BlockPos pos, Species species, List<ItemStack> dropList, ItemStack tool, int fertility, int fortune) {
         this.world = world;
         this.random = world == null ? new Random() : world.random;
         this.pos = pos;
         this.species = species;
         this.dropList = dropList;
+        this.tool = tool;
         this.fertility = fertility;
         this.fortune = fortune;
     }
@@ -58,6 +64,10 @@ public class DropContext {
 
     public List<ItemStack> drops() {
         return dropList;
+    }
+
+    public ItemStack tool() {
+        return tool;
     }
 
     /**
