@@ -11,12 +11,12 @@ import net.minecraft.util.ResourceLocation;
  *
  * @author Max Hyper
  */
-public class SticksDropCreator extends DropCreator {
+public class StickDropCreator extends DropCreator {
 
 	public static final ConfigurationProperty<ItemStack> STICKS = ConfigurationProperty.property("sticks", ItemStack.class);
 	public static final ConfigurationProperty<Integer> MAX_COUNT = ConfigurationProperty.integer("max_count");
 
-	public SticksDropCreator(ResourceLocation registryName) {
+	public StickDropCreator(ResourceLocation registryName) {
 		super(registryName);
 	}
 

@@ -13,8 +13,6 @@
         "dry": 0.5,
         "forest": 1.05
     },
-    "seed_drop_rarity": 1.0,
-    "stick_drop_rarity": 1.0,
     "common_override": { "name": "minecraft:tall_birch.*" },
     "perfect_biomes": { "name": "minecraft:tall_birch.*" },
     "features" : [
@@ -27,5 +25,9 @@
         },
         "rot_soil",
         "bee_nest"
+    ],
+    "drop_creators": [
+        "seed",
+        "stick"
     ]
 }

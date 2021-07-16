@@ -12,13 +12,15 @@
         "dry": 0.25,
         "wet": 0.75
     },
-    "seed_drop_rarity": 1.0,
-    "stick_drop_rarity": 1.0,
     "perfect_biomes": { "type": "coniferous" },
     "primitive_sapling": "spruce_sapling",
     "mega_species": "mega_spruce",
     "features" : [
         "conifer_topper",
         "podzol"
+    ],
+    "drop_creators": [
+        "seed",
+        "stick"
     ]
 }

@@ -249,7 +249,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Override
 	public Species setPreReloadDefaults() {
-		this.addDropCreator(DropCreators.LOGS);
+		this.addDropCreator(DropCreators.LOG);
 		return this.setDefaultGrowingParameters().setSaplingShape(CommonVoxelShapes.SAPLING).setSaplingSound(SoundType.GRASS);
 	}
 
@@ -637,13 +637,16 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 *
 	 * Typically called in the constructor
 	 */
+	@Deprecated
 	public Species setupStandardSeedDropping() {
 		this.addDropCreator(DropCreators.SEED.getDefaultConfiguration());
 		return this;
 	}
 
+	@Deprecated
 	public Species setupStandardSeedDropping(float rarity) {
 		this.addDropCreator(DropCreators.SEED.with(SeedDropCreator.RARITY, rarity));
+		LogManager.getLogger().warn("Deprecated use of `stick_drop_rarity` property by Species `" + this.getRegistryName() + "`. This will be removed in a future version of DT in favour of the `drop_creators` list property.");
 		return this;
 	}
 
@@ -651,22 +654,27 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * Same as setupStandardSeedDropping except it allows
 	 * for a custom seed item.
 	 */
+	@Deprecated
 	public Species setupCustomSeedDropping(ItemStack customSeed) {
 		this.addDropCreator(DropCreators.SEED.with(SeedDropCreator.SEED, customSeed));
 		return this;
 	}
 
+	@Deprecated
 	public Species setupCustomSeedDropping(ItemStack customSeed, float rarity) {
 		this.addDropCreator(DropCreators.SEED.with(SeedDropCreator.SEED, customSeed).with(SeedDropCreator.RARITY, rarity));
 		return this;
 	}
 
+	@Deprecated
 	public Species setupStandardStickDropping() {
 		return this.setupStandardStickDropping(1);
 	}
 
+	@Deprecated
 	public Species setupStandardStickDropping (float rarity) {
-		this.addDropCreator(DropCreators.STICKS);
+		this.addDropCreator(DropCreators.STICK);
+		LogManager.getLogger().warn("Deprecated use of `stick_drop_rarity` property by Species `" + this.getRegistryName() + "`. This will be removed in a future version of DT in favour of the `drop_creators` list property.");
 		return this;
 	}
 

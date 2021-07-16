@@ -14,8 +14,6 @@
         "dry": 0.25,
         "wet": 0.75
     },
-    "seed_drop_rarity": 1.0,
-    "stick_drop_rarity": 1.0,
     "common_override": { "name": "minecraft:.*giant_tree_taiga.*" },
     "perfect_biomes": { "name": "minecraft:.*giant_tree_taiga.*" },
     "features" : [
@@ -28,5 +26,9 @@
         },
         "clear_volume",
         "podzol"
+    ],
+    "drop_creators": [
+        "seed",
+        "stick"
     ]
 }

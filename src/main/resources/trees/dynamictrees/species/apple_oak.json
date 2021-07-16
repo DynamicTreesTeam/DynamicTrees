@@ -13,8 +13,6 @@
         "hot": 0.75,
         "dry": 0.25
     },
-    "seed_drop_rarity": 0.0,
-    "stick_drop_rarity": 1.0,
     "primitive_sapling_item": "apple",
     "perfect_biomes": { "name": "minecraft:plains" },
     "drops": [
@@ -28,5 +26,8 @@
     ],
     "features" : [
         "fruit"
+    ],
+    "drop_creators": [
+        "stick"
     ]
 }
