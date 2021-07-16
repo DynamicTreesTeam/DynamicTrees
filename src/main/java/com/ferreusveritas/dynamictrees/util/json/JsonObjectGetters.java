@@ -11,6 +11,8 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
@@ -167,6 +169,8 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<AxisAlignedBB> AXIS_ALIGNED_BB = register(AxisAlignedBB.class, new AxisAlignedBBGetter());
     public static final IJsonObjectGetter<VoxelShape> VOXEL_SHAPE = register(VoxelShape.class, new VoxelShapeGetter());
 
+    public static final IJsonObjectGetter<DropCreator.DropType<DropContext>> DROP_TYPE = register(DropCreator.DropType.getGenericClass(), new RegistryEntryGetter<>(DropCreator.DropType.REGISTRY));
+
     public static final IJsonObjectGetter<CellKit> CELL_KIT = register(CellKit.class, new RegistryEntryGetter<>(CellKit.REGISTRY));
     public static final IJsonObjectGetter<LeavesProperties> LEAVES_PROPERTIES = register(LeavesProperties.class, new RegistryEntryGetter<>(LeavesProperties.REGISTRY));
     public static final IJsonObjectGetter<GrowthLogicKit> GROWTH_LOGIC_KIT = register(GrowthLogicKit.class, new RegistryEntryGetter<>(GrowthLogicKit.REGISTRY));
@@ -181,6 +185,8 @@ public final class JsonObjectGetters {
 
      public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGetter<>("Gen Feature", GenFeature.class));
     public static final IJsonObjectGetter<ConfiguredDropCreator<DropCreator>> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, new ConfiguredGetter<>("Drop Creator", DropCreator.class));
+
+    public static final IJsonObjectGetter<Drops> DROPS = register(Drops.class, new DropsGetter());
 
     public static final IJsonObjectGetter<Seed> SEED = register(Seed.class, jsonElement -> ITEM.get(jsonElement).mapIfValid(item -> item instanceof Seed, "Item '{value}' is not a seed.", item -> (Seed) item));
 

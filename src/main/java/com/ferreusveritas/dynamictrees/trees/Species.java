@@ -1979,7 +1979,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this;
 	}
 
-	public boolean areAnyGenFeatures () {
+	public boolean hasGenFeatures() {
 		return this.genFeatures.size() > 0;
 	}
 

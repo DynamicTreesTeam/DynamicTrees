@@ -80,7 +80,7 @@ public class NetherFungusSpecies extends Species {
 
     @Override
     public Species setPostReloadDefaults() {
-        if (!this.areAnyGenFeatures())
+        if (!this.hasGenFeatures())
             this.addGenFeature(GenFeatures.CLEAR_VOLUME).addGenFeature(GenFeatures.SHROOMLIGHT);
         return super.setPostReloadDefaults();
     }
