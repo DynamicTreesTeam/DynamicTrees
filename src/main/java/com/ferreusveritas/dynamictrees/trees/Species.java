@@ -218,8 +218,6 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		this.family = family;
 		this.family.addSpecies(this);
 		this.setLeavesProperties(leavesProperties.isValid() ? leavesProperties : family.getCommonLeaves());
-
-		this.addDropCreator(DropCreators.LOGS);
 	}
 
 	/**
@@ -233,6 +231,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	public Species reset () {
 		this.envFactors.clear();
 		this.genFeatures.clear();
+		this.dropCreators.clear();
 		this.acceptableBlocksForGrowth.clear();
 		this.primitiveSaplingItems.clear();
 		this.perfectBiomes.clear();
@@ -250,6 +249,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Override
 	public Species setPreReloadDefaults() {
+		this.addDropCreator(DropCreators.LOGS);
 		return this.setDefaultGrowingParameters().setSaplingShape(CommonVoxelShapes.SAPLING).setSaplingSound(SoundType.GRASS);
 	}
 
@@ -672,13 +672,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	public boolean addDropCreator(DropCreator dropCreator) {
 		return this.dropCreators.add(dropCreator.getDefaultConfiguration());
-//		return dropCreatorStorage.addDropCreator(dropCreator);
 	}
 
 	@SuppressWarnings("unchecked")
 	public <DC extends DropCreator> boolean addDropCreator(ConfiguredDropCreator<DC> dropCreator) {
 		return this.dropCreators.add((ConfiguredDropCreator<DropCreator>) dropCreator);
-//		return dropCreatorStorage.addDropCreator(dropCreator);
 	}
 
 	public boolean remDropCreator(ResourceLocation dropCreatorName) {
@@ -689,16 +687,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return dropCreatorStorage.getDropCreators();
 	}
 
-	public List<ItemStack> getHarvestDrops(final World world, BlockPos leafPos, List<ItemStack> drops, Random random) {
-		this.dropCreators.forEach(dropCreator -> dropCreator.getConfigurable()
-				.appendHarvestDrops(dropCreator, new DropContext(world, leafPos, this, drops)));
-		return drops;
-	}
-
-	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, List<ItemStack> drops, int fertility) {
-		this.dropCreators.forEach(dropCreator -> dropCreator.getConfigurable()
-				.appendVoluntaryDrops(dropCreator, new DropContext(world, rootPos, this, drops)));
-		return drops;
+	public <C extends DropContext> List<ItemStack> getDrops(final DropCreator.DropType<C> dropType, final C context) {
+		this.dropCreators.forEach(configuration -> configuration.getConfigurable()
+				.appendDrops(configuration, dropType, context));
+		return context.drops();
 	}
 
 	/**
@@ -711,6 +703,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param random
 	 * @return
 	 */
+	@Deprecated
 	public List<ItemStack> getTreeHarvestDrops(World world, BlockPos leafPos, List<ItemStack> dropList, Random random) {
 		final DropContext dropContext = new DropContext(world, leafPos, this, dropList);
  		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendHarvestDrops(null, dropContext);
@@ -727,10 +720,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param fertility
 	 * @return
 	 */
+	@Deprecated
 	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, int fertility) {
 		final DropContext dropContext = new DropContext(world, rootPos, this, new ArrayList<>(), fertility, 0);
 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendVoluntaryDrops(null, dropContext);
-		this.dropCreatorStorage.appendLeavesDrops(null, dropContext);
+		this.dropCreatorStorage.appendVoluntaryDrops(null, dropContext);
 		return dropContext.drops();
 	}
 
@@ -744,7 +738,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param fortune
 	 * @return
 	 */
-	public List<ItemStack> getLeavesDrops(@Nullable World world, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
+	@Deprecated
+	public List<ItemStack> getLeavesDropsOld(@Nullable World world, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
 		final DropContext dropContext = new DropContext(world, breakPos, this, dropList, -1, fortune);
 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendLeavesDrops(null, dropContext);
 		dropCreatorStorage.appendLeavesDrops(null, dropContext);
@@ -762,6 +757,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * @param volume
 	 * @return
 	 */
+	@Deprecated
 	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, NetVolumeNode.Volume volume, ItemStack handStack) {
 		final LogDropContext dropContext = new LogDropContext(world, breakPos, this, dropList, volume);
 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendLogDrops(null, dropContext);
@@ -805,7 +801,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		if(tickSpeed > 0) {
 			double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
 			if(world.random.nextDouble() < slowFactor) {
-				List<ItemStack> drops = getVoluntaryDrops(world, rootPos, treePos, new LinkedList<>(), fertility);
+				final List<ItemStack> drops = this.getDrops(
+						DropCreator.DropType.VOLUNTARY,
+						new DropContext(world, rootPos, this, new LinkedList<>(), fertility, 0)
+				);
 
 				if(!drops.isEmpty() && !endPoints.isEmpty()) {
 					for(ItemStack drop: drops) {
@@ -2089,7 +2088,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 				Pair.of("soilTypeFlags", this.soilTypeFlags), Pair.of("maxBranchRadius", this.maxBranchRadius),
 				Pair.of("transformable", this.transformable), Pair.of("logicKit", this.logicKit),
 				Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
-				Pair.of("dropCreatorStorage", this.dropCreatorStorage), Pair.of("megaSpecies", this.megaSpecies),
+				Pair.of("dropCreators", this.dropCreators), Pair.of("megaSpecies", this.megaSpecies),
 				Pair.of("seed", this.seed), Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream()
 						.filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny().orElse(BlockStates.AIR)),
 				Pair.of("perfectBiomes", this.perfectBiomes), Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),

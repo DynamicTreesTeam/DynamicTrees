@@ -53,12 +53,12 @@ public class StorageDropCreator extends DropCreator {
 	protected void registerProperties() { }
 
 	@Override
-	public <C extends DropContext> List<ItemStack> appendDrops(ConfiguredDropCreator<DropCreator> configuration, DropType<C> dropType, C context) {
+	public <C extends DropContext> void appendDrops(ConfiguredDropCreator<DropCreator> configuration, DropType<C> dropType, C context) {
 		for (final DropCreator dropCreator : this.dropCreators.values()) {
 			dropCreator.appendDrops(null, dropType, context);
 		}
 
-		return context.drops();
+		context.drops();
 	}
 
 //	@Override

@@ -16,7 +16,7 @@ public final class DropCreators {
     public static final DropCreator LOGS = new LogsDropCreator(DynamicTrees.resLoc("logs"));
 
     public void register(final RegistryEvent<DropCreator> event) {
-        event.getRegistry().registerAll(LOOT_TABLE);
+        event.getRegistry().registerAll(NORMAL, LOOT_TABLE, SEED, FRUIT, STICKS, LOGS);
     }
 
 }

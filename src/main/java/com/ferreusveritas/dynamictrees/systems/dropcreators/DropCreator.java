@@ -9,10 +9,8 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-
-import java.util.List;
+import org.apache.logging.log4j.util.TriConsumer;
 
 /**
  * This exists solely to aid in the creation of a cleaner anonymous class.
@@ -25,20 +23,27 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 	public static final ConfigurationProperty<Float> RARITY = ConfigurationProperty.floatProperty("rarity");
 
 	public static final class DropType<C extends DropContext> extends RegistryEntry<DropType<C>> {
-		public static final DropType<DropContext> NULL = new DropType<>(DTTrees.NULL);
+		public static final DropType<DropContext> NULL = new DropType<>(DTTrees.NULL, (dropCreator, configured, context) -> {});
 
-		public static final DropType<DropContext> HARVEST = new DropType<>(DynamicTrees.resLoc("harvest"));
-		public static final DropType<DropContext> VOLUNTARY = new DropType<>(DynamicTrees.resLoc("voluntary"));
-		public static final DropType<DropContext> LEAVES = new DropType<>(DynamicTrees.resLoc("leaves"));
-		public static final DropType<LogDropContext> LOGS = new DropType<>(DynamicTrees.resLoc("logs"));
+		public static final DropType<DropContext> HARVEST = new DropType<>(DynamicTrees.resLoc("harvest"), DropCreator::appendHarvestDrops);
+		public static final DropType<DropContext> VOLUNTARY = new DropType<>(DynamicTrees.resLoc("voluntary"), DropCreator::appendVoluntaryDrops);
+		public static final DropType<DropContext> LEAVES = new DropType<>(DynamicTrees.resLoc("leaves"), DropCreator::appendLeavesDrops);
+		public static final DropType<LogDropContext> LOGS = new DropType<>(DynamicTrees.resLoc("logs"), DropCreator::appendLogDrops);
 
 		@SuppressWarnings("unchecked")
 		public static final Class<DropType<DropContext>> TYPE = (Class<DropType<DropContext>>) NULL.getClass();
 
 		public static final Registry<DropType<DropContext>> REGISTRY = new Registry<>(TYPE, NULL);
 
-		public DropType(ResourceLocation registryName) {
+		private final TriConsumer<DropCreator, ConfiguredDropCreator<DropCreator>, C> appendDropConsumer;
+
+		public DropType(ResourceLocation registryName, TriConsumer<DropCreator, ConfiguredDropCreator<DropCreator>, C> appendDropConsumer) {
 			super(registryName);
+			this.appendDropConsumer = appendDropConsumer;
+		}
+
+		public void appendDrops(ConfiguredDropCreator<DropCreator> configuration, C context) {
+			this.appendDropConsumer.accept(configuration.getConfigurable(), configuration, context);
 		}
 	}
 
@@ -57,17 +62,8 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 		return new ConfiguredDropCreator<>(this);
 	}
 
-	public <C extends DropContext> List<ItemStack> appendDrops(final ConfiguredDropCreator<DropCreator> configuration, final DropType<C> dropType, final C context) {
-		if (dropType == DropType.HARVEST)
-			this.appendHarvestDrops(configuration, context);
-		else if (dropType == DropType.VOLUNTARY)
-			this.appendVoluntaryDrops(configuration, context);
-		else if (dropType == DropType.LEAVES)
-			this.appendLeavesDrops(configuration, context);
-		else if (dropType == DropType.LOGS)
-			this.appendLogDrops(configuration, (LogDropContext) context);
-
-		return context.drops();
+	public <C extends DropContext> void appendDrops(final ConfiguredDropCreator<DropCreator> configuration, final DropType<C> dropType, final C context) {
+		dropType.appendDrops(configuration, context);
 	}
 
 	public void appendHarvestDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) { }

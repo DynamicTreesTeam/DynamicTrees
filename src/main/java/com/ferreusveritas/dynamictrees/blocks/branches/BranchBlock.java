@@ -11,6 +11,9 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity.DestroyType;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.DestroyerNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.SpeciesNode;
@@ -406,7 +409,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 			final BlockState blockState = world.getBlockState(pos);
 			if (family.isCompatibleGenericLeaves(species, blockState, world, pos) ) {
 				dropList.clear();
-				species.getTreeHarvestDrops(world, pos, dropList, world.random);
+				species.getDrops(DropCreator.DropType.HARVEST, new DropContext(world, pos, species, dropList));
 				final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
 				final BlockPos relPos = imPos.subtract(cutPos);
 				world.setBlock(imPos, BlockStates.AIR, 3);
@@ -430,7 +433,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 
 	public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NetVolumeNode.Volume volume, ItemStack handStack) {
 		volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
-		return species.getLogsDrops(world, pos, new ArrayList<>(), volume, handStack);
+		return species.getDrops(
+				DropCreator.DropType.LOGS,
+				new LogDropContext(world, pos, species, new ArrayList<>(), volume)
+		);
 	}
 
 	public float getPrimitiveLogs(float volumeIn, List<ItemStack> drops){

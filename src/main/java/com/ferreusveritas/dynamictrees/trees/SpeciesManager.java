@@ -120,7 +120,8 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                     return PropertyApplierResult.success();
                 })
                 .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreator)
-                .registerArrayApplier("features", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, Species::addGenFeature);
+                .registerArrayApplier("features", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, Species::addGenFeature)
+                .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreator);
 
         super.registerAppliers();
     }

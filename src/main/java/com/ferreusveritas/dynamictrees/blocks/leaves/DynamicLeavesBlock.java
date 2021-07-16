@@ -12,6 +12,8 @@ import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
@@ -609,7 +611,11 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 					EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, player.getMainHandItem()));
 		}
 
-		return this.getExactSpecies(builder.getLevel(), builderBlockPos, getProperties(state)).getLeavesDrops(builder.getLevel(), builderBlockPos, ret, fortuneLevel);
+		final Species species = this.getExactSpecies(builder.getLevel(), builderBlockPos, getProperties(state));
+		return species.getDrops(
+				DropCreator.DropType.LEAVES,
+				new DropContext(builder.getLevel(), builderBlockPos, species, ret, -1, fortuneLevel)
+		);
 	}
 	
 	/**
