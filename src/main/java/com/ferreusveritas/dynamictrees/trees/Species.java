@@ -1077,7 +1077,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	private void placeRootyDirtBlock (IWorld world, BlockPos rootPos, Block primitiveDirt, int fertility) {
-		RootyBlock rootyBlock = SoilHelper.getProperties(primitiveDirt).getDynamicSoilBlock();
+		RootyBlock rootyBlock = SoilHelper.getConfiguredProperties(primitiveDirt).getConfigurable().getDynamicSoilBlock();
 		if (rootyBlock != null)
 			this.placeRootyDirtBlock(world, rootPos, rootyBlock, fertility);
 	}

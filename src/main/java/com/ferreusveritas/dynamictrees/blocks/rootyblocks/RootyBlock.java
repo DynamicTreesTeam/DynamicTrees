@@ -32,7 +32,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -43,7 +42,6 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.ModLoadingContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -68,15 +66,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
 	public static final BooleanProperty IS_VARIANT = BooleanProperty.create("is_variant");
 
-	private SoilProperties properties = SoilProperties.NULL_PROPERTIES;
-
-	public RootyBlock(SoilProperties soilProperties) {
-		this(soilProperties.primitiveSoilBlock);
-		properties = soilProperties;
-	}
+	private final Block primitiveSoil;
+	//private ConfiguredSoilProperties<SoilProperties> configuredProperties = ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES;
 
 	public RootyBlock(Block primitiveDirt) {
 		super(Properties.copy(primitiveDirt).randomTicks());
+		primitiveSoil = primitiveDirt;
 		registerDefaultState(defaultBlockState().setValue(FERTILITY, 0).setValue(IS_VARIANT, false));
 	}
 
@@ -84,16 +79,16 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	// SOIL PROPERTIES
 	///////////////////////////////////////////
 
-	public SoilProperties getSoilProperties(){
-		return this.properties;
+	protected ConfiguredSoilProperties<SoilProperties> getConfiguration (){
+		return SoilHelper.getConfiguredProperties(primitiveSoil);
 	}
 
-	public void setSoilProperties (SoilProperties properties){
-		this.properties = properties;
+	public SoilProperties getSoilProperties(){
+		return getConfiguration().getConfigurable();
 	}
 
 	public Block getPrimitiveSoilBlock() {
-		return properties.getPrimitiveSoilBlock();
+		return primitiveSoil;
 	}
 
 	///////////////////////////////////////////

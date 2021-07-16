@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
+import com.ferreusveritas.dynamictrees.api.configurations.Configured;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +26,7 @@ public class SoilHelper {
     public static final String FUNGUS_LIKE = "fungus_like";
 
     private static final Map<String, Integer> adjectiveMap;
-    private static final Map<Block, SoilProperties> dirtMap;
+    private static final Map<Block, ConfiguredSoilProperties<SoilProperties>> dirtMap;
 
     static {
         adjectiveMap = new HashMap<>();
@@ -52,77 +53,79 @@ public class SoilHelper {
         return adjectiveMap.getOrDefault(adjName, 0);
     }
 
-    public static void addSoilPropertiesToMap(SoilProperties properties){
-        if (!dirtMap.containsKey(properties.getPrimitiveSoilBlock()))
-            dirtMap.put(properties.getPrimitiveSoilBlock(), properties);
+    public static void addSoilPropertiesToMap(ConfiguredSoilProperties<SoilProperties> configured){
+        if (!dirtMap.containsKey(configured.getConfigurable().getPrimitiveSoilBlock()))
+            dirtMap.put(configured.getConfigurable().getPrimitiveSoilBlock(), configured.getConfigurable().getDefaultConfiguration());
     }
 
-    public static void registerSoil(SoilProperties properties, String adjName) {
-        addSoilPropertiesToMap(properties);
-        registerSoil(properties.getRegistryName(), properties.getPrimitiveSoilBlock(), adjName);
+    public static void registerSoil(SoilProperties properties, String... adjNames) {
+        ConfiguredSoilProperties<SoilProperties> configured = new ConfiguredSoilProperties<>(properties);
+        addSoilPropertiesToMap(configured);
+        registerSoil(properties.getRegistryName(), properties.getPrimitiveSoilBlock(), adjNames);
     }
-
-    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, String adjName, RootyBlock generatedRootyBlock) {
-        if (dirtMap.containsKey(soilBlock)){
-            LogManager.getLogger().warn("Attempted to register " + generatedRootyBlock + " as the rooty block of " + soilBlock + " but it already had " + dirtMap.get(soilBlock));
-            return SoilProperties.NULL_PROPERTIES;
-        } else {
-            SoilProperties properties = new SoilProperties(soilBlock, name,0,false);
-            properties.setDynamicSoilBlock(generatedRootyBlock);
-            dirtMap.put(soilBlock, properties);
-            return registerSoil(name, soilBlock, adjName);
+//    public static ConfiguredSoilProperties<SoilProperties> registerSoil(ConfiguredSoilProperties<SoilProperties> configuredSoilProperties) {
+//        Block soilBlock = configuredSoilProperties.getConfigurable().primitiveSoilBlock;
+//        if (dirtMap.containsKey(soilBlock)){
+//            LogManager.getLogger().warn("Attempted to register " + configuredSoilProperties + " as the soil property of " + soilBlock + " but it already had " + dirtMap.get(soilBlock));
+//            return ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES;
+//        } else {
+//            dirtMap.put(soilBlock, configuredSoilProperties);
+//            return registerSoil(name, soilBlock, adjName);
+//        }
+//    }
+//
+//    //Crude way of creating a substitute where two blocks will point to the same soil properties.
+//    //Avoid if possible.
+//    public static ConfiguredSoilProperties<SoilProperties> registerSoil(ResourceLocation name, Block soilBlock, Block substituteBlock) {
+//        if (!dirtMap.containsKey(substituteBlock)){
+//            LOGGER.error("Attempted to use " + substituteBlock + " as a rooty block substitute for " + soilBlock + " but it had not been registered.");
+//        }
+//        ConfiguredSoilProperties<SoilProperties> substituteProperties = dirtMap.get(substituteBlock);
+//        RootyBlock substituteSoilBlock = substituteProperties.getConfigurable().getDynamicSoilBlock();
+//        if (substituteSoilBlock == null)
+//            return ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES;
+//        ConfiguredSoilProperties<SoilProperties> properties = new ConfiguredSoilProperties<>(new SoilProperties(soilBlock, name, substituteProperties.getConfigurable().soilFlags, false)).setPropertiesCopy(substituteProperties);
+//        properties.getConfigurable().setDynamicSoilBlock(substituteSoilBlock);
+//        dirtMap.put(soilBlock, properties);
+//        return properties;
+//    }
+//
+//    public static void addSoilTag(Block primitiveBlock, String adjName) {
+//        registerSoil(null, primitiveBlock, adjName);
+//    }
+    public static ConfiguredSoilProperties<SoilProperties> registerSoil(ResourceLocation name, Block soilBlock, String... adjNames) {
+        int flag = 0;
+        for (String adjName : adjNames){
+            if(adjectiveMap.containsKey(adjName)) {
+                flag |= adjectiveMap.get(adjName);
+            } else {
+                LOGGER.error("Adjective \"" + adjName + "\" not found while registering soil block: " + soilBlock);
+                return ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES;
+            }
         }
+        return registerSoil(name, soilBlock, flag);
     }
 
-    //Crude way of creating a substitute where two blocks will point to the same soil properties.
-    //Avoid if possible.
-    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, Block substituteBlock) {
-        if (!dirtMap.containsKey(substituteBlock)){
-            LOGGER.error("Attempted to use " + substituteBlock + " as a rooty block substitute for " + soilBlock + " but it had not been registered.");
-        }
-        SoilProperties substituteProperties = dirtMap.get(substituteBlock);
-        RootyBlock substituteSoilBlock = substituteProperties.getDynamicSoilBlock();
-        if (substituteSoilBlock == null)
-            return SoilProperties.NULL_PROPERTIES;
-        SoilProperties properties = new SoilProperties(soilBlock, name, substituteProperties.soilFlags, false);
-        properties.setDynamicSoilBlock(substituteSoilBlock);
-        dirtMap.put(soilBlock, properties);
-        return properties;
-    }
-
-    public static void addSoilTag(Block primitiveBlock, String adjName) {
-        registerSoil(null, primitiveBlock, adjName);
-    }
-    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, String adjName) {
-        if(adjectiveMap.containsKey(adjName)) {
-            int flag = adjectiveMap.get(adjName);
-            return registerSoil(name, soilBlock, flag);
-        } else {
-            LOGGER.error("Adjective \"" + adjName + "\" not found while registering soil block: " + soilBlock);
-            return SoilProperties.NULL_PROPERTIES;
-        }
-    }
-
-    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, int adjFlag) {
-        return dirtMap.compute(soilBlock, (bl, prop) -> (prop == null) ? new SoilProperties(soilBlock, name, adjFlag, true) : prop.addSoilFlags(adjFlag));
+    public static ConfiguredSoilProperties<SoilProperties> registerSoil(ResourceLocation name, Block soilBlock, int adjFlag) {
+        return dirtMap.compute(soilBlock, (bl, prop) -> (prop == null) ? new ConfiguredSoilProperties<>(new SoilProperties(soilBlock, name, adjFlag, true)) : prop.addSoilFlags(adjFlag));
     }
 
     public static boolean isSoilAcceptable(Block soilBlock, int soilFlags) {
         if (soilBlock instanceof RootyBlock)
             soilBlock = ((RootyBlock) soilBlock).getPrimitiveSoilBlock();
-        return (dirtMap.getOrDefault(soilBlock, SoilProperties.NULL_PROPERTIES).getSoilFlags() & soilFlags) != 0;
+        return (dirtMap.getOrDefault(soilBlock, ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES).getConfigurable().getSoilFlags() & soilFlags) != 0;
     }
 
     public static boolean isSoilRegistered(Block block){
         return dirtMap.containsKey(block);
     }
 
-    public static SoilProperties getProperties (Block block){
-        return dirtMap.getOrDefault(block, SoilProperties.NULL_PROPERTIES);
+    public static ConfiguredSoilProperties<SoilProperties> getConfiguredProperties(Block block){
+        return dirtMap.getOrDefault(block, ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES);
     }
 
     public static Set<RootyBlock> getRootyBlocksList (){
-        return dirtMap.values().stream().map(SoilProperties::getDynamicSoilBlock).filter(Objects::nonNull).collect(Collectors.toSet());
+        return dirtMap.values().stream().map(Configured::getConfigurable).map(SoilProperties::getDynamicSoilBlock).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     public static int getSoilFlags(String ... types) {

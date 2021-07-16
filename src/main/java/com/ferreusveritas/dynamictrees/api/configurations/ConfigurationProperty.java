@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 
 import javax.annotation.Nullable;
 
@@ -98,6 +99,11 @@ public class ConfigurationProperty<T> {
     public static ConfigurationProperty<Block> block(String identifier) {
         return property(identifier, Block.class);
     }
+
+    public static ConfigurationProperty<Item> item(String identifier) {
+        return property(identifier, Item.class);
+    }
+
 
     @Override
     public String toString() {

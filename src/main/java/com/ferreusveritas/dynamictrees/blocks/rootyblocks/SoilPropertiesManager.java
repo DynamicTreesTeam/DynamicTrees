@@ -25,15 +25,20 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
             SoilHelper.registerSoil(soilProperties, acceptableSoil);
             return PropertyApplierResult.success();
         });
- //       .register("properties", JsonObject.class, SoilProperties::setRootyBlockProperties);
 
         this.loadAppliers.register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
+
+        this.loadReloadAppliers.register("properties", JsonObject.class,
+                (prop, jsonObj) -> SoilProperties.REGISTRY.runOnNextLock(()->prop.setProperties(jsonObj)));
 
         super.registerAppliers();
     }
 
     @Override
     protected void preLoad(JsonObject jsonObject, SoilProperties soilProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
+        // the soil is added to the soil map
+
+
         // If a custom block registry name was set, set and use it.
         JsonHelper.JsonObjectReader.of(jsonObject).ifContains("block_registry_name", jsonElement ->
                 ResourceLocationGetter.create(soilProperties.getRegistryName().getNamespace()).get(jsonElement)
@@ -45,8 +50,8 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
     protected void postLoad(JsonObject jsonObject, SoilProperties soilProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
         //set the substitute soil if one exists and is valid
         // dont generate block if the there is a substitute.
-        SoilProperties substitute = JsonHelper.getOrDefault(jsonObject, "substitute_soil", SoilProperties.class, SoilProperties.NULL_PROPERTIES);
-        if (substitute != SoilProperties.NULL_PROPERTIES)
+        SoilProperties substitute = JsonHelper.getOrDefault(jsonObject, "substitute_soil", SoilProperties.class, SoilProperties.NULL_SOIL_PROPERTIES);
+        if (substitute != SoilProperties.NULL_SOIL_PROPERTIES)
             soilProperties.setDynamicSoilBlock(substitute.dynamicSoilBlock);
         else
             soilProperties.generateDynamicSoil();

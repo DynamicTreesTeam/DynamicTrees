@@ -27,7 +27,7 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
      * Adds the given {@link ConfigurationProperty} to this {@link Configured} object's
      * properties.
      *
-     * @param genFeatureProperty The {@link ConfigurationProperty} to set.
+     * @param property The {@link ConfigurationProperty} to set.
      * @param value The value to register.
      * @param <V> The type of value to register.
      * @return This {@link Configured} after adding the property.
@@ -35,16 +35,16 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
      *                           {@link Configurable}.
      */
     @SuppressWarnings("unchecked")
-    public <V> T with (ConfigurationProperty<V> genFeatureProperty, V value) {
-        if (!this.configurable.isPropertyRegistered(genFeatureProperty)) {
+    public <V> T with (ConfigurationProperty<V> property, V value) {
+        if (!this.configurable.isPropertyRegistered(property)) {
             final CrashReport crashReport = CrashReport.forThrowable(new IllegalArgumentException(), "Tried to add " +
-                    "unregistered property with identifier '" + genFeatureProperty.getIdentifier() + "' and type '" +
-                    genFeatureProperty.getType() + "' configurable '" + this.configurable + "'.");
+                    "unregistered property with identifier '" + property.getIdentifier() + "' and type '" +
+                    property.getType() + "' configurable '" + this.configurable + "'.");
             crashReport.addCategory("Adding property to a gen feature.");
             throw new ReportedException(crashReport);
         }
 
-        this.properties.put(genFeatureProperty, new ConfigurationPropertyValue<>(value));
+        this.properties.put(property, new ConfigurationPropertyValue<>(value));
         return (T) this;
     }
 

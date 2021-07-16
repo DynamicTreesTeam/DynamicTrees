@@ -38,18 +38,13 @@ public class WaterSoilProperties extends SoilProperties {
 
     @Override
     protected RootyBlock createDynamicSoil() {
-        return new RootyWaterBlock(this);
+        return new RootyWaterBlock(getPrimitiveSoilBlock());
     }
 
     public static class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
 
         protected static final AxisAlignedBB WATER_ROOTS_AABB = new AxisAlignedBB(0.1, 0.0, 0.1, 0.9, 1.0, 0.9);
         public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-
-        public RootyWaterBlock(SoilProperties soilProperties) {
-            super(soilProperties);
-            registerDefaultState(defaultBlockState().setValue(WATERLOGGED, true));
-        }
 
         public RootyWaterBlock (Block primitiveDirt){
             super(primitiveDirt);

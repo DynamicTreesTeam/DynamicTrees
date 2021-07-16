@@ -33,12 +33,7 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
                 .elseIfOfType(JsonObject.class, jsonObject ->
                     JsonHelper.JsonObjectReader.of(jsonObject).ifContains("name", configurableClass, configurable -> configured.setValue((T) configurable.getDefaultConfiguration()))
                             .ifContains("properties", JsonObject.class, propertiesObject -> {
-                                if (configured.getValue() == ConfiguredGenFeature.NULL_CONFIGURED_FEATURE || configured.getValue().getConfigurable() == null) {
-                                    return;
-                                }
-
-                                configured.getValue().getConfigurable().getRegisteredProperties().forEach(property ->
-                                        addProperty(configured, propertiesObject, property));
+                                setProperties(configured, propertiesObject);
                             })
                 );
 
@@ -48,6 +43,15 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
         }
 
         return configured;
+    }
+
+    public static <T extends Configured<T, ?>> void setProperties (ObjectFetchResult<T> fetchResult, JsonObject object){
+        if (fetchResult.getValue() == ConfiguredGenFeature.NULL_CONFIGURED_FEATURE || fetchResult.getValue().getConfigurable() == null) {
+            return;
+        }
+
+        fetchResult.getValue().getConfigurable().getRegisteredProperties().forEach(property ->
+                addProperty(fetchResult, object, property));
     }
 
     private static <T extends Configured<T, ?>, P> void addProperty(final ObjectFetchResult<T> fetchResult, final JsonObject propertiesObject, final ConfigurationProperty<P> configurationProperty) {
