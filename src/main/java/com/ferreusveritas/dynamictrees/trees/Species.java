@@ -722,7 +722,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Deprecated
 	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, int fertility) {
-		final DropContext dropContext = new DropContext(world, rootPos, this, new ArrayList<>(), fertility, 0);
+		final DropContext dropContext = new DropContext(world, world.random, rootPos, this, new ArrayList<>(), fertility, 0);
 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendVoluntaryDrops(null, dropContext);
 		this.dropCreatorStorage.appendVoluntaryDrops(null, dropContext);
 		return dropContext.drops();
@@ -740,7 +740,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Deprecated
 	public List<ItemStack> getLeavesDropsOld(@Nullable World world, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
-		final DropContext dropContext = new DropContext(world, breakPos, this, dropList, -1, fortune);
+		final DropContext dropContext = new DropContext(world, world.random, breakPos, this, dropList, -1, fortune);
 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendLeavesDrops(null, dropContext);
 		dropCreatorStorage.appendLeavesDrops(null, dropContext);
 		return dropContext.drops();
@@ -759,7 +759,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Deprecated
 	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, NetVolumeNode.Volume volume, ItemStack handStack) {
-		final LogDropContext dropContext = new LogDropContext(world, breakPos, this, dropList, volume);
+		final LogDropContext dropContext = new LogDropContext(world, breakPos, this, dropList, volume, handStack);
 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendLogDrops(null, dropContext);
 		dropCreatorStorage.appendLogDrops(null, dropContext);
 		return dropContext.drops();
