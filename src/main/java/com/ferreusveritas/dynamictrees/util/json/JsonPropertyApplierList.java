@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
 import com.ferreusveritas.dynamictrees.api.treepacks.*;
+import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -41,7 +42,7 @@ public final class JsonPropertyApplierList<T> {
     }
 
     private final Class<T> objectType;
-    private final List<JsonPropertyApplier<? extends T, ?>> appliers = new ArrayList<>();
+    private final List<JsonPropertyApplier<? extends T, ?>> appliers = Lists.newLinkedList();
 
     public JsonPropertyApplierList(final Class<T> objectType) {
         this.objectType = objectType;
