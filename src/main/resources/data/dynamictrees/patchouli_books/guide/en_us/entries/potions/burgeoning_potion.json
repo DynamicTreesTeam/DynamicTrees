@@ -10,7 +10,7 @@
       "ingredient": "minecraft:ghast_tear",
       "bottle": "dynamictrees:dendro_potion",
       "output": "dynamictrees:dendro_potion{potion_index:3}",
-      "text": "This potion causes the tree to rapidly grow."
+      "text": "This potion causes the tree to rapidly grow and replenishes its fertility. It will continue to grow until the soil is dry. The growth effect can be extended for as long as needed by replenishing the fertility every so often."
     },
 	{
       "type": "relations",

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,7 +60,7 @@ public class SoilHelper {
     }
 
     public static void addSoilPropertiesToMap(SoilProperties properties){
-        if (!dirtMap.containsKey(properties.getPrimitiveSoilBlock()))
+        if (!dirtMap.containsKey(properties.getPrimitiveSoilBlock()) && properties.getPrimitiveSoilBlock() != Blocks.AIR)
             dirtMap.put(properties.getPrimitiveSoilBlock(), properties);
     }
 
@@ -98,6 +99,8 @@ public class SoilHelper {
 //        registerSoil(null, primitiveBlock, adjName);
 //    }
     public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, String... adjNames) {
+        if (soilBlock == Blocks.AIR) return SoilProperties.NULL_SOIL_PROPERTIES;
+
         int flag = 0;
         for (String adjName : adjNames){
             if(adjectiveMap.containsKey(adjName)) {
@@ -107,6 +110,7 @@ public class SoilHelper {
                 return SoilProperties.NULL_SOIL_PROPERTIES;
             }
         }
+
         return registerSoil(name, soilBlock, flag);
     }
 

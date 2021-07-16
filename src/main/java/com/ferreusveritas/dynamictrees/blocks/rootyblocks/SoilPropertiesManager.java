@@ -36,8 +36,6 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
 
     @Override
     protected void preLoad(JsonObject jsonObject, SoilProperties soilProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
-        // the soil is added to the soil map
-        SoilHelper.addSoilPropertiesToMap(soilProperties);
 
         // If a custom block registry name was set, set and use it.
         JsonHelper.JsonObjectReader.of(jsonObject).ifContains("block_registry_name", jsonElement ->

@@ -66,9 +66,10 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
         return primitiveSoilBlock;
     }
 
-    public void setPrimitiveSoilBlock(final Block primitiveSoil) {
+    protected void setPrimitiveSoilBlock(final Block primitiveSoil) {
         if (this.primitiveSoilBlock == null || primitiveSoil != this.primitiveSoilBlock.getBlock())
             this.primitiveSoilBlock = primitiveSoil;
+        SoilHelper.addSoilPropertiesToMap(this);
     }
 
     ///////////////////////////////////////////
