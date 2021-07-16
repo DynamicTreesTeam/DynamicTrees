@@ -11,8 +11,10 @@
         "nether": 0.75,
         "wet": 0.75
     },
-    "seed_drop_rarity": 1.0,
-    "stick_drop_rarity": 1.0,
     "perfect_biomes": { "type": "savanna" },
-    "primitive_sapling": "acacia_sapling"
+    "primitive_sapling": "acacia_sapling",
+    "drop_creators": [
+        "seed",
+        "sticks"
+    ]
 }

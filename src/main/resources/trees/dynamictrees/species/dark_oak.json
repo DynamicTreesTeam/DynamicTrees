@@ -15,8 +15,6 @@
         "dry": 0.25,
         "mushroom": 1.25
     },
-    "seed_drop_rarity": 1.0,
-    "stick_drop_rarity": 1.0,
     "perfect_biomes": { "type": "spooky", "name": "minecraft:.*" },
     "primitive_sapling": "dark_oak_sapling",
     "features" : [
@@ -56,5 +54,9 @@
         "bottom_flare",
         "mound",
         "roots"
+    ],
+    "drop_creators": [
+        "seed",
+        "stick"
     ]
 }

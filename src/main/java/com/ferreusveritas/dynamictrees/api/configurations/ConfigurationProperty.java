@@ -107,7 +107,7 @@ public class ConfigurationProperty<T> {
 
     @Override
     public String toString() {
-        return "GenFeatureProperty{" +
+        return "ConfigurationProperty{" +
                 "identifier='" + identifier + '\'' +
                 ", type=" + type +
                 '}';

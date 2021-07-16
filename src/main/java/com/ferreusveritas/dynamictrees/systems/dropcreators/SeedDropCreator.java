@@ -21,14 +21,10 @@ public class SeedDropCreator extends DropCreator {
 		super(registryName);
 	}
 
-	//Allows for overriding species seed drop if a custom seed is set.
+	// Allows for overriding species seed drop if a custom seed is set.
 	protected ItemStack getSeedStack(Species species, ConfiguredDropCreator<DropCreator> configuration) {
 		final ItemStack customSeed = configuration.get(SEED);
-		if (customSeed.isEmpty()) {
-			return species.getSeedStack(1);
-		} else {
-			return customSeed;
-		}
+		return customSeed.isEmpty() ? species.getSeedStack(1) : customSeed;
 	}
 
 	@Override
@@ -78,8 +74,8 @@ public class SeedDropCreator extends DropCreator {
 
 	@Override
 	public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-		int chance = 20; //See BlockLeaves#getSaplingDropChance(state);
-		//Hokey fortune stuff here to match Vanilla logic.
+		int chance = 20; // See BlockLeaves#getSaplingDropChance(state);
+		// Hokey fortune stuff here to match Vanilla logic.
 		if (context.fortune() > 0) {
 			chance -= 2 << context.fortune();
 			if (chance < 10) {
@@ -89,7 +85,7 @@ public class SeedDropCreator extends DropCreator {
 
 		float seasonFactor = 1.0f;
 
-		if(!context.world().isClientSide) {
+		if (!context.world().isClientSide) {
 			seasonFactor = context.species().seasonalSeedDropFactor(context.world(), context.pos());
 		}
 

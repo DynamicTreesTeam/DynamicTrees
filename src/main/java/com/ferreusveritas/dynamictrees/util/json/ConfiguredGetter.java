@@ -35,8 +35,9 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
                             .ifContains("properties", JsonObject.class, propertiesObject -> setProperties(configured, propertiesObject))
                 );
 
-        final C configurable = configured.getValue().getConfigurable();
-        if (configurable == null || (configurable instanceof ConfigurableRegistryEntry && ((ConfigurableRegistryEntry<?, ?>) configurable).getRegistryName().equals(DTTrees.NULL))) {
+        final T value = configured.getValue();
+        if (value == null || value.getConfigurable() == null || (value.getConfigurable() instanceof ConfigurableRegistryEntry &&
+                ((ConfigurableRegistryEntry<?, ?>) value.getConfigurable()).getRegistryName().equals(DTTrees.NULL))) {
             return ObjectFetchResult.failure(configurableName + " couldn't be found from name or wasn't given a name.");
         }
 
@@ -44,7 +45,7 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
     }
 
     public static <T extends Configured<T, ?>> void setProperties (ObjectFetchResult<T> fetchResult, JsonObject object){
-        if (fetchResult.getValue() == ConfiguredGenFeature.NULL_CONFIGURED_FEATURE || fetchResult.getValue().getConfigurable() == null) {
+        if (fetchResult.getValue() == ConfiguredGenFeature.NULL_CONFIGURED_FEATURE || fetchResult.getValue() == null || fetchResult.getValue().getConfigurable() == null) {
             return;
         }
 
