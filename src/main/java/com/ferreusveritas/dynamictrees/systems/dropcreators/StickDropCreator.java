@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.dropcreators;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -13,8 +14,10 @@ import net.minecraft.util.ResourceLocation;
  */
 public class StickDropCreator extends DropCreator {
 
-	public static final ConfigurationProperty<ItemStack> STICKS = ConfigurationProperty.property("sticks", ItemStack.class);
+	public static final ConfigurationProperty<ItemStack> STICK = ConfigurationProperty.property("stick", ItemStack.class);
 	public static final ConfigurationProperty<Integer> MAX_COUNT = ConfigurationProperty.integer("max_count");
+
+	public static final ItemStack STICK_STACK = new ItemStack(Items.STICK);
 
 	public StickDropCreator(ResourceLocation registryName) {
 		super(registryName);
@@ -22,13 +25,13 @@ public class StickDropCreator extends DropCreator {
 
 	@Override
 	protected void registerProperties() {
-		this.register(STICKS, RARITY, MAX_COUNT);
+		this.register(STICK, RARITY, MAX_COUNT);
 	}
 
 	@Override
 	protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
 		return super.createDefaultConfiguration()
-				.with(STICKS, ItemStack.EMPTY)
+				.with(STICK, STICK_STACK)
 				.with(RARITY, 1f)
 				.with(MAX_COUNT, 2);
 	}
@@ -51,7 +54,7 @@ public class StickDropCreator extends DropCreator {
 				chance = 10;
 		}
 		if (context.random().nextInt((int) (chance / configuration.get(RARITY))) == 0) {
-			final ItemStack drop = configuration.getOrInvalidDefault(STICKS, stick -> stick != ItemStack.EMPTY,
+			final ItemStack drop = configuration.getOrInvalidDefault(STICK, stick -> stick != ItemStack.EMPTY,
 					context.species().getSeedStack(1)).copy();
 			drop.setCount(1 + context.random().nextInt(configuration.get(MAX_COUNT)));
 			context.drops().add(drop);
