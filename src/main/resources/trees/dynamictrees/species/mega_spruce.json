@@ -26,9 +26,5 @@
         },
         "clear_volume",
         "podzol"
-    ],
-    "drop_creators": [
-        "seed",
-        "stick"
     ]
 }

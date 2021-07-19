@@ -13,8 +13,4 @@
     },
     "perfect_biomes": { "type": "savanna" },
     "primitive_sapling": "acacia_sapling",
-    "drop_creators": [
-        "seed",
-        "sticks"
-    ]
 }

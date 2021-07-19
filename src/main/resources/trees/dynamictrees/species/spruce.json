@@ -18,9 +18,5 @@
     "features" : [
         "conifer_topper",
         "podzol"
-    ],
-    "drop_creators": [
-        "seed",
-        "stick"
     ]
 }

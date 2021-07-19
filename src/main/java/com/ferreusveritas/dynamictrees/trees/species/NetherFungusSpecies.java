@@ -39,7 +39,7 @@ public class NetherFungusSpecies extends Species {
         super(name, family, leavesProperties);
         this.setSaplingShape(CommonVoxelShapes.SAPLING);
 
-        addDropCreator(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")){
+        addDropCreators(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")){
             @Override
             protected void registerProperties() {
 

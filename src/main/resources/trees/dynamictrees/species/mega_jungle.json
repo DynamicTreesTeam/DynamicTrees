@@ -39,9 +39,5 @@
         },
         "clear_volume",
         "bottom_flare"
-    ],
-    "drop_creators": [
-        "seed",
-        "stick"
     ]
 }

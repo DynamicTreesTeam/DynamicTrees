@@ -139,7 +139,7 @@ public final class TreeRegistry {
 		if (speciesName == null || speciesName.equals(GLOBAL)) {
 			return GLOBAL_DROP_CREATOR_STORAGE.addDropCreator(dropCreator);
 		} else {
-			return findSpecies(speciesName).addDropCreator(dropCreator);
+			return findSpecies(speciesName).addDropCreators(dropCreator);
 		}
 	}
 

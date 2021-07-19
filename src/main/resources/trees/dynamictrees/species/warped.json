@@ -27,5 +27,8 @@
                 "min_radius": 7
             }
         }
+    ],
+    "drop_creators": [
+        "log"
     ]
 }

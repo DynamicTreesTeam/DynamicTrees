@@ -89,6 +89,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
+import static com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator.RARITY;
+
 public class Species extends RegistryEntry<Species> implements IResettable<Species> {
 
 	public static final Species NULL_SPECIES = new Species() {
@@ -98,7 +100,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		@Override public boolean plantSapling(IWorld world, BlockPos pos, boolean locationOverride) { return false; }
 		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
-		@Override public boolean addDropCreator(DropCreator dropCreator) { return false; }
+		@Override public boolean addDropCreators(DropCreator... dropCreators) { return false; }
 		@Override public Species setSeed(Seed seed) { return this; }
 		@Override public ItemStack getSeedStack(int qty) { return ItemStack.EMPTY; }
 		@Override public Species setupStandardSeedDropping() { return this; }
@@ -249,7 +251,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Override
 	public Species setPreReloadDefaults() {
-		this.addDropCreator(DropCreators.LOG);
+		this.addDropCreators(DropCreators.LOG, DropCreators.STICK, DropCreators.SEED);
 		return this.setDefaultGrowingParameters().setSaplingShape(CommonVoxelShapes.SAPLING).setSaplingSound(SoundType.GRASS);
 	}
 
@@ -639,13 +641,13 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Deprecated
 	public Species setupStandardSeedDropping() {
-		this.addDropCreator(DropCreators.SEED.getDefaultConfiguration());
+		this.addDropCreators(DropCreators.SEED.getDefaultConfiguration());
 		return this;
 	}
 
 	@Deprecated
 	public Species setupStandardSeedDropping(float rarity) {
-		this.addDropCreator(DropCreators.SEED.with(SeedDropCreator.RARITY, rarity));
+		this.addDropCreators(DropCreators.SEED.with(RARITY, rarity));
 		LogManager.getLogger().warn("Deprecated use of `stick_drop_rarity` property by Species `" + this.getRegistryName() + "`. This will be removed in a future version of DT in favour of the `drop_creators` list property.");
 		return this;
 	}
@@ -656,13 +658,13 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Deprecated
 	public Species setupCustomSeedDropping(ItemStack customSeed) {
-		this.addDropCreator(DropCreators.SEED.with(SeedDropCreator.SEED, customSeed));
+		this.addDropCreators(DropCreators.SEED.with(SeedDropCreator.SEED, customSeed));
 		return this;
 	}
 
 	@Deprecated
 	public Species setupCustomSeedDropping(ItemStack customSeed, float rarity) {
-		this.addDropCreator(DropCreators.SEED.with(SeedDropCreator.SEED, customSeed).with(SeedDropCreator.RARITY, rarity));
+		this.addDropCreators(DropCreators.SEED.with(SeedDropCreator.SEED, customSeed).with(RARITY, rarity));
 		return this;
 	}
 
@@ -673,18 +675,23 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	@Deprecated
 	public Species setupStandardStickDropping (float rarity) {
-		this.addDropCreator(DropCreators.STICK);
+		this.addDropCreators(DropCreators.STICK.with(RARITY, rarity));
 		LogManager.getLogger().warn("Deprecated use of `stick_drop_rarity` property by Species `" + this.getRegistryName() + "`. This will be removed in a future version of DT in favour of the `drop_creators` list property.");
 		return this;
 	}
 
-	public boolean addDropCreator(DropCreator dropCreator) {
-		return this.dropCreators.add(dropCreator.getDefaultConfiguration());
+	public boolean addDropCreators(DropCreator... dropCreators) {
+		Arrays.stream(dropCreators).forEach(dropCreator ->
+			this.dropCreators.add(dropCreator.getDefaultConfiguration()));
+		return true;
 	}
 
+	@SafeVarargs
 	@SuppressWarnings("unchecked")
-	public <DC extends DropCreator> boolean addDropCreator(ConfiguredDropCreator<DC> dropCreator) {
-		return this.dropCreators.add((ConfiguredDropCreator<DropCreator>) dropCreator);
+	public final <DC extends DropCreator> boolean addDropCreators(ConfiguredDropCreator<DC>... dropCreators) {
+		Arrays.stream(dropCreators).forEach(configuration ->
+				this.dropCreators.add(((ConfiguredDropCreator<DropCreator>) configuration)));
+		return true;
 	}
 
 	public boolean removeDropCreator(ResourceLocation registryName) {

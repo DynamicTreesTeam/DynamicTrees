@@ -54,9 +54,5 @@
         "bottom_flare",
         "mound",
         "roots"
-    ],
-    "drop_creators": [
-        "seed",
-        "stick"
     ]
 }

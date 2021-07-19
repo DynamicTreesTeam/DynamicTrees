@@ -119,9 +119,9 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                     species.addAcceptableSoils(acceptableSoil);
                     return PropertyApplierResult.success();
                 })
-                .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreator)
+                .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreators)
                 .registerArrayApplier("features", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, Species::addGenFeature)
-                .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreator);
+                .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreators);
 
         super.registerAppliers();
     }
@@ -135,6 +135,9 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
     @Override
     protected void preReload(JsonObject jsonObject, Species species, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
         this.composterChances.put(species, species.defaultSeedComposterChance());
+        if (jsonObject.has("drop_creators") && jsonObject.get("drop_creators").isJsonArray()) {
+            species.dropCreators.clear();
+        }
     }
 
     @Override

@@ -28,6 +28,7 @@
         "fruit"
     ],
     "drop_creators": [
+        "log",
         "stick"
     ]
 }

@@ -21,9 +21,5 @@
         },
         "mushroom_rot",
         "bee_nest"
-    ],
-    "drop_creators": [
-        "seed",
-        "stick"
     ]
 }

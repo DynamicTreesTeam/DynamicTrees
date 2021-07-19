@@ -25,9 +25,5 @@
         },
         "rot_soil",
         "bee_nest"
-    ],
-    "drop_creators": [
-        "seed",
-        "stick"
     ]
 }

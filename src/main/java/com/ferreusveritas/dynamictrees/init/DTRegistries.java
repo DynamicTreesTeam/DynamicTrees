@@ -123,7 +123,7 @@ public class DTRegistries {
 		final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
 
 		if (appleOak.isValid()) {
-			appleOak.addDropCreator(DropCreators.FRUIT);
+			appleOak.addDropCreators(DropCreators.FRUIT);
 			APPLE_FRUIT.setSpecies(appleOak);
 		}
 	}
