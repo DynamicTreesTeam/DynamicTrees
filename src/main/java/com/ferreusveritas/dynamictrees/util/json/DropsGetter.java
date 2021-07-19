@@ -19,25 +19,19 @@ import java.util.Optional;
  */
 public final class DropsGetter implements IJsonObjectGetter<Drops> {
 
-    public static final Map<String, DropsEntry<?>> DROPS_TYPES = new HashMap<>();
+    public static final Map<String, Codec<Drops>> DROPS_TYPES = new HashMap<>();
 
-    public static final class DropsEntry<D extends Drops> {
-        private final Class<D> dropsClass;
-        private final Codec<D> codec;
-
-        public DropsEntry(Class<D> dropsClass, Codec<D> codec) {
-            this.dropsClass = dropsClass;
-            this.codec = codec;
-        }
+    @SuppressWarnings("unchecked")
+    public static <D extends Drops> void registerCodec(String id, Codec<D> dropsCodec) {
+        DROPS_TYPES.put(id, ((Codec<Drops>) dropsCodec));
     }
 
     static {
-        DROPS_TYPES.put("normal", new DropsEntry<>(NormalDrops.class, NormalDrops.CODEC));
-        DROPS_TYPES.put("weighted", new DropsEntry<>(WeightedDrops.class, WeightedDrops.CODEC));
+        registerCodec("normal", NormalDrops.CODEC);
+        registerCodec("weighted", WeightedDrops.CODEC);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ObjectFetchResult<Drops> get(JsonElement jsonElement) {
         return JsonObjectGetters.JSON_OBJECT.get(jsonElement).map(object -> {
             final String id = JsonHelper.getOrDefault(object, "id", String.class, null);
@@ -45,15 +39,15 @@ public final class DropsGetter implements IJsonObjectGetter<Drops> {
                 return null;
             }
 
-            final DropsEntry<Drops> drops = (DropsEntry<Drops>) DROPS_TYPES.get(id);
-            if (drops == null) {
+            final Codec<Drops> codec = DROPS_TYPES.get(id);
+            if (codec == null) {
                 return null;
             }
 
             final JsonObject properties = JsonHelper.getOrDefault(object, "properties", JsonObject.class, new JsonObject());
-            return drops.codec.decode(JsonOps.INSTANCE, properties)
+            return codec.decode(JsonOps.INSTANCE, properties)
                     .result().map(Pair::getFirst).orElse(null);
-        }, "Error de-serialising drops.");
+        }, "Error de-serialising drops from element \"" + jsonElement + "\".");
     }
 
 }

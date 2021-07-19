@@ -27,8 +27,10 @@ public final class WeightedDrops implements Drops {
             instance.group(
                     Codec.unboundedMap(ITEM_CODEC, Codec.INT).fieldOf("items")
                             .forGetter(WeightedDrops::getItems),
-                    Codec.FLOAT.fieldOf("rarity").forGetter(WeightedDrops::getRarity),
-                    Codec.INT.fieldOf("base_chance").forGetter(WeightedDrops::getBaseChance)
+                    Codec.FLOAT.optionalFieldOf("rarity", 1f)
+                            .forGetter(WeightedDrops::getRarity),
+                    Codec.INT.optionalFieldOf("chance", 200)
+                            .forGetter(WeightedDrops::getChance)
             ).apply(instance, WeightedDrops::new)
     );
 
@@ -39,12 +41,12 @@ public final class WeightedDrops implements Drops {
     private final float rarity;
 
     /** The base chance of dropping each item. This will be altered depending on the fortune level. */
-    private final int baseChance;
+    private final int chance;
 
-    public WeightedDrops(Map<Item, Integer> items, float rarity, int baseChance) {
+    public WeightedDrops(Map<Item, Integer> items, float rarity, int chance) {
         this.items = items;
         this.rarity = rarity;
-        this.baseChance = baseChance;
+        this.chance = chance;
     }
 
     public Map<Item, Integer> getItems() {
@@ -55,8 +57,8 @@ public final class WeightedDrops implements Drops {
         return rarity;
     }
 
-    public int getBaseChance() {
-        return baseChance;
+    public int getChance() {
+        return chance;
     }
 
     public void addItem(final Item item, final int weight) {
@@ -69,7 +71,7 @@ public final class WeightedDrops implements Drops {
 
     @Override
     public void appendDrops(List<ItemStack> drops, Random random, int fortune) {
-        final int chance = this.getChance(fortune, this.baseChance) * this.getTotalWeight();
+        final int chance = this.getChance(fortune, this.chance) * this.getTotalWeight();
 
         this.items.forEach((item, weight) -> {
                 if (random.nextInt((int) ((chance / weight) / this.rarity)) == 0) {
