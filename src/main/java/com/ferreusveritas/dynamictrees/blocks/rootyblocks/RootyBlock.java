@@ -20,8 +20,11 @@ import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
@@ -36,11 +39,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
@@ -69,8 +75,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	private final SoilProperties properties;
 	//private ConfiguredSoilProperties<SoilProperties> configuredProperties = ConfiguredSoilProperties.NULL_CONFIGURED_SOIL_PROPERTIES;
 
-	public RootyBlock(SoilProperties properties) {
-		super(Properties.copy(properties.primitiveSoilBlock).randomTicks());
+	public RootyBlock(SoilProperties properties, Properties blockProperties) {
+		super(blockProperties.randomTicks());
 		this.properties = properties;
 		registerDefaultState(defaultBlockState().setValue(FERTILITY, 0).setValue(IS_VARIANT, false));
 	}
@@ -88,6 +94,62 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 
 	///////////////////////////////////////////
+	// BLOCK PROPERTIES
+	///////////////////////////////////////////
+
+	@Override public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
+		return getPrimitiveSoilBlock().getSoundType(getPrimitiveSoilBlock().defaultBlockState(), world, pos, entity);
+	}
+	@Override public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
+		return getPrimitiveSoilBlock().getLightValue(getPrimitiveSoilBlock().defaultBlockState(), world, pos);
+	}
+	@Override public boolean propagatesSkylightDown(BlockState p_200123_1_, IBlockReader p_200123_2_, BlockPos p_200123_3_) {
+		return getPrimitiveSoilBlock().propagatesSkylightDown(getPrimitiveSoilBlock().defaultBlockState(), p_200123_2_, p_200123_3_);
+	}
+	@Override public int getLightBlock(BlockState p_200011_1_, IBlockReader p_200011_2_, BlockPos p_200011_3_) {
+		return getPrimitiveSoilBlock().getLightBlock(getPrimitiveSoilBlock().defaultBlockState(), p_200011_2_, p_200011_3_);
+	}
+	@Nullable @Override public ToolType getHarvestTool(BlockState state) {
+		return getPrimitiveSoilBlock().getHarvestTool(getPrimitiveSoilBlock().defaultBlockState());
+	}
+	@Override public int getHarvestLevel(BlockState state) {
+		return getPrimitiveSoilBlock().getHarvestLevel(getPrimitiveSoilBlock().defaultBlockState());
+	}
+	@Override public MaterialColor defaultMaterialColor() {
+		return getPrimitiveSoilBlock().defaultMaterialColor();
+	}
+	@Override public VoxelShape getShape(BlockState p_220053_1_, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_) {
+		return getPrimitiveSoilBlock().getShape(getPrimitiveSoilBlock().defaultBlockState(), p_220053_2_, p_220053_3_, p_220053_4_);
+	}
+	@Override public float getFriction() {
+		return getPrimitiveSoilBlock().getFriction();
+	}
+	@Override public float getExplosionResistance(BlockState state, IBlockReader world, BlockPos pos, Explosion explosion) {
+		return getPrimitiveSoilBlock().getExplosionResistance(getPrimitiveSoilBlock().defaultBlockState(), world, pos, explosion);
+	}
+	@Override public float getSpeedFactor() {
+		return getPrimitiveSoilBlock().getSpeedFactor();
+	}
+	@Override public float getJumpFactor() {
+		return getPrimitiveSoilBlock().getJumpFactor();
+	}
+	@Override public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+		return getPrimitiveSoilBlock().getFireSpreadSpeed(getPrimitiveSoilBlock().defaultBlockState(), world, pos, face);
+	}
+	@Override public boolean isFireSource(BlockState state, IWorldReader world, BlockPos pos, Direction side) {
+		return getPrimitiveSoilBlock().isFireSource(getPrimitiveSoilBlock().defaultBlockState(), world, pos, side);
+	}
+	@Nonnull @Override public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
+		return getPrimitiveSoilBlock().defaultBlockState().getDrops(builder);
+	}
+	@Override public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+		return getPrimitiveSoilBlock().getPickBlock(getPrimitiveSoilBlock().defaultBlockState(), target, world, pos, player);
+	}
+	@Override public float getHardness(IBlockReader worldIn, BlockPos pos) {
+		return (float) (getPrimitiveSoilBlock().defaultBlockState().getDestroySpeed(worldIn, pos) * DTConfigs.ROOTY_BLOCK_HARDNESS_MULTIPLIER.get());
+	}
+
+	///////////////////////////////////////////
 	// BLOCKSTATES
 	///////////////////////////////////////////
 
@@ -99,7 +161,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	///////////////////////////////////////////
 	// INTERACTION
 	///////////////////////////////////////////
-
 
 	@Nullable
 	@Override
@@ -157,7 +218,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		
 	}
 	
-	
 	/**
 	 * This is the state the rooty dirt returns to once it no longer supports a tree structure.
 	 * 
@@ -205,22 +265,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		}
 	}
 
-	@Nonnull
-	@Override
-	public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
-		return getPrimitiveSoilBlock().defaultBlockState().getDrops(builder);
-	}
-	
-	@Override
-	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		return getPrimitiveSoilBlock().getPickBlock(getPrimitiveSoilBlock().defaultBlockState(), target, world, pos, player);
-	}
-
-	@Override
-	public float getHardness(IBlockReader worldIn, BlockPos pos) {
-		return (float) (getPrimitiveSoilBlock().defaultBlockState().getDestroySpeed(worldIn, pos) * DTConfigs.ROOTY_BLOCK_HARDNESS_MULTIPLIER.get());
-	}
-
 	@Override
 	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
@@ -235,7 +279,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getItemInHand(handIn), hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	}
-	
 	
 	public void destroyTree(World world, BlockPos rootPos) {
 		Optional<BranchBlock> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.above()));
@@ -257,7 +300,18 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		destroyTree(world, pos);
 		super.onBlockExploded(state, world, pos, explosion);
 	}
-	
+
+
+	@Nonnull
+	@Override
+	public PushReaction getPistonPushReaction(BlockState state) {
+		return PushReaction.BLOCK;
+	}
+
+	///////////////////////////////////////////
+	// TREE STUFF
+	///////////////////////////////////////////
+
 	public int getFertility(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
 		return blockState.getValue(FERTILITY);
 	}
@@ -389,12 +443,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		if(rootyDirtTE != null) {
 			rootyDirtTE.setSpecies(species);
 		}
-	}
-	
-	@Nonnull
-	@Override
-	public PushReaction getPistonPushReaction(BlockState state) {
-		return PushReaction.BLOCK;
 	}
 	
 	public final TreePartType getTreePartType() {

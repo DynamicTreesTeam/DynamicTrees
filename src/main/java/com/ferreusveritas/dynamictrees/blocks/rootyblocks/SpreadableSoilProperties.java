@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.util.json.ListGetter;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -47,14 +48,25 @@ public class SpreadableSoilProperties extends SoilProperties{
     }
 
     @Override
-    protected RootyBlock createDynamicSoil() {
-        return new SpreadableRootyBlock(this);
+    protected RootyBlock createDynamicSoil(AbstractBlock.Properties blockProperties) {
+        return new SpreadableRootyBlock(this, blockProperties);
+    }
+
+    public void addSpreadableSoils (Block... blocks){
+        for (Block block : blocks){
+            SoilProperties props = SoilHelper.getProperties(block);
+            if (props.isValid())
+                spreadable_soils.add(props);
+        }
+    }
+    public void addSpreadableSoils (SoilProperties... props){
+        spreadable_soils.addAll(Arrays.asList(props));
     }
 
     public static class SpreadableRootyBlock extends RootyBlock {
 
-        public SpreadableRootyBlock(SpreadableSoilProperties properties){
-            super(properties);
+        public SpreadableRootyBlock(SpreadableSoilProperties properties, Properties blockProperties){
+            super(properties, blockProperties);
         }
 
         @Override

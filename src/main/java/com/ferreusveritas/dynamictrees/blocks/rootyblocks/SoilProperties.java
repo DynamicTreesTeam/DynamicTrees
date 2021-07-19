@@ -10,8 +10,13 @@ import com.ferreusveritas.dynamictrees.trees.IResettable;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
@@ -29,7 +34,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
         @Override public Block getPrimitiveSoilBlock() { return Blocks.AIR; }
         @Nullable @Override public RootyBlock getDynamicSoilBlock() { return null; }
         @Override public Integer getSoilFlags() { return 0; }
-        @Override public void generateDynamicSoil() { }
+        @Override public void generateDynamicSoil(AbstractBlock.Properties properties) { }
      }.setRegistryName(DTTrees.NULL).setBlockRegistryName(DTTrees.NULL);
 
     /**
@@ -48,7 +53,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
     protected SoilProperties (final Block primitiveBlock, ResourceLocation name, Integer soilFlags, boolean generate){
         this(primitiveBlock, name);
         this.soilFlags = soilFlags;
-        if (generate) generateDynamicSoil();
+        if (generate) generateDynamicSoil(AbstractBlock.Properties.copy(primitiveBlock));
     }
     public SoilProperties (final ResourceLocation registryName){
         this(null, registryName);
@@ -98,16 +103,28 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
         return dynamicSoilBlock;
     }
 
-    public void generateDynamicSoil () {
+    public void generateDynamicSoil (AbstractBlock.Properties blockProperties) {
         setBlockRegistryNameIfNull();
-        this.dynamicSoilBlock = RegistryHandler.addBlock(this.blockRegistryName, this.createDynamicSoil());
+        this.dynamicSoilBlock = RegistryHandler.addBlock(this.blockRegistryName, this.createDynamicSoil(blockProperties));
     }
-    protected RootyBlock createDynamicSoil () {
-        return new RootyBlock(this);
+    protected RootyBlock createDynamicSoil (AbstractBlock.Properties blockProperties) {
+        return new RootyBlock(this, blockProperties);
     }
 
     public void setDynamicSoilBlock (RootyBlock rootyBlock){
         this.dynamicSoilBlock = rootyBlock;
+    }
+
+    ///////////////////////////////////////////
+    // MATERIAL
+    ///////////////////////////////////////////
+
+    public Material getDefaultMaterial() {
+        return Material.DIRT;
+    }
+
+    public AbstractBlock.Properties getDefaultBlockProperties(final Material material, final MaterialColor materialColor) {
+        return AbstractBlock.Properties.of(material, materialColor).strength(0.5F).sound(SoundType.GRAVEL);
     }
 
     ///////////////////////////////////////////

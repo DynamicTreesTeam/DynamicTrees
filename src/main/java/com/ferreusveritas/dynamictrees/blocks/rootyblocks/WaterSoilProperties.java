@@ -4,10 +4,9 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.IWaterLoggable;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -40,8 +39,18 @@ public class WaterSoilProperties extends SoilProperties {
     }
 
     @Override
-    protected RootyBlock createDynamicSoil() {
-        return new RootyWaterBlock(this);
+    protected RootyBlock createDynamicSoil(AbstractBlock.Properties blockProperties) {
+        return new RootyWaterBlock(this, blockProperties);
+    }
+
+    @Override
+    public Material getDefaultMaterial() {
+        return Material.WATER;
+    }
+
+    @Override
+    public AbstractBlock.Properties getDefaultBlockProperties(Material material, MaterialColor materialColor) {
+        return AbstractBlock.Properties.copy(Blocks.WATER);
     }
 
     public static class RootyWaterBlock extends RootyBlock implements IWaterLoggable {
@@ -49,8 +58,8 @@ public class WaterSoilProperties extends SoilProperties {
         protected static final AxisAlignedBB WATER_ROOTS_AABB = new AxisAlignedBB(0.1, 0.0, 0.1, 0.9, 1.0, 0.9);
         public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-        public RootyWaterBlock (SoilProperties properties){
-            super(properties);
+        public RootyWaterBlock (SoilProperties properties, Properties blockProperties){
+            super(properties, blockProperties);
             registerDefaultState(defaultBlockState().setValue(WATERLOGGED, true));
         }
 
