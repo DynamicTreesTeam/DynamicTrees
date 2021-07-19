@@ -647,8 +647,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	@Deprecated
 	public Species setupStandardSeedDropping(float rarity) {
-		this.addDropCreators(DropCreators.SEED.with(RARITY, rarity));
-		LogManager.getLogger().warn("Deprecated use of `stick_drop_rarity` property by Species `" + this.getRegistryName() + "`. This will be removed in a future version of DT in favour of the `drop_creators` list property.");
+//		this.addDropCreators(DropCreators.SEED.with(RARITY, rarity));
+		LogManager.getLogger().warn("Deprecated use of `stick_drop_rarity` property by Species `" + this.getRegistryName() + "`. This is ineffectual and will be removed in a future version of DT in favour of the `drop_creators` list property.");
 		return this;
 	}
 
@@ -675,8 +675,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	@Deprecated
 	public Species setupStandardStickDropping (float rarity) {
-		this.addDropCreators(DropCreators.STICK.with(RARITY, rarity));
-		LogManager.getLogger().warn("Deprecated use of `stick_drop_rarity` property by Species `" + this.getRegistryName() + "`. This will be removed in a future version of DT in favour of the `drop_creators` list property.");
+//		this.addDropCreators(DropCreators.STICK.with(RARITY, rarity));
+		LogManager.getLogger().warn("Deprecated use of `stick_drop_rarity` property by Species `" + this.getRegistryName() + "`. This is ineffectual and will be removed in a future version of DT in favour of the `drop_creators` list property.");
 		return this;
 	}
 
