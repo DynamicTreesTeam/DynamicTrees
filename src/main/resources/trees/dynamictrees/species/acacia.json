@@ -12,5 +12,5 @@
         "wet": 0.75
     },
     "perfect_biomes": { "type": "savanna" },
-    "primitive_sapling": "acacia_sapling",
+    "primitive_sapling": "acacia_sapling"
 }
