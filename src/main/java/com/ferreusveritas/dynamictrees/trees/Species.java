@@ -33,9 +33,11 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.*;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
@@ -169,8 +171,6 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	protected final Set<Item> primitiveSaplingItems = new HashSet<>();
 	/** A blockState that will turn itself into this tree */
 	protected DynamicSaplingBlock saplingBlock;
-	/** A place to store what drops from the species. Similar to a loot table */
-	protected StorageDropCreator dropCreatorStorage = new StorageDropCreator();
 
 	protected List<ConfiguredDropCreator<DropCreator>> dropCreators = new ArrayList<>();
 
@@ -687,90 +687,20 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this.dropCreators.add((ConfiguredDropCreator<DropCreator>) dropCreator);
 	}
 
-	public boolean remDropCreator(ResourceLocation dropCreatorName) {
-		return dropCreatorStorage.remDropCreator(dropCreatorName);
+	public boolean removeDropCreator(ResourceLocation registryName) {
+		return this.dropCreators.removeIf(dropCreator ->
+				dropCreator.getConfigurable().getRegistryName().equals(registryName));
 	}
 
-	public Map<ResourceLocation, DropCreator> getDropCreators() {
-		return dropCreatorStorage.getDropCreators();
+	public List<ConfiguredDropCreator<DropCreator>> getDropCreators() {
+		return this.dropCreators;
 	}
 
 	public <C extends DropContext> List<ItemStack> getDrops(final DropCreator.DropType<C> dropType, final C context) {
+		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(null, dropType, context);
 		this.dropCreators.forEach(configuration -> configuration.getConfigurable()
 				.appendDrops(configuration, dropType, context));
 		return context.drops();
-	}
-
-	/**
-	 * Gets a list of drops for a {@link DynamicLeavesBlock} when the entire tree is harvested.
-	 * NOT used for individual {@link DynamicLeavesBlock} being directly harvested by hand or tool.
-	 *
-	 * @param world
-	 * @param leafPos
-	 * @param dropList
-	 * @param random
-	 * @return
-	 */
-	@Deprecated
-	public List<ItemStack> getTreeHarvestDrops(World world, BlockPos leafPos, List<ItemStack> dropList, Random random) {
-		final DropContext dropContext = new DropContext(world, leafPos, this, dropList);
- 		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendHarvestDrops(null, dropContext);
-		this.dropCreatorStorage.appendHarvestDrops(null, dropContext);
-		return dropContext.drops();
-	}
-
-	/**
-	 * Gets a {@link List} of voluntary drops.  Voluntary drops are {@link ItemStack}s that fall from the {@link Family} at
-	 * random with no player interaction.
-	 *
-	 * @param world
-	 * @param rootPos
-	 * @param fertility
-	 * @return
-	 */
-	@Deprecated
-	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, int fertility) {
-		final DropContext dropContext = new DropContext(world, world.random, rootPos, this, new ArrayList<>(), fertility, 0);
-		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendVoluntaryDrops(null, dropContext);
-		this.dropCreatorStorage.appendVoluntaryDrops(null, dropContext);
-		return dropContext.drops();
-	}
-
-	/**
-	 * Gets a {@link List} of Leaves drops.  Leaves drops are {@link ItemStack}s that result from the breaking of
-	 * a {@link DynamicLeavesBlock} directly by hand or with a tool.
-	 *
-	 * @param world
-	 * @param breakPos
-	 * @param dropList
-	 * @param fortune
-	 * @return
-	 */
-	@Deprecated
-	public List<ItemStack> getLeavesDropsOld(@Nullable World world, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
-		final DropContext dropContext = new DropContext(world, world.random, breakPos, this, dropList, -1, fortune);
-		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendLeavesDrops(null, dropContext);
-		dropCreatorStorage.appendLeavesDrops(null, dropContext);
-		return dropContext.drops();
-	}
-
-
-	/**
-	 * Gets a {@link List} of Logs drops.  Logs drops are {@link ItemStack}s that result from the breaking of
-	 * a {@link BranchBlock} directly by hand or with a tool.
-	 *
-	 * @param world
-	 * @param breakPos
-	 * @param dropList
-	 * @param volume
-	 * @return
-	 */
-	@Deprecated
-	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, NetVolumeNode.Volume volume, ItemStack handStack) {
-		final LogDropContext dropContext = new LogDropContext(world, breakPos, this, dropList, volume, handStack);
-		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendLogDrops(null, dropContext);
-		dropCreatorStorage.appendLogDrops(null, dropContext);
-		return dropContext.drops();
 	}
 
 	public static class LogsAndSticks {

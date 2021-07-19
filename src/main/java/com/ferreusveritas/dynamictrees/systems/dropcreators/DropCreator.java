@@ -25,15 +25,20 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 	public static final class DropType<C extends DropContext> extends RegistryEntry<DropType<C>> {
 		public static final DropType<DropContext> NULL = new DropType<>(DTTrees.NULL, (dropCreator, configured, context) -> {});
 
-		public static final DropType<DropContext> HARVEST = new DropType<>(DynamicTrees.resLoc("harvest"), DropCreator::appendHarvestDrops);
-		public static final DropType<DropContext> VOLUNTARY = new DropType<>(DynamicTrees.resLoc("voluntary"), DropCreator::appendVoluntaryDrops);
-		public static final DropType<DropContext> LEAVES = new DropType<>(DynamicTrees.resLoc("leaves"), DropCreator::appendLeavesDrops);
-		public static final DropType<LogDropContext> LOGS = new DropType<>(DynamicTrees.resLoc("logs"), DropCreator::appendLogDrops);
-
 		@SuppressWarnings("unchecked")
 		public static final Class<DropType<DropContext>> TYPE = (Class<DropType<DropContext>>) NULL.getClass();
-
 		public static final Registry<DropType<DropContext>> REGISTRY = new Registry<>(TYPE, NULL);
+
+		public static final DropType<DropContext> HARVEST = register(new DropType<>(DynamicTrees.resLoc("harvest"), DropCreator::appendHarvestDrops));
+		public static final DropType<DropContext> VOLUNTARY = register(new DropType<>(DynamicTrees.resLoc("voluntary"), DropCreator::appendVoluntaryDrops));
+		public static final DropType<DropContext> LEAVES = register(new DropType<>(DynamicTrees.resLoc("leaves"), DropCreator::appendLeavesDrops));
+		public static final DropType<LogDropContext> LOGS = register(new DropType<>(DynamicTrees.resLoc("logs"), DropCreator::appendLogDrops));
+
+		@SuppressWarnings("unchecked")
+		private static <C extends DropContext> DropType<C> register(DropType<C> dropType) {
+			REGISTRY.register((DropType<DropContext>) dropType);
+			return dropType;
+		}
 
 		private final TriConsumer<DropCreator, ConfiguredDropCreator<DropCreator>, C> appendDropConsumer;
 

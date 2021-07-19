@@ -1,108 +1,63 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This works somewhat like a loot table except much more powerful.
  *
  * @author ferreusveritas
- *
  */
 public class StorageDropCreator extends DropCreator {
 
-	private final HashMap<ResourceLocation, DropCreator> dropCreators = new HashMap<>();
+	private final List<ConfiguredDropCreator<DropCreator>> dropCreators = new LinkedList<>();
 
 	public StorageDropCreator() {
 		super(DynamicTrees.resLoc("storage"));
 	}
 
 	public boolean addDropCreator(DropCreator dropCreator) {
-		this.dropCreators.put(dropCreator.getRegistryName(), dropCreator);
-		return true;
+		return this.dropCreators.add(dropCreator.getDefaultConfiguration());
 	}
 
-	public DropCreator findDropCreator(ResourceLocation name) {
-		return dropCreators.get(name);
+	@SuppressWarnings("unchecked")
+	public <DC extends DropCreator> boolean addDropCreator(ConfiguredDropCreator<DC> dropCreator) {
+		return this.dropCreators.add((ConfiguredDropCreator<DropCreator>) dropCreator);
 	}
 
-	public boolean remDropCreator(ResourceLocation name) {
-		return dropCreators.remove(name) != null;
+	public Optional<ConfiguredDropCreator<DropCreator>> findDropCreator(ResourceLocation registryName) {
+		return dropCreators.stream()
+				.filter(configuration -> configuration.getConfigurable().getRegistryName().equals(registryName))
+				.findFirst();
 	}
 
-	public Map<ResourceLocation, DropCreator> getDropCreators() {
-		return new HashMap<>(dropCreators);
+	public List<ConfiguredDropCreator<DropCreator>> findDropCreators(ResourceLocation registryName) {
+		return dropCreators.stream()
+				.filter(configuration -> configuration.getConfigurable().getRegistryName().equals(registryName))
+				.collect(Collectors.toList());
 	}
 
-	private List<ItemStack> makeDropListIfNull(List<ItemStack> dropList) {
-		if(dropList == null) {
-			dropList = new ArrayList<>();
-		}
-		return dropList;
+	public boolean removeDropCreator(ResourceLocation registryName) {
+		return this.dropCreators.removeIf(configuration ->
+				configuration.getConfigurable().getRegistryName().equals(registryName));
+	}
+
+	public List<ConfiguredDropCreator<DropCreator>> getDropCreators() {
+		return new LinkedList<>(this.dropCreators);
 	}
 
 	@Override
 	protected void registerProperties() { }
 
 	@Override
-	public <C extends DropContext> void appendDrops(ConfiguredDropCreator<DropCreator> configuration, DropType<C> dropType, C context) {
-		for (final DropCreator dropCreator : this.dropCreators.values()) {
-			dropCreator.appendDrops(null, dropType, context);
-		}
-
-		context.drops();
+	public <C extends DropContext> void appendDrops(ConfiguredDropCreator<DropCreator> nothing, DropType<C> dropType, C context) {
+		this.dropCreators.forEach(configuration ->
+				configuration.getConfigurable().appendDrops(configuration, dropType, context));
 	}
-
-//	@Override
-//	public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int soilLife, int fortune) {
-//		dropList = makeDropListIfNull(dropList);
-//
-//		for(DropCreator dropCreator : dropCreators.values()) {
-//			dropList = dropCreator.getHarvestDrop(world, species, leafPos, random, dropList, soilLife, fortune);
-//		}
-//
-//		return dropList;
-//	}
-//
-//	@Override
-//	public List<ItemStack> getVoluntaryDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, int soilLife) {
-//		dropList = makeDropListIfNull(dropList);
-//
-//		for(DropCreator dropCreator : dropCreators.values()) {
-//			dropList = dropCreator.getVoluntaryDrop(world, species, rootPos, random, dropList, soilLife);
-//		}
-//
-//		return dropList;
-//	}
-//
-//	@Override
-//	public List<ItemStack> getLeavesDrop(World access, Species species, BlockPos breakPos, Random random, List<ItemStack> dropList, int fortune) {
-//		dropList = makeDropListIfNull(dropList);
-//
-//		for(IDropCreator dropCreator : dropCreators.values()) {
-//			dropList = dropCreator.getLeavesDrop(access, species, breakPos, random, dropList, fortune);
-//		}
-//
-//		return dropList;
-//	}
-//
-//	public List<ItemStack> getLogsDrop(World world, Species species, BlockPos rootPos, Random random, List<ItemStack> dropList, NetVolumeNode.Volume volume) {
-//		dropList = makeDropListIfNull(dropList);
-//
-//		for(IDropCreator dropCreator : dropCreators.values()) {
-//			dropList = dropCreator.getLogsDrop(world, species, rootPos, random, dropList, volume);
-//		}
-//
-//		return dropList;
-//	}
 
 	@Override
 	public String toString() {

@@ -11,6 +11,8 @@ import java.util.Random;
 @FunctionalInterface
 public interface Drops {
 
+    Drops NONE = (drops, random, fortune) -> { };
+
     void appendDrops(List<ItemStack> drops, Random random, int fortune);
 
     default int getChance(int fortune, int baseChance) {

@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -148,14 +149,14 @@ public final class TreeRegistry {
 
 	public static boolean removeDropCreator(@Nullable final ResourceLocation speciesName, final ResourceLocation dropCreatorName) {
 		if (speciesName == null || speciesName.equals(GLOBAL)) {
-			return GLOBAL_DROP_CREATOR_STORAGE.remDropCreator(dropCreatorName);
+			return GLOBAL_DROP_CREATOR_STORAGE.removeDropCreator(dropCreatorName);
 		} else {
-			return findSpecies(speciesName).remDropCreator(dropCreatorName);
+			return findSpecies(speciesName).removeDropCreator(dropCreatorName);
 		}
 	}
 
-	public static Map<ResourceLocation, Map<ResourceLocation, DropCreator>> getDropCreatorsMap() {
-		final Map<ResourceLocation, Map<ResourceLocation, DropCreator>> dir = new HashMap<>();
+	public static Map<ResourceLocation, List<ConfiguredDropCreator<DropCreator>>> getDropCreatorsMap() {
+		final Map<ResourceLocation, List<ConfiguredDropCreator<DropCreator>>> dir = new HashMap<>();
 		dir.put(GLOBAL, GLOBAL_DROP_CREATOR_STORAGE.getDropCreators());
 		Species.REGISTRY.forEach(species -> dir.put(species.getRegistryName(), species.getDropCreators()));
 		return dir;

@@ -30,7 +30,7 @@ public final class MapGetter<K, V> implements IJsonObjectGetter<Map<K, V>> {
     public ObjectFetchResult<Map<K, V>> get(JsonElement jsonElement) {
         // TODO: Work out a way to log resulting warnings/errors.
         return JsonObjectGetters.JSON_OBJECT.get(jsonElement).map(object -> {
-            final Map<K, V> map = this.mapSupplier.get();
+                final Map<K, V> map = this.mapSupplier.get();
             object.entrySet().forEach(entry ->
                     this.valueGetter.get(entry.getValue()).ifSuccessful(value ->
                             this.keyGetter.get(new JsonPrimitive(entry.getKey()))

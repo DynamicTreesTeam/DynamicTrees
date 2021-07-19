@@ -45,22 +45,26 @@ public final class NormalDropCreator extends DropCreator {
 
     @Override
     public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-        configuration.get(DROP_MAP).get(DropType.HARVEST).appendDrops(context.drops(), context.random(), context.fortune());
+        configuration.get(DROP_MAP).getOrDefault(DropType.HARVEST, Drops.NONE)
+                .appendDrops(context.drops(), context.random(), context.fortune());
     }
 
     @Override
     public void appendVoluntaryDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-        configuration.get(DROP_MAP).get(DropType.VOLUNTARY).appendDrops(context.drops(), context.random(), 0);
+        configuration.get(DROP_MAP).getOrDefault(DropType.VOLUNTARY, Drops.NONE)
+                .appendDrops(context.drops(), context.random(), 0);
     }
 
     @Override
     public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-        configuration.get(DROP_MAP).get(DropType.LEAVES).appendDrops(context.drops(), context.random(), context.fortune());
+        configuration.get(DROP_MAP).getOrDefault(DropType.LEAVES, Drops.NONE)
+                .appendDrops(context.drops(), context.random(), context.fortune());
     }
 
     @Override
     public void appendLogDrops(ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) {
-        configuration.get(DROP_MAP).get(DropType.LOGS).appendDrops(context.drops(), context.random(), 0);
+        configuration.get(DROP_MAP).getOrDefault(DropType.LOGS, Drops.NONE)
+                .appendDrops(context.drops(), context.random(), 0);
     }
 
 }

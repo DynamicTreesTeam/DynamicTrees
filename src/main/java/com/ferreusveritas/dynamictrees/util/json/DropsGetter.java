@@ -4,12 +4,15 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.NormalDrops;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.WeightedDrops;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Harley O'Connor
@@ -47,9 +50,9 @@ public final class DropsGetter implements IJsonObjectGetter<Drops> {
                 return null;
             }
 
-            return drops.codec.decode(JsonOps.INSTANCE, object).result()
-                    .map(Pair::getFirst)
-                    .orElse(null);
+            final JsonObject properties = JsonHelper.getOrDefault(object, "properties", JsonObject.class, new JsonObject());
+            return drops.codec.decode(JsonOps.INSTANCE, properties)
+                    .result().map(Pair::getFirst).orElse(null);
         }, "Error de-serialising drops.");
     }
 
