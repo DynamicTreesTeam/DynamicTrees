@@ -79,13 +79,13 @@ public class PalmLeavesProperties extends LeavesProperties {
         }
 
         @Override
-        public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-            return side == Direction.UP && from.getFamily().isCompatibleDynamicLeaves(Species.NULL_SPECIES, blockState, world, pos) ? fromRadius : 0;
+        public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+            return side == Direction.UP && from.getFamily().isCompatibleDynamicLeaves(Species.NULL_SPECIES, state, reader, pos) ? fromRadius : 0;
         }
 
         @Override
-        public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
-            return branch.getFamily() == getFamily(blockState, blockAccess, pos) ? BranchBlock.setSupport(0, 1) : 0;
+        public int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+            return branch.getFamily() == getFamily(state, reader, pos) ? BranchBlock.setSupport(0, 1) : 0;
         }
 
         @Override

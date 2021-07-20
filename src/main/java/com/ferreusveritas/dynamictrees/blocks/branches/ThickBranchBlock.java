@@ -54,10 +54,10 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	///////////////////////////////////////////
 
 	@Override
-	public int getRadius(BlockState blockState) {
-		if (!(blockState.getBlock() instanceof ThickBranchBlock))
-			return super.getRadius(blockState);
-		return isSameTree(blockState) ? MathHelper.clamp(blockState.getValue(RADIUS_DOUBLE), 1, getMaxRadius()) : 0;
+	public int getRadius(BlockState state) {
+		if (!(state.getBlock() instanceof ThickBranchBlock))
+			return super.getRadius(state);
+		return isSameTree(state) ? MathHelper.clamp(state.getValue(RADIUS_DOUBLE), 1, getMaxRadius()) : 0;
 	}
 
 	@Override
@@ -109,10 +109,10 @@ public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
 	}
 
 	@Override
-	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+	public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		if (from instanceof ThickBranchBlock)
-			return getRadius(blockState);
-		return Math.min(getRadius(blockState), MAX_RADIUS);
+			return getRadius(state);
+		return Math.min(getRadius(state), MAX_RADIUS);
 	}
 
 	@Override
