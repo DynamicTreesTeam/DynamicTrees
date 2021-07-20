@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class FruitDropCreator extends DropCreator {
 
-	public static final ConfigurationProperty<ItemStack> FRUIT = ConfigurationProperty.property("fruit", ItemStack.class);
+	public static final ConfigurationProperty<ItemStack> FRUIT = ConfigurationProperty.property("fruit_item", ItemStack.class);
 
 	public FruitDropCreator(ResourceLocation registryName) {
 		super(registryName);
