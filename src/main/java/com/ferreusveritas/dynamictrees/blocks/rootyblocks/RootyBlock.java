@@ -185,7 +185,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	public Direction getTrunkDirection(IBlockReader access, BlockPos rootPos) {
 		return Direction.UP;
 	}
-	
+
 	/**
 //	 *
 //	 * @param world
@@ -250,19 +250,19 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 		if (TreeHelper.isRooty(newState) || (customRootDecay != null && customRootDecay.doDecay(world, rootPos, rootyState, species)))
 			return;
 
-		final Biome biome = world.getBiome(rootPos);
+//		final Biome biome = world.getBiome(rootPos);
 		final BlockState primitiveDirt = this.getPrimitiveSoilBlock().defaultBlockState();
 
-		final BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
-		final BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnderMaterial();
+//		final BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
+//		final BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnderMaterial();
 
-		if (primitiveDirt == topBlock || primitiveDirt == fillerBlock) {
-			world.setBlock(rootPos, primitiveDirt, Constants.BlockFlags.DEFAULT);
-		} else if (topBlock.getMaterial() == newState.getMaterial()) {
-			world.setBlock(rootPos, topBlock, Constants.BlockFlags.DEFAULT);
-		} else if (fillerBlock.getMaterial() == newState.getMaterial()) {
-			world.setBlock(rootPos, fillerBlock, Constants.BlockFlags.DEFAULT);
-		}
+		//if (primitiveDirt == topBlock || primitiveDirt == fillerBlock) {
+		world.setBlock(rootPos, primitiveDirt, Constants.BlockFlags.DEFAULT);
+//		} else if (topBlock.getMaterial() == newState.getMaterial()) {
+//			world.setBlock(rootPos, topBlock, Constants.BlockFlags.DEFAULT);
+//		} else if (fillerBlock.getMaterial() == newState.getMaterial()) {
+//			world.setBlock(rootPos, fillerBlock, Constants.BlockFlags.DEFAULT);
+//		}
 	}
 
 	@Override
