@@ -184,6 +184,7 @@ public class JsonHelper {
 			return this;
 		}
 
+		@SuppressWarnings("unchecked")
 		public <T> JsonElementReader elseIfEquals(final T value, final Consumer<T> consumer) {
 			if (!this.read)
 				JsonObjectGetters.getObjectGetter((Class<T>) value.getClass()).get(this.jsonElement)

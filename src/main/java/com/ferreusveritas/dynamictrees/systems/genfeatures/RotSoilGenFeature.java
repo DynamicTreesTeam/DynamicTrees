@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostRotGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
@@ -10,14 +9,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
-import java.util.Random;
-
 /**
- * Implementation of {@link IPostRotGenFeature} that rots the soil after a
+ * A{@link GenFeature} handling post rot behaviour in which the soil below the base
+ * branch is turned to the {@link #ROTTEN_SOIL} property block after that branch has
+ * rotted away.
  *
  * @author Harley O'Connor
  */
-public class RotSoilGenFeature extends GenFeature implements IPostRotGenFeature {
+public class RotSoilGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Block> ROTTEN_SOIL = ConfigurationProperty.block("rotten_soil");
 
@@ -36,11 +35,17 @@ public class RotSoilGenFeature extends GenFeature implements IPostRotGenFeature 
     }
 
     @Override
-    public void postRot(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid) {
-        if (!TreeHelper.isRooty(world.getBlockState(pos.below())))
-            return;
+    protected boolean postRot(ConfiguredGenFeature<GenFeature> configuration, PostRotContext context) {
+        final IWorld world = context.world();
+        final BlockPos belowPos = context.pos().below();
 
-        world.setBlock(pos.below(), configuredGenFeature.get(ROTTEN_SOIL).defaultBlockState(), 3); // Change rooty dirt to rotted soil.
+        if (!TreeHelper.isRooty(world.getBlockState(belowPos))) {
+            return false;
+        }
+
+        // Change rooty dirt to rotted soil.
+        world.setBlock(belowPos, configuration.get(ROTTEN_SOIL).defaultBlockState(), 3);
+        return true;
     }
 
 }

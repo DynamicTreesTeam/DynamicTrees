@@ -8,7 +8,9 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CoderNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
@@ -242,7 +244,9 @@ public class JoCode {
 		}
 
 		// Allow for special decorations by the tree itself.
-		species.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+		species.postGeneration(new PostGenerationContext(world, rootPos, species, biome, radius, endPoints,
+				safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos),
+				species.seasonalFruitProductionFactor(worldObj, rootPos)));
 		MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
 
 		// Add snow to parts of the tree in chunks where snow was already placed.

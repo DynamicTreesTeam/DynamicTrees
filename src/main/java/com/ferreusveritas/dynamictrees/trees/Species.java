@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.api.*;
+import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
@@ -38,7 +40,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
@@ -1260,7 +1262,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
 			if (branch != null)
 				branch.rot(world, pos);
-			this.postRot(world, pos, neighborCount, radius, fertility, random, rapid);
+			this.postRot(new PostRotContext(world, pos, this, radius, neighborCount, fertility, rapid));
 			return true;
 		}
 
@@ -1276,11 +1278,13 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return false;
 	}
 
-	public void postRot(final IWorld world, final BlockPos pos, final int neighborCount, final int radius, final int fertility, final Random random, final boolean rapid) {
-		this.genFeatures.stream()
-				.filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IPostRotGenFeature)
-				.forEach(configuredGenFeature -> ((IPostRotGenFeature) configuredGenFeature.getGenFeature())
-						.postRot(configuredGenFeature, world, pos, neighborCount, radius, fertility, random, rapid));
+	public void postRot(PostRotContext context) {
+		this.genFeatures.forEach(configuration -> configuration.getGenFeature()
+				.generate(
+						configuration,
+						GenFeature.Type.POST_ROT,
+						context
+				));
 	}
 
 	/**
@@ -1335,7 +1339,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 			}
 		} while(--growthRate > 0.0f);
 
-		return postGrow(world, rootPos, treePos, fertility, natural);
+		this.postGrow(world, rootPos, treePos, fertility, natural);
+		return true;
 	}
 
 	/**
@@ -1437,15 +1442,12 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * 		If false then this member is being used to grow a tree with a growth accelerant like bonemeal or the potion of burgeoning.
 	 */
 	public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
-		for (final ConfiguredGenFeature<?> configuredGenFeature : this.genFeatures) {
-			final GenFeature genFeature = (GenFeature) configuredGenFeature.getGenFeature();
-
-			if (!(genFeature instanceof IPostGrowFeature))
-				continue;
-
-			((IPostGrowFeature) genFeature).postGrow(configuredGenFeature, world, rootPos, treePos, this, fertility, natural);
-		}
-
+		this.genFeatures.forEach(configuration -> configuration.getGenFeature()
+				.generate(
+						configuration,
+						GenFeature.Type.POST_GROW,
+						new PostGrowContext(world, rootPos, this, treePos, fertility, natural)
+				));
 		return true;
 	}
 
@@ -1939,12 +1941,13 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	public BlockPos preGeneration(IWorld world, BlockPos rootPosition, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
 		final AtomicReference<BlockPos> rootPos = new AtomicReference<>(rootPosition);
 
-		this.genFeatures.stream()
-				.filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IPreGenFeature)
-				.forEach(cofiguredGenFeature -> rootPos.set(((IPreGenFeature) cofiguredGenFeature.getGenFeature())
-						.preGeneration(cofiguredGenFeature, world, rootPos.get(), this, radius, facing,
-								safeBounds, joCode))
-				);
+		this.genFeatures.forEach(configuration -> rootPos.set(
+				configuration.getGenFeature().generate(
+						configuration,
+						GenFeature.Type.PRE_GENERATION,
+						new PreGenerationContext(world, rootPos.get(), this, radius, facing, safeBounds, joCode)
+				)
+		));
 
 		return rootPos.get();
 	}
@@ -1953,23 +1956,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 * Allows the tree to decorate itself after it has been generated.
 	 * Use this to add vines, add fruit, fix the soil, add butress roots etc.
 	 *
-	 * @param worldObj The world object
-	 * @param world The world object.
-	 * @param rootPos The position of {@link RootyBlock} this tree is planted in
-	 * @param biome The biome this tree is generating in
-	 * @param radius The radius of the tree generation boundary
-	 * @param endPoints A {@link List} of {@link BlockPos} in the world designating branch endpoints
-	 * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
-	 * @param initialDirtState The blockstate of the dirt that became rooty.  Useful for matching terrain.
+	 * @param context The {@link PostGenerationContext} instance.
 	 */
-	public void postGeneration(World worldObj, IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
-		this.genFeatures.stream()
-				.filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IPostGenFeature)
-				.forEach(configuredGenFeature -> ((IPostGenFeature) configuredGenFeature.getGenFeature())
-						.postGeneration(configuredGenFeature, world, rootPos, this, biome, radius, endPoints,
-								safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos),
-								this.seasonalFruitProductionFactor(worldObj, rootPos))
-				);
+	public void postGeneration(PostGenerationContext context) {
+		this.genFeatures
+				.forEach(configuration -> configuration.getConfigurable().generate(
+						configuration,
+						GenFeature.Type.POST_GENERATION,
+						context
+				));
 	}
 
 	/**

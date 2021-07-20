@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IFruitGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -18,11 +17,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
 import java.util.List;
 
-public class FruitGenFeature extends GenFeature implements IFruitGenFeature {
+public class FruitGenFeature extends GenFeature {
 
 	public static final ConfigurationProperty<FruitBlock> FRUIT_BLOCK = ConfigurationProperty.property("fruit_block", FruitBlock.class);
 
@@ -45,14 +43,15 @@ public class FruitGenFeature extends GenFeature implements IFruitGenFeature {
 				.with(PLACE_CHANCE, 1f);
 	}
 
-    @Override
-	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-		if (!endPoints.isEmpty()) {
-			int qty = configuredGenFeature.get(QUANTITY);
-			qty *= seasonFruitProductionFactor;
+	@Override
+	protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+		if (!context.endPoints().isEmpty()) {
+			int qty = configuration.get(QUANTITY);
+			qty *= context.fruitProductionFactor();
 			for (int i = 0; i < qty; i++) {
-				final BlockPos endPoint = endPoints.get(world.getRandom().nextInt(endPoints.size()));
-				this.addFruit(configuredGenFeature, world, species, rootPos.above(), endPoint, true, false, safeBounds, seasonValue);
+				final BlockPos endPoint = context.endPoints().get(context.random().nextInt(context.endPoints().size()));
+				this.addFruit(configuration, context.world(), context.species(), context.pos().above(), endPoint, true,
+						false, context.bounds(), context.seasonValue());
 			}
 			return true;
 		}
@@ -60,21 +59,25 @@ public class FruitGenFeature extends GenFeature implements IFruitGenFeature {
 	}
 
 	@Override
-	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-		final BlockState blockState = world.getBlockState(treePos);
+	protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+		final World world = context.world();
+		final BlockState blockState = world.getBlockState(context.treePos());
 		final BranchBlock branch = TreeHelper.getBranch(blockState);
 
-		if (branch != null && branch.getRadius(blockState) >= configuredGenFeature.get(FRUITING_RADIUS) && natural) {
-			final float fruitingFactor = species.seasonalFruitProductionFactor(world, rootPos);
-			if (fruitingFactor > configuredGenFeature.get(FRUIT_BLOCK).getMinimumSeasonalValue() && fruitingFactor > world.random.nextFloat()) {
+		if (branch != null && branch.getRadius(blockState) >= configuration.get(FRUITING_RADIUS) && context.natural()) {
+			final BlockPos rootPos = context.pos();
+			final float fruitingFactor = context.species().seasonalFruitProductionFactor(world, rootPos);
+
+			if (fruitingFactor > configuration.get(FRUIT_BLOCK).getMinimumSeasonalValue() && fruitingFactor > world.random.nextFloat()) {
 				final FindEndsNode endFinder = new FindEndsNode();
 				TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
 				final List<BlockPos> endPoints = endFinder.getEnds();
-				int qty = configuredGenFeature.get(QUANTITY);
+				int qty = configuration.get(QUANTITY);
 				if (!endPoints.isEmpty()) {
 					for (int i = 0; i < qty; i++) {
 						final BlockPos endPoint = endPoints.get(world.random.nextInt(endPoints.size()));
-						this.addFruit(configuredGenFeature, world, species, rootPos.above(), endPoint, false, true, SafeChunkBounds.ANY, SeasonHelper.getSeasonValue(world, rootPos));
+						this.addFruit(configuration, world, context.species(), rootPos.above(), endPoint, false, true,
+								SafeChunkBounds.ANY, SeasonHelper.getSeasonValue(world, rootPos));
 					}
 				}
 			}

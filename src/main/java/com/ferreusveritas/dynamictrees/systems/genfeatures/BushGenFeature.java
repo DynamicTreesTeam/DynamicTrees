@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
@@ -20,10 +19,9 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 
-import java.util.List;
 import java.util.Random;
 
-public class BushGenFeature extends GenFeature implements IFullGenFeature, IPostGenFeature {
+public class BushGenFeature extends GenFeature implements IFullGenFeature {
 
 	public static final ConfigurationProperty<Block> LOG_BLOCK = ConfigurationProperty.block("log");
 	public static final ConfigurationProperty<Block> LEAVES_BLOCK = ConfigurationProperty.block("leaves");
@@ -53,9 +51,9 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 	}
 
 	@Override
-	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-		if (safeBounds != SafeChunkBounds.ANY && configuredGenFeature.get(BIOME_PREDICATE).test(biome)) {
-			this.commonGen(configuredGenFeature, world, rootPos, species, world.getRandom(), radius, safeBounds);
+	protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+		if (context.bounds() != SafeChunkBounds.ANY && configuration.get(BIOME_PREDICATE).test(context.biome())) {
+			this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(), context.radius(), context.bounds());
 			return true;
 		}
 		return false;

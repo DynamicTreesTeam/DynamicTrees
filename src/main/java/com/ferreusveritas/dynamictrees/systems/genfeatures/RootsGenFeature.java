@@ -1,7 +1,5 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
@@ -11,7 +9,6 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenF
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.TetraFunction;
 import net.minecraft.block.BlockState;
@@ -22,11 +19,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
-import java.util.List;
-
-public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPostGenFeature {
+public class RootsGenFeature extends GenFeature {
 
 	public static final ConfigurationProperty<Integer> MIN_TRUNK_RADIUS = ConfigurationProperty.integer("min_trunk_radius");
 	public static final ConfigurationProperty<Integer> LEVEL_LIMIT = ConfigurationProperty.integer("level_limit");
@@ -79,29 +73,27 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 	}
 
 	@Override
-	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-
-		BlockPos treePos = rootPos.above();
-		int trunkRadius = TreeHelper.getRadius(world, treePos);
-
-		if (trunkRadius >= configuredGenFeature.get(MIN_TRUNK_RADIUS)) {
-			return this.startRoots(configuredGenFeature, world, treePos, species, trunkRadius);
-		}
-		return false;
+	protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+		final BlockPos treePos = context.pos().above();
+		final int trunkRadius = TreeHelper.getRadius(context.world(), treePos);
+		return trunkRadius >= configuration.get(MIN_TRUNK_RADIUS) &&
+				this.startRoots(configuration, context.world(), treePos, context.species(), trunkRadius);
 	}
 
 	@Override
-	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-		int trunkRadius = TreeHelper.getRadius(world, treePos);
+	protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+		final World world = context.world();
+		final BlockPos treePos = context.treePos();
+		final int trunkRadius = TreeHelper.getRadius(world, treePos);
 
-		if(fertility > 0 && trunkRadius >= configuredGenFeature.get(MIN_TRUNK_RADIUS)) {
-			Surround surr = Surround.values()[world.random.nextInt(8)];
-			BlockPos dPos = treePos.offset(surr.getOffset());
-			if(world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
+		if (context.fertility() > 0 && trunkRadius >= configuration.get(MIN_TRUNK_RADIUS)) {
+			final Surround surr = Surround.values()[world.random.nextInt(8)];
+			final BlockPos dPos = treePos.offset(surr.getOffset());
+			if (world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
 				world.setBlockAndUpdate(dPos, DTRegistries.TRUNK_SHELL.defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
 			}
 
-			this.startRoots(configuredGenFeature, world, treePos, species, trunkRadius);
+			this.startRoots(configuration, world, treePos, context.species(), trunkRadius);
 		}
 
 		return true;

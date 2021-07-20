@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.PalmLeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -21,7 +22,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -72,10 +72,12 @@ public class PalmSpecies extends Species {
     }
 
     @Override
-    public void postGeneration(World worldObj, IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
-        if (!endPoints.isEmpty()){
-            BlockPos tip = endPoints.get(0).above(2);
-            if (safeBounds.inBounds(tip, true))
+    public void postGeneration(PostGenerationContext context) {
+        final IWorld world = context.world();
+
+        if (!context.endPoints().isEmpty()){
+            BlockPos tip = context.endPoints().get(0).above(2);
+            if (context.bounds().inBounds(tip, true))
                 if (world.getBlockState(tip).getBlock() instanceof DynamicLeavesBlock)
                     for (CoordUtils.Surround surr : CoordUtils.Surround.values()){
                         BlockPos leafPos = tip.offset(surr.getOffset());
@@ -86,7 +88,7 @@ public class PalmSpecies extends Species {
                         }
                     }
         }
-        super.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+        super.postGeneration(context);
     }
 
     @Nullable

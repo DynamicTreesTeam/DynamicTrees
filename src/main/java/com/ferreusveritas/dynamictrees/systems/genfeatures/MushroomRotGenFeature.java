@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostRotGenFeature;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import net.minecraft.block.Block;
@@ -12,15 +11,13 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
 import net.minecraftforge.common.IPlantable;
 
-import java.util.Random;
-
 /**
- * Default implementation of {@link IPostRotGenFeature}, simply turning the rotted branch
+ * A {@link GenFeature} handling the default post rot behaviour: turning the rotted branch
  * into the {@link #MUSHROOM} set in the {@link ConfiguredGenFeature} object.
  *
  * @author Harley O'Connor
  */
-public class MushroomRotGenFeature extends GenFeature implements IPostRotGenFeature {
+public class MushroomRotGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Block> MUSHROOM = ConfigurationProperty.block("mushroom");
     public static final ConfigurationProperty<Block> ALTERNATE_MUSHROOM = ConfigurationProperty.block("alternate_mushroom");
@@ -44,13 +41,19 @@ public class MushroomRotGenFeature extends GenFeature implements IPostRotGenFeat
     }
 
     @Override
-    public void postRot(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid) {
-        final Block mushroom = configuredGenFeature.get(ALTERNATE_MUSHROOM_CHANCE) > random.nextFloat() ? configuredGenFeature.get(MUSHROOM) : configuredGenFeature.get(ALTERNATE_MUSHROOM);
+    protected boolean postRot(ConfiguredGenFeature<GenFeature> configuration, PostRotContext context) {
+        final IWorld world = context.world();
+        final BlockPos pos = context.pos();
+        final Block mushroom = configuration.get(ALTERNATE_MUSHROOM_CHANCE) > context.random().nextFloat() ?
+                configuration.get(MUSHROOM) : configuration.get(ALTERNATE_MUSHROOM);
 
-        if (radius <= 4 || !this.canSustainMushroom(world, pos, mushroom) || world.getBrightness(LightType.SKY, pos) >= 4)
-            return;
+        if (context.radius() <= 4 || !this.canSustainMushroom(world, pos, mushroom) ||
+                world.getBrightness(LightType.SKY, pos) >= 4) {
+            return false;
+        }
 
         world.setBlock(pos, mushroom.defaultBlockState(), 3);
+        return true;
     }
 
     private boolean canSustainMushroom (final IWorld world, final BlockPos pos, final Block block) {

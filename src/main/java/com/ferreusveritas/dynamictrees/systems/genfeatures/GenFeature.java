@@ -1,9 +1,5 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
-import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
@@ -11,14 +7,13 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
 import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
+import com.ferreusveritas.dynamictrees.util.TriFunction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Base class for all gen features. These are features that grow on/in/around a tree on generation,
- * or whilst growing, depending on which interface is implemented.
- *
- * <p>Sub-classes should implement at least one of the following: {@link IFullGenFeature},
- * {@link IPostGenFeature}, {@link IPostGrowFeature}, or {@link IPreGenFeature} to do their generation.</p>
+ * or whilst growing, depending on which methods are overridden.
  *
  * @author Harley O'Connor
  */
@@ -52,6 +47,43 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
     @Override
     protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return new ConfiguredGenFeature<>(this);
+    }
+
+    public static final class Type<C extends GenerationContext<?>, R> {
+        public static final Type<PreGenerationContext, BlockPos> PRE_GENERATION = new Type<>(GenFeature::preGenerate);
+        public static final Type<PostGenerationContext, Boolean> POST_GENERATION = new Type<>(GenFeature::postGenerate);
+        public static final Type<PostGrowContext, Boolean> POST_GROW = new Type<>(GenFeature::postGrow);
+        public static final Type<PostRotContext, Boolean> POST_ROT = new Type<>(GenFeature::postRot);
+
+        private final TriFunction<GenFeature, ConfiguredGenFeature<GenFeature>, C, R> generateConsumer;
+
+        public Type(TriFunction<GenFeature, ConfiguredGenFeature<GenFeature>, C, R> generateConsumer) {
+            this.generateConsumer = generateConsumer;
+        }
+
+        public R generate(ConfiguredGenFeature<GenFeature> configuration, C context) {
+            return generateConsumer.apply(configuration.getGenFeature(), configuration, context);
+        }
+    }
+
+    public <C extends GenerationContext<?>, R> R generate(ConfiguredGenFeature<GenFeature> configuration, Type<C, R> type, C context) {
+        return type.generate(configuration, context);
+    }
+
+    protected BlockPos preGenerate(ConfiguredGenFeature<GenFeature> configuration, PreGenerationContext context) {
+        return context.pos();
+    }
+
+    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+        return true;
+    }
+
+    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+        return true;
+    }
+
+    protected boolean postRot(ConfiguredGenFeature<GenFeature> configuration, PostRotContext context) {
+        return true;
     }
 
 }

@@ -6,6 +6,6 @@ package com.ferreusveritas.dynamictrees.api;
  *
  * @author Harley O'Connor
  */
-public interface IFruitGenFeature extends IPostGenFeature, IPostGrowFeature {
+public interface IFruitGenFeature {
 
 }

@@ -1,14 +1,9 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.TetraFunction;
 import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.Block;
@@ -45,15 +40,15 @@ import java.util.function.BiFunction;
  *
  * @author Max Hyper
  */
-public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
+public class BeeNestGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Block> NEST_BLOCK = ConfigurationProperty.block("nest");
     public static final ConfigurationProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = ConfigurationProperty.property("world_gen_chance", WorldGenChanceFunction.class);
 
-    private static final double vanillaGenChancePlains = 0.05f;
-    private static final double vanillaGenChanceFlowerForest = 0.02f;
-    private static final double vanillaGenChanceForest = 0.0005f;
-    private static final double vanillaGrowChance = 0.001f;
+    private static final float PLAINS_CHANCE = 0.05f;
+    private static final float FLOWER_FOREST_CHANCE = 0.02f;
+    private static final float FOREST_CHANCE = 0.0005f;
+    private static final float CHANCE = 0.001f;
 
     public BeeNestGenFeature (ResourceLocation registryName) {
         super(registryName);
@@ -67,7 +62,7 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
     @Override
     public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos) -> {
-            if (world.getRandom().nextFloat() > vanillaGrowChance) return false;
+            if (world.getRandom().nextFloat() > CHANCE) return false;
             // Default flower check predicate, straight from the sapling class
             for(BlockPos blockpos : BlockPos.Mutable.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
                 if (world.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
@@ -79,28 +74,31 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
             // Default biome check chance function. Uses vanilla chances
             RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).getRegistryName()));
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
-                return vanillaGenChancePlains;
+                return PLAINS_CHANCE;
             if (biomeKey == Biomes.FLOWER_FOREST)
-                return vanillaGenChanceFlowerForest;
+                return FLOWER_FOREST_CHANCE;
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST))
-                return vanillaGenChanceForest;
-            return 0D;
+                return FOREST_CHANCE;
+            return 0F;
         }).with(MAX_COUNT, 1);
     }
 
     @Override
-    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-        if (world.getRandom().nextFloat() > configuredGenFeature.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos))
-            return false;
-
-        return placeBeeNestInValidPlace(configuredGenFeature, world, rootPos, true);
+    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+        final IWorld world = context.world();
+        final BlockPos rootPos = context.pos();
+        return !(world.getRandom().nextFloat() > configuration.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos)) &&
+                this.placeBeeNestInValidPlace(configuration, world, rootPos, true);
     }
 
     @Override
-    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above()) || fertility == 0) return false;
+    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+        if (!context.natural() || !configuration.get(CAN_GROW_PREDICATE).test(context.world(), context.pos().above()) ||
+                context.fertility() == 0) {
+            return false;
+        }
 
-        return placeBeeNestInValidPlace(configuredGenFeature, world, rootPos, false);
+        return this.placeBeeNestInValidPlace(configuration, context.world(), context.pos(), false);
     }
 
     private boolean placeBeeNestInValidPlace(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen) {
@@ -125,22 +123,22 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
     }
 
     private boolean placeBeeNestWithBees(IWorld world, Block nestBlock, BlockPos pos, Direction faceDir, boolean worldGen) {
-        int honeyLevel = worldGen? world.getRandom().nextInt(6) : 0;
+        int honeyLevel = worldGen ? world.getRandom().nextInt(6) : 0;
         BlockState nestState = nestBlock.defaultBlockState();
         if (nestState.hasProperty(BeehiveBlock.FACING)) nestState = nestState.setValue(BeehiveBlock.FACING, faceDir);
         if (nestState.hasProperty(BeehiveBlock.HONEY_LEVEL)) nestState = nestState.setValue(BeehiveBlock.HONEY_LEVEL, honeyLevel);
-        //Sets the nest block, but the bees still need to be added
+        // Sets the nest block, but the bees still need to be added.
         world.setBlock(pos, nestState, 2);
-        TileEntity tileentity = world.getBlockEntity(pos);
-        //Populates the bee nest with 3 bees if the nest was generated, or with 2-3 bees if it was grown.
-        if (tileentity instanceof BeehiveTileEntity) {
-            BeehiveTileEntity beehivetileentity = (BeehiveTileEntity)tileentity;
+        TileEntity blockEntity = world.getBlockEntity(pos);
+        // Populates the bee nest with 3 bees if the nest was generated, or with 2-3 bees if it was grown.
+        if (blockEntity instanceof BeehiveTileEntity) {
+            BeehiveTileEntity beehivetileentity = (BeehiveTileEntity) blockEntity;
             World thisWorld = worldFromIWorld(world);
             if (thisWorld == null) return false;
-            int beeCount = worldGen? 3 : 2 + world.getRandom().nextInt(2);
-            for(int i = 0; i < beeCount; ++i) {
-                BeeEntity beeentity = new BeeEntity(EntityType.BEE, thisWorld);
-                beehivetileentity.addOccupantWithPresetTicks(beeentity, false, world.getRandom().nextInt(599));
+            int beeCount = worldGen ? 3 : 2 + world.getRandom().nextInt(2);
+            for (int i = 0; i < beeCount; ++i) {
+                BeeEntity beeEntity = new BeeEntity(EntityType.BEE, thisWorld);
+                beehivetileentity.addOccupantWithPresetTicks(beeEntity, false, world.getRandom().nextInt(599));
             }
             return true;
         }
@@ -151,9 +149,9 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
     @Nullable
     private World worldFromIWorld (IWorld iWorld) {
         if (iWorld instanceof WorldGenRegion) {
-            return ((WorldGenRegion)iWorld).getLevel();
+            return ((WorldGenRegion) iWorld).getLevel();
         } else if (iWorld instanceof World) {
-            return (World)iWorld;
+            return (World) iWorld;
         }
         return null;
     }
@@ -208,6 +206,6 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
         return validSpaces;
     }
 
-    public interface WorldGenChanceFunction extends BiFunction<IWorld, BlockPos, Double> {}
+    public interface WorldGenChanceFunction extends BiFunction<IWorld, BlockPos, Float> {}
 
 }
