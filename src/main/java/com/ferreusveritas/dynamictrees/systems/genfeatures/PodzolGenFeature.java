@@ -28,6 +28,9 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 	}
 
 	@Override
+	protected void registerProperties() { }
+
+	@Override
 	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
 		if(DTConfigs.PODZOL_GEN.get()) {
 			FindEndsNode endFinder = new FindEndsNode();
@@ -90,5 +93,5 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
 			}
 		}
 	}
-	
+
 }

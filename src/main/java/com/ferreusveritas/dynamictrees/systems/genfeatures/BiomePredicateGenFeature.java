@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -17,16 +17,24 @@ import java.util.List;
 
 public class BiomePredicateGenFeature extends GenFeature implements IPostGenFeature {
 
-	public static final GenFeatureProperty<Boolean> ONLY_WORLD_GEN = GenFeatureProperty.createBooleanProperty("only_world_gen");
-	public static final GenFeatureProperty<ConfiguredGenFeature<GenFeature>> GEN_FEATURE = GenFeatureProperty.createProperty("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
+	public static final ConfigurationProperty<Boolean> ONLY_WORLD_GEN = ConfigurationProperty.bool("only_world_gen");
+	public static final ConfigurationProperty<ConfiguredGenFeature<GenFeature>> GEN_FEATURE = ConfigurationProperty.property("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
 
 	public BiomePredicateGenFeature(ResourceLocation registryName) {
-		super(registryName, BIOME_PREDICATE, GEN_FEATURE, ONLY_WORLD_GEN);
+		super(registryName);
+	}
+
+	@Override
+	protected void registerProperties() {
+		this.register(BIOME_PREDICATE, GEN_FEATURE, ONLY_WORLD_GEN);
 	}
 
 	@Override
 	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(BIOME_PREDICATE, i -> true).with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE).with(ONLY_WORLD_GEN, false);
+		return super.createDefaultConfiguration()
+				.with(BIOME_PREDICATE, i -> true)
+				.with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE)
+				.with(ONLY_WORLD_GEN, false);
 	}
 
 	@Override

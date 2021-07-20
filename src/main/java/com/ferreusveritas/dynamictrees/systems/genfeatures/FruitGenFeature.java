@@ -2,13 +2,13 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IFruitGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -24,16 +24,25 @@ import java.util.List;
 
 public class FruitGenFeature extends GenFeature implements IFruitGenFeature {
 
-	public static final GenFeatureProperty<FruitBlock> FRUIT_BLOCK = GenFeatureProperty.createProperty("fruit_block", FruitBlock.class);
+	public static final ConfigurationProperty<FruitBlock> FRUIT_BLOCK = ConfigurationProperty.property("fruit_block", FruitBlock.class);
 
 	public FruitGenFeature(ResourceLocation registryName) {
-		super(registryName, FRUIT_BLOCK, VERTICAL_SPREAD, QUANTITY, FRUITING_RADIUS, PLACE_CHANCE);
+		super(registryName);
+	}
+
+	@Override
+	protected void registerProperties() {
+		this.register(FRUIT_BLOCK, VERTICAL_SPREAD, QUANTITY, RAY_DISTANCE, FRUITING_RADIUS, PLACE_CHANCE);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
-				.with(VERTICAL_SPREAD, 30f).with(QUANTITY, 4).with(FRUITING_RADIUS, 8).with(PLACE_CHANCE, 1f);
+		return super.createDefaultConfiguration()
+				.with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
+				.with(VERTICAL_SPREAD, 30f)
+				.with(QUANTITY, 4)
+				.with(FRUITING_RADIUS, 8)
+				.with(PLACE_CHANCE, 1f);
 	}
 
     @Override

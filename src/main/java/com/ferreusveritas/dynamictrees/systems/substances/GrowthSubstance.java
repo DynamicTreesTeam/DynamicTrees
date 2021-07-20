@@ -9,8 +9,18 @@ import net.minecraft.world.World;
 
 public class GrowthSubstance implements ISubstanceEffect {
 
-	private final int ticksPerPulse = 24;
+	private final int pulses;
+	private final int ticksPerPulse;
 	private final int ticksPerParticlePulse = 8;
+
+	public GrowthSubstance() {
+		this(-1, 24);
+	}
+
+	public GrowthSubstance(int pulses, int ticksPerPulse) {
+		this.pulses = pulses;
+		this.ticksPerPulse = ticksPerPulse;
+	}
 
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
@@ -18,11 +28,13 @@ public class GrowthSubstance implements ISubstanceEffect {
 		TreeHelper.treeParticles(world, rootPos, ParticleTypes.EFFECT, 8);
 		return true;
 	}
-	
+
+	private int pulseCount;
+
 	@Override
 	public boolean update(World world, BlockPos rootPos, int deltaTicks, int fertility) {
 		// Stop when fertility has depleted.
-		if (fertility <= 0)
+		if (fertility <= 0 || this.pulseCount >= this.pulses)
 			return false;
 
 		if (world.isClientSide) {
@@ -32,6 +44,7 @@ public class GrowthSubstance implements ISubstanceEffect {
 		} else {
 			if (deltaTicks % this.ticksPerPulse == 0) {
 				TreeHelper.growPulse(world, rootPos);
+				this.pulseCount++;
 			}
 		}
 		

@@ -89,7 +89,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	protected CellKit cellKit;
 
 	protected Family family;
-	protected DynamicLeavesBlock dynamicLeavesBlock;
 	protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro+1];
 	protected int flammability = 60;// Mimic vanilla leaves
 	protected int fireSpreadSpeed = 30;// Mimic vanilla leaves
@@ -124,6 +123,10 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 		this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
 	}
 
+	///////////////////////////////////////////
+	// PRIMITIVE LEAVES BLOCK
+	///////////////////////////////////////////
+
 	/**
 	 * Gets the primitive (vanilla) leaves for these {@link LeavesProperties}.
 	 *
@@ -150,13 +153,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 		return new ItemStack(Item.BY_BLOCK.get(getPrimitiveLeaves().getBlock()));
 	}
 
-	public Optional<DynamicLeavesBlock> getDynamicLeavesBlock() {
-		return Optional.ofNullable(this.dynamicLeavesBlock);
-	}
-
-	protected DynamicLeavesBlock createDynamicLeaves (final AbstractBlock.Properties properties) {
-		return new DynamicLeavesBlock(this, properties);
-	}
+	///////////////////////////////////////////
+	// DYNAMIC LEAVES BLOCK
+	///////////////////////////////////////////
 
 	/**
 	 * The registry name for the leaves block. This allows for built-in compatibility where
@@ -195,9 +194,17 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 		return "_leaves";
 	}
 
+	public Optional<DynamicLeavesBlock> getDynamicLeavesBlock() {
+		Block block = this.getDynamicLeavesState().getBlock();
+		return Optional.ofNullable(block instanceof DynamicLeavesBlock ? (DynamicLeavesBlock) block : null);
+	}
+
+	protected DynamicLeavesBlock createDynamicLeaves (final AbstractBlock.Properties properties) {
+		return new DynamicLeavesBlock(this, properties);
+	}
+
 	public void generateDynamicLeaves (final AbstractBlock.Properties properties) {
-		this.dynamicLeavesBlock = RegistryHandler.addBlock(this.blockRegistryName, this.createDynamicLeaves(properties));
-		LeavesPaging.addLeavesBlockForModId(this.dynamicLeavesBlock, this.getRegistryName().getNamespace());
+		RegistryHandler.addBlock(this.blockRegistryName, this.createDynamicLeaves(properties));
 	}
 	
 	public LeavesProperties setDynamicLeavesState(BlockState state) {
@@ -217,9 +224,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 				.orElse(Blocks.AIR.defaultBlockState());
 	}
 
-	public boolean hasDynamicLeavesBlock() {
-		return getDynamicLeavesState().getBlock() instanceof DynamicLeavesBlock;
-	}
+	///////////////////////////////////////////
+	// PROPERTIES
+	///////////////////////////////////////////
 
 	/**
 	 * Used by the {@link DynamicLeavesBlock} to find out if it can pull hydro from a branch.
@@ -364,6 +371,10 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 				.isSuffocating((s, r, p) -> false).isViewBlocking((s, r, p) -> false);
 	}
 
+	///////////////////////////////////////////
+	// INTERACTION
+	///////////////////////////////////////////
+
 	/**
 	 * Allows the leaves to perform a specific needed behavior or to optionally cancel the update.
 	 *
@@ -393,7 +404,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	}
 
 	///////////////////////////////////////////
-	// Leaves colours
+	// LEAVES COLORS
 	///////////////////////////////////////////
 
 	protected Integer colorNumber;
@@ -454,6 +465,10 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public static void postInitClient() {
 		REGISTRY.getAll().forEach(LeavesProperties::processColor);
 	}
+
+	///////////////////////////////////////////
+	// MISC
+	///////////////////////////////////////////
 
 	@Override
 	public String toReloadDataString() {

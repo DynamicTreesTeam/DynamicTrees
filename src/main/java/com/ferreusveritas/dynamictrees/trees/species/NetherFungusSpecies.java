@@ -5,8 +5,10 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
-import com.ferreusveritas.dynamictrees.systems.DirtHelper;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -21,12 +23,10 @@ import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Harley O'Connor
@@ -39,20 +39,24 @@ public class NetherFungusSpecies extends Species {
         super(name, family, leavesProperties);
         this.setSaplingShape(CommonVoxelShapes.SAPLING);
 
-        addDropCreator(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")){
+        addDropCreators(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")){
             @Override
-            public List<ItemStack> getHarvestDrop(World world, Species species, BlockPos leafPos, Random random, List<ItemStack> dropList, int fertility, int fortune) {
+            protected void registerProperties() {
+
+            }
+
+            @Override
+            public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
                 int chance = 10;
-                if (fortune > 0) {
-                    chance -= 2 << fortune;
+                if (context.fortune() > 0) {
+                    chance -= 2 << context.fortune();
                     if (chance < 10)
                         chance = 5;
                 }
-                if(random.nextInt(chance) == 0) {
-                    ItemStack drop = species.getLeavesProperties().getPrimitiveLeavesItemStack().copy();
-                    dropList.add(drop);
+                if (context.random().nextInt(chance) == 0) {
+                    ItemStack drop = context.species().getLeavesProperties().getPrimitiveLeavesItemStack().copy();
+                    context.drops().add(drop);
                 }
-                return dropList;
             }
         });
     }
@@ -65,7 +69,7 @@ public class NetherFungusSpecies extends Species {
 
     @Override
     protected void setStandardSoils() {
-        this.addAcceptableSoils(DirtHelper.NETHER_SOIL_LIKE, DirtHelper.FUNGUS_LIKE, DirtHelper.DIRT_LIKE);
+        this.addAcceptableSoils(SoilHelper.NETHER_SOIL_LIKE, SoilHelper.FUNGUS_LIKE, SoilHelper.DIRT_LIKE);
     }
 
     @Override
@@ -76,7 +80,7 @@ public class NetherFungusSpecies extends Species {
 
     @Override
     public Species setPostReloadDefaults() {
-        if (!this.areAnyGenFeatures())
+        if (!this.hasGenFeatures())
             this.addGenFeature(GenFeatures.CLEAR_VOLUME).addGenFeature(GenFeatures.SHROOMLIGHT);
         return super.setPostReloadDefaults();
     }

@@ -43,7 +43,7 @@ String modName = property("modName")
 String modVersion = property("modVersion")
 String mcVersion = property("mcVersion")
 
-version = "${modName}-${modVersion}"
+version = "${mcVersion}-${modVersion}"
 group = property("group")
 archivesBaseName = modName
 

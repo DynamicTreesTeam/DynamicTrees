@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -21,15 +21,21 @@ import java.util.List;
 public class BottomFlareGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature{
 
 	// Min radius for the flare.
-	public static final GenFeatureProperty<Integer> MIN_RADIUS = GenFeatureProperty.createIntegerProperty("min_radius");
+	public static final ConfigurationProperty<Integer> MIN_RADIUS = ConfigurationProperty.integer("min_radius");
 
 	public BottomFlareGenFeature(ResourceLocation registryName) {
-		super(registryName, MIN_RADIUS);
+		super(registryName);
+	}
+
+	@Override
+	protected void registerProperties() {
+		this.register(MIN_RADIUS);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(MIN_RADIUS, 6);
+		return super.createDefaultConfiguration()
+				.with(MIN_RADIUS, 6);
 	}
 
 	@Override

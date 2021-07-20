@@ -1,12 +1,14 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
+import com.google.gson.JsonElement;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.util.StackLocatorUtil;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -163,6 +165,14 @@ public final class ObjectFetchResult<T> {
         this.errorMessage = otherFetchResult.errorMessage;
         this.warnings.addAll(otherFetchResult.warnings);
         return this;
+    }
+
+    public static <T> ObjectFetchResult<T> from(final DataResult<Pair<T, JsonElement>> dataResult) {
+        final ObjectFetchResult<T> fetchResult = new ObjectFetchResult<>();
+        dataResult.get()
+                .ifLeft(pair -> fetchResult.value = pair.getFirst())
+                .ifRight(partialResult -> fetchResult.setErrorMessage(partialResult.message()));
+        return fetchResult;
     }
 
     public static <T> ObjectFetchResult<T> success (final T value) {

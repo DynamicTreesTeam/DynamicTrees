@@ -1,13 +1,13 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import net.minecraft.world.biome.Biome;
 
 import java.util.function.Predicate;
 
 /**
  * A {@link Predicate} that tests if something should happen in a {@link Biome}.
- * Mainly used as a {@link GenFeatureProperty}.
+ * Mainly used as a {@link ConfigurationProperty}.
  *
  * @author Harley O'Connor
  */

@@ -26,6 +26,9 @@ public class UndergrowthGenFeature extends GenFeature implements IPostGenFeature
 	}
 
 	@Override
+	protected void registerProperties() { }
+
+	@Override
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 

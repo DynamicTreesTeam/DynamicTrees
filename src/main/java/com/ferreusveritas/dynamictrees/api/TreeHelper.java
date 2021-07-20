@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTClient;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.TwinkleNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -53,6 +52,8 @@ public class TreeHelper {
 	/**
 	 * Pulses an entire leafMap volume of blocks each with an age signal.
 	 * Warning: CPU intensive and should be used sparingly.
+	 *
+	 * {@link net.minecraft.util.Direction.Axis}
 	 *
 	 * @param world The {@link IWorld} instance.
 	 * @param leafMap The voxel map of hydro values to use as an iterator.

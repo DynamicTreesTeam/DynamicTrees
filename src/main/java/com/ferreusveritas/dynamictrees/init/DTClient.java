@@ -3,18 +3,17 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
-import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesPaging;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.entities.render.FallingTreeRenderer;
 import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer;
-import com.ferreusveritas.dynamictrees.systems.RootyBlockHelper;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
@@ -145,7 +144,7 @@ public class DTClient {
 		final BlockColors blockColors = Minecraft.getInstance().getBlockColors();
 		
 		// Register Rooty Colorizers
-		for (RootyBlock roots : RootyBlockHelper.generateListForRegistry(false)){
+		for (RootyBlock roots : SoilHelper.getRootyBlocksList()){
 			blockColors.register((state, world, pos, tintIndex) -> roots.colorMultiplier(blockColors, state, world, pos, tintIndex), roots);
 		}
 		
@@ -172,7 +171,7 @@ public class DTClient {
 		}
 		
 		// Register Leaves Colorizers
-		for (DynamicLeavesBlock leaves: LeavesPaging.getLeavesList()) {
+		for (DynamicLeavesBlock leaves: LeavesProperties.REGISTRY.getAll().stream().filter(lp -> lp.getDynamicLeavesBlock().isPresent()).map(lp -> lp.getDynamicLeavesBlock().get()).collect(Collectors.toSet())) {
 			ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) -> {
 						final LeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getProperties(state);
 						return TreeHelper.isLeaves(state.getBlock()) ? properties.foliageColorMultiplier(state, worldIn, pos) : magenta;

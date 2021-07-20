@@ -8,10 +8,12 @@ on:
     branches:
     - 1.12.2
     - 1.16.5
+    - dev/tree-packs
   pull_request:
     branches: 
     - 1.12.2 
     - 1.16.5
+    - dev/tree-packs
 
 jobs:
   build:

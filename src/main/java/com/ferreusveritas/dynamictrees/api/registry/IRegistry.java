@@ -14,7 +14,13 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
+ * A custom registry which can be safely unlocked at any point. Largely based off
+ * {@link net.minecraftforge.registries.IForgeRegistry}.
+ *
  * @author Harley O'Connor
+ * @see AbstractRegistry
+ * @see Registry
+ * @see ConcurrentRegistry
  */
 public interface IRegistry<V extends RegistryEntry<V>> extends Iterable<V> {
 

@@ -3,12 +3,12 @@ package com.ferreusveritas.dynamictrees.api;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
-import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
-import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.StorageDropCreator;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
@@ -28,7 +28,7 @@ public final class TreeRegistry {
 
 	private TreeRegistry() {}
 
-	public static final IDropCreatorStorage GLOBAL_DROP_CREATOR_STORAGE = new StorageDropCreator();
+	public static final StorageDropCreator GLOBAL_DROP_CREATOR_STORAGE = new StorageDropCreator();
 
 	//////////////////////////////
 	// SPECIES REGISTRY
@@ -133,30 +133,30 @@ public final class TreeRegistry {
 	 * This exists so that mods not interested in making Dynamic Trees can still add drops to
 	 * all trees.
 	 *
-	 * @param dropCreator The {@link IDropCreator} to register.
+	 * @param dropCreator The {@link DropCreator} to register.
 	 */
-	public static boolean registerDropCreator(@Nullable final ResourceLocation speciesName, final IDropCreator dropCreator) {
+	public static boolean registerDropCreator(@Nullable final ResourceLocation speciesName, final DropCreator dropCreator) {
 		if (speciesName == null || speciesName.equals(GLOBAL)) {
 			return GLOBAL_DROP_CREATOR_STORAGE.addDropCreator(dropCreator);
 		} else {
-			return findSpecies(speciesName).addDropCreator(dropCreator);
+			return findSpecies(speciesName).addDropCreators(dropCreator);
 		}
 	}
 
-	public static boolean registerGlobalDropCreator(final IDropCreator dropCreator) {
+	public static boolean registerGlobalDropCreator(final DropCreator dropCreator) {
 		return registerDropCreator(GLOBAL, dropCreator);
 	}
 
 	public static boolean removeDropCreator(@Nullable final ResourceLocation speciesName, final ResourceLocation dropCreatorName) {
 		if (speciesName == null || speciesName.equals(GLOBAL)) {
-			return GLOBAL_DROP_CREATOR_STORAGE.remDropCreator(dropCreatorName);
+			return GLOBAL_DROP_CREATOR_STORAGE.removeDropCreator(dropCreatorName);
 		} else {
-			return findSpecies(speciesName).remDropCreator(dropCreatorName);
+			return findSpecies(speciesName).removeDropCreator(dropCreatorName);
 		}
 	}
 
-	public static Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> getDropCreatorsMap() {
-		final Map<ResourceLocation, Map<ResourceLocation, IDropCreator>> dir = new HashMap<>();
+	public static Map<ResourceLocation, List<ConfiguredDropCreator<DropCreator>>> getDropCreatorsMap() {
+		final Map<ResourceLocation, List<ConfiguredDropCreator<DropCreator>>> dir = new HashMap<>();
 		dir.put(GLOBAL, GLOBAL_DROP_CREATOR_STORAGE.getDropCreators());
 		Species.REGISTRY.forEach(species -> dir.put(species.getRegistryName(), species.getDropCreators()));
 		return dir;

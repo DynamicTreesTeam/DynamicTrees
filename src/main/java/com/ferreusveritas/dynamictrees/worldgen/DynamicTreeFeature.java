@@ -50,7 +50,7 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
 		final long endTime = System.nanoTime();
 		final long duration = (endTime - startTime) / 1000000;
-        LogManager.getLogger().debug("Dynamic trees at chunk " + chunkPos + " took " + duration + " ms to generate.");
+       // LogManager.getLogger().debug("Dynamic trees at chunk " + chunkPos + " took " + duration + " ms to generate.");
         return true;
     }
 

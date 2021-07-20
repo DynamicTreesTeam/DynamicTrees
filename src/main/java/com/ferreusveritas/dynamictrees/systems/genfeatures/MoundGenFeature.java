@@ -3,9 +3,9 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -31,15 +31,21 @@ public class MoundGenFeature extends GenFeature implements IPreGenFeature, IPost
 			0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0
 		}).setCenter(new BlockPos(2, 3, 2));
 
-	public static final GenFeatureProperty<Integer> MOUND_CUTOFF_RADIUS = GenFeatureProperty.createIntegerProperty("mound_cutoff_radius");
+	public static final ConfigurationProperty<Integer> MOUND_CUTOFF_RADIUS = ConfigurationProperty.integer("mound_cutoff_radius");
 
 	public MoundGenFeature(ResourceLocation registryName) {
-		super(registryName, MOUND_CUTOFF_RADIUS);
+		super(registryName);
+	}
+
+	@Override
+	protected void registerProperties() {
+		this.register(MOUND_CUTOFF_RADIUS);
 	}
 
 	@Override
 	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(MOUND_CUTOFF_RADIUS, 5);
+		return super.createDefaultConfiguration()
+				.with(MOUND_CUTOFF_RADIUS, 5);
 	}
 
 	/**

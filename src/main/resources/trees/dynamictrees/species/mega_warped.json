@@ -27,5 +27,8 @@
         "clear_volume",
         "shroomlight",
         "bottom_flare"
+    ],
+    "drop_creators": [
+        "log"
     ]
 }

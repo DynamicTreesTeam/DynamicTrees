@@ -4,19 +4,14 @@ import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
-import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeaturePropertyValue;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
 import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
-import com.google.common.collect.Sets;
 import net.minecraft.util.ResourceLocation;
-
-import java.util.Arrays;
-import java.util.Set;
 
 /**
  * Base class for all gen features. These are features that grow on/in/around a tree on generation,
@@ -27,101 +22,36 @@ import java.util.Set;
  *
  * @author Harley O'Connor
  */
-public abstract class GenFeature extends RegistryEntry<GenFeature> {
+public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, ConfiguredGenFeature<GenFeature>> {
 
     // Common properties.
-    public static final GenFeatureProperty<Float> VERTICAL_SPREAD = GenFeatureProperty.createFloatProperty("vertical_spread");
-    public static final GenFeatureProperty<Integer> QUANTITY = GenFeatureProperty.createIntegerProperty("quantity");
-    public static final GenFeatureProperty<Float> RAY_DISTANCE = GenFeatureProperty.createFloatProperty("ray_distance");
-    public static final GenFeatureProperty<Integer> MAX_HEIGHT = GenFeatureProperty.createIntegerProperty("max_height");
-    public static final GenFeatureProperty<CanGrowPredicate> CAN_GROW_PREDICATE = GenFeatureProperty.createProperty("can_grow_predicate", CanGrowPredicate.class);
-    public static final GenFeatureProperty<Integer> MAX_COUNT = GenFeatureProperty.createIntegerProperty("max_count");
-    public static final GenFeatureProperty<Integer> FRUITING_RADIUS = GenFeatureProperty.createIntegerProperty("fruiting_radius");
-    public static final GenFeatureProperty<Float> PLACE_CHANCE = GenFeatureProperty.createFloatProperty("place_chance");
-    public static final GenFeatureProperty<BiomePredicate> BIOME_PREDICATE = GenFeatureProperty.createProperty("biome_predicate", BiomePredicate.class);
+    public static final ConfigurationProperty<Float> VERTICAL_SPREAD = ConfigurationProperty.floatProperty("vertical_spread");
+    public static final ConfigurationProperty<Integer> QUANTITY = ConfigurationProperty.integer("quantity");
+    public static final ConfigurationProperty<Float> RAY_DISTANCE = ConfigurationProperty.floatProperty("ray_distance");
+    public static final ConfigurationProperty<Integer> MAX_HEIGHT = ConfigurationProperty.integer("max_height");
+    public static final ConfigurationProperty<CanGrowPredicate> CAN_GROW_PREDICATE = ConfigurationProperty.property("can_grow_predicate", CanGrowPredicate.class);
+    public static final ConfigurationProperty<Integer> MAX_COUNT = ConfigurationProperty.integer("max_count");
+    public static final ConfigurationProperty<Integer> FRUITING_RADIUS = ConfigurationProperty.integer("fruiting_radius");
+    public static final ConfigurationProperty<Float> PLACE_CHANCE = ConfigurationProperty.floatProperty("place_chance");
+    public static final ConfigurationProperty<BiomePredicate> BIOME_PREDICATE = ConfigurationProperty.property("biome_predicate", BiomePredicate.class);
 
-    public static final GenFeature NULL_GEN_FEATURE = new GenFeature(DTTrees.NULL) {};
+    public static final GenFeature NULL_GEN_FEATURE = new GenFeature(DTTrees.NULL) {
+        @Override
+        protected void registerProperties() { }
+    };
 
     /**
      * Central registry for all {@link GenFeature} objects.
      */
     public static final Registry<GenFeature> REGISTRY = new Registry<>(GenFeature.class, NULL_GEN_FEATURE);
 
-    private final ConfiguredGenFeature<GenFeature> defaultConfiguration;
-
-    /** A set of properties that can be used by this {@link GenFeature}. */
-    private final Set<GenFeatureProperty<?>> registeredProperties = Sets.newHashSet();
-
-    public GenFeature(ResourceLocation registryName, GenFeatureProperty<?>... properties) {
-        this.setRegistryName(registryName);
-        this.register(properties);
-
-        this.defaultConfiguration = this.createDefaultConfiguration();
+    public GenFeature(final ResourceLocation registryName) {
+        super(registryName);
     }
 
-    /**
-     * Creates the default configuration for this {@link GenFeature}. Sub-classes should override
-     * this to add their default property values.
-     *
-     * @return The default {@link ConfiguredGenFeature}.
-     */
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration () {
+    @Override
+    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return new ConfiguredGenFeature<>(this);
-    }
-
-    /**
-     * Registers the given properties. This should only be called from this class's constructor
-     * with the properties given as it is needed for creating the default configuration.
-     *
-     * @param properties The {@link GenFeatureProperty} to register.
-     */
-    private void register (GenFeatureProperty<?>... properties) {
-        this.registeredProperties.addAll(Arrays.asList(properties));
-    }
-
-    /**
-     * Checks if the given {@link GenFeatureProperty} is registered (and so can be set to)
-     * this {@link GenFeature}.
-     *
-     * @param property The {@link GenFeatureProperty} to check for.
-     * @return True if it is registered, false if not.
-     */
-    public boolean isPropertyRegistered(GenFeatureProperty<?> property) {
-        return this.registeredProperties.contains(property);
-    }
-
-    /**
-     * Gets the {@link Set} of {@link GenFeatureProperty} objects registered to this
-     * {@link GenFeature}.
-     *
-     * @return The {@link Set} of {@link GenFeatureProperty} for this {@link GenFeature}.
-     */
-    public Set<GenFeatureProperty<?>> getRegisteredProperties() {
-        return registeredProperties;
-    }
-
-    /**
-     * Gets the default configuration. For sub-classes, do not use this to add default
-     * properties, use <tt>createDefaultConfiguration</tt>. This returns a copy of the
-     * default configuration, so any default properties will not be set.
-     *
-     * @return A copy of the default configuration.
-     */
-    public ConfiguredGenFeature<GenFeature> getDefaultConfiguration() {
-        return ConfiguredGenFeature.copyOf(this.defaultConfiguration);
-    }
-
-    /**
-     * Utility method that gets the default configuration and adds the value, so that a chain
-     * of configurations can be added without calling <tt>getDefaultConfiguration</tt>.
-     *
-     * @param featureProperty The {@link GenFeatureProperty} to add.
-     * @param value The {@link GenFeaturePropertyValue} to set.
-     * @param <V> The type of the value being added.
-     * @return The {@link ConfiguredGenFeature} object created.
-     */
-    public <V> ConfiguredGenFeature<GenFeature> with (GenFeatureProperty<V> featureProperty, V value) {
-        return this.getDefaultConfiguration().with(featureProperty, value);
     }
 
 }

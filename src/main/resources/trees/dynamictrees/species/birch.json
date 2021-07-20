@@ -12,8 +12,6 @@
         "dry": 0.5,
         "forest": 1.05
     },
-    "seed_drop_rarity": 1.0,
-    "stick_drop_rarity": 1.0,
     "perfect_biomes": { "name": "minecraft:.*birch.*" },
     "primitive_sapling": "birch_sapling",
     "features" : [

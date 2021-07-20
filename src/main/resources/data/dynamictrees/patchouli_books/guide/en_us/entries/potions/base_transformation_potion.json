@@ -2,7 +2,7 @@
     "name": "Base Potion of Transformation",
     "icon": "dynamictrees:dendro_potion{potion_index:6}",
     "category": "potions",
-	"sortnum": "6",
+	"sortnum": "4",
   "pages": [
 	{
       "type": "brewing",

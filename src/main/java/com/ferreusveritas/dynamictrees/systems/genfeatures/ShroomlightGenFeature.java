@@ -3,10 +3,9 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -28,25 +27,35 @@ import java.util.List;
 /**
  * Gen feature for shroomlight but works for any block.
  * Can be fully customized with a custom predicate for natural growth.
- * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, TetraFunction)}  makeBlockConnectable}
+ * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, TetraFunction)}
  *
  * @author Max Hyper
  */
 public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    public static final GenFeatureProperty<Block> SHROOMLIGHT_BLOCK = GenFeatureProperty.createBlockProperty("shroomlight");
+    public static final ConfigurationProperty<Block> SHROOMLIGHT_BLOCK = ConfigurationProperty.block("shroomlight");
 
     private static final Direction[] HORIZONTALS = CoordUtils.HORIZONTALS;
     private static final double VANILLA_GROW_CHANCE = .005f;
 
     public ShroomlightGenFeature (ResourceLocation registryName) {
-        super(registryName, SHROOMLIGHT_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, PLACE_CHANCE, MAX_COUNT);
+        super(registryName);
+    }
+
+    @Override
+    protected void registerProperties() {
+        this.register(SHROOMLIGHT_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, PLACE_CHANCE, MAX_COUNT);
     }
 
     @Override
     protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-        return super.createDefaultConfiguration().with(SHROOMLIGHT_BLOCK, Blocks.SHROOMLIGHT).with(MAX_HEIGHT, 32)
-                .with(CAN_GROW_PREDICATE, (world, blockPos) -> world.getRandom().nextFloat() <= VANILLA_GROW_CHANCE).with(PLACE_CHANCE, .4f).with(MAX_COUNT, 4);
+        return super.createDefaultConfiguration()
+                .with(SHROOMLIGHT_BLOCK, Blocks.SHROOMLIGHT)
+                .with(MAX_HEIGHT, 32)
+                .with(CAN_GROW_PREDICATE, (world, blockPos) ->
+                        world.getRandom().nextFloat() <= VANILLA_GROW_CHANCE)
+                .with(PLACE_CHANCE, .4f)
+                .with(MAX_COUNT, 4);
     }
 
     @Override

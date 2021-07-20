@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -41,22 +41,27 @@ import java.util.function.BiFunction;
 /**
  * Gen feature for bee nests. Can be fully customized with a custom predicate for natural growth
  * and with a custom function for worldgen chances.
- * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, TetraFunction)}  makeBlockConnectable}
+ * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, TetraFunction)}
  *
  * @author Max Hyper
  */
 public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-    public static final GenFeatureProperty<Block> NEST_BLOCK = GenFeatureProperty.createBlockProperty("nest");
-    public static final GenFeatureProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = GenFeatureProperty.createProperty("world_gen_chance", WorldGenChanceFunction.class);
+    public static final ConfigurationProperty<Block> NEST_BLOCK = ConfigurationProperty.block("nest");
+    public static final ConfigurationProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = ConfigurationProperty.property("world_gen_chance", WorldGenChanceFunction.class);
 
     private static final double vanillaGenChancePlains = 0.05f;
     private static final double vanillaGenChanceFlowerForest = 0.02f;
     private static final double vanillaGenChanceForest = 0.0005f;
     private static final double vanillaGrowChance = 0.001f;
-    
+
     public BeeNestGenFeature (ResourceLocation registryName) {
-        super(registryName, NEST_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, WORLD_GEN_CHANCE_FUNCTION, MAX_COUNT);
+        super(registryName);
+    }
+
+    @Override
+    protected void registerProperties() {
+        this.register(NEST_BLOCK, MAX_HEIGHT, CAN_GROW_PREDICATE, WORLD_GEN_CHANCE_FUNCTION, MAX_COUNT);
     }
 
     @Override
@@ -85,7 +90,8 @@ public class BeeNestGenFeature extends GenFeature implements IPostGenFeature, IP
 
     @Override
     public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-        if (world.getRandom().nextFloat() > configuredGenFeature.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos)) return false;
+        if (world.getRandom().nextFloat() > configuredGenFeature.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos))
+            return false;
 
         return placeBeeNestInValidPlace(configuredGenFeature, world, rootPos, true);
     }

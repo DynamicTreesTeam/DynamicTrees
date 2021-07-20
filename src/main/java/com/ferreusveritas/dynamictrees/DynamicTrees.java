@@ -92,7 +92,7 @@ public final class DynamicTrees {
 		DTClient.setup();
 	}
 
-	public void onCommonSetup(final FMLCommonSetupEvent event) {
+	private void onCommonSetup(final FMLCommonSetupEvent event) {
 		// Clears and locks registry handlers to free them from memory.
 		RegistryHandler.REGISTRY.clear();
 
@@ -106,7 +106,7 @@ public final class DynamicTrees {
 		event.enqueueWork(DTRegistries::registerConfiguredFeatures);
 	}
 
-	public void gatherData(final GatherDataEvent event) {
+	private void gatherData(final GatherDataEvent event) {
 		gatherTagGenerators(MOD_ID, event);
 	}
 

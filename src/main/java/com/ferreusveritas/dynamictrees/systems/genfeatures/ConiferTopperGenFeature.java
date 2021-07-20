@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.GenFeatureProperty;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockState;
@@ -19,15 +19,21 @@ import java.util.List;
 
 public class ConiferTopperGenFeature extends GenFeature implements IPostGenFeature {
 
-	public static final GenFeatureProperty<LeavesProperties> LEAVES_PROPERTIES = GenFeatureProperty.createProperty("leaves_properties", LeavesProperties.class);
+	public static final ConfigurationProperty<LeavesProperties> LEAVES_PROPERTIES = ConfigurationProperty.property("leaves_properties", LeavesProperties.class);
 
 	public ConiferTopperGenFeature(ResourceLocation registryName) {
-		super(registryName, LEAVES_PROPERTIES);
+		super(registryName);
+	}
+
+	@Override
+	protected void registerProperties() {
+		this.register(LEAVES_PROPERTIES);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration().with(LEAVES_PROPERTIES, LeavesProperties.NULL_PROPERTIES);
+		return super.createDefaultConfiguration()
+				.with(LEAVES_PROPERTIES, LeavesProperties.NULL_PROPERTIES);
 	}
 
 	@Override

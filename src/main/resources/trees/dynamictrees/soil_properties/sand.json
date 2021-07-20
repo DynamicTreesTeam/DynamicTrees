@@ -1,0 +1,4 @@
+{
+  "primitive_soil": "sand",
+  "acceptable_soils": [ "sand_like" ]
+}
