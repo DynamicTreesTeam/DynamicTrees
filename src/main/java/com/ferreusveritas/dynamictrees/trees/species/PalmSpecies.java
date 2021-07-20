@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.PalmLeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;

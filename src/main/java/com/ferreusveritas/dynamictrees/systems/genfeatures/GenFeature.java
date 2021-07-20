@@ -5,9 +5,11 @@ import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
 import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
 import com.ferreusveritas.dynamictrees.util.TriFunction;
+import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
@@ -54,6 +56,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
         public static final Type<PostGenerationContext, Boolean> POST_GENERATION = new Type<>(GenFeature::postGenerate);
         public static final Type<PostGrowContext, Boolean> POST_GROW = new Type<>(GenFeature::postGrow);
         public static final Type<PostRotContext, Boolean> POST_ROT = new Type<>(GenFeature::postRot);
+        public static final Type<FullGenerationContext, Boolean> FULL = new Type<>(GenFeature::generate);
 
         private final TriFunction<GenFeature, ConfiguredGenFeature<GenFeature>, C, R> generateConsumer;
 
@@ -84,6 +87,18 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
 
     protected boolean postRot(ConfiguredGenFeature<GenFeature> configuration, PostRotContext context) {
         return true;
+    }
+
+    /**
+     * Handles full generation of a tree.
+     *
+     * @param configuration The {@link ConfiguredGenFeature} instance to generate for.
+     * @param context The {@link FullGenerationContext} object.
+     * @return {@code true} if this {@link GenFeature} handles full generation and so generation
+     *         from a {@link JoCode} should <b>not</b> proceed; {@code false} otherwise.
+     */
+    protected boolean generate(ConfiguredGenFeature<GenFeature> configuration, FullGenerationContext context) {
+        return false;
     }
 
 }

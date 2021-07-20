@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
@@ -40,8 +39,9 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.*;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
@@ -1861,19 +1861,19 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		final AtomicBoolean fullGen = new AtomicBoolean(false);
-		final AtomicBoolean fullGenReturn = new AtomicBoolean(false);
+		final FullGenerationContext context = new FullGenerationContext(world, rootPos, this, biome, radius, safeBounds);
 
-		this.genFeatures.stream()
-				.filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IFullGenFeature)
-				.findFirst()
-				.ifPresent(configuredGenFeature -> {
-					fullGen.set(true);
-					fullGenReturn.set(((IFullGenFeature) configuredGenFeature.getGenFeature())
-							.generate(configuredGenFeature, world, rootPos, this, biome, random, radius, safeBounds));
-				});
+		this.genFeatures.forEach(configuration ->
+				fullGen.set(fullGen.get() || configuration.getGenFeature()
+						.generate(
+								configuration,
+								GenFeature.Type.FULL,
+								context
+						)
+				));
 
 		if (fullGen.get()) {
-			return fullGenReturn.get();
+			return true;
 		}
 
 		final Direction facing = CoordUtils.getRandomDir(random);

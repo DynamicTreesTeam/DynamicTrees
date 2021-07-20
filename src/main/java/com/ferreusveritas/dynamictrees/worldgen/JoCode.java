@@ -10,7 +10,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CoderNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;

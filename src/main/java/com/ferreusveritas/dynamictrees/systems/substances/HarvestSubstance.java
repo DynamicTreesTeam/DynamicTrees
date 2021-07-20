@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.PostGrowContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.Sets;

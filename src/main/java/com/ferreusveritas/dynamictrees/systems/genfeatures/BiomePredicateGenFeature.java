@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import net.minecraft.util.ResourceLocation;
 
 public class BiomePredicateGenFeature extends GenFeature {
@@ -37,8 +38,7 @@ public class BiomePredicateGenFeature extends GenFeature {
 
 		final GenFeature genFeatureToPlace = configuredGenFeatureToPlace.getGenFeature();
 
-		if (genFeatureToPlace instanceof IPostGenFeature && !(configuration.get(ONLY_WORLD_GEN) && !worldGen) &&
-				configuration.get(BIOME_PREDICATE).test(context.biome())) {
+		if (!(configuration.get(ONLY_WORLD_GEN) && !worldGen) && configuration.get(BIOME_PREDICATE).test(context.biome())) {
 			return genFeatureToPlace.generate(
 					configuredGenFeatureToPlace,
 					Type.POST_GENERATION,

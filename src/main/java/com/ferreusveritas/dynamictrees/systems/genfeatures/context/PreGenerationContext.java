@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.systems.genfeatures;
+package com.ferreusveritas.dynamictrees.systems.genfeatures.context;
 
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;

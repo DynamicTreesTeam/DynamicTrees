@@ -2,6 +2,8 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -69,8 +71,14 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature {
 				if (maxHeight >= 2) {
 					int height = MathHelper.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
 
-					if (this.setHeight(height).generate(configuration, world, mushPos.below(), context.species(),
-							context.biome(), rand, context.radius(), context.bounds())) {
+					if (this.setHeight(height).generate(configuration, new FullGenerationContext(
+							context.world(),
+							context.pos(),
+							context.species(),
+							context.biome(),
+							context.radius(),
+							context.bounds()
+					))) {
 						if (++success >= configuration.get(MAX_MUSHROOMS)) {
 							return true;
 						}

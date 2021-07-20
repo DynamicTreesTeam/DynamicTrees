@@ -1,9 +1,8 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
@@ -25,7 +24,7 @@ import static net.minecraft.block.HugeMushroomBlock.*;
  * 
  * @author ferreusveritas
  */
-public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeature {
+public class HugeMushroomGenFeature extends GenFeature {
 
 	public static final ConfigurationProperty<Block> MUSHROOM_BLOCK = ConfigurationProperty.block("mushroom");
 	public static final ConfigurationProperty<Block> STEM_BLOCK = ConfigurationProperty.block("stem");
@@ -175,18 +174,21 @@ public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeatur
 	protected int getMushroomHeight(IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
 		return this.height > 0 ? this.height : random.nextInt(9) + 2;
 	}
-	
+
 	@Override
-	public boolean generate(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	protected boolean generate(ConfiguredGenFeature<GenFeature> configuration, FullGenerationContext context) {
+		final IWorld world = context.world();
+		final BlockPos rootPos = context.pos();
+
 		final BlockPos genPos = rootPos.above();
-		final int height = this.getMushroomHeight(world, rootPos, biome, random, radius, safeBounds);
+		final int height = this.getMushroomHeight(world, rootPos, context.biome(), context.random(), context.radius(), context.bounds());
 		final BlockState soilState = world.getBlockState(rootPos);
 
-		if (species.isAcceptableSoilForWorldgen(world, rootPos, soilState)) {
-			Block mushroomBlock = configuredGenFeature.get(MUSHROOM_BLOCK);
+		if (context.species().isAcceptableSoilForWorldgen(world, rootPos, soilState)) {
+			Block mushroomBlock = configuration.get(MUSHROOM_BLOCK);
 
 			if (mushroomBlock == null) {
-				mushroomBlock = random.nextBoolean() ? Blocks.BROWN_MUSHROOM_BLOCK : Blocks.RED_MUSHROOM_BLOCK;
+				mushroomBlock = context.random().nextBoolean() ? Blocks.BROWN_MUSHROOM_BLOCK : Blocks.RED_MUSHROOM_BLOCK;
 			}
 
 			final SimpleVoxmap capMap = this.getCapForHeight(mushroomBlock, height);
@@ -194,18 +196,18 @@ public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeatur
 			final BlockPos capPos = genPos.above(height - 1); // Determine the cap position(top block of mushroom cap)
 			final BlockBounds capBounds = capMap.getBounds().move(capPos); // Get a bounding box for the entire cap
 
-			if (safeBounds.inBounds(capBounds, true)) {//Check to see if the cap can be generated in safeBounds
+			if (context.bounds().inBounds(capBounds, true)) {//Check to see if the cap can be generated in safeBounds
 
 				// Check there's room for a mushroom cap and stem.
 				for (BlockPos mutPos : Iterables.concat(BlockPos.betweenClosed(BlockPos.ZERO.below(capMap.getLenY()), BlockPos.ZERO.below(height - 1)), capMap.getAllNonZero())) {
 					final BlockPos dPos = mutPos.offset(capPos);
 					final BlockState state = world.getBlockState(dPos);
 					if (!state.getMaterial().isReplaceable()) {
-						return false;
+						return true;
 					}
 				}
 
-				final BlockState stemState = configuredGenFeature.get(STEM_BLOCK).defaultBlockState();
+				final BlockState stemState = configuration.get(STEM_BLOCK).defaultBlockState();
 
 				// Construct the mushroom cap from the voxel map.
 				for (SimpleVoxmap.Cell cell: capMap.getAllNonZeroCells()) {
@@ -222,10 +224,9 @@ public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeatur
 			}
 		}
 
-		return false;
+		return true;
 	}
 
-	// Whatever. It works.
 	protected BlockState getMushroomStateForValue(Block mushroomBlock, BlockState stemBlock, int value, int y) {
 		if (value == 10)
 			return stemBlock;

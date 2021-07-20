@@ -1,9 +1,10 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -17,11 +18,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
 
 import java.util.Random;
 
-public class BushGenFeature extends GenFeature implements IFullGenFeature {
+public class BushGenFeature extends GenFeature {
 
 	public static final ConfigurationProperty<Block> LOG_BLOCK = ConfigurationProperty.block("log");
 	public static final ConfigurationProperty<Block> LEAVES_BLOCK = ConfigurationProperty.block("leaves");
@@ -45,8 +45,8 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature {
 	}
 
 	@Override
-	public boolean generate(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-		this.commonGen(configuredGenFeature, world, rootPos, species, random, radius, safeBounds);
+	protected boolean generate(ConfiguredGenFeature<GenFeature> configuration, FullGenerationContext context) {
+		this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(), context.radius(), context.bounds());
 		return true;
 	}
 
