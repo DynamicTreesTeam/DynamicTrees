@@ -12,6 +12,7 @@ import net.minecraft.network.IPacket;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -41,11 +42,20 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
 		if (this.effect != null) {
 			// Search for existing effectors with the same effect in the same place.
 			for (final LingeringEffectorEntity effector : world.getEntitiesOfClass(LingeringEffectorEntity.class, new AxisAlignedBB(pos))) {
-				if (effector.getBlockPos().equals(pos) && effector.getEffect() != null && effector.getEffect().getName().equals(effect.getName())) {
+				if (effector.getEffect() != null && effector.getEffect().getName().equals(effect.getName())) {
 					effector.kill(); // Kill old effector if it's the same.
 				}
 			}
 		}
+	}
+
+	public static boolean treeHasEffectorForEffect(IWorld world, BlockPos pos, ISubstanceEffect effect) {
+		for (final LingeringEffectorEntity effector : world.getEntitiesOfClass(LingeringEffectorEntity.class, new AxisAlignedBB(pos))) {
+			if (effector.getEffect() != null && effector.getEffect().getName().equals(effect.getName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void setBlockPos(BlockPos pos) {

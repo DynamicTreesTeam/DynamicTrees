@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.substances;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -24,6 +25,11 @@ public class GrowthSubstance implements ISubstanceEffect {
 
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
+		// Don't apply if there is already a growth substance.
+		if (LingeringEffectorEntity.treeHasEffectorForEffect(world, rootPos, this)) {
+			return false;
+		}
+
 		new FertilizeSubstance().setAmount(15).setDisplayParticles(false).apply(world, rootPos);
 		TreeHelper.treeParticles(world, rootPos, ParticleTypes.EFFECT, 8);
 		return true;
