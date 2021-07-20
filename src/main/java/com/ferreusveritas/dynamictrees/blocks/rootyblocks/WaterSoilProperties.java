@@ -69,7 +69,7 @@ public class WaterSoilProperties extends SoilProperties {
         }
 
         @Override
-        public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+        public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
             return 1;
         }
 

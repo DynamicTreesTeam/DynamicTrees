@@ -22,7 +22,7 @@ public class NullTreePart implements ITreePart {
 	//Handles some vanilla blocks
 	
 	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesTree) {
+	public ICell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
 		return CellNull.NULL_CELL;
 	}
 
@@ -32,47 +32,47 @@ public class NullTreePart implements ITreePart {
 	}
 
 	@Override
-	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+	public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		//Connectable blocks such as bee nests and shroomlight will be handled here.
-		if (BranchConnectables.isBlockConnectable(blockState.getBlock())){
-			int rad = BranchConnectables.getConnectionRadiusForBlock(blockState, blockAccess, pos, side);
+		if (BranchConnectables.isBlockConnectable(state.getBlock())){
+			int rad = BranchConnectables.getConnectionRadiusForBlock(state, reader, pos, side);
 			if (rad > 0) return rad;
 		}
 		//Twigs connect to Vanilla leaves
 		if (fromRadius == 1) {
-			return from.getFamily().isCompatibleVanillaLeaves(from.getFamily().getCommonSpecies(), blockState, blockAccess, pos) ? 1: 0;
+			return from.getFamily().isCompatibleVanillaLeaves(from.getFamily().getCommonSpecies(), state, reader, pos) ? 1: 0;
 		}
 		return 0;
 	}
 	
 	@Override
-	public int probabilityForBlock(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from) {
-		return blockState.getBlock().isAir(blockState, blockAccess, pos) ? 1 : 0;
+	public int probabilityForBlock(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from) {
+		return state.getBlock().isAir(state, reader, pos) ? 1 : 0;
 	}
 	
 	@Override
-	public int getRadius(BlockState blockState) {
+	public int getRadius(BlockState state) {
 		return 0;
 	}
 	
 	@Override
-	public boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		return BranchConnectables.isBlockConnectable(blockState.getBlock());
+	public boolean shouldAnalyse(BlockState state, IBlockReader reader, BlockPos pos) {
+		return BranchConnectables.isBlockConnectable(state.getBlock());
 	}
 	
 	@Override
-	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
-		signal.run(blockState, world, pos, fromDir);
+	public MapSignal analyse(BlockState state, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
+		signal.run(state, world, pos, fromDir);
 		return signal;
 	}
 	
 	@Override
-	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+	public int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
 		return 0;
 	}
 	
 	@Override
-	public Family getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+	public Family getFamily(BlockState state, IBlockReader reader, BlockPos pos) {
 		return Family.NULL_FAMILY;
 	}
 	

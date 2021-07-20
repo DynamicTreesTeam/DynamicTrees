@@ -89,7 +89,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 	
 	@Override
-	public Family getFamily(BlockState state, IBlockReader blockAccess, BlockPos pos) {
+	public Family getFamily(BlockState state, IBlockReader reader, BlockPos pos) {
 		return getFamily();
 	}
 	
@@ -116,7 +116,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	}
 
 	@Override
-	public abstract int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius);
+	public abstract int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius);
 	
 	///////////////////////////////////////////
 	// WORLD UPDATE
@@ -252,7 +252,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	///////////////////////////////////////////
 	
 	@Override
-	public int getRadius(BlockState blockState) {
+	public int getRadius(BlockState state) {
 		return 1;
 	}
 	
@@ -276,7 +276,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
 	 * Generally, all branch blocks should be analyzed.
 	 */
 	@Override
-	public boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+	public boolean shouldAnalyse(BlockState state, IBlockReader reader, BlockPos pos) {
 		return true;
 	}
 

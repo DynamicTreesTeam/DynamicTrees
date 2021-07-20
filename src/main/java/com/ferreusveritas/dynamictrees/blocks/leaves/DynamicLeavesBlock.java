@@ -93,8 +93,8 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public Family getFamily(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-		return getProperties(blockState).getFamily();
+	public Family getFamily(BlockState state, IBlockReader reader, BlockPos pos) {
+		return getProperties(state).getFamily();
 	}
 	
 	// Get Leaves-specific flammability
@@ -468,8 +468,8 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
-		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(blockState.getValue(LeavesBlock.DISTANCE)) : CellNull.NULL_CELL;
+	public ICell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
+		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(state.getValue(LeavesBlock.DISTANCE)) : CellNull.NULL_CELL;
 	}
 	
 	@Override
@@ -538,8 +538,8 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public int probabilityForBlock(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from) {
-		return from.getFamily().isCompatibleDynamicLeaves(from.getFamily().getCommonSpecies(), blockState, blockAccess, pos) ? 2: 0;
+	public int probabilityForBlock(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from) {
+		return from.getFamily().isCompatibleDynamicLeaves(from.getFamily().getCommonSpecies(), state, reader, pos) ? 2: 0;
 	}
 	
 	//////////////////////////////
@@ -672,12 +672,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	//////////////////////////////
 
 	@Override
-	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-		return getProperties(blockState).getRadiusForConnection(blockState, world, pos, from, side, fromRadius);
+	public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+		return getProperties(state).getRadiusForConnection(state, reader, pos, from, side, fromRadius);
 	}
 	
 	@Override
-	public int getRadius(BlockState blockState) {
+	public int getRadius(BlockState state) {
 		return 0;
 	}
 	
@@ -685,19 +685,19 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	 * Generally Leaves blocks should not be analyzed
 	 */
 	@Override
-	public boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+	public boolean shouldAnalyse(BlockState state, IBlockReader reader, BlockPos pos) {
 		return false;
 	}
 	
 	@Override
-	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
+	public MapSignal analyse(BlockState state, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
 		return signal; // Shouldn't need to run analysis on leaf blocks.
 	}
 	
 	@Override
-	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+	public int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
 		// Leaves are only support for "twigs".
-		return radius == branch.getFamily().getPrimaryThickness() && branch.getFamily() == getFamily(blockState, blockAccess, pos) ? BranchBlock.setSupport(0, 1) : 0;
+		return radius == branch.getFamily().getPrimaryThickness() && branch.getFamily() == getFamily(state, reader, pos) ? BranchBlock.setSupport(0, 1) : 0;
 	}
 	
 	@Override

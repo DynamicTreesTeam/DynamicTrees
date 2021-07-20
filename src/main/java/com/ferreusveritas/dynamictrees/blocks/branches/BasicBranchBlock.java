@@ -125,7 +125,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
 	///////////////////////////////////////////
 	
 	@Override
-	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+	public int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
 		return isSameTree(branch) ? BasicBranchBlock.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
 	}
 	
@@ -234,12 +234,12 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
 	///////////////////////////////////////////
 	
 	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesProperties) {
+	public ICell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
 		final Family thisTree = getFamily();
 
 		// The requesting leaves must match the tree for hydration to occur, and the branch must not be stripped.
 		if (leavesProperties.getFamily() == thisTree) {
-			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);
+			int radiusAndMeta = thisTree.getRadiusForCellKit(reader, pos, state, dir, this);
 			int radius = MetadataCell.getRadius(radiusAndMeta);
 			int metadata = MetadataCell.getMeta(radiusAndMeta);
 			return leavesProperties.getCellKit().getCellForBranch(radius, metadata);
@@ -249,8 +249,8 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
 	}
 	
 	@Override
-	public int getRadius(BlockState blockState) {
-		return isSameTree(blockState) ? blockState.getValue(RADIUS) : 0;
+	public int getRadius(BlockState state) {
+		return isSameTree(state) ? state.getValue(RADIUS) : 0;
 	}
 	
 	@Override
@@ -270,8 +270,8 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
 	
 	// Directionless probability grabber
 	@Override
-	public int probabilityForBlock(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from) {
-		return isSameTree(from) ? getRadius(blockState) + 2 : 0;
+	public int probabilityForBlock(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from) {
+		return isSameTree(from) ? getRadius(state) + 2 : 0;
 	}
 	
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
@@ -400,8 +400,8 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
 	}
 
 	@Override
-	public int getRadiusForConnection(BlockState blockState, IBlockReader world, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-		return getRadius(blockState);
+	public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+		return getRadius(state);
 	}
 	
 	protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {

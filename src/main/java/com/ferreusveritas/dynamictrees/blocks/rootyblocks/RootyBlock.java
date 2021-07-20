@@ -335,7 +335,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	public ICell getHydrationCell(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, LeavesProperties leavesTree) {
+	public ICell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
 		return CellNull.NULL_CELL;
 	}
 	
@@ -345,17 +345,17 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	public int getRadius(BlockState blockState) {
+	public int getRadius(BlockState state) {
 		return 8;
 	}
 	
 	@Override
-	public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+	public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
 		return 8;
 	}
 	
 	@Override
-	public int probabilityForBlock(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from) {
+	public int probabilityForBlock(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from) {
 		return 0;
 	}
 	
@@ -380,13 +380,13 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	public boolean shouldAnalyse(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+	public boolean shouldAnalyse(BlockState state, IBlockReader reader, BlockPos pos) {
 		return true;
 	}
 	
 	@Override
-	public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal) {
-		signal.run(blockState, world, pos, fromDir);//Run inspector of choice
+	public MapSignal analyse(BlockState state, IWorld world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal) {
+		signal.run(state, world, pos, fromDir);//Run inspector of choice
 		
 		if (signal.root == null) {
 			signal.root = pos;
@@ -400,15 +400,15 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 	}
 	
 	@Override
-	public int branchSupport(BlockState blockState, IBlockReader blockAccess, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+	public int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
 		return dir == Direction.DOWN ? BranchBlock.setSupport(1, 1) : 0;
 	}
 	
 	@Override
-	public Family getFamily(BlockState rootyState, IBlockReader blockAccess, BlockPos rootPos) {
-		BlockPos treePos = rootPos.relative(getTrunkDirection(blockAccess, rootPos));
-		BlockState treeState = blockAccess.getBlockState(treePos);
-		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : Family.NULL_FAMILY;
+	public Family getFamily(BlockState state, IBlockReader reader, BlockPos rootPos) {
+		BlockPos treePos = rootPos.relative(getTrunkDirection(reader, rootPos));
+		BlockState treeState = reader.getBlockState(treePos);
+		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, reader, treePos) : Family.NULL_FAMILY;
 	}
 
 	@Nullable
