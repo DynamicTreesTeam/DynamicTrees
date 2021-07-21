@@ -20,6 +20,12 @@
     ],
     "drop_creators": [
         "log",
-        "stick"
+        "stick",
+        {
+            "name": "fruit",
+            "properties":{
+                "fruit_item": "apple"
+            }
+        }
     ]
 }
