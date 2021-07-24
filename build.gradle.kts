@@ -29,7 +29,7 @@ val modId = property("modId")
 val modVersion = property("modVersion")
 val mcVersion = property("mcVersion")
 
-version = "${mcVersion}-${modVersion}"
+version = "$mcVersion-$modVersion"
 group = property("group")
 
 minecraft {
@@ -149,7 +149,7 @@ java {
     withSourcesJar()
 
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(16))
+        languageVersion.set(JavaLanguageVersion.of(8))
     }
 }
 
@@ -238,7 +238,7 @@ publishing {
                 // Clear dependencies.
                 for (i in 0 until element.childNodes.length) {
                     val node = element.childNodes.item(i)
-                    if (node.nodeName == "dependencies") {
+                    if (node?.nodeName == "dependencies") {
                         element.removeChild(node)
                     }
                 }
