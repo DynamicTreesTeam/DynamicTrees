@@ -1,6 +1,7 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
   "1.16.5": {
+    "1.16.5-0.10.0-Beta19": "Bug Fixes:\n- Fixed crash with DT Traverse due to bush gen features not having a default property value.\n\nTree Pack Changes:\n- Added `can_craft_sapling_to_seed` and `can_craft_seed_to_sapling` properties to Species for individual control over automatically generated recipes.",
     "1.16.5-0.10.0-Beta18": "New Features:\n- Soil blocks are now defined through Tree Packs.\n- Drop creators are now defined through Tree Packs, allowing customization of tree drops.\n- Updated Patchouli manual to 2nd edition.\n\nBug Fixes:\n- Fixed threading issue due to some modded dimensions being generated on alternate threads.\n- Various minor bug fixes.",
     "1.16.5-0.10.0-Beta17": "New Features:\n- Tree branches can now be waterlogged.\n- Surface roots can now be waterlogged.\n- Added Block and Item tag generators for addons.\n\nTree Pack Changes:\n- Added `fire_proof` property to families.\n- Added `max_signal_depth` property to families.\n- Added `can_grow_on_ground` property to leaves_properties.\n- Added `sapling_name` property to species.\n- Added `seed_name` property to species.",
     "1.16.5-0.10.0-Beta16": "Bug Fixes:\n- Fixed tree pack loading order.",
@@ -16,7 +17,7 @@
     "1.16.5-0.10.0-Beta6": "Initial 1.16.5 beta for CF."
   },
   "promos": {
-    "1.16.5-latest": "1.16.5-0.10.0-Beta18",
-    "1.16.5-recommended": "1.16.5-0.10.0-Beta18"
+    "1.16.5-latest": "1.16.5-0.10.0-Beta19",
+    "1.16.5-recommended": "1.16.5-0.10.0-Beta19"
   }
 }
