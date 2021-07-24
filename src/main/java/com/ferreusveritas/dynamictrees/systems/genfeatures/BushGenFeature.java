@@ -43,7 +43,8 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 		return super.createDefaultConfiguration()
 				.with(BIOME_PREDICATE, i -> true)
 				.with(LOG_BLOCK, Blocks.OAK_LOG)
-				.with(LEAVES_BLOCK, Blocks.OAK_LEAVES);
+				.with(LEAVES_BLOCK, Blocks.OAK_LEAVES)
+				.with(SECONDARY_LEAVES_BLOCK, Blocks.AIR);
 	}
 
 	@Override
@@ -91,7 +92,7 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 				for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
 					leafPos.set( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
 					if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getMaterial().isReplaceable()) {
-						Block leaf = ((configuredGenFeature.get(SECONDARY_LEAVES_BLOCK) == null || random.nextInt(4) != 0) ?
+						Block leaf = ((configuredGenFeature.get(SECONDARY_LEAVES_BLOCK) == Blocks.AIR || random.nextInt(4) != 0) ?
 								configuredGenFeature.get(LEAVES_BLOCK) : configuredGenFeature.get(SECONDARY_LEAVES_BLOCK));
 						BlockState leafState = leaf.defaultBlockState();
 						if (leaf instanceof LeavesBlock)  leafState = leafState.setValue(LeavesBlock.PERSISTENT, true);
