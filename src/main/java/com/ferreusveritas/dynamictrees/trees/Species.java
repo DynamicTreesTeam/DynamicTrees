@@ -778,6 +778,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	// SAPLING
 	///////////////////////////////////////////
 
+
+
 	public Set<Item> getPrimitiveSaplingItems() {
 		final Set<Item> saplingItems = new HashSet<>(this.primitiveSaplingItems);
 		saplingItems.addAll(TreeRegistry.SAPLING_REPLACERS.entrySet().stream().filter(entry -> entry.getValue() == this).map(Map.Entry::getKey)
@@ -793,6 +795,24 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	public Species setSapling(DynamicSaplingBlock sapling) {
 		saplingBlock = sapling;
 		return this;
+	}
+
+	private boolean canCraftSeedToSapling = true;
+	public Species setCanCraftSeedToSapling (boolean truth){
+		this.canCraftSeedToSapling = truth;
+		return this;
+	}
+	public boolean canCraftSeedToSapling (){
+		return canCraftSeedToSapling;
+	}
+
+	private boolean canCraftSaplingToSeed = true;
+	public Species setCanCraftSaplingToSeed (boolean truth){
+		this.canCraftSaplingToSeed = truth;
+		return this;
+	}
+	public boolean canCraftSaplingToSeed (){
+		return canCraftSaplingToSeed;
 	}
 
 	/**
