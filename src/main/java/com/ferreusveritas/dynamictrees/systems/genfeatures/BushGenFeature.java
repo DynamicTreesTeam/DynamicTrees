@@ -24,21 +24,21 @@ import java.util.Random;
 public class BushGenFeature extends GenFeature {
 
 	/** Defines the logs {@link Block} for the bush. Defaults to {@link Blocks#OAK_LOG}. */
-	public static final ConfigurationProperty<Block> LOG_BLOCK = ConfigurationProperty.block("log");
+	public static final ConfigurationProperty<Block> LOG = ConfigurationProperty.block("log");
 	/**
 	 * Defines the leaves {@link Block} for the bush. Set these to {@link Blocks#AIR} to if the
 	 * bush should be dead. Defaults to {@link Blocks#OAK_LEAVES}.
 	 */
-	public static final ConfigurationProperty<Block> LEAVES_BLOCK = ConfigurationProperty.block("leaves");
+	public static final ConfigurationProperty<Block> LEAVES = ConfigurationProperty.block("leaves");
 	/**
 	 * Secondary leaves for the bush, have a chance defined by {@link #SECONDARY_LEAVES_CHANCE}
-	 * of generating instead of {@link #LEAVES_BLOCK} if set (not {@code null}). Set these to
+	 * of generating instead of {@link #LEAVES} if set (not {@code null}). Set these to
 	 * {@link Blocks#AIR} to create a dying effect. Defaults to {code null}.
 	 */
-	public static final ConfigurationProperty<Block> SECONDARY_LEAVES_BLOCK = ConfigurationProperty.block("secondary_leaves");
+	public static final ConfigurationProperty<Block> SECONDARY_LEAVES = ConfigurationProperty.block("secondary_leaves");
 	/**
-	 * The chance for the {@link #SECONDARY_LEAVES_BLOCK} (if set) to generate in place of
-	 * {@link #LEAVES_BLOCK}. Defaults to {@code 4}, giving them a 1 in 4 chance of spawning.
+	 * The chance for the {@link #SECONDARY_LEAVES} (if set) to generate in place of
+	 * {@link #LEAVES}. Defaults to {@code 4}, giving them a 1 in 4 chance of spawning.
 	 */
 	public static final ConfigurationProperty<Integer> SECONDARY_LEAVES_CHANCE = ConfigurationProperty.integer("secondary_leaves_chance");
 
@@ -48,16 +48,16 @@ public class BushGenFeature extends GenFeature {
 
 	@Override
 	protected void registerProperties() {
-		this.register(LOG_BLOCK, LEAVES_BLOCK, SECONDARY_LEAVES_BLOCK, BIOME_PREDICATE);
+		this.register(BIOME_PREDICATE, LOG, LEAVES, SECONDARY_LEAVES, SECONDARY_LEAVES_CHANCE);
 	}
 
 	@Override
 	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
 		return super.createDefaultConfiguration()
 				.with(BIOME_PREDICATE, i -> true)
-				.with(LOG_BLOCK, Blocks.OAK_LOG)
-				.with(LEAVES_BLOCK, Blocks.OAK_LEAVES)
-				.with(SECONDARY_LEAVES_BLOCK, null)
+				.with(LOG, Blocks.OAK_LOG)
+				.with(LEAVES, Blocks.OAK_LEAVES)
+				.with(SECONDARY_LEAVES, null)
 				.with(SECONDARY_LEAVES_CHANCE, 4);
 	}
 
@@ -99,16 +99,16 @@ public class BushGenFeature extends GenFeature {
 
 			final BlockPos pos = groundPos.above();
 			if (!world.getBlockState(groundPos).getMaterial().isLiquid() && species.isAcceptableSoil(world, groundPos, soilBlockState)) {
-				world.setBlock(pos, configuredGenFeature.get(LOG_BLOCK).defaultBlockState(), 3);
+				world.setBlock(pos, configuredGenFeature.get(LOG).defaultBlockState(), 3);
 
 				SimpleVoxmap leafMap = LeafClusters.BUSH;
 				BlockPos.Mutable leafPos = new BlockPos.Mutable();
 				for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
 					leafPos.set( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
 					if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getMaterial().isReplaceable()) {
-						Block leaf = ((configuredGenFeature.get(SECONDARY_LEAVES_BLOCK) == null ||
+						Block leaf = ((configuredGenFeature.get(SECONDARY_LEAVES) == null ||
 								random.nextInt(configuredGenFeature.get(SECONDARY_LEAVES_CHANCE)) != 0) ?
-								configuredGenFeature.get(LEAVES_BLOCK) : configuredGenFeature.get(SECONDARY_LEAVES_BLOCK));
+								configuredGenFeature.get(LEAVES) : configuredGenFeature.get(SECONDARY_LEAVES));
 						BlockState leafState = leaf.defaultBlockState();
 						if (leaf instanceof LeavesBlock)  leafState = leafState.setValue(LeavesBlock.PERSISTENT, true);
 						world.setBlock(leafPos, leafState, 3);
