@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * @author Harley O'Connor
- *
  * Each item individually attempts to drop with a global rarity.
  * Can drop multiple items, or none.
+ *
+ * @author Harley O'Connor
  */
 public final class StackDrops implements Drops {
 

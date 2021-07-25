@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * @author Max Hyper
- *
  * Can drop only one item picked randomly from the selection of all items
  * with weighted odds.
+ *
+ * @author Max Hyper
  */
 public final class WeightedDrops implements Drops {
 
