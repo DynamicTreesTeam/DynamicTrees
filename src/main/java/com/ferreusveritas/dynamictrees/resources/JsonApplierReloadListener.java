@@ -27,7 +27,10 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
     protected static final String JSON_EXTENSION = ".json";
     protected static final int JSON_EXTENSION_LENGTH = JSON_EXTENSION.length();
 
-    protected final Gson gson = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
+    protected final Gson gson = (new GsonBuilder())
+            .setPrettyPrinting()
+            .disableHtmlEscaping()
+            .create();
 
     /** Holds appliers that should be applied both when loading and reloading. */
     protected final JsonPropertyApplierList<V> loadReloadAppliers;

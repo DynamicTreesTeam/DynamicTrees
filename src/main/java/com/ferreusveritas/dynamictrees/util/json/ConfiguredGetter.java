@@ -61,7 +61,7 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
         }
 
         propertyValueFetchResult.ifSuccessful(value -> fetchResult.getValue().with(configurationProperty, value))
-                .otherwise(fetchResult::addWarning);
+                .elseIfError(fetchResult::addWarning);
     }
 
 }

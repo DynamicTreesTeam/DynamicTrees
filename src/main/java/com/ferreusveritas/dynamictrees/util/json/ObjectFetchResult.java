@@ -86,15 +86,24 @@ public final class ObjectFetchResult<T> {
         return this;
     }
 
-    public ObjectFetchResult<T> otherwise (final Consumer<String> errorConsumer) {
+    public ObjectFetchResult<T> elseIfError(final Consumer<String> errorConsumer) {
         if (!this.wasSuccessful())
             errorConsumer.accept(this.errorMessage);
         return this;
     }
 
-    public ObjectFetchResult<T> otherwise (final Runnable runnable) {
+    public ObjectFetchResult<T> elseIfError(final Runnable runnable) {
         if (!this.wasSuccessful())
             runnable.run();
+        return this;
+    }
+
+    public ObjectFetchResult<T> forEachWarning(final Consumer<String> warningConsumer) {
+        if (!this.wasSuccessful()) {
+            for (final String warning : this.warnings) {
+                warningConsumer.accept(warning);
+            }
+        }
         return this;
     }
 

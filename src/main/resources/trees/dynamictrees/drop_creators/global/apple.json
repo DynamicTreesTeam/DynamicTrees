@@ -1,0 +1,7 @@
+{
+  "_comment": "This for testing purposes! Don't forget to remove it before releasing.",
+  "name": "fruit",
+  "properties": {
+    "fruit_item": "nether_star"
+  }
+}

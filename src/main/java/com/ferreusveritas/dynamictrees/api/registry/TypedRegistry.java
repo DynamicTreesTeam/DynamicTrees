@@ -12,7 +12,6 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
 import org.apache.logging.log4j.LogManager;
 
@@ -95,7 +94,7 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
             JsonObjectGetters.RESOURCE_LOCATION.get(typeElement)
                     .map(resourceLocation -> this.getType(TreeRegistry.processResLoc(resourceLocation)), "Could not find type for '{previous_value}' (will use default).")
                     .ifSuccessful(type::set)
-                    .otherwise(error -> LogManager.getLogger().error("Error constructing " + this.name + " '" + registryName + "': " + error));
+                    .elseIfError(error -> LogManager.getLogger().error("Error constructing " + this.name + " '" + registryName + "': " + error));
         }
 
         return type.get();

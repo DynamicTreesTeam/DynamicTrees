@@ -165,16 +165,16 @@ public class JsonHelper {
 			JsonObjectGetters.getObjectGetter(typeClass).get(jsonElement).ifSuccessful(value -> {
 				consumer.accept(value);
 				this.read = true;
-			}).otherwise(errorMessage -> this.lastError = errorMessage).otherwise(() -> this.attemptedClasses.add(typeClass));
+			}).elseIfError(errorMessage -> this.lastError = errorMessage).elseIfError(() -> this.attemptedClasses.add(typeClass));
 			return this;
 		}
 
 		public <T> JsonElementReader ifArrayForEach (final Class<T> typeClass, final Consumer<T> consumer) {
 			JsonObjectGetters.JSON_ARRAY.get(jsonElement).ifSuccessful(jsonArray -> {
 				jsonArray.forEach(arrayElement -> JsonObjectGetters.getObjectGetter(typeClass).get(arrayElement)
-						.ifSuccessful(consumer).otherwise(errorMessage -> this.lastError = errorMessage));
+						.ifSuccessful(consumer).elseIfError(errorMessage -> this.lastError = errorMessage));
 				this.read = true;
-			}).otherwise(() -> this.attemptedClasses.add(typeClass));
+			}).elseIfError(() -> this.attemptedClasses.add(typeClass));
 			return this;
 		}
 

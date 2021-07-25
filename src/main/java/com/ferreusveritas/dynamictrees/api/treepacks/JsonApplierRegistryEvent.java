@@ -13,7 +13,7 @@ public class JsonApplierRegistryEvent<T> extends GenericEvent<T> implements IMod
     public static final String SPECIES = "species";
     public static final String FAMILY = "family";
     public static final String LEAVES_PROPERTIES = "leaves_properties";
-    public static final String DROP_CREATORS = "drop_creators";
+    public static final String GLOBAL_DROP_CREATORS = "global_drop_creators";
     public static final String SOIL_PROPERTIES = "soil_properties";
 
     public static final String LOAD_SUFFIX = "_load";

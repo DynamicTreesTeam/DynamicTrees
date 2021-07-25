@@ -34,8 +34,8 @@ public final class MapGetter<K, V> implements IJsonObjectGetter<Map<K, V>> {
             object.entrySet().forEach(entry ->
                     this.valueGetter.get(entry.getValue()).ifSuccessful(value ->
                             this.keyGetter.get(new JsonPrimitive(entry.getKey()))
-                                    .ifSuccessful(key -> map.put(key, value)).otherwise(err -> errorMsg[0] = err)
-                    ).otherwise(err -> {if (errorMsg[0] == null) errorMsg[0] = err;} )
+                                    .ifSuccessful(key -> map.put(key, value)).elseIfError(err -> errorMsg[0] = err)
+                    ).elseIfError(err -> {if (errorMsg[0] == null) errorMsg[0] = err;} )
             );
             return map;
         }).setErrorMessage(errorMsg[0]);

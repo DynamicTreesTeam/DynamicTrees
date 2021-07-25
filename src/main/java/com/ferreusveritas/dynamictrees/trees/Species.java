@@ -706,7 +706,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	}
 
 	public <C extends DropContext> List<ItemStack> getDrops(final DropCreator.DropType<C> dropType, final C context) {
-		TreeRegistry.GLOBAL_DROP_CREATOR_STORAGE.appendDrops(null, dropType, context);
+		DTResourceRegistries.GLOBAL_DROP_CREATOR_MANAGER.appendAll(dropType, context);
 		this.dropCreators.forEach(configuration -> configuration.getConfigurable()
 				.appendDrops(configuration, dropType, context));
 		return context.drops();
