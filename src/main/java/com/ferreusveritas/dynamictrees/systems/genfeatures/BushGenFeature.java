@@ -25,9 +25,24 @@ import java.util.Random;
 
 public class BushGenFeature extends GenFeature implements IFullGenFeature, IPostGenFeature {
 
+	/** Defines the logs {@link Block} for the bush. Defaults to {@link Blocks#OAK_LOG}. */
 	public static final ConfigurationProperty<Block> LOG_BLOCK = ConfigurationProperty.block("log");
+	/**
+	 * Defines the leaves {@link Block} for the bush. Set these to {@link Blocks#AIR} to if the
+	 * bush should be dead. Defaults to {@link Blocks#OAK_LEAVES}.
+	 */
 	public static final ConfigurationProperty<Block> LEAVES_BLOCK = ConfigurationProperty.block("leaves");
+	/**
+	 * Secondary leaves for the bush, have a chance defined by {@link #SECONDARY_LEAVES_CHANCE}
+	 * of generating instead of {@link #LEAVES_BLOCK} if set (not {@code null}). Set these to
+	 * {@link Blocks#AIR} to create a dying effect. Defaults to {code null}.
+	 */
 	public static final ConfigurationProperty<Block> SECONDARY_LEAVES_BLOCK = ConfigurationProperty.block("secondary_leaves");
+	/**
+	 * The chance for the {@link #SECONDARY_LEAVES_BLOCK} (if set) to generate in place of
+	 * {@link #LEAVES_BLOCK}. Defaults to {@code 4}, giving them a 1 in 4 chance of spawning.
+	 */
+	public static final ConfigurationProperty<Integer> SECONDARY_LEAVES_CHANCE = ConfigurationProperty.integer("secondary_leaves_chance");
 
 	public BushGenFeature(ResourceLocation registryName) {
 		super(registryName);
@@ -44,7 +59,8 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 				.with(BIOME_PREDICATE, i -> true)
 				.with(LOG_BLOCK, Blocks.OAK_LOG)
 				.with(LEAVES_BLOCK, Blocks.OAK_LEAVES)
-				.with(SECONDARY_LEAVES_BLOCK, null);
+				.with(SECONDARY_LEAVES_BLOCK, null)
+				.with(SECONDARY_LEAVES_CHANCE, 4);
 	}
 
 	@Override
@@ -92,7 +108,8 @@ public class BushGenFeature extends GenFeature implements IFullGenFeature, IPost
 				for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
 					leafPos.set( pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ() );
 					if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getMaterial().isReplaceable()) {
-						Block leaf = ((configuredGenFeature.get(SECONDARY_LEAVES_BLOCK) == null || random.nextInt(4) != 0) ?
+						Block leaf = ((configuredGenFeature.get(SECONDARY_LEAVES_BLOCK) == null ||
+								random.nextInt(configuredGenFeature.get(SECONDARY_LEAVES_CHANCE)) != 0) ?
 								configuredGenFeature.get(LEAVES_BLOCK) : configuredGenFeature.get(SECONDARY_LEAVES_BLOCK));
 						BlockState leafState = leaf.defaultBlockState();
 						if (leaf instanceof LeavesBlock)  leafState = leafState.setValue(LeavesBlock.PERSISTENT, true);

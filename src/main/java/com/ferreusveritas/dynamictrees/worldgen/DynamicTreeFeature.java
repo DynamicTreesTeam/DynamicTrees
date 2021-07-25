@@ -27,7 +27,7 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
     @Override
     public boolean place(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-        final long startTime = System.nanoTime();
+//        final long startTime = System.nanoTime();
 		final BiomeDatabaseManager biomeDatabaseManager = DTResourceRegistries.BIOME_DATABASE_MANAGER;
         final TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
 		final ServerWorld serverWorld = world.getLevel();
@@ -48,9 +48,9 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 		treeGenerator.getCircleProvider().getPoissonDiscs(serverWorld, world, chunkPos)
 				.forEach(c -> treeGenerator.makeTrees(world, biomeDatabase, c, new GroundFinder(), chunkBounds));
 
-		final long endTime = System.nanoTime();
-		final long duration = (endTime - startTime) / 1000000;
-       // LogManager.getLogger().debug("Dynamic trees at chunk " + chunkPos + " took " + duration + " ms to generate.");
+//		final long endTime = System.nanoTime();
+//		final long duration = (endTime - startTime) / 1000000;
+//		LogManager.getLogger().debug("Dynamic trees at chunk " + chunkPos + " took " + duration + " ms to generate.");
         return true;
     }
 
