@@ -14,9 +14,10 @@ public final class DropCreators {
     public static final DropCreator FRUIT = new FruitDropCreator(DynamicTrees.resLoc("fruit"));
     public static final DropCreator STICK = new StickDropCreator(DynamicTrees.resLoc("stick"));
     public static final DropCreator LOG = new LogDropCreator(DynamicTrees.resLoc("log"));
+    public static final DropCreator WART_BLOCK = new LogDropCreator(DynamicTrees.resLoc("wart_block"));
 
     public static void register(final IRegistry<DropCreator> registry) {
-        registry.registerAll(NORMAL, LOOT_TABLE, SEED, FRUIT, STICK, LOG);
+        registry.registerAll(NORMAL, LOOT_TABLE, SEED, FRUIT, STICK, LOG, WART_BLOCK);
     }
 
 }

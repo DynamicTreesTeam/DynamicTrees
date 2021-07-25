@@ -27,29 +27,5 @@
         "clear_volume",
         "shroomlight",
         "bottom_flare"
-    ],
-    "drop_creators": [
-        "log",
-        {
-            "name": "normal",
-            "properties": {
-                "drops": {
-                    "leaves": {
-                        "id": "stack",
-                        "properties": {
-                            "items": [ { "id": "warped_wart_block", "Count": 1 } ],
-                            "chance": 1
-                        }
-                    },
-                    "harvest": {
-                        "id": "stack",
-                        "properties": {
-                            "items": [ { "id": "warped_wart_block", "Count": 1 } ],
-                            "chance": 10
-                        }
-                    }
-                }
-            }
-        }
     ]
 }

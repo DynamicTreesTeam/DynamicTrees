@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Family;
@@ -38,27 +39,6 @@ public class NetherFungusSpecies extends Species {
     public NetherFungusSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
         this.setSaplingShape(CommonVoxelShapes.SAPLING);
-
-        addDropCreators(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")){
-            @Override
-            protected void registerProperties() {
-
-            }
-
-            @Override
-            public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-                int chance = 10;
-                if (context.fortune() > 0) {
-                    chance -= 2 << context.fortune();
-                    if (chance < 10)
-                        chance = 5;
-                }
-                if (context.random().nextInt(chance) == 0) {
-                    ItemStack drop = context.species().getLeavesProperties().getPrimitiveLeavesItemStack().copy();
-                    context.drops().add(drop);
-                }
-            }
-        });
     }
 
     @Override
@@ -74,8 +54,13 @@ public class NetherFungusSpecies extends Species {
 
     @Override
     public Species setPreReloadDefaults() {
-        return super.setPreReloadDefaults().setSaplingSound(SoundType.FUNGUS).setCanSaplingGrowNaturally(false).setSaplingShape(CommonVoxelShapes.FLAT_MUSHROOM)
-                .envFactor(BiomeDictionary.Type.COLD, 0.25f).envFactor(BiomeDictionary.Type.WET, 0.75f);
+        return this.setDefaultGrowingParameters()
+                .setSaplingShape(CommonVoxelShapes.FLAT_MUSHROOM)
+                .setSaplingSound(SoundType.FUNGUS)
+                .setCanSaplingGrowNaturally(false)
+                .addDropCreators(DropCreators.LOG, DropCreators.WART_BLOCK)
+                .envFactor(BiomeDictionary.Type.COLD, 0.25f)
+                .envFactor(BiomeDictionary.Type.WET, 0.75f);
     }
 
     @Override

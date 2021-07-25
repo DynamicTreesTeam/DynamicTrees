@@ -102,7 +102,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		@Override public boolean plantSapling(IWorld world, BlockPos pos, boolean locationOverride) { return false; }
 		@Override public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) { return false; }
 		@Override public float biomeSuitability(World world, BlockPos pos) { return 0.0f; }
-		@Override public boolean addDropCreators(DropCreator... dropCreators) { return false; }
+		@Override public Species addDropCreators(DropCreator... dropCreators) { return this; }
 		@Override public Species setSeed(Seed seed) { return this; }
 		@Override public ItemStack getSeedStack(int qty) { return ItemStack.EMPTY; }
 		@Override public Species setupStandardSeedDropping() { return this; }
@@ -253,8 +253,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 	 */
 	@Override
 	public Species setPreReloadDefaults() {
-		this.addDropCreators(DropCreators.LOG, DropCreators.STICK, DropCreators.SEED);
-		return this.setDefaultGrowingParameters().setSaplingShape(CommonVoxelShapes.SAPLING).setSaplingSound(SoundType.GRASS);
+		return this.setDefaultGrowingParameters()
+				.setSaplingShape(CommonVoxelShapes.SAPLING)
+				.setSaplingSound(SoundType.GRASS)
+				.addDropCreators(DropCreators.LOG, DropCreators.STICK, DropCreators.SEED);
 	}
 
 	/**
@@ -682,10 +684,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 		return this;
 	}
 
-	public boolean addDropCreators(DropCreator... dropCreators) {
+	public Species addDropCreators(DropCreator... dropCreators) {
 		Arrays.stream(dropCreators).forEach(dropCreator ->
 			this.dropCreators.add(dropCreator.getDefaultConfiguration()));
-		return true;
+		return this;
 	}
 
 	@SafeVarargs

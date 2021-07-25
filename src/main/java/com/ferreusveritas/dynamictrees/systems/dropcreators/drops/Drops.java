@@ -26,7 +26,7 @@ public interface Drops {
 
     void appendDrops(List<ItemStack> drops, Random random, int fortune);
 
-    default int getChance(int fortune, int baseChance) {
+    static int getChance(int fortune, int baseChance) {
         if (baseChance <= 1) return baseChance;
         int chance = baseChance;
         if (fortune > 0) {

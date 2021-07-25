@@ -79,7 +79,7 @@ public final class WeightedDrops implements Drops {
 
     @Override
     public void appendDrops(List<ItemStack> drops, Random random, int fortune) {
-        final int chance = this.getChance(fortune, this.baseChance);
+        final int chance = Drops.getChance(fortune, this.baseChance);
         final int attempts = MathHelper.randomBetween(random, this.minAttempts, this.maxAttempts);
 
         WeightedList<Item> list = new WeightedList<>();

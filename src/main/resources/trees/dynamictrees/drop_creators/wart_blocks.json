@@ -1,0 +1,30 @@
+{
+  "_comment": "Plan for how WartBlockDropCreator will be defined in Json.",
+  "name": "normal",
+  "variable_definitions": [
+    {
+      "name": "block",
+      "_comment": "The type is not actually needed, it's more of an annotation.",
+      "type": "block",
+      "default": "air"
+    }
+  ],
+  "properties": {
+    "drops": {
+      "leaves": {
+        "id": "stack",
+        "properties": {
+          "items": [ { "id": "#block", "Count": 1 } ],
+          "chance": 1
+        }
+      },
+      "harvest": {
+        "id": "stack",
+        "properties": {
+          "items": [ { "id": "#block", "Count": 1 } ],
+          "chance": 10
+        }
+      }
+    }
+  }
+}
