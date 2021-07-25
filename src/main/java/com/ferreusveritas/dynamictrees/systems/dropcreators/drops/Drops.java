@@ -1,6 +1,11 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators.drops;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Random;
@@ -10,6 +15,12 @@ import java.util.Random;
  */
 @FunctionalInterface
 public interface Drops {
+
+    Codec<Item> ITEM_CODEC = ResourceLocation.CODEC.comapFlatMap(registryName -> {
+        final Item item = ForgeRegistries.ITEMS.getValue(registryName);
+        return item == null ? DataResult.error("Could not find item for registry name \"" + registryName + "\".") :
+                DataResult.success(item);
+    }, Item::getRegistryName);
 
     Drops NONE = (drops, random, fortune) -> {};
 

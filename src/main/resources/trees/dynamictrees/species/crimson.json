@@ -46,14 +46,14 @@
             "properties": {
                 "drops": {
                     "leaves": {
-                        "id": "normal",
+                        "id": "stack",
                         "properties": {
                             "items": [ { "id": "nether_wart_block", "Count": 1 } ],
                             "chance": 1
                         }
                     },
                     "harvest": {
-                        "id": "normal",
+                        "id": "stack",
                         "properties": {
                             "items": [ { "id": "nether_wart_block", "Count": 1 } ],
                             "chance": 10

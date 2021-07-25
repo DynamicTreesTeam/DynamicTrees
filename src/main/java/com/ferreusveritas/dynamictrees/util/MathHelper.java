@@ -50,5 +50,10 @@ public class MathHelper {
 	public static float angleDegreesInterpolate(float ang1, float ang2, float t) {
 	    return ang1 + shortDegreesDist(ang1, ang2) * t;
 	}
+
+	public static int randomBetween(Random random, int min, int max){
+		if (min == max) return min;
+		return min + random.nextInt(1 + max - min);
+	}
 	
 }
