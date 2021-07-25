@@ -31,16 +31,13 @@ public class SpreadableSoilProperties extends SoilProperties{
 
     private Integer required_light = null;
     private Item spread_item = null;
-    private List<SoilProperties> spreadable_soils = new LinkedList<>();
+    private final List<SoilProperties> spreadable_soils = new LinkedList<>();
 
     public void setRequiredLight (Integer light){
         this.required_light = light;
     }
     public void setSpreadItem (Item item){
         this.spread_item = item;
-    }
-    public void setSpreadableSoils (List<SoilProperties> soils){
-        this.spreadable_soils = soils;
     }
 
     public SpreadableSoilProperties (final ResourceLocation registryName){

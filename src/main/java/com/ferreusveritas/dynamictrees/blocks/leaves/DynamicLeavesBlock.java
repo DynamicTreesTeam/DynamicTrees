@@ -83,7 +83,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(DISTANCE, PERSISTENT);
 	}
-	
+
 	public void setProperties(LeavesProperties properties) {
 		this.properties = properties;
 	}
@@ -579,6 +579,10 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
 	public boolean shouldDrop(BlockState state, IBlockReader world, BlockPos pos, PlayerEntity player) {
 		final ItemStack stack = player.getMainHandItem();
 		final Item item = stack.getItem();
+
+		// If the tool has silktouch, drop the block
+		if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, stack) > 0)
+			return true;
 
 		// Since shears don't have a ToolType, requireShears acts as an override.
 		if (this.getProperties(state).doRequireShears())

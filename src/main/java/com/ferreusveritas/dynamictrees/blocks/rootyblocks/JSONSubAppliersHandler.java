@@ -24,8 +24,8 @@ public class JSONSubAppliersHandler {
 
         event.getApplierList().register("required_light", SpreadableSoilProperties.class, Integer.class, SpreadableSoilProperties::setRequiredLight)
                 .register("spread_item", SpreadableSoilProperties.class, Item.class, SpreadableSoilProperties::setSpreadItem)
-                .register("spreadable_soils", SpreadableSoilProperties.class, ListGetter.getListClass(SoilProperties.class),
-                        (soilProp,list)->SoilProperties.REGISTRY.runOnNextLock(()->soilProp.setSpreadableSoils(list)));
+                .registerArrayApplier("spreadable_soils", SpreadableSoilProperties.class, SoilProperties.class,
+                        (soilProp,soil)->SoilProperties.REGISTRY.runOnNextLock(()->soilProp.addSpreadableSoils(soil)));
     }
 
 }

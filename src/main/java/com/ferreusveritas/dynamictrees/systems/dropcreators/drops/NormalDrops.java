@@ -54,11 +54,12 @@ public final class NormalDrops implements Drops {
     public void appendDrops(List<ItemStack> drops, Random random, int fortune) {
         final int chance = this.getChance(fortune, this.baseChance);
 
-        this.items.forEach(stack -> {
-            if (random.nextInt((int) (chance / this.rarity)) == 0) {
-                drops.add(stack.copy());
-            }
-        });
+        if (this.rarity > 0)
+            this.items.forEach(stack -> {
+                if (random.nextInt(Math.max((int) (chance / this.rarity), 1)) == 0) {
+                    drops.add(stack.copy());
+                }
+            });
     }
 
 }

@@ -181,9 +181,7 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<FeatureCanceller> FEATURE_CANCELLER = register(FeatureCanceller.class, new RegistryEntryGetter<>(FeatureCanceller.REGISTRY));
     public static final IJsonObjectGetter<SoilProperties> SOIL_PROPERTIES = register(SoilProperties.class, new RegistryEntryGetter<>(SoilProperties.REGISTRY));
 
-    public static final IJsonObjectGetter<List<SoilProperties>> SOIL_PROPERTIES_LIST = register(ListGetter.getListClass(SoilProperties.class), new ListGetter<>(SOIL_PROPERTIES));
-
-     public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGetter<>("Gen Feature", GenFeature.class));
+    public static final IJsonObjectGetter<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredGetter<>("Gen Feature", GenFeature.class));
     public static final IJsonObjectGetter<ConfiguredDropCreator<DropCreator>> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, new ConfiguredGetter<>("Drop Creator", DropCreator.class));
 
     public static final IJsonObjectGetter<Drops> DROPS = register(Drops.class, new DropsGetter());
