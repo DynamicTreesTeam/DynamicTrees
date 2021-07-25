@@ -1,6 +1,7 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
   "1.16.5": {
+    "1.16.5-0.10.0-Beta21": "Bug Fixes:\n- Fixed secondary leaves chance property not being registered to bush gen feature.",
     "1.16.5-0.10.0-Beta20": "Bug Fixes:\n- Fixed crash whilst generating bush gen features.\n- Fixed silk touch not dropping leaves.\n- Fixed absent wart block drops.\n\nTree Pack Changes:\n- Weighted drop type now uses WeightedList.\n- Added `secondary_leaves_chance` property to bush gen feature.",
     "1.16.5-0.10.0-Beta19": "Bug Fixes:\n- Fixed crash with DT Traverse due to bush gen features not having a default property value.\n\nTree Pack Changes:\n- Added `can_craft_sapling_to_seed` and `can_craft_seed_to_sapling` properties to Species for individual control over automatically generated recipes.",
     "1.16.5-0.10.0-Beta18": "New Features:\n- Soil blocks are now defined through Tree Packs.\n- Drop creators are now defined through Tree Packs, allowing customization of tree drops.\n- Updated Patchouli manual to 2nd edition.\n\nBug Fixes:\n- Fixed threading issue due to some modded dimensions being generated on alternate threads.\n- Various minor bug fixes.",
@@ -18,7 +19,7 @@
     "1.16.5-0.10.0-Beta6": "Initial 1.16.5 beta for CF."
   },
   "promos": {
-    "1.16.5-latest": "1.16.5-0.10.0-Beta20",
-    "1.16.5-recommended": "1.16.5-0.10.0-Beta20"
+    "1.16.5-latest": "1.16.5-0.10.0-Beta21",
+    "1.16.5-recommended": "1.16.5-0.10.0-Beta21"
   }
 }
