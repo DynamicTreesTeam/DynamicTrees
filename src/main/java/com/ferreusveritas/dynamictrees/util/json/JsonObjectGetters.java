@@ -148,7 +148,7 @@ public final class JsonObjectGetters {
 
     public static final IJsonObjectGetter<ResourceLocation> RESOURCE_LOCATION = register(ResourceLocation.class, ResourceLocationGetter.create());
     /** Alternative to {@link #RESOURCE_LOCATION}, defaulting the namespace to {@code dynamictrees}.  */
-    public static final IJsonObjectGetter<ResourceLocation> DT_RESOURCE_LOCATION = register(ResourceLocation.class, ResourceLocationGetter.create(DynamicTrees.MOD_ID));
+    public static final IJsonObjectGetter<ResourceLocation> DT_RESOURCE_LOCATION = ResourceLocationGetter.create(DynamicTrees.MOD_ID);
 
     public static IJsonObjectGetter<Block> BLOCK;
     public static IJsonObjectGetter<Item> ITEM;

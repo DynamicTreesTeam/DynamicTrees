@@ -8,19 +8,23 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * Each item individually attempts to drop with a global rarity.
+ * Can drop multiple items, or none.
+ *
  * @author Harley O'Connor
  */
-public final class NormalDrops implements Drops {
+public final class StackDrops implements Drops {
 
-    public static final Codec<NormalDrops> CODEC = RecordCodecBuilder.create(instance ->
+    public static final Codec<StackDrops> CODEC = RecordCodecBuilder.create(instance ->
         instance.group(
+                //The item stack codec requires the "Count" key to be capitalized. No clue why.
                 Codec.list(ItemStack.CODEC).fieldOf("items")
-                        .forGetter(NormalDrops::getItems),
+                        .forGetter(StackDrops::getItems),
                 Codec.FLOAT.optionalFieldOf("rarity", 1f)
-                        .forGetter(NormalDrops::getRarity),
+                        .forGetter(StackDrops::getRarity),
                 Codec.INT.optionalFieldOf("chance", 200)
-                        .forGetter(NormalDrops::getBaseChance)
-        ).apply(instance, NormalDrops::new)
+                        .forGetter(StackDrops::getBaseChance)
+        ).apply(instance, StackDrops::new)
     );
 
     /** A {@link List} of {@link ItemStack}s to drop. */
@@ -32,7 +36,7 @@ public final class NormalDrops implements Drops {
     /** The base chance of dropping each item. This will be altered depending on the fortune level. */
     private final int baseChance;
 
-    public NormalDrops(List<ItemStack> items, float rarity, int baseChance) {
+    public StackDrops(List<ItemStack> items, float rarity, int baseChance) {
         this.items = items;
         this.rarity = rarity;
         this.baseChance = baseChance;
@@ -54,11 +58,12 @@ public final class NormalDrops implements Drops {
     public void appendDrops(List<ItemStack> drops, Random random, int fortune) {
         final int chance = this.getChance(fortune, this.baseChance);
 
-        this.items.forEach(stack -> {
-            if (random.nextInt((int) (chance / this.rarity)) == 0) {
-                drops.add(stack.copy());
-            }
-        });
+        if (this.rarity > 0)
+            this.items.forEach(stack -> {
+                if (random.nextInt(Math.max((int) (chance / this.rarity), 1)) == 0) {
+                    drops.add(stack.copy());
+                }
+            });
     }
 
 }

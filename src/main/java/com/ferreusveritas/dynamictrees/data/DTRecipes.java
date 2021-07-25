@@ -33,15 +33,21 @@ public final class DTRecipes {
             species.getPrimitiveSaplingItems().forEach(primitiveSapling -> {
                 assert primitiveSapling.getRegistryName() != null;
 
-                final ResourceLocation saplingToSeed = new ResourceLocation(registryName.getNamespace(),
-                        separate(primitiveSapling.getRegistryName()) + "_to_" + registryName.getPath() + "_seed");
-                final ResourceLocation seedToSapling = new ResourceLocation(registryName.getNamespace(),
-                        registryName.getPath() + "_seed_to_" + separate(primitiveSapling.getRegistryName()));
+                if (species.canCraftSaplingToSeed()){
+                    final ResourceLocation saplingToSeed = new ResourceLocation(registryName.getNamespace(),
+                            separate(primitiveSapling.getRegistryName()) + "_to_" + registryName.getPath() + "_seed");
+                    craftingRecipes.putIfAbsent(saplingToSeed, createShapeless(saplingToSeed, species.getSeedStack(1),
+                            ingredient(DTRegistries.DIRT_BUCKET), ingredient(primitiveSapling)));
 
-                craftingRecipes.putIfAbsent(saplingToSeed, createShapeless(saplingToSeed, species.getSeedStack(1),
-                        ingredient(DTRegistries.DIRT_BUCKET), ingredient(primitiveSapling)));
-                craftingRecipes.putIfAbsent(seedToSapling, createShapeless(seedToSapling, new ItemStack(primitiveSapling),
-                        ingredient(DTRegistries.DIRT_BUCKET), ingredient(species.getSeed().map(Item.class::cast).orElse(Items.AIR))));
+                }
+
+                if (species.canCraftSeedToSapling()){
+                    final ResourceLocation seedToSapling = new ResourceLocation(registryName.getNamespace(),
+                            registryName.getPath() + "_seed_to_" + separate(primitiveSapling.getRegistryName()));
+                    craftingRecipes.putIfAbsent(seedToSapling, createShapeless(seedToSapling, new ItemStack(primitiveSapling),
+                            ingredient(DTRegistries.DIRT_BUCKET), ingredient(species.getSeed().map(Item.class::cast).orElse(Items.AIR))));
+                }
+
             });
         }
     }

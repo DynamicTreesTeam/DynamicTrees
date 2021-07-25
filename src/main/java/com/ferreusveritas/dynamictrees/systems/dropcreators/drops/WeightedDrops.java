@@ -1,27 +1,23 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators.drops;
 
+import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.util.WeightedList;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 /**
- * @author Harley O'Connor
+ * Can drop only one item picked randomly from the selection of all items
+ * with weighted odds.
+ *
+ * @author Max Hyper
  */
 public final class WeightedDrops implements Drops {
-
-    private static final Codec<Item> ITEM_CODEC = ResourceLocation.CODEC.comapFlatMap(registryName -> {
-        final Item item = ForgeRegistries.ITEMS.getValue(registryName);
-        return item == null ? DataResult.error("Could not find item for registry name \"" + registryName + "\".") :
-                DataResult.success(item);
-    }, Item::getRegistryName);
 
     public static final Codec<WeightedDrops> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -30,7 +26,11 @@ public final class WeightedDrops implements Drops {
                     Codec.FLOAT.optionalFieldOf("rarity", 1f)
                             .forGetter(WeightedDrops::getRarity),
                     Codec.INT.optionalFieldOf("chance", 200)
-                            .forGetter(WeightedDrops::getChance)
+                            .forGetter(WeightedDrops::getBaseChance),
+                    Codec.INT.optionalFieldOf("min_count", 1)
+                            .forGetter(WeightedDrops::getMinAttempts),
+                    Codec.INT.optionalFieldOf("max_count", 1)
+                            .forGetter(WeightedDrops::getMaxAttempts)
             ).apply(instance, WeightedDrops::new)
     );
 
@@ -40,13 +40,21 @@ public final class WeightedDrops implements Drops {
     /** The rarity of the item. This is what the chance will be divided by. */
     private final float rarity;
 
-    /** The base chance of dropping each item. This will be altered depending on the fortune level. */
-    private final int chance;
+    /** The base chance of dropping an item. This will be altered depending on the fortune level. */
+    private final int baseChance;
 
-    public WeightedDrops(Map<Item, Integer> items, float rarity, int chance) {
+    /** The minimum times an item is attempted to be added to the drops. */
+    private final int minAttempts;
+
+    /** The maximum times an item is attempted to be added to the drops. */
+    private final int maxAttempts;
+
+    public WeightedDrops(Map<Item, Integer> items, float rarity, int baseChance, int minAttempts, int maxAttempts) {
         this.items = items;
         this.rarity = rarity;
-        this.chance = chance;
+        this.baseChance = baseChance;
+        this.minAttempts = minAttempts;
+        this.maxAttempts = maxAttempts;
     }
 
     public Map<Item, Integer> getItems() {
@@ -57,27 +65,30 @@ public final class WeightedDrops implements Drops {
         return rarity;
     }
 
-    public int getChance() {
-        return chance;
+    public int getBaseChance() {
+        return baseChance;
     }
+
+    public int getMinAttempts() { return minAttempts; }
+
+    public int getMaxAttempts() { return maxAttempts; }
 
     public void addItem(final Item item, final int weight) {
         this.items.put(item, weight);
     }
 
-    public int getTotalWeight() {
-        return this.items.values().stream().mapToInt(Integer::intValue).sum();
-    }
-
     @Override
     public void appendDrops(List<ItemStack> drops, Random random, int fortune) {
-        final int chance = this.getChance(fortune, this.chance) * this.getTotalWeight();
+        final int chance = this.getChance(fortune, this.baseChance);
+        final int attempts = MathHelper.randomBetween(random, this.minAttempts, this.maxAttempts);
 
-        this.items.forEach((item, weight) -> {
-                if (random.nextInt((int) ((chance / weight) / this.rarity)) == 0) {
-					drops.add(new ItemStack(item));
-				}
-        });
+        WeightedList<Item> list = new WeightedList<>();
+        this.items.forEach(list::add);
+        for (int i=0; i<attempts; i++)
+            if (random.nextInt(Math.max((int) (chance / this.rarity), 1)) == 0) {
+                drops.add(new ItemStack(list.getOne(random)));
+            }
+
     }
 
 }

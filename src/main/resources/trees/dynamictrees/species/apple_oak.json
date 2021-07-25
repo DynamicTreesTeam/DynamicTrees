@@ -14,12 +14,19 @@
         "dry": 0.25
     },
     "primitive_sapling_item": "apple",
+    "can_craft_seed_to_sapling": false,
     "perfect_biomes": { "name": "minecraft:plains" },
     "features" : [
         "fruit"
     ],
     "drop_creators": [
         "log",
-        "stick"
+        "stick",
+        {
+            "name": "fruit",
+            "properties":{
+                "fruit_item": "apple"
+            }
+        }
     ]
 }

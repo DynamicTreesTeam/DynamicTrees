@@ -43,25 +43,27 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		FERTILITY(  4, false, "fertility",   0x4ad400, Items.COD),
 		PERSISTENCE(5, false, "persistence", 0x389aff, Items.BLUE_ORCHID),
 		TRANSFORM(  6, true, "transform",   0x7fb8a4, Items.PRISMARINE_CRYSTALS),
-		HARVEST(7, false, "harvest", 0xe7c164, Items.GOLDEN_APPLE),
-		DENUDING(8, false, "denuding", 0xa47e46, Items.IRON_AXE);
+		HARVEST(7, false, "harvest", 0xe7c164, Items.GLISTERING_MELON_SLICE),
+		DENUDING(8, false, "denuding", 0xa47e46, Items.FERMENTED_SPIDER_EYE, 1);//obtained by corrupting depletion
 		
 		private final int index;
 		private final boolean active;
 		private final String name;
 		private final int color;
 		private final ItemStack ingredient;
+		private final int baseIndex;
 
 		DendroPotionType(int index, boolean active, String name, int color, Item ingredient) {
-			this(index, active, name, color, new ItemStack(ingredient));
+			this(index, active, name, color, ingredient,0);
 		}
 
-		DendroPotionType(int index, boolean active, String name, int color, ItemStack ingredient) {
+		DendroPotionType(int index, boolean active, String name, int color, Item ingredient, int baseIndex) {
 			this.index = index;
 			this.active = active;
 			this.name = name;
 			this.color = color;
-			this.ingredient = ingredient;
+			this.ingredient = new ItemStack(ingredient);
+			this.baseIndex = baseIndex;
 		}
 
 		public int getIndex() {
@@ -88,6 +90,10 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			return new TranslationTextComponent("potion." + this.name +
 					".description" + (this == TRANSFORM ? ".empty" : ""))
 					.withStyle(style -> style.withColor(TextFormatting.GRAY));
+		}
+
+		public DendroPotionType getBasePotionType(){
+			return DendroPotionType.values()[baseIndex];
 		}
 	};
 
@@ -176,7 +182,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	}
 
 	private DendroBrewingRecipe getRecipe(ItemStack ingredient, DendroPotionType typeOut) {
-		return this.getRecipe(ingredient, this.getPotionStack(typeOut));
+		return this.getRecipe(this.getPotionStack(typeOut.getBasePotionType()),ingredient, this.getPotionStack(typeOut));
 	}
 
 	private DendroBrewingRecipe getRecipe(ItemStack ingredientStack, ItemStack stackOut) {
