@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Harley O'Connor
  */
-public final class ConfiguredGetter<T extends Configured<T, C>, C extends Configurable> implements IJsonObjectGetter<T> {
+public final class ConfiguredGetter<T extends Configured<T, C>, C extends Configurable> implements JsonGetter<T> {
 
     private final String configurableName;
     private final Class<C> configurableClass;
@@ -24,8 +24,8 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
 
     @SuppressWarnings("unchecked")
     @Override
-    public ObjectFetchResult<T> get(final JsonElement jsonElement) {
-        final ObjectFetchResult<T> configured = new ObjectFetchResult<>();
+    public FetchResult<T> get(final JsonElement jsonElement) {
+        final FetchResult<T> configured = new FetchResult<>();
 
         // TODO: Check error logging here.
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(configurableClass, configurable -> configured.setValue((T) configurable.getDefaultConfiguration()))
@@ -38,13 +38,13 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
         final T value = configured.getValue();
         if (value == null || value.getConfigurable() == null || (value.getConfigurable() instanceof ConfigurableRegistryEntry &&
                 ((ConfigurableRegistryEntry<?, ?>) value.getConfigurable()).getRegistryName().equals(DTTrees.NULL))) {
-            return ObjectFetchResult.failure(configurableName + " couldn't be found from name or wasn't given a name.");
+            return FetchResult.failure(configurableName + " couldn't be found from name or wasn't given a name.");
         }
 
         return configured;
     }
 
-    public static <T extends Configured<T, ?>> void setProperties (ObjectFetchResult<T> fetchResult, JsonObject object){
+    public static <T extends Configured<T, ?>> void setProperties (FetchResult<T> fetchResult, JsonObject object){
         if (fetchResult.getValue() == ConfiguredGenFeature.NULL_CONFIGURED_FEATURE || fetchResult.getValue() == null || fetchResult.getValue().getConfigurable() == null) {
             return;
         }
@@ -53,8 +53,8 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
                 addProperty(fetchResult, object, property));
     }
 
-    private static <T extends Configured<T, ?>, P> void addProperty(final ObjectFetchResult<T> fetchResult, final JsonObject propertiesObject, final ConfigurationProperty<P> configurationProperty) {
-        final ObjectFetchResult<P> propertyValueFetchResult = configurationProperty.deserialise(propertiesObject);
+    private static <T extends Configured<T, ?>, P> void addProperty(final FetchResult<T> fetchResult, final JsonObject propertiesObject, final ConfigurationProperty<P> configurationProperty) {
+        final FetchResult<P> propertyValueFetchResult = configurationProperty.deserialise(propertiesObject);
 
         if (propertyValueFetchResult == null) {
             return;

@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @author Harley O'Connor
  */
-public final class DropsGetter implements IJsonObjectGetter<Drops> {
+public final class DropsGetter implements JsonGetter<Drops> {
 
     public static final Map<String, Codec<Drops>> DROPS_TYPES = new HashMap<>();
 
@@ -28,8 +28,8 @@ public final class DropsGetter implements IJsonObjectGetter<Drops> {
     }
 
     @Override
-    public ObjectFetchResult<Drops> get(JsonElement jsonElement) {
-        return JsonObjectGetters.JSON_OBJECT.get(jsonElement).map(object -> {
+    public FetchResult<Drops> get(JsonElement jsonElement) {
+        return JsonGetters.JSON_OBJECT.get(jsonElement).map(object -> {
             final String id = JsonHelper.getOrDefault(object, "id", String.class, null);
             if (id == null) {
                 return null;

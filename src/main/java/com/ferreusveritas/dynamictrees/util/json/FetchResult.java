@@ -15,24 +15,24 @@ import java.util.function.Predicate;
 
 /**
  * Stores the value or the error that came from trying to fetch an object from a
- * {@link com.google.gson.JsonElement}, mainly used by {@link IJsonObjectGetter}.
+ * {@link com.google.gson.JsonElement}, mainly used by {@link JsonGetter}.
  *
  * @author Harley O'Connor
  */
-public final class ObjectFetchResult<T> {
+public final class FetchResult<T> {
 
     private T value;
     private String errorMessage;
 
     private final List<String> warnings = new ArrayList<>();
 
-    public ObjectFetchResult() {}
+    public FetchResult() {}
 
-    public ObjectFetchResult(final T value) {
+    public FetchResult(final T value) {
         this.value = value;
     }
 
-    public ObjectFetchResult(final String errorMessage) {
+    public FetchResult(final String errorMessage) {
         this.errorMessage = errorMessage;
     }
 
@@ -40,20 +40,20 @@ public final class ObjectFetchResult<T> {
         return this.value != null;
     }
 
-    public <V> ObjectFetchResult<V> map (final Function<T, V> conversionFunction) {
-        final ObjectFetchResult<V> mappedFetchResult = new ObjectFetchResult<V>().copyErrorsFrom(this);
+    public <V> FetchResult<V> map (final Function<T, V> conversionFunction) {
+        final FetchResult<V> mappedFetchResult = new FetchResult<V>().copyErrorsFrom(this);
         if (this.value != null)
             mappedFetchResult.value = conversionFunction.apply(this.value);
         return mappedFetchResult;
     }
 
-    public <V> ObjectFetchResult<V> map (final Function<T, V> conversionFunction, final String nullError) {
+    public <V> FetchResult<V> map (final Function<T, V> conversionFunction, final String nullError) {
         // The validator returns true as there is already a null check.
         return this.map(conversionFunction, value -> true, nullError);
     }
 
-    public <V> ObjectFetchResult<V> map (final Function<T, V> conversionFunction, final Predicate<V> validator, final String invalidError) {
-        final ObjectFetchResult<V> mappedFetchResult = new ObjectFetchResult<V>().copyErrorsFrom(this);
+    public <V> FetchResult<V> map (final Function<T, V> conversionFunction, final Predicate<V> validator, final String invalidError) {
+        final FetchResult<V> mappedFetchResult = new FetchResult<V>().copyErrorsFrom(this);
         if (this.value != null) {
             final String previousValue = this.value.toString();
             final V value = conversionFunction.apply(this.value);
@@ -65,8 +65,8 @@ public final class ObjectFetchResult<T> {
         return mappedFetchResult;
     }
 
-    public <V> ObjectFetchResult<V> mapIfValid(final Predicate<T> validator, final String invalidError, final Function<T, V> conversionFunction) {
-        ObjectFetchResult<V> mappedFetchResult = new ObjectFetchResult<V>().copyErrorsFrom(this);
+    public <V> FetchResult<V> mapIfValid(final Predicate<T> validator, final String invalidError, final Function<T, V> conversionFunction) {
+        FetchResult<V> mappedFetchResult = new FetchResult<V>().copyErrorsFrom(this);
         if (this.value != null) {
             if (validator.test(this.value)) {
                 mappedFetchResult = this.map(conversionFunction, "Internal error.");
@@ -75,30 +75,30 @@ public final class ObjectFetchResult<T> {
         return mappedFetchResult;
     }
 
-    public ObjectFetchResult<T> addWarning(final String warning) {
+    public FetchResult<T> addWarning(final String warning) {
         this.warnings.add(warning);
         return this;
     }
 
-    public ObjectFetchResult<T> ifSuccessful (final Consumer<T> valueConsumer) {
+    public FetchResult<T> ifSuccessful (final Consumer<T> valueConsumer) {
         if (this.wasSuccessful())
             valueConsumer.accept(this.value);
         return this;
     }
 
-    public ObjectFetchResult<T> elseIfError(final Consumer<String> errorConsumer) {
+    public FetchResult<T> elseIfError(final Consumer<String> errorConsumer) {
         if (!this.wasSuccessful())
             errorConsumer.accept(this.errorMessage);
         return this;
     }
 
-    public ObjectFetchResult<T> elseIfError(final Runnable runnable) {
+    public FetchResult<T> elseIfError(final Runnable runnable) {
         if (!this.wasSuccessful())
             runnable.run();
         return this;
     }
 
-    public ObjectFetchResult<T> forEachWarning(final Consumer<String> warningConsumer) {
+    public FetchResult<T> forEachWarning(final Consumer<String> warningConsumer) {
         if (!this.wasSuccessful()) {
             for (final String warning : this.warnings) {
                 warningConsumer.accept(warning);
@@ -107,7 +107,7 @@ public final class ObjectFetchResult<T> {
         return this;
     }
 
-    public ObjectFetchResult<T> otherwiseWarn(final String warnPrefix) {
+    public FetchResult<T> otherwiseWarn(final String warnPrefix) {
         if (!this.wasSuccessful())
             LogManager.getLogger(StackLocatorUtil.getCallerClass(1)).warn(warnPrefix + this.getErrorMessage());
         return this;
@@ -127,12 +127,12 @@ public final class ObjectFetchResult<T> {
         return value;
     }
 
-    public ObjectFetchResult<T> setValue (final T value) {
+    public FetchResult<T> setValue (final T value) {
         this.value = value;
         return this;
     }
 
-    public ObjectFetchResult<T> setValueOrFailure (@Nullable final T value, final String errorMessage) {
+    public FetchResult<T> setValueOrFailure (@Nullable final T value, final String errorMessage) {
         if (value == null)
             this.errorMessage = errorMessage;
         else this.value = value;
@@ -149,12 +149,12 @@ public final class ObjectFetchResult<T> {
         return errorMessage;
     }
 
-    public ObjectFetchResult<T> setErrorMessage(String errorMessage) {
+    public FetchResult<T> setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
         return this;
     }
 
-    public ObjectFetchResult<T> setErrorMessageIfUnsetAndNull(String errorMessage) {
+    public FetchResult<T> setErrorMessageIfUnsetAndNull(String errorMessage) {
         if (this.value == null && this.errorMessage == null)
             this.setErrorMessage(errorMessage);
         return this;
@@ -164,40 +164,40 @@ public final class ObjectFetchResult<T> {
         return warnings;
     }
 
-    public ObjectFetchResult<T> copyFrom(final ObjectFetchResult<T> otherFetchResult) {
+    public FetchResult<T> copyFrom(final FetchResult<T> otherFetchResult) {
         this.value = otherFetchResult.value;
         this.copyErrorsFrom(otherFetchResult);
         return this;
     }
 
-    public ObjectFetchResult<T> copyErrorsFrom(final ObjectFetchResult<?> otherFetchResult) {
+    public FetchResult<T> copyErrorsFrom(final FetchResult<?> otherFetchResult) {
         this.errorMessage = otherFetchResult.errorMessage;
         this.warnings.addAll(otherFetchResult.warnings);
         return this;
     }
 
-    public static <T> ObjectFetchResult<T> from(final DataResult<Pair<T, JsonElement>> dataResult) {
-        final ObjectFetchResult<T> fetchResult = new ObjectFetchResult<>();
+    public static <T> FetchResult<T> from(final DataResult<Pair<T, JsonElement>> dataResult) {
+        final FetchResult<T> fetchResult = new FetchResult<>();
         dataResult.get()
                 .ifLeft(pair -> fetchResult.value = pair.getFirst())
                 .ifRight(partialResult -> fetchResult.setErrorMessage(partialResult.message()));
         return fetchResult;
     }
 
-    public static <T> ObjectFetchResult<T> success (final T value) {
-        return new ObjectFetchResult<>(value);
+    public static <T> FetchResult<T> success (final T value) {
+        return new FetchResult<>(value);
     }
 
-    public static <T> ObjectFetchResult<T> failure (final String errorMessage) {
-        return new ObjectFetchResult<>(errorMessage);
+    public static <T> FetchResult<T> failure (final String errorMessage) {
+        return new FetchResult<>(errorMessage);
     }
 
-    public static <T> ObjectFetchResult<T> successOrFailure(@Nullable final T value, final String errorMessage) {
-        return value == null ? ObjectFetchResult.failure(errorMessage) : ObjectFetchResult.success(value);
+    public static <T> FetchResult<T> successOrFailure(@Nullable final T value, final String errorMessage) {
+        return value == null ? FetchResult.failure(errorMessage) : FetchResult.success(value);
     }
 
-    public static <T> ObjectFetchResult<T> failureFromOther (final ObjectFetchResult<?> otherFetchResult) {
-        return ObjectFetchResult.failure(otherFetchResult.getErrorMessage());
+    public static <T> FetchResult<T> failureFromOther (final FetchResult<?> otherFetchResult) {
+        return FetchResult.failure(otherFetchResult.getErrorMessage());
     }
 
 }

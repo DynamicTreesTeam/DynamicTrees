@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.google.gson.JsonElement;
@@ -10,7 +9,7 @@ import com.google.gson.JsonElement;
  *
  * @author Harley O'Connor
  */
-public final class RegistryEntryGetter<T extends RegistryEntry<T>> implements IJsonObjectGetter<T> {
+public final class RegistryEntryGetter<T extends RegistryEntry<T>> implements JsonGetter<T> {
 
     private final Registry<T> registry;
 
@@ -19,8 +18,8 @@ public final class RegistryEntryGetter<T extends RegistryEntry<T>> implements IJ
     }
 
     @Override
-    public ObjectFetchResult<T> get(JsonElement jsonElement) {
-        return JsonObjectGetters.DT_RESOURCE_LOCATION.get(jsonElement).map(this.registry::get,
+    public FetchResult<T> get(JsonElement jsonElement) {
+        return JsonGetters.DT_RESOURCE_LOCATION.get(jsonElement).map(this.registry::get,
                 RegistryEntry::isValid, "Could not find " + this.registry.getName() +
                         " for registry name '{previous_value}'.");
     }

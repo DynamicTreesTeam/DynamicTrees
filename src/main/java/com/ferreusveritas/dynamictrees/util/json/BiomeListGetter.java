@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * @author Harley O'Connor
  */
-public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
+public final class BiomeListGetter implements JsonGetter<BiomeList> {
 
     private static final IVoidPropertyApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeString) ->
             biomeList.removeIf(biome -> {
@@ -55,16 +55,16 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
     }
 
     @Override
-    public ObjectFetchResult<BiomeList> get (final JsonElement jsonElement) {
+    public FetchResult<BiomeList> get (final JsonElement jsonElement) {
         final BiomeList biomes;
 
-        final ObjectFetchResult<Biome> biomeFetchResult = JsonObjectGetters.BIOME.get(jsonElement);
+        final FetchResult<Biome> biomeFetchResult = JsonGetters.BIOME.get(jsonElement);
 
         if (biomeFetchResult.wasSuccessful()) {
             biomes = new BiomeList(Collections.singletonList(biomeFetchResult.getValue()));
         } else {
             if (!jsonElement.isJsonObject())
-                return ObjectFetchResult.failureFromOther(biomeFetchResult);
+                return FetchResult.failureFromOther(biomeFetchResult);
 
             // Start with a list of all biomes.
             biomes = BiomeList.getAll();
@@ -73,7 +73,7 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
             this.appliers.applyAll(jsonElement.getAsJsonObject(), biomes);
         }
 
-        return ObjectFetchResult.success(biomes);
+        return FetchResult.success(biomes);
     }
 
 }

@@ -9,7 +9,7 @@ import com.google.gson.JsonElement;
  * @author Harley O'Connor
  */
 @FunctionalInterface
-public interface IJsonObjectGetter<T> {
+public interface JsonGetter<T> {
 
     default boolean isValid() {
         return true;
@@ -19,8 +19,8 @@ public interface IJsonObjectGetter<T> {
      * Attempts to fetch the object from the given {@link JsonElement}.
      *
      * @param jsonElement The {@link JsonElement}.
-     * @return An {@link ObjectFetchResult}, containing an object obtained or an error message if it failed.
+     * @return An {@link FetchResult}, containing an object obtained or an error message if it failed.
      */
-    ObjectFetchResult<T> get (final JsonElement jsonElement);
+    FetchResult<T> get (final JsonElement jsonElement);
 
 }

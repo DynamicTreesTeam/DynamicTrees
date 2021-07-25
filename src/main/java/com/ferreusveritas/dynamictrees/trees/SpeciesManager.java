@@ -13,9 +13,9 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreato
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
+import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
+import com.ferreusveritas.dynamictrees.util.json.FetchResult;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
@@ -56,13 +56,13 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
         BiomeDictionary.Type.getAll().stream().map(type -> new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
                 .forEach(this.environmentFactorAppliers::register);
 
-        JsonObjectGetters.register(Species.ICommonOverride.class, jsonElement -> {
-            final ObjectFetchResult<BiomePredicate> biomePredicateFetchResult = JsonObjectGetters.BIOME_PREDICATE.get(jsonElement);
+        JsonGetters.register(Species.ICommonOverride.class, jsonElement -> {
+            final FetchResult<BiomePredicate> biomePredicateFetchResult = JsonGetters.BIOME_PREDICATE.get(jsonElement);
 
             if (!biomePredicateFetchResult.wasSuccessful())
-                return ObjectFetchResult.failureFromOther(biomePredicateFetchResult);
+                return FetchResult.failureFromOther(biomePredicateFetchResult);
 
-            return ObjectFetchResult.success((world, pos) ->
+            return FetchResult.success((world, pos) ->
                 world instanceof IWorldReader &&
                         biomePredicateFetchResult.getValue().test(((IWorldReader) world).getBiome(pos))
             );

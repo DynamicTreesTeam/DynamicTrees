@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
 import com.ferreusveritas.dynamictrees.util.Null;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
+import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
+import com.ferreusveritas.dynamictrees.util.json.FetchResult;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
@@ -25,7 +25,7 @@ public class JsonArrayPropertyApplier<T, V> extends JsonPropertyApplier<T, V> {
     @Nullable
     @Override
     public PropertyApplierResult applyIfShould(String keyIn, Object object, JsonElement jsonElement) {
-        final ObjectFetchResult<JsonArray> arrayFetchResult = JsonObjectGetters.JSON_ARRAY.get(jsonElement);
+        final FetchResult<JsonArray> arrayFetchResult = JsonGetters.JSON_ARRAY.get(jsonElement);
 
         if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object) || !arrayFetchResult.wasSuccessful())
             return null;

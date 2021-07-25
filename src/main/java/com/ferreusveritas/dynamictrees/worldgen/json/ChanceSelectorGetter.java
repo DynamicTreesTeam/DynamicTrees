@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.worldgen.json;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
+import com.ferreusveritas.dynamictrees.util.json.FetchResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -11,11 +11,11 @@ import com.google.gson.JsonObject;
  *
  * @author Harley O'Connor
  */
-public final class ChanceSelectorGetter implements IJsonBiomeDatabaseObjectGetter<BiomePropertySelectors.IChanceSelector> {
+public final class ChanceSelectorGetter implements JsonBiomeDatabaseGetter<BiomePropertySelectors.IChanceSelector> {
 
     @Override
-    public ObjectFetchResult<BiomePropertySelectors.IChanceSelector> get(JsonElement jsonElement) {
-        final ObjectFetchResult<BiomePropertySelectors.IChanceSelector> chanceSelector = new ObjectFetchResult<>();
+    public FetchResult<BiomePropertySelectors.IChanceSelector> get(JsonElement jsonElement) {
+        final FetchResult<BiomePropertySelectors.IChanceSelector> chanceSelector = new FetchResult<>();
 
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(JsonObject.class, jsonObject -> chanceSelector.copyFrom(this.readChanceSelector(jsonObject)))
                 .elseIfOfType(Float.class, chance -> chanceSelector.setValue(createSimpleChanceSelector(chance)))
@@ -36,8 +36,8 @@ public final class ChanceSelectorGetter implements IJsonBiomeDatabaseObjectGette
         return (rnd, spc, rad) -> rnd.nextFloat() < value ? BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
     }
 
-    private ObjectFetchResult<BiomePropertySelectors.IChanceSelector> readChanceSelector(final JsonObject jsonObject) {
-        final ObjectFetchResult<BiomePropertySelectors.IChanceSelector> chanceSelector = new ObjectFetchResult<>();
+    private FetchResult<BiomePropertySelectors.IChanceSelector> readChanceSelector(final JsonObject jsonObject) {
+        final FetchResult<BiomePropertySelectors.IChanceSelector> chanceSelector = new FetchResult<>();
 
         JsonHelper.JsonObjectReader.of(jsonObject)
                 .ifContains(STATIC, jsonElement ->

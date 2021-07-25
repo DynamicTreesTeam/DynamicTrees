@@ -17,11 +17,10 @@ import com.ferreusveritas.dynamictrees.trees.families.NetherFungusFamily;
 import com.ferreusveritas.dynamictrees.trees.species.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.PalmSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.SwampOakSpecies;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
+import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedList;
 import net.minecraft.world.gen.blockstateprovider.WeightedBlockStateProvider;
@@ -99,8 +98,8 @@ public class DTTrees {
 		DTResourceRegistries.setupTreesResourceManager();
 
 		// Register Forge registry entry getters and add-on Json object getters.
-		JsonObjectGetters.registerForgeEntryGetters();
-		JsonObjectGetters.postRegistryEvent();
+		JsonGetters.registerForgeEntryGetters();
+		JsonGetters.postRegistryEvent();
 
 		// Register any registry entries from Json files.
 		DTResourceRegistries.TREES_RESOURCE_MANAGER.load();

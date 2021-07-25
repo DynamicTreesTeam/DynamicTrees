@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.worldgen.json;
 
-import com.ferreusveritas.dynamictrees.util.json.IJsonObjectGetter;
+import com.ferreusveritas.dynamictrees.util.json.JsonGetter;
 
 /**
  * @author Harley O'Connor
  */
-public interface IJsonBiomeDatabaseObjectGetter<T> extends IJsonObjectGetter<T> {
+public interface JsonBiomeDatabaseGetter<T> extends JsonGetter<T> {
 
     String DEFAULT = "...";
 

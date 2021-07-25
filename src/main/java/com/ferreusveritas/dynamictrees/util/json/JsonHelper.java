@@ -47,7 +47,7 @@ public class JsonHelper {
 	 * @return True if {@link JsonElement} is a comment.
 	 */
 	public static boolean isComment(final JsonElement jsonElement) {
-		final ObjectFetchResult<String> fetchResult = JsonObjectGetters.STRING.get(jsonElement);
+		final FetchResult<String> fetchResult = JsonGetters.STRING.get(jsonElement);
 		return fetchResult.wasSuccessful() && isComment(fetchResult.getValue());
 	}
 
@@ -76,7 +76,7 @@ public class JsonHelper {
 		if (element == null)
 			return defaultValue;
 
-		final T result = JsonObjectGetters.getObjectGetter(type).get(element).getValue();
+		final T result = JsonGetters.get(type).get(element).getValue();
 		return result == null ? defaultValue : result;
 	}
 
@@ -96,7 +96,7 @@ public class JsonHelper {
 		if (element == null)
 			return defaultValue;
 
-		final ObjectFetchResult<T> result = JsonObjectGetters.getObjectGetter(type).get(element);
+		final FetchResult<T> result = JsonGetters.get(type).get(element);
 
 		if (!result.wasSuccessful()) {
 			errorConsumer.accept(result.getErrorMessage());
@@ -128,7 +128,7 @@ public class JsonHelper {
 			return null;
 		}
 
-		final ObjectFetchResult<T> fetchResult = JsonObjectGetters.getObjectGetter(classToGet).get(jsonObject.get(key));
+		final FetchResult<T> fetchResult = JsonGetters.get(classToGet).get(jsonObject.get(key));
 
 		if (!fetchResult.wasSuccessful()) {
 			LOGGER.warn("{} {}", errorPrefix, fetchResult.getErrorMessage());
@@ -162,7 +162,7 @@ public class JsonHelper {
 		}
 
 		public <T> JsonElementReader ifOfType (final Class<T> typeClass, final Consumer<T> consumer) {
-			JsonObjectGetters.getObjectGetter(typeClass).get(jsonElement).ifSuccessful(value -> {
+			JsonGetters.get(typeClass).get(jsonElement).ifSuccessful(value -> {
 				consumer.accept(value);
 				this.read = true;
 			}).elseIfError(errorMessage -> this.lastError = errorMessage).elseIfError(() -> this.attemptedClasses.add(typeClass));
@@ -170,8 +170,8 @@ public class JsonHelper {
 		}
 
 		public <T> JsonElementReader ifArrayForEach (final Class<T> typeClass, final Consumer<T> consumer) {
-			JsonObjectGetters.JSON_ARRAY.get(jsonElement).ifSuccessful(jsonArray -> {
-				jsonArray.forEach(arrayElement -> JsonObjectGetters.getObjectGetter(typeClass).get(arrayElement)
+			JsonGetters.JSON_ARRAY.get(jsonElement).ifSuccessful(jsonArray -> {
+				jsonArray.forEach(arrayElement -> JsonGetters.get(typeClass).get(arrayElement)
 						.ifSuccessful(consumer).elseIfError(errorMessage -> this.lastError = errorMessage));
 				this.read = true;
 			}).elseIfError(() -> this.attemptedClasses.add(typeClass));
@@ -187,7 +187,7 @@ public class JsonHelper {
 		@SuppressWarnings("unchecked")
 		public <T> JsonElementReader elseIfEquals(final T value, final Consumer<T> consumer) {
 			if (!this.read)
-				JsonObjectGetters.getObjectGetter((Class<T>) value.getClass()).get(this.jsonElement)
+				JsonGetters.get((Class<T>) value.getClass()).get(this.jsonElement)
 						.ifSuccessful(obj -> {
 							if (Objects.equals(obj, value))
 								consumer.accept(obj);

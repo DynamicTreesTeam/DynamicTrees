@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.worldgen.json;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
+import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
+import com.ferreusveritas.dynamictrees.util.json.FetchResult;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,11 +16,11 @@ import java.util.List;
  *
  * @author Harley O'Connor
  */
-public final class DensitySelectorGetter implements IJsonBiomeDatabaseObjectGetter<BiomePropertySelectors.IDensitySelector> {
+public final class DensitySelectorGetter implements JsonBiomeDatabaseGetter<BiomePropertySelectors.IDensitySelector> {
 
     @Override
-    public ObjectFetchResult<BiomePropertySelectors.IDensitySelector> get(JsonElement jsonElement) {
-        final ObjectFetchResult<BiomePropertySelectors.IDensitySelector> densitySelector = new ObjectFetchResult<>();
+    public FetchResult<BiomePropertySelectors.IDensitySelector> get(JsonElement jsonElement) {
+        final FetchResult<BiomePropertySelectors.IDensitySelector> densitySelector = new FetchResult<>();
 
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(JsonObject.class, jsonObject -> densitySelector.copyFrom(this.readDensitySelector(jsonObject)))
                 .elseIfOfType(JsonArray.class, jsonArray -> densitySelector.setValue(this.createScaleDensitySelector(jsonArray)))
@@ -34,7 +34,7 @@ public final class DensitySelectorGetter implements IJsonBiomeDatabaseObjectGett
         final List<Float> parameters = new ArrayList<>();
 
         for (final JsonElement element : jsonArray) {
-            JsonObjectGetters.FLOAT.get(element).ifSuccessful(parameters::add)
+            JsonGetters.FLOAT.get(element).ifSuccessful(parameters::add)
                     .otherwiseWarn("Error whilst applying density selector: ");
         }
 
@@ -47,8 +47,8 @@ public final class DensitySelectorGetter implements IJsonBiomeDatabaseObjectGett
         }
     }
 
-    private ObjectFetchResult<BiomePropertySelectors.IDensitySelector> readDensitySelector(final JsonObject jsonObject) {
-        final ObjectFetchResult<BiomePropertySelectors.IDensitySelector> densitySelector = new ObjectFetchResult<>();
+    private FetchResult<BiomePropertySelectors.IDensitySelector> readDensitySelector(final JsonObject jsonObject) {
+        final FetchResult<BiomePropertySelectors.IDensitySelector> densitySelector = new FetchResult<>();
 
         JsonHelper.JsonObjectReader.of(jsonObject)
                 .ifContains(SCALE, jsonElement -> JsonHelper.JsonElementReader.of(jsonElement)

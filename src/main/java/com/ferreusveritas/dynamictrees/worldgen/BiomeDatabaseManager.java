@@ -12,9 +12,9 @@ import com.ferreusveritas.dynamictrees.resources.MultiJsonReloadListener;
 import com.ferreusveritas.dynamictrees.resources.TreesResourceManager;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
+import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
+import com.ferreusveritas.dynamictrees.util.json.FetchResult;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
@@ -70,19 +70,19 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     public void registerAppliers() {
         this.biomeDatabaseAppliers
                 .register("species", JsonElement.class, (entry, jsonElement) -> {
-                    return PropertyApplierResult.from(JsonObjectGetters.SPECIES_SELECTOR.get(jsonElement)
+                    return PropertyApplierResult.from(JsonGetters.SPECIES_SELECTOR.get(jsonElement)
                             .ifSuccessful(speciesSelector ->
                                 entry.getDatabase().setSpeciesSelector(entry.getBiome(), speciesSelector, getOperationOrWarn(jsonElement))
                             ));
                 })
                 .register("density", JsonElement.class, (entry, jsonElement) -> {
-                    return PropertyApplierResult.from(JsonObjectGetters.DENSITY_SELECTOR.get(jsonElement)
+                    return PropertyApplierResult.from(JsonGetters.DENSITY_SELECTOR.get(jsonElement)
                             .ifSuccessful(densitySelector ->
                                 entry.getDatabase().setDensitySelector(entry.getBiome(), densitySelector, getOperationOrWarn(jsonElement))
                             ));
                 })
                 .register("chance", JsonElement.class, (entry, jsonElement) -> {
-                    return PropertyApplierResult.from(JsonObjectGetters.CHANCE_SELECTOR.get(jsonElement)
+                    return PropertyApplierResult.from(JsonGetters.CHANCE_SELECTOR.get(jsonElement)
                             .ifSuccessful(chanceSelector ->
                                 entry.getDatabase().setChanceSelector(entry.getBiome(), chanceSelector, getOperationOrWarn(jsonElement))
                             ));
@@ -106,7 +106,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                     for (final Map.Entry<String, JsonElement> passEntry : multipass.entrySet()) {
                         try {
                             final int pass = Integer.parseInt(passEntry.getKey());
-                            final int radius = JsonObjectGetters.INTEGER.get(passEntry.getValue()).orDefault(-1);
+                            final int radius = JsonGetters.INTEGER.get(passEntry.getValue()).orDefault(-1);
 
                             // Terminate when radius is -1.
                             if (radius == -1)
@@ -144,11 +144,11 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         this.postApplierEvent(this.featureCancellationAppliers, "feature_cancellations");
     }
 
-    private static ObjectFetchResult<BiomeDatabase.Operation> getOperation (final JsonElement jsonElement) {
-        return JsonObjectGetters.JSON_OBJECT.get(jsonElement)
-                .map(jsonObject -> jsonObject.has(METHOD) ? jsonObject.get(METHOD) : null).map(JsonObjectGetters.OPERATION::get)
+    private static FetchResult<BiomeDatabase.Operation> getOperation (final JsonElement jsonElement) {
+        return JsonGetters.JSON_OBJECT.get(jsonElement)
+                .map(jsonObject -> jsonObject.has(METHOD) ? jsonObject.get(METHOD) : null).map(JsonGetters.OPERATION::get)
                 // If there was no Json object or method element, default to replace.
-                .orDefault(ObjectFetchResult.success(BiomeDatabase.Operation.REPLACE));
+                .orDefault(FetchResult.success(BiomeDatabase.Operation.REPLACE));
     }
 
     public static BiomeDatabase.Operation getOperationOrWarn(final JsonElement jsonElement) {

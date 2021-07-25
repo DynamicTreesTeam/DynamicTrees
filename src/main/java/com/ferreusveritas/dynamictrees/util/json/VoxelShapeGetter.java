@@ -10,11 +10,11 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 /**
  * @author Harley O'Connor
  */
-public final class VoxelShapeGetter implements IJsonObjectGetter<VoxelShape> {
+public final class VoxelShapeGetter implements JsonGetter<VoxelShape> {
 
     @Override
-    public ObjectFetchResult<VoxelShape> get(JsonElement jsonElement) {
-        final ObjectFetchResult<VoxelShape> voxelShape = new ObjectFetchResult<>();
+    public FetchResult<VoxelShape> get(JsonElement jsonElement) {
+        final FetchResult<VoxelShape> voxelShape = new FetchResult<>();
 
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(String.class, string ->
                 voxelShape.setValue(CommonVoxelShapes.SHAPES.getOrDefault(string.toLowerCase(), VoxelShapes.block())))

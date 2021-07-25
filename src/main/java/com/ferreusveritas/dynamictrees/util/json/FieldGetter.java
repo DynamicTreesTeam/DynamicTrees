@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  *
  * @author Harley O'Connor
  */
-public final class FieldGetter<T> implements IJsonObjectGetter<T> {
+public final class FieldGetter<T> implements JsonGetter<T> {
 
     private final Class<T> type;
 
@@ -24,8 +24,8 @@ public final class FieldGetter<T> implements IJsonObjectGetter<T> {
     }
 
     @Override
-    public ObjectFetchResult<T> get(JsonElement jsonElement) {
-        return JsonObjectGetters.STRING.get(jsonElement).map(string -> Stream.of(this.type.getFields()).filter(field -> Modifier.isStatic(field.getModifiers()) && field.getName().equals(string)).findFirst().map(field -> {
+    public FetchResult<T> get(JsonElement jsonElement) {
+        return JsonGetters.STRING.get(jsonElement).map(string -> Stream.of(this.type.getFields()).filter(field -> Modifier.isStatic(field.getModifiers()) && field.getName().equals(string)).findFirst().map(field -> {
             try {
                 final Object obj = field.get(null);
 

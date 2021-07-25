@@ -5,16 +5,16 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * An {@link IJsonObjectGetter} for {@link ResourceLocation}s, but if no namespace is
+ * An {@link JsonGetter} for {@link ResourceLocation}s, but if no namespace is
  * defined it defaults to the specified {@link #defaultNamespace} given in
  * {@link #ResourceLocationGetter(String)}.
  *
- * Main instance stored in {@link JsonObjectGetters#RESOURCE_LOCATION} for fetching
+ * Main instance stored in {@link JsonGetters#RESOURCE_LOCATION} for fetching
  * resource locations with default namespace {@code minecraft}.
  *
  * @author Harley O'Connor
  */
-public final class ResourceLocationGetter implements IJsonObjectGetter<ResourceLocation> {
+public final class ResourceLocationGetter implements JsonGetter<ResourceLocation> {
 
     private final String defaultNamespace;
 
@@ -23,8 +23,8 @@ public final class ResourceLocationGetter implements IJsonObjectGetter<ResourceL
     }
 
     @Override
-    public ObjectFetchResult<ResourceLocation> get(JsonElement jsonElement) {
-        return JsonObjectGetters.STRING.get(jsonElement)
+    public FetchResult<ResourceLocation> get(JsonElement jsonElement) {
+        return JsonGetters.STRING.get(jsonElement)
                 .mapIfValid(ResourceLocationGetter::isValidResourceLocation,
                         "Invalid resource location '{value}'. Namespace Constraints: [a-z0-9_.-] Path Constraints: [a-z0-9/._-]",
                         this::decode);

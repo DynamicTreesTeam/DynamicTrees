@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
+import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
 import com.ferreusveritas.dynamictrees.util.json.MapGetter;
 import com.google.common.collect.Maps;
 import net.minecraft.util.ResourceLocation;
@@ -22,9 +22,9 @@ public final class NormalDropCreator extends DropCreator {
             MapGetter.getMapClass(DropType.getGenericClass(), Drops.class, HashMap::new));
 
     static {
-        JsonObjectGetters.register(
+        JsonGetters.register(
                 MapGetter.getMapClass(DropType.getGenericClass(), Drops.class),
-                new MapGetter<>(JsonObjectGetters.DROP_TYPE, JsonObjectGetters.DROPS)
+                new MapGetter<>(JsonGetters.DROP_TYPE, JsonGetters.DROPS)
         );
     }
 

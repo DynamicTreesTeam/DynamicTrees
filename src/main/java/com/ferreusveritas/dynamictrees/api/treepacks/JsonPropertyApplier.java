@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
-import com.ferreusveritas.dynamictrees.util.json.IJsonObjectGetter;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
+import com.ferreusveritas.dynamictrees.util.json.JsonGetter;
+import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
+import com.ferreusveritas.dynamictrees.util.json.FetchResult;
 import com.google.gson.JsonElement;
 
 import javax.annotation.Nullable;
@@ -52,12 +52,12 @@ public class JsonPropertyApplier<T, V> {
     @SuppressWarnings("unchecked")
     @Nullable
     protected <S, R> PropertyApplierResult applyIfShould(final Object object, final JsonElement jsonElement, final Class<R> valueClass, final IPropertyApplier<S, R> applier) {
-        final IJsonObjectGetter<R> valueGetter = JsonObjectGetters.getObjectGetter(valueClass);
+        final JsonGetter<R> valueGetter = JsonGetters.get(valueClass);
 
         if (!valueGetter.isValid())
             return null;
 
-        final ObjectFetchResult<R> fetchResult = valueGetter.get(jsonElement);
+        final FetchResult<R> fetchResult = valueGetter.get(jsonElement);
 
         return fetchResult.wasSuccessful() ? applier.apply((S) object, fetchResult.getValue()) :
                 PropertyApplierResult.failure(fetchResult);

@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.configurations.Configured;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
+import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
 
 /**
  * A configured version of a {@link GenFeature}. This is used for holding {@link ConfigurationProperty}
@@ -15,7 +15,7 @@ import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 public class ConfiguredGenFeature<GF extends GenFeature> extends Configured<ConfiguredGenFeature<GF>, GF> {
 
     /** A null configured gen feature. Mainly used for getting the class with the
-     * {@link GenFeature} parameter for {@link JsonObjectGetters#CONFIGURED_GEN_FEATURE}. */
+     * {@link GenFeature} parameter for {@link JsonGetters#CONFIGURED_GEN_FEATURE}. */
     public static final ConfiguredGenFeature<GenFeature> NULL_CONFIGURED_FEATURE = new ConfiguredGenFeature<>(GenFeature.NULL_GEN_FEATURE);
 
     @SuppressWarnings("unchecked")

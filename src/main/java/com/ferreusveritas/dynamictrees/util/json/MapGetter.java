@@ -10,26 +10,26 @@ import java.util.function.Supplier;
 /**
  * @author Harley O'Connor
  */
-public final class MapGetter<K, V> implements IJsonObjectGetter<Map<K, V>> {
+public final class MapGetter<K, V> implements JsonGetter<Map<K, V>> {
 
-    private final IJsonObjectGetter<K> keyGetter;
-    private final IJsonObjectGetter<V> valueGetter;
+    private final JsonGetter<K> keyGetter;
+    private final JsonGetter<V> valueGetter;
     private final Supplier<Map<K, V>> mapSupplier;
 
-    public MapGetter(IJsonObjectGetter<K> keyGetter, IJsonObjectGetter<V> valueGetter) {
+    public MapGetter(JsonGetter<K> keyGetter, JsonGetter<V> valueGetter) {
         this(keyGetter, valueGetter, HashMap::new);
     }
 
-    public MapGetter(IJsonObjectGetter<K> keyGetter, IJsonObjectGetter<V> valueGetter, Supplier<Map<K, V>> mapSupplier) {
+    public MapGetter(JsonGetter<K> keyGetter, JsonGetter<V> valueGetter, Supplier<Map<K, V>> mapSupplier) {
         this.keyGetter = keyGetter;
         this.valueGetter = valueGetter;
         this.mapSupplier = mapSupplier;
     }
 
     @Override
-    public ObjectFetchResult<Map<K, V>> get(JsonElement jsonElement) {
+    public FetchResult<Map<K, V>> get(JsonElement jsonElement) {
         final String[] errorMsg = {null};
-        return JsonObjectGetters.JSON_OBJECT.get(jsonElement).map(object -> {
+        return JsonGetters.JSON_OBJECT.get(jsonElement).map(object -> {
             final Map<K, V> map = this.mapSupplier.get();
             object.entrySet().forEach(entry ->
                     this.valueGetter.get(entry.getValue()).ifSuccessful(value ->
