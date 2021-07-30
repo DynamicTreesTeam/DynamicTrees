@@ -184,7 +184,6 @@ public class DTConfigs {
 				define("enableSeasonalGrowthFactor", true);
 		ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR = COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").
 				define("enableSeasonalFruitProductionFactor", true);
-
 		COMMON_BUILDER.pop();
 
 //		CLIENT_BUILDER.comment("Visual Settings").push("visuals");

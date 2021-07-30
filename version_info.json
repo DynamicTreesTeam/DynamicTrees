@@ -1,6 +1,7 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
   "1.16.5": {
+    "1.16.5-0.10.0-Beta23": "Enhancements:\n- Built-in integration with Better Weather seasons.\n- `preferredSeasonMod` config option for selecting which season provider should be used.",
     "1.16.5-0.10.0-Beta22": "Bug Fixes:\n- Fixed NoSuchElementException when generating a conifer topper.",
     "1.16.5-0.10.0-Beta21": "Bug Fixes:\n- Fixed secondary leaves chance property not being registered to bush gen feature.",
     "1.16.5-0.10.0-Beta20": "Bug Fixes:\n- Fixed crash whilst generating bush gen features.\n- Fixed silk touch not dropping leaves.\n- Fixed absent wart block drops.\n\nTree Pack Changes:\n- Weighted drop type now uses WeightedList.\n- Added `secondary_leaves_chance` property to bush gen feature.",
@@ -20,7 +21,7 @@
     "1.16.5-0.10.0-Beta6": "Initial 1.16.5 beta for CF."
   },
   "promos": {
-    "1.16.5-latest": "1.16.5-0.10.0-Beta22",
-    "1.16.5-recommended": "1.16.5-0.10.0-Beta22"
+    "1.16.5-latest": "1.16.5-0.10.0-Beta23",
+    "1.16.5-recommended": "1.16.5-0.10.0-Beta23"
   }
 }
