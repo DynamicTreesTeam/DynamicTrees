@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.compat.seasons.*;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
-import corgitaco.betterweather.api.Climate;
 import corgitaco.betterweather.api.season.Season;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -15,7 +14,9 @@ import org.apache.logging.log4j.LogManager;
 import sereneseasons.config.BiomeConfig;
 import sereneseasons.config.SeasonsConfig;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
  */
 public final class CompatHandler {
 
-    private static final Map<String, Supplier<SeasonManager>> SEASON_MANAGERS = Maps.newHashMap();
+    private static final LinkedHashMap<String, Supplier<SeasonManager>> SEASON_MANAGERS = Maps.newLinkedHashMap();
 
     /**
      * Registers the specified {@link SeasonManager} supplier for the specified {@code modId}.
@@ -60,12 +61,33 @@ public final class CompatHandler {
         ));
     }
 
+    public static final String DISABLED = "!";
+    public static final String ANY = "*";
+
     public static void reloadSeasonManager() {
         final String modId = DTConfigs.PREFERRED_SEASON_MOD.get();
 
-        // If the selected mod is not loaded take that as disabling integration, set a null manager.
+        // If disabled, use null manager.
+        if (Objects.equals(modId, DISABLED)) {
+            SeasonHelper.setSeasonManager(SeasonManager.NULL.get());
+            return;
+        }
+
+        // If any, select first manager registered.
+        if (Objects.equals(modId, ANY)) {
+            SeasonHelper.setSeasonManager(
+                    SEASON_MANAGERS.entrySet().stream()
+                            .filter(entry -> ModList.get().isLoaded(entry.getKey()))
+                            .map(Map.Entry::getValue)
+                            .findFirst()
+                            .orElse(SeasonManager.NULL)
+                            .get()
+            );
+            return;
+        }
+
         if (!ModList.get().isLoaded(modId)) {
-            SeasonHelper.setSeasonManager(new SeasonManager());
+            LogManager.getLogger().warn("Preferred season mod \"{}\" not installed.", modId);
             return;
         }
 

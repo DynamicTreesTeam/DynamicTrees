@@ -18,7 +18,7 @@ public class SeasonHelper {
 	public static final float DRY = SUMMER;
 	public static final float WET = WINTER;
 	
-	private static ISeasonManager seasonManager = new SeasonManager();
+	private static ISeasonManager seasonManager = SeasonManager.NULL.get();
 
 	static public ISeasonManager getSeasonManager() {
 		return seasonManager;
