@@ -4,6 +4,8 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.compat.seasons.*;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
+import corgitaco.betterweather.api.Climate;
+import corgitaco.betterweather.api.season.Season;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
@@ -41,8 +43,8 @@ public final class CompatHandler {
         registerSeasonManager(DynamicTrees.SERENE_SEASONS, () -> {
             SeasonManager seasonManager = new SeasonManager(
                     world -> SeasonsConfig.isDimensionWhitelisted(world.dimension()) ?
-                            new Tuple<>(new SeasonProviderSereneSeasons(), new SeasonGrowthCalculatorActive()) :
-                            new Tuple<>(new SeasonProviderNull(), new SeasonGrowthCalculatorNull())
+                            new Tuple<>(new SereneSeasonsSeasonProvider(), new ActiveSeasonGrowthCalculator()) :
+                            new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator())
             );
             seasonManager.setTropicalPredicate((world, pos) -> {
                 final ResourceLocation registryName = world.getBiome(pos).getRegistryName();
@@ -51,10 +53,11 @@ public final class CompatHandler {
             return seasonManager;
         });
 
-        // TODO: Better weather season provider.
-        registerSeasonManager(DynamicTrees.BETTER_WEATHER, () -> {
-            return new SeasonManager();
-        });
+        registerSeasonManager(DynamicTrees.BETTER_WEATHER, () -> new SeasonManager(
+                world -> Season.getSeason(world) == null ?
+                        new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator()) :
+                        new Tuple<>(new BetterWeatherSeasonProvider(), new ActiveSeasonGrowthCalculator())
+        ));
     }
 
     public static void reloadSeasonManager() {

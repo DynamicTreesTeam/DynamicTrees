@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 public class SeasonManager implements ISeasonManager {
 	
 	private final Map<ResourceLocation, SeasonContext> seasonContextMap = new HashMap<>();
-	private Function<World, Tuple<ISeasonProvider, ISeasonGrowthCalculator>> seasonMapper = w -> new Tuple<>(new SeasonProviderNull(), new SeasonGrowthCalculatorNull());
+	private Function<World, Tuple<ISeasonProvider, ISeasonGrowthCalculator>> seasonMapper = w -> new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator());
 	
 	public SeasonManager() {}
 	

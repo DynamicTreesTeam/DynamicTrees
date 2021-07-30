@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.api.seasons.ISeasonGrowthCalculator;
  *
  * @author ferreusveritas
  */
-public class SeasonGrowthCalculatorNull implements ISeasonGrowthCalculator {
+public class NullSeasonGrowthCalculator implements ISeasonGrowthCalculator {
 
 	@Override
 	public float calcGrowthRate(Float seasonValue, ClimateZoneType type) {

@@ -120,14 +120,30 @@ dependencies {
     // At runtime, use Patchouli mod (for the guide book, which is Json so we don"t need the API).
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
 
-    //At runtime use ComputerCraft for creating the growth chambers
+    // At runtime use, CC for creating growth chambers.
     runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3236650"))
 
-    // Compile full Serene Seasons mod and use in runtime.
-    implementation(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))
+    // Compile Serene Seasons.
+    compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))
+
+    // Compile Better Weather API.
+    compileOnly(fg.deobf("curse.maven:BetterWeatherAPI-400714:3403615"))
+
+//    useSereneSeasons(this)
+    useBetterWeather(this)
 
     // At runtime, use suggestion provider fix mod.
     runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${mcVersion}-${property("suggestionProviderFixVersion")}"))
+}
+
+fun useSereneSeasons(depHandler: DependencyHandlerScope) {
+    // At runtime, use full Serene Seasons mod.
+    depHandler.runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))
+}
+
+fun useBetterWeather(depHandler: DependencyHandlerScope) {
+    // At runtime, use the full Better Weather mod.
+    depHandler.runtimeOnly(fg.deobf("curse.maven:BetterWeather-400714:3403614"))
 }
 
 tasks.jar {
