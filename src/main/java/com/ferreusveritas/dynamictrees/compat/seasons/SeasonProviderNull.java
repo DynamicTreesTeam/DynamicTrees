@@ -7,10 +7,8 @@ import net.minecraft.world.World;
  * Season provider that does nothing at all
  * 
  * @author ferreusveritas
- *
  */
 public class SeasonProviderNull implements ISeasonProvider {
-	
 	
 	public SeasonProviderNull() {}
 	

@@ -16,7 +16,7 @@ public interface ISeasonProvider {
 	 * 
 	 * @return season value as a Float object or null if seasons are not enabled
 	 */
-	public Float getSeasonValue(World world, BlockPos pos);
+	Float getSeasonValue(World world, BlockPos pos);
 	
 	/**
 	 * A simple method for updating the handler every tick.
@@ -24,8 +24,8 @@ public interface ISeasonProvider {
 	 * @param world
 	 * @param worldTicks
 	 */
-	public void updateTick(World world, long worldTicks);
+	void updateTick(World world, long worldTicks);
 
-	public boolean shouldSnowMelt(World world, BlockPos pos);
+	boolean shouldSnowMelt(World world, BlockPos pos);
 	
 }
