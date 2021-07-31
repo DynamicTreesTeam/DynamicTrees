@@ -74,17 +74,19 @@ public class PalmSpecies extends Species {
     @Override
     public void postGeneration(World worldObj, IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
         if (!endPoints.isEmpty()){
-            BlockPos tip = endPoints.get(0).above(2);
-            if (safeBounds.inBounds(tip, true))
-                if (world.getBlockState(tip).getBlock() instanceof DynamicLeavesBlock)
-                    for (CoordUtils.Surround surr : CoordUtils.Surround.values()){
-                        BlockPos leafPos = tip.offset(surr.getOffset());
-                        BlockState leafState = world.getBlockState(leafPos);
-                        if (leafState.getBlock() instanceof DynamicLeavesBlock){
-                            DynamicLeavesBlock block = (DynamicLeavesBlock) leafState.getBlock();
-                            world.setBlock(leafPos, block.getLeavesBlockStateForPlacement(world, leafPos, leafState, leafState.getValue(LeavesBlock.DISTANCE), true), 2);
+            for (BlockPos endPoint : endPoints) {
+                BlockPos tip = endPoint.above(2);
+                if (safeBounds.inBounds(tip, true))
+                    if (world.getBlockState(tip).getBlock() instanceof DynamicLeavesBlock)
+                        for (CoordUtils.Surround surr : CoordUtils.Surround.values()) {
+                            BlockPos leafPos = tip.offset(surr.getOffset());
+                            BlockState leafState = world.getBlockState(leafPos);
+                            if (leafState.getBlock() instanceof DynamicLeavesBlock) {
+                                DynamicLeavesBlock block = (DynamicLeavesBlock) leafState.getBlock();
+                                world.setBlock(leafPos, block.getLeavesBlockStateForPlacement(world, leafPos, leafState, leafState.getValue(LeavesBlock.DISTANCE), true), 2);
+                            }
                         }
-                    }
+            }
         }
         super.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
     }
