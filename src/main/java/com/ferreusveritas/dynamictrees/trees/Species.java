@@ -1927,12 +1927,14 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
 	/**
 	 * Adds a {@link ConfiguredGenFeature} object to this species.
+	 * The GenFeature can cancel its addition if {@link GenFeature#onGenFeatureAdded(Species, ConfiguredGenFeature)} returns false.
 	 *
 	 * @param configuredGenFeature The {@link ConfiguredGenFeature} to add.
 	 * @return This {@link Species} object.
 	 */
 	public Species addGenFeature(ConfiguredGenFeature<GenFeature> configuredGenFeature) {
-		this.genFeatures.add(configuredGenFeature);
+		if (configuredGenFeature.getGenFeature().onGenFeatureAdded(this, configuredGenFeature))
+			this.genFeatures.add(configuredGenFeature);
 		return this;
 	}
 

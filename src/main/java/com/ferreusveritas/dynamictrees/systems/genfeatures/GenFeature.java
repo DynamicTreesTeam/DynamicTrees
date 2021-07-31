@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
 import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
 import net.minecraft.util.ResourceLocation;
@@ -53,5 +54,14 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
     protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return new ConfiguredGenFeature<>(this);
     }
+
+    /**
+     * Method called right before a gen feature is added to a Species.
+     * Should return true by default, but can return false to cancel the genFeature from being added.
+     * @param species the species the feature is being added to
+     * @param configuration the configuration the feature is being added with
+     * @return whether the genFeature can be added.
+     */
+    public boolean onGenFeatureAdded (Species species, ConfiguredGenFeature<GenFeature> configuration){ return true; }
 
 }
