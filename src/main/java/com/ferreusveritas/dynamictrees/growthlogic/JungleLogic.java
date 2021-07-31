@@ -15,7 +15,7 @@ public class JungleLogic extends GrowthLogicKit {
 	}
 
 	private static final int canopyHeight = 18;
-	private static final int canopyHeightMega = 25;
+	private static final int canopyHeightMega = 20;
 
 	@Override
 	public int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap) {
