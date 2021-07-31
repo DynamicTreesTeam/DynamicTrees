@@ -41,7 +41,7 @@ public final class GrowPulseCommand extends SubCommand {
     }
 
     private void sendGrowPulse(final CommandSource source, final BlockPos rootPos, final int number) {
-        final ISubstanceEffect substanceEffect = new GrowthSubstance(number, 1);
+        final ISubstanceEffect substanceEffect = new GrowthSubstance(number, 1, false);
         final ServerWorld level = source.getLevel();
 
         substanceEffect.apply(source.getLevel(), rootPos);

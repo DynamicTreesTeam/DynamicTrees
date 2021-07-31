@@ -13,14 +13,20 @@ public class GrowthSubstance implements ISubstanceEffect {
 	private final int pulses;
 	private final int ticksPerPulse;
 	private final int ticksPerParticlePulse = 8;
+	private final boolean fillFertility;
 
 	public GrowthSubstance() {
 		this(-1, 24);
 	}
 
 	public GrowthSubstance(int pulses, int ticksPerPulse) {
+		this(pulses, ticksPerPulse, true);
+	}
+
+	public GrowthSubstance(int pulses, int ticksPerPulse, boolean fillFertility) {
 		this.pulses = pulses;
 		this.ticksPerPulse = ticksPerPulse;
+		this.fillFertility = fillFertility;
 	}
 
 	@Override
@@ -29,8 +35,9 @@ public class GrowthSubstance implements ISubstanceEffect {
 		if (LingeringEffectorEntity.treeHasEffectorForEffect(world, rootPos, this)) {
 			return false;
 		}
+		if (fillFertility)
+			new FertilizeSubstance().setAmount(15).setDisplayParticles(false).apply(world, rootPos);
 
-		new FertilizeSubstance().setAmount(15).setDisplayParticles(false).apply(world, rootPos);
 		TreeHelper.treeParticles(world, rootPos, ParticleTypes.EFFECT, 8);
 		return true;
 	}
