@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.command;
 
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
@@ -41,11 +42,8 @@ public final class GrowPulseCommand extends SubCommand {
     }
 
     private void sendGrowPulse(final CommandSource source, final BlockPos rootPos, final int number) {
-        final ISubstanceEffect substanceEffect = new GrowthSubstance(number, 1, false);
-        final ServerWorld level = source.getLevel();
-
-        substanceEffect.apply(source.getLevel(), rootPos);
-        level.addFreshEntity(new LingeringEffectorEntity(level, rootPos, substanceEffect));
+        for (int i = 0; i < number; i++)
+            TreeHelper.growPulse(source.getLevel(), rootPos);
 
         sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.grow_pulse",
                 CommandHelper.colour(String.valueOf(number), TextFormatting.AQUA),
