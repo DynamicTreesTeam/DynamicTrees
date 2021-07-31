@@ -37,11 +37,11 @@ public class AlternativeLeavesGenFeature extends GenFeature implements IPostGrow
 
     @Override
     protected void registerProperties() {
-        this.register(ALT_LEAVES, PLACE_CHANCE, QUANTITY);
+        this.register(ALT_LEAVES, ALT_LEAVES_BLOCK, PLACE_CHANCE, QUANTITY);
     }
 
     public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-        return super.createDefaultConfiguration().with(ALT_LEAVES_BLOCK, Blocks.AIR).with(ALT_LEAVES, LeavesProperties.NULL_PROPERTIES)
+        return super.createDefaultConfiguration().with(ALT_LEAVES, LeavesProperties.NULL_PROPERTIES).with(ALT_LEAVES_BLOCK, Blocks.AIR)
                 .with(PLACE_CHANCE, 0.5f).with(QUANTITY, 5);
     }
 
