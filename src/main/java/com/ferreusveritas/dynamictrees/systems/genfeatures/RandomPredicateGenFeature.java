@@ -41,7 +41,7 @@ public class RandomPredicateGenFeature extends GenFeature implements IPostGenFea
 	@Override
 	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
 		//If the chance is not met, just return false
-		if (Math.abs(CoordUtils.coordHashCode(rootPos, 2)) % (1/configuredGenFeature.get(PLACE_CHANCE)) != 0)
+		if (Math.abs(CoordUtils.coordHashCode(rootPos, 2)/(float)0xFFFF) > configuredGenFeature.get(PLACE_CHANCE))
 			return false;
 
 		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
@@ -63,7 +63,7 @@ public class RandomPredicateGenFeature extends GenFeature implements IPostGenFea
 	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
 		//If the chance is not met, or its only for world gen, just return false
 		if (configuredGenFeature.get(ONLY_WORLD_GEN)
-				|| Math.abs(CoordUtils.coordHashCode(rootPos, 2)) % (1/configuredGenFeature.get(PLACE_CHANCE)) != 0)
+				|| Math.abs(CoordUtils.coordHashCode(rootPos, 2)/(float)0xFFFF) > configuredGenFeature.get(PLACE_CHANCE))
 			return false;
 
 		final ConfiguredGenFeature<?> configuredGenFeatureToPlace = configuredGenFeature.get(GEN_FEATURE);
