@@ -42,6 +42,7 @@ public final class GenFeatures {
     public static final GenFeature ROT_SOIL = new RotSoilGenFeature(regName("rot_soil"));
 
     public static final GenFeature BIOME_PREDICATE = new BiomePredicateGenFeature(regName("biome_predicate"));
+    public static final GenFeature RANDOM_PREDICATE = new RandomPredicateGenFeature(regName("random_predicate"));
 
     public static final GenFeature ALTERNATIVE_LEAVES = new AlternativeLeavesGenFeature(regName("alt_leaves"));
 
@@ -52,7 +53,7 @@ public final class GenFeatures {
     public static void register(final IRegistry<GenFeature> registry) {
         registry.registerAll(FRUIT, COCOA, VINES, BEE_NEST, SHROOMLIGHT, CONIFER_TOPPER, MOUND,
                 ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH, PODZOL, BUSH, HUGE_MUSHROOM,
-                HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE, ALTERNATIVE_LEAVES);
+                HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE, RANDOM_PREDICATE, ALTERNATIVE_LEAVES);
     }
     
 }
