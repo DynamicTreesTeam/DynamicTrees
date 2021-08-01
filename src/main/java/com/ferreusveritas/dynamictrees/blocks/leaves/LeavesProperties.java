@@ -83,8 +83,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	/** The primitive (vanilla) leaves are used for many purposes including rendering, drops, and some other basic behavior. */
 	protected BlockState primitiveLeaves;
 
-	protected Family.IConnectable primitiveLeavesConnectable;
-
 	/** The {@link CellKit}, which is for leaves automata. */
 	protected CellKit cellKit;
 
@@ -139,8 +137,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 	public void setPrimitiveLeaves(final Block primitiveLeaves) {
 		if (this.primitiveLeaves == null || primitiveLeaves != this.primitiveLeaves.getBlock()) {
 			this.primitiveLeaves = primitiveLeaves.defaultBlockState();
-			this.family.removeConnectable(this.primitiveLeavesConnectable);
-			this.family.addConnectable(state -> state.getBlock() == primitiveLeaves);
 		}
 	}
 

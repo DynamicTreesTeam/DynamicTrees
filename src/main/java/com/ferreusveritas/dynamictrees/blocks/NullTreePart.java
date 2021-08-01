@@ -38,10 +38,6 @@ public class NullTreePart implements ITreePart {
 			int rad = BranchConnectables.getConnectionRadiusForBlock(state, reader, pos, side);
 			if (rad > 0) return rad;
 		}
-		//Twigs connect to Vanilla leaves
-		if (fromRadius == 1) {
-			return from.getFamily().isCompatibleVanillaLeaves(from.getFamily().getCommonSpecies(), state, reader, pos) ? 1: 0;
-		}
 		return 0;
 	}
 	
