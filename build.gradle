@@ -1,10 +1,14 @@
+import org.w3c.dom.Element
+import org.apache.tools.ant.filters.ReplaceTokens
+
 buildscript {
 	repositories {
 		jcenter()
+		mavenCentral()
 		maven { url = "http://files.minecraftforge.net/maven" }
 	}
 	dependencies {
-		classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+		classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
 	}
 }
 
@@ -20,9 +24,10 @@ repositories {
 	}
 }
 
+apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
-apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 ext.configFile = file "build.properties"
 configFile.withReader {
@@ -31,36 +36,46 @@ configFile.withReader {
     ext.config = new ConfigSlurper().parse prop
 }
 
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+def mcVersion = config.mc_version
+def forgeVersion = config.forge_version
 
-version = "${config.mc_version}-${config.mod_version}"
-if (System.getenv()["Version"] != null)
-{
-    version = "${config.mc_version}-${System.getenv()["Version"]}"
-}
+def modName = config.mod_name
+def modVersion = config.mod_version
+
+version = "${mcVersion}-${config.mod_version}"
 
 group = config.package_group
 archivesBaseName = config.mod_name
 
-sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
-compileJava {
-	sourceCompatibility = targetCompatibility = '1.8'
-}
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-	version = "${config.mc_version}-${config.forge_version}"
-	runDir = "run"
-	
-	replace("1.12.2-9999.9999.9999z", project.version)
-	replaceIn "ModConstants.java"
+	mappings channel: 'snapshot', version: config.mappings_version
 
-	makeObfSourceJar = false
-	
-	if (config.mappings_version)
-		mappings = config.mappings_version
+	runs {
+        client {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+        }
+
+        server {
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+        }
+    }
 }
 
 dependencies {
+	minecraft "net.minecraftforge:forge:${mcVersion}-${forgeVersion}"
+
 	// Compile against full Hwyla jar.
 	compile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
 
@@ -73,17 +88,28 @@ dependencies {
 
 processResources {
 	inputs.property "version", project.version
-	inputs.property "mcversion", project.minecraft.version
-	
+	inputs.property "mcversion", mcVersion
+
 	from(sourceSets.main.resources.srcDirs) {
 		include 'mcmod.info'
-		
-		expand 'version':project.version, 'mcversion':project.minecraft.version
+
+		expand 'version': project.version, 'mcversion': mcVersion
 	}
-	
+
 	from(sourceSets.main.resources.srcDirs) {
 		exclude 'mcmod.info'
 	}
+}
+
+// Assign version constant in ModConstants.
+task prepareSources(type: Copy) {
+	from('src/main/java')
+	into('build/src/main/java')
+	filter(ReplaceTokens, tokens: [VERSION: version.toString()])
+}
+
+compileJava {
+	source = prepareSources.outputs
 }
 
 task sourcesJar(type: Jar) {
@@ -92,11 +118,99 @@ task sourcesJar(type: Jar) {
 }
 
 task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
+	from sourceSets.main.output
+	classifier = 'deobf'
 }
 
 tasks.build.dependsOn deobfJar
+
+jar {
+	manifest {
+		attributes([
+				"Specification-Title": "Dynamic Trees",
+				"Specification-Vendor": "ferreusveritas",
+				"Specification-Version": "1", // We are version 1 of ourselves
+				"Implementation-Title": project.name,
+				"Implementation-Version": project.version,
+				"Implementation-Vendor" :"ferreusveritas",
+				"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+		])
+	}
+}
+
+jar.finalizedBy('reobfJar')
+
+tasks.withType(GenerateModuleMetadata) {
+	enabled = false
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			setArtifactId("${modName}-${mcVersion}")
+			setVersion(modVersion)
+
+			from components.java
+
+			pom {
+				url = "https://github.com/ferreusveritas/${modName}".toString()
+				licenses {
+					license {
+						name = 'MIT'
+						url = 'https://mit-license.org'
+					}
+				}
+				developers {
+					developer {
+						id = "ferreusveritas"
+						name = "Ferreus Veritas"
+					}
+					developer {
+						id = "supermassimo"
+						name = "Max Hyper"
+					}
+					developer {
+						id = "Harleyoc1"
+						name = "Harley O'Connor"
+						email = "Harleyoc1@gmail.com"
+					}
+				}
+				scm {
+					connection = "scm:git:git://github.com/ferreusveritas/${modName}.git".toString()
+					developerConnection = "scm:git:ssh://github.com/ferreusveritas/${modName}.git".toString()
+					url = "https://github.com/ferreusveritas/${modName}".toString()
+				}
+			}
+
+			pom.withXml { xmlProvider ->
+				final Element element = xmlProvider.asElement();
+
+				// Clear dependencies.
+				element.getChildNodes().each { node ->
+					if (node.getNodeName() == "dependencies")
+						element.removeChild(node)
+				}
+			}
+		}
+	}
+	repositories {
+		maven {
+			url "file:///${project.projectDir}/mcmodsrepo"
+		}
+		if (project.hasProperty("harleyOConnorMavenUsername") && project.hasProperty("harleyOConnorMavenPassword")) {
+			maven {
+				name = "HarleyOConnorMaven"
+				url = uri("https://harleyoconnor.com/maven")
+				credentials {
+					username = property("harleyOConnorMavenUsername")
+					password = property("harleyOConnorMavenPassword")
+				}
+			}
+		} else {
+			project.logger.log(LogLevel.WARN, "Credentials for maven not detected; it will be disabled.")
+		}
+	}
+}
 
 idea {
     module {
@@ -108,6 +222,6 @@ idea {
 
 artifacts {
     archives jar
-    archives sourceJar
+    archives sourcesJar
     archives deobfJar
 }
