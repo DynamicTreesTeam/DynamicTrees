@@ -94,7 +94,7 @@ public class Staff extends Item {
 				setSpecies(heldStack, species);
 				if(!player.isSneaking()) {
 					EnumFacing playerFacing = player.getHorizontalFacing();
-					Optional<JoCode> joCode = TreeHelper.getJoCode(world, pos, playerFacing);
+					Optional<JoCode> joCode = TreeHelper.getJoCode(world, pos, playerFacing, species);
 
 					if(joCode.isPresent()) {
 						String code = joCode.get().toString();

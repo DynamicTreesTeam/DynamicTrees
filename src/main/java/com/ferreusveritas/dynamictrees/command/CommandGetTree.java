@@ -44,7 +44,7 @@ public class CommandGetTree extends SubCommand {
 		
 		BlockPos pos = CommandBase.parseBlockPos(sender, args, 1, false);
 		Species species = TreeHelper.getBestGuessSpecies(world, pos);
-		String code = TreeHelper.getJoCode(world, pos).map(JoCode::toString).orElse("?");
+		String code = TreeHelper.getJoCode(world, pos, species).map(JoCode::toString).orElse("?");
 		
 		sender.sendMessage((new TextComponentString(species.toString())));
 		sender.sendMessage((new TextComponentString(code)));

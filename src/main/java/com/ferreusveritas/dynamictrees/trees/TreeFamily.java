@@ -361,10 +361,14 @@ public class TreeFamily {
 		return 2.0f;
 	}
 
+	/** Adds the branch blocks passed as valid branches for the TreeFamily.
+	 * This is used by the tree felling animation to render multiple blocks */
 	public void addValidBranches (BlockBranch... branches){
 		this.validBranches.addAll(Arrays.asList(branches));
 	}
 
+	/** @return the index in the validBranches List of the block passed.
+	 * If the block is not in the list, the index for the default branch is returned (0) */
 	public int getBranchBlockIndex (BlockBranch block){
 		int index = this.validBranches.indexOf(block);
 		if (index < 0){
@@ -374,6 +378,7 @@ public class TreeFamily {
 		return index;
 	}
 
+	/** @return the branch block of the index passed in validBranches */
 	@Nullable
 	public BlockBranch getValidBranchBlock (int index) {
 		return this.validBranches.get(index);

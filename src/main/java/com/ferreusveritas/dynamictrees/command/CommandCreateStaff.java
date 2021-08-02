@@ -30,8 +30,8 @@ public class CommandCreateStaff extends SubCommand {
 		return CREATESTAFF;
 	}
 
-	public List<String> getJoCode(World world, BlockPos targetPos) {
-		return Arrays.asList(new String[] { TreeHelper.getJoCode(world, targetPos).map(JoCode::toString).orElse(DEFAULTJOCODE) });
+	public List<String> getJoCode(World world, BlockPos targetPos, Species species) {
+		return Arrays.asList(new String[] { TreeHelper.getJoCode(world, targetPos, species).map(JoCode::toString).orElse(DEFAULTJOCODE) });
 	}
 	
 	@Override
@@ -42,9 +42,9 @@ public class CommandCreateStaff extends SubCommand {
 			case 3: 
 			case 4: return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
 			case 5: return CommandBase.getListOfStringsMatchingLastWord(args, Species.REGISTRY.getKeys());
-			case 6: return getJoCode(sender.getEntityWorld(), targetPos);
+			case 6: return getJoCode(sender.getEntityWorld(), targetPos, TreeHelper.getExactSpecies(sender.getEntityWorld(), targetPos));
 			case 7: return Arrays.asList(new Object[] {"#00FFFF"});
-			case 8: return CommandBase.getListOfStringsMatchingLastWord(args, new String[] {"true", "false"});
+			case 8: return CommandBase.getListOfStringsMatchingLastWord(args, "true", "false");
 			case 9: return Arrays.asList(new String[] {"64"});
 		}
 		

@@ -1,0 +1,93 @@
+itemGroup.dynamictrees=Dynamiczne Drzewa
+
+tile.dynamictrees:rootydirt.name=Ukorzeniona Ziemia
+tile.dynamictrees:rootysand.name=Ukorzeniony Piasek
+
+tile.dynamictrees:leaves0.name=Liście
+tile.dynamictrees:leaves1.name=Liście
+
+tile.dynamictrees:oakbranch.name=Drzewo Dębowe
+tile.dynamictrees:sprucebranch.name=Drzewo Świerkowe
+tile.dynamictrees:birchbranch.name=Drzewo Brzozowe
+tile.dynamictrees:junglebranch.name=Drzewo Dżunglowe
+tile.dynamictrees:darkoakbranch.name=Drzewo Ciemnego Dębu
+tile.dynamictrees:acaciabranch.name=Drzewo Akacjowe
+tile.dynamictrees:cactusbranch.name=Kaktus
+
+species.dynamictrees:oak.name=Dąb
+species.dynamictrees:oakswamp.name=Dąb Bagienny
+species.dynamictrees:spruce.name=Świerk
+species.dynamictrees:megaspruce.name=Wielki Świerk
+species.dynamictrees:birch.name=Brzoza
+species.dynamictrees:jungle.name=Dżungla
+species.dynamictrees:megajungle.name=Wielka Dżungla
+species.dynamictrees:darkoak.name=Ciemny Dąb
+species.dynamictrees:acacia.name=Akacja
+species.dynamictrees:apple.name=Jabłko
+species.dynamictrees:cactus.name=Kaktus
+
+item.dynamictrees:oakseed.name=Żołądź Dębowy
+item.dynamictrees:spruceseed.name=Szyszka Świerkowa
+item.dynamictrees:birchseed.name=Kotka Brzozowa
+item.dynamictrees:jungleseed.name=Strąk Dżunglowy
+item.dynamictrees:darkoakseed.name=Żołądź Ciemnego Dębu
+item.dynamictrees:acaciaseed.name=Nasiono Akacji
+item.dynamictrees:appleseed.name=Jabłkowa Pestka
+item.dynamictrees:cactusseed.name=Nasiono Kaktusa
+
+item.dynamictrees:dendropotion.biochar.name=Mikstura Bazowa Biowęglowa
+item.dynamictrees:dendropotion.depletion.name=Mikstura Uszczuplenia
+item.dynamictrees:dendropotion.gigas.name=Mikstura Wielkości
+item.dynamictrees:dendropotion.burgeoning.name=Mikstura Rozkwitu
+item.dynamictrees:dendropotion.fertility.name=Mikstura Żyzności
+item.dynamictrees:dendropotion.persistance.name=Mikstura Trwałości
+item.dynamictrees:dendropotion.transform.name=Mikstura Transformacji
+
+item.dynamictrees:dirtbucket.name=Wiaderko Ziemi
+item.dynamictrees:staff.name=Leśna Laska
+tile.dynamictrees:bonsaipot.name=Doniczka Bonsai
+
+commands.dynamictrees.usage=/dt <%s> [args]
+commands.dynamictrees.repop.usage=/dt repop
+commands.dynamictrees.repop.run=Ponowne zapełnianie bazy danych generatora świata
+commands.dynamictrees.setree.usage=/dt settree <x> <y> <z> <species> [joCode] [turns]
+commands.dynamictrees.getree.usage=/dt gettree <x> <y> <z>
+commands.dynamictrees.soillife.usage=/dt soillife <x> <y> <z> [life]
+commands.dynamictrees.createstaff.usage=/dt createstaff <x> <y> <z> [species] [joCode] [color] [readonly] [maxUses]
+commands.dynamictrees.growpulse.usage=/dt growpulse <x> <y> <z>
+commands.dynamictrees.killtree.usage=/dt killtree <x> <y> <z>
+commands.dynamictrees.rotatejocode.usage=/dt rotatejocode <joCode> <turns>
+commands.dynamictrees.transform.usage=/dt transform <x> <y> <z> <species>
+commands.dynamictrees.createtransformpotion.usage=/dt createtransformpotion <x> <y> <z> <species>
+
+commands.dynamictrees.setree.specieserror=Nie udało się znaleźć gatunków %s!
+commands.dynamictrees.createstaff.specieserror=Nie udało się znaleźć gatunków %s!
+commands.dynamictrees.createstaff.colorerror=%s nie jest kolorem do dekodowania
+commands.dynamictrees.createstaff.readonlyerror=%s nie jest wartością logiczną
+commands.dynamictrees.createstaff.maxuseserror=%s nie jest prawidłową dodatnią liczbą całkowitą
+commands.dynamictrees.soillife.lifeerror=%s nie jest prawidłową liczbą całkowitą
+commands.dynamictrees.soillife.notreeerror=Nie znaleziono drzewa w %s
+commands.dynamictrees.growpulse.norootyerror=Nie znaleziono ukorzenionej ziemi w %s
+commands.dynamictrees.rotatejocode.turnserror=%s nie jest prawidłową liczbą całkowitą
+commands.dynamictrees.transform.nottransformableerror=Gatunek %s nie podlega transformacji
+
+potion.biochar.description=§7Bazowa drzewna mikstura do warzenia
+potion.depletion.description=§7Niszczy żyzność gleby drzew
+potion.gigas.description=§7Pozwala drzewu osiągnąć mega rozmiar
+potion.burgeoning.description=§7Szybko wyrasta drzewo
+potion.fertility.description=§7W pełni nawozi glebę drzewa
+potion.persistance.description=§7Powstrzymuje drzewo przed zmienianiem
+potion.transform.description=§7Przekształca drzewo w §a%s §7drzewo
+potion.transform.description.empty=§7Bazowa drzewna mikstura do transformacji warzenia
+
+tooltip.seed.season.fertile_seasons=Żyzne Sezony:
+tooltip.seed.season.year_round=§dCały Rok
+tooltip.seed.season.spring=§aWiosna
+tooltip.seed.season.summer=§eLato
+tooltip.seed.season.autumn=§6Jesień
+tooltip.seed.season.winter=§bZima
+
+tooltip.woodland_staff.tree=Drzewo:
+tooltip.woodland_staff.tree_not_set=§7nic
+
+death.attack.fallingtree=%1$s został zgnieciony przez spadające drzewo

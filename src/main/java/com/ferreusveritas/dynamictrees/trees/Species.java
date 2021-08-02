@@ -37,6 +37,7 @@ import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.growthlogic.IGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.models.ModelEntityFallingTree;
 import com.ferreusveritas.dynamictrees.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
@@ -85,6 +86,8 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import org.apache.logging.log4j.LogManager;
+
+import javax.annotation.Nullable;
 
 public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<Species> {
 	
@@ -152,8 +155,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	private final List<ILeavesProperties> validLeaves = new LinkedList<>();
 
 	//Seeds
-	/** The seed used to reproduce this species.  Drops from the tree and can plant itself */
-	/** Hold damage value for seed items with multiple variants */
+	/** The seed used to reproduce this species.  Drops from the tree and can plant itself *
+	* Hold damage value for seed items with multiple variants */
 	protected ItemStack seedStack;
 	/** A blockState that will turn itself into this tree */
 	protected IBlockState saplingBlock;
@@ -165,6 +168,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	protected Map <Type, Float> envFactors = new HashMap<Type, Float>();//Environmental factors
 	/** A list of JoCodes for world generation. Initialized in addJoCodes()*/
 	protected JoCodeStore joCodeStore = new JoCodeStore(this);
+	
+	private Species megaSpecies;
 	
 	protected IFullGenFeature genFeatureOverride;
 	protected List<IPreGenFeature> preGenFeatures;
@@ -211,6 +216,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		setStandardSoils();
 		seedStack = new ItemStack(Seed.NULLSEED);
 		saplingBlock = Blocks.AIR.getDefaultState();
+		megaSpecies = NULLSPECIES;
 		
 		//Add JoCode models for worldgen
 		addJoCodes();
@@ -288,7 +294,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return tapering;
 	}
 	
-	//Rare species require TileEntity Storage
+	/** Rare species require TileEntity Storage */
 	public boolean getRequiresTileEntity(World world, BlockPos pos) {
 		return requiresTileEntity;
 	}
@@ -323,10 +329,14 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return leavesProperties;
 	}
 
+	/** Adds the leaves properties passed as valid leaves for the Species.
+	 * This is used by the tree felling animation to render multiple blocks */
 	public void addValidLeavesBlocks(ILeavesProperties... leaves){
 		this.validLeaves.addAll(Arrays.asList(leaves));
 	}
 
+	/** @return the index in the validLeaves List of the blockState passed.
+	 * If the block is not in the list, the index for the default leaves is returned (0) */
 	public int getLeavesBlockIndex(IBlockState state) {
 		if (!(state.getBlock() instanceof BlockDynamicLeaves))
 			return 0;
@@ -335,6 +345,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return this.getLeavesBlockIndex(dynamicLeaves.getProperties(state));
 	}
 
+	/** @return the index in the validLeaves List of the properties passed.
+	 * If the block is not in the list, the index for the default leaves is returned (0) */
 	public int getLeavesBlockIndex(ILeavesProperties leavesProperties) {
 		int index = this.validLeaves.indexOf(leavesProperties);
 
@@ -345,19 +357,21 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 
 		return index;
 	}
-	
-	public List<ILeavesProperties> getValidLeaves () {
-		return this.validLeaves;
-	}
 
+	/** @return the leaves properties of the index passed in validLeaves */
 	public ILeavesProperties getValidLeavesProperties(int index) {
 		return this.validLeaves.get(index);
 	}
 
+	/** @return the blockState of the index passed in validLeaves */
 	public IBlockState getValidLeavesBlock(int index) {
 		return this.getValidLeavesProperties(index).getDynamicLeavesState();
 	}
 
+	public int colorTreeQuads (int defaultColor, ModelEntityFallingTree.TreeQuadData treeQuad, @Nullable EntityFallingTree entity){
+		return defaultColor;
+	}
+	
 	///////////////////////////////////////////
 	//SEEDS
 	///////////////////////////////////////////
@@ -825,7 +839,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return ends.isEmpty() && !TreeHelper.isBranch(world.getBlockState(treePos));//There are no endpoints and the trunk is missing
 	}
 	
-	static private final EnumFacing upFirst[] = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
+	static private final EnumFacing[] upFirst = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
 	
 	/**
 	* Handle rotting branches
@@ -1276,19 +1290,41 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean useDefaultWailaBody (){
 		return true;
 	}
+
+	/**
+	 * 
+	 * @return true to show the species name on the Waila Display. By default, it shows only non-common species
+	 */
+	public boolean showSpeciesOnWaila (){
+		return this != getFamily().getCommonSpecies();
+	}
 	
 	///////////////////////////////////////////
 	// MEGANESS
 	///////////////////////////////////////////
-	
+
+	/**
+	 * @return true if this species is a Mega variant of another species
+	 */
 	public boolean isMega() {
 		return false;
 	}
-	
+
+	/**
+	 * @return the Mega variant of this species. if it has none it returns NULLSPECIES
+	 * Override to set a custom megaSpecies.
+	 */
 	public Species getMegaSpecies() {
-		return Species.NULLSPECIES;
+		return megaSpecies;
 	}
-	
+
+	/**
+	 * @param megaSpecies new Mega variant of this species if it has none. Will not change existing variant
+	 */
+	public void setMegaSpecies(Species megaSpecies) { 
+		if (this.megaSpecies == NULLSPECIES)
+			this.megaSpecies = megaSpecies;
+	}
 	
 	///////////////////////////////////////////
 	// FALL ANIMATION HANDLING
@@ -1353,6 +1389,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public JoCode getJoCode(String joCodeString) {
 		return new JoCode(joCodeString);
 	}
+	public JoCode getJoCode(World world, BlockPos rootPos, EnumFacing facing) { return new JoCode(world, rootPos, facing); }
 	
 	/**
 	 * A {@link JoCode} defines the block model of the {@link TreeFamily}

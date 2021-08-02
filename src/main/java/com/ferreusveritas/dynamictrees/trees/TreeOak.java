@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorApple;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenFruit;
 import com.ferreusveritas.dynamictrees.systems.featuregen.FeatureGenVine;
 
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.block.BlockOldLeaf;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
@@ -94,22 +95,6 @@ public class TreeOak extends TreeFamilyVanilla {
 			return isOneOfBiomes(biome, Biomes.SWAMPLAND);
 		}
 		
-		@Override
-		public boolean isAcceptableSoilForWorldgen(World world, BlockPos pos, IBlockState soilBlockState) {
-			
-			if(soilBlockState.getBlock() == Blocks.WATER) {
-				Biome biome = world.getBiome(pos);
-				if(BiomeDictionary.hasType(biome, Type.SWAMP)) {
-					BlockPos down = pos.down();
-					if(isAcceptableSoil(world, down, world.getBlockState(down))) {
-						return true;
-					}
-				}
-			}
-			
-			return super.isAcceptableSoilForWorldgen(world, pos, soilBlockState);
-		}
-		
 		//Swamp Oaks are just oaks in a swamp..  So they have the same seeds
 		@Override
 		public ItemStack getSeedStack(int qty) {
@@ -134,7 +119,34 @@ public class TreeOak extends TreeFamilyVanilla {
 			
 			return false;
 		}
-		
+
+		private boolean isGeneratingInWater (World world, BlockPos pos, IBlockState soilBlockState) {
+			if (soilBlockState.getBlock() == Blocks.WATER) {
+				Biome biome = world.getBiome(pos);
+				if (BiomeDictionary.hasType(biome, Type.SWAMP)) {
+					BlockPos down = pos.down();
+					return isAcceptableSoil(world, down, world.getBlockState(down));
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public boolean isAcceptableSoilForWorldgen(World world, BlockPos pos, IBlockState soilBlockState) {
+			if (isGeneratingInWater(world, pos, soilBlockState))
+				return true;
+			return super.isAcceptableSoilForWorldgen(world, pos, soilBlockState);
+		}
+
+		@Override
+		public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+			if (isGeneratingInWater(world, rootPos, world.getBlockState(rootPos))){
+				if (radius >= 5)
+					return super.generate(world, rootPos.down(), biome, random, radius, safeBounds);
+				return false;
+			}
+			return super.generate(world, rootPos, biome, random, radius, safeBounds);
+		}
 	}
 	
 	/**
