@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.ResourceLocationGetter;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 
 import java.util.function.Consumer;
 
@@ -23,8 +22,9 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
     @Override
     public void registerAppliers() {
         this.loadReloadAppliers.registerArrayApplier("acceptable_soils", String.class, (soilProperties, acceptableSoil) -> {
-            if (SoilHelper.getSoilFlags(acceptableSoil) == 0)
+            if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
                 SoilHelper.createNewAdjective(acceptableSoil);
+            }
 
             SoilHelper.registerSoil(soilProperties, acceptableSoil);
             return PropertyApplierResult.success();
@@ -51,11 +51,12 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
         //set the substitute soil if one exists and is valid
         // dont generate block if the there is a substitute.
         SoilProperties substitute = JsonHelper.getOrDefault(jsonObject, "substitute_soil", SoilProperties.class, SoilProperties.NULL_SOIL_PROPERTIES);
-        if (substitute != SoilProperties.NULL_SOIL_PROPERTIES)
+        if (substitute != SoilProperties.NULL_SOIL_PROPERTIES) {
             soilProperties.setDynamicSoilBlock(substitute.dynamicSoilBlock);
-        else
+        } else {
             soilProperties.generateDynamicSoil(JsonHelper.getBlockProperties(jsonObject,
                     soilProperties.getDefaultMaterial(), soilProperties.getDefaultMaterial().getColor(),
                     soilProperties::getDefaultBlockProperties, errorConsumer, warningConsumer));
+        }
     }
 }

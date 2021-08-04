@@ -5,12 +5,11 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * An {@link IJsonObjectGetter} for {@link ResourceLocation}s, but if no namespace is
- * defined it defaults to the specified {@link #defaultNamespace} given in
- * {@link #ResourceLocationGetter(String)}.
- *
- * Main instance stored in {@link JsonObjectGetters#RESOURCE_LOCATION} for fetching
- * resource locations with default namespace {@code minecraft}.
+ * An {@link IJsonObjectGetter} for {@link ResourceLocation}s, but if no namespace is defined it defaults to the
+ * specified {@link #defaultNamespace} given in {@link #ResourceLocationGetter(String)}.
+ * <p>
+ * Main instance stored in {@link JsonObjectGetters#RESOURCE_LOCATION} for fetching resource locations with default
+ * namespace {@code minecraft}.
  *
  * @author Harley O'Connor
  */

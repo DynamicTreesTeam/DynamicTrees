@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Sub-class of {@link TreeResourcePack} for {@link IModFile} so tree resources are automatically
- * loaded from other mods.
+ * Sub-class of {@link TreeResourcePack} for {@link IModFile} so tree resources are automatically loaded from other
+ * mods.
  *
  * @author Harley O'Connor
  */

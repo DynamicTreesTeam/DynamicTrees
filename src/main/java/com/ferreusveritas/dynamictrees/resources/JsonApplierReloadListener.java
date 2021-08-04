@@ -13,8 +13,7 @@ import net.minecraftforge.fml.ModLoader;
 import java.util.function.Consumer;
 
 /**
- * An abstract extension of {@link ReloadListener} that stores {@link JsonPropertyApplierList}
- * of type {@link V}.
+ * An abstract extension of {@link ReloadListener} that stores {@link JsonPropertyApplierList} of type {@link V}.
  *
  * @param <T> The type of {@link Object} returned by {@link ReloadListener#prepare(TreesResourceManager)}.
  * @param <V> The type of {@link Object} the {@link JsonPropertyApplierList} objects are applying to.
@@ -29,17 +28,25 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
 
     protected final Gson gson = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
-    /** Holds appliers that should be applied both when loading and reloading. */
+    /**
+     * Holds appliers that should be applied both when loading and reloading.
+     */
     protected final JsonPropertyApplierList<V> loadReloadAppliers;
 
-    /** Holds appliers that should only be applied when loading. */
+    /**
+     * Holds appliers that should only be applied when loading.
+     */
     protected final JsonPropertyApplierList<V> loadAppliers;
 
-    /** Holds appliers that should only be applied on {@link net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent}
-     *  (once all Forge registry entries have been registered). */
+    /**
+     * Holds appliers that should only be applied on {@link net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent}
+     * (once all Forge registry entries have been registered).
+     */
     protected final JsonPropertyApplierList<V> setupAppliers;
 
-    /** Holds appliers that should only be applied when reloading. */
+    /**
+     * Holds appliers that should only be applied when reloading.
+     */
     protected final JsonPropertyApplierList<V> reloadAppliers;
 
     protected final String applierListIdentifier;
@@ -55,9 +62,8 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
     }
 
     /**
-     * Called from {@link DTResourceRegistries#setupTreesResourceManager()}. Sub-classes should
-     * can override to register their Json appliers, and should call super so their events are
-     * posted properly.
+     * Called from {@link DTResourceRegistries#setupTreesResourceManager()}. Sub-classes should can override to register
+     * their Json appliers, and should call super so their events are posted properly.
      */
     public void registerAppliers() {
         this.postApplierEvent(this.loadReloadAppliers, this.applierListIdentifier);
@@ -67,22 +73,22 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
     }
 
     /**
-     * Creates a {@link JsonApplierRegistryEvent} instance for the given {@link JsonPropertyApplierList}
-     * and identifier, posting it to the mod event bus from {@link ModLoader}.
+     * Creates a {@link JsonApplierRegistryEvent} instance for the given {@link JsonPropertyApplierList} and identifier,
+     * posting it to the mod event bus from {@link ModLoader}.
      *
-     * @param applierList The {@link JsonPropertyApplierList} to post an applier event for.
+     * @param applierList           The {@link JsonPropertyApplierList} to post an applier event for.
      * @param applierListIdentifier The identifier for the applier list.
      */
-    protected void postApplierEvent (final JsonPropertyApplierList<?> applierList, final String applierListIdentifier) {
+    protected void postApplierEvent(final JsonPropertyApplierList<?> applierList, final String applierListIdentifier) {
         ModLoader.get().postEvent(new JsonApplierRegistryEvent<>(applierList, applierListIdentifier));
     }
 
     /**
-     * Checks if the entry for the given {@link JsonObject} should load based on the {@link ModList}.
-     * This allows entries to only load if the given mod ID is loaded, which can be used by add-ons
-     * to create custom species types if, for example, dynamic trees plus is installed.
+     * Checks if the entry for the given {@link JsonObject} should load based on the {@link ModList}. This allows
+     * entries to only load if the given mod ID is loaded, which can be used by add-ons to create custom species types
+     * if, for example, dynamic trees plus is installed.
      *
-     * @param jsonObject The {@link JsonObject} to check.
+     * @param jsonObject    The {@link JsonObject} to check.
      * @param errorConsumer The {@link Consumer<String>} to accept if there is an error.
      * @return Whether or not the given entry should load.
      */

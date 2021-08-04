@@ -23,8 +23,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Manages {@link JoCode} objects, reading from tree packs. Can be used to call random JoCodes during worldgen.
- * Main instance stored in {@link DTResourceRegistries}.
+ * Manages {@link JoCode} objects, reading from tree packs. Can be used to call random JoCodes during worldgen. Main
+ * instance stored in {@link DTResourceRegistries}.
  *
  * @author Harley O'Connor
  */
@@ -52,8 +52,9 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
             ResourceLocation resourceLocation = new ResourceLocation(resourceLocationIn.getNamespace(), resLocStr.substring(this.folderName.length() + 1, resLocStr.length() - TEXT_EXTENSION_LENGTH));
 
             // Only add the JoCode file if its name matches a species name.
-            if (!TreeRegistry.findSpecies(resourceLocation).isValid())
+            if (!TreeRegistry.findSpecies(resourceLocation).isValid()) {
                 continue;
+            }
 
             try {
                 final IResource resource = resourceManager.getResource(resourceLocationIn);
@@ -112,9 +113,9 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
     }
 
     /**
-     * This collects a list of trees and creates 4 variations for the 4 directions and then
-     * sorts them alphanumerically.  By sorting the rotated JoCodes you can eliminate duplicates
-     * who are only different by the direction they are facing.
+     * This collects a list of trees and creates 4 variations for the 4 directions and then sorts them alphanumerically.
+     *  By sorting the rotated JoCodes you can eliminate duplicates who are only different by the direction they are
+     * facing.
      *
      * @param radius The radius for the given {@link JoCode}.
      * @param joCode The {@link JoCode} object.
@@ -124,7 +125,7 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
         Direction[] dirs = {Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST};
         ArrayList<String> arr = new ArrayList<>();
 
-        for(Direction dir: dirs) {
+        for (Direction dir : dirs) {
             arr.add(joCode.rotate(dir).toString());
         }
 
@@ -136,10 +137,10 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
      * Gets all {@link JoCode} objects for the given species, keyed by the radius.
      *
      * @param species The {@link Species} object to get the codes for.
-     * @return A map of integers (radii) and the list of {@link JoCode} objects for that radius,
-     *      or an empty map if none were found for the species.
+     * @return A map of integers (radii) and the list of {@link JoCode} objects for that radius, or an empty map if none
+     * were found for the species.
      */
-    public Map<Integer, List<JoCode>> getCodes (Species species) {
+    public Map<Integer, List<JoCode>> getCodes(Species species) {
         return joCodes.getOrDefault(species.getRegistryName(), new HashMap<>());
     }
 
@@ -147,9 +148,9 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
      * Gets codes for the given species under the given radius.
      *
      * @param species The {@link Species} object to get the codes for.
-     * @param radius The radius of the codes desired.
-     * @return The list of {@link JoCode} objects, or an empty list if species doesn't have any codes
-     *      or radius doesn't have any codes.
+     * @param radius  The radius of the codes desired.
+     * @return The list of {@link JoCode} objects, or an empty list if species doesn't have any codes or radius doesn't
+     * have any codes.
      */
     public List<JoCode> getCodes(Species species, int radius) {
         return this.getCodes(species).getOrDefault(radius, new ArrayList<>());
@@ -159,16 +160,17 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
      * Gets a random code for the species given under the radius given.
      *
      * @param species The {@link Species} object to get the code for.
-     * @param radius The radius of the code desired.
-     * @param rand A {@link Random} instance.
+     * @param radius  The radius of the code desired.
+     * @param rand    A {@link Random} instance.
      * @return The randomly selected {@link JoCode} object.
      */
     @Nullable
     public JoCode getRandomCode(Species species, int radius, Random rand) {
         final List<JoCode> list = this.getCodes(species, radius);
 
-        if (list.isEmpty())
+        if (list.isEmpty()) {
             return null;
+        }
 
         return list.get(rand.nextInt(list.size()));
     }
@@ -181,7 +183,8 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
      */
     @Override
     public CompletableFuture<Void> load(TreesResourceManager resourceManager) {
-        return CompletableFuture.runAsync(() -> {});
+        return CompletableFuture.runAsync(() -> {
+        });
     }
 
     /**
@@ -192,7 +195,8 @@ public final class JoCodeManager extends ReloadListener<Map<ResourceLocation, Li
      */
     @Override
     public CompletableFuture<Void> setup(TreesResourceManager resourceManager) {
-        return CompletableFuture.runAsync(() -> {});
+        return CompletableFuture.runAsync(() -> {
+        });
     }
 
 }

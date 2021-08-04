@@ -26,12 +26,14 @@ public final class SwampOakSpecies extends Species {
 
     @Override
     public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-        if (isWater(world.getBlockState(rootPos))){
-            switch (DTConfigs.SWAMP_OAKS_IN_WATER.get()){
+        if (isWater(world.getBlockState(rootPos))) {
+            switch (DTConfigs.SWAMP_OAKS_IN_WATER.get()) {
                 case SUNK: //generate 1 block down
-                    if (radius >= minRadiusForSunkGeneration)
+                    if (radius >= minRadiusForSunkGeneration) {
                         return super.generate(worldObj, world, rootPos.below(), biome, random, radius, safeBounds);
-                    else return false;
+                    } else {
+                        return false;
+                    }
                 case DISABLED: //do not generate
                     return false;
                 case ROOTED: //just generate normally

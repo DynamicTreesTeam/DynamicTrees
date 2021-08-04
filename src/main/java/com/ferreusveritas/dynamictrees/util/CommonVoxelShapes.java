@@ -12,7 +12,9 @@ import java.util.Map;
  */
 public final class CommonVoxelShapes {
 
-    /** Holds common {@link VoxelShape}s keyed by a string, allowing easy access via Json elements. */
+    /**
+     * Holds common {@link VoxelShape}s keyed by a string, allowing easy access via Json elements.
+     */
     public static final Map<String, VoxelShape> SHAPES = new HashMap<>();
 
     public static final VoxelShape SAPLING_TRUNK = Block.box(7D, 0D, 7D, 9D, 5D, 9D);

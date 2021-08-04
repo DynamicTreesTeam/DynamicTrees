@@ -53,11 +53,11 @@ public class TreesResourceManager implements IResourceManager {
                 .forEach(JsonApplierReloadListener::registerAppliers);
     }
 
-    public void load () {
+    public void load() {
         this.reloadListeners.forEach(reloadListener -> reloadListener.load(this).join());
     }
 
-    public void setup () {
+    public void setup() {
         this.reloadListeners.forEach(reloadListener -> reloadListener.setup(this).join());
     }
 
@@ -66,8 +66,8 @@ public class TreesResourceManager implements IResourceManager {
     }
 
     /**
-     * Reloads the given {@link CompletableFuture}s. These <b>must</b> be given in the same order
-     * as returned from {@link #prepareReload(Executor, Executor)}.
+     * Reloads the given {@link CompletableFuture}s. These <b>must</b> be given in the same order as returned from
+     * {@link #prepareReload(Executor, Executor)}.
      *
      * @param futures The {@link CompletableFuture} returned from {@link #prepareReload(Executor, Executor)}.
      */
@@ -82,7 +82,7 @@ public class TreesResourceManager implements IResourceManager {
         reloadListener.reload((CompletableFuture<T>) future, this);
     }
 
-    public void addResourcePack (final TreeResourcePack treeResourcePack) {
+    public void addResourcePack(final TreeResourcePack treeResourcePack) {
         this.resourcePacks.add(treeResourcePack);
     }
 
@@ -119,16 +119,16 @@ public class TreesResourceManager implements IResourceManager {
     @Override
     public List<IResource> getResources(ResourceLocation path) throws IOException {
         return this.resourcePacks.stream().map(resourcePack -> {
-            final InputStream stream;
+                    final InputStream stream;
 
-            try {
-                stream = resourcePack.getResource(null, path);
-            } catch (final IOException e) {
-                return NULL_RESOURCE; // This resource pack did not have this resource.
-            }
+                    try {
+                        stream = resourcePack.getResource(null, path);
+                    } catch (final IOException e) {
+                        return NULL_RESOURCE; // This resource pack did not have this resource.
+                    }
 
-            return new SimpleResource(resourcePack.getName(), path, stream, null);
-        }).filter(resourcePack -> resourcePack != NULL_RESOURCE) // Filter out non-existent resources.
+                    return new SimpleResource(resourcePack.getName(), path, stream, null);
+                }).filter(resourcePack -> resourcePack != NULL_RESOURCE) // Filter out non-existent resources.
                 .collect(Collectors.toList());
     }
 

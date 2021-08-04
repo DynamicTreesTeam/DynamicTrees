@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.registry.IRegistry;
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -46,7 +45,7 @@ public final class GenFeatures {
 
     public static final GenFeature ALTERNATIVE_LEAVES = new AlternativeLeavesGenFeature(regName("alt_leaves"));
 
-    private static ResourceLocation regName (String name) {
+    private static ResourceLocation regName(String name) {
         return new ResourceLocation(DynamicTrees.MOD_ID, name);
     }
 
@@ -55,5 +54,5 @@ public final class GenFeatures {
                 ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH, PODZOL, BUSH, HUGE_MUSHROOM,
                 HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE, RANDOM_PREDICATE, ALTERNATIVE_LEAVES);
     }
-    
+
 }

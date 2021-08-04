@@ -16,13 +16,19 @@ public final class CommonCollectors {
 
     public static <T> Collector<T, ?, LinkedHashSet<T>> toLinkedSet() {
         return Collector.of(LinkedHashSet::new, LinkedHashSet::add,
-                (left, right) -> { left.addAll(right); return left; },
+                (left, right) -> {
+                    left.addAll(right);
+                    return left;
+                },
                 IDENTITY_FINISH);
     }
 
     public static <T> Collector<T, ?, AlternateLinkedHashSet<T>> toAlternateLinkedSet() {
         return Collector.of(AlternateLinkedHashSet::new, LinkedHashSet::add,
-                (left, right) -> { left.addAll(right); return left; },
+                (left, right) -> {
+                    left.addAll(right);
+                    return left;
+                },
                 IDENTITY_FINISH);
     }
 
@@ -31,9 +37,11 @@ public final class CommonCollectors {
         return Collector.of(HashSet::new, Set::add,
                 (left, right) -> {
                     if (left.size() < right.size()) {
-                        right.addAll(left); return right;
+                        right.addAll(left);
+                        return right;
                     } else {
-                        left.addAll(right); return left;
+                        left.addAll(right);
+                        return left;
                     }
                 },
                 set -> (Set<T>) Collections.unmodifiableSet(set),
@@ -43,7 +51,10 @@ public final class CommonCollectors {
     @SuppressWarnings("unchecked")
     public static <T> Collector<T, ?, Set<T>> toUnmodifiableLinkedSet() {
         return Collector.of(HashSet::new, Set::add,
-                (left, right) -> { left.addAll(right); return left; },
+                (left, right) -> {
+                    left.addAll(right);
+                    return left;
+                },
                 set -> (Set<T>) Collections.unmodifiableSet(set),
                 UNORDERED, IDENTITY_FINISH);
     }

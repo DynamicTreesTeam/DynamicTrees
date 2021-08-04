@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
-import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.*;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.StackDrops;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.WeightedDrops;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;

@@ -22,221 +22,229 @@ import static net.minecraft.block.HugeMushroomBlock.*;
 
 /**
  * Generates a singular huge mushroom
- * 
+ *
  * @author ferreusveritas
  */
 public class HugeMushroomGenFeature extends GenFeature implements IFullGenFeature {
 
-	public static final ConfigurationProperty<Block> MUSHROOM_BLOCK = ConfigurationProperty.block("mushroom");
-	public static final ConfigurationProperty<Block> STEM_BLOCK = ConfigurationProperty.block("stem");
+    public static final ConfigurationProperty<Block> MUSHROOM_BLOCK = ConfigurationProperty.block("mushroom");
+    public static final ConfigurationProperty<Block> STEM_BLOCK = ConfigurationProperty.block("stem");
 
-	private int height = -1;
+    private int height = -1;
 
-	public HugeMushroomGenFeature(ResourceLocation registryName) {
-		super(registryName);
-	}
+    public HugeMushroomGenFeature(ResourceLocation registryName) {
+        super(registryName);
+    }
 
-	@Override
-	protected void registerProperties() {
-		this.register(MUSHROOM_BLOCK, STEM_BLOCK);
-	}
+    @Override
+    protected void registerProperties() {
+        this.register(MUSHROOM_BLOCK, STEM_BLOCK);
+    }
 
-	@Override
-	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration()
-				.with(MUSHROOM_BLOCK, Blocks.RED_MUSHROOM_BLOCK)
-				.with(STEM_BLOCK, Blocks.MUSHROOM_STEM);
-	}
+    @Override
+    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+        return super.createDefaultConfiguration()
+                .with(MUSHROOM_BLOCK, Blocks.RED_MUSHROOM_BLOCK)
+                .with(STEM_BLOCK, Blocks.MUSHROOM_STEM);
+    }
 
-	static final SimpleVoxmap BROWN_CAP;
-	static final SimpleVoxmap BROWN_CAP_MEDIUM;
-	static final SimpleVoxmap BROWN_CAP_SMALL;
-	static final SimpleVoxmap RED_CAP;
-	static final SimpleVoxmap RED_CAP_SHORT;
-	static final SimpleVoxmap RED_CAP_SMALL;
-		
-	static {
-		BROWN_CAP = new SimpleVoxmap(7, 1, 7, new byte[] {
-				0, 1, 2, 2, 2, 3, 0,
-				1, 5, 5, 5, 5, 5, 3,
-				4, 5, 5, 5, 5, 5, 6,
-				4, 5, 5, 5, 5, 5, 6,
-				4, 5, 5, 5, 5, 5, 6,
-				7, 5, 5, 5, 5, 5, 9,
-				0, 7, 8, 8, 8, 9, 0
-		}).setCenter(new BlockPos(3, 0, 3));
+    static final SimpleVoxmap BROWN_CAP;
+    static final SimpleVoxmap BROWN_CAP_MEDIUM;
+    static final SimpleVoxmap BROWN_CAP_SMALL;
+    static final SimpleVoxmap RED_CAP;
+    static final SimpleVoxmap RED_CAP_SHORT;
+    static final SimpleVoxmap RED_CAP_SMALL;
 
-		BROWN_CAP_MEDIUM = new SimpleVoxmap(5, 1, 5, new byte[] {
-				0, 1, 2, 3, 0,
-				1, 5, 5, 5, 3,
-				4, 5, 5, 5, 6,
-				7, 5, 5, 5, 9,
-				0, 7, 8, 9, 0
-		}).setCenter(new BlockPos(2, 0, 2));
-		
-		BROWN_CAP_SMALL = new SimpleVoxmap(3, 1, 3, new byte[] {
-				1, 2, 3,
-				4, 5, 6,
-				7, 8, 9
-		}).setCenter(new BlockPos(1, 0, 1));
-		
-		RED_CAP = new SimpleVoxmap(5, 4, 5, new byte[] {
-				0, 1, 2, 3, 0,
-				1, 0, 0, 0, 3,
-				4, 0, 10,0, 6,
-				7, 0, 0, 0, 9,
-				0, 7, 8, 9, 0, // Bottom
+    static {
+        BROWN_CAP = new SimpleVoxmap(7, 1, 7, new byte[]{
+                0, 1, 2, 2, 2, 3, 0,
+                1, 5, 5, 5, 5, 5, 3,
+                4, 5, 5, 5, 5, 5, 6,
+                4, 5, 5, 5, 5, 5, 6,
+                4, 5, 5, 5, 5, 5, 6,
+                7, 5, 5, 5, 5, 5, 9,
+                0, 7, 8, 8, 8, 9, 0
+        }).setCenter(new BlockPos(3, 0, 3));
 
-				0, 1, 2, 3, 0,
-				1, 0, 0, 0, 3,
-				4, 0, 10,0, 6,
-				7, 0, 0, 0, 9,
-				0, 7, 8, 9, 0,
+        BROWN_CAP_MEDIUM = new SimpleVoxmap(5, 1, 5, new byte[]{
+                0, 1, 2, 3, 0,
+                1, 5, 5, 5, 3,
+                4, 5, 5, 5, 6,
+                7, 5, 5, 5, 9,
+                0, 7, 8, 9, 0
+        }).setCenter(new BlockPos(2, 0, 2));
 
-				0, 1, 2, 3, 0,
-				1, 0, 0, 0, 3,
-				4, 0, 10,0, 6,
-				7, 0, 0, 0, 9,
-				0, 7, 8, 9, 0,
+        BROWN_CAP_SMALL = new SimpleVoxmap(3, 1, 3, new byte[]{
+                1, 2, 3,
+                4, 5, 6,
+                7, 8, 9
+        }).setCenter(new BlockPos(1, 0, 1));
 
-				0, 0, 0, 0, 0,
-				0, 1, 2, 3, 0,
-				0, 4, 5, 6, 0,
-				0, 7, 8, 9, 0,
-				0, 0, 0, 0, 0 // Top
-		}).setCenter(new BlockPos(2, 3, 2));
-		
-		RED_CAP_SHORT = new SimpleVoxmap(5, 3, 5, new byte[] {
-				0, 1, 2, 3, 0,
-				1, 0, 0, 0, 3,
-				4, 0, 10,0, 6,
-				7, 0, 0, 0, 9,
-				0, 7, 8, 9, 0, // Bottom
+        RED_CAP = new SimpleVoxmap(5, 4, 5, new byte[]{
+                0, 1, 2, 3, 0,
+                1, 0, 0, 0, 3,
+                4, 0, 10, 0, 6,
+                7, 0, 0, 0, 9,
+                0, 7, 8, 9, 0, // Bottom
 
-				0, 1, 2, 3, 0,
-				1, 0, 0, 0, 3,
-				4, 0, 10,0, 6,
-				7, 0, 0, 0, 9,
-				0, 7, 8, 9, 0,
+                0, 1, 2, 3, 0,
+                1, 0, 0, 0, 3,
+                4, 0, 10, 0, 6,
+                7, 0, 0, 0, 9,
+                0, 7, 8, 9, 0,
 
-				0, 0, 0, 0, 0,
-				0, 1, 2, 3, 0,
-				0, 4, 5, 6, 0,
-				0, 7, 8, 9, 0,
-				0, 0, 0, 0, 0 // Top
-		}).setCenter(new BlockPos(2, 2, 2));
+                0, 1, 2, 3, 0,
+                1, 0, 0, 0, 3,
+                4, 0, 10, 0, 6,
+                7, 0, 0, 0, 9,
+                0, 7, 8, 9, 0,
 
-		RED_CAP_SMALL = new SimpleVoxmap(3, 2, 3, new byte[] {
-				1, 2, 3,
-				4, 10,6,
-				7, 8, 9, // Bottom
+                0, 0, 0, 0, 0,
+                0, 1, 2, 3, 0,
+                0, 4, 5, 6, 0,
+                0, 7, 8, 9, 0,
+                0, 0, 0, 0, 0 // Top
+        }).setCenter(new BlockPos(2, 3, 2));
 
-				1, 2, 3,
-				4, 5, 6,
-				7, 8, 9 // Top
-		}).setCenter(new BlockPos(1, 1, 1));
-	}
-	
-	public HugeMushroomGenFeature setHeight(int height) {
-		this.height = height;
-		return this;
-	}
-	
-	/**
-	 * Select the appropriate sized cap for a huge mushroom type
-	 * 
-	 * @param mushroomBlock Red or Brown mushroom block
-	 * @param height The height of the huge mushroom
-	 * @return a voxmap of the cap to create
-	 */
-	protected SimpleVoxmap getCapForHeight(Block mushroomBlock, int height) {
+        RED_CAP_SHORT = new SimpleVoxmap(5, 3, 5, new byte[]{
+                0, 1, 2, 3, 0,
+                1, 0, 0, 0, 3,
+                4, 0, 10, 0, 6,
+                7, 0, 0, 0, 9,
+                0, 7, 8, 9, 0, // Bottom
 
-		// Brown Cap mushroom
-		if (mushroomBlock == Blocks.BROWN_MUSHROOM_BLOCK) {
-			switch(height) {
-				case 2:
-				case 3: return BROWN_CAP_SMALL;
-				case 4:
-				case 5: return BROWN_CAP_MEDIUM;
-				default: return BROWN_CAP;
-			}
-		}
+                0, 1, 2, 3, 0,
+                1, 0, 0, 0, 3,
+                4, 0, 10, 0, 6,
+                7, 0, 0, 0, 9,
+                0, 7, 8, 9, 0,
 
-		// Red Cap mushroom
-		switch (height) {
-			case 2: return BROWN_CAP_SMALL;
-			case 3: return RED_CAP_SMALL;
-			case 4: return RED_CAP_SHORT;
-			default: return RED_CAP;
-		}
-	}
-	
-	//Override this for custom mushroom heights
-	protected int getMushroomHeight(IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-		return this.height > 0 ? this.height : random.nextInt(9) + 2;
-	}
-	
-	@Override
-	public boolean generate(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-		final BlockPos genPos = rootPos.above();
-		final int height = this.getMushroomHeight(world, rootPos, biome, random, radius, safeBounds);
-		final BlockState soilState = world.getBlockState(rootPos);
+                0, 0, 0, 0, 0,
+                0, 1, 2, 3, 0,
+                0, 4, 5, 6, 0,
+                0, 7, 8, 9, 0,
+                0, 0, 0, 0, 0 // Top
+        }).setCenter(new BlockPos(2, 2, 2));
 
-		if (species.isAcceptableSoilForWorldgen(world, rootPos, soilState)) {
-			Block mushroomBlock = configuredGenFeature.get(MUSHROOM_BLOCK);
+        RED_CAP_SMALL = new SimpleVoxmap(3, 2, 3, new byte[]{
+                1, 2, 3,
+                4, 10, 6,
+                7, 8, 9, // Bottom
 
-			if (mushroomBlock == null) {
-				mushroomBlock = random.nextBoolean() ? Blocks.BROWN_MUSHROOM_BLOCK : Blocks.RED_MUSHROOM_BLOCK;
-			}
+                1, 2, 3,
+                4, 5, 6,
+                7, 8, 9 // Top
+        }).setCenter(new BlockPos(1, 1, 1));
+    }
 
-			final SimpleVoxmap capMap = this.getCapForHeight(mushroomBlock, height);
+    public HugeMushroomGenFeature setHeight(int height) {
+        this.height = height;
+        return this;
+    }
 
-			final BlockPos capPos = genPos.above(height - 1); // Determine the cap position(top block of mushroom cap)
-			final BlockBounds capBounds = capMap.getBounds().move(capPos); // Get a bounding box for the entire cap
+    /**
+     * Select the appropriate sized cap for a huge mushroom type
+     *
+     * @param mushroomBlock Red or Brown mushroom block
+     * @param height        The height of the huge mushroom
+     * @return a voxmap of the cap to create
+     */
+    protected SimpleVoxmap getCapForHeight(Block mushroomBlock, int height) {
 
-			if (safeBounds.inBounds(capBounds, true)) {//Check to see if the cap can be generated in safeBounds
+        // Brown Cap mushroom
+        if (mushroomBlock == Blocks.BROWN_MUSHROOM_BLOCK) {
+            switch (height) {
+                case 2:
+                case 3:
+                    return BROWN_CAP_SMALL;
+                case 4:
+                case 5:
+                    return BROWN_CAP_MEDIUM;
+                default:
+                    return BROWN_CAP;
+            }
+        }
 
-				// Check there's room for a mushroom cap and stem.
-				for (BlockPos mutPos : Iterables.concat(BlockPos.betweenClosed(BlockPos.ZERO.below(capMap.getLenY()), BlockPos.ZERO.below(height - 1)), capMap.getAllNonZero())) {
-					final BlockPos dPos = mutPos.offset(capPos);
-					final BlockState state = world.getBlockState(dPos);
-					if (!state.getMaterial().isReplaceable()) {
-						return false;
-					}
-				}
+        // Red Cap mushroom
+        switch (height) {
+            case 2:
+                return BROWN_CAP_SMALL;
+            case 3:
+                return RED_CAP_SMALL;
+            case 4:
+                return RED_CAP_SHORT;
+            default:
+                return RED_CAP;
+        }
+    }
 
-				final BlockState stemState = configuredGenFeature.get(STEM_BLOCK).defaultBlockState();
+    //Override this for custom mushroom heights
+    protected int getMushroomHeight(IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+        return this.height > 0 ? this.height : random.nextInt(9) + 2;
+    }
 
-				// Construct the mushroom cap from the voxel map.
-				for (SimpleVoxmap.Cell cell: capMap.getAllNonZeroCells()) {
-					world.setBlock(capPos.offset(cell.getPos()), this.getMushroomStateForValue(mushroomBlock, stemState, cell.getValue(), cell.getPos().getY()), 2);
-				}
+    @Override
+    public boolean generate(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+        final BlockPos genPos = rootPos.above();
+        final int height = this.getMushroomHeight(world, rootPos, biome, random, radius, safeBounds);
+        final BlockState soilState = world.getBlockState(rootPos);
 
-				// Construct the stem.
-				final int stemLen = height - capMap.getLenY();
-				for (int y = 0; y < stemLen; y++) {
-					world.setBlock(genPos.above(y), stemState, 2);
-				}
+        if (species.isAcceptableSoilForWorldgen(world, rootPos, soilState)) {
+            Block mushroomBlock = configuredGenFeature.get(MUSHROOM_BLOCK);
 
-				return true;
-			}
-		}
+            if (mushroomBlock == null) {
+                mushroomBlock = random.nextBoolean() ? Blocks.BROWN_MUSHROOM_BLOCK : Blocks.RED_MUSHROOM_BLOCK;
+            }
 
-		return false;
-	}
+            final SimpleVoxmap capMap = this.getCapForHeight(mushroomBlock, height);
 
-	// Whatever. It works.
-	protected BlockState getMushroomStateForValue(Block mushroomBlock, BlockState stemBlock, int value, int y) {
-		if (value == 10)
-			return stemBlock;
+            final BlockPos capPos = genPos.above(height - 1); // Determine the cap position(top block of mushroom cap)
+            final BlockBounds capBounds = capMap.getBounds().move(capPos); // Get a bounding box for the entire cap
 
-		return mushroomBlock.defaultBlockState()
-				.setValue(UP, y >= -1)
-				.setValue(DOWN, false)
-				.setValue(NORTH, value >= 1 && value <= 3)
-				.setValue(SOUTH, value >= 7 && value <= 9)
-				.setValue(WEST, value == 1 || value == 4 || value == 7)
-				.setValue(EAST, value % 3 == 0);
-	}
-	
+            if (safeBounds.inBounds(capBounds, true)) {//Check to see if the cap can be generated in safeBounds
+
+                // Check there's room for a mushroom cap and stem.
+                for (BlockPos mutPos : Iterables.concat(BlockPos.betweenClosed(BlockPos.ZERO.below(capMap.getLenY()), BlockPos.ZERO.below(height - 1)), capMap.getAllNonZero())) {
+                    final BlockPos dPos = mutPos.offset(capPos);
+                    final BlockState state = world.getBlockState(dPos);
+                    if (!state.getMaterial().isReplaceable()) {
+                        return false;
+                    }
+                }
+
+                final BlockState stemState = configuredGenFeature.get(STEM_BLOCK).defaultBlockState();
+
+                // Construct the mushroom cap from the voxel map.
+                for (SimpleVoxmap.Cell cell : capMap.getAllNonZeroCells()) {
+                    world.setBlock(capPos.offset(cell.getPos()), this.getMushroomStateForValue(mushroomBlock, stemState, cell.getValue(), cell.getPos().getY()), 2);
+                }
+
+                // Construct the stem.
+                final int stemLen = height - capMap.getLenY();
+                for (int y = 0; y < stemLen; y++) {
+                    world.setBlock(genPos.above(y), stemState, 2);
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Whatever. It works.
+    protected BlockState getMushroomStateForValue(Block mushroomBlock, BlockState stemBlock, int value, int y) {
+        if (value == 10) {
+            return stemBlock;
+        }
+
+        return mushroomBlock.defaultBlockState()
+                .setValue(UP, y >= -1)
+                .setValue(DOWN, false)
+                .setValue(NORTH, value >= 1 && value <= 3)
+                .setValue(SOUTH, value >= 7 && value <= 9)
+                .setValue(WEST, value == 1 || value == 4 || value == 7)
+                .setValue(EAST, value % 3 == 0);
+    }
+
 }

@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * Manages a list of {@link JsonPropertyApplier} objects of type {@link T}, allowing for an
- * easy way of storing, registering, and applying property appliers.
+ * Manages a list of {@link JsonPropertyApplier} objects of type {@link T}, allowing for an easy way of storing,
+ * registering, and applying property appliers.
  *
  * @param <T> The type of {@link Object} the {@link JsonPropertyApplier} for this list are applying to.
  * @author Harley O'Connor
@@ -54,8 +54,9 @@ public final class JsonPropertyApplierList<T> {
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
             final PropertyApplierResult result = this.apply(object, entry.getKey(), entry.getValue());
 
-            if (!result.wasSuccessful())
+            if (!result.wasSuccessful()) {
                 failureResults.add(result);
+            }
         }
 
         return failureResults;
@@ -63,24 +64,28 @@ public final class JsonPropertyApplierList<T> {
 
     public PropertyApplierResult apply(final T object, final String key, final JsonElement jsonElement) {
         // If the element is a comment, ignore it and move onto next entry.
-        if (JsonHelper.isComment(jsonElement))
+        if (JsonHelper.isComment(jsonElement)) {
             return PropertyApplierResult.success();
+        }
 
         final List<String> warnings = new ArrayList<>();
 
         for (final JsonPropertyApplier<? extends T, ?> applier : this.appliers) {
-            if (!applier.getObjectClass().isInstance(object))
+            if (!applier.getObjectClass().isInstance(object)) {
                 continue;
+            }
 
             final PropertyApplierResult result = applier.applyIfShould(key, object, jsonElement);
 
             // If the result is null, it's not the right applier, so move onto the next one.
-            if (result == null)
+            if (result == null) {
                 continue;
+            }
 
             // If the application wasn't successful, return the error.
-            if (!result.wasSuccessful())
+            if (!result.wasSuccessful()) {
                 return result.addErrorPrefix("[" + key + "] ").addWarningsPrefix("[" + key + "] ");
+            }
 
             warnings.addAll(result.getWarnings());
             break; // We have read (or tried to read) this entry, so move onto the next.
@@ -89,7 +94,7 @@ public final class JsonPropertyApplierList<T> {
         return PropertyApplierResult.success(warnings).addWarningsPrefix("[" + key + "] ");
     }
 
-    public <E extends T> JsonPropertyApplierList<T> register (final JsonPropertyApplier<E, ?> applier) {
+    public <E extends T> JsonPropertyApplierList<T> register(final JsonPropertyApplier<E, ?> applier) {
         this.appliers.add(applier);
         return this;
     }
@@ -123,15 +128,19 @@ public final class JsonPropertyApplierList<T> {
     }
 
     public <E extends T> JsonPropertyApplierList<T> registerIfTrueApplier(final String key, final Class<E> subClass, final IIfTrueApplier<E> applier) {
-        return this.register(key, subClass, Boolean.class, (object, value) -> { if (value) applier.apply(object); });
+        return this.register(key, subClass, Boolean.class, (object, value) -> {
+            if (value) {
+                applier.apply(object);
+            }
+        });
     }
 
     public <E extends T, V> JsonPropertyApplierList<T> registerArrayApplier(final String key, final Class<E> subClass, final Class<V> valueClass, final IPropertyApplier<E, V> applier) {
-        return this.register(new JsonArrayPropertyApplier<>(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass , applier)));
+        return this.register(new JsonArrayPropertyApplier<>(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass, applier)));
     }
 
     public <E extends T, V> JsonPropertyApplierList<T> registerArrayApplier(final String key, final Class<E> subClass, final Class<V> valueClass, final IVoidPropertyApplier<E, V> applier) {
-        return this.register(new JsonArrayPropertyApplier<>(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass , applier)));
+        return this.register(new JsonArrayPropertyApplier<>(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass, applier)));
     }
 
     public Class<T> getObjectType() {

@@ -3,10 +3,10 @@ package com.ferreusveritas.dynamictrees.trees.species;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
@@ -39,7 +39,7 @@ public class NetherFungusSpecies extends Species {
         super(name, family, leavesProperties);
         this.setSaplingShape(CommonVoxelShapes.SAPLING);
 
-        addDropCreators(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")){
+        addDropCreators(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")) {
             @Override
             protected void registerProperties() {
 
@@ -50,8 +50,9 @@ public class NetherFungusSpecies extends Species {
                 int chance = 10;
                 if (context.fortune() > 0) {
                     chance -= 2 << context.fortune();
-                    if (chance < 10)
+                    if (chance < 10) {
                         chance = 5;
+                    }
                 }
                 if (context.random().nextInt(chance) == 0) {
                     ItemStack drop = context.species().getLeavesProperties().getPrimitiveLeavesItemStack().copy();
@@ -80,14 +81,17 @@ public class NetherFungusSpecies extends Species {
 
     @Override
     public Species setPostReloadDefaults() {
-        if (!this.hasGenFeatures())
+        if (!this.hasGenFeatures()) {
             this.addGenFeature(GenFeatures.CLEAR_VOLUME).addGenFeature(GenFeatures.SHROOMLIGHT);
+        }
         return super.setPostReloadDefaults();
     }
 
     @Override
     public boolean isAcceptableSoilForWorldgen(IWorld world, BlockPos pos, BlockState soilBlockState) {
-        if (soilBlockState.getBlock() == Blocks.NETHERRACK) return true; //Soil exception for worldgen
+        if (soilBlockState.getBlock() == Blocks.NETHERRACK) {
+            return true; //Soil exception for worldgen
+        }
         return super.isAcceptableSoilForWorldgen(world, pos, soilBlockState);
     }
 

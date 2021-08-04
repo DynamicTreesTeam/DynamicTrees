@@ -19,11 +19,11 @@ public class JsonPropertyApplier<T, V> {
     protected final Class<V> valueClass;
     protected final IPropertyApplier<T, V> propertyApplier;
 
-    public JsonPropertyApplier (final String key, final Class<T> objectClass, final Class<V> valueClass, final IVoidPropertyApplier<T, V> propertyApplier) {
+    public JsonPropertyApplier(final String key, final Class<T> objectClass, final Class<V> valueClass, final IVoidPropertyApplier<T, V> propertyApplier) {
         this(key, objectClass, valueClass, (IPropertyApplier<T, V>) propertyApplier);
     }
 
-    public JsonPropertyApplier (final String key, final Class<T> objectClass, final Class<V> valueClass, final IPropertyApplier<T, V> propertyApplier) {
+    public JsonPropertyApplier(final String key, final Class<T> objectClass, final Class<V> valueClass, final IPropertyApplier<T, V> propertyApplier) {
         this.key = key;
         this.objectClass = objectClass;
         this.valueClass = valueClass;
@@ -31,20 +31,20 @@ public class JsonPropertyApplier<T, V> {
     }
 
     /**
-     * Calls {@link IPropertyApplier#apply(Object, Object)} if it should be called - or in other
-     * words if the given key equaled {@link #key} and the object given is an instance of the
-     * {@link #objectClass} value, and the {@link JsonElement} given contained a value that can
-     * be converted to the {@link #valueClass}.
+     * Calls {@link IPropertyApplier#apply(Object, Object)} if it should be called - or in other words if the given key
+     * equaled {@link #key} and the object given is an instance of the {@link #objectClass} value, and the {@link
+     * JsonElement} given contained a value that can be converted to the {@link #valueClass}.
      *
-     * @param keyIn The keyIn for the current {@link JsonElement}.
-     * @param object The {@link Object} being applied to.
+     * @param keyIn       The keyIn for the current {@link JsonElement}.
+     * @param object      The {@link Object} being applied to.
      * @param jsonElement The {@link JsonElement} for the key given.
      * @return The {@link PropertyApplierResult}, or null if application was not necessary.
      */
     @Nullable
     public PropertyApplierResult applyIfShould(final String keyIn, final Object object, final JsonElement jsonElement) {
-        if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object))
+        if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object)) {
             return null;
+        }
 
         return this.applyIfShould(object, jsonElement, this.valueClass, this.propertyApplier);
     }
@@ -54,8 +54,9 @@ public class JsonPropertyApplier<T, V> {
     protected <S, R> PropertyApplierResult applyIfShould(final Object object, final JsonElement jsonElement, final Class<R> valueClass, final IPropertyApplier<S, R> applier) {
         final IJsonObjectGetter<R> valueGetter = JsonObjectGetters.getObjectGetter(valueClass);
 
-        if (!valueGetter.isValid())
+        if (!valueGetter.isValid()) {
             return null;
+        }
 
         final ObjectFetchResult<R> fetchResult = valueGetter.get(jsonElement);
 

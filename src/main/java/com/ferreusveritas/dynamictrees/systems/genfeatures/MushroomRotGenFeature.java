@@ -15,8 +15,8 @@ import net.minecraftforge.common.IPlantable;
 import java.util.Random;
 
 /**
- * Default implementation of {@link IPostRotGenFeature}, simply turning the rotted branch
- * into the {@link #MUSHROOM} set in the {@link ConfiguredGenFeature} object.
+ * Default implementation of {@link IPostRotGenFeature}, simply turning the rotted branch into the {@link #MUSHROOM} set
+ * in the {@link ConfiguredGenFeature} object.
  *
  * @author Harley O'Connor
  */
@@ -47,13 +47,14 @@ public class MushroomRotGenFeature extends GenFeature implements IPostRotGenFeat
     public void postRot(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid) {
         final Block mushroom = configuredGenFeature.get(ALTERNATE_MUSHROOM_CHANCE) > random.nextFloat() ? configuredGenFeature.get(MUSHROOM) : configuredGenFeature.get(ALTERNATE_MUSHROOM);
 
-        if (radius <= 4 || !this.canSustainMushroom(world, pos, mushroom) || world.getBrightness(LightType.SKY, pos) >= 4)
+        if (radius <= 4 || !this.canSustainMushroom(world, pos, mushroom) || world.getBrightness(LightType.SKY, pos) >= 4) {
             return;
+        }
 
         world.setBlock(pos, mushroom.defaultBlockState(), 3);
     }
 
-    private boolean canSustainMushroom (final IWorld world, final BlockPos pos, final Block block) {
+    private boolean canSustainMushroom(final IWorld world, final BlockPos pos, final Block block) {
         return block instanceof IPlantable && world.getBlockState(pos).canSustainPlant(world, pos, Direction.UP, (IPlantable) block);
     }
 

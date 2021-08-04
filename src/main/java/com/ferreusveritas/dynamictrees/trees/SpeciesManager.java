@@ -40,8 +40,8 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * A {@link JsonPropertyApplierList} for applying environment factors to {@link Species} objects.
-     * (based on {@link net.minecraftforge.common.BiomeManager.BiomeType}).
+     * A {@link JsonPropertyApplierList} for applying environment factors to {@link Species} objects. (based on {@link
+     * net.minecraftforge.common.BiomeManager.BiomeType}).
      */
     private final JsonPropertyApplierList<Species> environmentFactorAppliers = new JsonPropertyApplierList<>(Species.class);
 
@@ -59,12 +59,13 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
         JsonObjectGetters.register(Species.ICommonOverride.class, jsonElement -> {
             final ObjectFetchResult<BiomePredicate> biomePredicateFetchResult = JsonObjectGetters.BIOME_PREDICATE.get(jsonElement);
 
-            if (!biomePredicateFetchResult.wasSuccessful())
+            if (!biomePredicateFetchResult.wasSuccessful()) {
                 return ObjectFetchResult.failureFromOther(biomePredicateFetchResult);
+            }
 
             return ObjectFetchResult.success((world, pos) ->
-                world instanceof IWorldReader &&
-                        biomePredicateFetchResult.getValue().test(((IWorldReader) world).getBiome(pos))
+                    world instanceof IWorldReader &&
+                            biomePredicateFetchResult.getValue().test(((IWorldReader) world).getBiome(pos))
             );
         });
 
@@ -115,8 +116,9 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (species, acceptableSoil) -> {
-                    if (SoilHelper.getSoilFlags(acceptableSoil) == 0)
+                    if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
                         return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
+                    }
 
                     species.addAcceptableSoils(acceptableSoil);
                     return PropertyApplierResult.success();

@@ -14,8 +14,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * A custom registry which can be safely unlocked at any point. Largely based off
- * {@link net.minecraftforge.registries.IForgeRegistry}.
+ * A custom registry which can be safely unlocked at any point. Largely based off {@link
+ * net.minecraftforge.registries.IForgeRegistry}.
  *
  * @author Harley O'Connor
  * @see AbstractRegistry
@@ -28,9 +28,8 @@ public interface IRegistry<V extends RegistryEntry<V>> extends Iterable<V> {
      * Registers the given {@link RegistryEntry} to this {@link IRegistry}.
      *
      * <p>Note that this will throw a runtime exception if this {@link IRegistry} is locked, or if
-     * the {@link ResourceLocation} already has a value registered, therefore {@link #isLocked()}
-     * or/and {@link #has(ResourceLocation)} should be checked before calling if either conditions
-     * are uncertain.</p>
+     * the {@link ResourceLocation} already has a value registered, therefore {@link #isLocked()} or/and {@link
+     * #has(ResourceLocation)} should be checked before calling if either conditions are uncertain.</p>
      *
      * <p>If you're thinking of using this you should probably be doing it from a
      * {@link RegistryEvent}, in which case you don't have to worry about locking.</p>
@@ -41,8 +40,8 @@ public interface IRegistry<V extends RegistryEntry<V>> extends Iterable<V> {
     IRegistry<V> register(V value);
 
     /**
-     * Registers all the given {@link RegistryEntry} to this {@link IRegistry}. See
-     * {@link #register(RegistryEntry)} for more details on the specific registry objects.
+     * Registers all the given {@link RegistryEntry} to this {@link IRegistry}. See {@link #register(RegistryEntry)} for
+     * more details on the specific registry objects.
      *
      * @param values The {@link RegistryEntry} objects to register.
      */
@@ -70,8 +69,8 @@ public interface IRegistry<V extends RegistryEntry<V>> extends Iterable<V> {
     Set<V> getAll();
 
     /**
-     * Gets all the registry name {@link ResourceLocation} objects of all the entries currently in
-     * this {@link IRegistry}.
+     * Gets all the registry name {@link ResourceLocation} objects of all the entries currently in this {@link
+     * IRegistry}.
      *
      * @return The {@link Set} of registry names.
      */
@@ -84,7 +83,8 @@ public interface IRegistry<V extends RegistryEntry<V>> extends Iterable<V> {
     boolean isLocked();
 
     /**
-     * Locks the registries, dumping all registry objects to debug log and running any {@link #onLockRunnables}.
+     * Locks the registries, dumping all registry objects to debug log and running any on lock runnables given to {@link
+     * #runOnNextLock(Runnable)}.
      */
     void lock();
 
@@ -105,9 +105,8 @@ public interface IRegistry<V extends RegistryEntry<V>> extends Iterable<V> {
     Codec<V> getGetterCodec();
 
     /**
-     * Generates a runnable that runs the given {@link Consumer} only if the {@link RegistryEntry}
-     * obtained from the given {@link ResourceLocation} is valid (not null), and if it's not runs
-     * the given {@link Runnable}.
+     * Generates a runnable that runs the given {@link Consumer} only if the {@link RegistryEntry} obtained from the
+     * given {@link ResourceLocation} is valid (not null), and if it's not runs the given {@link Runnable}.
      *
      * @param registryName The {@link ResourceLocation} of the {@link RegistryEntry}.
      * @param consumer     The {@link Consumer} to accept if the {@link RegistryEntry} is vaid.
@@ -117,21 +116,18 @@ public interface IRegistry<V extends RegistryEntry<V>> extends Iterable<V> {
     Runnable generateIfValidRunnable(ResourceLocation registryName, Consumer<V> consumer, Runnable elseRunnable);
 
     /**
-     * Posts a {@link RegistryEvent} to the mod event bus. Note that this is posted using
-     * {@link ModLoader#postEvent(Event)} and as such should only be called during the initial
-     * loading phase.
+     * Posts a {@link RegistryEvent} to the mod event bus. Note that this is posted using {@link
+     * ModLoader#postEvent(Event)} and as such should only be called during the initial loading phase.
      */
     void postRegistryEvent();
 
     /**
-     * @return The {@link Comparator} for sorting the registry objects by their registry names
-     * in natural order.
+     * @return The {@link Comparator} for sorting the registry objects by their registry names in natural order.
      */
     Comparator<V> getComparator();
 
     /**
-     * Dumps all entries with their registry names in the debug log, based off the
-     * {@link ForgeRegistry} dump method.
+     * Dumps all entries with their registry names in the debug log, based off the {@link ForgeRegistry} dump method.
      */
     void dump();
 

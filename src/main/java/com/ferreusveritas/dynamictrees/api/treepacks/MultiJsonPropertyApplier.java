@@ -9,8 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * An applier for applying multiple {@link JsonPropertyApplier} with different values for
- * the same key.
+ * An applier for applying multiple {@link JsonPropertyApplier} with different values for the same key.
  *
  * @author Harley O'Connor
  */
@@ -19,20 +18,22 @@ public class MultiJsonPropertyApplier<T> extends JsonPropertyApplier<T, Object> 
     private final List<JsonPropertyApplier<T, ?>> appliers = new ArrayList<>();
 
     @SafeVarargs
-    public MultiJsonPropertyApplier (final String key, final Class<T> objectClass, final JsonPropertyApplier<T, ?>... appliers) {
-        super(key, objectClass, Object.class, (object, value) -> {});
+    public MultiJsonPropertyApplier(final String key, final Class<T> objectClass, final JsonPropertyApplier<T, ?>... appliers) {
+        super(key, objectClass, Object.class, (object, value) -> {
+        });
         this.appliers.addAll(Arrays.asList(appliers));
     }
 
-    public void addApplier (final JsonPropertyApplier<T, ?> applier) {
+    public void addApplier(final JsonPropertyApplier<T, ?> applier) {
         this.appliers.add(applier);
     }
 
     @Nullable
     @Override
     public PropertyApplierResult applyIfShould(String keyIn, Object object, JsonElement jsonElement) {
-        if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object))
+        if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object)) {
             return null;
+        }
 
         final Iterator<JsonPropertyApplier<T, ?>> iterator = appliers.iterator();
         PropertyApplierResult applierResult;

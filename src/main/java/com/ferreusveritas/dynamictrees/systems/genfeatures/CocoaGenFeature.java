@@ -19,34 +19,35 @@ import java.util.List;
 
 public class CocoaGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-	public CocoaGenFeature(ResourceLocation registryName) {
-		super(registryName);
-	}
+    public CocoaGenFeature(ResourceLocation registryName) {
+        super(registryName);
+    }
 
-	@Override
-	protected void registerProperties() { }
+    @Override
+    protected void registerProperties() {
+    }
 
-	@Override
-	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-		if (fertility == 0 && world.random.nextInt() % 16 == 0) {
-			if (species.seasonalFruitProductionFactor(world, treePos) > world.random.nextFloat()) {
-				this.addCocoa(world, rootPos, false);
-			}
-		}
-		return false;
-	}
+    @Override
+    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
+        if (fertility == 0 && world.random.nextInt() % 16 == 0) {
+            if (species.seasonalFruitProductionFactor(world, treePos) > world.random.nextFloat()) {
+                this.addCocoa(world, rootPos, false);
+            }
+        }
+        return false;
+    }
 
-	@Override
-	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-		if(world.getRandom().nextInt() % 8 == 0) {
-			this.addCocoa(world, rootPos, true);
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
+        if (world.getRandom().nextInt() % 8 == 0) {
+            this.addCocoa(world, rootPos, true);
+            return true;
+        }
+        return false;
+    }
 
-	private void addCocoa(IWorld world, BlockPos rootPos, boolean worldGen) {
-		TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new CocoaFruitNode().setWorldGen(worldGen)));
-	}
+    private void addCocoa(IWorld world, BlockPos rootPos, boolean worldGen) {
+        TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new CocoaFruitNode().setWorldGen(worldGen)));
+    }
 
 }

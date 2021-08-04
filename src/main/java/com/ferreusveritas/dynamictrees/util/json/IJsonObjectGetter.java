@@ -21,6 +21,6 @@ public interface IJsonObjectGetter<T> {
      * @param jsonElement The {@link JsonElement}.
      * @return An {@link ObjectFetchResult}, containing an object obtained or an error message if it failed.
      */
-    ObjectFetchResult<T> get (final JsonElement jsonElement);
+    ObjectFetchResult<T> get(final JsonElement jsonElement);
 
 }

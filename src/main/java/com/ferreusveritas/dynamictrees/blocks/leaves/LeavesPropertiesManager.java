@@ -5,7 +5,6 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.ResourceLocationGetter;
 import com.google.gson.JsonObject;

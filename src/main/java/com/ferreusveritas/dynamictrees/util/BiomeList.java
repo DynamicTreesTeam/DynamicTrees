@@ -11,13 +11,14 @@ import java.util.Collection;
  */
 public final class BiomeList extends ArrayList<Biome> {
 
-    public BiomeList() { }
+    public BiomeList() {
+    }
 
     public BiomeList(Collection<? extends Biome> c) {
         super(c);
     }
 
-    public static BiomeList getAll () {
+    public static BiomeList getAll() {
         final BiomeList biomes = new BiomeList();
         biomes.addAll(ForgeRegistries.BIOMES.getValues());
         return biomes;

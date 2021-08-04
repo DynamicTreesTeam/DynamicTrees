@@ -27,13 +27,13 @@ public final class CompatHandler {
     private static final LinkedHashMap<String, Supplier<SeasonManager>> SEASON_MANAGERS = Maps.newLinkedHashMap();
 
     /**
-     * Registers the specified {@link SeasonManager} supplier for the specified {@code modId}.
-     * Given as a supplier for lazy initialisation.
+     * Registers the specified {@link SeasonManager} supplier for the specified {@code modId}. Given as a supplier for
+     * lazy initialisation.
      *
      * <p>The season manager to use is then selected by {@link DTConfigs#PREFERRED_SEASON_MOD}
      * on config reload.</p>
      *
-     * @param modId The mod ID the season manager handles.
+     * @param modId    The mod ID the season manager handles.
      * @param supplier The {@link SeasonManager} supplier.
      */
     public static void registerSeasonManager(final String modId, Supplier<SeasonManager> supplier) {

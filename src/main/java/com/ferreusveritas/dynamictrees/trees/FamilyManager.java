@@ -30,8 +30,9 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
     @Override
     public void registerAppliers() {
         this.loadReloadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
-            registryName = TreeRegistry.processResLoc(registryName);
-            Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setupCommonSpecies, setCommonWarn(family, registryName))); })
+                    registryName = TreeRegistry.processResLoc(registryName);
+                    Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setupCommonSpecies, setCommonWarn(family, registryName)));
+                })
                 .register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
                 .register("max_branch_radius", Integer.class, Family::setMaxBranchRadius);
 
@@ -54,10 +55,10 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
     }
 
     /**
-     * Generates a runnable for if there was not a registered {@link Species} under the
-     * {@link ResourceLocation} given to set as common for the {@link Family} given.
+     * Generates a runnable for if there was not a registered {@link Species} under the {@link ResourceLocation} given
+     * to set as common for the {@link Family} given.
      *
-     * @param family The {@link Family} object.
+     * @param family       The {@link Family} object.
      * @param registryName The registry name {@link ResourceLocation}.
      * @return A {@link Runnable} that warns the user of the error.
      */

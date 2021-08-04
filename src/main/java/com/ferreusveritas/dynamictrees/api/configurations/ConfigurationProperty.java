@@ -11,10 +11,9 @@ import net.minecraft.item.Item;
 import javax.annotation.Nullable;
 
 /**
- * Class for custom configuration properties that can be deserialised from a
- * {@link JsonObject} using {@link #deserialise(JsonObject)}. Stores a property's
- * identifier and class type, handling getting properties of type {@link T}
- * using {@link JsonObjectGetters}s.
+ * Class for custom configuration properties that can be deserialised from a {@link JsonObject} using {@link
+ * #deserialise(JsonObject)}. Stores a property's identifier and class type, handling getting properties of type {@link
+ * T} using {@link JsonObjectGetters}s.
  *
  * @param <T> The type of the property being held.
  * @author Harley O'Connor
@@ -38,8 +37,8 @@ public class ConfigurationProperty<T> {
     }
 
     /**
-     * Gets an {@link ObjectFetchResult} for the property's value from the given {@link JsonObject},
-     * or null if it was not found.
+     * Gets an {@link ObjectFetchResult} for the property's value from the given {@link JsonObject}, or null if it was
+     * not found.
      *
      * @param jsonObject The {@link JsonObject} to fetch from.
      * @return The an {@link ObjectFetchResult} for the property value, or null if it wasn't found.
@@ -48,14 +47,16 @@ public class ConfigurationProperty<T> {
     public ObjectFetchResult<T> deserialise(JsonObject jsonObject) {
         final JsonElement jsonElement = jsonObject.get(this.identifier);
 
-        if (jsonElement == null)
+        if (jsonElement == null) {
             return null;
+        }
 
         final IJsonObjectGetter<T> getter = JsonObjectGetters.getObjectGetter(this.type);
 
-        if (!getter.isValid())
+        if (!getter.isValid()) {
             return ObjectFetchResult.failure("Tried to get class '" + (this.type == null ? "null" : this.type.getSimpleName()) +
                     "' for gen feature property '" + this.identifier + "', but object getter was not registered.");
+        }
 
         return getter.get(jsonElement);
     }
@@ -64,8 +65,8 @@ public class ConfigurationProperty<T> {
      * Creates a new {@link ConfigurationProperty} from the identifier and class given.
      *
      * @param identifier The identifier for the property.
-     * @param type The {@link Class} of the value the property will store.
-     * @param <T> The value the property will store.
+     * @param type       The {@link Class} of the value the property will store.
+     * @param <T>        The value the property will store.
      * @return The new {@link ConfigurationProperty} object.
      */
     public static <T> ConfigurationProperty<T> property(String identifier, Class<T> type) {

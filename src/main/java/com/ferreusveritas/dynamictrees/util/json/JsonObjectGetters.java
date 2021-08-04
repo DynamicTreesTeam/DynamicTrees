@@ -51,14 +51,12 @@ import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Holds {@link IJsonObjectGetter} objects, which can be used to obtain objects from
- * {@link JsonElement} objects.
+ * Holds {@link IJsonObjectGetter} objects, which can be used to obtain objects from {@link JsonElement} objects.
  *
  * @author Harley O'Connor
  */
@@ -67,7 +65,9 @@ public final class JsonObjectGetters {
 
     private static final Set<JsonObjectGetterHolder<?>> OBJECT_GETTERS = Sets.newHashSet();
 
-    /** Returned by {@link #getObjectGetter(Class)} if an object getter wasn't found. */
+    /**
+     * Returned by {@link #getObjectGetter(Class)} if an object getter wasn't found.
+     */
     public static final class NullObjectGetter<T> implements IJsonObjectGetter<T> {
         @Override
         public boolean isValid() {
@@ -84,11 +84,11 @@ public final class JsonObjectGetters {
      * Gets the {@link IJsonObjectGetter} for the given class type.
      *
      * @param objectClass The {@link Class} of the object to get.
-     * @param <T> The type of the object.
+     * @param <T>         The type of the object.
      * @return The {@link IJsonObjectGetter} for the class, or {@link NullObjectGetter} if it wasn't found.
      */
     @SuppressWarnings("unchecked")
-    public static <T> IJsonObjectGetter<T> getObjectGetter (final Class<T> objectClass) {
+    public static <T> IJsonObjectGetter<T> getObjectGetter(final Class<T> objectClass) {
         return OBJECT_GETTERS.stream().filter(jsonObjectGetterHolder -> jsonObjectGetterHolder.objectClass.equals(objectClass))
                 .findFirst().map(jsonObjectGetterHolder -> (IJsonObjectGetter<T>) jsonObjectGetterHolder.objectGetter).orElse(new NullObjectGetter<>());
     }
@@ -96,9 +96,9 @@ public final class JsonObjectGetters {
     /**
      * Registers an {@link IJsonObjectGetter} to the registry.
      *
-     * @param objectClass The {@link Class} of the object that will be obtained.
+     * @param objectClass  The {@link Class} of the object that will be obtained.
      * @param objectGetter The {@link IJsonObjectGetter} to register.
-     * @param <T> The type of the object getter.
+     * @param <T>          The type of the object getter.
      * @return The {@link IJsonObjectGetter} given.
      */
     public static <T> IJsonObjectGetter<T> register(final Class<T> objectClass, final IJsonObjectGetter<T> objectGetter) {
@@ -132,15 +132,17 @@ public final class JsonObjectGetters {
     });
 
     public static final IJsonObjectGetter<JsonObject> JSON_OBJECT = register(JsonObject.class, jsonElement -> {
-        if (!jsonElement.isJsonObject())
+        if (!jsonElement.isJsonObject()) {
             return ObjectFetchResult.failure("Json element was not a json object.");
+        }
 
         return ObjectFetchResult.success(jsonElement.getAsJsonObject());
     });
 
     public static final IJsonObjectGetter<JsonArray> JSON_ARRAY = register(JsonArray.class, jsonElement -> {
-        if (!jsonElement.isJsonArray())
+        if (!jsonElement.isJsonArray()) {
             return ObjectFetchResult.failure("Json element was not a json array.");
+        }
 
         return ObjectFetchResult.success(jsonElement.getAsJsonArray());
     });
@@ -202,8 +204,9 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement -> {
         final ObjectFetchResult<BiomeList> biomeListFetchResult = BIOME_LIST.get(jsonElement);
 
-        if (!biomeListFetchResult.wasSuccessful())
+        if (!biomeListFetchResult.wasSuccessful()) {
             return ObjectFetchResult.failureFromOther(biomeListFetchResult);
+        }
 
         return ObjectFetchResult.success(biome -> biomeListFetchResult.getValue().stream().anyMatch(currentBiome -> Objects.equals(currentBiome.getRegistryName(), biome.getRegistryName())));
     });
@@ -227,8 +230,8 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<LootTable> LOOT_TABLE = register(LootTable.class, jsonElement -> JSON_OBJECT.get(jsonElement).map(obj -> LootSerializers.createLootTableSerializer().create().fromJson(obj, LootTable.class)));
 
     /**
-     * Registers {@link ForgeRegistryEntryGetter} objects. This should be called after the registries are initiated to avoid
-     * giving null to the getters.
+     * Registers {@link ForgeRegistryEntryGetter} objects. This should be called after the registries are initiated to
+     * avoid giving null to the getters.
      */
     public static void registerForgeEntryGetters() {
         BLOCK = register(Block.class, new ForgeRegistryEntryGetter<>(ForgeRegistries.BLOCKS, "block", Blocks.AIR));
@@ -243,6 +246,7 @@ public final class JsonObjectGetters {
     /**
      * This event is posted for add-ons to register custom Json object getters at the right time.
      */
-    public static final class RegistryEvent extends Event implements IModBusEvent { }
+    public static final class RegistryEvent extends Event implements IModBusEvent {
+    }
 
 }

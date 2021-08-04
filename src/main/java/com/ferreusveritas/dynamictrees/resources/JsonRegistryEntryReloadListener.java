@@ -13,8 +13,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * An abstract extension of {@link JsonReloadListener} implementing {@link ReloadListener#apply(Object, TreesResourceManager, ApplicationType)}
- * for {@link RegistryEntry} (and {@link IResettable}) objects to be loaded, setup, and registered from Json.
+ * An abstract extension of {@link JsonReloadListener} implementing {@link ReloadListener#apply(Object,
+ * TreesResourceManager, ApplicationType)} for {@link RegistryEntry} (and {@link IResettable}) objects to be loaded,
+ * setup, and registered from Json.
  *
  * @param <V> The type of the {@link RegistryEntry}.
  * @author Harley O'Connor
@@ -40,8 +41,9 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> preparedObject, TreesResourceManager resourceManager, ApplicationType applicationType) {
         // Only unlock the registry on reload.
-        if (applicationType == ApplicationType.RELOAD)
+        if (applicationType == ApplicationType.RELOAD) {
             this.registry.unlock();
+        }
 
         preparedObject.forEach((registryName, jsonElement) -> {
             if (!jsonElement.isJsonObject()) {
@@ -55,14 +57,16 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
             final Consumer<String> warningConsumer = warning -> LOGGER.warn("Warning whilst loading {} '{}': {}", this.registryName, registryName, warning);
 
             // Skip the current entry if it shouldn't load.
-            if (!this.shouldLoad(jsonObject, errorConsumer))
+            if (!this.shouldLoad(jsonObject, errorConsumer)) {
                 return;
+            }
 
             final boolean newEntry = !this.registry.has(registryName);
 
             // Don't load new entries on setup.
-            if (newEntry && applicationType == ApplicationType.SETUP)
+            if (newEntry && applicationType == ApplicationType.SETUP) {
                 return;
+            }
 
             final V registryEntry;
 
@@ -70,13 +74,16 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
                 registryEntry = this.registry.getType(jsonObject, registryName).decode(jsonObject);
 
                 // Stop loading this entry (error should have been logged already).
-                if (registryEntry == null)
+                if (registryEntry == null) {
                     return;
+                }
 
                 if (applicationType == ApplicationType.LOAD) {
                     this.preLoad(jsonObject, registryEntry, errorConsumer, warningConsumer);
                     this.loadAppliers.applyAll(jsonObject, registryEntry).forEachErrorWarning(errorConsumer, warningConsumer);
-                } else registryEntry.setPreReloadDefaults();
+                } else {
+                    registryEntry.setPreReloadDefaults();
+                }
             } else {
                 registryEntry = this.registry.get(registryName).reset().setPreReloadDefaults();
             }
@@ -94,8 +101,9 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
 
             this.loadReloadAppliers.applyAll(jsonObject, registryEntry).forEachErrorWarning(errorConsumer, warningConsumer);
 
-            if (applicationType == ApplicationType.RELOAD)
+            if (applicationType == ApplicationType.RELOAD) {
                 registryEntry.setPostReloadDefaults();
+            }
 
             if (newEntry) {
                 this.postLoad(jsonObject, registryEntry, errorConsumer, warningConsumer);
@@ -108,49 +116,53 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
         });
 
         // Only lock the registry on reload.
-        if (applicationType == ApplicationType.RELOAD)
+        if (applicationType == ApplicationType.RELOAD) {
             this.registry.lock();
+        }
     }
 
     /**
      * Called directly before {@link #loadAppliers} are applied on initial load.
      *
-     * @param jsonObject The {@link JsonObject} for the {@code registryEntry}.
-     * @param registryEntry The current {@link RegistryEntry<V>}.
-     * @param errorConsumer The {@link Consumer} for error messages.
+     * @param jsonObject      The {@link JsonObject} for the {@code registryEntry}.
+     * @param registryEntry   The current {@link RegistryEntry<V>}.
+     * @param errorConsumer   The {@link Consumer} for error messages.
      * @param warningConsumer The {@link Consumer} for warnings.
      */
-    protected void preLoad(final JsonObject jsonObject, final V registryEntry, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) { }
+    protected void preLoad(final JsonObject jsonObject, final V registryEntry, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
+    }
 
     /**
-     * Called after the {@code registryEntry} has been loaded for the first time (but
-     * before it has been registered).
+     * Called after the {@code registryEntry} has been loaded for the first time (but before it has been registered).
      *
-     * @param jsonObject The {@link JsonObject} for the {@code registryEntry}.
-     * @param registryEntry The current {@link RegistryEntry<V>}.
-     * @param errorConsumer The {@link Consumer} for error messages.
+     * @param jsonObject      The {@link JsonObject} for the {@code registryEntry}.
+     * @param registryEntry   The current {@link RegistryEntry<V>}.
+     * @param errorConsumer   The {@link Consumer} for error messages.
      * @param warningConsumer The {@link Consumer} for warnings.
      */
-    protected void postLoad(final JsonObject jsonObject, final V registryEntry, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) { }
+    protected void postLoad(final JsonObject jsonObject, final V registryEntry, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
+    }
 
     /**
      * Called directly before {@link #reloadAppliers} are applied on reload.
      *
-     * @param jsonObject The {@link JsonObject} for the {@code registryEntry}.
-     * @param registryEntry The current {@link RegistryEntry<V>}.
-     * @param errorConsumer The {@link Consumer} for error messages.
+     * @param jsonObject      The {@link JsonObject} for the {@code registryEntry}.
+     * @param registryEntry   The current {@link RegistryEntry<V>}.
+     * @param errorConsumer   The {@link Consumer} for error messages.
      * @param warningConsumer The {@link Consumer} for warnings.
      */
-    protected void preReload(final JsonObject jsonObject, final V registryEntry, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) { }
+    protected void preReload(final JsonObject jsonObject, final V registryEntry, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
+    }
 
     /**
      * Called after the {@code registryEntry} has been reloaded.
      *
-     * @param jsonObject The {@link JsonObject} for the {@code registryEntry}.
-     * @param registryEntry The current {@link RegistryEntry<V>}.
-     * @param errorConsumer The {@link Consumer} for error messages.
+     * @param jsonObject      The {@link JsonObject} for the {@code registryEntry}.
+     * @param registryEntry   The current {@link RegistryEntry<V>}.
+     * @param errorConsumer   The {@link Consumer} for error messages.
      * @param warningConsumer The {@link Consumer} for warnings.
      */
-    protected void postReload(final JsonObject jsonObject, final V registryEntry, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) { }
+    protected void postReload(final JsonObject jsonObject, final V registryEntry, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
+    }
 
 }

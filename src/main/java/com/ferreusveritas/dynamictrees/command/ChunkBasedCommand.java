@@ -30,7 +30,7 @@ public abstract class ChunkBasedCommand extends SubCommand {
     @Override
     public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().executes(context -> executesSuccess(() -> this.processChunk(context.getSource(),
-                context.getSource().getLevel(), new ChunkPos(blockPosArgument(context)), DEFAULT_RADIUS)))
+                        context.getSource().getLevel(), new ChunkPos(blockPosArgument(context)), DEFAULT_RADIUS)))
                 .then(Commands.argument(RADIUS, IntegerArgumentType.integer(1))
                         .executes(context -> executesSuccess(() -> this.processChunk(context.getSource(),
                                 context.getSource().getLevel(), new ChunkPos(blockPosArgument(context)), intArgument(context, RADIUS)))));

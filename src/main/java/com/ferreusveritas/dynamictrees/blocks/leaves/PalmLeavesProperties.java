@@ -39,7 +39,7 @@ public class PalmLeavesProperties extends LeavesProperties {
 
         public static final IntegerProperty DIRECTION = IntegerProperty.create("direction", 0, 8);
 
-        public static final CoordUtils.Surround[][] hydroSurroundMap = new CoordUtils.Surround[][] {
+        public static final CoordUtils.Surround[][] hydroSurroundMap = new CoordUtils.Surround[][]{
                 {}, //distance 0
                 {CoordUtils.Surround.NE, CoordUtils.Surround.SE, CoordUtils.Surround.SW, CoordUtils.Surround.NW}, //distance 1
                 {CoordUtils.Surround.N, CoordUtils.Surround.E, CoordUtils.Surround.S, CoordUtils.Surround.W}, //distance 2
@@ -52,9 +52,9 @@ public class PalmLeavesProperties extends LeavesProperties {
 
         @Override
         public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
-            if (state.getBlock() == this){
+            if (state.getBlock() == this) {
                 int dist = state.getValue(DISTANCE);
-                if ((dist == 1 || dist == 2) && state.getValue(DIRECTION) == 0){
+                if ((dist == 1 || dist == 2) && state.getValue(DIRECTION) == 0) {
                     world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                     return;
                 }
@@ -73,8 +73,10 @@ public class PalmLeavesProperties extends LeavesProperties {
             builder.add(DIRECTION);
         }
 
-        public static BlockState getDirectionState (BlockState state, CoordUtils.Surround surround){
-            if (state == null) return null;
+        public static BlockState getDirectionState(BlockState state, CoordUtils.Surround surround) {
+            if (state == null) {
+                return null;
+            }
             return state.setValue(DIRECTION, surround == null ? 0 : surround.ordinal() + 1);
         }
 
@@ -95,10 +97,11 @@ public class PalmLeavesProperties extends LeavesProperties {
 
         @Override
         public BlockState getLeavesBlockStateForPlacement(IWorld world, BlockPos pos, BlockState leavesStateWithHydro, int oldHydro, boolean worldGen) {
-            for (CoordUtils.Surround surround : CoordUtils.Surround.values()){
+            for (CoordUtils.Surround surround : CoordUtils.Surround.values()) {
                 BlockState offstate = world.getBlockState(pos.offset(surround.getOffset()));
-                if (offstate.getBlock() == this && offstate.getValue(DISTANCE) == 3)
+                if (offstate.getBlock() == this && offstate.getValue(DISTANCE) == 3) {
                     return getDirectionState(leavesStateWithHydro, surround);
+                }
             }
             return leavesStateWithHydro;
         }
@@ -107,7 +110,7 @@ public class PalmLeavesProperties extends LeavesProperties {
         public VoxelShape getOcclusionShape(BlockState state, IBlockReader world, BlockPos pos) {
             AxisAlignedBB base = super.getOcclusionShape(state, world, pos).bounds();
             base.inflate(1, 0, 1);
-            base.inflate(-1,-0,-1);
+            base.inflate(-1, -0, -1);
             return VoxelShapes.create(base);
         }
 

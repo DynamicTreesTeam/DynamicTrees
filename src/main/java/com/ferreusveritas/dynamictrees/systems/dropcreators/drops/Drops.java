@@ -22,12 +22,15 @@ public interface Drops {
                 DataResult.success(item);
     }, Item::getRegistryName);
 
-    Drops NONE = (drops, random, fortune) -> {};
+    Drops NONE = (drops, random, fortune) -> {
+    };
 
     void appendDrops(List<ItemStack> drops, Random random, int fortune);
 
     default int getChance(int fortune, int baseChance) {
-        if (baseChance <= 1) return baseChance;
+        if (baseChance <= 1) {
+            return baseChance;
+        }
         int chance = baseChance;
         if (fortune > 0) {
             chance -= 10 << fortune;

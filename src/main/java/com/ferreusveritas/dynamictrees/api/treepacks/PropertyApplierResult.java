@@ -12,13 +12,17 @@ import java.util.List;
  */
 public final class PropertyApplierResult {
 
-    /** Stores the error message, or null to signify there was none. */
+    /**
+     * Stores the error message, or null to signify there was none.
+     */
     private String errorMessage;
 
-    /** Stores any warnings. */
+    /**
+     * Stores any warnings.
+     */
     private final List<String> warnings;
 
-    private PropertyApplierResult (final String errorMessage) {
+    private PropertyApplierResult(final String errorMessage) {
         this(errorMessage, Collections.emptyList());
     }
 
@@ -27,7 +31,7 @@ public final class PropertyApplierResult {
         this.warnings = warnings;
     }
 
-    public boolean wasSuccessful () {
+    public boolean wasSuccessful() {
         return this.errorMessage == null;
     }
 
@@ -49,7 +53,7 @@ public final class PropertyApplierResult {
         return this;
     }
 
-    public static PropertyApplierResult success () {
+    public static PropertyApplierResult success() {
         return new PropertyApplierResult(null);
     }
 

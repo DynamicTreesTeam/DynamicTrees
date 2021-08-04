@@ -25,7 +25,7 @@ public final class EventHandlers {
     /**
      * Registers common events, called in {@link DynamicTrees#DynamicTrees()}.
      */
-    public static void registerCommon () {
+    public static void registerCommon() {
         MinecraftForge.EVENT_BUS.register(COMMON_EVENT_HANDLER);
         MinecraftForge.EVENT_BUS.register(SERVER_EVENT_HANDLER);
 
@@ -35,8 +35,8 @@ public final class EventHandlers {
     }
 
     /**
-     * Registers or unregisters event handlers based on config changes.
-     * Called when the config is loaded or reloaded in {@link DTConfigs}.
+     * Registers or unregisters event handlers based on config changes. Called when the config is loaded or reloaded in
+     * {@link DTConfigs}.
      */
     public static void configReload() {
         registerOrUnregister(VANILLA_SAPLING_EVENT_HANDLER, DTConfigs.REPLACE_VANILLA_SAPLING.get());
@@ -45,15 +45,18 @@ public final class EventHandlers {
     }
 
     /**
-     * Registers or unregisters the given object to the {@link MinecraftForge#EVENT_BUS},
-     * depending on the boolean given.
+     * Registers or unregisters the given object to the {@link MinecraftForge#EVENT_BUS}, depending on the boolean
+     * given.
      *
-     * @param handler The handler object to register/unregisters.
+     * @param handler  The handler object to register/unregisters.
      * @param register True if handler should be registered.
      */
-    private static void registerOrUnregister (final Object handler, final boolean register) {
-        if (register) MinecraftForge.EVENT_BUS.register(handler);
-        else MinecraftForge.EVENT_BUS.unregister(handler);
+    private static void registerOrUnregister(final Object handler, final boolean register) {
+        if (register) {
+            MinecraftForge.EVENT_BUS.register(handler);
+        } else {
+            MinecraftForge.EVENT_BUS.unregister(handler);
+        }
     }
 
 }

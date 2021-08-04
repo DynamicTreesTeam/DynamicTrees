@@ -24,8 +24,8 @@ import java.util.List;
 public abstract class BranchBlockBakedModel implements IDynamicBakedModel {
 
     /**
-     * A list of {@link BranchBlockBakedModel} instances, so that {@link #setupModels} can be
-     * called in {@link BakedModelEventHandler}.
+     * A list of {@link BranchBlockBakedModel} instances, so that {@link #setupModels} can be called in {@link
+     * BakedModelEventHandler}.
      */
     public static final List<BranchBlockBakedModel> INSTANCES = new ArrayList<>();
 
@@ -46,10 +46,10 @@ public abstract class BranchBlockBakedModel implements IDynamicBakedModel {
     }
 
     /**
-     * Sets up the {@link IBakedModel} objects for the model. This is called from
-     * {@link BakedModelEventHandler#onModelBake(ModelBakeEvent)}, once the textures have
-     * been stitched and so can be baked onto models.
+     * Sets up the {@link IBakedModel} objects for the model. This is called from {@link
+     * BakedModelEventHandler#onModelBake(ModelBakeEvent)}, once the textures have been stitched and so can be baked
+     * onto models.
      */
-    public abstract void setupModels ();
+    public abstract void setupModels();
 
 }

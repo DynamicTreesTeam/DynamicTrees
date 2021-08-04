@@ -19,40 +19,40 @@ import java.util.List;
 
 public class ConiferTopperGenFeature extends GenFeature implements IPostGenFeature {
 
-	public static final ConfigurationProperty<LeavesProperties> LEAVES_PROPERTIES = ConfigurationProperty.property("leaves_properties", LeavesProperties.class);
+    public static final ConfigurationProperty<LeavesProperties> LEAVES_PROPERTIES = ConfigurationProperty.property("leaves_properties", LeavesProperties.class);
 
-	public ConiferTopperGenFeature(ResourceLocation registryName) {
-		super(registryName);
-	}
+    public ConiferTopperGenFeature(ResourceLocation registryName) {
+        super(registryName);
+    }
 
-	@Override
-	protected void registerProperties() {
-		this.register(LEAVES_PROPERTIES);
-	}
+    @Override
+    protected void registerProperties() {
+        this.register(LEAVES_PROPERTIES);
+    }
 
-	@Override
-	public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration()
-				.with(LEAVES_PROPERTIES, LeavesProperties.NULL_PROPERTIES);
-	}
+    @Override
+    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+        return super.createDefaultConfiguration()
+                .with(LEAVES_PROPERTIES, LeavesProperties.NULL_PROPERTIES);
+    }
 
-	@Override
-	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-		if (endPoints.isEmpty()) {
-			return false;
-		}
+    @Override
+    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
+        if (endPoints.isEmpty()) {
+            return false;
+        }
 
-		// Manually place the highest few blocks of the conifer since the leafCluster voxmap won't handle it
-		final BlockPos highest = Collections.max(endPoints, Comparator.comparingInt(Vector3i::getY));
-		// Fetch leaves properties property set or the default for the Species.
-		final LeavesProperties leavesProperties = configuredGenFeature.get(LEAVES_PROPERTIES)
-				.elseIfInvalid(species.getLeavesProperties());
+        // Manually place the highest few blocks of the conifer since the leafCluster voxmap won't handle it
+        final BlockPos highest = Collections.max(endPoints, Comparator.comparingInt(Vector3i::getY));
+        // Fetch leaves properties property set or the default for the Species.
+        final LeavesProperties leavesProperties = configuredGenFeature.get(LEAVES_PROPERTIES)
+                .elseIfInvalid(species.getLeavesProperties());
 
-		world.setBlock(highest.above(1), leavesProperties.getDynamicLeavesState(4), 3);
-		world.setBlock(highest.above(2), leavesProperties.getDynamicLeavesState(3), 3);
-		world.setBlock(highest.above(3), leavesProperties.getDynamicLeavesState(1), 3);
+        world.setBlock(highest.above(1), leavesProperties.getDynamicLeavesState(4), 3);
+        world.setBlock(highest.above(2), leavesProperties.getDynamicLeavesState(3), 3);
+        world.setBlock(highest.above(3), leavesProperties.getDynamicLeavesState(1), 3);
 
-		return true;
-	}
+        return true;
+    }
 
 }

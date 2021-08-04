@@ -5,7 +5,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
 import java.util.Set;
 
@@ -14,7 +13,7 @@ import java.util.Set;
  */
 public class CollectorNode implements INodeInspector {
 
-    private Set<BlockPos> nodeSet;
+    private final Set<BlockPos> nodeSet;
 
     public CollectorNode(Set<BlockPos> nodeSet) {
         this.nodeSet = nodeSet;

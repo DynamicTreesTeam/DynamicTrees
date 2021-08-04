@@ -10,7 +10,7 @@ public interface IJsonApplierManager {
 
     void registerAppliers();
 
-    default void fireEvent (final Event event) {
+    default void fireEvent(final Event event) {
         MinecraftForge.EVENT_BUS.post(event);
     }
 

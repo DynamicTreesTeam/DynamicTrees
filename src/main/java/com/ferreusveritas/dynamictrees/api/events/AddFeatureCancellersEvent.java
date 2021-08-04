@@ -10,9 +10,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 
 /**
- * An {@link Event} for adding {@link FeatureCanceller} objects to biomes via
- * {@link #registerFeatureCancellations(RegistryKey, FeatureCanceller...)} and namespaces to
- * of features to cancel via {@link #registerNamespaces(RegistryKey, String...)}.
+ * An {@link Event} for adding {@link FeatureCanceller} objects to biomes via {@link
+ * #registerFeatureCancellations(RegistryKey, FeatureCanceller...)} and namespaces to of features to cancel via {@link
+ * #registerNamespaces(RegistryKey, String...)}.
  *
  * <p>Fired on the {@link MinecraftForge#EVENT_BUS}.</p>
  *
@@ -26,22 +26,24 @@ public final class AddFeatureCancellersEvent extends Event {
         this.defaultDatabase = defaultDatabase;
     }
 
-    private BiomePropertySelectors.FeatureCancellations getCancellations (final ResourceLocation biomeResLoc) {
+    private BiomePropertySelectors.FeatureCancellations getCancellations(final ResourceLocation biomeResLoc) {
         return this.defaultDatabase.getEntry(biomeResLoc).getFeatureCancellations();
     }
 
-    public void registerFeatureCancellations (final RegistryKey<Biome> biome, final FeatureCanceller... featureCancellers) {
+    public void registerFeatureCancellations(final RegistryKey<Biome> biome, final FeatureCanceller... featureCancellers) {
         final BiomePropertySelectors.FeatureCancellations featureCancellations = this.getCancellations(biome.location());
 
-        for (final FeatureCanceller featureCanceller : featureCancellers)
+        for (final FeatureCanceller featureCanceller : featureCancellers) {
             featureCancellations.putCanceller(featureCanceller);
+        }
     }
 
-    public void registerNamespaces (final RegistryKey<Biome> biome, final String... namespaces) {
+    public void registerNamespaces(final RegistryKey<Biome> biome, final String... namespaces) {
         final BiomePropertySelectors.FeatureCancellations featureCancellations = this.getCancellations(biome.location());
 
-        for (final String namespace : namespaces)
+        for (final String namespace : namespaces) {
             featureCancellations.putNamespace(namespace);
+        }
     }
 
 }

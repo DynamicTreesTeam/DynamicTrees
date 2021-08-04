@@ -15,8 +15,8 @@ import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
 import net.minecraft.util.ResourceLocation;
 
 /**
- * Base class for all gen features. These are features that grow on/in/around a tree on generation,
- * or whilst growing, depending on which interface is implemented.
+ * Base class for all gen features. These are features that grow on/in/around a tree on generation, or whilst growing,
+ * depending on which interface is implemented.
  *
  * <p>Sub-classes should implement at least one of the following: {@link IFullGenFeature},
  * {@link IPostGenFeature}, {@link IPostGrowFeature}, or {@link IPreGenFeature} to do their generation.</p>
@@ -38,7 +38,8 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
 
     public static final GenFeature NULL_GEN_FEATURE = new GenFeature(DTTrees.NULL) {
         @Override
-        protected void registerProperties() { }
+        protected void registerProperties() {
+        }
     };
 
     /**
@@ -56,12 +57,15 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
     }
 
     /**
-     * Method called right before a gen feature is added to a Species.
-     * Should return true by default, but can return false to cancel the genFeature from being added.
-     * @param species the species the feature is being added to
+     * Method called right before a gen feature is added to a Species. Should return true by default, but can return
+     * false to cancel the genFeature from being added.
+     *
+     * @param species       the species the feature is being added to
      * @param configuration the configuration the feature is being added with
      * @return whether the genFeature can be added.
      */
-    public boolean onGenFeatureAdded (Species species, ConfiguredGenFeature<GenFeature> configuration){ return true; }
+    public boolean onGenFeatureAdded(Species species, ConfiguredGenFeature<GenFeature> configuration) {
+        return true;
+    }
 
 }

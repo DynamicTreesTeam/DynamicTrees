@@ -3,9 +3,8 @@ package com.ferreusveritas.dynamictrees.util;
 import java.util.LinkedHashSet;
 
 /**
- * An extension of {@link java.util.LinkedHashSet} which changes the order on insertion.
- * This means that if an element is a added, instead of keeping the original insertion
- * order it will be moved to the back of the set.
+ * An extension of {@link java.util.LinkedHashSet} which changes the order on insertion. This means that if an element
+ * is added, instead of keeping the original insertion order it will be moved to the back of the set.
  *
  * @author Harley O'Connor
  */

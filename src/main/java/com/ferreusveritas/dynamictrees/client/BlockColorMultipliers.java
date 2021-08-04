@@ -10,27 +10,27 @@ import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class BlockColorMultipliers {
-	
-	private static Map<String, IBlockColor> colorBase = new HashMap<>();
-	
-	public static void register(String label, IBlockColor colorMultiplier) {
-		colorBase.put(label, colorMultiplier);
-	}
-	
-	public static void register(ResourceLocation label, IBlockColor colorMultiplier) {
-		colorBase.put(label.toString(), colorMultiplier);
-	}
-	
-	public static IBlockColor find(String label) {
-		return colorBase.get(label);
-	}
-	
-	public static IBlockColor find(ResourceLocation label) {
-		return colorBase.get(label.toString());
-	}
-	
-	public static void cleanUp() {
-		colorBase = null;//Once all of the color multipliers have been resolved we no longer need this data structure
-	}
-	
+
+    private static Map<String, IBlockColor> colorBase = new HashMap<>();
+
+    public static void register(String label, IBlockColor colorMultiplier) {
+        colorBase.put(label, colorMultiplier);
+    }
+
+    public static void register(ResourceLocation label, IBlockColor colorMultiplier) {
+        colorBase.put(label.toString(), colorMultiplier);
+    }
+
+    public static IBlockColor find(String label) {
+        return colorBase.get(label);
+    }
+
+    public static IBlockColor find(ResourceLocation label) {
+        return colorBase.get(label.toString());
+    }
+
+    public static void cleanUp() {
+        colorBase = null;//Once all of the color multipliers have been resolved we no longer need this data structure
+    }
+
 }

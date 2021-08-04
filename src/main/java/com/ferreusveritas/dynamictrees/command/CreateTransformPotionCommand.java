@@ -35,8 +35,9 @@ public final class CreateTransformPotionCommand extends SubCommand {
     }
 
     private int spawnTransformPotion(final CommandSource source, final BlockPos pos, final Species species) throws CommandSyntaxException {
-        if (!species.isTransformable())
+        if (!species.isTransformable()) {
             throw SPECIES_NOT_TRANSFORMABLE.create(species.getTextComponent());
+        }
 
         final DendroPotion dendroPotion = DTRegistries.DENDRO_POTION;
         final ItemStack dendroPotionStack = new ItemStack(dendroPotion);

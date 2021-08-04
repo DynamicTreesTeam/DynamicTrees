@@ -29,8 +29,9 @@ public class DenuderNode implements INodeInspector {
     public boolean run(BlockState state, IWorld world, BlockPos pos, Direction fromDir) {
         final BranchBlock branch = TreeHelper.getBranch(state);
 
-        if (branch == null || branch != this.family.getBranch())
+        if (branch == null || branch != this.family.getBranch()) {
             return false;
+        }
 
         final int radius = branch.getRadius(state);
 
@@ -49,8 +50,9 @@ public class DenuderNode implements INodeInspector {
     }
 
     public void removeSurroundingLeaves(IWorld world, BlockPos twigPos) {
-        if (world.isClientSide())
+        if (world.isClientSide()) {
             return;
+        }
 
         final SimpleVoxmap leafCluster = this.species.getLeavesProperties().getCellKit().getLeafCluster();
         final int xBound = leafCluster.getLenX();
@@ -59,8 +61,9 @@ public class DenuderNode implements INodeInspector {
 
         BlockPos.betweenClosedStream(twigPos.offset(-xBound, -yBound, -zBound), twigPos.offset(xBound, yBound, zBound)).forEach(testPos -> {
             // We're only interested in where leaves could possibly be.
-            if (leafCluster.getVoxel(twigPos, testPos) == 0)
+            if (leafCluster.getVoxel(twigPos, testPos) == 0) {
                 return;
+            }
 
             final BlockState state = world.getBlockState(testPos);
             if (this.family.isCompatibleGenericLeaves(this.species, state, world, testPos)) {

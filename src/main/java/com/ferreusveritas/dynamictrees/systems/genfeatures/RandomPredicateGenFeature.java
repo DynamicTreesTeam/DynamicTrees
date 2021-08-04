@@ -19,64 +19,71 @@ import java.util.List;
 
 public class RandomPredicateGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
 
-	public static final ConfigurationProperty<Boolean> ONLY_WORLD_GEN = ConfigurationProperty.bool("only_world_gen");
-	public static final ConfigurationProperty<ConfiguredGenFeature<GenFeature>> GEN_FEATURE = ConfigurationProperty.property("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
-	public RandomPredicateGenFeature(ResourceLocation registryName) {
-		super(registryName);
-	}
+    public static final ConfigurationProperty<Boolean> ONLY_WORLD_GEN = ConfigurationProperty.bool("only_world_gen");
+    public static final ConfigurationProperty<ConfiguredGenFeature<GenFeature>> GEN_FEATURE = ConfigurationProperty.property("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
 
-	@Override
-	protected void registerProperties() {
-		this.register(PLACE_CHANCE, GEN_FEATURE, ONLY_WORLD_GEN);
-	}
+    public RandomPredicateGenFeature(ResourceLocation registryName) {
+        super(registryName);
+    }
 
-	@Override
-	protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-		return super.createDefaultConfiguration()
-				.with(PLACE_CHANCE, 0.5f)
-				.with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE)
-				.with(ONLY_WORLD_GEN, false);
-	}
+    @Override
+    protected void registerProperties() {
+        this.register(PLACE_CHANCE, GEN_FEATURE, ONLY_WORLD_GEN);
+    }
 
-	@Override
-	public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-		//If the chance is not met, just return false
-		if (Math.abs(CoordUtils.coordHashCode(rootPos, 2)/(float)0xFFFF) > configuredGenFeature.get(PLACE_CHANCE))
-			return false;
+    @Override
+    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+        return super.createDefaultConfiguration()
+                .with(PLACE_CHANCE, 0.5f)
+                .with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE)
+                .with(ONLY_WORLD_GEN, false);
+    }
 
-		final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
-		final ConfiguredGenFeature<?> configuredGenFeatureToPlace = configuredGenFeature.get(GEN_FEATURE);
+    @Override
+    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
+        //If the chance is not met, just return false
+        if (Math.abs(CoordUtils.coordHashCode(rootPos, 2) / (float) 0xFFFF) > configuredGenFeature.get(PLACE_CHANCE)) {
+            return false;
+        }
 
-		if (configuredGenFeature.getGenFeature().getRegistryName().equals(DTTrees.NULL)) // If the gen feature was null, do nothing.
-			return false;
+        final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
+        final ConfiguredGenFeature<?> configuredGenFeatureToPlace = configuredGenFeature.get(GEN_FEATURE);
 
-		final GenFeature genFeatureToPlace = configuredGenFeatureToPlace.getGenFeature();
+        if (configuredGenFeature.getGenFeature().getRegistryName().equals(DTTrees.NULL)) // If the gen feature was null, do nothing.
+        {
+            return false;
+        }
 
-		if (genFeatureToPlace instanceof IPostGenFeature && !(configuredGenFeature.get(ONLY_WORLD_GEN) && !worldGen)) {
-			return ((IPostGenFeature) genFeatureToPlace).postGeneration(configuredGenFeatureToPlace, world, rootPos, species, biome, radius, endPoints, safeBounds, initialDirtState, seasonValue, seasonFruitProductionFactor);
-		}
+        final GenFeature genFeatureToPlace = configuredGenFeatureToPlace.getGenFeature();
 
-		return false;
-	}
+        if (genFeatureToPlace instanceof IPostGenFeature && !(configuredGenFeature.get(ONLY_WORLD_GEN) && !worldGen)) {
+            return ((IPostGenFeature) genFeatureToPlace).postGeneration(configuredGenFeatureToPlace, world, rootPos, species, biome, radius, endPoints, safeBounds, initialDirtState, seasonValue, seasonFruitProductionFactor);
+        }
 
-	@Override
-	public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-		//If the chance is not met, or its only for world gen, just return false
-		if (configuredGenFeature.get(ONLY_WORLD_GEN)
-				|| Math.abs(CoordUtils.coordHashCode(rootPos, 2)/(float)0xFFFF) > configuredGenFeature.get(PLACE_CHANCE))
-			return false;
+        return false;
+    }
 
-		final ConfiguredGenFeature<?> configuredGenFeatureToPlace = configuredGenFeature.get(GEN_FEATURE);
+    @Override
+    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
+        //If the chance is not met, or its only for world gen, just return false
+        if (configuredGenFeature.get(ONLY_WORLD_GEN)
+                || Math.abs(CoordUtils.coordHashCode(rootPos, 2) / (float) 0xFFFF) > configuredGenFeature.get(PLACE_CHANCE)) {
+            return false;
+        }
 
-		if (configuredGenFeature.getGenFeature().getRegistryName().equals(DTTrees.NULL)) // If the gen feature was null, do nothing.
-			return false;
+        final ConfiguredGenFeature<?> configuredGenFeatureToPlace = configuredGenFeature.get(GEN_FEATURE);
 
-		final GenFeature genFeatureToPlace = configuredGenFeatureToPlace.getGenFeature();
+        if (configuredGenFeature.getGenFeature().getRegistryName().equals(DTTrees.NULL)) // If the gen feature was null, do nothing.
+        {
+            return false;
+        }
 
-		if (genFeatureToPlace instanceof IPostGrowFeature) {
-			return ((IPostGrowFeature) genFeatureToPlace).postGrow(configuredGenFeatureToPlace, world, rootPos, treePos, species, fertility, natural);
-		}
+        final GenFeature genFeatureToPlace = configuredGenFeatureToPlace.getGenFeature();
 
-		return false;
-	}
+        if (genFeatureToPlace instanceof IPostGrowFeature) {
+            return ((IPostGrowFeature) genFeatureToPlace).postGrow(configuredGenFeatureToPlace, world, rootPos, treePos, species, fertility, natural);
+        }
+
+        return false;
+    }
 }

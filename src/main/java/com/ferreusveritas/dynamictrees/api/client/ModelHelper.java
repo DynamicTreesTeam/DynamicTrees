@@ -11,12 +11,12 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ModelHelper {
 
-	public static void regColorHandler(Block block, IBlockColor blockColor) {
-		Minecraft.getInstance().getBlockColors().register(blockColor, block);
-	}
+    public static void regColorHandler(Block block, IBlockColor blockColor) {
+        Minecraft.getInstance().getBlockColors().register(blockColor, block);
+    }
 
-	public static void regColorHandler(Item item, IItemColor itemColor) {
-		Minecraft.getInstance().getItemColors().register(itemColor, new Item[] {item});
-	}
+    public static void regColorHandler(Item item, IItemColor itemColor) {
+        Minecraft.getInstance().getItemColors().register(itemColor, new Item[]{item});
+    }
 
 }

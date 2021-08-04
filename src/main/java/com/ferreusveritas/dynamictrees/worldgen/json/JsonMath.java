@@ -13,462 +13,474 @@ import java.util.Random;
 
 public class JsonMath {
 
-	public MathOperator rootOp;
-
-	public JsonMath(JsonElement mathElement) {
-		if(mathElement.isJsonObject()) {
-			JsonObject mathObject = mathElement.getAsJsonObject();
-
-			for(Entry<String, JsonElement> entry : mathObject.entrySet()) {
-				rootOp = processElement(entry.getKey(), entry.getValue());
-				if (rootOp != NULL_OPERATOR) {
-					return;
-				}
-			}
-		}
-	}
-
-	private MathOperator getVariable(String name) {
-		if(MathFunction.NOISE.name.equals(name)) {
-			return new Noise();
-		} else
-		if(MathFunction.RAND.name.equals(name)) {
-			return new Rand();
-		}
-		if(MathFunction.RADIUS.name.equals(name)) {
-			return new Radius();
-		}
-
-		return NULL_OPERATOR;
-	}
-
-	private MathOperator processElement(String key, JsonElement value) {
-
-		MathFunction op = MathFunction.getFunction(key);
-
-		if (op == null)
-			return NULL_OPERATOR;
-
-		ArrayList<MathOperator> paramList = new ArrayList<>();
-		Species speciesArg = Species.NULL_SPECIES;
-
-		//If the value is an array then these are the parameters for this operation
-		if(value.isJsonArray()) {
-			for(JsonElement parameter : value.getAsJsonArray()) {
-				MathOperator m = NULL_OPERATOR;
-				if(parameter.isJsonObject()) {
-					Entry<String, JsonElement> entry = parameter.getAsJsonObject().entrySet().iterator().next();
-					m = processElement(entry.getKey(), entry.getValue());
-				} else
-				if (parameter.isJsonPrimitive()) {
-					if(parameter.getAsJsonPrimitive().isNumber()) {
-						m = new Const(parameter.getAsFloat());
-					} else
-					if(parameter.getAsJsonPrimitive().isString()) {
-						String name = parameter.getAsString();
-						MathOperator var = getVariable(name);
-						if(var != NULL_OPERATOR) {
-							m = var;
-						}
-						else if(TreeRegistry.findSpeciesSloppy(name) != Species.NULL_SPECIES) {
-							speciesArg = TreeRegistry.findSpeciesSloppy(name);
-						}
-					}
-				}
-
-				if(m != NULL_OPERATOR) {
-					paramList.add(m);
-				}
-
-			}
-		}
-
-		MathOperator[] paramArray = paramList.toArray(new MathOperator[0]);
-
-		switch(op) {
-			case NOISE: return new Noise();
-			case RAND: return new Rand();
-			case RADIUS: return new Radius();
-			case ADD: return new Adder(paramArray);
-			case SUB: return new Subtractor(paramArray);
-			case MUL: return new Multiplier(paramArray);
-			case DIV: return new Divider(paramArray);
-			case MAX: return new Maximum(paramArray);
-			case MIN: return new Minimum(paramArray);
-			case IFGT: return new IfGreaterThan(paramArray);
-			case SPECIES: return speciesArg != Species.NULL_SPECIES ? new IfSpecies(speciesArg, paramArray) : null;
-			case DEBUG: return new Debug(paramArray);
-			default: return NULL_OPERATOR;
-		}
-
-	}
-
-	public float apply(Random random, float noise) {
-		MathContext mc = new MathContext(noise, random);
-		return rootOp.apply(mc);
-	}
-
-	public float apply(Random random, Species species, float radius) {
-		MathContext mc = new MathSpeciesContext(random, species, radius);
-		return rootOp.apply(mc);
-	}
-
-	public static class MathContext {
-		public float noise;
-		public Random rand;
+    public MathOperator rootOp;
+
+    public JsonMath(JsonElement mathElement) {
+        if (mathElement.isJsonObject()) {
+            JsonObject mathObject = mathElement.getAsJsonObject();
+
+            for (Entry<String, JsonElement> entry : mathObject.entrySet()) {
+                rootOp = processElement(entry.getKey(), entry.getValue());
+                if (rootOp != NULL_OPERATOR) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private MathOperator getVariable(String name) {
+        if (MathFunction.NOISE.name.equals(name)) {
+            return new Noise();
+        } else if (MathFunction.RAND.name.equals(name)) {
+            return new Rand();
+        }
+        if (MathFunction.RADIUS.name.equals(name)) {
+            return new Radius();
+        }
+
+        return NULL_OPERATOR;
+    }
+
+    private MathOperator processElement(String key, JsonElement value) {
+
+        MathFunction op = MathFunction.getFunction(key);
+
+        if (op == null) {
+            return NULL_OPERATOR;
+        }
+
+        ArrayList<MathOperator> paramList = new ArrayList<>();
+        Species speciesArg = Species.NULL_SPECIES;
+
+        //If the value is an array then these are the parameters for this operation
+        if (value.isJsonArray()) {
+            for (JsonElement parameter : value.getAsJsonArray()) {
+                MathOperator m = NULL_OPERATOR;
+                if (parameter.isJsonObject()) {
+                    Entry<String, JsonElement> entry = parameter.getAsJsonObject().entrySet().iterator().next();
+                    m = processElement(entry.getKey(), entry.getValue());
+                } else if (parameter.isJsonPrimitive()) {
+                    if (parameter.getAsJsonPrimitive().isNumber()) {
+                        m = new Const(parameter.getAsFloat());
+                    } else if (parameter.getAsJsonPrimitive().isString()) {
+                        String name = parameter.getAsString();
+                        MathOperator var = getVariable(name);
+                        if (var != NULL_OPERATOR) {
+                            m = var;
+                        } else if (TreeRegistry.findSpeciesSloppy(name) != Species.NULL_SPECIES) {
+                            speciesArg = TreeRegistry.findSpeciesSloppy(name);
+                        }
+                    }
+                }
+
+                if (m != NULL_OPERATOR) {
+                    paramList.add(m);
+                }
+
+            }
+        }
+
+        MathOperator[] paramArray = paramList.toArray(new MathOperator[0]);
+
+        switch (op) {
+            case NOISE:
+                return new Noise();
+            case RAND:
+                return new Rand();
+            case RADIUS:
+                return new Radius();
+            case ADD:
+                return new Adder(paramArray);
+            case SUB:
+                return new Subtractor(paramArray);
+            case MUL:
+                return new Multiplier(paramArray);
+            case DIV:
+                return new Divider(paramArray);
+            case MAX:
+                return new Maximum(paramArray);
+            case MIN:
+                return new Minimum(paramArray);
+            case IFGT:
+                return new IfGreaterThan(paramArray);
+            case SPECIES:
+                return speciesArg != Species.NULL_SPECIES ? new IfSpecies(speciesArg, paramArray) : null;
+            case DEBUG:
+                return new Debug(paramArray);
+            default:
+                return NULL_OPERATOR;
+        }
+
+    }
+
+    public float apply(Random random, float noise) {
+        MathContext mc = new MathContext(noise, random);
+        return rootOp.apply(mc);
+    }
 
-		public MathContext(float noise, Random random) {
-			this.noise = noise;
-			this.rand = random;
-		}
-	}
+    public float apply(Random random, Species species, float radius) {
+        MathContext mc = new MathSpeciesContext(random, species, radius);
+        return rootOp.apply(mc);
+    }
 
-	public static class MathSpeciesContext extends MathContext {
-		public float radius;
-		public Species species;
+    public static class MathContext {
+        public float noise;
+        public Random rand;
 
-		public MathSpeciesContext(Random random, Species species, float radius) {
-			super(0.0f, random);
-			this.radius = radius;
-			this.species = species;
-		}
+        public MathContext(float noise, Random random) {
+            this.noise = noise;
+            this.rand = random;
+        }
+    }
 
-	}
+    public static class MathSpeciesContext extends MathContext {
+        public float radius;
+        public Species species;
 
-	public interface MathOperator {
-		float apply(MathContext mc);
-	}
+        public MathSpeciesContext(Random random, Species species, float radius) {
+            super(0.0f, random);
+            this.radius = radius;
+            this.species = species;
+        }
 
-	public static class Const implements MathOperator {
-		private final float value;
+    }
 
-		Const(float value) {
-			this.value = value;
-		}
+    public interface MathOperator {
+        float apply(MathContext mc);
+    }
 
-		@Override
-		public float apply(MathContext mc) {
-			return value;
-		}
-	}
+    public static class Const implements MathOperator {
+        private final float value;
 
-	public static class Noise implements MathOperator {
+        Const(float value) {
+            this.value = value;
+        }
 
-		@Override
-		public float apply(MathContext mc) {
-			return mc.noise;
-		}
+        @Override
+        public float apply(MathContext mc) {
+            return value;
+        }
+    }
 
-	}
+    public static class Noise implements MathOperator {
 
-	public static class Rand implements MathOperator {
+        @Override
+        public float apply(MathContext mc) {
+            return mc.noise;
+        }
 
-		@Override
-		public float apply(MathContext mc) {
-			return mc.rand.nextFloat();
-		}
+    }
 
-	}
+    public static class Rand implements MathOperator {
 
-	public static class Radius implements MathOperator {
+        @Override
+        public float apply(MathContext mc) {
+            return mc.rand.nextFloat();
+        }
 
-		@Override
-		public float apply(MathContext mc) {
-			if(mc instanceof MathSpeciesContext) {
-				return ((MathSpeciesContext)mc).radius;
-			}
+    }
 
-			return 0;
-		}
+    public static class Radius implements MathOperator {
 
-	}
+        @Override
+        public float apply(MathContext mc) {
+            if (mc instanceof MathSpeciesContext) {
+                return ((MathSpeciesContext) mc).radius;
+            }
 
+            return 0;
+        }
 
-	public static class Adder implements MathOperator {
+    }
 
-		private final MathOperator[] functions;
-		private final boolean dual;
 
-		public Adder(MathOperator[] functionArray) {
-			this.functions = functionArray;
-			dual = functions.length == 2;
-		}
+    public static class Adder implements MathOperator {
 
-		@Override
-		public float apply(MathContext mc) {
+        private final MathOperator[] functions;
+        private final boolean dual;
 
-			if(dual) {
-				return functions[0].apply(mc) + functions[1].apply(mc);
-			}
+        public Adder(MathOperator[] functionArray) {
+            this.functions = functionArray;
+            dual = functions.length == 2;
+        }
 
-			float r = 0;
-			for(MathOperator f: functions) {
-				r += f.apply(mc);
-			}
+        @Override
+        public float apply(MathContext mc) {
 
-			return r;
-		}
-	}
+            if (dual) {
+                return functions[0].apply(mc) + functions[1].apply(mc);
+            }
 
-	public static class Subtractor implements MathOperator {
+            float r = 0;
+            for (MathOperator f : functions) {
+                r += f.apply(mc);
+            }
 
-		private final MathOperator[] functions;
-		private final boolean dual;
+            return r;
+        }
+    }
 
-		public Subtractor(MathOperator[] functionArray) {
-			this.functions = functionArray;
-			dual = functions.length == 2;
-		}
+    public static class Subtractor implements MathOperator {
 
-		@Override
-		public float apply(MathContext mc) {
+        private final MathOperator[] functions;
+        private final boolean dual;
 
-			if(dual) {
-				return functions[0].apply(mc) - functions[1].apply(mc);
-			}
+        public Subtractor(MathOperator[] functionArray) {
+            this.functions = functionArray;
+            dual = functions.length == 2;
+        }
 
-			Float r = null;
-			for(MathOperator f: functions) {
-				float v = f.apply(mc);
-				r = r == null ? v : r - v;
-			}
+        @Override
+        public float apply(MathContext mc) {
 
-			return r == null ? 0.0f : r;
-		}
-	}
+            if (dual) {
+                return functions[0].apply(mc) - functions[1].apply(mc);
+            }
 
-	public static class Multiplier implements MathOperator {
+            Float r = null;
+            for (MathOperator f : functions) {
+                float v = f.apply(mc);
+                r = r == null ? v : r - v;
+            }
 
-		private final MathOperator[] functions;
-		private final boolean dual;
+            return r == null ? 0.0f : r;
+        }
+    }
 
-		public Multiplier(MathOperator[] functionArray) {
-			this.functions = functionArray;
-			dual = functions.length == 2;
-		}
+    public static class Multiplier implements MathOperator {
 
-		@Override
-		public float apply(MathContext mc) {
+        private final MathOperator[] functions;
+        private final boolean dual;
 
-			if(dual) {
-				return functions[0].apply(mc) * functions[1].apply(mc);
-			}
+        public Multiplier(MathOperator[] functionArray) {
+            this.functions = functionArray;
+            dual = functions.length == 2;
+        }
 
-			float r = 1.0f;
-			for(MathOperator f: functions) {
-				r *= f.apply(mc);
-			}
+        @Override
+        public float apply(MathContext mc) {
 
-			return r;
-		}
-	}
+            if (dual) {
+                return functions[0].apply(mc) * functions[1].apply(mc);
+            }
 
-	public static class Divider implements MathOperator {
+            float r = 1.0f;
+            for (MathOperator f : functions) {
+                r *= f.apply(mc);
+            }
 
-		private final MathOperator[] functions;
-		private final boolean dual;
+            return r;
+        }
+    }
 
-		public Divider(MathOperator[] functionArray) {
-			this.functions = functionArray;
-			dual = functions.length == 2;
-		}
+    public static class Divider implements MathOperator {
 
-		@Override
-		public float apply(MathContext mc) {
+        private final MathOperator[] functions;
+        private final boolean dual;
 
-			if(dual) {
-				return functions[0].apply(mc) / functions[1].apply(mc);
-			}
+        public Divider(MathOperator[] functionArray) {
+            this.functions = functionArray;
+            dual = functions.length == 2;
+        }
 
-			Float r = null;
-			for(MathOperator f: functions) {
-				float v = f.apply(mc);
-				r = r == null ? v : r / v;
-			}
+        @Override
+        public float apply(MathContext mc) {
 
-			return r == null ? 0.0f : r;
-		}
-	}
+            if (dual) {
+                return functions[0].apply(mc) / functions[1].apply(mc);
+            }
 
-	public static class Modulus implements MathOperator {
+            Float r = null;
+            for (MathOperator f : functions) {
+                float v = f.apply(mc);
+                r = r == null ? v : r / v;
+            }
 
-		private final MathOperator[] functions;
-		private final boolean dual;
+            return r == null ? 0.0f : r;
+        }
+    }
 
-		public Modulus(MathOperator[] functionArray) {
-			this.functions = functionArray;
-			dual = functions.length == 2;
-		}
+    public static class Modulus implements MathOperator {
 
-		@Override
-		public float apply(MathContext mc) {
+        private final MathOperator[] functions;
+        private final boolean dual;
 
-			if(dual) {
-				return functions[0].apply(mc) % functions[1].apply(mc);
-			}
+        public Modulus(MathOperator[] functionArray) {
+            this.functions = functionArray;
+            dual = functions.length == 2;
+        }
 
-			return 0.0f;
-		}
-	}
+        @Override
+        public float apply(MathContext mc) {
 
+            if (dual) {
+                return functions[0].apply(mc) % functions[1].apply(mc);
+            }
 
-	public static class Maximum implements MathOperator {
+            return 0.0f;
+        }
+    }
 
-		private final MathOperator[] functions;
-		private final boolean dual;
 
-		public Maximum(MathOperator[] functionArray) {
-			this.functions = functionArray;
-			dual = functions.length == 2;
-		}
+    public static class Maximum implements MathOperator {
 
-		@Override
-		public float apply(MathContext mc) {
+        private final MathOperator[] functions;
+        private final boolean dual;
 
-			if(dual) {
-				return Math.max(functions[0].apply(mc), functions[1].apply(mc));
-			}
+        public Maximum(MathOperator[] functionArray) {
+            this.functions = functionArray;
+            dual = functions.length == 2;
+        }
 
-			Float r = null;
-			for(MathOperator f: functions) {
-				float v = f.apply(mc);
-				r = r == null ? v : Math.max(r, v);
-			}
+        @Override
+        public float apply(MathContext mc) {
 
-			return r == null ? 0.0f : r;
-		}
-	}
+            if (dual) {
+                return Math.max(functions[0].apply(mc), functions[1].apply(mc));
+            }
 
-	public static class Minimum implements MathOperator {
+            Float r = null;
+            for (MathOperator f : functions) {
+                float v = f.apply(mc);
+                r = r == null ? v : Math.max(r, v);
+            }
 
-		private final MathOperator[] functions;
-		private final boolean dual;
+            return r == null ? 0.0f : r;
+        }
+    }
 
-		public Minimum(MathOperator[] functionArray) {
-			this.functions = functionArray;
-			dual = functions.length == 2;
-		}
+    public static class Minimum implements MathOperator {
 
-		@Override
-		public float apply(MathContext mc) {
+        private final MathOperator[] functions;
+        private final boolean dual;
 
-			if(dual) {
-				return Math.min(functions[0].apply(mc), functions[1].apply(mc));
-			}
+        public Minimum(MathOperator[] functionArray) {
+            this.functions = functionArray;
+            dual = functions.length == 2;
+        }
 
-			Float r = null;
-			for(MathOperator f: functions) {
-				float v = f.apply(mc);
-				r = r == null ? v : Math.min(r, v);
-			}
+        @Override
+        public float apply(MathContext mc) {
 
-			return r == null ? 0.0f : r;
-		}
-	}
+            if (dual) {
+                return Math.min(functions[0].apply(mc), functions[1].apply(mc));
+            }
 
-	public static class IfGreaterThan implements MathOperator {
+            Float r = null;
+            for (MathOperator f : functions) {
+                float v = f.apply(mc);
+                r = r == null ? v : Math.min(r, v);
+            }
 
-		private final MathOperator[] functions;
+            return r == null ? 0.0f : r;
+        }
+    }
 
-		public IfGreaterThan(MathOperator[] functionArray) {
-			this.functions = functionArray;
-		}
+    public static class IfGreaterThan implements MathOperator {
 
-		@Override
-		public float apply(MathContext mc) {
+        private final MathOperator[] functions;
 
-			if(functions.length == 4) {
-				return functions[0].apply(mc) > functions[1].apply(mc) ? functions[2].apply(mc) : functions[3].apply(mc);
-			}
+        public IfGreaterThan(MathOperator[] functionArray) {
+            this.functions = functionArray;
+        }
 
-			return 0.0f;
-		}
+        @Override
+        public float apply(MathContext mc) {
 
-	}
+            if (functions.length == 4) {
+                return functions[0].apply(mc) > functions[1].apply(mc) ? functions[2].apply(mc) : functions[3].apply(mc);
+            }
 
-	public static class IfSpecies implements MathOperator {
+            return 0.0f;
+        }
 
-		private final MathOperator[] functions;
-		private final Species species;
+    }
 
-		public IfSpecies(Species species, MathOperator[] functionArray) {
-			this.species = species;
-			this.functions = functionArray;
-		}
+    public static class IfSpecies implements MathOperator {
 
-		@Override
-		public float apply(MathContext mc) {
+        private final MathOperator[] functions;
+        private final Species species;
 
-			if(mc instanceof MathSpeciesContext && functions.length == 2) {
-				return ((MathSpeciesContext)mc).species == species ? functions[0].apply(mc) : functions[1].apply(mc);
-			}
+        public IfSpecies(Species species, MathOperator[] functionArray) {
+            this.species = species;
+            this.functions = functionArray;
+        }
 
-			return 0.0f;
-		}
+        @Override
+        public float apply(MathContext mc) {
 
-	}
+            if (mc instanceof MathSpeciesContext && functions.length == 2) {
+                return ((MathSpeciesContext) mc).species == species ? functions[0].apply(mc) : functions[1].apply(mc);
+            }
 
-	public static class Debug implements MathOperator {
+            return 0.0f;
+        }
 
-		private final MathOperator[] functions;
+    }
 
-		public Debug(MathOperator[] functionArray) {
-			this.functions = functionArray;
-		}
+    public static class Debug implements MathOperator {
 
-		@Override
-		public float apply(MathContext mc) {
-			if(functions.length >= 1) {
-				float val = functions[0].apply(mc);
-				LogManager.getLogger().debug("Json Debug Value: " + val);
-				return val;
-			}
-			return 0;
-		}
+        private final MathOperator[] functions;
 
-	}
+        public Debug(MathOperator[] functionArray) {
+            this.functions = functionArray;
+        }
 
-	public static final MathOperator NULL_OPERATOR = new Null();
+        @Override
+        public float apply(MathContext mc) {
+            if (functions.length >= 1) {
+                float val = functions[0].apply(mc);
+                LogManager.getLogger().debug("Json Debug Value: " + val);
+                return val;
+            }
+            return 0;
+        }
 
-	private static class Null implements MathOperator {
-		@Override
-		public float apply(MathContext mc) {
-			return 0f;
-		}
-	}
+    }
 
-	public enum MathFunction {
-		CONST,
-		NOISE,
-		RAND,
-		RADIUS,
-		ADD,
-		SUB,
-		MUL,
-		DIV,
-		MOD,
-		MAX,
-		MIN,
-		/** {@link IfGreaterThan} */
-		IFGT,
-		SPECIES,
-		DEBUG;
+    public static final MathOperator NULL_OPERATOR = new Null();
 
-		public final String name;
+    private static class Null implements MathOperator {
+        @Override
+        public float apply(MathContext mc) {
+            return 0f;
+        }
+    }
 
-		MathFunction() {
-			this.name = toString().toLowerCase();
-		}
+    public enum MathFunction {
+        CONST,
+        NOISE,
+        RAND,
+        RADIUS,
+        ADD,
+        SUB,
+        MUL,
+        DIV,
+        MOD,
+        MAX,
+        MIN,
+        /**
+         * {@link IfGreaterThan}
+         */
+        IFGT,
+        SPECIES,
+        DEBUG;
 
-		@Nullable
-		static MathFunction getFunction(String findName) {
-			for(MathFunction fun : MathFunction.values()) {
-				if(fun.name.equals(findName)) {
-					return fun;
-				}
-			}
-			return null;
-		}
+        public final String name;
 
-	}
+        MathFunction() {
+            this.name = toString().toLowerCase();
+        }
+
+        @Nullable
+        static MathFunction getFunction(String findName) {
+            for (MathFunction fun : MathFunction.values()) {
+                if (fun.name.equals(findName)) {
+                    return fun;
+                }
+            }
+            return null;
+        }
+
+    }
 }

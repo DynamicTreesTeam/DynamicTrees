@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Handles programmatic recipes. These should be done sparingly and only for dynamic
- * recipes - one-off recipes should be defined in Json.
+ * Handles programmatic recipes. These should be done sparingly and only for dynamic recipes - one-off recipes should be
+ * defined in Json.
  *
  * @author Harley O'Connor
  */
@@ -25,15 +25,16 @@ public final class DTRecipes {
     public static void registerDirtBucketRecipes(final Map<ResourceLocation, IRecipe<?>> craftingRecipes) {
         for (final Species species : Species.REGISTRY.getAll()) {
             // If the species doesn't have a seed it doesn't need any recipes.
-            if (!species.hasSeed())
+            if (!species.hasSeed()) {
                 continue;
+            }
 
             final ResourceLocation registryName = species.getRegistryName();
 
             species.getPrimitiveSaplingItems().forEach(primitiveSapling -> {
                 assert primitiveSapling.getRegistryName() != null;
 
-                if (species.canCraftSaplingToSeed()){
+                if (species.canCraftSaplingToSeed()) {
                     final ResourceLocation saplingToSeed = new ResourceLocation(registryName.getNamespace(),
                             separate(primitiveSapling.getRegistryName()) + "_to_" + registryName.getPath() + "_seed");
                     craftingRecipes.putIfAbsent(saplingToSeed, createShapeless(saplingToSeed, species.getSeedStack(1),
@@ -41,7 +42,7 @@ public final class DTRecipes {
 
                 }
 
-                if (species.canCraftSeedToSapling()){
+                if (species.canCraftSeedToSapling()) {
                     final ResourceLocation seedToSapling = new ResourceLocation(registryName.getNamespace(),
                             registryName.getPath() + "_seed_to_" + separate(primitiveSapling.getRegistryName()));
                     craftingRecipes.putIfAbsent(seedToSapling, createShapeless(seedToSapling, new ItemStack(primitiveSapling),
@@ -52,7 +53,7 @@ public final class DTRecipes {
         }
     }
 
-    private static String separate (final ResourceLocation resourceLocation) {
+    private static String separate(final ResourceLocation resourceLocation) {
         return resourceLocation.getNamespace() + "_" + resourceLocation.getPath();
     }
 
@@ -60,7 +61,7 @@ public final class DTRecipes {
         return new ShapelessRecipe(registryName, "CRAFTING_MISC", out, NonNullList.of(Ingredient.EMPTY, ingredients));
     }
 
-    private static Ingredient ingredient (final Item item) {
+    private static Ingredient ingredient(final Item item) {
         return Ingredient.fromValues(Stream.of(new Ingredient.SingleItemList(new ItemStack(item))));
     }
 

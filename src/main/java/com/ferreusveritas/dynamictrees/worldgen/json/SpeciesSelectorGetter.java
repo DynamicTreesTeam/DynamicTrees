@@ -22,8 +22,9 @@ public final class SpeciesSelectorGetter implements IJsonBiomeDatabaseObjectGett
     public ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> get(final JsonElement jsonElement) {
         final ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> speciesSelectorFetchResult = this.getStaticSelector(jsonElement);
 
-        if (speciesSelectorFetchResult.wasSuccessful())
+        if (speciesSelectorFetchResult.wasSuccessful()) {
             return speciesSelectorFetchResult;
+        }
 
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(JsonObject.class, jsonObject -> {
             JsonHelper.JsonObjectReader.of(jsonObject).ifContains(STATIC, staticElement -> speciesSelectorFetchResult.copyFrom(this.getStaticSelector(staticElement)))
@@ -34,15 +35,17 @@ public final class SpeciesSelectorGetter implements IJsonBiomeDatabaseObjectGett
         return speciesSelectorFetchResult;
     }
 
-    private ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> getStaticSelector (final JsonElement jsonElement) {
+    private ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> getStaticSelector(final JsonElement jsonElement) {
         final ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> speciesSelectorFetchResult = new ObjectFetchResult<>();
 
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(Species.class, species ->
-                speciesSelectorFetchResult.setValue(new BiomePropertySelectors.StaticSpeciesSelector(new BiomePropertySelectors.SpeciesSelection(species))))
+                        speciesSelectorFetchResult.setValue(new BiomePropertySelectors.StaticSpeciesSelector(new BiomePropertySelectors.SpeciesSelection(species))))
                 .elseIfOfType(String.class, str -> {
-                    if (this.isDefault(str))
+                    if (this.isDefault(str)) {
                         speciesSelectorFetchResult.setValue(new BiomePropertySelectors.StaticSpeciesSelector());
-                    else speciesSelectorFetchResult.setErrorMessage("'" + str + " is not a supported parameter for a static species selector.");
+                    } else {
+                        speciesSelectorFetchResult.setErrorMessage("'" + str + " is not a supported parameter for a static species selector.");
+                    }
                 }).elseUnsupportedError(speciesSelectorFetchResult::setErrorMessage);
 
         return speciesSelectorFetchResult;
@@ -52,8 +55,9 @@ public final class SpeciesSelectorGetter implements IJsonBiomeDatabaseObjectGett
         final ObjectFetchResult<BiomePropertySelectors.ISpeciesSelector> selectorFetchResult = new ObjectFetchResult<>();
         final ObjectFetchResult<JsonObject> objectFetchResult = JsonObjectGetters.JSON_OBJECT.get(jsonElement);
 
-        if (!objectFetchResult.wasSuccessful())
+        if (!objectFetchResult.wasSuccessful()) {
             return ObjectFetchResult.failureFromOther(objectFetchResult);
+        }
 
         final BiomePropertySelectors.RandomSpeciesSelector randomSelector = new BiomePropertySelectors.RandomSpeciesSelector();
         selectorFetchResult.setValue(randomSelector);
@@ -72,9 +76,11 @@ public final class SpeciesSelectorGetter implements IJsonBiomeDatabaseObjectGett
             }).ifFailed(selectorFetchResult::addWarning);
         }
 
-        if (randomSelector.getSize() > 0)
+        if (randomSelector.getSize() > 0) {
             return selectorFetchResult;
-        else return selectorFetchResult.setErrorMessage("No species were selected in random selector '" + jsonElement + "'.");
+        } else {
+            return selectorFetchResult.setErrorMessage("No species were selected in random selector '" + jsonElement + "'.");
+        }
     }
 
 }

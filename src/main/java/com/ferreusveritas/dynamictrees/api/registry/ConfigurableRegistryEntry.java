@@ -19,7 +19,9 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
 
     protected final C defaultConfiguration;
 
-    /** A set of properties that can be used by this {@link GenFeature}. */
+    /**
+     * A set of properties that can be used by this {@link GenFeature}.
+     */
     private final Set<ConfigurationProperty<?>> properties = Sets.newHashSet();
 
     protected ConfigurableRegistryEntry() {
@@ -34,12 +36,12 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
     }
 
     /**
-     * Creates the default configuration for this {@link ConfigurableRegistryEntry}. Sub-classes
-     * should override this to add their default property values.
+     * Creates the default configuration for this {@link ConfigurableRegistryEntry}. Sub-classes should override this to
+     * add their default property values.
      *
      * @return The default configured {@link ConfigurableRegistryEntry}.
      */
-    protected abstract C createDefaultConfiguration ();
+    protected abstract C createDefaultConfiguration();
 
     /**
      * Sub-classes should override this to register their properties.
@@ -47,13 +49,13 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
     protected abstract void registerProperties();
 
     /**
-     * Registers the given properties. For the majority of use cases, this should be used by
-     * {@link #registerProperties()}. Registering properties after this is not recommended.
+     * Registers the given properties. For the majority of use cases, this should be used by {@link
+     * #registerProperties()}. Registering properties after this is not recommended.
      *
      * @param properties The {@link ConfigurationProperty} to register.
      */
     @SuppressWarnings("unchecked")
-    protected final T register (final ConfigurationProperty<?>... properties) {
+    protected final T register(final ConfigurationProperty<?>... properties) {
         this.properties.addAll(Arrays.asList(properties));
         return (T) this;
     }
@@ -70,11 +72,10 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
     }
 
     /**
-     * Gets an unmodifiable view of the {@link Set} of {@link ConfigurationProperty} objects
-     * registered to this {@link ConfigurableRegistryEntry}.
+     * Gets an unmodifiable view of the {@link Set} of {@link ConfigurationProperty} objects registered to this {@link
+     * ConfigurableRegistryEntry}.
      *
-     * @return The {@link Set} of {@link ConfigurationProperty} for this
-     *         {@link ConfigurableRegistryEntry}.
+     * @return The {@link Set} of {@link ConfigurationProperty} for this {@link ConfigurableRegistryEntry}.
      */
     @Override
     public Set<ConfigurationProperty<?>> getRegisteredProperties() {
@@ -82,9 +83,8 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
     }
 
     /**
-     * Returns the {@link #defaultConfiguration}. Generally, this will return a <b>copy</b>
-     * of the default config so that it can be configured without impacting the default
-     * configuration.
+     * Returns the {@link #defaultConfiguration}. Generally, this will return a <b>copy</b> of the default config so
+     * that it can be configured without impacting the default configuration.
      *
      * @return The {@link #defaultConfiguration}.
      */
@@ -94,15 +94,14 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
     }
 
     /**
-     * Gets the default configuration, adding the specified {@code property} with the specified
-     * {@code value}.
+     * Gets the default configuration, adding the specified {@code property} with the specified {@code value}.
      *
      * @param property The {@link ConfigurationProperty} to add.
-     * @param value The {@link ConfigurationPropertyValue} to set.
-     * @param <V> The type of the value being added.
+     * @param value    The {@link ConfigurationPropertyValue} to set.
+     * @param <V>      The type of the value being added.
      * @return The {@link Configured} object created.
      */
-    public <V> C with (final ConfigurationProperty<V> property, final V value) {
+    public <V> C with(final ConfigurationProperty<V> property, final V value) {
         return this.getDefaultConfiguration().with(property, value);
     }
 

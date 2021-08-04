@@ -8,9 +8,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * A configured version of a {@link Configurable}. This is used for holding
- * {@link ConfigurationProperty} objects so that registered {@link Configurable}s
- * can have custom configurations.
+ * A configured version of a {@link Configurable}. This is used for holding {@link ConfigurationProperty} objects so
+ * that registered {@link Configurable}s can have custom configurations.
  *
  * @author Harley O'Connor
  */
@@ -24,18 +23,16 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
     }
 
     /**
-     * Adds the given {@link ConfigurationProperty} to this {@link Configured} object's
-     * properties.
+     * Adds the given {@link ConfigurationProperty} to this {@link Configured} object's properties.
      *
      * @param property The {@link ConfigurationProperty} to set.
-     * @param value The value to register.
-     * @param <V> The type of value to register.
+     * @param value    The value to register.
+     * @param <V>      The type of value to register.
      * @return This {@link Configured} after adding the property.
-     * @throws ReportedException If the property given is not registered to the
-     *                           {@link Configurable}.
+     * @throws ReportedException If the property given is not registered to the {@link Configurable}.
      */
     @SuppressWarnings("unchecked")
-    public <V> T with (ConfigurationProperty<V> property, V value) {
+    public <V> T with(ConfigurationProperty<V> property, V value) {
         if (!this.configurable.isPropertyRegistered(property)) {
             final CrashReport crashReport = CrashReport.forThrowable(new IllegalArgumentException(), "Tried to add " +
                     "unregistered property with identifier '" + property.getIdentifier() + "' and type '" +
@@ -54,23 +51,22 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
      * @param property The {@link ConfigurationProperty} to check for.
      * @return {@code true} if it does, {@code false} if not.
      */
-    public boolean has (ConfigurationProperty<?> property) {
+    public boolean has(ConfigurationProperty<?> property) {
         return this.properties.containsKey(property);
     }
 
     /**
-     * Gets the {@link ConfigurationPropertyValue} object's value for the given
-     * {@link ConfigurationProperty}. This method expects that the feature will be set, so
-     * call {@link #has(ConfigurationProperty)} first if it is optional.
+     * Gets the {@link ConfigurationPropertyValue} object's value for the given {@link ConfigurationProperty}. This
+     * method expects that the feature will be set, so call {@link #has(ConfigurationProperty)} first if it is
+     * optional.
      *
      * @param property The {@link ConfigurationProperty} to get.
-     * @param <V> The type of the property's value.
+     * @param <V>      The type of the property's value.
      * @return The property's value.
-     * @throws ReportedException If the property did not exist. If a property is optional.
-     *                           {@link #has(ConfigurationProperty)} should be checked before
-     *                           calling this.
+     * @throws ReportedException If the property did not exist. If a property is optional. {@link
+     *                           #has(ConfigurationProperty)} should be checked before calling this.
      */
-    public <V> V get (ConfigurationProperty<V> property) {
+    public <V> V get(ConfigurationProperty<V> property) {
         if (!this.has(property)) {
             final CrashReport crashReport = CrashReport.forThrowable(new IllegalStateException(), "Tried to obtain " +
                     "gen feature property '" + property.getIdentifier() + "' from '" + this.configurable + "' " +
@@ -88,8 +84,8 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
     }
 
     /**
-     * Makes a copy of this {@link Configurable}, copying the {@link #configurable} reference
-     * and all {@link #properties} from this {@link Configurable}.
+     * Makes a copy of this {@link Configurable}, copying the {@link #configurable} reference and all {@link
+     * #properties} from this {@link Configurable}.
      *
      * @return The copy of this {@link Configurable}.
      */

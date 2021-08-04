@@ -9,7 +9,8 @@ import net.minecraft.command.arguments.ArgumentTypes;
  */
 public final class DTArgumentTypes {
 
-    private DTArgumentTypes() {}
+    private DTArgumentTypes() {
+    }
 
     public static void register() {
         ArgumentTypes.register(DynamicTrees.MOD_ID + ":hex_color", HexColorArgument.class, new ArgumentSerializer<>(HexColorArgument::hex));

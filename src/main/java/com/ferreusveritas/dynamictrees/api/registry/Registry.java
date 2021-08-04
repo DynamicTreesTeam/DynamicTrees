@@ -23,10 +23,10 @@ public class Registry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
     private final Set<V> entries = new LinkedHashSet<>();
 
     /**
-     * Constructs a new {@link Registry} with the name being set to {@link Class#getSimpleName()}
-     * of the given {@link RegistryEntry}.
+     * Constructs a new {@link Registry} with the name being set to {@link Class#getSimpleName()} of the given {@link
+     * RegistryEntry}.
      *
-     * @param type The {@link Class} of the {@link RegistryEntry}.
+     * @param type      The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
      */
     public Registry(final Class<V> type, final V nullValue) {
@@ -36,8 +36,8 @@ public class Registry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
     /**
      * Constructs a new {@link Registry}.
      *
-     * @param name The {@link #name} for this {@link Registry}.
-     * @param type The {@link Class} of the {@link RegistryEntry}.
+     * @param name      The {@link #name} for this {@link Registry}.
+     * @param type      The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
      */
     public Registry(final String name, final Class<V> type, final V nullValue) {
@@ -45,10 +45,10 @@ public class Registry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
     }
 
     /**
-     * Constructs a new {@link Registry} with the name being set to {@link Class#getSimpleName()}
-     * of the given {@link RegistryEntry}.
+     * Constructs a new {@link Registry} with the name being set to {@link Class#getSimpleName()} of the given {@link
+     * RegistryEntry}.
      *
-     * @param type The {@link Class} of the {@link RegistryEntry}.
+     * @param type      The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
      * @param clearable True if {@link #clear()} can be called to wipe the registry.
      */
@@ -59,8 +59,8 @@ public class Registry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
     /**
      * Constructs a new {@link Registry}.
      *
-     * @param name The {@link #name} for this {@link Registry}.
-     * @param type The {@link Class} of the {@link RegistryEntry}.
+     * @param name      The {@link #name} for this {@link Registry}.
+     * @param type      The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
      * @param clearable True if {@link #clear()} can be called to wipe the registry.
      */
@@ -74,9 +74,8 @@ public class Registry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
      * Registers the given {@link RegistryEntry} to this {@link Registry}.
      *
      * <p>Note that this will throw a runtime exception if this {@link Registry} is locked, or if
-     * the {@link ResourceLocation} already has a value registered, therefore {@link #isLocked()}
-     * or/and {@link #has(ResourceLocation)} should be checked before calling if either conditions
-     * are uncertain.</p>
+     * the {@link ResourceLocation} already has a value registered, therefore {@link #isLocked()} or/and {@link
+     * #has(ResourceLocation)} should be checked before calling if either conditions are uncertain.</p>
      *
      * <p>If you're thinking of using this you should probably be doing it from a
      * {@link RegistryEvent}, in which case you don't have to worry about locking.</p>

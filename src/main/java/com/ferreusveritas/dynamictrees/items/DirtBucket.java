@@ -19,72 +19,72 @@ import javax.annotation.Nullable;
 
 public class DirtBucket extends Item {
 
-	public DirtBucket() {
-		super(new Item.Properties().stacksTo(1).tab(DTRegistries.ITEM_GROUP));
-	}
+    public DirtBucket() {
+        super(new Item.Properties().stacksTo(1).tab(DTRegistries.ITEM_GROUP));
+    }
 
-	@Override
-	public boolean hasContainerItem(ItemStack stack) {
-		return true;
-	}
+    @Override
+    public boolean hasContainerItem(ItemStack stack) {
+        return true;
+    }
 
-	@Override
-	public ItemStack getContainerItem(ItemStack itemStack) {
-		return itemStack.copy();
-	}
+    @Override
+    public ItemStack getContainerItem(ItemStack itemStack) {
+        return itemStack.copy();
+    }
 
-	@Override
-	public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-		
-		final ItemStack itemStack = player.getItemInHand(hand);
-		final BlockRayTraceResult blockRayTraceResult;
+    @Override
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 
-		{
-			blockRayTraceResult = getPlayerPOVHitResult(world, player, RayTraceContext.FluidMode.NONE);
-			if (blockRayTraceResult.getType() != RayTraceResult.Type.BLOCK) {
-				return new ActionResult<>(ActionResultType.FAIL, itemStack);
-			}
-		}
+        final ItemStack itemStack = player.getItemInHand(hand);
+        final BlockRayTraceResult blockRayTraceResult;
 
-		if (DTConfigs.DIRT_BUCKET_PLACES_DIRT.get()) {
-			if (blockRayTraceResult.getType() != RayTraceResult.Type.BLOCK) {
-				return new ActionResult<>(ActionResultType.PASS, itemStack);
-			} else {
-				final BlockPos pos = blockRayTraceResult.getBlockPos();
-				
-				if (!world.mayInteract(player, pos)) {
-					return new ActionResult<>(ActionResultType.FAIL, itemStack);
-				} else {
-					final boolean isReplaceable = world.getBlockState(pos).getMaterial().isReplaceable();
-					final BlockPos workingPos = isReplaceable && blockRayTraceResult.getDirection() == Direction.UP ? pos : pos.relative(blockRayTraceResult.getDirection());
-					
-					if (!player.mayUseItemAt(workingPos, blockRayTraceResult.getDirection(), itemStack)) {
-						return new ActionResult<>(ActionResultType.FAIL, itemStack);
-					} else if (this.tryPlaceContainedDirt(player, world, workingPos)) {
-						player.awardStat(Stats.ITEM_USED.get(this));
-						return !player.abilities.instabuild ? new ActionResult<>(ActionResultType.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult<>(ActionResultType.SUCCESS, itemStack);
-					} else {
-						return new ActionResult<>(ActionResultType.FAIL, itemStack);
-					}
-				}
-			}
-		} else {
-			return new ActionResult<>(ActionResultType.PASS, itemStack);
-		}
-	}
-	
-	public boolean tryPlaceContainedDirt(@Nullable PlayerEntity player, World world, BlockPos posIn) {
-		if (world.getBlockState(posIn).getMaterial().isReplaceable()) {
-			if (!world.isClientSide) {
-				world.destroyBlock(posIn, true);
-			}
-			
-			world.playSound(player, posIn, SoundEvents.GRAVEL_PLACE, SoundCategory.BLOCKS, 1.0F, 0.8F);
-			world.setBlock(posIn, Blocks.DIRT.defaultBlockState(), 11);
-			return true;
-		}
+        {
+            blockRayTraceResult = getPlayerPOVHitResult(world, player, RayTraceContext.FluidMode.NONE);
+            if (blockRayTraceResult.getType() != RayTraceResult.Type.BLOCK) {
+                return new ActionResult<>(ActionResultType.FAIL, itemStack);
+            }
+        }
 
-		return false;
-	}
-	
+        if (DTConfigs.DIRT_BUCKET_PLACES_DIRT.get()) {
+            if (blockRayTraceResult.getType() != RayTraceResult.Type.BLOCK) {
+                return new ActionResult<>(ActionResultType.PASS, itemStack);
+            } else {
+                final BlockPos pos = blockRayTraceResult.getBlockPos();
+
+                if (!world.mayInteract(player, pos)) {
+                    return new ActionResult<>(ActionResultType.FAIL, itemStack);
+                } else {
+                    final boolean isReplaceable = world.getBlockState(pos).getMaterial().isReplaceable();
+                    final BlockPos workingPos = isReplaceable && blockRayTraceResult.getDirection() == Direction.UP ? pos : pos.relative(blockRayTraceResult.getDirection());
+
+                    if (!player.mayUseItemAt(workingPos, blockRayTraceResult.getDirection(), itemStack)) {
+                        return new ActionResult<>(ActionResultType.FAIL, itemStack);
+                    } else if (this.tryPlaceContainedDirt(player, world, workingPos)) {
+                        player.awardStat(Stats.ITEM_USED.get(this));
+                        return !player.abilities.instabuild ? new ActionResult<>(ActionResultType.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult<>(ActionResultType.SUCCESS, itemStack);
+                    } else {
+                        return new ActionResult<>(ActionResultType.FAIL, itemStack);
+                    }
+                }
+            }
+        } else {
+            return new ActionResult<>(ActionResultType.PASS, itemStack);
+        }
+    }
+
+    public boolean tryPlaceContainedDirt(@Nullable PlayerEntity player, World world, BlockPos posIn) {
+        if (world.getBlockState(posIn).getMaterial().isReplaceable()) {
+            if (!world.isClientSide) {
+                world.destroyBlock(posIn, true);
+            }
+
+            world.playSound(player, posIn, SoundEvents.GRAVEL_PLACE, SoundCategory.BLOCKS, 1.0F, 0.8F);
+            world.setBlock(posIn, Blocks.DIRT.defaultBlockState(), 11);
+            return true;
+        }
+
+        return false;
+    }
+
 }

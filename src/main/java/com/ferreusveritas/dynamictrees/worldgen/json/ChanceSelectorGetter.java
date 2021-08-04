@@ -20,8 +20,8 @@ public final class ChanceSelectorGetter implements IJsonBiomeDatabaseObjectGette
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(JsonObject.class, jsonObject -> chanceSelector.copyFrom(this.readChanceSelector(jsonObject)))
                 .elseIfOfType(Float.class, chance -> chanceSelector.setValue(createSimpleChanceSelector(chance)))
                 .elseIfEquals("standard", str ->
-                    chanceSelector.setValue((rnd, spc, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ?
-                            BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL)
+                        chanceSelector.setValue((rnd, spc, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ?
+                                BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL)
                 ).elseUnsupportedError(chanceSelector::setErrorMessage);
 
         return chanceSelector;
@@ -41,12 +41,13 @@ public final class ChanceSelectorGetter implements IJsonBiomeDatabaseObjectGette
 
         JsonHelper.JsonObjectReader.of(jsonObject)
                 .ifContains(STATIC, jsonElement ->
-                    JsonHelper.JsonElementReader.of(jsonElement)
-                            .ifOfType(Float.class, chance -> chanceSelector.setValue(createSimpleChanceSelector(chance))).ifFailed(chanceSelector::addWarning)
-                            .elseIfOfType(String.class, str -> {
-                                if (this.isDefault(str))
-                                    chanceSelector.setValue((rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED);
-                            }).ifFailed(chanceSelector::setErrorMessage))
+                        JsonHelper.JsonElementReader.of(jsonElement)
+                                .ifOfType(Float.class, chance -> chanceSelector.setValue(createSimpleChanceSelector(chance))).ifFailed(chanceSelector::addWarning)
+                                .elseIfOfType(String.class, str -> {
+                                    if (this.isDefault(str)) {
+                                        chanceSelector.setValue((rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED);
+                                    }
+                                }).ifFailed(chanceSelector::setErrorMessage))
                 .elseIfContains(MATH, jsonElement -> {
                     final JsonMath jsonMath = new JsonMath(jsonElement);
                     chanceSelector.setValue((rnd, spc, rad) -> rnd.nextFloat() < jsonMath.apply(rnd, spc, rad) ?

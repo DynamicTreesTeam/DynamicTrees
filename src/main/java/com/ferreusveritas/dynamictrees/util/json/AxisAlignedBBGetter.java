@@ -4,8 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.minecraft.util.math.AxisAlignedBB;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * @author Harley O'Connor
  */
@@ -14,8 +12,9 @@ public final class AxisAlignedBBGetter implements IJsonObjectGetter<AxisAlignedB
     @Override
     public ObjectFetchResult<AxisAlignedBB> get(JsonElement jsonElement) {
         return JsonObjectGetters.JSON_ARRAY.get(jsonElement).map(jsonArray -> {
-            if (jsonArray.size() != 6 || !this.allElementsNumber(jsonArray))
+            if (jsonArray.size() != 6 || !this.allElementsNumber(jsonArray)) {
                 return null;
+            }
 
             final double[] params = new double[6];
 
@@ -29,8 +28,9 @@ public final class AxisAlignedBBGetter implements IJsonObjectGetter<AxisAlignedB
 
     public boolean allElementsNumber(final JsonArray jsonArray) {
         for (JsonElement jsonElement : jsonArray) {
-            if (!jsonElement.isJsonPrimitive() || !jsonElement.getAsJsonPrimitive().isNumber())
+            if (!jsonElement.isJsonPrimitive() || !jsonElement.getAsJsonPrimitive().isNumber()) {
                 return false;
+            }
         }
         return true;
     }

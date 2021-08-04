@@ -16,7 +16,7 @@ import java.util.Optional;
 public final class GetTreeCommand extends SubCommand {
 
     @Override
-    protected String getName () {
+    protected String getName() {
         return CommandConstants.GET_TREE;
     }
 
@@ -38,17 +38,17 @@ public final class GetTreeCommand extends SubCommand {
         final World world = source.getLevel();
 
         return TreeHelper.getBestGuessSpecies(world, pos).ifValidElse(species -> {
-            final Optional<JoCode> joCode = TreeHelper.getJoCode(world, pos);
+                    final Optional<JoCode> joCode = TreeHelper.getJoCode(world, pos);
 
-            if (codeRaw) {
-                sendSuccess(source, new StringTextComponent(joCode.map(JoCode::toString).orElse("?")));
-            } else {
-                sendSuccess(source, new TranslationTextComponent("commands.dynamictrees.success.get_tree",
-                        species.getTextComponent(), joCode.map(JoCode::getTextComponent)
-                        .orElse(new StringTextComponent("?"))));
-            }
-        }, () -> sendFailure(source, new TranslationTextComponent("commands.dynamictrees.error.get_tree",
-                CommandHelper.posComponent(pos).copy().withStyle(style -> style.withColor(TextFormatting.DARK_RED))))
+                    if (codeRaw) {
+                        sendSuccess(source, new StringTextComponent(joCode.map(JoCode::toString).orElse("?")));
+                    } else {
+                        sendSuccess(source, new TranslationTextComponent("commands.dynamictrees.success.get_tree",
+                                species.getTextComponent(), joCode.map(JoCode::getTextComponent)
+                                .orElse(new StringTextComponent("?"))));
+                    }
+                }, () -> sendFailure(source, new TranslationTextComponent("commands.dynamictrees.error.get_tree",
+                        CommandHelper.posComponent(pos).copy().withStyle(style -> style.withColor(TextFormatting.DARK_RED))))
         ) ? 1 : 0;
     }
 

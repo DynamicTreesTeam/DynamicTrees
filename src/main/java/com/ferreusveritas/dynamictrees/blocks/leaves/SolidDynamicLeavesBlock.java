@@ -12,9 +12,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
 /**
- * An extension of {@link DynamicLeavesBlock} which makes the block solid. This means
- * that it can be landed on like normal and gives fall damage, is a full cube, and isn't
- * made passable when the config option is enabled.
+ * An extension of {@link DynamicLeavesBlock} which makes the block solid. This means that it can be landed on like
+ * normal and gives fall damage, is a full cube, and isn't made passable when the config option is enabled.
  */
 public class SolidDynamicLeavesBlock extends DynamicLeavesBlock {
 
@@ -38,6 +37,7 @@ public class SolidDynamicLeavesBlock extends DynamicLeavesBlock {
     }
 
     @Override
-    public void entityInside(BlockState state, World world, BlockPos pos, Entity entity) { }
+    public void entityInside(BlockState state, World world, BlockPos pos, Entity entity) {
+    }
 
 }

@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Can drop only one item picked randomly from the selection of all items
- * with weighted odds.
+ * Can drop only one item picked randomly from the selection of all items with weighted odds.
  *
  * @author Max Hyper
  */
@@ -34,19 +33,29 @@ public final class WeightedDrops implements Drops {
             ).apply(instance, WeightedDrops::new)
     );
 
-    /** A {@link Map} of {@link Item}s to drop and their weight. */
+    /**
+     * A {@link Map} of {@link Item}s to drop and their weight.
+     */
     private final Map<Item, Integer> items;
 
-    /** The rarity of the item. This is what the chance will be divided by. */
+    /**
+     * The rarity of the item. This is what the chance will be divided by.
+     */
     private final float rarity;
 
-    /** The base chance of dropping an item. This will be altered depending on the fortune level. */
+    /**
+     * The base chance of dropping an item. This will be altered depending on the fortune level.
+     */
     private final int baseChance;
 
-    /** The minimum times an item is attempted to be added to the drops. */
+    /**
+     * The minimum times an item is attempted to be added to the drops.
+     */
     private final int minAttempts;
 
-    /** The maximum times an item is attempted to be added to the drops. */
+    /**
+     * The maximum times an item is attempted to be added to the drops.
+     */
     private final int maxAttempts;
 
     public WeightedDrops(Map<Item, Integer> items, float rarity, int baseChance, int minAttempts, int maxAttempts) {
@@ -69,9 +78,13 @@ public final class WeightedDrops implements Drops {
         return baseChance;
     }
 
-    public int getMinAttempts() { return minAttempts; }
+    public int getMinAttempts() {
+        return minAttempts;
+    }
 
-    public int getMaxAttempts() { return maxAttempts; }
+    public int getMaxAttempts() {
+        return maxAttempts;
+    }
 
     public void addItem(final Item item, final int weight) {
         this.items.put(item, weight);
@@ -84,10 +97,11 @@ public final class WeightedDrops implements Drops {
 
         WeightedList<Item> list = new WeightedList<>();
         this.items.forEach(list::add);
-        for (int i=0; i<attempts; i++)
+        for (int i = 0; i < attempts; i++) {
             if (random.nextInt(Math.max((int) (chance / this.rarity), 1)) == 0) {
                 drops.add(new ItemStack(list.getOne(random)));
             }
+        }
 
     }
 

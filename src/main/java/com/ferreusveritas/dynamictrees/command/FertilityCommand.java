@@ -34,7 +34,7 @@ public final class FertilityCommand extends SubCommand {
     @Override
     public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().executes(context -> executesSuccess(() -> this.getFertility(context.getSource(),
-                rootPosArgument(context), false)))
+                        rootPosArgument(context), false)))
                 .then(booleanArgument(RAW).executes(context -> executesSuccess(() -> this.getFertility(context.getSource(),
                         rootPosArgument(context), booleanArgument(context, RAW)))))
                 .then(Commands.argument(FERTILITY, IntegerArgumentType.integer(0, 15)).suggests(FERTILITY_SUGGESTIONS)

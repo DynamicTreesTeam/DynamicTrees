@@ -35,18 +35,22 @@ public final class MapGetter<K, V> implements IJsonObjectGetter<Map<K, V>> {
                     this.valueGetter.get(entry.getValue()).ifSuccessful(value ->
                             this.keyGetter.get(new JsonPrimitive(entry.getKey()))
                                     .ifSuccessful(key -> map.put(key, value)).otherwise(err -> errorMsg[0] = err)
-                    ).otherwise(err -> {if (errorMsg[0] == null) errorMsg[0] = err;} )
+                    ).otherwise(err -> {
+                        if (errorMsg[0] == null) {
+                            errorMsg[0] = err;
+                        }
+                    })
             );
             return map;
         }).setErrorMessage(errorMsg[0]);
     }
 
-    public static <K, V> Class<Map<K, V>> getMapClass (Class<K> keyClass, Class<V> valueClass) {
+    public static <K, V> Class<Map<K, V>> getMapClass(Class<K> keyClass, Class<V> valueClass) {
         return getMapClass(keyClass, valueClass, HashMap::new);
     }
 
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unchecked"})
-    public static <K, V> Class<Map<K, V>> getMapClass (Class<K> keyClass, Class<V> valueClass, Supplier<Map<K, V>> mapSupplier) {
+    public static <K, V> Class<Map<K, V>> getMapClass(Class<K> keyClass, Class<V> valueClass, Supplier<Map<K, V>> mapSupplier) {
         return (Class<Map<K, V>>) mapSupplier.get().getClass();
     }
 

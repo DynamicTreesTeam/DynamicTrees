@@ -4,7 +4,6 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.ISuggestionProvider;
 
-import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

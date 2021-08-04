@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
 import com.ferreusveritas.dynamictrees.api.configurations.Configurable;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.configurations.Configured;
 import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -31,8 +31,8 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(configurableClass, configurable -> configured.setValue((T) configurable.getDefaultConfiguration()))
                 .ifFailed(configured::setErrorMessage)
                 .elseIfOfType(JsonObject.class, jsonObject ->
-                    JsonHelper.JsonObjectReader.of(jsonObject).ifContains("name", configurableClass, configurable -> configured.setValue((T) configurable.getDefaultConfiguration()))
-                            .ifContains("properties", JsonObject.class, propertiesObject -> setProperties(configured, propertiesObject))
+                        JsonHelper.JsonObjectReader.of(jsonObject).ifContains("name", configurableClass, configurable -> configured.setValue((T) configurable.getDefaultConfiguration()))
+                                .ifContains("properties", JsonObject.class, propertiesObject -> setProperties(configured, propertiesObject))
                 );
 
         final T value = configured.getValue();
@@ -44,7 +44,7 @@ public final class ConfiguredGetter<T extends Configured<T, C>, C extends Config
         return configured;
     }
 
-    public static <T extends Configured<T, ?>> void setProperties (ObjectFetchResult<T> fetchResult, JsonObject object){
+    public static <T extends Configured<T, ?>> void setProperties(ObjectFetchResult<T> fetchResult, JsonObject object) {
         if (fetchResult.getValue() == ConfiguredGenFeature.NULL_CONFIGURED_FEATURE || fetchResult.getValue() == null || fetchResult.getValue().getConfigurable() == null) {
             return;
         }

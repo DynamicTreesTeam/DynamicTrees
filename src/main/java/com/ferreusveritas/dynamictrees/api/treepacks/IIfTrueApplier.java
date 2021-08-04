@@ -5,6 +5,6 @@ package com.ferreusveritas.dynamictrees.api.treepacks;
  */
 public interface IIfTrueApplier<T> {
 
-    void apply (final T object);
+    void apply(final T object);
 
 }

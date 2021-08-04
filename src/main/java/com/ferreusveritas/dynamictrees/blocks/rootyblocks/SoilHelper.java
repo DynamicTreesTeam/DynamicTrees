@@ -59,16 +59,18 @@ public class SoilHelper {
         return adjectiveMap.getOrDefault(adjName, 0);
     }
 
-    public static void addSoilPropertiesToMap(SoilProperties properties){
-        if (!dirtMap.containsKey(properties.getPrimitiveSoilBlock()) && properties.getPrimitiveSoilBlock() != Blocks.AIR)
+    public static void addSoilPropertiesToMap(SoilProperties properties) {
+        if (!dirtMap.containsKey(properties.getPrimitiveSoilBlock()) && properties.getPrimitiveSoilBlock() != Blocks.AIR) {
             dirtMap.put(properties.getPrimitiveSoilBlock(), properties);
+        }
     }
 
     public static void registerSoil(SoilProperties properties, String... adjNames) {
         addSoilPropertiesToMap(properties);
         registerSoil(properties.getRegistryName(), properties.getPrimitiveSoilBlock(), adjNames);
     }
-//    public static ConfiguredSoilProperties<SoilProperties> registerSoil(ConfiguredSoilProperties<SoilProperties> configuredSoilProperties) {
+
+    //    public static ConfiguredSoilProperties<SoilProperties> registerSoil(ConfiguredSoilProperties<SoilProperties> configuredSoilProperties) {
 //        Block soilBlock = configuredSoilProperties.getConfigurable().primitiveSoilBlock;
 //        if (dirtMap.containsKey(soilBlock)){
 //            LogManager.getLogger().warn("Attempted to register " + configuredSoilProperties + " as the soil property of " + soilBlock + " but it already had " + dirtMap.get(soilBlock));
@@ -99,11 +101,13 @@ public class SoilHelper {
 //        registerSoil(null, primitiveBlock, adjName);
 //    }
     public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, String... adjNames) {
-        if (soilBlock == Blocks.AIR) return SoilProperties.NULL_SOIL_PROPERTIES;
+        if (soilBlock == Blocks.AIR) {
+            return SoilProperties.NULL_SOIL_PROPERTIES;
+        }
 
         int flag = 0;
-        for (String adjName : adjNames){
-            if(adjectiveMap.containsKey(adjName)) {
+        for (String adjName : adjNames) {
+            if (adjectiveMap.containsKey(adjName)) {
                 flag |= adjectiveMap.get(adjName);
             } else {
                 LOGGER.error("Adjective \"" + adjName + "\" not found while registering soil block: " + soilBlock);
@@ -119,27 +123,28 @@ public class SoilHelper {
     }
 
     public static boolean isSoilAcceptable(Block soilBlock, int soilFlags) {
-        if (soilBlock instanceof RootyBlock)
+        if (soilBlock instanceof RootyBlock) {
             soilBlock = ((RootyBlock) soilBlock).getPrimitiveSoilBlock();
+        }
         return (dirtMap.getOrDefault(soilBlock, SoilProperties.NULL_SOIL_PROPERTIES).getSoilFlags() & soilFlags) != 0;
     }
 
-    public static boolean isSoilRegistered(Block block){
+    public static boolean isSoilRegistered(Block block) {
         return dirtMap.containsKey(block);
     }
 
-    public static SoilProperties getProperties(Block block){
+    public static SoilProperties getProperties(Block block) {
         return dirtMap.getOrDefault(block, SoilProperties.NULL_SOIL_PROPERTIES);
     }
 
-    public static Set<RootyBlock> getRootyBlocksList (){
+    public static Set<RootyBlock> getRootyBlocksList() {
         return dirtMap.values().stream().map(SoilProperties::getDynamicSoilBlock).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
-    public static int getSoilFlags(String ... types) {
+    public static int getSoilFlags(String... types) {
         int flags = 0;
 
-        for(String t : types) {
+        for (String t : types) {
             flags |= getFlags(t);
         }
 
