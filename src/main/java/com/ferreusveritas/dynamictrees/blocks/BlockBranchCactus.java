@@ -109,7 +109,7 @@ public class BlockBranchCactus extends BlockBranch {
 	///////////////////////////////////////////
 	
 	@Override
-	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(IBlockState state, IBlockAccess world, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return 0;// Cacti don't have leaves and don't rot
 	}
 	
@@ -167,12 +167,12 @@ public class BlockBranchCactus extends BlockBranch {
 	///////////////////////////////////////////
 	
 	@Override
-	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
+	public ICell getHydrationCell(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing dir, ILeavesProperties leavesProperties) {
 		return CellNull.NULLCELL;
 	}
 	
-	public int getRadius(IBlockState blockState) {
-		return blockState.getBlock() == this ? (blockState.getValue(TRUNK) ? 5 : 4) : 0;
+	public int getRadius(IBlockState state) {
+		return state.getBlock() == this ? (state.getValue(TRUNK) ? 5 : 4) : 0;
 	}
 	
 	@Override
@@ -182,8 +182,8 @@ public class BlockBranchCactus extends BlockBranch {
 	
 	// Directionless probability grabber
 	@Override
-	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return isSameTree(from) ? getRadius(blockState) + 2 : 0;
+	public int probabilityForBlock(IBlockState state, IBlockAccess world, BlockPos pos, BlockBranch from) {
+		return isSameTree(from) ? getRadius(state) + 2 : 0;
 	}
 	
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
@@ -293,7 +293,7 @@ public class BlockBranchCactus extends BlockBranch {
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+	public int getRadiusForConnection(IBlockState state, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return 0;
 	}
 	

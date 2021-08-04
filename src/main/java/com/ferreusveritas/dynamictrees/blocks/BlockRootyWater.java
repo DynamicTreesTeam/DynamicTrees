@@ -358,7 +358,7 @@ public class BlockRootyWater extends BlockRooty {
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+	public int getRadiusForConnection(IBlockState state, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return 8;
 	}
 	

@@ -307,7 +307,7 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 	}
 	
 	@Override
-	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesTree) {
+	public ICell getHydrationCell(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing dir, ILeavesProperties leavesTree) {
 		return CellNull.NULLCELL;
 	}
 	
@@ -317,17 +317,17 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 	}
 	
 	@Override
-	public int getRadius(IBlockState blockState) {
+	public int getRadius(IBlockState state) {
 		return 8;
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+	public int getRadiusForConnection(IBlockState state, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return 8;
 	}
 	
 	@Override
-	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+	public int probabilityForBlock(IBlockState state, IBlockAccess world, BlockPos pos, BlockBranch from) {
 		return 0;
 	}
 	
@@ -357,8 +357,8 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 	}
 	
 	@Override
-	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
-		signal.run(blockState, world, pos, fromDir);//Run inspector of choice
+	public MapSignal analyse(IBlockState state, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+		signal.run(state, world, pos, fromDir);//Run inspector of choice
 		
 		if(signal.root == null) {
 			signal.root = pos;
@@ -371,15 +371,15 @@ public class BlockRooty extends Block implements ITreePart, ITileEntityProvider,
 	}
 	
 	@Override
-	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(IBlockState state, IBlockAccess world, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return dir == EnumFacing.DOWN ? BlockBranch.setSupport(1, 1) : 0;
 	}
 	
 	@Override
-	public TreeFamily getFamily(IBlockState rootyState, IBlockAccess blockAccess, BlockPos rootPos) {
-		BlockPos treePos = rootPos.offset(getTrunkDirection(blockAccess, rootPos));
-		IBlockState treeState = blockAccess.getBlockState(treePos);
-		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, blockAccess, treePos) : TreeFamily.NULLFAMILY;
+	public TreeFamily getFamily(IBlockState state, IBlockAccess world, BlockPos rootPos) {
+		BlockPos treePos = rootPos.offset(getTrunkDirection(world, rootPos));
+		IBlockState treeState = world.getBlockState(treePos);
+		return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, world, treePos) : TreeFamily.NULLFAMILY;
 	}
 	
 	private TileEntitySpecies getTileEntitySpecies(World world, BlockPos pos) {

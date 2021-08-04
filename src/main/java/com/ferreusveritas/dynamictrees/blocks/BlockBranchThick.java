@@ -164,8 +164,8 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	// GROWTH
 	///////////////////////////////////////////
 	
-	public int getRadius(IBlockState blockState) {
-		return blockState.getBlock() == this ? MathHelper.clamp(blockState.getValue(RADIUSNYBBLE) + (((BlockBranchThick)blockState.getBlock()).extended ? 17 : 1), 1, getMaxRadius()) : 0;
+	public int getRadius(IBlockState state) {
+		return state.getBlock() == this ? MathHelper.clamp(state.getValue(RADIUSNYBBLE) + (((BlockBranchThick) state.getBlock()).extended ? 17 : 1), 1, getMaxRadius()) : 0;
 	}
 	
 	@Override
@@ -208,12 +208,12 @@ public class BlockBranchThick extends BlockBranchBasic implements IMusable {
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockState blockState, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+	public int getRadiusForConnection(IBlockState state, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		if (from == this || from == this.otherBlock) {
-			return getRadius(blockState);
+			return getRadius(state);
 		}
 		
-		return Math.min(getRadius(blockState), RADMAX_NORMAL);
+		return Math.min(getRadius(state), RADMAX_NORMAL);
 	}
 	
 	@Override

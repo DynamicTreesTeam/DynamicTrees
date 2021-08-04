@@ -41,10 +41,10 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 	
 	TextureAtlasSprite barkParticles;
 	
-	//74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway. 
-	private IBakedModel sleeves[][] = new IBakedModel[6][7];
-	private IBakedModel cores[][] = new IBakedModel[3][8]; //8 Cores for 3 axis with the bark texture and all 6 sides rotated appropriately.
-	private IBakedModel rings[] = new IBakedModel[8]; //8 Cores with the ring textures on all 6 sides
+	// 74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway. 
+	private final IBakedModel[][] sleeves = new IBakedModel[6][7];
+	private final IBakedModel[][] cores = new IBakedModel[3][8]; // 8 Cores for 3 axis with the bark texture and all 6 sides rotated appropriately.
+	private final IBakedModel[] rings = new IBakedModel[8]; // 8 Cores with the ring textures on all 6 sides
 	
 	public BakedModelBlockBranchBasic(ResourceLocation barkRes, ResourceLocation ringsRes, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {		
 		this.modelBlock = new ModelBlock(null, null, null, false, false, ItemCameraTransforms.DEFAULT, null);
@@ -53,9 +53,9 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 		TextureAtlasSprite ringIcon = bakedTextureGetter.apply(ringsRes);
 		barkParticles = barkIcon;
 		
-		for(int i = 0; i < 8; i++) {
+		for (int i = 0; i < 8; i++) {
 			int radius = i + 1;
-			if(radius < 8) {
+			if (radius < 8) {
 				for(EnumFacing dir: EnumFacing.VALUES) {
 					sleeves[dir.getIndex()][i] = bakeSleeve(radius, dir, barkIcon);
 				}
@@ -165,50 +165,52 @@ public class BakedModelBlockBranchBasic implements IBakedModel {
 	}
 	
 	@Override
-	public List<BakedQuad> getQuads(IBlockState blockState, EnumFacing side, long rand) {
-		List<BakedQuad> quadsList = new ArrayList<>(24);
-		IExtendedBlockState extendedBlockState = (IExtendedBlockState)blockState;
-		if (blockState instanceof IExtendedBlockState) {
-			int coreRadius = getRadius(blockState);
-			int[] connections = pollConnections(coreRadius, extendedBlockState);
-			
-			//Count number of connections
-			int numConnections = 0;
-			for(int i: connections) {
-				numConnections += (i != 0) ? 1: 0;
+	public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+		final List<BakedQuad> quadsList = new ArrayList<>(24);
+
+		if (!(state instanceof IExtendedBlockState)) {
+			// Not extended block state
+			return quadsList;
+		}
+		
+		final IExtendedBlockState extendedState = (IExtendedBlockState) state;
+		int coreRadius = getRadius(state);
+		int[] connections = pollConnections(coreRadius, extendedState);
+		
+		// Count number of connections
+		int numConnections = 0;
+		for (int i: connections) {
+			numConnections += (i != 0) ? 1: 0;
+		}
+		
+		// The source direction is the biggest connection from one of the 6 directions
+		EnumFacing sourceDir = getSourceDir(coreRadius, connections);
+		if (sourceDir == null) {
+			sourceDir = EnumFacing.DOWN;
+		}
+		int coreDir = resolveCoreDir(sourceDir);
+		
+		// This is for drawing the rings on a terminating branch
+		EnumFacing coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
+		
+		// Get quads for core model
+		if (side == null || coreRadius != connections[side.getIndex()]) {
+			if (coreRingDir == null || coreRingDir != side) {
+				quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(state, side, rand));
+			} else {
+				quadsList.addAll(rings[coreRadius-1].getQuads(state, side, rand));
 			}
-			
-			//The source direction is the biggest connection from one of the 6 directions
-			EnumFacing sourceDir = getSourceDir(coreRadius, connections);
-			if(sourceDir == null) {
-				sourceDir = EnumFacing.DOWN;
-			}
-			int coreDir = resolveCoreDir(sourceDir);
-			
-			//This is for drawing the rings on a terminating branch
-			EnumFacing coreRingDir = (numConnections == 1) ? sourceDir.getOpposite() : null;
-			
-			//Get quads for core model
-			if(side == null || coreRadius != connections[side.getIndex()]) {
-				if(coreRingDir == null || coreRingDir != side) {
-					quadsList.addAll(cores[coreDir][coreRadius-1].getQuads(blockState, side, rand));
-				} else {
-					quadsList.addAll(rings[coreRadius-1].getQuads(blockState, side, rand));
+		}
+		// Get quads for sleeves models
+		if (coreRadius != 8) { // Special case for r!=8.. If it's a solid block so it has no sleeves
+			for (EnumFacing connDir : EnumFacing.VALUES) {
+				int idx = connDir.getIndex();
+				int connRadius = connections[idx];
+				// If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
+				if (connRadius > 0  && (connRadius == 1 || side != connDir)) {
+					quadsList.addAll(sleeves[idx][connRadius-1].getQuads(extendedState, side, rand));
 				}
 			}
-			//Get quads for sleeves models
-			if(coreRadius != 8) { //Special case for r!=8.. If it's a solid block so it has no sleeves
-				for(EnumFacing connDir : EnumFacing.VALUES) {
-					int idx = connDir.getIndex();
-					int connRadius = connections[idx];
-					//If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
-					if (connRadius > 0  && (connRadius == 1 || side != connDir)) {
-						quadsList.addAll(sleeves[idx][connRadius-1].getQuads(extendedBlockState, side, rand));
-					}
-				}
-			}
-		} else {
-			//Not extended block state
 		}
 		
 		return quadsList;

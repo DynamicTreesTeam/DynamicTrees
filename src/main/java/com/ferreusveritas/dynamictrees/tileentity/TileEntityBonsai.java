@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.tileentity;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 import net.minecraft.block.Block;
@@ -14,11 +15,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 
 /**
- * 
- * A TileEntity that holds a species value.
+ * A tile entity for the {@link BlockBonsaiPot} that holds a {@link Species} value.
  * 
  * @author ferreusveritas
- *
  */
 public class TileEntityBonsai extends TileEntity {
 	
@@ -27,7 +26,7 @@ public class TileEntityBonsai extends TileEntity {
 	ResourceLocation speciesName = species.getRegistryName();
 	
 	public Species getSpecies() {
-		if(species == Species.NULLSPECIES) {
+		if (species == Species.NULLSPECIES) {
 			species = TreeRegistry.findSpecies(speciesName);
 		}
 		return species;

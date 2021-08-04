@@ -38,6 +38,11 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+/**
+ * A bonsai pot block; effectively a regular flower pot, but for dynamic saplings.
+ * 
+ * @author ferreusveritas
+ */
 public class BlockBonsaiPot extends BlockContainer {
 	
 	public static final MimicProperty POT = new MimicProperty("pot");

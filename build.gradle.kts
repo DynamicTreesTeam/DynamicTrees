@@ -86,8 +86,8 @@ dependencies {
 // Workaround for resources issue. Use gradle tasks rather than generated runs for now.
 sourceSets {
     main {
-        output.resourcesDir = file("build/combined")
-        java.outputDir = file("build/combined")
+        output.setResourcesDir(file("build/combined"))
+        java.destinationDirectory.set(file("build/combined"))
     }
 }
 

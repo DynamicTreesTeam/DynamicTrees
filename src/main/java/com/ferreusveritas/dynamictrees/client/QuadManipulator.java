@@ -26,7 +26,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class QuadManipulator {
 	
-	public static final EnumFacing everyFace[] = { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST, null };
+	public static final EnumFacing[] everyFace = { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST, null };
 	
 	public static List<BakedQuad> getQuads(IBakedModel modelIn, IBlockState stateIn) {
 		return getQuads(modelIn, stateIn, Vec3d.ZERO, everyFace, 0);
@@ -53,11 +53,11 @@ public class QuadManipulator {
 	}
 	
 	public static List<BakedQuad> getQuads(IBakedModel modelIn, IBlockState stateIn, Vec3d offset, EnumFacing[] sides, long rand) {
-		ArrayList<BakedQuad> outQuads = new ArrayList<BakedQuad>();
+		final ArrayList<BakedQuad> outQuads = new ArrayList<>();
 		
-		if(stateIn != null) {
-			for (EnumFacing enumfacing : sides) {
-				outQuads.addAll(modelIn.getQuads(stateIn, enumfacing, rand));
+		if (stateIn != null) {
+			for (EnumFacing side : sides) {
+				outQuads.addAll(modelIn.getQuads(stateIn, side, rand));
 			}
 		}
 		
@@ -65,15 +65,15 @@ public class QuadManipulator {
 	}
 	
 	public static List<BakedQuad> moveQuads(List<BakedQuad> inQuads, Vec3d offset) {
-		ArrayList<BakedQuad> outQuads = new ArrayList<BakedQuad>();
+		ArrayList<BakedQuad> outQuads = new ArrayList<>();
 		
-		for(BakedQuad inQuad: inQuads) {
+		for (BakedQuad inQuad: inQuads) {
 			BakedQuad quadCopy = new BakedQuad(inQuad.getVertexData().clone(), inQuad.getTintIndex(), inQuad.getFace(), inQuad.getSprite(), inQuad.shouldApplyDiffuseLighting(), inQuad.getFormat());
 			int[] vertexData = quadCopy.getVertexData();
-			for(int i = 0; i < vertexData.length; i += inQuad.getFormat().getIntegerSize()) {
+			for (int i = 0; i < vertexData.length; i += inQuad.getFormat().getIntegerSize()) {
 				int pos = 0;
-				for(VertexFormatElement vfe: inQuad.getFormat().getElements()) {
-					if(vfe.getUsage() == EnumUsage.POSITION) {
+				for (VertexFormatElement vfe: inQuad.getFormat().getElements()) {
+					if (vfe.getUsage() == EnumUsage.POSITION) {
 						float x = Float.intBitsToFloat(vertexData[i + pos + 0]);
 						float y = Float.intBitsToFloat(vertexData[i + pos + 1]);
 						float z = Float.intBitsToFloat(vertexData[i + pos + 2]);
@@ -85,7 +85,7 @@ public class QuadManipulator {
 						vertexData[i + pos + 2] = Float.floatToIntBits(z);
 						break;
 					}
-					pos += vfe.getSize() / 4;//Size is always in bytes but we are dealing with an array of int32s
+					pos += vfe.getSize() / 4; // Size is always in bytes but we are dealing with an array of int32s
 				}
 			}
 			

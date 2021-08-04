@@ -87,14 +87,14 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		
 		for (ModelEntityFallingTree.TreeQuadData treeQuad: inQuads) {
-			int color = species==null ? treeQuad.color : species.colorTreeQuads(treeQuad.color, treeQuad, entity);
+			int color = species == null ? treeQuad.color : species.colorTreeQuads(treeQuad.color, treeQuad, entity);
 			this.drawBakedQuad(buffer, treeQuad.bakedQuad, brightness, color);
 		}
 		
 		tessellator.draw();
 	}
 	
-	public void drawBakedQuad (BufferBuilder buffer, BakedQuad bakedQuad, int brightness, int color) {
+	public void drawBakedQuad(BufferBuilder buffer, BakedQuad bakedQuad, int brightness, int color) {
 		buffer.addVertexData(bakedQuad.getVertexData());
 		buffer.putBrightness4(brightness, brightness, brightness, brightness);
 
@@ -102,7 +102,7 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 			float r = (float)(color >> 16 & 255) / 255.0F;
 			float g = (float)(color >> 8 & 255) / 255.0F;
 			float b = (float)(color & 255) / 255.0F;
-			if(bakedQuad.shouldApplyDiffuseLighting()) {
+			if (bakedQuad.shouldApplyDiffuseLighting()) {
 				float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedQuad.getFace());
 				r *= diffuse;
 				g *= diffuse;
@@ -112,7 +112,7 @@ public class RenderFallingTree extends Render<EntityFallingTree>{
 			buffer.putColorMultiplier(r, g, b, 3);
 			buffer.putColorMultiplier(r, g, b, 2);
 			buffer.putColorMultiplier(r, g, b, 1);
-		} else if(bakedQuad.shouldApplyDiffuseLighting()) {
+		} else if (bakedQuad.shouldApplyDiffuseLighting()) {
 			float diffuse = net.minecraftforge.client.model.pipeline.LightUtil.diffuseLight(bakedQuad.getFace());
 			buffer.putColorMultiplier(diffuse, diffuse, diffuse, 4);
 			buffer.putColorMultiplier(diffuse, diffuse, diffuse, 3);

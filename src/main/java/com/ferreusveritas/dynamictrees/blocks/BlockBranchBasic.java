@@ -121,7 +121,7 @@ public class BlockBranchBasic extends BlockBranch {
 	///////////////////////////////////////////
 	
 	@Override
-	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(IBlockState state, IBlockAccess world, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return isSameTree(branch) ? BlockBranchBasic.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
 	}
 	
@@ -224,11 +224,11 @@ public class BlockBranchBasic extends BlockBranch {
 	///////////////////////////////////////////
 	
 	@Override
-	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
+	public ICell getHydrationCell(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing dir, ILeavesProperties leavesProperties) {
 		TreeFamily thisTree = getFamily();
 		
 		if(leavesProperties.getTree() == thisTree) {// The requesting leaves must match the tree for hydration to occur
-			int radiusAndMeta = thisTree.getRadiusForCellKit(blockAccess, pos, blockState, dir, this);
+			int radiusAndMeta = thisTree.getRadiusForCellKit(world, pos, state, dir, this);
 			int radius = CellMetadata.getRadius(radiusAndMeta);
 			int metadata = CellMetadata.getMeta(radiusAndMeta);
 			return leavesProperties.getCellKit().getCellForBranch(radius, metadata);
@@ -238,8 +238,8 @@ public class BlockBranchBasic extends BlockBranch {
 	}
 	
 	@Override
-	public int getRadius(IBlockState blockState) {
-		return blockState.getBlock() == this ? blockState.getValue(RADIUS) : 0;
+	public int getRadius(IBlockState state) {
+		return state.getBlock() == this ? state.getValue(RADIUS) : 0;
 	}
 	
 	@Override
@@ -257,8 +257,8 @@ public class BlockBranchBasic extends BlockBranch {
 	
 	// Directionless probability grabber
 	@Override
-	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return isSameTree(from) ? getRadius(blockState) + 2 : 0;
+	public int probabilityForBlock(IBlockState state, IBlockAccess world, BlockPos pos, BlockBranch from) {
+		return isSameTree(from) ? getRadius(state) + 2 : 0;
 	}
 	
 	public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
@@ -407,8 +407,8 @@ public class BlockBranchBasic extends BlockBranch {
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockState blockState, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
-		return getRadius(blockState);
+	public int getRadiusForConnection(IBlockState state, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+		return getRadius(state);
 	}
 	
 	protected int getSideConnectionRadius(IBlockAccess blockAccess, BlockPos pos, int radius, EnumFacing side) {

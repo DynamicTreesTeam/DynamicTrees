@@ -20,7 +20,7 @@ public class NullTreePart implements ITreePart {
 	//Handles some vanilla blocks
 	
 	@Override
-	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesTree) {
+	public ICell getHydrationCell(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing dir, ILeavesProperties leavesTree) {
 		return CellNull.NULLCELL;
 	}
 	
@@ -30,21 +30,21 @@ public class NullTreePart implements ITreePart {
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+	public int getRadiusForConnection(IBlockState state, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		//Twigs connect to Vanilla leaves
 		if(fromRadius == 1) {
-			return from.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1: 0;
+			return from.getFamily().isCompatibleVanillaLeaves(state, blockAccess, pos) ? 1: 0;
 		}
 		return 0;
 	}
 	
 	@Override
-	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return blockState.getBlock().isAir(blockState, blockAccess, pos) ? 1 : 0;
+	public int probabilityForBlock(IBlockState state, IBlockAccess world, BlockPos pos, BlockBranch from) {
+		return state.getBlock().isAir(state, world, pos) ? 1 : 0;
 	}
 	
 	@Override
-	public int getRadius(IBlockState blockState) {
+	public int getRadius(IBlockState state) {
 		return 0;
 	}
 	
@@ -54,17 +54,17 @@ public class NullTreePart implements ITreePart {
 	}
 	
 	@Override
-	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(IBlockState state, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		return signal;
 	}
 	
 	@Override
-	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
-		return BlockBranch.setSupport(0, branch.getFamily().isCompatibleVanillaLeaves(blockState, blockAccess, pos) ? 1 : 0);
+	public int branchSupport(IBlockState state, IBlockAccess world, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+		return BlockBranch.setSupport(0, branch.getFamily().isCompatibleVanillaLeaves(state, world, pos) ? 1 : 0);
 	}
 	
 	@Override
-	public TreeFamily getFamily(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+	public TreeFamily getFamily(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return TreeFamily.NULLFAMILY;
 	}
 	

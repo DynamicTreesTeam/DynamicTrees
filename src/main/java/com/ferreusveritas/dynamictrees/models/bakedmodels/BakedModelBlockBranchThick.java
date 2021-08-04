@@ -148,29 +148,29 @@ public class BakedModelBlockBranchThick extends BakedModelBlockBranchBasic imple
 	}
 	
 	@Override
-	public List<BakedQuad> getQuads(IBlockState blockState, EnumFacing side, long rand) {
-		int coreRadius = getRadius(blockState);
+	public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+		int coreRadius = getRadius(state);
 		
 		if (coreRadius <= BlockBranch.RADMAX_NORMAL) {
-			return super.getQuads(blockState, side, rand);
+			return super.getQuads(state, side, rand);
 		}
 		
 		coreRadius = MathHelper.clamp(coreRadius, 9, 24);
 		
 		List<BakedQuad> quadsList = new ArrayList<>(30);
-		quadsList.addAll(trunksBark[coreRadius-9].getQuads(blockState, side, rand));
+		quadsList.addAll(trunksBark[coreRadius-9].getQuads(state, side, rand));
 		
-		if (blockState instanceof IExtendedBlockState) {
-			IExtendedBlockState extendedBlockState = (IExtendedBlockState) blockState;
+		if (state instanceof IExtendedBlockState) {
+			IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
 			int[] connections = pollConnections(coreRadius, extendedBlockState);
 			
 			if (connections[0] < 1) {
-				quadsList.addAll(trunksBotRings[coreRadius-9].getQuads(blockState, side, rand));
+				quadsList.addAll(trunksBotRings[coreRadius-9].getQuads(state, side, rand));
 			}
 			if (connections[1] < 1) {
-				quadsList.addAll(trunksTopRings[coreRadius-9].getQuads(blockState, side, rand));
+				quadsList.addAll(trunksTopRings[coreRadius-9].getQuads(state, side, rand));
 			} else if (connections[1] == 1 && side == EnumFacing.UP) {
-				quadsList.addAll(trunksTopBark[coreRadius-9].getQuads(blockState, side, rand));
+				quadsList.addAll(trunksTopBark[coreRadius-9].getQuads(state, side, rand));
 			}
 				
 		}

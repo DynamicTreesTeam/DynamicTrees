@@ -81,12 +81,12 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 	}
 	
 	@Override
-	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(IBlockState state, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		return signal;
 	}
 	
 	@Override
-	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
+	public ICell getHydrationCell(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing dir, ILeavesProperties leavesProperties) {
 		return CellNull.NULLCELL;
 	}
 	
@@ -96,27 +96,27 @@ public class BlockRootyDirtFake extends Block implements ITreePart, IMimic {
 	}
 	
 	@Override
-	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
+	public int probabilityForBlock(IBlockState state, IBlockAccess world, BlockPos pos, BlockBranch from) {
 		return 0;
 	}
 	
 	@Override
-	public int getRadiusForConnection(IBlockState blockState, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+	public int getRadiusForConnection(IBlockState state, IBlockAccess world, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
 		return 8;
 	}
 	
 	@Override
-	public int getRadius(IBlockState blockState) {
+	public int getRadius(IBlockState state) {
 		return 8;
 	}
 	
 	@Override
-	public TreeFamily getFamily(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
+	public TreeFamily getFamily(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return TreeFamily.NULLFAMILY;
 	}
 	
 	@Override
-	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(IBlockState state, IBlockAccess world, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		return BlockBranch.setSupport(1, 1);
 	}
 	

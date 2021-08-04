@@ -111,8 +111,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public TreeFamily getFamily(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos) {
-		return getProperties(blockState).getTree();
+	public TreeFamily getFamily(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return getProperties(state).getTree();
 	}
 	
 	// Get Leaves-specific flammability
@@ -457,8 +457,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public ICell getHydrationCell(IBlockAccess blockAccess, BlockPos pos, IBlockState blockState, EnumFacing dir, ILeavesProperties leavesProperties) {
-		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(blockState.getValue(BlockDynamicLeaves.HYDRO)) : CellNull.NULLCELL;
+	public ICell getHydrationCell(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing dir, ILeavesProperties leavesProperties) {
+		return dir != null ? leavesProperties.getCellKit().getCellForLeaves(state.getValue(BlockDynamicLeaves.HYDRO)) : CellNull.NULLCELL;
 	}
 	
 	@Override
@@ -534,8 +534,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public int probabilityForBlock(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from) {
-		return from.getFamily().isCompatibleDynamicLeaves(blockState, blockAccess, pos) ? 2: 0;
+	public int probabilityForBlock(IBlockState state, IBlockAccess world, BlockPos pos, BlockBranch from) {
+		return from.getFamily().isCompatibleDynamicLeaves(state, world, pos) ? 2: 0;
 	}
 	
 	@Override
@@ -645,8 +645,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	//////////////////////////////
 	
 	@Override
-	public int getRadiusForConnection(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
-		return getProperties(blockState).getRadiusForConnection(blockState, blockAccess, pos, from, side, fromRadius);
+	public int getRadiusForConnection(IBlockState state, IBlockAccess blockAccess, BlockPos pos, BlockBranch from, EnumFacing side, int fromRadius) {
+		return getProperties(state).getRadiusForConnection(state, blockAccess, pos, from, side, fromRadius);
 	}
 	
 	@Override
@@ -655,7 +655,7 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public int getRadius(IBlockState blockState) {
+	public int getRadius(IBlockState state) {
 		return 0;
 	}
 	
@@ -668,14 +668,14 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 	
 	@Override
-	public MapSignal analyse(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
+	public MapSignal analyse(IBlockState state, World world, BlockPos pos, EnumFacing fromDir, MapSignal signal) {
 		return signal;//Shouldn't need to run analysis on leaf blocks
 	}
 	
 	@Override
-	public int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
+	public int branchSupport(IBlockState state, IBlockAccess world, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius) {
 		//Leaves are only support for "twigs"
-		return radius == 1 && branch.getFamily() == getFamily(blockState, blockAccess, pos) ? BlockBranch.setSupport(0, 1) : 0;
+		return radius == 1 && branch.getFamily() == getFamily(state, world, pos) ? BlockBranch.setSupport(0, 1) : 0;
 	}
 	
 	@Override

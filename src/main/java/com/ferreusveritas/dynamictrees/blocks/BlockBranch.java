@@ -58,7 +58,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	
 	public static final int RADMAX_NORMAL = 8;
 	
-	public static final IUnlistedProperty CONNECTIONS[] = { 
+	public static final IUnlistedProperty[] CONNECTIONS = { 
 			new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusd", 0, 8)),
 			new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusu", 0, 8)),
 			new Properties.PropertyAdapter<Integer>(PropertyInteger.create("radiusn", 0, 8)),
@@ -93,7 +93,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	}
 	
 	@Override
-	public TreeFamily getFamily(IBlockState state, IBlockAccess blockAccess, BlockPos pos) {
+	public TreeFamily getFamily(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return getFamily();
 	}
 	
@@ -112,7 +112,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	}
 	
 	@Override
-	public abstract int branchSupport(IBlockState blockState, IBlockAccess blockAccess, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
+	public abstract int branchSupport(IBlockState state, IBlockAccess world, BlockBranch branch, BlockPos pos, EnumFacing dir, int radius);
 	
 	@Override
 	public boolean isWood(IBlockAccess world, BlockPos pos) {
@@ -189,7 +189,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	///////////////////////////////////////////
 	
 	@Override
-	public int getRadius(IBlockState blockState) {
+	public int getRadius(IBlockState state) {
 		return 1;
 	}
 	
