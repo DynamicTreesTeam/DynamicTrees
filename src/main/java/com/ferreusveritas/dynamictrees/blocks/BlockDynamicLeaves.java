@@ -1,9 +1,5 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
@@ -21,17 +17,10 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.TreeFamily;
 import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoublePlant;
+import net.minecraft.block.*;
 import net.minecraft.block.BlockDoublePlant.EnumBlockHalf;
 import net.minecraft.block.BlockDoublePlant.EnumPlantType;
-import net.minecraft.block.BlockLeaves;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockPlanks.EnumType;
-import net.minecraft.block.BlockTallGrass;
-import net.minecraft.block.SoundType;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -42,7 +31,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -53,7 +41,6 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -61,6 +48,11 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+@SuppressWarnings("deprecation")
 public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeable, IRayTraceCollision {
 	
 	public static boolean passableLeavesModLoaded = false;
@@ -106,8 +98,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		this.properties[tree & 3] = properties;
 	}
 	
-	public ILeavesProperties getProperties(IBlockState blockState) {
-		return properties[blockState.getValue(TREE) & 3];
+	public ILeavesProperties getProperties(IBlockState state) {
+		return properties[state.getValue(TREE) & 3];
 	}
 	
 	@Override
@@ -474,9 +466,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	* Otherwise it will check to see if the block is already there.
 	* 
 	* @param world
-	* @param x
-	* @param y
-	* @param z
 	* @param leavesProperties
 	* @return True if the leaves are now at the coordinates.
 	*/
@@ -555,10 +544,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess access, BlockPos pos, IBlockState state, int fortune) {
-		
-		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
-		getExactSpecies(access, pos, getProperties(state)).getLeavesDrops(access, pos, ret, fortune);
-		
+		final ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
+		this.getExactSpecies(access, pos, getProperties(state)).getLeavesDrops(access, pos, ret, fortune);
 		return ret;
 	}
 	
@@ -608,11 +595,6 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return Species.NULLSPECIES;
 	}
 	
-	@Override
-	protected boolean canSilkHarvest() {
-		return false;
-	}
-	
 	//Some mods are using the following 3 member functions to find what items to drop, I'm disabling this behavior here.  I'm looking at you FastLeafDecay mod. ;)
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
@@ -629,15 +611,23 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 		return 0;
 	}
 	
-	//When the leaves are sheared just return vanilla leaves for usability
+	/** When the leaves are sheared, just return primitive leaves for usability. */
 	@Override
 	public ArrayList<ItemStack> onSheared(ItemStack item, IBlockAccess blockAccess, BlockPos pos, int fortune) {
-		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
-		ILeavesProperties properties = getProperties(blockAccess.getBlockState(pos));
-		ItemStack stack = properties.getPrimitiveLeavesItemStack().copy();
-		stack.setCount(1);
-		ret.add(stack);
+		ArrayList<ItemStack> ret = new ArrayList<>();
+		ret.add(this.copyPrimitiveLeavesStack(this.getProperties(blockAccess.getBlockState(pos))));
 		return ret;
+	}
+
+	@Override
+	protected ItemStack getSilkTouchDrop(IBlockState state) {
+		return this.copyPrimitiveLeavesStack(this.getProperties(state));
+	}
+
+	public ItemStack copyPrimitiveLeavesStack(ILeavesProperties properties) {
+		final ItemStack stack = properties.getPrimitiveLeavesItemStack().copy();
+		stack.setCount(1);
+		return stack;
 	}
 	
 	//////////////////////////////
