@@ -1,9 +1,5 @@
 package com.ferreusveritas.dynamictrees.items;
 
-import java.awt.Color;
-import java.util.List;
-import java.util.Optional;
-
 import com.ferreusveritas.dynamictrees.ModTabs;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
@@ -13,7 +9,6 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.Multimap;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.util.ITooltipFlag;
@@ -36,9 +31,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.awt.*;
+import java.util.List;
+import java.util.Optional;
+
 /**
- * Try the following in a command block to demonstrate the extra tag functionality.
- * /give @p dynamictrees:staff 1 0 {color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"dynamictrees:birch",maxuses:16,display:{Name:"Frog"}}
+ * Try the following in a command block to demonstrate the extra tag functionality. /give @p dynamictrees:staff 1 0
+ * {color:"#88FF00",code:"OUiVpPzkbtJ9uSRPbZP",readonly:1,tree:"dynamictrees:birch",maxuses:16,display:{Name:"Frog"}}
  */
 public class Staff extends Item {
 
@@ -65,7 +64,7 @@ public class Staff extends Item {
 
 	@Override
 	public float getDestroySpeed(ItemStack stack, IBlockState state) {
-		if(state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
+		if (state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
 			return 64.0f;
 		}
 		return super.getDestroySpeed(stack, state);
@@ -73,8 +72,8 @@ public class Staff extends Item {
 
 	@Override
 	public boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving) {
-		if(state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
-			if(decUses(stack)) {
+		if (state.getBlock() instanceof BlockBranch || state.getBlock() instanceof BlockTrunkShell) {
+			if (decUses(stack)) {
 				stack.shrink(1);
 			}
 			return true;
@@ -88,18 +87,18 @@ public class Staff extends Item {
 		ItemStack heldStack = player.getHeldItem(hand);
 		IBlockState clickedBlockState = world.getBlockState(pos);
 
-		if(!isReadOnly(heldStack)) {
+		if (!isReadOnly(heldStack)) {
 			Species species = TreeHelper.getBestGuessSpecies(world, pos);
-			if(species.isValid()) {
+			if (species.isValid()) {
 				setSpecies(heldStack, species);
-				if(!player.isSneaking()) {
+				if (!player.isSneaking()) {
 					EnumFacing playerFacing = player.getHorizontalFacing();
 					Optional<JoCode> joCode = TreeHelper.getJoCode(world, pos, playerFacing, species);
 
-					if(joCode.isPresent()) {
+					if (joCode.isPresent()) {
 						String code = joCode.get().toString();
 						setCode(heldStack, code);
-						if(world.isRemote) {//Make sure this doesn't run on the server
+						if (world.isRemote) {//Make sure this doesn't run on the server
 							GuiScreen.setClipboardString(code);//Put the code in the system clipboard to annoy everyone.
 						}
 					}
@@ -111,11 +110,11 @@ public class Staff extends Item {
 
 		//Create a tree from right clicking on soil
 		Species species = getSpecies(heldStack);
-		if(species.isValid() && species.isAcceptableSoil(world, pos, clickedBlockState)) {
+		if (species.isValid() && species.isAcceptableSoil(world, pos, clickedBlockState)) {
 			species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, species, pos, world.getBiome(pos), player.getHorizontalFacing(), 8, SafeChunkBounds.ANY);
-			if(!player.isCreative()) {
-				if(hasMaxUses(heldStack)) {
-					if(decUses(heldStack)) {
+			if (!player.isCreative()) {
+				if (hasMaxUses(heldStack)) {
+					if (decUses(heldStack)) {
 						heldStack.shrink(1);//If the player is in creative this will have no effect.
 					}
 				} else {
@@ -140,13 +139,13 @@ public class Staff extends Item {
 
 	@Override
 	public double getDurabilityForDisplay(ItemStack stack) {
-		double damage = getUses(stack) / (double)getMaxUses(stack);
+		double damage = getUses(stack) / (double) getMaxUses(stack);
 		return 1 - damage;
 	}
 
 	/**
 	 * Gets the NBT for the itemStack or creates a new one if it doesn't exist
-	 * 
+	 *
 	 * @param itemStack
 	 * @return
 	 */
@@ -182,7 +181,7 @@ public class Staff extends Item {
 	public Species getSpecies(ItemStack itemStack) {
 		NBTTagCompound nbt = getNBT(itemStack);
 
-		if(nbt.hasKey(TREE)) {
+		if (nbt.hasKey(TREE)) {
 			return TreeRegistry.findSpecies(new ResourceLocation(nbt.getString(TREE)));
 		} else {
 			Species species = TreeRegistry.findSpeciesSloppy("oak");
@@ -194,7 +193,7 @@ public class Staff extends Item {
 	public int getUses(ItemStack itemStack) {
 		NBTTagCompound nbt = getNBT(itemStack);
 
-		if(nbt.hasKey(USES)) {
+		if (nbt.hasKey(USES)) {
 			return nbt.getInteger(USES);
 		} else {
 			int uses = getMaxUses(itemStack);
@@ -211,7 +210,7 @@ public class Staff extends Item {
 	public int getMaxUses(ItemStack itemStack) {
 		NBTTagCompound nbt = getNBT(itemStack);
 
-		if(nbt.hasKey(MAXUSES)) {
+		if (nbt.hasKey(MAXUSES)) {
 			return nbt.getInteger(MAXUSES);
 		}
 
@@ -233,40 +232,37 @@ public class Staff extends Item {
 	}
 
 	public int getColor(ItemStack itemStack, int tint) {
-		if(tint == 0) {
+		if (tint == 0) {
 			NBTTagCompound nbt = getNBT(itemStack);
 
 			int color = 0x005b472f;//Original brown wood color
 
-			if(nbt.hasKey(HANDLE)) {
+			if (nbt.hasKey(HANDLE)) {
 				try {
 					color = Color.decode(nbt.getString(HANDLE)).getRGB();
 				} catch (NumberFormatException e) {
 					nbt.removeTag(HANDLE);
 				}
-			}
-			else {
+			} else {
 				color = getSpecies(itemStack).getFamily().getWoodColor();
 			}
 
 			return color;
-		}
-		else
-			if(tint == 1) {
-				NBTTagCompound nbt = getNBT(itemStack);
+		} else if (tint == 1) {
+			NBTTagCompound nbt = getNBT(itemStack);
 
-				int color = 0x0000FFFF;//Cyan crystal like Radagast the Brown's staff.
+			int color = 0x0000FFFF;//Cyan crystal like Radagast the Brown's staff.
 
-				if(nbt.hasKey(COLOR)) {
-					try {
-						color = Color.decode(nbt.getString(COLOR)).getRGB();
-					} catch (NumberFormatException e) {
-						nbt.removeTag(COLOR);
-					}
+			if (nbt.hasKey(COLOR)) {
+				try {
+					color = Color.decode(nbt.getString(COLOR)).getRGB();
+				} catch (NumberFormatException e) {
+					nbt.removeTag(COLOR);
 				}
-
-				return color;
 			}
+
+			return color;
+		}
 
 
 		return 0xFFFFFFFF;//white
@@ -283,7 +279,7 @@ public class Staff extends Item {
 		String code = "P";//Code of a sapling
 		NBTTagCompound nbt = getNBT(itemStack);
 
-		if(nbt.hasKey(CODE)) {
+		if (nbt.hasKey(CODE)) {
 			code = nbt.getString(CODE);
 		} else {
 			nbt.setString(CODE, code);
@@ -313,7 +309,7 @@ public class Staff extends Item {
 	@Override
 	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flagIn) {
 		Species species = getSpecies(stack);
-		tooltip.add(getTranslationText("tooltip.woodland_staff.tree") + " " + 
+		tooltip.add(getTranslationText("tooltip.woodland_staff.tree") + " " +
 			((species != null) ? "§a" + species.getLocalizedName() : getTranslationText("tooltip.woodland_staff.tree_not_set")));
 		tooltip.add("JoCode: §6" + getCode(stack));
 	}

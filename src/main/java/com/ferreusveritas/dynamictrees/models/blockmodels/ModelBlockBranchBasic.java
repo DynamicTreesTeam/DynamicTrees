@@ -1,11 +1,7 @@
 package com.ferreusveritas.dynamictrees.models.blockmodels;
 
-import java.util.Collection;
-import java.util.function.Function;
-
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockBranchBasic;
 import com.google.common.collect.ImmutableList;
-
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -17,18 +13,21 @@ import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.Collection;
+import java.util.function.Function;
+
 @SideOnly(Side.CLIENT)
 public class ModelBlockBranchBasic implements IModel {
 
 	public ResourceLocation barkTexture;
 	public ResourceLocation ringsTexture;
 
-	
+
 	public ModelBlockBranchBasic(ModelBlock modelBlock) {
 		barkTexture = new ResourceLocation(modelBlock.resolveTextureName("bark"));
 		ringsTexture = new ResourceLocation(modelBlock.resolveTextureName("rings"));
 	}
-	
+
 	// return all other resources used by this model
 	@Override
 	public Collection<ResourceLocation> getDependencies() {
@@ -51,5 +50,5 @@ public class ModelBlockBranchBasic implements IModel {
 			return ModelLoaderRegistry.getMissingModel().bake(state, format, bakedTextureGetter);
 		}
 	}
-	
+
 }	

@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public interface IFutureBreakable {
-	
-	public void futureBreak(IBlockState state, World world, BlockPos pos, EntityLivingBase player);
-	
+
+	void futureBreak(IBlockState state, World world, BlockPos pos, EntityLivingBase player);
+
 }

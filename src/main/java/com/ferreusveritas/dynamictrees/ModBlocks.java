@@ -1,26 +1,9 @@
 package com.ferreusveritas.dynamictrees;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
-import com.ferreusveritas.dynamictrees.blocks.BlockFruitCocoa;
-import com.ferreusveritas.dynamictrees.blocks.BlockLeavesSnow;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirt;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootyDirtFake;
-import com.ferreusveritas.dynamictrees.blocks.BlockRootySand;
-import com.ferreusveritas.dynamictrees.blocks.BlockTrunkShell;
-import com.ferreusveritas.dynamictrees.blocks.LeavesPaging;
-import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockSnow;
@@ -34,9 +17,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 @Mod.EventBusSubscriber(modid = ModConstants.MODID)
 public class ModBlocks {
-	
+
 	public static BlockRooty blockRootyDirt;
 	public static BlockRooty blockRootySand;
 	public static BlockRooty blockRootyDirtSpecies;
@@ -46,16 +33,16 @@ public class ModBlocks {
 	public static BlockFruitCocoa blockFruitCocoa;
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockTrunkShell blockTrunkShell;
-	
+
 	public static BlockSnow blockLeavesSnow;
-	
+
 	public static Map<String, ILeavesProperties> leaves = new HashMap<>();
-	
+
 	public static CommonBlockStates blockStates;
-	
+
 	public static void preInit() {
 		BlockDynamicLeaves.passableLeavesModLoaded = net.minecraftforge.fml.common.Loader.isModLoaded("passableleaves");
-		
+
 		blockRootyDirt = new BlockRootyDirt(false);//Dirt
 		blockRootySand = new BlockRootySand(false);//Sand
 		blockRootyDirtSpecies = new BlockRootyDirt(true);//Special dirt for rarer species
@@ -65,28 +52,28 @@ public class ModBlocks {
 		blockFruitCocoa = new BlockFruitCocoa();//Modified Cocoa pods
 		blockApple = new BlockFruit().setDroppedItem(new ItemStack(Items.APPLE));//Apple
 		blockTrunkShell = new BlockTrunkShell();
-		
+
 		blockLeavesSnow = ModConfigs.enableAltLeavesSnow ? new BlockLeavesSnow() : (BlockSnow) Blocks.SNOW_LAYER;
-		
+
 		blockStates = new CommonBlockStates();
-		
+
 		setupLeavesProperties();
 	}
-	
+
 	public static void setupLeavesProperties() {
 		leaves = LeavesPaging.build(new ResourceLocation(ModConstants.MODID, "leaves/common.json"));
 		leaves.put("cactus", new LeavesProperties(null, ItemStack.EMPTY, TreeRegistry.findCellKit("bare")));//Explicitly unbuilt since there's no leaves
 	}
-	
+
 	@SubscribeEvent
 	public static void register(RegistryEvent.Register<Block> event) {
 		IForgeRegistry<Block> registry = event.getRegistry();
-		
+
 		ArrayList<Block> treeBlocks = new ArrayList<Block>();
 		ModTrees.baseFamilies.forEach(tree -> tree.getRegisterableBlocks(treeBlocks));
 		ModTrees.dynamicCactus.getRegisterableBlocks(treeBlocks);
 		treeBlocks.addAll(LeavesPaging.getLeavesMapForModId(ModConstants.MODID).values());
-		
+
 		registry.registerAll(
 			blockRootyDirt,
 			blockRootySand,
@@ -98,13 +85,13 @@ public class ModBlocks {
 			blockApple,
 			blockTrunkShell
 		);
-		
-		if(ModConfigs.enableAltLeavesSnow) {
+
+		if (ModConfigs.enableAltLeavesSnow) {
 			registry.register(blockLeavesSnow);
 		}
-		
+
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
-		
+
 		DirtHelper.registerSoil(Blocks.DIRT, DirtHelper.DIRTLIKE);
 		DirtHelper.registerSoil(Blocks.GRASS, DirtHelper.DIRTLIKE);
 		DirtHelper.registerSoil(Blocks.MYCELIUM, DirtHelper.DIRTLIKE);
@@ -121,7 +108,7 @@ public class ModBlocks {
 		DirtHelper.registerSoil(Blocks.NETHERRACK, DirtHelper.NETHERLIKE);
 		DirtHelper.registerSoil(Blocks.SOUL_SAND, DirtHelper.NETHERLIKE);
 	}
-	
+
 	public static class CommonBlockStates {
 		public final IBlockState air = Blocks.AIR.getDefaultState();
 		public final IBlockState dirt = Blocks.DIRT.getDefaultState();
@@ -132,5 +119,5 @@ public class ModBlocks {
 		public final IBlockState brownMushroom = Blocks.BROWN_MUSHROOM.getDefaultState();
 		public final IBlockState snowLayer = blockLeavesSnow.getDefaultState();
 	}
-	
+
 }

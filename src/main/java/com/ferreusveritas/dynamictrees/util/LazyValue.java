@@ -7,11 +7,11 @@ import java.util.function.Supplier;
  */
 @FunctionalInterface
 public interface LazyValue<T> {
-	
+
 	T get();
 
-	static <T> LazyValue<T> uninitialised(Supplier<T> supplier) {
+	static <T> LazyValue<T> supplied(Supplier<T> supplier) {
 		return new SuppliedLazyValue<>(supplier);
 	}
-	
+
 }

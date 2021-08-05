@@ -13,7 +13,7 @@ public final class SuppliedLazyValue<T> implements LazyValue<T> {
 	SuppliedLazyValue(Supplier<T> supplier) {
 		this.supplier = supplier;
 	}
-	
+
 	public T get() {
 		if (this.object == null) {
 			this.object = supplier.get();

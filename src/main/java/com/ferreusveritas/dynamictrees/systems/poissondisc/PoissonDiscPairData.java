@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 public class PoissonDiscPairData {
-	private Vec2i coordData[];
-	private int sectors;
-	
-	private static Vec2i coordTable[][][] = new Vec2i[7][7][];
-	
+	private final Vec2i[] coordData;
+	private final int sectors;
+
+	private static final Vec2i[][][] coordTable = new Vec2i[7][7][];
+
 	static { //Yuh.. magic.
 		createPairData(8, 8, 32, 0x049556DF, 0x04955490);
 		createPairData(8, 7, 30, 0x012556DF, 0x01255480);
@@ -34,62 +34,62 @@ public class PoissonDiscPairData {
 		createPairData(4, 2, 12, 0x000000AF, 0x000000A8);
 		createPairData(3, 3, 12, 0x00000157, 0x00000154);
 		createPairData(3, 2, 10, 0x00000057, 0x00000054);
-		createPairData(2, 2,  8, 0x00000017, 0x00000014);
+		createPairData(2, 2, 8, 0x00000017, 0x00000014);
 	}
-	
+
 	private static void createPairData(int rad1, int rad2, int codeSize, int curveCode, int looseMask) {
 		int idx1 = rad1 - 2;
 		int idx2 = rad2 - 2;
 		int sectors = codeSize * 4;
 		Vec2i[] coord = coordTable[idx1][idx2] = coordTable[idx2][idx1] = new Vec2i[sectors];
-		
-		byte curveData[] = uncompressCurve(codeSize, curveCode);
-		
-		for(int sector = 0; sector < sectors; sector++) {
-			int modulus = Math.abs(((sector + codeSize) % (codeSize * 2) ) - codeSize);
-			
+
+		byte[] curveData = uncompressCurve(codeSize, curveCode);
+
+		for (int sector = 0; sector < sectors; sector++) {
+			int modulus = Math.abs(((sector + codeSize) % (codeSize * 2)) - codeSize);
+
 			//Avoid branching by using a bit twiddle to determine the sign of the data.
 			coord[sector] = new Vec2iPCA(//Use the Precomputed angle variant of Vec2i
-					(-( ((sector / codeSize) + 1) & 2) + 1) * curveData[codeSize - modulus],
-					(-(  (sector / codeSize)      & 2) + 1) * curveData[modulus],
-					((looseMask >> Math.min(modulus - 1, 32)) & 1) == 0
-				);
+				(-(((sector / codeSize) + 1) & 2) + 1) * curveData[codeSize - modulus],
+				(-((sector / codeSize) & 2) + 1) * curveData[modulus],
+				((looseMask >> Math.min(modulus - 1, 32)) & 1) == 0
+			);
 		}
-		
+
 	}
-	
+
 	private static byte[] uncompressCurve(int codeSize, long curveCode) {
 		byte[] wave = new byte[codeSize + 2];
-		
-		for(int i = 0; i <= codeSize; i++) {
+
+		for (int i = 0; i <= codeSize; i++) {
 			wave[i + 1] = (byte) (wave[i] + ((curveCode >> i) & 1));
 		}
-		
+
 		return wave;
 	}
-	
+
 	public PoissonDiscPairData(int rad1, int rad2) {
 		int idx1 = rad1 - 2;
 		int idx2 = rad2 - 2;
 		this.coordData = coordTable[idx1][idx2];
 		this.sectors = coordData.length;
 	}
-	
+
 	public Vec2i getCoords(int sector) {
 		return new Vec2i(coordData[PoissonDiscMathHelper.wrap(sector, sectors)]);
 	}
-	
+
 	public int getSector(double actualAngle) {
-		
-		int sector = (int)(PoissonDiscMathHelper.radiansToTurns(actualAngle) * sectors);
+
+		int sector = (int) (PoissonDiscMathHelper.radiansToTurns(actualAngle) * sectors);
 		double smallestDelta = PoissonDiscMathHelper.deltaAngle(actualAngle, getCoords(sector).angle());
 		boolean runNextDir = true;
-		
-		for(int dir = -1; runNextDir && dir <= 1; dir += 2) {//Search one direction and then the other
-			while(true) {
+
+		for (int dir = -1; runNextDir && dir <= 1; dir += 2) {//Search one direction and then the other
+			while (true) {
 				double ang = getCoords(sector + dir).angle();
 				double del = PoissonDiscMathHelper.deltaAngle(actualAngle, ang);
-				if(del < smallestDelta) {
+				if (del < smallestDelta) {
 					smallestDelta = del;
 					sector += dir;
 					runNextDir = false;//If this direction leads to a decrease in the delta angle then the other direction can only make it larger.  
@@ -98,8 +98,8 @@ public class PoissonDiscPairData {
 				}
 			}
 		}
-		
+
 		return sector;
 	}
-	
+
 }

@@ -16,7 +16,7 @@ import java.util.List;
 public class CommandSoilLife extends SubCommand {
 
 	public static final String SOILLIFE = "soillife";
-	
+
 	@Override
 	public String getName() {
 		return SOILLIFE;
@@ -24,37 +24,38 @@ public class CommandSoilLife extends SubCommand {
 
 	@Override
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-		
-		switch(args.length) {
-			case 2: 
-			case 3: 
-			case 4: return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
+
+		switch (args.length) {
+			case 2:
+			case 3:
+			case 4:
+				return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
 		}
-		
+
 		return super.getTabCompletions(server, sender, args, targetPos);
 	}
 
 	@Override
 	public void execute(World world, ICommandSender sender, String[] args) throws CommandException {
-		
-		if(args.length < 4) {
+
+		if (args.length < 4) {
 			throw new WrongUsageException("commands.dynamictrees.soillife.usage");
 		}
-		
+
 		BlockPos pos = CommandBase.parseBlockPos(sender, args, 1, false);
-		
+
 		BlockPos rootPos = TreeHelper.findRootNode(world, pos);
-		if(rootPos != BlockPos.ORIGIN) {
+		if (rootPos != BlockPos.ORIGIN) {
 			IBlockState state = world.getBlockState(rootPos);
-			
-			if(args.length >= 5) {
+
+			if (args.length >= 5) {
 				int life = 0;
 				try {
 					life = Integer.parseInt(args[4]);
-				} catch(NumberFormatException e) {
+				} catch (NumberFormatException e) {
 					throw new CommandException("commands.dynamictrees.soillife.lifeerror", args[4]);
 				}
-				
+
 				TreeHelper.getRooty(state).setSoilLife(world, rootPos, life);
 			} else {
 				int life = TreeHelper.getRooty(state).getSoilLife(state, world, rootPos);
@@ -63,7 +64,7 @@ public class CommandSoilLife extends SubCommand {
 		} else {
 			throw new CommandException("commands.dynamictrees.soillife.notreeerror", pos.getX() + " " + pos.getY() + " " + pos.getZ());
 		}
-		
+
 	}
-	
+
 }

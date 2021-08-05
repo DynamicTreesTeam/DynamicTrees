@@ -5,9 +5,9 @@ import net.minecraft.util.EnumFacing;
 public interface ICell {
 
 	//This is the actual value of the cell.
-	public int getValue();
-	
+	int getValue();
+
 	//This is the value the cell returns for a side
-	public int getValueFromSide(EnumFacing side);
-	
+	int getValueFromSide(EnumFacing side);
+
 }

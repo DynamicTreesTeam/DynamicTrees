@@ -8,11 +8,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod.EventBusSubscriber(modid = ModConstants.MODID)
 public class ModModels {
-	
+
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public static void register(ModelRegistryEvent event) {
 		DynamicTrees.proxy.registerModels();
 	}
-	
+
 }

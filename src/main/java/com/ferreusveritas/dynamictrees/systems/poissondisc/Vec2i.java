@@ -6,7 +6,8 @@ public class Vec2i {
 	public int z;
 	public boolean tight;//for use with 2nd and 3rd circle finder algorithm
 
-	public Vec2i() {}
+	public Vec2i() {
+	}
 
 	public Vec2i(int x, int z) {
 		this(x, z, false);
@@ -16,7 +17,7 @@ public class Vec2i {
 		set(x, z);
 		this.tight = tight;
 	}
-	
+
 	public Vec2i(Vec2i aCoord) {
 		this(aCoord.x, aCoord.z);
 		setTight(aCoord.tight);

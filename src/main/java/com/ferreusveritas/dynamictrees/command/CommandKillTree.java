@@ -14,7 +14,7 @@ import java.util.List;
 public class CommandKillTree extends SubCommand {
 
 	public static final String KILLTREE = "killtree";
-	
+
 	@Override
 	public String getName() {
 		return KILLTREE;
@@ -22,31 +22,32 @@ public class CommandKillTree extends SubCommand {
 
 	@Override
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-		
-		switch(args.length) {
-			case 2: 
-			case 3: 
-			case 4: return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
+
+		switch (args.length) {
+			case 2:
+			case 3:
+			case 4:
+				return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
 		}
-		
+
 		return super.getTabCompletions(server, sender, args, targetPos);
 	}
 
 	@Override
 	public void execute(World world, ICommandSender sender, String[] args) throws CommandException {
-		
-		if(args.length < 4) {
-			throw new WrongUsageException("commands.dynamictrees.killtree.usage", new Object[0]);
+
+		if (args.length < 4) {
+			throw new WrongUsageException("commands.dynamictrees.killtree.usage");
 		}
-		
+
 		BlockPos pos = CommandBase.parseBlockPos(sender, args, 1, false);
-		
+
 		BlockPos rootPos = TreeHelper.findRootNode(world, pos);
-		if(rootPos != BlockPos.ORIGIN) {
+		if (rootPos != BlockPos.ORIGIN) {
 			TreeHelper.getRooty(world.getBlockState(rootPos)).destroyTree(world, rootPos);
 		} else {
-			throw new CommandException("No tree found", new Object[] {});
+			throw new CommandException("No tree found");
 		}
 	}
-		
+
 }

@@ -32,11 +32,13 @@ public class CommandTransform extends SubCommand {
 	@Override
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
 
-		switch(args.length) {
+		switch (args.length) {
 			case 2:
 			case 3:
-			case 4: return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
-			case 5: return CommandBase.getListOfStringsMatchingLastWord(args, TreeRegistry.getTransformableSpeciesLocs());
+			case 4:
+				return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
+			case 5:
+				return CommandBase.getListOfStringsMatchingLastWord(args, TreeRegistry.getTransformableSpeciesLocs());
 		}
 
 		return super.getTabCompletions(server, sender, args, targetPos);
@@ -47,25 +49,27 @@ public class CommandTransform extends SubCommand {
 		BlockPos pos = BlockPos.ORIGIN;
 		Species toSpecies = null;
 
-		if(args.length < 5) {
+		if (args.length < 5) {
 			throw new WrongUsageException("commands.dynamictrees.transform.usage");
 		}
 
-		for(int arg = 0; arg < args.length; arg++) {
-			switch(arg) {
-				case 3: pos = CommandBase.parseBlockPos(sender, args, 1, false); break;
+		for (int arg = 0; arg < args.length; arg++) {
+			switch (arg) {
+				case 3:
+					pos = CommandBase.parseBlockPos(sender, args, 1, false);
+					break;
 				case 4:
 					toSpecies = TreeRegistry.findSpeciesSloppy(args[4]);
-					if(toSpecies == Species.NULLSPECIES) {
+					if (toSpecies == Species.NULLSPECIES) {
 						throw new CommandException("commands.dynamictrees.setree.specieserror", args[4]);
 					}
 					break;
 			}
 		}
-		
+
 		BlockPos rootPos = TreeHelper.findRootNode(world, pos);
 		Species fromSpecies = TreeHelper.getExactSpecies(world, rootPos);
-		
+
 		if (rootPos == BlockPos.ORIGIN) {
 			throw new CommandException("commands.dynamictrees.soillife.notreeerror", pos.getX() + " " + pos.getY() + " " + pos.getZ());
 		}
@@ -76,7 +80,7 @@ public class CommandTransform extends SubCommand {
 
 		IBlockState rootyState = world.getBlockState(rootPos);
 		BlockRooty rootyBlock = TreeHelper.getRooty(rootyState);
-		
+
 		rootyBlock.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
 
 		if (rootyBlock.getSpecies(rootyState, world, rootPos) != toSpecies) {
@@ -84,5 +88,5 @@ public class CommandTransform extends SubCommand {
 			toSpecies.placeRootyDirtBlock(world, rootPos, rootyBlock.getSoilLife(rootyState, world, rootPos));
 		}
 	}
-	
+
 }

@@ -4,14 +4,13 @@ import net.minecraft.util.EnumFacing;
 
 /**
  * Cell that always returns 0
- * 
- * @author ferreusveritas
  *
+ * @author ferreusveritas
  */
 public class CellNull implements ICell {
 
 	public static final CellNull NULLCELL = new CellNull();
-	
+
 	@Override
 	public int getValue() {
 		return 0;

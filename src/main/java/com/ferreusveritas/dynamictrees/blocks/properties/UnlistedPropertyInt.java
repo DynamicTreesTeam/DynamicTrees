@@ -3,13 +3,13 @@ package com.ferreusveritas.dynamictrees.blocks.properties;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class UnlistedPropertyInt implements IUnlistedProperty<Integer> {
-	
+
 	protected final String name;
-	
+
 	public UnlistedPropertyInt(String name) {
 		this.name = name;
 	}
-	
+
 	@Override
 	public String getName() {
 		return name;

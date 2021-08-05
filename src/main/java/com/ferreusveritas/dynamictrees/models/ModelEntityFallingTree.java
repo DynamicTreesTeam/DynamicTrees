@@ -27,63 +27,65 @@ import java.util.stream.Collectors;
 
 @SideOnly(Side.CLIENT)
 public class ModelEntityFallingTree {
-	
+
 	protected final List<TreeQuadData> quads;
 	protected final int entityId;
-	
+
 	public ModelEntityFallingTree(EntityFallingTree entity) {
 		quads = generateTreeQuads(entity, entity.getEntityWorld());
 		entityId = entity.getEntityId();
 	}
-	
+
 	public List<TreeQuadData> getQuadData() {
 		return quads;
 	}
-	
+
 	public int getEntityId() {
 		return entityId;
 	}
-	
+
 	public static int getBrightness(EntityFallingTree entity) {
 		BranchDestructionData destructionData = entity.getDestroyData();
 		World world = entity.getEntityWorld();
 		return world.getBlockState(destructionData.cutPos).getPackedLightmapCoords(world, destructionData.cutPos);
 	}
-	
+
 	public List<TreeQuadData> generateTreeQuads(EntityFallingTree entity, World world) {
 		final BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 		final BranchDestructionData destructionData = entity.getDestroyData();
 		final Species species = destructionData.species;
 		final BlockPos cutPos = destructionData.cutPos;
 		final EnumFacing cutDir = destructionData.cutDir;
-		
+
 		final ArrayList<TreeQuadData> treeQuads = new ArrayList<>();
-		
+
 		if (destructionData.getNumBranches() <= 0) {
 			return treeQuads;
 		}
 
 		// Draw the ring texture cap on the cut block
 		IExtendedBlockState exState = destructionData.getBranchBlockState(0);
-		
+
 		if (exState == null) {
 			return treeQuads;
 		}
-		
-		for (EnumFacing face: EnumFacing.VALUES) {
+
+		for (EnumFacing face : EnumFacing.VALUES) {
 			exState = exState.withProperty(BlockBranch.CONNECTIONS[face.getIndex()], face == cutDir.getOpposite() ? 8 : 0);
 		}
 		int radius = ((BlockBranch) exState.getBlock()).getRadius(exState);
-		float offset = (8 - Math.min(radius, BlockBranch.RADMAX_NORMAL) ) / 16f;
+		float offset = (8 - Math.min(radius, BlockBranch.RADMAX_NORMAL)) / 16f;
 		IBakedModel branchModel = dispatcher.getModelForState(exState.getClean()); // Since we source the blockState from the destruction data it will always be the same
-		treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3d(BlockPos.ORIGIN.offset(cutDir)).scale(offset), new EnumFacing[] { cutDir }), 0xFFFFFFFF, exState.getClean()));
+		treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3d(BlockPos.ORIGIN.offset(cutDir)).scale(offset), new EnumFacing[]{cutDir}), 0xFFFFFFFF, exState.getClean()));
 
 		// Draw the rest of the tree/branch
 		for (int index = 0; index < destructionData.getNumBranches(); index++) {
 			Block previousBranch = exState.getBlock();
 			exState = destructionData.getBranchBlockState(index);
 			if (!previousBranch.equals(exState.getBlock())) // Update the branch model only if the block is different
+			{
 				branchModel = dispatcher.getModelForState(exState.getClean());
+			}
 			BlockPos relPos = destructionData.getBranchRelPos(index);
 			treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3d(relPos)), 0xFFFFFFFF, exState.getClean()));
 		}
@@ -91,31 +93,31 @@ public class ModelEntityFallingTree {
 		// Draw the leaves
 		HashMap<BlockPos, IBlockState> leavesClusters = species.getFamily().getFellingLeavesClusters(destructionData);
 		if (leavesClusters != null) {
-			for(Entry<BlockPos, IBlockState> leafLoc : leavesClusters.entrySet()) {
+			for (Entry<BlockPos, IBlockState> leafLoc : leavesClusters.entrySet()) {
 				IBlockState leafState = leafLoc.getValue();
 				if (leafState instanceof IExtendedBlockState) {
 					leafState = ((IExtendedBlockState) leafState).getClean();
 				}
-				treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafLoc.getValue(), new Vec3d(leafLoc.getKey())), 
-					species.getLeavesProperties().foliageColorMultiplier(leafState, world, cutPos), leafState));				
+				treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(dispatcher.getModelForState(leafState), leafLoc.getValue(), new Vec3d(leafLoc.getKey())),
+					species.getLeavesProperties().foliageColorMultiplier(leafState, world, cutPos), leafState));
 			}
 		} else {
 			for (int index = 0; index < destructionData.getNumLeaves(); index++) {
 				BlockPos relPos = destructionData.getLeavesRelPos(index);
 				IBlockState state = destructionData.getLeavesBlockState(index);
 				IBakedModel leavesModel = dispatcher.getModelForState(state);
-				treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, state, new Vec3d(relPos)), 
+				treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, state, new Vec3d(relPos)),
 					destructionData.getLeavesProperties(index).foliageColorMultiplier(state, world, cutPos.add(relPos)), state));
 			}
 		}
-		
+
 		return treeQuads;
 	}
-	
-	public static List<TreeQuadData> toTreeQuadData (List<BakedQuad> bakedQuads, int color, IBlockState state) {
+
+	public static List<TreeQuadData> toTreeQuadData(List<BakedQuad> bakedQuads, int color, IBlockState state) {
 		return bakedQuads.stream().map(bakedQuad -> new TreeQuadData(bakedQuad, color, state)).collect(Collectors.toList());
 	}
-	
+
 	public static final class TreeQuadData {
 		public final BakedQuad bakedQuad;
 		public final IBlockState state;

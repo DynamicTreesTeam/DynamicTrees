@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 
 public interface INodeInspector {
 
-	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir);
+	boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir);
 
-	public boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir);
+	boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir);
 }

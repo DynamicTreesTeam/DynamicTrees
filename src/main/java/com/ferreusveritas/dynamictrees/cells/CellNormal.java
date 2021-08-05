@@ -1,19 +1,17 @@
 package com.ferreusveritas.dynamictrees.cells;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-
 import net.minecraft.util.EnumFacing;
 
 /**
  * Cell that simply returns it's value
- * 
+ *
  * @author ferreusveritas
- * 
  */
 public class CellNormal implements ICell {
 
 	private final int value;
-	
+
 	public CellNormal(int value) {
 		this.value = value;
 	}
@@ -27,5 +25,5 @@ public class CellNormal implements ICell {
 	public int getValueFromSide(EnumFacing side) {
 		return value;
 	}
-	
+
 }

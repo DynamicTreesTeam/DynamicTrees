@@ -1,11 +1,7 @@
 package com.ferreusveritas.dynamictrees.models.blockmodels;
 
-import java.util.Collection;
-import java.util.function.Function;
-
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BakedModelBlockSurfaceRoot;
 import com.google.common.collect.ImmutableList;
-
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -17,15 +13,18 @@ import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.Collection;
+import java.util.function.Function;
+
 @SideOnly(Side.CLIENT)
 public class ModelBlockSurfaceRoot implements IModel {
 
 	public ResourceLocation barkTexture;
-	
+
 	public ModelBlockSurfaceRoot(ModelBlock modelBlock) {
 		barkTexture = new ResourceLocation(modelBlock.resolveTextureName("bark"));
 	}
-	
+
 	// return all other resources used by this model
 	@Override
 	public Collection<ResourceLocation> getDependencies() {
@@ -48,5 +47,5 @@ public class ModelBlockSurfaceRoot implements IModel {
 			return ModelLoaderRegistry.getMissingModel().bake(state, format, bakedTextureGetter);
 		}
 	}
-	
+
 }	

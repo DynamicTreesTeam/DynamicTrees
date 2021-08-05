@@ -31,31 +31,35 @@ public class CommandCreateTransformPotion extends SubCommand {
 	@Override
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
 
-		switch(args.length) {
+		switch (args.length) {
 			case 2:
 			case 3:
-			case 4: return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
-			case 5: return CommandBase.getListOfStringsMatchingLastWord(args, TreeRegistry.getTransformableSpeciesLocs());
+			case 4:
+				return CommandBase.getTabCompletionCoordinate(args, 1, targetPos);
+			case 5:
+				return CommandBase.getListOfStringsMatchingLastWord(args, TreeRegistry.getTransformableSpeciesLocs());
 		}
-		
+
 		return super.getTabCompletions(server, sender, args, targetPos);
 	}
 
 	@Override
 	public void execute(World world, ICommandSender sender, String[] args) throws CommandException {
-		if(args.length < 4) {
+		if (args.length < 4) {
 			throw new WrongUsageException("commands.dynamictrees.createtransformpotion.usage");
 		}
 
 		BlockPos pos = BlockPos.ORIGIN;
 		Species species = null;
 
-		for(int arg = 0; arg < args.length; arg++) {
-			switch(arg) {
-				case 3: pos = CommandBase.parseBlockPos(sender, args, 1, false); break;
+		for (int arg = 0; arg < args.length; arg++) {
+			switch (arg) {
+				case 3:
+					pos = CommandBase.parseBlockPos(sender, args, 1, false);
+					break;
 				case 4:
 					species = TreeRegistry.findSpeciesSloppy(args[4]);
-					if(species == Species.NULLSPECIES) {
+					if (species == Species.NULLSPECIES) {
 						throw new CommandException("commands.dynamictrees.setree.specieserror", args[4]);
 					}
 					break;
@@ -68,5 +72,5 @@ public class CommandCreateTransformPotion extends SubCommand {
 
 		ItemUtils.spawnItemStack(world, pos, dendroPotionStack, true); // Spawn potion in the world.
 	}
-	
+
 }

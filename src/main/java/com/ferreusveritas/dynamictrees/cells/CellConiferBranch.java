@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.cells;
 
 import com.ferreusveritas.dynamictrees.api.cells.ICell;
-
 import net.minecraft.util.EnumFacing;
 
 public class CellConiferBranch implements ICell {
@@ -11,11 +10,11 @@ public class CellConiferBranch implements ICell {
 		return 5;
 	}
 
-	static final int map[] = {2, 2, 3, 3, 3, 3};
-	
+	static final int[] map = {2, 2, 3, 3, 3, 3};
+
 	@Override
 	public int getValueFromSide(EnumFacing side) {
 		return map[side.ordinal()];
 	}
-	
+
 }

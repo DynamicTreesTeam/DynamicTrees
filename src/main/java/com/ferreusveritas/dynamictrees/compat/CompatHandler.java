@@ -1,13 +1,7 @@
 package com.ferreusveritas.dynamictrees.compat;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.seasons.SeasonGrowthCalculatorActive;
-import com.ferreusveritas.dynamictrees.seasons.SeasonGrowthCalculatorNull;
-import com.ferreusveritas.dynamictrees.seasons.SeasonHelper;
-import com.ferreusveritas.dynamictrees.seasons.SeasonManager;
-import com.ferreusveritas.dynamictrees.seasons.SeasonProviderNull;
-import com.ferreusveritas.dynamictrees.seasons.SeasonProviderSereneSeasons;
-
+import com.ferreusveritas.dynamictrees.seasons.*;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
@@ -15,13 +9,13 @@ import sereneseasons.config.BiomeConfig;
 import sereneseasons.config.SeasonsConfig;
 
 public class CompatHandler {
-	
+
 	public static void preInit() {
-		if(Loader.isModLoaded(ModConstants.SERENESEASONS)) {
+		if (Loader.isModLoaded(ModConstants.SERENESEASONS)) {
 			HandleSereneSeasons();
 		}
 	}
-	
+
 	@Optional.Method(modid = ModConstants.SERENESEASONS)
 	public static void HandleSereneSeasons() {
 		SeasonManager seasonManager = new SeasonManager(
@@ -32,5 +26,5 @@ public class CompatHandler {
 		seasonManager.setTropicalPredicate((world, pos) -> BiomeConfig.usesTropicalSeasons(world.getBiome(pos)));
 		SeasonHelper.setSeasonManager(seasonManager);
 	}
-	
+
 }
