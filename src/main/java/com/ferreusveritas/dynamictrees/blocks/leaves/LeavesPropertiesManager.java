@@ -5,9 +5,11 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.util.ToolTypes;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.ferreusveritas.dynamictrees.util.json.ResourceLocationGetter;
 import com.google.gson.JsonObject;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -61,9 +63,15 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
 
         // Generate block by default, but allow it to be turned off.
         if (JsonHelper.getOrDefault(jsonObject, "generate_block", Boolean.class, true)) {
-            leavesProperties.generateDynamicLeaves(JsonHelper.getBlockProperties(jsonObject,
+            final AbstractBlock.Properties blockProperties = JsonHelper.getBlockProperties(jsonObject,
                     leavesProperties.getDefaultMaterial(), leavesProperties.getDefaultMaterial().getColor(),
-                    leavesProperties::getDefaultBlockProperties, errorConsumer, warningConsumer));
+                    leavesProperties::getDefaultBlockProperties, errorConsumer, warningConsumer);
+
+            if (blockProperties.getHarvestTool() == ToolTypes.SHEARS) {
+                leavesProperties.setRequiresShears(true);
+            }
+
+            leavesProperties.generateDynamicLeaves(blockProperties);
         }
     }
 

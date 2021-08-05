@@ -181,7 +181,7 @@ curseforge {
     if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
         apiKey = property("curseApiKey")
 
-        project(closureOf<CurseProject> {
+        project {
             id = "252818"
 
             addGameVersion("1.16.4")
@@ -193,13 +193,13 @@ curseforge {
 
             addArtifact(tasks.findByName("sourcesJar"))
 
-            mainArtifact(tasks.findByName("jar"), closureOf<CurseArtifact>{
-                relations(closureOf<CurseRelation> {
+            mainArtifact(tasks.findByName("jar")) {
+                relations {
                     optionalDependency("dynamictreesplus")
                     optionalDependency("chunk-saving-fix")
-                })
-            })
-        })
+                }
+            }
+        }
     } else {
         project.logger.log(LogLevel.WARN, "API Key and file type for CurseForge not detected; uploading will be disabled.")
     }
@@ -275,4 +275,18 @@ publishing {
             logger.log(LogLevel.WARN, "Credentials for maven not detected; it will be disabled.")
         }
     }
+}
+
+// Extensions to make CurseGradle extension slightly neater.
+
+fun com.matthewprenger.cursegradle.CurseExtension.project(action: CurseProject.() -> Unit) {
+    this.project(closureOf(action))
+}
+
+fun CurseProject.mainArtifact(artifact: Task?, action: CurseArtifact.() -> Unit) {
+    this.mainArtifact(artifact, closureOf(action))
+}
+
+fun CurseArtifact.relations(action: CurseRelation.() -> Unit) {
+    this.relations(closureOf(action))
 }

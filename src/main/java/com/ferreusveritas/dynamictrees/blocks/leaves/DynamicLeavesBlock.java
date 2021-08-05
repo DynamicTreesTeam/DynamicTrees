@@ -18,6 +18,7 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.ToolTypes;
 import net.minecraft.block.*;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -599,13 +600,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
             return true;
         }
 
-        // Since shears don't have a ToolType, requireShears acts as an override.
+        // Since shears don't have a ToolType, requireShears acts as an override for shears not extending ShearsItem.
         if (this.getProperties(state).doRequireShears()) {
-            return item instanceof ShearsItem;
+            return item instanceof ShearsItem || item.getToolTypes(stack).contains(ToolTypes.SHEARS);
         }
 
-        final ToolType harvestTool = state.getHarvestTool();
-
+        final ToolType harvestTool = this.getHarvestTool(state);
         return harvestTool != null && item.getToolTypes(stack).contains(harvestTool);
     }
 

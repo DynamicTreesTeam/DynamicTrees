@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
+import com.ferreusveritas.dynamictrees.util.ToolTypes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.*;
@@ -24,6 +25,7 @@ import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShearsItem;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -35,6 +37,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
@@ -151,8 +154,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     protected boolean connectAnyRadius = false;
 
     /**
-     * Since shears are not a {@link net.minecraftforge.common.ToolType} (at the moment), we'll use this for an optional
-     * override of the {@link Block.Properties} {@link net.minecraftforge.common.ToolType}.
+     * A shears {@link ToolType} doesn't exist by default, so we use this as a backup for shears extending
+     * {@link ShearsItem} but not registering a shears tool type.
      */
     protected boolean requiresShears = true;
 
@@ -422,9 +425,15 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     public AbstractBlock.Properties getDefaultBlockProperties(final Material material, final MaterialColor materialColor) {
-        return AbstractBlock.Properties.of(material, materialColor).strength(0.2F).randomTicks()
-                .sound(SoundType.GRASS).noOcclusion().isValidSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
-                .isSuffocating((s, r, p) -> false).isViewBlocking((s, r, p) -> false);
+        return AbstractBlock.Properties.of(material, materialColor)
+                .strength(0.2F)
+                .harvestTool(ToolTypes.SHEARS)
+                .randomTicks()
+                .sound(SoundType.GRASS)
+                .noOcclusion()
+                .isValidSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
+                .isSuffocating((s, r, p) -> false)
+                .isViewBlocking((s, r, p) -> false);
     }
 
     ///////////////////////////////////////////
@@ -444,7 +453,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return getDoesAge(false, state);
     }
 
-    public int getRadiusForConnection(BlockState blockState, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+    public int getRadiusForConnection(BlockState state, IBlockReader blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         final int twigRadius = from.getFamily().getPrimaryThickness();
         return (fromRadius == twigRadius || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(from.getFamily().getCommonSpecies(), blockAccess.getBlockState(pos), blockAccess, pos) ? twigRadius : 0;
     }
