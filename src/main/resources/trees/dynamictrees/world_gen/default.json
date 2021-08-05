@@ -85,10 +85,11 @@
     "apply": {
       "species" : {
         "random" : {
-          "jungle" : 1
+          "jungle" : 5,
+          "mega_jungle" : 1
         }
       },
-      "density": [ 5 ],
+      "density": [ 2 ],
       "forestness" : 1.0
     }
   },

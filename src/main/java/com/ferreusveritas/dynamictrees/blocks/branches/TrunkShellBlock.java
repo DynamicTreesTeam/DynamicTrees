@@ -185,21 +185,16 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
     }
 
     public void scheduleUpdateTick(IBlockReader access, BlockPos pos) {
-        if (!(access instanceof World) || !((World) access).isClientSide()) {
+        if (!(access instanceof IWorld)) {
             return;
         }
 
-        ((World) access).getBlockTicks().scheduleTick(pos.immutable(), this, 0, TickPriority.HIGH);
-    }
-
-    @Override
-    public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
-        this.getMuse(world, pos);
+        ((IWorld) access).getBlockTicks().scheduleTick(pos.immutable(), this, 0, TickPriority.HIGH);
     }
 
     @Override
     public void neighborChanged(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean p_220069_6_) {
-        this.getMuse(world, pos);
+        scheduleUpdateTick(world, pos);
     }
 
     @Override

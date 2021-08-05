@@ -64,7 +64,7 @@ public class DestroyerNode implements INodeInspector {
             if (branch.getRadius(blockState) == species.getFamily().getPrimaryThickness()) {
                 endPoints.add(pos);
             }
-            world.setBlock(pos, waterlogged ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState(), 2);//Destroy the branch and notify the client
+            world.setBlock(pos, waterlogged ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState(), 3);//Destroy the branch and notify the client
         }
 
         return true;
