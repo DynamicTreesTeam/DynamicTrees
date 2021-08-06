@@ -132,6 +132,13 @@
 		} 
 	},
 	{
+		"__comment": "Any biome with 'mutated_birch' in the name is 100% tall birch",
+		"select": { "name": "minecraft:.*mutated_birch.*" },
+		"apply": {
+			"species" : "tallbirch"
+		}
+	},
+	{
 		"__comment": "1/25 chance to spawn apple trees in any minecraft biome that ends in 'plains'",
 		"select": { "name": "minecraft:.*plains" },
 		"apply": {

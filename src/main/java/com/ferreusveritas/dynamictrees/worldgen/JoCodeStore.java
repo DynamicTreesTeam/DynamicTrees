@@ -22,8 +22,8 @@ public class JoCodeStore {
 	ArrayList<ArrayList<JoCode>> store = new ArrayList<ArrayList<JoCode>>(7);//Radius values 2,3,4,5,6,7,8
 	Species species;
 
-	public JoCodeStore(Species tree) {
-		this.species = tree;
+	public JoCodeStore(Species species) {
+		this.species = species;
 		for (int i = 0; i < 7; i++) {
 			store.add(new ArrayList<JoCode>());
 		}
