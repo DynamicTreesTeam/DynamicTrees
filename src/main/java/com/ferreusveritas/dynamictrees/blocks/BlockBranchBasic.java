@@ -422,7 +422,7 @@ public class BlockBranchBasic extends BlockBranch {
 	///////////////////////////////////////////
 
 	protected int getMaxSignalDepth() {
-		return 32;
+		return this.getFamily().getMaxSignalDepth();
 	}
 
 	/**

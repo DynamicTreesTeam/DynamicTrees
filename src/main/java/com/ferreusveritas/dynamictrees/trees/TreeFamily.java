@@ -190,7 +190,9 @@ public class TreeFamily {
 	private final LinkedList<ISpeciesLocationOverride> speciesLocationOverrides = new LinkedList<>();
 
 	public interface ISpeciesLocationOverride {
+
 		Species getSpeciesForLocation(World world, BlockPos trunkPos);
+
 	}
 
 	///////////////////////////////////////////
@@ -421,7 +423,7 @@ public class TreeFamily {
 	}
 
 	/**
-	 * @return the branch block from the specified {@code index} in {@link #validBranches}; otherwise {@code null} 
+	 * @return the branch block from the specified {@code index} in {@link #validBranches}; otherwise {@code null}
 	 * if the specified {@code index} was out of bounds
 	 */
 	@Nullable
@@ -429,7 +431,11 @@ public class TreeFamily {
 		return index < this.validBranches.size() ?
 			this.validBranches.get(index) : null;
 	}
-
+	
+	public int getMaxSignalDepth() {
+		return 32;
+	}
+	
 	///////////////////////////////////////////
 	// SURFACE ROOTS
 	///////////////////////////////////////////
@@ -456,7 +462,9 @@ public class TreeFamily {
 	}
 
 	public interface IConnectable {
+
 		boolean isConnectable(IBlockState blockState);
+
 	}
 
 	LinkedList<IConnectable> vanillaConnectables = new LinkedList<>();
