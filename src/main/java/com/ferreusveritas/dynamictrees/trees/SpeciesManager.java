@@ -125,7 +125,8 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 })
                 .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreators)
                 .registerArrayApplier("features", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, Species::addGenFeature)
-                .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreators);
+                .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreators)
+                .register("does_rot", Boolean.class, Species::setDoesRot);
 
         super.registerAppliers();
     }

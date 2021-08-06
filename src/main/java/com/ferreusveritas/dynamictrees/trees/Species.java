@@ -1333,6 +1333,12 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     static private final Direction[] upFirst = {Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 
+    private boolean doesRot = true;
+
+    public void setDoesRot (boolean doesRot){
+        this.doesRot = doesRot;
+    }
+
     /**
      * Handles rotting branches.
      *
@@ -1348,6 +1354,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @return true if the branch should rot
      */
     public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
+        if (!doesRot) return false;
         if (radius <= family.getPrimaryThickness()) {
             if (!getLeavesProperties().getDynamicLeavesBlock().isPresent()) {
                 return false;
