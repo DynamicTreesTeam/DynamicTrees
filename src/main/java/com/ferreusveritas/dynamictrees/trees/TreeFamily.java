@@ -421,11 +421,13 @@ public class TreeFamily {
 	}
 
 	/**
-	 * @return the branch block of the index passed in validBranches
+	 * @return the branch block from the specified {@code index} in {@link #validBranches}; otherwise {@code null} 
+	 * if the specified {@code index} was out of bounds
 	 */
 	@Nullable
 	public BlockBranch getValidBranchBlock(int index) {
-		return this.validBranches.get(index);
+		return index < this.validBranches.size() ?
+			this.validBranches.get(index) : null;
 	}
 
 	///////////////////////////////////////////
