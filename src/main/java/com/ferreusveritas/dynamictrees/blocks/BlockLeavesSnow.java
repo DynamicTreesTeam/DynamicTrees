@@ -50,4 +50,5 @@ public class BlockLeavesSnow extends BlockSnow {
 			world.setBlockToAir(pos);
 		}
 	}
+
 }

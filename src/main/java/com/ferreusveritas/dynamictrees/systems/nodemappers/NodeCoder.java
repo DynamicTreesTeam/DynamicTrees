@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class NodeCoder implements INodeInspector {
 
 	private class Link {
+
 		BlockPos pos;
 		int forks;
 		Link[] links;//Links to the other possible 6 directions
@@ -21,6 +22,7 @@ public class NodeCoder implements INodeInspector {
 			this.pos = pos;
 			links = new Link[6];
 		}
+
 	}
 
 	private final ArrayList<Link> links;

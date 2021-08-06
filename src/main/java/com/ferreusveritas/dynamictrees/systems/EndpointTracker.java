@@ -14,6 +14,7 @@ import java.util.HashMap;
 public class EndpointTracker {
 
 	public static class ChunkLocation extends Vec3i {
+
 		public ChunkLocation(World world, int x, int z) {
 			super(x, world.provider.getDimension(), z);
 		}
@@ -25,9 +26,11 @@ public class EndpointTracker {
 		public int blockZ() {
 			return getZ() << 4;
 		}
+
 	}
 
 	public static class ChunkEntry {
+
 		public ChunkLocation chunkLoc;
 		public short[] points;
 		private int numPoints;

@@ -164,6 +164,7 @@ public class TreeCactus extends TreeFamily {
 		public SoundType getSaplingSound() {
 			return SoundType.CLOTH;
 		}
+
 	}
 
 	public TreeCactus() {

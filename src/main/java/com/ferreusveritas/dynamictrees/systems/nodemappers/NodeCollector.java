@@ -30,4 +30,5 @@ public class NodeCollector implements INodeInspector {
 	public boolean contains(BlockPos pos) {
 		return nodeSet.contains(pos);
 	}
+
 }

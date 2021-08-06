@@ -51,4 +51,5 @@ public class SeedVoluntaryPlantEvent extends Event {
 	public boolean getWillPlant() {
 		return willPlant;
 	}
+
 }

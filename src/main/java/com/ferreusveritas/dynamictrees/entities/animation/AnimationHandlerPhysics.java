@@ -21,14 +21,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.Random;
 
 public class AnimationHandlerPhysics implements IAnimationHandler {
+
 	@Override
 	public String getName() {
 		return "physics";
 	}
 
 	class HandlerData extends AnimationHandlerData {
+
 		float rotYaw = 0;
 		float rotPit = 0;
+
 	}
 
 	HandlerData getData(EntityFallingTree entity) {
@@ -166,4 +169,5 @@ public class AnimationHandlerPhysics implements IAnimationHandler {
 	public boolean shouldRender(EntityFallingTree entity) {
 		return true;
 	}
+
 }

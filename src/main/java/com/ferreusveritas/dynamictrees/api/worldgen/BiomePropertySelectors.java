@@ -19,21 +19,28 @@ import java.util.Random;
 public class BiomePropertySelectors {
 
 	public interface IChanceSelector {
+
 		EnumChance getChance(Random random, @Nonnull Species species, int radius);
+
 	}
 
 	public interface IDensitySelector {
+
 		double getDensity(Random random, double noiseDensity);
+
 	}
 
 	public interface ISpeciesSelector {
+
 		SpeciesSelection getSpecies(BlockPos pos, IBlockState dirt, Random random);
+
 	}
 
 	/**
 	 * This is the data that represents a species selection. This class was necessary to have an unhandled state.
 	 */
 	public static class SpeciesSelection {
+
 		private final boolean handled;
 		private final Species species;
 
@@ -54,9 +61,11 @@ public class BiomePropertySelectors {
 		public Species getSpecies() {
 			return species;
 		}
+
 	}
 
 	public static class StaticSpeciesSelector implements ISpeciesSelector {
+
 		final SpeciesSelection decision;
 
 		public StaticSpeciesSelector(SpeciesSelection decision) {
@@ -75,11 +84,13 @@ public class BiomePropertySelectors {
 		public SpeciesSelection getSpecies(BlockPos pos, IBlockState dirt, Random random) {
 			return decision;
 		}
+
 	}
 
 	public static class RandomSpeciesSelector implements ISpeciesSelector {
 
 		private class Entry {
+
 			public Entry(SpeciesSelection d, int w) {
 				decision = d;
 				weight = w;
@@ -87,6 +98,7 @@ public class BiomePropertySelectors {
 
 			public SpeciesSelection decision;
 			public int weight;
+
 		}
 
 		ArrayList<Entry> decisionTable = new ArrayList<Entry>();
@@ -131,4 +143,5 @@ public class BiomePropertySelectors {
 		CANCEL,
 		UNHANDLED
 	}
+
 }

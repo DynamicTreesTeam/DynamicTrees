@@ -6,6 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public interface ICustomRootDecay {
+
 	/**
 	 * @param world      The World
 	 * @param rootPos    The position of the root block
@@ -14,4 +15,5 @@ public interface ICustomRootDecay {
 	 * @return true if handled, false to run the default decay algorithm
 	 */
 	boolean doDecay(World world, BlockPos rootPos, IBlockState rootyState, Species species);
+
 }

@@ -215,6 +215,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 	}
 
 	public class BlockItemStack {
+
 		public final ItemStack stack;
 		public final BlockPos pos;
 
@@ -222,6 +223,7 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 			this.stack = stack;
 			this.pos = pos;
 		}
+
 	}
 
 	/**

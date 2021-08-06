@@ -119,6 +119,7 @@ public class ModelEntityFallingTree {
 	}
 
 	public static final class TreeQuadData {
+
 		public final BakedQuad bakedQuad;
 		public final IBlockState state;
 		public final int color;
@@ -128,6 +129,7 @@ public class ModelEntityFallingTree {
 			this.state = state;
 			this.color = color;
 		}
+
 	}
 
 }

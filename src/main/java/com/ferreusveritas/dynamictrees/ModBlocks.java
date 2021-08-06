@@ -110,6 +110,7 @@ public class ModBlocks {
 	}
 
 	public static class CommonBlockStates {
+
 		public final IBlockState air = Blocks.AIR.getDefaultState();
 		public final IBlockState dirt = Blocks.DIRT.getDefaultState();
 		public final IBlockState sand = Blocks.SAND.getDefaultState();
@@ -118,6 +119,7 @@ public class ModBlocks {
 		public final IBlockState redMushroom = Blocks.RED_MUSHROOM.getDefaultState();
 		public final IBlockState brownMushroom = Blocks.BROWN_MUSHROOM.getDefaultState();
 		public final IBlockState snowLayer = blockLeavesSnow.getDefaultState();
+
 	}
 
 }

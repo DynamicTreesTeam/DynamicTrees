@@ -520,6 +520,7 @@ public class JoCode {
 
 			return array;
 		}
+
 	}
 
 }

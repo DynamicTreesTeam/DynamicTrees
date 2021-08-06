@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 
 public class BranchDestructionData {
+
 	public final Species species; // The species of the tree that was harvested
 	public final int[] destroyedBranchesRadiusPosition; // Encoded branch radius and relative positions
 	public final int[] destroyedBranchesConnections; // Encoded branch shapes

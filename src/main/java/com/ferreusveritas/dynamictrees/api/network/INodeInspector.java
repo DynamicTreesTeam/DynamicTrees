@@ -10,4 +10,5 @@ public interface INodeInspector {
 	boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir);
 
 	boolean returnRun(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir);
+
 }

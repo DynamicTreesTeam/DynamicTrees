@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
@@ -43,6 +42,7 @@ public class BlockTrunkShell extends Block {
 	public static final String name = "trunkshell";
 
 	public static class ShellMuse {
+
 		public final IBlockState state;
 		public final BlockPos pos;
 		public final Surround dir;
@@ -57,6 +57,7 @@ public class BlockTrunkShell extends Block {
 			Block block = state.getBlock();
 			return block instanceof BlockBranch ? ((BlockBranch) block).getRadius(state) : 0;
 		}
+
 	}
 
 	public BlockTrunkShell() {

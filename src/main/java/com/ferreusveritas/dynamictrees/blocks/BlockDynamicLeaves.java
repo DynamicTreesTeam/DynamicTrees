@@ -24,7 +24,6 @@ import net.minecraft.block.BlockPlanks.EnumType;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -209,7 +208,9 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	protected interface NewLeavesPropertiesHandler {
+
 		IBlockState getLeaves(World world, BlockPos pos, IBlockState leavesStateWithHydro);
+
 	}
 
 	@Override

@@ -23,4 +23,5 @@ public class WailaRootyHandler implements IWailaDataProvider {
 
 		return tooltip;
 	}
+
 }

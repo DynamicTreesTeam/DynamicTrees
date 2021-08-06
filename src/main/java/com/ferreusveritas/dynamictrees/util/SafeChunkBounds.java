@@ -19,6 +19,7 @@ public class SafeChunkBounds {
 	protected static final Tile[] tiles = new Tile[16];
 
 	protected static class Tile {
+
 		public final ChunkPos pos;
 		public final int borders;
 		public final int index;
@@ -28,6 +29,7 @@ public class SafeChunkBounds {
 			this.pos = pos;
 			this.borders = borderFlags;
 		}
+
 	}
 
 	static {

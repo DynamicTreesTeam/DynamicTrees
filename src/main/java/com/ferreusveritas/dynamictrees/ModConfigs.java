@@ -124,4 +124,5 @@ public class ModConfigs {
 
 		config.save();
 	}
+
 }

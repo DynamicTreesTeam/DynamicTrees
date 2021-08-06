@@ -28,15 +28,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class AnimationHandlerFallover implements IAnimationHandler {
+
 	@Override
 	public String getName() {
 		return "fallover";
 	}
 
 	class HandlerData extends AnimationHandlerData {
+
 		float fallSpeed = 0;
 		int bounces = 0;
 		HashSet<EntityLivingBase> entitiesHit = new HashSet<>();//A record of the entities that have taken damage to ensure they are only damaged a single time
+
 	}
 
 	HandlerData getData(EntityFallingTree entity) {

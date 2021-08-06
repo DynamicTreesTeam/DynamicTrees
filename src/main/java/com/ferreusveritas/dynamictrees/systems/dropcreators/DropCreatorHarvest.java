@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 public class DropCreatorHarvest extends DropCreator {
+
 	ItemStack droppedItem;
 	float rate;
 

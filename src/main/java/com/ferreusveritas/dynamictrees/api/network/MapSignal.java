@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MapSignal {
 
@@ -30,10 +31,7 @@ public class MapSignal {
 
 	public MapSignal(INodeInspector... nis) {
 		this();
-
-		for (INodeInspector ni : nis) {
-			nodeInspectors.add(ni);
-		}
+		Collections.addAll(nodeInspectors, nis);
 	}
 
 	public boolean run(IBlockState blockState, World world, BlockPos pos, EnumFacing fromDir) {

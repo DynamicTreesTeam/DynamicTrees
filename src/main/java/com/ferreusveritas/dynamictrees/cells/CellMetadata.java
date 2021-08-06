@@ -22,4 +22,5 @@ public class CellMetadata {
 	public static int getMeta(int radiusMeta) {
 		return radiusMeta >> 8;
 	}
+
 }

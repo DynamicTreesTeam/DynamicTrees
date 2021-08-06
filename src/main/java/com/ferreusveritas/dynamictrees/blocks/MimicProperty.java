@@ -100,7 +100,9 @@ public class MimicProperty implements IUnlistedProperty<IBlockState> {
 	}
 
 	public interface IMimic {
+
 		IBlockState getMimic(IBlockAccess access, BlockPos pos);
+
 	}
 
 }

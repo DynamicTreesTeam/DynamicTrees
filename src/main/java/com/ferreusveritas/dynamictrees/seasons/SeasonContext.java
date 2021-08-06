@@ -6,6 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SeasonContext {
+
 	private final ISeasonProvider provider;
 	private final ISeasonGrowthCalculator calculator;
 	private float temperateGrowthFactor;

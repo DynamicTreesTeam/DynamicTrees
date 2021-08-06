@@ -328,7 +328,9 @@ public class TreeBuilder {
 	}
 
 	public interface ISpeciesCreator {
+
 		Species create(TreeFamily tree);
+
 	}
 
 }

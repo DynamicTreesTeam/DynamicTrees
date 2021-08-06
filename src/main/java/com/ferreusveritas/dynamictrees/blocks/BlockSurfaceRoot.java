@@ -89,6 +89,7 @@ public class BlockSurfaceRoot extends Block {
 	}
 
 	public class RootConnection {
+
 		public ConnectionLevel level;
 		public int radius;
 
@@ -96,6 +97,7 @@ public class BlockSurfaceRoot extends Block {
 			this.level = level;
 			this.radius = radius;
 		}
+
 	}
 
 	///////////////////////////////////////////

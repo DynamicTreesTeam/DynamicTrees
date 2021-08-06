@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class ExtendedBlockStateWater extends BlockStateContainer {
+
 	private final ImmutableSet<IUnlistedProperty<?>> unlistedProperties;
 
 	public ExtendedBlockStateWater(Block blockIn, IProperty<?>[] properties, IUnlistedProperty<?>[] unlistedProperties) {
@@ -52,6 +53,7 @@ public class ExtendedBlockStateWater extends BlockStateContainer {
 	}
 
 	protected static class ExtendedStateImplementationWater extends StateImplementation implements IExtendedBlockState {
+
 		private final ImmutableMap<IUnlistedProperty<?>, Optional<?>> unlistedProperties;
 		private final IBlockState cleanState;
 
@@ -138,5 +140,7 @@ public class ExtendedBlockStateWater extends BlockStateContainer {
 		public IBlockState getClean() {
 			return cleanState;
 		}
+
 	}
+
 }

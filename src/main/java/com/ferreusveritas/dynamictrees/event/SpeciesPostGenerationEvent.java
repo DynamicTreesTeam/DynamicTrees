@@ -71,4 +71,5 @@ public class SpeciesPostGenerationEvent extends Event {
 	public IBlockState getInitialDirtState() {
 		return initialDirtState;
 	}
+
 }

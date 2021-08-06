@@ -8,6 +8,7 @@ import java.util.Arrays;
 public class TextureUtils {
 
 	public static class PixelBuffer {
+
 		public final int[] pixels;
 		public final int w;
 		public final int h;
@@ -196,4 +197,5 @@ public class TextureUtils {
 
 		return compose(r, g, b, 255);
 	}
+
 }

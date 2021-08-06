@@ -20,6 +20,7 @@ public class TextureGenerationHandler {
 	private static final Map<ResourceLocation, ResourceLocation> thickRingTextures = new HashMap<ResourceLocation, ResourceLocation>();
 
 	public static class DualResourceLocation extends ResourceLocation {
+
 		private final ResourceLocation alternate;
 
 		public DualResourceLocation(ResourceLocation primary, ResourceLocation alternate) {
@@ -30,6 +31,7 @@ public class TextureGenerationHandler {
 		public ResourceLocation getAlternate() {
 			return alternate;
 		}
+
 	}
 
 	public static ResourceLocation addRingTextureLocation(ResourceLocation ringsRes) {

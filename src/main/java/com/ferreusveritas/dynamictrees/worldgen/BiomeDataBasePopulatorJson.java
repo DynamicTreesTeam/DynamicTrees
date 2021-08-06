@@ -216,6 +216,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	}
 
 	private class JsonBiomeSelectorData {
+
 		final IJsonBiomeSelector selector;
 		final JsonElement elementData;
 
@@ -227,9 +228,11 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 		Predicate<Biome> getFilter() {
 			return this.selector.getFilter(elementData);
 		}
+
 	}
 
 	private class JsonBiomeApplierData {
+
 		IJsonBiomeApplier applier;
 		JsonElement elementData;
 
@@ -241,6 +244,7 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 		void apply(BiomeDataBase dbase, Biome biome) {
 			this.applier.apply(dbase, elementData, biome);
 		}
+
 	}
 
 	public static boolean isComment(String s) {

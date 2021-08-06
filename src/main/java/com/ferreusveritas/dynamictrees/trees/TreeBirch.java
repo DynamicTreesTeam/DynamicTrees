@@ -61,12 +61,12 @@ public class TreeBirch extends TreeFamilyVanilla {
 		}
 
 	}
-	
+
 	public class SpeciesTallBirch extends SpeciesBirch {
 
 		public SpeciesTallBirch(TreeFamily treeFamily) {
 			super(new ResourceLocation(ModConstants.MODID, "tallbirch"), treeFamily);
-			
+
 			this.setBasicGrowingParameters(0.08F, 24.0F, 7, 7, 1.3F);
 			this.setSoilLongevity(12);
 		}
@@ -85,23 +85,24 @@ public class TreeBirch extends TreeFamilyVanilla {
 		public Seed getSeed() {
 			return getCommonSpecies().getSeed();
 		}
+
 	}
-	
+
 	private static boolean isMutatedBirchForest(Biome biome) {
 		return isOneOfBiomes(biome, Biomes.MUTATED_BIRCH_FOREST, Biomes.MUTATED_BIRCH_FOREST_HILLS);
 	}
-	
+
 	Species tallSpecies;
 
 	public TreeBirch() {
 		super(BlockPlanks.EnumType.BIRCH);
-		
+
 		this.hasConiferVariants = true;
-		this.addConnectableVanillaLeaves((state) -> 
+		this.addConnectableVanillaLeaves((state) ->
 			state.getBlock() instanceof BlockOldLeaf && (state.getValue(BlockOldLeaf.VARIANT) == BlockPlanks.EnumType.BIRCH)
 		);
 		this.addSpeciesLocationOverride(
-			(world, trunkPos) -> isMutatedBirchForest(world.getBiome(trunkPos)) ? 
+			(world, trunkPos) -> isMutatedBirchForest(world.getBiome(trunkPos)) ?
 				this.tallSpecies : Species.NULLSPECIES
 		);
 	}

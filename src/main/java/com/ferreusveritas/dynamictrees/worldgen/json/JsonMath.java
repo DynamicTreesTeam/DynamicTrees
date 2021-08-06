@@ -129,6 +129,7 @@ public class JsonMath {
 	}
 
 	public static class MathContext {
+
 		public float noise;
 		public Random rand;
 
@@ -136,9 +137,11 @@ public class JsonMath {
 			this.noise = noise;
 			this.rand = random;
 		}
+
 	}
 
 	public static class MathSpeciesContext extends MathContext {
+
 		public float radius;
 		public Species species;
 
@@ -151,10 +154,13 @@ public class JsonMath {
 	}
 
 	public interface MathOperator {
+
 		float apply(MathContext mc);
+
 	}
 
 	public static class Const implements MathOperator {
+
 		private final float value;
 
 		Const(float value) {
@@ -165,6 +171,7 @@ public class JsonMath {
 		public float apply(MathContext mc) {
 			return value;
 		}
+
 	}
 
 	public static class Noise implements MathOperator {
@@ -238,6 +245,7 @@ public class JsonMath {
 
 			return r;
 		}
+
 	}
 
 	public static class Subtractor implements MathOperator {
@@ -265,6 +273,7 @@ public class JsonMath {
 
 			return r == null ? 0.0f : r.floatValue();
 		}
+
 	}
 
 	public static class Multiplier implements MathOperator {
@@ -291,6 +300,7 @@ public class JsonMath {
 
 			return r;
 		}
+
 	}
 
 	public static class Divider implements MathOperator {
@@ -318,6 +328,7 @@ public class JsonMath {
 
 			return r == null ? 0.0f : r.floatValue();
 		}
+
 	}
 
 	public static class Modulus implements MathOperator {
@@ -339,6 +350,7 @@ public class JsonMath {
 
 			return 0.0f;
 		}
+
 	}
 
 
@@ -367,6 +379,7 @@ public class JsonMath {
 
 			return r == null ? 0.0f : r.floatValue();
 		}
+
 	}
 
 	public static class Minimum implements MathOperator {
@@ -394,6 +407,7 @@ public class JsonMath {
 
 			return r == null ? 0.0f : r.floatValue();
 		}
+
 	}
 
 	public static class IfGreaterThan implements MathOperator {
@@ -491,4 +505,5 @@ public class JsonMath {
 		}
 
 	}
+
 }

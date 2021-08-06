@@ -36,4 +36,5 @@ public class WailaRootyWaterHandler implements IWailaDataProvider {
 
 		return tooltip;
 	}
+
 }

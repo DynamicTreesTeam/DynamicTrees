@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 public class PoissonDiscPairData {
+
 	private final Vec2i[] coordData;
 	private final int sectors;
 

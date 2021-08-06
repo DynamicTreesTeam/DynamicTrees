@@ -591,6 +591,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 
 	public class LogsAndSticks {
+
 		public final int logs;
 		public final int sticks;
 

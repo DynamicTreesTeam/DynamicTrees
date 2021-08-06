@@ -118,7 +118,9 @@ public class SimpleVoxmap {
 	}
 
 	public interface IBlitOp {
+
 		byte getOp(byte srcValue, byte dstValue);
+
 	}
 
 	public SimpleVoxmap blitOp(BlockPos pos, SimpleVoxmap src, IBlitOp op) {
@@ -160,7 +162,9 @@ public class SimpleVoxmap {
 	}
 
 	public interface IFilterOp {
+
 		byte getOp(byte data);
+
 	}
 
 	public SimpleVoxmap filter(IFilterOp op) {
@@ -270,6 +274,7 @@ public class SimpleVoxmap {
 
 
 	public class Cell {
+
 		private byte value;
 		private final MutableBlockPos pos;
 

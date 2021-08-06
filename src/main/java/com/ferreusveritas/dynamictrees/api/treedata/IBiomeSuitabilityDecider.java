@@ -21,6 +21,7 @@ public interface IBiomeSuitabilityDecider {
 	 * Decision interface for handling the event
 	 */
 	class Decision {
+
 		private final boolean handled;//The handling indicator
 		private float suitability;//The payload
 
@@ -49,6 +50,7 @@ public interface IBiomeSuitabilityDecider {
 		public float getSuitability() {
 			return suitability;
 		}
+
 	}
 
 }

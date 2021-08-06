@@ -101,6 +101,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	}
 
 	public static class PrimitiveLeavesComponents {
+
 		public IBlockState state;
 		public ItemStack stack;
 
@@ -113,6 +114,7 @@ public class LeavesPropertiesJson extends LeavesProperties {
 			lpJson.primitiveLeaves = state;
 			lpJson.primitiveLeavesItemStack = stack;
 		}
+
 	}
 
 	private static PrimitiveLeavesComponents getPrimitiveLeaves(String leavesDesc) {
@@ -221,7 +223,9 @@ public class LeavesPropertiesJson extends LeavesProperties {
 	protected ILeavesUpdate leavesUpdate = (w, p, s, r, l) -> true;
 
 	public interface ILeavesUpdate {
+
 		boolean updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand, ILeavesProperties leavesProperties);
+
 	}
 
 	public void setLeavesUpdate(ILeavesUpdate leavesUpdate) {

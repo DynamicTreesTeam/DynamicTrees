@@ -431,11 +431,11 @@ public class TreeFamily {
 		return index < this.validBranches.size() ?
 			this.validBranches.get(index) : null;
 	}
-	
+
 	public int getMaxSignalDepth() {
 		return 32;
 	}
-	
+
 	///////////////////////////////////////////
 	// SURFACE ROOTS
 	///////////////////////////////////////////

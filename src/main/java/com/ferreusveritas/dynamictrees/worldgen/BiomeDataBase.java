@@ -70,6 +70,7 @@ public class BiomeDataBase {
 	}
 
 	public static class BiomeEntry {
+
 		private final Biome biome;
 		private final int biomeId;
 		private IChanceSelector chanceSelector = (rnd, spc, rad) -> EnumChance.UNHANDLED;
