@@ -70,7 +70,12 @@
 	{
 		"select": { "type": "jungle", "name": "minecraft:.*" },
 		"apply": {
-			"species" : "jungle",
+			"species" : {
+				"random" : {
+					"jungle" : 5,
+					"megajungle" : 1
+				}
+			},
 			"forestness" : 1.0
 		}
 	},

@@ -39,7 +39,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 			super(treeFamily.getName(), treeFamily);
 
 			//Jungle Trees are tall, wildly growing, fast growing trees with low branches to provide inconvenient obstruction and climbing
-			setBasicGrowingParameters(0.2f, 28.0f, 3, 2, 1.0f);
+			setBasicGrowingParameters(0.2f, 24.0f, 3, 2, 1.0f);
 			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(ModTrees.JUNGLE));
 
 			envFactor(Type.COLD, 0.15f);
@@ -77,7 +77,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 
 			setRequiresTileEntity(true);
 
-			setBasicGrowingParameters(0.32f, 32.0f, 7, 8, 0.9f);
+			setBasicGrowingParameters(0.17F, 35.0f, 10, 8, 0.9f);
 			setGrowthLogicKit(TreeRegistry.findGrowthLogicKit(ModTrees.JUNGLE));
 
 			envFactor(Type.COLD, 0.15f);
@@ -85,7 +85,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 			envFactor(Type.HOT, 1.1f);
 			envFactor(Type.WET, 1.1f);
 
-			setSoilLongevity(16);//Grows for a while so it can actually get tall
+			setSoilLongevity(16); // Grows for a while so it can actually get tall
 
 			//Add species features
 			addGenFeature(new FeatureGenVine().setQuantity(16).setMaxLength(16));
@@ -97,7 +97,7 @@ public class TreeJungle extends TreeFamilyVanilla {
 
 		protected BiFunction<Integer, Integer, Integer> getRootScaler() {
 			return (inRadius, trunkRadius) -> {
-				float scale = MathHelper.clamp(trunkRadius >= 9 ? (trunkRadius / 18f) : 0, 0, 1);
+				float scale = MathHelper.clamp(trunkRadius >= 9 ? (trunkRadius / 20f) : 0, 0, 1);
 				return (int) (inRadius * scale);
 			};
 		}
@@ -132,6 +132,11 @@ public class TreeJungle extends TreeFamilyVanilla {
 		@Override
 		public boolean isMega() {
 			return true;
+		}
+
+		@Override
+		public int getWorldGenLeafMapHeight() {
+			return 40;
 		}
 
 	}
@@ -173,6 +178,11 @@ public class TreeJungle extends TreeFamilyVanilla {
 		blockList = super.getRegisterableBlocks(blockList);
 		blockList.add(surfaceRootBlock);
 		return blockList;
+	}
+
+	@Override
+	public int getMaxSignalDepth() {
+		return 64; // Allows Mega Jungle to grow much higher.
 	}
 
 	@Override
