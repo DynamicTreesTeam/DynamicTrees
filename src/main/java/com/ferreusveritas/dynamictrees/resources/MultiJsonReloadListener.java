@@ -18,9 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An extension of {@link ReloadListener} in which each map entry contains every file loaded
- * for the given resource location. Useful for reload listeners that need to load multiple files
- * from the same resource location.
+ * An extension of {@link ReloadListener} in which each map entry contains every file loaded for the given resource
+ * location. Useful for reload listeners that need to load multiple files from the same resource location.
  *
  * @author Harley O'Connor
  */

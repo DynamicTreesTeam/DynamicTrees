@@ -19,29 +19,32 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
     private static final VoidApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeString) ->
             biomeList.removeIf(biome -> {
                         final Set<BiomeDictionary.Type> biomeTypes = BiomeDictionary.getTypes(RegistryKey.create(ForgeRegistries.Keys.BIOMES, biome.getRegistryName()));
-                        if (typeString.toCharArray()[0] == '!')
-                            return biomeTypes.stream().anyMatch(type -> type.toString().toLowerCase().matches(typeString.substring(1).toLowerCase()));
-                         else
-                            return biomeTypes.stream().noneMatch(type -> type.toString().toLowerCase().matches(typeString.toLowerCase()));
+                if (typeString.toCharArray()[0] == '!') {
+                    return biomeTypes.stream().anyMatch(type -> type.toString().toLowerCase().matches(typeString.substring(1).toLowerCase()));
+                } else {
+                    return biomeTypes.stream().noneMatch(type -> type.toString().toLowerCase().matches(typeString.toLowerCase()));
+                }
                     }
             );
 
     private static final VoidApplier<BiomeList, String> CATEGORY_APPLIER = (biomeList, categoryString) ->
             biomeList.removeIf(biome -> {
                 final String biomeName = biome.getRegistryName().toString();
-                if (categoryString.toCharArray()[0] == '!')
+                if (categoryString.toCharArray()[0] == '!') {
                     return biomeName.toLowerCase().matches(categoryString.substring(1).toLowerCase());
-                else
+                } else {
                     return !biomeName.toLowerCase().matches(categoryString.toLowerCase());
+                }
             });
 
     private static final VoidApplier<BiomeList, String> NAME_APPLIER = (biomeList, nameString) ->
             biomeList.removeIf(biome -> {
                 final String biomeName = biome.getRegistryName().toString();
-                if (nameString.toCharArray()[0] == '!')
+                if (nameString.toCharArray()[0] == '!') {
                     return biomeName.matches(nameString.substring(1).toLowerCase());
-                else
+                } else {
                     return !biomeName.matches(nameString.toLowerCase());
+                }
             });
 
     private final JsonPropertyApplierList<BiomeList> appliers = new JsonPropertyApplierList<>(BiomeList.class);
@@ -63,8 +66,9 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
         if (biomeResult.wasSuccessful()) {
             biomes = new BiomeList(Collections.singletonList(biomeResult.getValue()));
         } else {
-            if (!jsonElement.isJsonObject())
+            if (!jsonElement.isJsonObject()) {
                 return DeserialisationResult.failureFromOther(biomeResult);
+            }
 
             // Start with a list of all biomes.
             biomes = BiomeList.getAll();

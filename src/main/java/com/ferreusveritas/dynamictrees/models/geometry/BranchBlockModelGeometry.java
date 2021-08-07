@@ -16,13 +16,15 @@ import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Bakes {@link BasicBranchBlockBakedModel} from bark and rings texture locations
- * given by {@link BranchBlockModelLoader}.
+ * Bakes {@link BasicBranchBlockBakedModel} from bark and rings texture locations given by {@link
+ * BranchBlockModelLoader}.
  *
  * <p>Can also be used by sub-classes to bake other models, like for roots in
  * {@link RootBlockModelGeometry}.</p>
@@ -52,12 +54,12 @@ public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModel
     }
 
     /**
-     * Adds the given texture {@link ResourceLocation} objects to the list. Checks they're not null
-     * before adding them so {@link Nullable} objects can be fed safely.
+     * Adds the given texture {@link ResourceLocation} objects to the list. Checks they're not null before adding them
+     * so {@link Nullable} objects can be fed safely.
      *
      * @param textureResourceLocations Texture {@link ResourceLocation} objects.
      */
-    protected void addTextures (final ResourceLocation... textureResourceLocations) {
+    protected void addTextures(final ResourceLocation... textureResourceLocations) {
         for (ResourceLocation resourceLocation : textureResourceLocations) {
             if (resourceLocation != null) {
                 this.textures.add(resourceLocation);
@@ -67,9 +69,9 @@ public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModel
 
     @Override
     public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform, ItemOverrideList overrides, ResourceLocation modelLocation) {
-        if (!this.useThickModel(this.setFamily(modelLocation)))
+        if (!this.useThickModel(this.setFamily(modelLocation))) {
             return new BasicBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc);
-        else {
+        } else {
             return new ThickBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc, this.thickRingsResLoc);
         }
     }

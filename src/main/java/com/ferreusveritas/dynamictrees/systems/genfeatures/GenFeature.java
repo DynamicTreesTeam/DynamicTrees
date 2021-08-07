@@ -14,8 +14,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * Base class for all gen features. These are features that grow on/in/around a tree on generation,
- * or whilst growing, depending on which methods are overridden.
+ * Base class for all gen features. These are features that grow on/in/around a tree on generation, or whilst growing,
+ * depending on which methods are overridden.
  *
  * @author Harley O'Connor
  */
@@ -34,7 +34,8 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
 
     public static final GenFeature NULL_GEN_FEATURE = new GenFeature(DTTrees.NULL) {
         @Override
-        protected void registerProperties() { }
+        protected void registerProperties() {
+        }
     };
 
     /**
@@ -93,9 +94,9 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * Handles full generation of a tree.
      *
      * @param configuration The {@link ConfiguredGenFeature} instance to generate for.
-     * @param context The {@link FullGenerationContext} object.
-     * @return {@code true} if this {@link GenFeature} handles full generation and so generation
-     *         from a {@link JoCode} should <b>not</b> proceed; {@code false} otherwise.
+     * @param context       The {@link FullGenerationContext} object.
+     * @return {@code true} if this {@link GenFeature} handles full generation and so generation from a {@link JoCode}
+     * should <b>not</b> proceed; {@code false} otherwise.
      */
     protected boolean generate(ConfiguredGenFeature<GenFeature> configuration, FullGenerationContext context) {
         return false;

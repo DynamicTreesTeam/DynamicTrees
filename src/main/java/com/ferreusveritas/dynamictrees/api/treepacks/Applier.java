@@ -12,9 +12,9 @@ public interface Applier<O, V> {
      * Applies the specified {@code value} to the given object.
      *
      * @param object the object to apply to
-     * @param value the value to apply
+     * @param value  the value to apply
      * @return the result of the application
      */
-    PropertyApplierResult apply (final O object, final V value);
+    PropertyApplierResult apply(final O object, final V value);
 
 }

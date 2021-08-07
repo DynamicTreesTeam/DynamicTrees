@@ -8,8 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * An applier for applying multiple {@link PropertyApplier} with different values for
- * the same key.
+ * An applier for applying multiple {@link PropertyApplier} with different values for the same key.
  *
  * @author Harley O'Connor
  */
@@ -19,11 +18,12 @@ public class MultiPropertyApplier<T, I> extends PropertyApplier<T, Object, I> {
 
     @SafeVarargs
     public MultiPropertyApplier(final String key, final Class<T> objectClass, final PropertyApplier<T, ?, I>... appliers) {
-        super(key, objectClass, Object.class, (object, value) -> {});
+        super(key, objectClass, Object.class, (object, value) -> {
+        });
         this.appliers.addAll(Arrays.asList(appliers));
     }
 
-    public void addApplier (final PropertyApplier<T, ?, I> applier) {
+    public void addApplier(final PropertyApplier<T, ?, I> applier) {
         this.appliers.add(applier);
     }
 

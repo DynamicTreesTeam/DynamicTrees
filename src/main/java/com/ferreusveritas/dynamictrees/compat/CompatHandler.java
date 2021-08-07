@@ -15,7 +15,7 @@ import sereneseasons.config.SeasonsConfig;
  */
 public final class CompatHandler {
 
-    public static void init () {
+    public static void init() {
         if (ModList.get().isLoaded(DynamicTrees.SERENE_SEASONS)) {
             initSereneSeasons();
         }

@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.resources.JsonReloadListener;
 import com.ferreusveritas.dynamictrees.resources.TreesResourceManager;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
@@ -34,7 +34,8 @@ public final class GlobalDropCreatorManager extends JsonReloadListener<DropCreat
     }
 
     @Override
-    public void registerAppliers() { }
+    public void registerAppliers() {
+    }
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> preparedObject, TreesResourceManager resourceManager, ApplicationType applicationType) {
@@ -76,7 +77,8 @@ public final class GlobalDropCreatorManager extends JsonReloadListener<DropCreat
      */
     @Override
     public CompletableFuture<Void> load(TreesResourceManager resourceManager) {
-        return CompletableFuture.runAsync(() -> {});
+        return CompletableFuture.runAsync(() -> {
+        });
     }
 
     /**
@@ -87,7 +89,8 @@ public final class GlobalDropCreatorManager extends JsonReloadListener<DropCreat
      */
     @Override
     public CompletableFuture<Void> setup(TreesResourceManager resourceManager) {
-        return CompletableFuture.runAsync(() -> {});
+        return CompletableFuture.runAsync(() -> {
+        });
     }
 
 }

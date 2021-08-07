@@ -7,15 +7,17 @@ import net.minecraftforge.client.model.data.ModelProperty;
 import javax.annotation.Nullable;
 
 /**
- * Extension of {@link RootConnections} to implement {@link IModelData}, so surface root connections can be transferred to the baked model.
+ * Extension of {@link RootConnections} to implement {@link IModelData}, so surface root connections can be transferred
+ * to the baked model.
  *
  * @author Harley O'Connor
  */
 public class RootModelConnections extends RootConnections implements IModelData {
 
-    public RootModelConnections () {}
+    public RootModelConnections() {
+    }
 
-    public RootModelConnections (RootConnections connections) {
+    public RootModelConnections(RootConnections connections) {
         this.setAllRadii(connections.getAllRadii());
         this.setConnectionLevels(connections.getConnectionLevels());
     }

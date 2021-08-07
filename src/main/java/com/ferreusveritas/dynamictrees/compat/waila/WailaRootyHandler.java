@@ -13,16 +13,17 @@ import java.util.List;
 
 public class WailaRootyHandler implements IComponentProvider {
 
-	@Override
-	public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
-		final BlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
+    @Override
+    public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
+        final BlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
 
-		if (!(state.getBlock() instanceof RootyBlock))
-			return;
+        if (!(state.getBlock() instanceof RootyBlock)) {
+            return;
+        }
 
-		final RootyBlock rooty = (RootyBlock) state.getBlock();
-		final int fertility = rooty.getFertility(state, accessor.getWorld(), accessor.getPosition());
-		tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.fertility",
-				MathHelper.floor(fertility * 100 / 15f) + "%"));
-	}
+        final RootyBlock rooty = (RootyBlock) state.getBlock();
+        final int fertility = rooty.getFertility(state, accessor.getWorld(), accessor.getPosition());
+        tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.fertility",
+                MathHelper.floor(fertility * 100 / 15f) + "%"));
+    }
 }

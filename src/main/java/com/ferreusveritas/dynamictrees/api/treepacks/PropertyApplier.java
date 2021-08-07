@@ -30,14 +30,13 @@ public abstract class PropertyApplier<O, V, I> {
     }
 
     /**
-     * Calls {@link Applier#apply(Object, Object)} if it should be called - or in other
-     * words if the given key equaled {@link #key} and the object given is an instance of the
-     * {@link #objectClass} value, and the {@link JsonElement} given contained a value that can
-     * be converted to the {@link #valueClass}.
+     * Calls {@link Applier#apply(Object, Object)} if it should be called - or in other words if the given key equaled
+     * {@link #key} and the object given is an instance of the {@link #objectClass} value, and the {@link JsonElement}
+     * given contained a value that can be converted to the {@link #valueClass}.
      *
-     * @param keyIn The keyIn for the current {@link JsonElement}.
+     * @param keyIn  The keyIn for the current {@link JsonElement}.
      * @param object The {@link Object} being applied to.
-     * @param input The {@link JsonElement} for the key given.
+     * @param input  The {@link JsonElement} for the key given.
      * @return The {@link PropertyApplierResult}, or null if application was not necessary.
      */
     @Nullable
@@ -50,7 +49,7 @@ public abstract class PropertyApplier<O, V, I> {
     }
 
     @Nullable
-    protected abstract  <S, R> PropertyApplierResult applyIfShould(final Object object, final I input, final Class<R> valueClass, final Applier<S, R> applier);
+    protected abstract <S, R> PropertyApplierResult applyIfShould(final Object object, final I input, final Class<R> valueClass, final Applier<S, R> applier);
 
     public Class<O> getObjectClass() {
         return objectClass;

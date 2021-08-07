@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * Manages a list of {@link PropertyApplier} objects of type {@link O}, allowing for an
- * easy way of storing, registering, and applying property appliers.
+ * Manages a list of {@link PropertyApplier} objects of type {@link O}, allowing for an easy way of storing,
+ * registering, and applying property appliers.
  *
  * @param <O> The type of {@link Object} the {@link PropertyApplier} for this list are applying to.
  * @author Harley O'Connor
@@ -54,8 +54,9 @@ public final class JsonPropertyApplierList<O> {
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
             final PropertyApplierResult result = this.apply(object, entry.getKey(), entry.getValue());
 
-            if (!result.wasSuccessful())
+            if (!result.wasSuccessful()) {
                 failureResults.add(result);
+            }
         }
 
         return failureResults;
@@ -70,18 +71,21 @@ public final class JsonPropertyApplierList<O> {
         final List<String> warnings = new ArrayList<>();
 
         for (final PropertyApplier<? extends O, ?, JsonElement> applier : this.appliers) {
-            if (!applier.getObjectClass().isInstance(object))
+            if (!applier.getObjectClass().isInstance(object)) {
                 continue;
+            }
 
             final PropertyApplierResult result = applier.applyIfShould(key, object, jsonElement);
 
             // If the result is null, it's not the right applier, so move onto the next one.
-            if (result == null)
+            if (result == null) {
                 continue;
+            }
 
             // If the application wasn't successful, return the error.
-            if (!result.wasSuccessful())
+            if (!result.wasSuccessful()) {
                 return result.addErrorPrefix("[" + key + "] ").addWarningsPrefix("[" + key + "] ");
+            }
 
             warnings.addAll(result.getWarnings());
             break; // We have read (or tried to read) this entry, so move onto the next.
@@ -90,7 +94,7 @@ public final class JsonPropertyApplierList<O> {
         return PropertyApplierResult.success(warnings).addWarningsPrefix("[" + key + "] ");
     }
 
-    public <E extends O> JsonPropertyApplierList<O> register (final PropertyApplier<E, ?, JsonElement> applier) {
+    public <E extends O> JsonPropertyApplierList<O> register(final PropertyApplier<E, ?, JsonElement> applier) {
         this.appliers.add(applier);
         return this;
     }
@@ -124,15 +128,19 @@ public final class JsonPropertyApplierList<O> {
     }
 
     public <E extends O> JsonPropertyApplierList<O> registerIfTrueApplier(final String key, final Class<E> subClass, final IfTrueApplier<E> applier) {
-        return this.register(key, subClass, Boolean.class, (object, value) -> { if (value) applier.apply(object); });
+        return this.register(key, subClass, Boolean.class, (object, value) -> {
+            if (value) {
+                applier.apply(object);
+            }
+        });
     }
 
     public <E extends O, V> JsonPropertyApplierList<O> registerArrayApplier(final String key, final Class<E> subClass, final Class<V> valueClass, final Applier<E, V> applier) {
-        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass , applier)));
+        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass, applier)));
     }
 
     public <E extends O, V> JsonPropertyApplierList<O> registerArrayApplier(final String key, final Class<E> subClass, final Class<V> valueClass, final VoidApplier<E, V> applier) {
-        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass , applier)));
+        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass, new JsonPropertyApplier<>("", subClass, valueClass, applier)));
     }
 
     public Class<O> getObjectType() {

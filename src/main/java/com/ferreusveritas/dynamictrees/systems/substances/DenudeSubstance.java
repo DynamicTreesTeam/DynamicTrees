@@ -13,8 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**
- * An {@link ISubstanceEffect} that "denudes" the tree. This involves stripping all
- * branches and removing all leaves.
+ * An {@link ISubstanceEffect} that "denudes" the tree. This involves stripping all branches and removing all leaves.
  *
  * @author Harley O'Connor
  */
@@ -25,15 +24,17 @@ public class DenudeSubstance implements ISubstanceEffect {
         final BlockState rootState = world.getBlockState(rootPos);
         final RootyBlock dirt = TreeHelper.getRooty(rootState);
 
-        if (dirt == null)
+        if (dirt == null) {
             return false;
+        }
 
         final Species species = dirt.getSpecies(rootState, world, rootPos);
         final Family family = species.getFamily();
 
         // If the family doesn't have a stripped branch the substance can't be applied.
-        if (!family.hasStrippedBranch())
+        if (!family.hasStrippedBranch()) {
             return false;
+        }
 
         // Set fertility to zero so the leaves won't grow back.
         dirt.setFertility(world, rootPos, 0);

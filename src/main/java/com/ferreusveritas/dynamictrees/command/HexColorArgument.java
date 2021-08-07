@@ -11,7 +11,6 @@ import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
@@ -19,7 +18,7 @@ public final class HexColorArgument implements ArgumentType<Integer> {
 
     public static final DynamicCommandExceptionType COLOR_INVALID = new DynamicCommandExceptionType(colourString -> new TranslationTextComponent("argument.color.invalid", colourString));
 
-    public static HexColorArgument hex () {
+    public static HexColorArgument hex() {
         return new HexColorArgument();
     }
 

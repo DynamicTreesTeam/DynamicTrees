@@ -10,33 +10,32 @@ package com.ferreusveritas.dynamictrees.trees;
 public interface IResettable<T extends IResettable<T>> {
 
     /**
-     * Can be overridden for resetting values, such as lists and maps. Should be called
-     * before {@link #setPreReloadDefaults()}.
+     * Can be overridden for resetting values, such as lists and maps. Should be called before {@link
+     * #setPreReloadDefaults()}.
      *
      * @return This {@link IResettable} object for chaining.
      */
-    default T reset () {
+    default T reset() {
         return (T) this;
     }
 
     /**
-     * Can be overridden for setting pre-reload defaults. These are any defaults that may
-     * be overridden during reload if needed.
+     * Can be overridden for setting pre-reload defaults. These are any defaults that may be overridden during reload if
+     * needed.
      *
      * @return This {@link IResettable} object for chaining.
      */
-    default T setPreReloadDefaults () {
+    default T setPreReloadDefaults() {
         return (T) this;
     }
 
     /**
-     * Can be overridden for setting post-reload defaults. This may be used for defaults
-     * which are a requirement of a sub-class, or for setting default lists if they were
-     * not populated during reload.
+     * Can be overridden for setting post-reload defaults. This may be used for defaults which are a requirement of a
+     * sub-class, or for setting default lists if they were not populated during reload.
      *
      * @return This {@link IResettable} object for chaining.
      */
-    default T setPostReloadDefaults () {
+    default T setPostReloadDefaults() {
         return (T) this;
     }
 

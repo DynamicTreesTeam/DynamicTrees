@@ -34,7 +34,7 @@ public class WaterSoilProperties extends SoilProperties {
 
     public static final TypedRegistry.EntryType<SoilProperties> TYPE = TypedRegistry.newType(WaterSoilProperties::new);
 
-    public WaterSoilProperties (final ResourceLocation registryName){
+    public WaterSoilProperties(final ResourceLocation registryName) {
         super(null, registryName);
     }
 
@@ -58,7 +58,7 @@ public class WaterSoilProperties extends SoilProperties {
         protected static final AxisAlignedBB WATER_ROOTS_AABB = new AxisAlignedBB(0.1, 0.0, 0.1, 0.9, 1.0, 0.9);
         public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-        public RootyWaterBlock (SoilProperties properties, Properties blockProperties){
+        public RootyWaterBlock(SoilProperties properties, Properties blockProperties) {
             super(properties, blockProperties);
             registerDefaultState(defaultBlockState().setValue(WATERLOGGED, true));
         }
@@ -76,8 +76,9 @@ public class WaterSoilProperties extends SoilProperties {
         @Override
         public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
             BlockState upState = world.getBlockState(pos.above());
-            if (TreeHelper.isBranch(upState))
+            if (TreeHelper.isBranch(upState)) {
                 return new ItemStack(TreeHelper.getBranch(upState).getFamily().getBranchItem());
+            }
             return ItemStack.EMPTY;
         }
 
@@ -116,9 +117,10 @@ public class WaterSoilProperties extends SoilProperties {
 
         @Override
         public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
-            if (state.hasProperty(WATERLOGGED) && !state.getValue(WATERLOGGED))
+            if (state.hasProperty(WATERLOGGED) && !state.getValue(WATERLOGGED)) {
                 return Blocks.AIR.defaultBlockState();
-            return super.getDecayBlockState(state,access, pos);
+            }
+            return super.getDecayBlockState(state, access, pos);
         }
 
         ///////////////////////////////////////////
@@ -130,7 +132,7 @@ public class WaterSoilProperties extends SoilProperties {
             return true;
         }
 
-        public boolean fallWithTree (BlockState state, World world, BlockPos pos){
+        public boolean fallWithTree(BlockState state, World world, BlockPos pos) {
             //The block is removed when this is checked because it means it got attached to a tree
             world.setBlockAndUpdate(pos, getDecayBlockState(state, world, pos));
             return true;

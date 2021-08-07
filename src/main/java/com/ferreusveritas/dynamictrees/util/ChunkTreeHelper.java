@@ -23,14 +23,15 @@ import java.util.Optional;
 public class ChunkTreeHelper {
 
     public static int removeOrphanedBranchNodes(World world, @Nullable ChunkPos chunkPos, int radius) {
-        if (chunkPos == null)
+        if (chunkPos == null) {
             return 0;
+        }
 
         final Chunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
         final BlockBounds bounds = getBounds(world, chunk, radius);
         int orphansCleared = 0;
 
-        for (BlockPos pos: bounds) {
+        for (BlockPos pos : bounds) {
             final BlockState state = world.getBlockState(pos);
             final Optional<BranchBlock> branchBlock = TreeHelper.getBranchOpt(state);
 
@@ -73,15 +74,16 @@ public class ChunkTreeHelper {
     }
 
     public static int removeAllBranchesFromChunk(World world, @Nullable ChunkPos chunkPos, int radius) {
-        if (chunkPos == null)
+        if (chunkPos == null) {
             return 0;
+        }
 
         final Chunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
         final BlockBounds bounds = getBounds(world, chunk, radius);
 
         int treesCleared = 0;
 
-        for (BlockPos pos: bounds) {
+        for (BlockPos pos : bounds) {
             BlockState state = world.getBlockState(pos);
             Optional<BranchBlock> branchBlock = TreeHelper.getBranchOpt(state);
             if (branchBlock.isPresent()) {
@@ -105,18 +107,19 @@ public class ChunkTreeHelper {
         return bounds;
     }
 
-    private static int getTopFilledSegment (final Chunk chunk) {
+    private static int getTopFilledSegment(final Chunk chunk) {
         final ChunkSection lastChunkSection = getLastSection(chunk);
         return lastChunkSection == null ? 0 : lastChunkSection.bottomBlockY();
     }
 
     @Nullable
-    private static ChunkSection getLastSection (final Chunk chunk) {
+    private static ChunkSection getLastSection(final Chunk chunk) {
         final ChunkSection[] sections = chunk.getSections();
 
         for (int i = sections.length - 1; i >= 0; i--) {
-            if (sections[i] != null && !sections[i].isEmpty())
+            if (sections[i] != null && !sections[i].isEmpty()) {
                 return sections[i];
+            }
         }
 
         return null;

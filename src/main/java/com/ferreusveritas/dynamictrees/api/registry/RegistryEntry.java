@@ -21,7 +21,8 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     private ResourceLocation registryName;
     private boolean valid = true;
 
-    protected RegistryEntry() { }
+    protected RegistryEntry() {
+    }
 
     protected RegistryEntry(ResourceLocation registryName) {
         this.registryName = registryName;
@@ -33,7 +34,7 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
      * @return This {@link RegistryEntry}, for calling this in-line.
      */
     @SuppressWarnings("unchecked")
-    protected T nullEntry () {
+    protected T nullEntry() {
         this.valid = false;
         return (T) this;
     }
@@ -41,17 +42,16 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     /**
      * @return True if the {@link RegistryEntry} is not null.
      */
-    public boolean isValid () {
+    public boolean isValid() {
         return this.valid;
     }
 
     /**
-     * Calls {@link Consumer#accept(Object)} on the given {@link Consumer} of type {@link T},
-     * only if this {@link RegistryEntry} is {@code valid}.
+     * Calls {@link Consumer#accept(Object)} on the given {@link Consumer} of type {@link T}, only if this {@link
+     * RegistryEntry} is {@code valid}.
      *
      * @param consumer The {@link Consumer} of type {@link T}.
-     * @return {@code true} if this {@link RegistryEntry} is {@code valid}; {@code false}
-     *         otherwise.
+     * @return {@code true} if this {@link RegistryEntry} is {@code valid}; {@code false} otherwise.
      */
     @SuppressWarnings("unchecked")
     public final boolean ifValid(final Consumer<T> consumer) {
@@ -63,14 +63,12 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     }
 
     /**
-     * Calls {@link Consumer#accept(Object)} on the given {@link Consumer} of type {@link T},
-     * only if this {@link RegistryEntry} is {@code valid}. Otherwise calls
-     * {@link Runnable#run()} on the given {@link Runnable}.
+     * Calls {@link Consumer#accept(Object)} on the given {@link Consumer} of type {@link T}, only if this {@link
+     * RegistryEntry} is {@code valid}. Otherwise calls {@link Runnable#run()} on the given {@link Runnable}.
      *
      * @param consumer The {@link Consumer} of type {@link T} to consume if {@code valid}.
      * @param runnable The {@link Runnable} to run if {@code invalid}.
-     * @return {@code true} if this {@link RegistryEntry} is {@code valid}; {@code false}
-     *         otherwise.
+     * @return {@code true} if this {@link RegistryEntry} is {@code valid}; {@code false} otherwise.
      */
     @SuppressWarnings("unchecked")
     public final boolean ifValidElse(final Consumer<T> consumer, final Runnable runnable) {
@@ -83,8 +81,7 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     }
 
     /**
-     * Returns this {@link RegistryEntry} if valid, or otherwise the specified
-     * {@link RegistryEntry}.
+     * Returns this {@link RegistryEntry} if valid, or otherwise the specified {@link RegistryEntry}.
      *
      * @param otherValue The value to return if this {@link RegistryEntry} is invalid.
      * @return This {@link RegistryEntry} if it is valid; otherwise the specified one.
@@ -95,12 +92,10 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     }
 
     /**
-     * Calls {@link Runnable#run()} on the given {@link Runnable} if this {@link RegistryEntry}
-     * is {@code invalid}.
+     * Calls {@link Runnable#run()} on the given {@link Runnable} if this {@link RegistryEntry} is {@code invalid}.
      *
      * @param runnable The {@link Runnable} to run if {@code invalid}.
-     * @return {@code true} if this {@link RegistryEntry} is {@code invalid}; {@code false}
-     *         otherwise.
+     * @return {@code true} if this {@link RegistryEntry} is {@code invalid}; {@code false} otherwise.
      */
     public final boolean ifInvalid(final Runnable runnable) {
         if (!this.isValid()) {

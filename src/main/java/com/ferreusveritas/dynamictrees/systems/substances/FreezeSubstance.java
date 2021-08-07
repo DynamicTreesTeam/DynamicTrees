@@ -12,33 +12,33 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class FreezeSubstance implements ISubstanceEffect {
-	
-	@Override
-	public boolean apply(World world, BlockPos rootPos) {
- 		final BlockState rootyState = world.getBlockState(rootPos);
- 		final RootyBlock dirt = TreeHelper.getRooty(rootyState);
- 		final Species species = dirt.getSpecies(rootyState, world, rootPos);
 
- 		if (species != Species.NULL_SPECIES && dirt != null) {
- 			if (world.isClientSide) {
- 				TreeHelper.treeParticles(world, rootPos, ParticleTypes.FIREWORK, 8);
- 			} else {
- 				dirt.startAnalysis(world, rootPos, new MapSignal(new FreezerNode(species)));
- 				dirt.fertilize(world, rootPos, -15); // Destroy the fertility so it can no longer grow.
- 			}
- 			return true;
- 		}
-		return false;
-	}
+    @Override
+    public boolean apply(World world, BlockPos rootPos) {
+        final BlockState rootyState = world.getBlockState(rootPos);
+        final RootyBlock dirt = TreeHelper.getRooty(rootyState);
+        final Species species = dirt.getSpecies(rootyState, world, rootPos);
 
-	@Override
-	public String getName() {
-		return "freeze";
-	}
-	
-	@Override
-	public boolean isLingering() {
-		return false;
-	}
-	
+        if (species != Species.NULL_SPECIES && dirt != null) {
+            if (world.isClientSide) {
+                TreeHelper.treeParticles(world, rootPos, ParticleTypes.FIREWORK, 8);
+            } else {
+                dirt.startAnalysis(world, rootPos, new MapSignal(new FreezerNode(species)));
+                dirt.fertilize(world, rootPos, -15); // Destroy the fertility so it can no longer grow.
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return "freeze";
+    }
+
+    @Override
+    public boolean isLingering() {
+        return false;
+    }
+
 }

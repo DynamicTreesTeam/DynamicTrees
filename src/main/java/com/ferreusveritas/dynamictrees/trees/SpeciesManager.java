@@ -6,6 +6,9 @@ import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
@@ -13,9 +16,6 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreato
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
-import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
@@ -40,8 +40,8 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * A {@link JsonPropertyApplierList} for applying environment factors to {@link Species} objects.
-     * (based on {@link net.minecraftforge.common.BiomeManager.BiomeType}).
+     * A {@link JsonPropertyApplierList} for applying environment factors to {@link Species} objects. (based on {@link
+     * net.minecraftforge.common.BiomeManager.BiomeType}).
      */
     private final JsonPropertyApplierList<Species> environmentFactorAppliers = new JsonPropertyApplierList<>(Species.class);
 
@@ -59,12 +59,13 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
         JsonDeserialisers.register(Species.ICommonOverride.class, jsonElement -> {
             final DeserialisationResult<BiomePredicate> biomePredicateResult = JsonDeserialisers.BIOME_PREDICATE.deserialise(jsonElement);
 
-            if (!biomePredicateResult.wasSuccessful())
+            if (!biomePredicateResult.wasSuccessful()) {
                 return DeserialisationResult.failureFromOther(biomePredicateResult);
+            }
 
             return DeserialisationResult.success((world, pos) ->
-                world instanceof IWorldReader &&
-                        biomePredicateResult.getValue().test(((IWorldReader) world).getBiome(pos))
+                    world instanceof IWorldReader &&
+                            biomePredicateResult.getValue().test(((IWorldReader) world).getBiome(pos))
             );
         });
 
@@ -115,8 +116,9 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (species, acceptableSoil) -> {
-                    if (SoilHelper.getSoilFlags(acceptableSoil) == 0)
+                    if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
                         return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
+                    }
 
                     species.addAcceptableSoils(acceptableSoil);
                     return PropertyApplierResult.success();

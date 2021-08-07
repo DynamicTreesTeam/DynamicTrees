@@ -13,8 +13,8 @@ import net.minecraft.world.LightType;
 import net.minecraftforge.common.IPlantable;
 
 /**
- * A {@link GenFeature} handling the default post rot behaviour: turning the rotted branch
- * into the {@link #MUSHROOM} set in the {@link ConfiguredGenFeature} object.
+ * A {@link GenFeature} handling the default post rot behaviour: turning the rotted branch into the {@link #MUSHROOM}
+ * set in the {@link ConfiguredGenFeature} object.
  *
  * @author Harley O'Connor
  */
@@ -57,7 +57,7 @@ public class MushroomRotGenFeature extends GenFeature {
         return true;
     }
 
-    private boolean canSustainMushroom (final IWorld world, final BlockPos pos, final Block block) {
+    private boolean canSustainMushroom(final IWorld world, final BlockPos pos, final Block block) {
         return block instanceof IPlantable && world.getBlockState(pos).canSustainPlant(world, pos, Direction.UP, (IPlantable) block);
     }
 

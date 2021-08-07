@@ -29,12 +29,12 @@ public final class DTJeiPlugin implements IModPlugin {
     }
 
     @Override
-    public void registerItemSubtypes (final ISubtypeRegistration registration) {
+    public void registerItemSubtypes(final ISubtypeRegistration registration) {
         registration.useNbtForSubtypes(DTRegistries.DENDRO_POTION);
     }
 
     @Override
-    public void registerRecipes (final IRecipeRegistration registration) {
+    public void registerRecipes(final IRecipeRegistration registration) {
         final IVanillaRecipeFactory factory = registration.getVanillaRecipeFactory();
         final List<IJeiBrewingRecipe> brewingRecipes = new ArrayList<>();
 

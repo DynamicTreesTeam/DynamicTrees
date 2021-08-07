@@ -12,66 +12,68 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
 public class TransformNode implements INodeInspector {
-	
-	private final Species fromSpecies;
-	private final Species toSpecies;
-	
-	public TransformNode(Species fromTree, Species toTree) {
-		this.fromSpecies = fromTree;
-		this.toSpecies = toTree;
-	}
-	
-	@Override
-	public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
-		BranchBlock branch = TreeHelper.getBranch(blockState);
-		
-		if(branch != null && fromSpecies.getFamily() == branch.getFamily()) {
-			int radius = branch.getRadius(blockState);
-			if(radius > 0) {
-				BranchBlock newBranchBlock = toSpecies.getFamily().getBranch();
 
-				// If the branch is stripped, make the replacement branch stripped.
-				if (fromSpecies.getFamily().getStrippedBranch().equals(branch)) {
-					newBranchBlock = toSpecies.getFamily().getStrippedBranch();
-				}
+    private final Species fromSpecies;
+    private final Species toSpecies;
 
-				newBranchBlock.setRadius(world, pos, radius, null);
-				if(radius == 1) {
-					transformSurroundingLeaves(world, pos);
-				}
-			}
-		}
-		
-		return true;
-	}
-	
-	@Override
-	public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
-		return false;
-	}
+    public TransformNode(Species fromTree, Species toTree) {
+        this.fromSpecies = fromTree;
+        this.toSpecies = toTree;
+    }
 
-	private static final int TEST_LEAVES_RADIUS = 3;
-	
-	public void transformSurroundingLeaves(IWorld world, BlockPos twigPos) {
-		if (world.isClientSide())
-			return;
+    @Override
+    public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+        BranchBlock branch = TreeHelper.getBranch(blockState);
 
-		final SimpleVoxmap leafCluster = this.fromSpecies.getLeavesProperties().getCellKit().getLeafCluster();
-		final int xBound = leafCluster.getLenX();
-		final int yBound = leafCluster.getLenY();
-		final int zBound = leafCluster.getLenZ();
+        if (branch != null && fromSpecies.getFamily() == branch.getFamily()) {
+            int radius = branch.getRadius(blockState);
+            if (radius > 0) {
+                BranchBlock newBranchBlock = toSpecies.getFamily().getBranch();
 
-		BlockPos.betweenClosedStream(twigPos.offset(-xBound, -yBound, -zBound), twigPos.offset(xBound, yBound, zBound)).forEach(testPos -> {
-			// We're only interested in where leaves could possibly be.
-			if (this.fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, testPos) == 0)
-				return;
+                // If the branch is stripped, make the replacement branch stripped.
+                if (fromSpecies.getFamily().getStrippedBranch().equals(branch)) {
+                    newBranchBlock = toSpecies.getFamily().getStrippedBranch();
+                }
 
-			final BlockState state = world.getBlockState(testPos);
-			if (fromSpecies.getFamily().isCompatibleGenericLeaves(this.fromSpecies, state, world, testPos)) {
-				final int hydro = state.getBlock() instanceof DynamicLeavesBlock ? state.getValue(DynamicLeavesBlock.DISTANCE) : 2;
-				world.setBlock(testPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro), 3);
-			}
-		});
-	}
-	
+                newBranchBlock.setRadius(world, pos, radius, null);
+                if (radius == 1) {
+                    transformSurroundingLeaves(world, pos);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+        return false;
+    }
+
+    private static final int TEST_LEAVES_RADIUS = 3;
+
+    public void transformSurroundingLeaves(IWorld world, BlockPos twigPos) {
+        if (world.isClientSide()) {
+            return;
+        }
+
+        final SimpleVoxmap leafCluster = this.fromSpecies.getLeavesProperties().getCellKit().getLeafCluster();
+        final int xBound = leafCluster.getLenX();
+        final int yBound = leafCluster.getLenY();
+        final int zBound = leafCluster.getLenZ();
+
+        BlockPos.betweenClosedStream(twigPos.offset(-xBound, -yBound, -zBound), twigPos.offset(xBound, yBound, zBound)).forEach(testPos -> {
+            // We're only interested in where leaves could possibly be.
+            if (this.fromSpecies.getLeavesProperties().getCellKit().getLeafCluster().getVoxel(twigPos, testPos) == 0) {
+                return;
+            }
+
+            final BlockState state = world.getBlockState(testPos);
+            if (fromSpecies.getFamily().isCompatibleGenericLeaves(this.fromSpecies, state, world, testPos)) {
+                final int hydro = state.getBlock() instanceof DynamicLeavesBlock ? state.getValue(DynamicLeavesBlock.DISTANCE) : 2;
+                world.setBlock(testPos, toSpecies.getLeavesProperties().getDynamicLeavesState(hydro), 3);
+            }
+        });
+    }
+
 }

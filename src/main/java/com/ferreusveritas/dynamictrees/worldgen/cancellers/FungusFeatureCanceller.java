@@ -8,8 +8,8 @@ import net.minecraft.world.gen.feature.DecoratedFeatureConfig;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 
 /**
- * This class is an alternate version of {@link TreeFeatureCanceller} specifically made for cancelling
- * fungus features. It cancels any features that have a config that extends the given class.
+ * This class is an alternate version of {@link TreeFeatureCanceller} specifically made for cancelling fungus features.
+ * It cancels any features that have a config that extends the given class.
  *
  * @param <T> An {@link IFeatureConfig} which should be cancelled.
  * @author Harley O'Connor
@@ -25,7 +25,9 @@ public class FungusFeatureCanceller<T extends IFeatureConfig> extends FeatureCan
 
     @Override
     public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
-        if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
+        if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) {
+            return false;
+        }
 
         final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfig) configuredFeature.config).feature.get();
         final ResourceLocation featureRegistryName = nextConfiguredFeature.feature.getRegistryName();

@@ -11,7 +11,7 @@ public final class ListDeserialiser<T> implements JsonDeserialiser<List<T>> {
     private final JsonDeserialiser<T> thisGetter;
     private final Supplier<List<T>> listSupplier;
 
-    public ListDeserialiser(JsonDeserialiser<T> thisGetter){
+    public ListDeserialiser(JsonDeserialiser<T> thisGetter) {
         this(thisGetter, LinkedList::new);
     }
 
@@ -29,12 +29,12 @@ public final class ListDeserialiser<T> implements JsonDeserialiser<List<T>> {
         });
     }
 
-    public static <T> Class<List<T>> getListClass (Class<T> c) {
+    public static <T> Class<List<T>> getListClass(Class<T> c) {
         return getListClass(c, LinkedList::new);
     }
 
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unchecked"})
-    public static <T> Class<List<T>> getListClass (Class<T> c, Supplier<List<T>> listSupplier) {
+    public static <T> Class<List<T>> getListClass(Class<T> c, Supplier<List<T>> listSupplier) {
         List<T> instance = listSupplier.get();
         return (Class<List<T>>) instance.getClass();
     }

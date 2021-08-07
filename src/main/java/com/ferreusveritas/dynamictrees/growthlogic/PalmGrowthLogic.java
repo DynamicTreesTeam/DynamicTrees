@@ -21,7 +21,7 @@ public class PalmGrowthLogic extends GrowthLogicKit {
         // Alter probability map for direction change
         probMap[0] = 0; // Down is always disallowed for palm
         probMap[1] = 10;
-        probMap[2] = probMap[3] = probMap[4] = probMap[5] =  0;
+        probMap[2] = probMap[3] = probMap[4] = probMap[5] = 0;
         probMap[originDir.ordinal()] = 0; // Disable the direction we came from
 
         return probMap;

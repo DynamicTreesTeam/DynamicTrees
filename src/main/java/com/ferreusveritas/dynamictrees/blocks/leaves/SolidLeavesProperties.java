@@ -5,8 +5,8 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.util.ResourceLocation;
 
 /**
- * An extension of {@link LeavesProperties} which provides {@link SolidDynamicLeavesBlock}
- * for a solid version of {@link DynamicLeavesBlock}.
+ * An extension of {@link LeavesProperties} which provides {@link SolidDynamicLeavesBlock} for a solid version of {@link
+ * DynamicLeavesBlock}.
  *
  * @author Harley O'Connor
  */

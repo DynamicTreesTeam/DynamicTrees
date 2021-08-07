@@ -2,9 +2,9 @@ package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
-import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
+import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -27,8 +27,9 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
         this.registerSpreadableAppliers();
 
         this.commonAppliers.registerArrayApplier("acceptable_soils", String.class, (soilProperties, acceptableSoil) -> {
-            if (SoilHelper.getSoilFlags(acceptableSoil) == 0)
+            if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
                 SoilHelper.createNewAdjective(acceptableSoil);
+            }
 
             SoilHelper.registerSoil(soilProperties, acceptableSoil);
             return PropertyApplierResult.success();
@@ -61,11 +62,12 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
         //set the substitute soil if one exists and is valid
         // dont generate block if the there is a substitute.
         SoilProperties substitute = JsonHelper.getOrDefault(jsonObject, "substitute_soil", SoilProperties.class, SoilProperties.NULL_SOIL_PROPERTIES);
-        if (substitute != SoilProperties.NULL_SOIL_PROPERTIES)
+        if (substitute != SoilProperties.NULL_SOIL_PROPERTIES) {
             soilProperties.setDynamicSoilBlock(substitute.dynamicSoilBlock);
-        else
+        } else {
             soilProperties.generateDynamicSoil(JsonHelper.getBlockProperties(jsonObject,
                     soilProperties.getDefaultMaterial(), soilProperties.getDefaultMaterial().getColor(),
                     soilProperties::getDefaultBlockProperties, errorConsumer, warningConsumer));
+        }
     }
 }

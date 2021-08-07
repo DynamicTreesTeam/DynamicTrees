@@ -23,19 +23,20 @@ public class TextureStitchEventHandler {
     public static void onTextureStitchEventPre(TextureStitchEvent.Pre event) {
         ResourceLocation eventAtlasLocation = event.getMap().location();
         if (eventAtlasLocation.equals(AtlasTexture.LOCATION_BLOCKS)) {
-            SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager)Minecraft.getInstance().getResourceManager();
+            SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager) Minecraft.getInstance().getResourceManager();
 
             List<ResourceLocation> ringLocationsToGenerate = new LinkedList<>();
             boolean textureNotFound = true;
-            for(Map.Entry<ResourceLocation, ResourceLocation> reslocs : ThickRingTextureManager.getThickRingEntrySet()){
+            for (Map.Entry<ResourceLocation, ResourceLocation> reslocs : ThickRingTextureManager.getThickRingEntrySet()) {
                 ResourceLocation thickLogResLoc = reslocs.getValue();
 
                 try {
                     manager.getResource(new ResourceLocation(thickLogResLoc.getNamespace(), String.format("textures/%s%s", thickLogResLoc.getPath(), ".png")));
                     textureNotFound = false;
-                } catch (IOException ignored){ }
+                } catch (IOException ignored) {
+                }
 
-                if (textureNotFound){
+                if (textureNotFound) {
                     ringLocationsToGenerate.add(thickLogResLoc);
                 }
             }

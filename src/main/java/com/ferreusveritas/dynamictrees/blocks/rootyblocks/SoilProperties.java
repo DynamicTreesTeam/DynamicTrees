@@ -16,7 +16,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
-import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
@@ -31,11 +30,26 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
             .apply(instance, SoilProperties::new));
 
     public static final SoilProperties NULL_SOIL_PROPERTIES = new SoilProperties() {
-        @Override public Block getPrimitiveSoilBlock() { return Blocks.AIR; }
-        @Nullable @Override public RootyBlock getDynamicSoilBlock() { return null; }
-        @Override public Integer getSoilFlags() { return 0; }
-        @Override public void generateDynamicSoil(AbstractBlock.Properties properties) { }
-     }.setRegistryName(DTTrees.NULL).setBlockRegistryName(DTTrees.NULL);
+        @Override
+        public Block getPrimitiveSoilBlock() {
+            return Blocks.AIR;
+        }
+
+        @Nullable
+        @Override
+        public RootyBlock getDynamicSoilBlock() {
+            return null;
+        }
+
+        @Override
+        public Integer getSoilFlags() {
+            return 0;
+        }
+
+        @Override
+        public void generateDynamicSoil(AbstractBlock.Properties properties) {
+        }
+    }.setRegistryName(DTTrees.NULL).setBlockRegistryName(DTTrees.NULL);
 
     /**
      * Central registry for all {@link LeavesProperties} objects.
@@ -48,17 +62,23 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
     private ResourceLocation blockRegistryName;
 
     //used for null soil properties
-    protected SoilProperties() { }
+    protected SoilProperties() {
+    }
+
     //used for Dirt Helper registrations only
-    protected SoilProperties (final Block primitiveBlock, ResourceLocation name, Integer soilFlags, boolean generate){
+    protected SoilProperties(final Block primitiveBlock, ResourceLocation name, Integer soilFlags, boolean generate) {
         this(primitiveBlock, name);
         this.soilFlags = soilFlags;
-        if (generate) generateDynamicSoil(AbstractBlock.Properties.copy(primitiveBlock));
+        if (generate) {
+            generateDynamicSoil(AbstractBlock.Properties.copy(primitiveBlock));
+        }
     }
-    public SoilProperties (final ResourceLocation registryName){
+
+    public SoilProperties(final ResourceLocation registryName) {
         this(null, registryName);
     }
-    public SoilProperties (@Nullable final Block primitiveBlock, final ResourceLocation registryName){
+
+    public SoilProperties(@Nullable final Block primitiveBlock, final ResourceLocation registryName) {
         super(registryName);
         this.primitiveSoilBlock = primitiveBlock != null ? primitiveBlock : Blocks.AIR;
     }
@@ -67,13 +87,14 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
     // PRIMITIVE SOIL
     ///////////////////////////////////////////
 
-    public Block getPrimitiveSoilBlock(){
+    public Block getPrimitiveSoilBlock() {
         return primitiveSoilBlock;
     }
 
     protected void setPrimitiveSoilBlock(final Block primitiveSoil) {
-        if (this.primitiveSoilBlock == null || primitiveSoil != this.primitiveSoilBlock.getBlock())
+        if (this.primitiveSoilBlock == null || primitiveSoil != this.primitiveSoilBlock.getBlock()) {
             this.primitiveSoilBlock = primitiveSoil;
+        }
         SoilHelper.addSoilPropertiesToMap(this);
     }
 
@@ -88,30 +109,33 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
     public ResourceLocation getBlockRegistryName() {
         return this.blockRegistryName;
     }
+
     public SoilProperties setBlockRegistryName(ResourceLocation blockRegistryName) {
         this.blockRegistryName = blockRegistryName;
         return this;
     }
 
-    private void setBlockRegistryNameIfNull(){
-        if (this.blockRegistryName == null)
+    private void setBlockRegistryNameIfNull() {
+        if (this.blockRegistryName == null) {
             this.blockRegistryName = ResourceLocationUtils.prefix(this.getRegistryName(), this.getBlockRegistryNamePrefix());
+        }
     }
 
     @Nullable
-    public RootyBlock getDynamicSoilBlock (){
+    public RootyBlock getDynamicSoilBlock() {
         return dynamicSoilBlock;
     }
 
-    public void generateDynamicSoil (AbstractBlock.Properties blockProperties) {
+    public void generateDynamicSoil(AbstractBlock.Properties blockProperties) {
         setBlockRegistryNameIfNull();
         this.dynamicSoilBlock = RegistryHandler.addBlock(this.blockRegistryName, this.createDynamicSoil(blockProperties));
     }
-    protected RootyBlock createDynamicSoil (AbstractBlock.Properties blockProperties) {
+
+    protected RootyBlock createDynamicSoil(AbstractBlock.Properties blockProperties) {
         return new RootyBlock(this, blockProperties);
     }
 
-    public void setDynamicSoilBlock (RootyBlock rootyBlock){
+    public void setDynamicSoilBlock(RootyBlock rootyBlock) {
         this.dynamicSoilBlock = rootyBlock;
     }
 
@@ -131,16 +155,16 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
     // SOIL FLAGS
     ///////////////////////////////////////////
 
-    public Integer getSoilFlags(){
+    public Integer getSoilFlags() {
         return soilFlags;
     }
 
-    public SoilProperties setSoilFlags(Integer adjFlag){
+    public SoilProperties setSoilFlags(Integer adjFlag) {
         this.soilFlags = adjFlag;
         return this;
     }
 
-    public SoilProperties addSoilFlags(Integer adjFlag){
+    public SoilProperties addSoilFlags(Integer adjFlag) {
         this.soilFlags |= adjFlag;
         return this;
     }

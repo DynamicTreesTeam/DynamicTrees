@@ -9,7 +9,7 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 public class ServerEventHandler {
 
     @SubscribeEvent
-    public void onServerStart (final FMLServerStartingEvent event) {
+    public void onServerStart(final FMLServerStartingEvent event) {
         SeasonHelper.getSeasonManager().flushMappings();
     }
 

@@ -13,35 +13,36 @@ import net.minecraft.world.World;
 
 public class CocoaGenFeature extends GenFeature {
 
-	public CocoaGenFeature(ResourceLocation registryName) {
-		super(registryName);
-	}
+    public CocoaGenFeature(ResourceLocation registryName) {
+        super(registryName);
+    }
 
-	@Override
-	protected void registerProperties() { }
+    @Override
+    protected void registerProperties() {
+    }
 
-	@Override
-	protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
-		if (context.fertility() == 0 && context.random().nextInt() % 16 == 0) {
-			final World world = context.world();
-			if (context.species().seasonalFruitProductionFactor(world, context.treePos()) > context.random().nextFloat()) {
-				this.addCocoa(world, context.pos(), false);
-			}
-		}
-		return false;
-	}
+    @Override
+    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+        if (context.fertility() == 0 && context.random().nextInt() % 16 == 0) {
+            final World world = context.world();
+            if (context.species().seasonalFruitProductionFactor(world, context.treePos()) > context.random().nextFloat()) {
+                this.addCocoa(world, context.pos(), false);
+            }
+        }
+        return false;
+    }
 
-	@Override
-	protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
-		if (context.random().nextInt() % 8 == 0) {
-			this.addCocoa(context.world(), context.pos(), true);
-			return true;
-		}
-		return false;
-	}
+    @Override
+    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+        if (context.random().nextInt() % 8 == 0) {
+            this.addCocoa(context.world(), context.pos(), true);
+            return true;
+        }
+        return false;
+    }
 
-	private void addCocoa(IWorld world, BlockPos rootPos, boolean worldGen) {
-		TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new CocoaFruitNode().setWorldGen(worldGen)));
-	}
+    private void addCocoa(IWorld world, BlockPos rootPos, boolean worldGen) {
+        TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new CocoaFruitNode().setWorldGen(worldGen)));
+    }
 
 }

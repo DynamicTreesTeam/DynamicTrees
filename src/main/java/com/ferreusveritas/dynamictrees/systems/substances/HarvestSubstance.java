@@ -53,15 +53,17 @@ public class HarvestSubstance implements ISubstanceEffect {
         final BlockState rootState = world.getBlockState(rootPos);
         final RootyBlock rootyBlock = TreeHelper.getRooty(rootState);
 
-        if (rootyBlock == null)
+        if (rootyBlock == null) {
             return false;
+        }
 
         this.species = rootyBlock.getSpecies(rootState, world, rootPos);
         this.compatibleFruitBlocks.addAll(FruitBlock.getFruitBlocksForSpecies(species));
 
         // If the species is invalid or doesn't have any compatible fruit, don't apply substance.
-        if (!this.species.isValid() || this.compatibleFruitBlocks.size() < 1)
+        if (!this.species.isValid() || this.compatibleFruitBlocks.size() < 1) {
             return false;
+        }
 
         this.recalculateFruitPositions(world, rootPos, rootyBlock);
 
@@ -88,13 +90,15 @@ public class HarvestSubstance implements ISubstanceEffect {
 
     @Override
     public boolean update(World world, BlockPos rootPos, int deltaTicks, int fertility) {
-        if (deltaTicks > this.duration)
+        if (deltaTicks > this.duration) {
             return false;
+        }
 
         final RootyBlock rootyBlock = TreeHelper.getRooty(world.getBlockState(rootPos));
 
-        if (rootyBlock == null)
+        if (rootyBlock == null) {
             return false;
+        }
 
         if (world.isClientSide) {
             if (deltaTicks % this.ticksPerParticlePulse == 0) {

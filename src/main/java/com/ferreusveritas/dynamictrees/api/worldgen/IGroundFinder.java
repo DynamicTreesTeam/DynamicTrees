@@ -11,15 +11,14 @@ import java.util.List;
  */
 public interface IGroundFinder {
 
-	/**
-	 * Finds the {@link BlockPos} of the first ground block for the y-column of the
-	 * start {@link BlockPos} given.
-	 *
-	 * @param entry The {@link BiomeDatabase.Entry} of the biome for the position.
-	 * @param world The {@link ISeedReader} world object.
-	 * @param start The {@link BlockPos} to start from.
-	 * @return The {@link BlockPos} of the first ground block.
-	 */
-	List<BlockPos> findGround(BiomeDatabase.Entry entry, ISeedReader world, BlockPos start);
+    /**
+     * Finds the {@link BlockPos} of the first ground block for the y-column of the start {@link BlockPos} given.
+     *
+     * @param entry The {@link BiomeDatabase.Entry} of the biome for the position.
+     * @param world The {@link ISeedReader} world object.
+     * @param start The {@link BlockPos} to start from.
+     * @return The {@link BlockPos} of the first ground block.
+     */
+    List<BlockPos> findGround(BiomeDatabase.Entry entry, ISeedReader world, BlockPos start);
 
 }

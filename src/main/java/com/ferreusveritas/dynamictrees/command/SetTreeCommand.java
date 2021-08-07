@@ -35,9 +35,9 @@ public final class SetTreeCommand extends SubCommand {
     @Override
     public ArgumentBuilder<CommandSource, ?> registerArgument() {
         return blockPosArgument().then(speciesArgument().executes(context -> this.setTree(context.getSource(), blockPosArgument(context),
-                speciesArgument(context), JO_CODE, DEFAULT_TURNS, DEFAULT_FERTILITY))
+                        speciesArgument(context), JO_CODE, DEFAULT_TURNS, DEFAULT_FERTILITY))
                 .then(stringArgument(JO_CODE).suggests(((context, builder) -> ISuggestionProvider.suggest(speciesArgument(context).getJoCodes()
-                        .stream().map(JoCode::toString).collect(Collectors.toList()), builder)))
+                                .stream().map(JoCode::toString).collect(Collectors.toList()), builder)))
                         .executes(context -> this.setTree(context.getSource(), blockPosArgument(context), speciesArgument(context),
                                 stringArgument(context, JO_CODE), DEFAULT_TURNS, DEFAULT_FERTILITY))
                         .then(intArgument(TURNS).suggests(TURNS_SUGGESTIONS)
@@ -55,7 +55,7 @@ public final class SetTreeCommand extends SubCommand {
         sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.set_tree", CommandHelper.posComponent(rootPos),
                 species.getTextComponent(), joCode.getTextComponent()));
         joCode.generate(world, world, species, rootPos, source.getLevel().getBiome(rootPos),
-                        Direction.SOUTH, 8, SafeChunkBounds.ANY, false);
+                Direction.SOUTH, 8, SafeChunkBounds.ANY, false);
 
         // Try to set the fertility.
         Null.consumeIfNonnull(TreeHelper.getRooty(world.getBlockState(rootPos)),

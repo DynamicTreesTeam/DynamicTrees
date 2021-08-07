@@ -26,7 +26,9 @@ public final class DTCommand {
         LiteralArgumentBuilder<CommandSource> dtCommandBuilder = LiteralArgumentBuilder.literal(CommandConstants.COMMAND);
 
         // Add sub-commands.
-        for (SubCommand subCommand : this.subCommands) dtCommandBuilder = dtCommandBuilder.then(subCommand.register());
+        for (SubCommand subCommand : this.subCommands) {
+            dtCommandBuilder = dtCommandBuilder.then(subCommand.register());
+        }
 
         // Register command.
         LiteralCommandNode<CommandSource> dtCommand = dispatcher.register(dtCommandBuilder);

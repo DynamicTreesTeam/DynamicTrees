@@ -35,18 +35,22 @@ public final class MapDeserialiser<K, V> implements JsonDeserialiser<Map<K, V>> 
                     this.valueGetter.deserialise(entry.getValue()).ifSuccessful(value ->
                             this.keyGetter.deserialise(new JsonPrimitive(entry.getKey()))
                                     .ifSuccessful(key -> map.put(key, value)).elseIfError(err -> errorMsg[0] = err)
-                    ).elseIfError(err -> {if (errorMsg[0] == null) errorMsg[0] = err;} )
+                    ).elseIfError(err -> {
+                        if (errorMsg[0] == null) {
+                            errorMsg[0] = err;
+                        }
+                    })
             );
             return map;
         }).setErrorMessage(errorMsg[0]);
     }
 
-    public static <K, V> Class<Map<K, V>> getMapClass (Class<K> keyClass, Class<V> valueClass) {
+    public static <K, V> Class<Map<K, V>> getMapClass(Class<K> keyClass, Class<V> valueClass) {
         return getMapClass(keyClass, valueClass, HashMap::new);
     }
 
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unchecked"})
-    public static <K, V> Class<Map<K, V>> getMapClass (Class<K> keyClass, Class<V> valueClass, Supplier<Map<K, V>> mapSupplier) {
+    public static <K, V> Class<Map<K, V>> getMapClass(Class<K> keyClass, Class<V> valueClass, Supplier<Map<K, V>> mapSupplier) {
         return (Class<Map<K, V>>) mapSupplier.get().getClass();
     }
 

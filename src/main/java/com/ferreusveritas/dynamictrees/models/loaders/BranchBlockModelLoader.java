@@ -35,7 +35,8 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
     private static final String RINGS = "rings";
 
     @Override
-    public void onResourceManagerReload(IResourceManager resourceManager) { }
+    public void onResourceManagerReload(IResourceManager resourceManager) {
+    }
 
     @Override
     public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelObject) {
@@ -46,18 +47,19 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
                 familyResLoc == null ? null : TreeRegistry.processResLoc(familyResLoc));
     }
 
-    protected JsonObject getTexturesObject (final JsonObject modelContents) {
-        if (!modelContents.has(TEXTURES) || !modelContents.get(TEXTURES).isJsonObject())
+    protected JsonObject getTexturesObject(final JsonObject modelContents) {
+        if (!modelContents.has(TEXTURES) || !modelContents.get(TEXTURES).isJsonObject()) {
             this.throwRequiresElement(TEXTURES, "Json Object");
+        }
 
         return modelContents.getAsJsonObject(TEXTURES);
     }
 
-    protected ResourceLocation getBarkResLoc (final JsonObject textureObject) {
+    protected ResourceLocation getBarkResLoc(final JsonObject textureObject) {
         return this.getTextureLocation(textureObject, BARK);
     }
 
-    protected ResourceLocation getRingsResLoc (final JsonObject textureObject) {
+    protected ResourceLocation getRingsResLoc(final JsonObject textureObject) {
         return this.getTextureLocation(textureObject, RINGS);
     }
 
@@ -70,7 +72,7 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
         }
     }
 
-    protected ResourceLocation getTextureLocation (final JsonObject textureObject, final String textureElement) {
+    protected ResourceLocation getTextureLocation(final JsonObject textureObject, final String textureElement) {
         try {
             return this.getResLocOrThrow(this.getOrThrow(textureObject, textureElement));
         } catch (final RuntimeException e) {
@@ -82,13 +84,14 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
 
     protected String getOrThrow(final JsonObject jsonObject, final String identifier) {
         if (jsonObject.get(identifier) == null || !jsonObject.get(identifier).isJsonPrimitive() ||
-                !jsonObject.get(identifier).getAsJsonPrimitive().isString())
+                !jsonObject.get(identifier).getAsJsonPrimitive().isString()) {
             this.throwRequiresElement(identifier, "String");
+        }
 
         return jsonObject.get(identifier).getAsString();
     }
 
-    protected void throwRequiresElement (final String element, final String expectedType) {
+    protected void throwRequiresElement(final String element, final String expectedType) {
         throw new RuntimeException(this.getModelTypeName() + " requires a valid \"" + element + "\" element of " +
                 "type " + expectedType + ".");
     }
@@ -104,21 +107,21 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
     /**
      * @return The type of model the class is loading. Useful for warnings when using sub-classes.
      */
-    protected String getModelTypeName () {
+    protected String getModelTypeName() {
         return "Branch";
     }
 
     /**
-     * Gets the {@link IModelGeometry} object from the given bark and rings texture locations.
-     * Can be overridden by sub-classes to provide their custom {@link IModelGeometry}.
+     * Gets the {@link IModelGeometry} object from the given bark and rings texture locations. Can be overridden by
+     * sub-classes to provide their custom {@link IModelGeometry}.
      *
-     * @param barkResLoc The {@link ResourceLocation} object for the bark.
+     * @param barkResLoc  The {@link ResourceLocation} object for the bark.
      * @param ringsResLoc The {@link ResourceLocation} object for the rings.
      * @return The {@link IModelGeometry} object.
      */
-    protected BranchBlockModelGeometry getModelGeometry (final ResourceLocation barkResLoc,
-                                                         final ResourceLocation ringsResLoc,
-                                                         @Nullable final ResourceLocation familyResLoc) {
+    protected BranchBlockModelGeometry getModelGeometry(final ResourceLocation barkResLoc,
+                                                        final ResourceLocation ringsResLoc,
+                                                        @Nullable final ResourceLocation familyResLoc) {
         return new BranchBlockModelGeometry(barkResLoc, ringsResLoc, familyResLoc, false);
     }
 

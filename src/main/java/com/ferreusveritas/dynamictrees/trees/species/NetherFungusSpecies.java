@@ -1,15 +1,11 @@
 package com.ferreusveritas.dynamictrees.trees.species;
 
-import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -19,7 +15,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -65,14 +60,17 @@ public class NetherFungusSpecies extends Species {
 
     @Override
     public Species setPostReloadDefaults() {
-        if (!this.hasGenFeatures())
+        if (!this.hasGenFeatures()) {
             this.addGenFeature(GenFeatures.CLEAR_VOLUME).addGenFeature(GenFeatures.SHROOMLIGHT);
+        }
         return super.setPostReloadDefaults();
     }
 
     @Override
     public boolean isAcceptableSoilForWorldgen(IWorld world, BlockPos pos, BlockState soilBlockState) {
-        if (soilBlockState.getBlock() == Blocks.NETHERRACK) return true; //Soil exception for worldgen
+        if (soilBlockState.getBlock() == Blocks.NETHERRACK) {
+            return true; //Soil exception for worldgen
+        }
         return super.isAcceptableSoilForWorldgen(world, pos, soilBlockState);
     }
 

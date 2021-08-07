@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropConte
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
 import net.minecraft.loot.LootTable;
-import net.minecraft.loot.LootTableManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.server.ServerWorld;
 

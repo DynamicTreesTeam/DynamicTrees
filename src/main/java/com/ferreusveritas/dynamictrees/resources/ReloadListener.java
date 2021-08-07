@@ -7,8 +7,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 /**
- * A simplified version of {@link net.minecraft.client.resources.ReloadListener} that omits
- * things we don't use (namely profilers), and adds the load capability for initial loading.
+ * A simplified version of {@link net.minecraft.client.resources.ReloadListener} that omits things we don't use (namely
+ * profilers), and adds the load capability for initial loading.
  *
  * @param <T> The type of {@link Object} returned by {@link #prepare(TreesResourceManager)}.
  * @author Harley O'Connor
@@ -28,14 +28,13 @@ public abstract class ReloadListener<T> {
     }
 
     /**
-     * Loads the relevant data from the resource manager given. This should only be
-     * called on initial game load, allowing apply to handle registering to Forge
-     * registries.
+     * Loads the relevant data from the resource manager given. This should only be called on initial game load,
+     * allowing apply to handle registering to Forge registries.
      *
      * @param resourceManager The {@link IResourceManager} object.
      * @return The {@link CompletableFuture<Void>} that loads the relevant data.
      */
-    public CompletableFuture<Void> load (final TreesResourceManager resourceManager) {
+    public CompletableFuture<Void> load(final TreesResourceManager resourceManager) {
         return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), Util.backgroundExecutor())
                 .thenAccept(preparedObject -> this.apply(preparedObject, resourceManager, ApplicationType.LOAD));
     }
@@ -46,10 +45,9 @@ public abstract class ReloadListener<T> {
     }
 
     /**
-     * Prepares reload by creating a {@link CompletableFuture} that calls
-     * {@link #prepare(TreesResourceManager)}.
+     * Prepares reload by creating a {@link CompletableFuture} that calls {@link #prepare(TreesResourceManager)}.
      *
-     * @param resourceManager The {@link IResourceManager} object.
+     * @param resourceManager    The {@link IResourceManager} object.
      * @param backgroundExecutor The {@link Executor} to prepare files on.
      */
     public CompletableFuture<T> prepareReload(final TreesResourceManager resourceManager, final Executor backgroundExecutor) {
@@ -57,10 +55,11 @@ public abstract class ReloadListener<T> {
     }
 
     /**
-     * Reloads the relevant data from the prepared {@link CompletableFuture} supplied by
-     * {@link #prepareReload(TreesResourceManager, Executor)}.
+     * Reloads the relevant data from the prepared {@link CompletableFuture} supplied by {@link
+     * #prepareReload(TreesResourceManager, Executor)}.
      *
-     * @param future The {@link CompletableFuture} created by {@link #prepareReload(TreesResourceManager, Executor)}.
+     * @param future          The {@link CompletableFuture} created by {@link #prepareReload(TreesResourceManager,
+     *                        Executor)}.
      * @param resourceManager The {@link IResourceManager} object.
      */
     public void reload(CompletableFuture<T> future, final TreesResourceManager resourceManager) {
@@ -76,7 +75,8 @@ public abstract class ReloadListener<T> {
 
     /**
      * Applies the given data.
-     *  @param preparedObject The prepared/formatted data.
+     *
+     * @param preparedObject  The prepared/formatted data.
      * @param resourceManager The {@link IResourceManager} object.
      * @param applicationType The {@link ApplicationType} to use.
      */

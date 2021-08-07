@@ -27,10 +27,10 @@ public abstract class FeatureCanceller extends RegistryEntry<FeatureCanceller> {
     /**
      * Works out if the configured feature in the given biome should be cancelled or not.
      *
-     * @param configuredFeature The configured feature.
+     * @param configuredFeature    The configured feature.
      * @param featureCancellations The tree canceller object.
      * @return True if feature should be cancelled, false if not.
      */
-    public abstract boolean shouldCancel (ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations);
+    public abstract boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations);
 
 }

@@ -8,8 +8,8 @@ import net.minecraftforge.eventbus.api.Event;
 import java.util.Map;
 
 /**
- * An {@link Event} for populating dimensional databases programmatically. This is posted
- * after all default populators and dimensional populators from Json have been registered.
+ * An {@link Event} for populating dimensional databases programmatically. This is posted after all default populators
+ * and dimensional populators from Json have been registered.
  *
  * <p>Fired on the {@link MinecraftForge#EVENT_BUS}.</p>
  *

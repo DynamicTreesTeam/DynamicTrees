@@ -12,8 +12,9 @@ public final class AxisAlignedBBDeserialiser implements JsonDeserialiser<AxisAli
     @Override
     public DeserialisationResult<AxisAlignedBB> deserialise(JsonElement jsonElement) {
         return JsonDeserialisers.JSON_ARRAY.deserialise(jsonElement).map(jsonArray -> {
-            if (jsonArray.size() != 6 || !this.allElementsNumber(jsonArray))
+            if (jsonArray.size() != 6 || !this.allElementsNumber(jsonArray)) {
                 return null;
+            }
 
             final double[] params = new double[6];
 
@@ -27,8 +28,9 @@ public final class AxisAlignedBBDeserialiser implements JsonDeserialiser<AxisAli
 
     public boolean allElementsNumber(final JsonArray jsonArray) {
         for (JsonElement jsonElement : jsonArray) {
-            if (!jsonElement.isJsonPrimitive() || !jsonElement.getAsJsonPrimitive().isNumber())
+            if (!jsonElement.isJsonPrimitive() || !jsonElement.getAsJsonPrimitive().isNumber()) {
                 return false;
+            }
         }
         return true;
     }

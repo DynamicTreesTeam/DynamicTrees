@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 /**
- * Implementation of {@link JsonDeserialiser} that attempts to get a {@link ForgeRegistryEntry}
- * object from a {@link JsonElement}.
+ * Implementation of {@link JsonDeserialiser} that attempts to get a {@link ForgeRegistryEntry} object from a {@link
+ * JsonElement}.
  *
  * @author Harley O'Connor
  */
@@ -39,14 +39,14 @@ public final class ForgeRegistryEntryDeserialiser<T extends ForgeRegistryEntry<T
     public DeserialisationResult<T> deserialise(JsonElement jsonElement) {
         final AtomicBoolean intentionallyNull = new AtomicBoolean();
         return JsonDeserialisers.RESOURCE_LOCATION.deserialise(jsonElement).map(registryName -> {
-            // If registry name is the null value's registry name then it was intentionally the null value, so don't warn.
-            if (this.nullValue != null && Objects.equals(registryName, this.nullValue.getRegistryName())) {
-                intentionallyNull.set(true);
-                return this.nullValue;
-            }
+                    // If registry name is the null value's registry name then it was intentionally the null value, so don't warn.
+                    if (this.nullValue != null && Objects.equals(registryName, this.nullValue.getRegistryName())) {
+                        intentionallyNull.set(true);
+                        return this.nullValue;
+                    }
 
-            return this.registry.getValue(registryName);
-            }, value -> intentionallyNull.get() || this.validator.test(value),
+                    return this.registry.getValue(registryName);
+                }, value -> intentionallyNull.get() || this.validator.test(value),
                 "Could not find " + this.registryDisplayName + " for registry name '{previous_value}'.");
     }
 

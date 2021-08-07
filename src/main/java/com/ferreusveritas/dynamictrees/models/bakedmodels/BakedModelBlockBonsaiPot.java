@@ -60,19 +60,19 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
     }
 
     @Override
-	public boolean useAmbientOcclusion() {
-		return this.basePotModel.useAmbientOcclusion();
-	}
+    public boolean useAmbientOcclusion() {
+        return this.basePotModel.useAmbientOcclusion();
+    }
 
-	@Override
-	public boolean isGui3d() {
-		return true;
-	}
+    @Override
+    public boolean isGui3d() {
+        return true;
+    }
 
-	@Override
-	public boolean isCustomRenderer() {
-		return true;
-	}
+    @Override
+    public boolean isCustomRenderer() {
+        return true;
+    }
 
     @Override
     public boolean usesBlockLight() {
@@ -85,8 +85,8 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
     }
 
     @Override
-	public ItemOverrideList getOverrides() {
-		return ItemOverrideList.EMPTY;
-	}
+    public ItemOverrideList getOverrides() {
+        return ItemOverrideList.EMPTY;
+    }
 
 }

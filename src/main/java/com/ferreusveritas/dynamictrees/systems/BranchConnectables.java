@@ -18,18 +18,18 @@ import java.util.Map;
  */
 public class BranchConnectables {
 
-    private static final Map<Block, TetraFunction<BlockState,IBlockReader,BlockPos,Direction,Integer>> connectablesMap = new HashMap<>();
+    private static final Map<Block, TetraFunction<BlockState, IBlockReader, BlockPos, Direction, Integer>> connectablesMap = new HashMap<>();
 
     //Direction can be null
-    public static void makeBlockConnectable (Block block, TetraFunction<BlockState,IBlockReader,BlockPos,Direction,Integer> radiusFunction){
+    public static void makeBlockConnectable(Block block, TetraFunction<BlockState, IBlockReader, BlockPos, Direction, Integer> radiusFunction) {
         connectablesMap.putIfAbsent(block, radiusFunction);
     }
 
-    public static boolean isBlockConnectable (Block block){
+    public static boolean isBlockConnectable(Block block) {
         return connectablesMap.containsKey(block);
     }
 
-    public static int getConnectionRadiusForBlock (BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
+    public static int getConnectionRadiusForBlock(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
         final Block block = state.getBlock();
         return isBlockConnectable(block) ? connectablesMap.get(block).apply(state, world, pos, side) : 0;
     }

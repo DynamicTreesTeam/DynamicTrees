@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.data;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;

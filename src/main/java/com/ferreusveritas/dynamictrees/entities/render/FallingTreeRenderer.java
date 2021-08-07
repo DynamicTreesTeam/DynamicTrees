@@ -18,42 +18,42 @@ import net.minecraftforge.fml.client.registry.IRenderFactory;
 
 @OnlyIn(Dist.CLIENT)
 public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
-	
-	protected FallingTreeRenderer(EntityRendererManager renderManager) {
-		super(renderManager);
-	}
 
-	@Override
-	public ResourceLocation getTextureLocation(FallingTreeEntity entity) {
-		return AtlasTexture.LOCATION_BLOCKS;
-	}
+    protected FallingTreeRenderer(EntityRendererManager renderManager) {
+        super(renderManager);
+    }
 
-	@Override
-	public void render(FallingTreeEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
-		super.render(entity, entityYaw, partialTicks, matrixStack, buffer, packedLight);
+    @Override
+    public ResourceLocation getTextureLocation(FallingTreeEntity entity) {
+        return AtlasTexture.LOCATION_BLOCKS;
+    }
 
-		if (!entity.isClientBuilt() || !entity.shouldRender()) {
-			return;
-		}
+    @Override
+    public void render(FallingTreeEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int packedLight) {
+        super.render(entity, entityYaw, partialTicks, matrixStack, buffer, packedLight);
 
-		this.entityRenderDispatcher.textureManager.bind(this.getTextureLocation(entity));
+        if (!entity.isClientBuilt() || !entity.shouldRender()) {
+            return;
+        }
 
-		final FallingTreeEntityModel treeModel = FallingTreeEntityModelTrackerCache.getModel(entity);
+        this.entityRenderDispatcher.textureManager.bind(this.getTextureLocation(entity));
 
-		matrixStack.pushPose();
+        final FallingTreeEntityModel treeModel = FallingTreeEntityModelTrackerCache.getModel(entity);
 
-		final IVertexBuilder vertexBuilder = buffer.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity)));
+        matrixStack.pushPose();
+
+        final IVertexBuilder vertexBuilder = buffer.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity)));
 
 //		if (entity.onFire) {
 //			renderFire(matrixStack, vertexBuilder);
 //		}
 
-		entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks, matrixStack);
+        entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTicks, matrixStack);
 
-		treeModel.renderToBuffer(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1,1,1, 1.0F);
+        treeModel.renderToBuffer(matrixStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1.0F);
 
-		matrixStack.popPose();
-	}
+        matrixStack.popPose();
+    }
 
 //	private void renderFire(MatrixStack matrixStack, IVertexBuilder buffer) {
 //		matrixStack.push();
@@ -66,14 +66,14 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 //		matrixStack.pop();
 //	}
 
-	public static class Factory implements IRenderFactory<FallingTreeEntity> {
-		
-		@Override
-		public EntityRenderer<FallingTreeEntity> createRenderFor(EntityRendererManager manager) {
-			return new FallingTreeRenderer(manager);
-		}
-		
-	}
-	
+    public static class Factory implements IRenderFactory<FallingTreeEntity> {
+
+        @Override
+        public EntityRenderer<FallingTreeEntity> createRenderFor(EntityRendererManager manager) {
+            return new FallingTreeRenderer(manager);
+        }
+
+    }
+
 }
 

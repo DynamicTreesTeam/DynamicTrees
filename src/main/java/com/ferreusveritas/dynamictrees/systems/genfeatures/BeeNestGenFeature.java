@@ -36,9 +36,9 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 
 /**
- * Gen feature for bee nests. Can be fully customized with a custom predicate for natural growth
- * and with a custom function for worldgen chances.
- * It is recommended for the generated block to be made connectable using {@link com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, TetraFunction)}
+ * Gen feature for bee nests. Can be fully customized with a custom predicate for natural growth and with a custom
+ * function for worldgen chances. It is recommended for the generated block to be made connectable using {@link
+ * com.ferreusveritas.dynamictrees.systems.BranchConnectables#makeBlockConnectable(Block, TetraFunction)}
  *
  * @author Max Hyper
  */
@@ -52,7 +52,7 @@ public class BeeNestGenFeature extends GenFeature {
     private static final float FOREST_CHANCE = 0.0005f;
     private static final float CHANCE = 0.001f;
 
-    public BeeNestGenFeature (ResourceLocation registryName) {
+    public BeeNestGenFeature(ResourceLocation registryName) {
         super(registryName);
     }
 
@@ -64,9 +64,11 @@ public class BeeNestGenFeature extends GenFeature {
     @Override
     public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos) -> {
-            if (world.getRandom().nextFloat() > CHANCE) return false;
+            if (world.getRandom().nextFloat() > CHANCE) {
+                return false;
+            }
             // Default flower check predicate, straight from the sapling class
-            for(BlockPos blockpos : BlockPos.Mutable.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
+            for (BlockPos blockpos : BlockPos.Mutable.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
                 if (world.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
                     return true;
                 }
@@ -75,12 +77,15 @@ public class BeeNestGenFeature extends GenFeature {
         }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
             // Default biome check chance function. Uses vanilla chances
             RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).getRegistryName()));
-            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS))
+            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS)) {
                 return PLAINS_CHANCE;
-            if (biomeKey == Biomes.FLOWER_FOREST)
+            }
+            if (biomeKey == Biomes.FLOWER_FOREST) {
                 return FLOWER_FOREST_CHANCE;
-            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST))
+            }
+            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST)) {
                 return FOREST_CHANCE;
+            }
             return 0F;
         }).with(MAX_COUNT, 1);
     }
@@ -108,12 +113,16 @@ public class BeeNestGenFeature extends GenFeature {
 
         int treeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
         //This prevents trees from having multiple bee nests. There should be only one per tree.
-        if (nestAlreadyPresent(world, nestBlock, rootPos, treeHeight)) return false;
+        if (nestAlreadyPresent(world, nestBlock, rootPos, treeHeight)) {
+            return false;
+        }
 
         //Finds the valid places next to the trunk and under an existing branch.
         //The places are mapped to a direction list that hold the valid orientations with an air block in front
         List<Pair<BlockPos, List<Direction>>> validSpaces = findBranchPits(configuredGenFeature, world, rootPos, treeHeight);
-        if (validSpaces == null) return false;
+        if (validSpaces == null) {
+            return false;
+        }
         if (validSpaces.size() > 0) {
             Pair<BlockPos, List<Direction>> chosenSpace = validSpaces.get(world.getRandom().nextInt(validSpaces.size()));
             //There is always AT LEAST one valid direction, since if there were none the pos would not have been added to validSpaces
@@ -127,8 +136,12 @@ public class BeeNestGenFeature extends GenFeature {
     private boolean placeBeeNestWithBees(IWorld world, Block nestBlock, BlockPos pos, Direction faceDir, boolean worldGen) {
         int honeyLevel = worldGen ? world.getRandom().nextInt(6) : 0;
         BlockState nestState = nestBlock.defaultBlockState();
-        if (nestState.hasProperty(BeehiveBlock.FACING)) nestState = nestState.setValue(BeehiveBlock.FACING, faceDir);
-        if (nestState.hasProperty(BeehiveBlock.HONEY_LEVEL)) nestState = nestState.setValue(BeehiveBlock.HONEY_LEVEL, honeyLevel);
+        if (nestState.hasProperty(BeehiveBlock.FACING)) {
+            nestState = nestState.setValue(BeehiveBlock.FACING, faceDir);
+        }
+        if (nestState.hasProperty(BeehiveBlock.HONEY_LEVEL)) {
+            nestState = nestState.setValue(BeehiveBlock.HONEY_LEVEL, honeyLevel);
+        }
         // Sets the nest block, but the bees still need to be added.
         world.setBlock(pos, nestState, 2);
         TileEntity blockEntity = world.getBlockEntity(pos);
@@ -136,7 +149,9 @@ public class BeeNestGenFeature extends GenFeature {
         if (blockEntity instanceof BeehiveTileEntity) {
             BeehiveTileEntity beehivetileentity = (BeehiveTileEntity) blockEntity;
             World thisWorld = worldFromIWorld(world);
-            if (thisWorld == null) return false;
+            if (thisWorld == null) {
+                return false;
+            }
             int beeCount = worldGen ? 3 : 2 + world.getRandom().nextInt(2);
             for (int i = 0; i < beeCount; ++i) {
                 BeeEntity beeEntity = new BeeEntity(EntityType.BEE, thisWorld);
@@ -149,7 +164,7 @@ public class BeeNestGenFeature extends GenFeature {
 
     //This just fetches a World instance from an IWorld instance, since IWorld cannot be used to create bees.
     @Nullable
-    private World worldFromIWorld (IWorld iWorld) {
+    private World worldFromIWorld(IWorld iWorld) {
         if (iWorld instanceof WorldGenRegion) {
             return ((WorldGenRegion) iWorld).getLevel();
         } else if (iWorld instanceof World) {
@@ -170,7 +185,7 @@ public class BeeNestGenFeature extends GenFeature {
         return false;
     }
 
-    private int getTreeHeight (IWorld world, BlockPos rootPos, int maxHeight) {
+    private int getTreeHeight(IWorld world, BlockPos rootPos, int maxHeight) {
         for (int i = 1; i < maxHeight; i++) {
             if (!TreeHelper.isBranch(world.getBlockState(rootPos.above(i)))) {
                 return i - 1;
@@ -181,7 +196,7 @@ public class BeeNestGenFeature extends GenFeature {
 
     //The valid places this genFeature looks for are empty blocks under branches next to the trunk, similar to armpits lol
     @Nullable
-    private List<Pair<BlockPos, List<Direction>>> findBranchPits (ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, int maxHeight) {
+    private List<Pair<BlockPos, List<Direction>>> findBranchPits(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, int maxHeight) {
         int existingBlocks = 0;
         List<Pair<BlockPos, List<Direction>>> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++) {
@@ -200,14 +215,17 @@ public class BeeNestGenFeature extends GenFeature {
                         validSpaces.add(Pair.of(sidePos, validDirs));
                     }
                 } else if (world.getBlockState(sidePos).getBlock() == configuredGenFeature.get(NEST_BLOCK)) {
-                    existingBlocks ++;
-                    if (existingBlocks > configuredGenFeature.get(MAX_COUNT)) return null;
+                    existingBlocks++;
+                    if (existingBlocks > configuredGenFeature.get(MAX_COUNT)) {
+                        return null;
+                    }
                 }
             }
         }
         return validSpaces;
     }
 
-    public interface WorldGenChanceFunction extends BiFunction<IWorld, BlockPos, Float> {}
+    public interface WorldGenChanceFunction extends BiFunction<IWorld, BlockPos, Float> {
+    }
 
 }

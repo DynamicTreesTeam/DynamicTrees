@@ -2,10 +2,10 @@ package com.ferreusveritas.dynamictrees.worldgen.deserialisation;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -22,8 +22,9 @@ public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeser
     public DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> deserialise(final JsonElement jsonElement) {
         final DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> speciesSelectorResult = this.getStaticSelector(jsonElement);
 
-        if (speciesSelectorResult.wasSuccessful())
+        if (speciesSelectorResult.wasSuccessful()) {
             return speciesSelectorResult;
+        }
 
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(JsonObject.class, jsonObject -> {
             JsonHelper.JsonObjectReader.of(jsonObject).ifContains(STATIC, staticElement -> speciesSelectorResult.copyFrom(this.getStaticSelector(staticElement)))
@@ -34,15 +35,17 @@ public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeser
         return speciesSelectorResult;
     }
 
-    private DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> getStaticSelector (final JsonElement jsonElement) {
+    private DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> getStaticSelector(final JsonElement jsonElement) {
         final DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> speciesSelectorResult = new DeserialisationResult<>();
 
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(Species.class, species ->
-                speciesSelectorResult.setValue(new BiomePropertySelectors.StaticSpeciesSelector(new BiomePropertySelectors.SpeciesSelection(species))))
+                        speciesSelectorResult.setValue(new BiomePropertySelectors.StaticSpeciesSelector(new BiomePropertySelectors.SpeciesSelection(species))))
                 .elseIfOfType(String.class, str -> {
-                    if (this.isDefault(str))
+                    if (this.isDefault(str)) {
                         speciesSelectorResult.setValue(new BiomePropertySelectors.StaticSpeciesSelector());
-                    else speciesSelectorResult.setErrorMessage("'" + str + " is not a supported parameter for a static species selector.");
+                    } else {
+                        speciesSelectorResult.setErrorMessage("'" + str + " is not a supported parameter for a static species selector.");
+                    }
                 }).elseUnsupportedError(speciesSelectorResult::setErrorMessage);
 
         return speciesSelectorResult;
@@ -52,8 +55,9 @@ public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeser
         final DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> selectorResult = new DeserialisationResult<>();
         final DeserialisationResult<JsonObject> result = JsonDeserialisers.JSON_OBJECT.deserialise(jsonElement);
 
-        if (!result.wasSuccessful())
+        if (!result.wasSuccessful()) {
             return DeserialisationResult.failureFromOther(result);
+        }
 
         final BiomePropertySelectors.RandomSpeciesSelector randomSelector = new BiomePropertySelectors.RandomSpeciesSelector();
         selectorResult.setValue(randomSelector);
@@ -72,9 +76,11 @@ public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeser
             }).ifFailed(selectorResult::addWarning);
         }
 
-        if (randomSelector.getSize() > 0)
+        if (randomSelector.getSize() > 0) {
             return selectorResult;
-        else return selectorResult.setErrorMessage("No species were selected in random selector '" + jsonElement + "'.");
+        } else {
+            return selectorResult.setErrorMessage("No species were selected in random selector '" + jsonElement + "'.");
+        }
     }
 
 }

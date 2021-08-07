@@ -11,9 +11,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
 /**
- * A{@link GenFeature} handling post rot behaviour in which the soil below the base
- * branch is turned to the {@link #ROTTEN_SOIL} property block after that branch has
- * rotted away.
+ * A{@link GenFeature} handling post rot behaviour in which the soil below the base branch is turned to the {@link
+ * #ROTTEN_SOIL} property block after that branch has rotted away.
  *
  * @author Harley O'Connor
  */

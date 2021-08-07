@@ -6,9 +6,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.feature.*;
 
 /**
- * This is default implementation of {@link FeatureCanceller}, cancelling any features which
- * have a config that extends the given class, or that extends {@link MultipleRandomFeatureConfig} and
- * contains a feature that has a config extending the given class. <br>
+ * This is default implementation of {@link FeatureCanceller}, cancelling any features which have a config that extends
+ * the given class, or that extends {@link MultipleRandomFeatureConfig} and contains a feature that has a config
+ * extending the given class. <br>
  *
  * @param <T> An {@link IFeatureConfig} which should be cancelled.
  * @author Harley O'Connor
@@ -24,7 +24,9 @@ public class TreeFeatureCanceller<T extends IFeatureConfig> extends FeatureCance
 
     @Override
     public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
-        if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) return false;
+        if (!(configuredFeature.config instanceof DecoratedFeatureConfig)) {
+            return false;
+        }
 
         final IFeatureConfig featureConfig = ((DecoratedFeatureConfig) configuredFeature.config).feature.get().config;
 
@@ -59,14 +61,15 @@ public class TreeFeatureCanceller<T extends IFeatureConfig> extends FeatureCance
      * @param featureConfig The MultipleRandomFeatureConfig to check.
      * @return True if trees were found.
      */
-    private boolean doesContainTrees (MultipleRandomFeatureConfig featureConfig, BiomePropertySelectors.FeatureCancellations featureCancellations) {
+    private boolean doesContainTrees(MultipleRandomFeatureConfig featureConfig, BiomePropertySelectors.FeatureCancellations featureCancellations) {
         for (ConfiguredRandomFeatureList feature : featureConfig.features) {
             final ConfiguredFeature<?, ?> currentConfiguredFeature = feature.feature.get();
             final ResourceLocation featureRegistryName = currentConfiguredFeature.feature.getRegistryName();
 
             if (this.treeFeatureConfigClass.isInstance(currentConfiguredFeature.config) && featureRegistryName != null &&
-                    featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace()))
+                    featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace())) {
                 return true;
+            }
         }
         return false;
     }

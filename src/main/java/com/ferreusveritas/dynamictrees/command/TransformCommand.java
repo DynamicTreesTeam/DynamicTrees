@@ -45,11 +45,13 @@ public final class TransformCommand extends SubCommand {
 
         final Species fromSpecies = TreeHelper.getExactSpecies(world, rootPos);
 
-        if (toSpecies == fromSpecies)
+        if (toSpecies == fromSpecies) {
             throw SPECIES_EQUAL.create(toSpecies.getTextComponent(), fromSpecies.getTextComponent());
+        }
 
-        if (!toSpecies.isTransformable() || !fromSpecies.isTransformable())
+        if (!toSpecies.isTransformable() || !fromSpecies.isTransformable()) {
             throw SPECIES_NOT_TRANSFORMABLE.create(!toSpecies.isTransformable() ? toSpecies.getTextComponent() : fromSpecies.getTextComponent());
+        }
 
         final BlockState rootyState = world.getBlockState(rootPos);
         final RootyBlock rootyBlock = ((RootyBlock) rootyState.getBlock());

@@ -7,15 +7,15 @@ import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
+import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.resources.MultiJsonReloadListener;
 import com.ferreusveritas.dynamictrees.resources.TreesResourceManager;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
-import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
@@ -37,8 +37,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
- * Manages {@link BiomeDatabase} objects, reading from tree packs. Main instance stored in
- * {@link DTResourceRegistries}.
+ * Manages {@link BiomeDatabase} objects, reading from tree packs. Main instance stored in {@link
+ * DTResourceRegistries}.
  *
  * @author Harley O'Connor
  */
@@ -73,31 +73,36 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                 .register("species", JsonElement.class, (entry, jsonElement) -> {
                     return PropertyApplierResult.from(JsonDeserialisers.SPECIES_SELECTOR.deserialise(jsonElement)
                             .ifSuccessful(speciesSelector ->
-                                entry.getDatabase().setSpeciesSelector(entry.getBiome(), speciesSelector, getOperationOrWarn(jsonElement))
+                                    entry.getDatabase().setSpeciesSelector(entry.getBiome(), speciesSelector, getOperationOrWarn(jsonElement))
                             ));
                 })
                 .register("density", JsonElement.class, (entry, jsonElement) -> {
                     return PropertyApplierResult.from(JsonDeserialisers.DENSITY_SELECTOR.deserialise(jsonElement)
                             .ifSuccessful(densitySelector ->
-                                entry.getDatabase().setDensitySelector(entry.getBiome(), densitySelector, getOperationOrWarn(jsonElement))
+                                    entry.getDatabase().setDensitySelector(entry.getBiome(), densitySelector, getOperationOrWarn(jsonElement))
                             ));
                 })
                 .register("chance", JsonElement.class, (entry, jsonElement) -> {
                     return PropertyApplierResult.from(JsonDeserialisers.CHANCE_SELECTOR.deserialise(jsonElement)
                             .ifSuccessful(chanceSelector ->
-                                entry.getDatabase().setChanceSelector(entry.getBiome(), chanceSelector, getOperationOrWarn(jsonElement))
+                                    entry.getDatabase().setChanceSelector(entry.getBiome(), chanceSelector, getOperationOrWarn(jsonElement))
                             ));
                 })
                 .register("multipass", Boolean.class, (entry, multipass) -> {
-                    if (!multipass)
+                    if (!multipass) {
                         return;
+                    }
 
                     entry.getDatabase().setMultipass(entry.getBiome(), pass -> {
-                        switch(pass) {
-                            case 0: return 0; // Zero means to run as normal.
-                            case 1: return 5; // Return only radius 5 on pass 1.
-                            case 2: return 3; // Return only radius 3 on pass 2.
-                            default: return -1; // A negative number means to terminate.
+                        switch (pass) {
+                            case 0:
+                                return 0; // Zero means to run as normal.
+                            case 1:
+                                return 5; // Return only radius 5 on pass 1.
+                            case 2:
+                                return 3; // Return only radius 3 on pass 2.
+                            default:
+                                return -1; // A negative number means to terminate.
                         }
                     });
                 })
@@ -110,11 +115,13 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                             final int radius = JsonDeserialisers.INTEGER.deserialise(passEntry.getValue()).orDefault(-1);
 
                             // Terminate when radius is -1.
-                            if (radius == -1)
+                            if (radius == -1) {
                                 break;
+                            }
 
                             passMap.put(pass, radius);
-                        } catch (NumberFormatException ignored) { }
+                        } catch (NumberFormatException ignored) {
+                        }
                     }
 
                     entry.getDatabase().setMultipass(entry.getBiome(), pass -> passMap.getOrDefault(pass, -1));
@@ -157,7 +164,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         }
     }
 
-    private static DeserialisationResult<BiomeDatabase.Operation> getOperation (final JsonElement jsonElement) {
+    private static DeserialisationResult<BiomeDatabase.Operation> getOperation(final JsonElement jsonElement) {
         return JsonDeserialisers.JSON_OBJECT.deserialise(jsonElement)
                 .map(jsonObject -> jsonObject.has(METHOD) ? jsonObject.get(METHOD) : null).map(JsonDeserialisers.OPERATION::deserialise)
                 // If there was no Json object or method element, default to replace.
@@ -175,8 +182,9 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
             this.defaultDatabase = new BiomeDatabase();
 
             // If world gen is disabled don't waste processing power reading these.
-            if (!DTConfigs.WORLD_GEN.get())
+            if (!DTConfigs.WORLD_GEN.get()) {
                 return;
+            }
 
             MinecraftForge.EVENT_BUS.post(new AddFeatureCancellersEvent(this.defaultDatabase));
 
@@ -190,8 +198,9 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         this.blacklistedDimensions.clear();
 
         // If world gen is disabled don't waste processing power reading these.
-        if (!DTConfigs.WORLD_GEN.get())
+        if (!DTConfigs.WORLD_GEN.get()) {
             return;
+        }
 
         MinecraftForge.EVENT_BUS.post(new AddFeatureCancellersEvent(this.defaultDatabase));
         MinecraftForge.EVENT_BUS.post(new PopulateDefaultDatabaseEvent(this.defaultDatabase));
@@ -239,22 +248,23 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                 this.readPopulator(this.defaultDatabase, defaultPopulator.getKey(), jsonElement, readCancellerOnly)));
     }
 
-    private boolean isDefaultPopulator (final Map.Entry<ResourceLocation, List<JsonElement>> entry) {
+    private boolean isDefaultPopulator(final Map.Entry<ResourceLocation, List<JsonElement>> entry) {
         return entry.getKey().getPath().equals(DEFAULT_POPULATOR);
     }
 
-    private void readPopulator (final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonElement jsonElement, final boolean readCancellerOnly) {
+    private void readPopulator(final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonElement jsonElement, final boolean readCancellerOnly) {
         LOGGER.debug("Loading Json biome populator '{}'.", resourceLocation);
         JsonHelper.JsonElementReader.of(jsonElement).ifArrayForEach(JsonObject.class, jsonObject ->
-                this.readPopulatorSection(database, resourceLocation, jsonObject, readCancellerOnly))
+                        this.readPopulatorSection(database, resourceLocation, jsonObject, readCancellerOnly))
                 .elseWarn("Root element of populator '" + resourceLocation + "' was not a Json array.");
     }
 
-    private void readPopulatorSection (final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonObject jsonObject, final boolean readCancellerOnly) {
+    private void readPopulatorSection(final BiomeDatabase database, final ResourceLocation resourceLocation, final JsonObject jsonObject, final boolean readCancellerOnly) {
         final AtomicReference<BiomeList> biomeList = new AtomicReference<>();
 
-        if (!this.shouldLoad(jsonObject, error -> LOGGER.error("Error loading populator '{}': {}", resourceLocation, error)))
+        if (!this.shouldLoad(jsonObject, error -> LOGGER.error("Error loading populator '{}': {}", resourceLocation, error))) {
             return;
+        }
 
         final JsonHelper.JsonObjectReader reader = JsonHelper.JsonObjectReader.of(jsonObject).ifContains(SELECT, selectElement ->
                 JsonHelper.JsonElementReader.of(selectElement).ifOfType(BiomeList.class, biomeList::set));
@@ -267,21 +277,22 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
 
         if (!readCancellerOnly) {
             reader.ifContains(APPLY, applyElement ->
-                    JsonHelper.JsonElementReader.of(applyElement).ifOfType(JsonObject.class, applyObject -> {
-                        if (biomeList.get() == null || biomeList.get().size() == 0)
-                            LogManager.getLogger().warn("Tried to apply to null or empty biome list in '" + resourceLocation + "' populator.");
-                        else {
-                            biomeList.get().forEach(biome -> this.entryAppliers.applyAll(applyObject, database.getEntry(biome)));
+                            JsonHelper.JsonElementReader.of(applyElement).ifOfType(JsonObject.class, applyObject -> {
+                                if (biomeList.get() == null || biomeList.get().size() == 0) {
+                                    LogManager.getLogger().warn("Tried to apply to null or empty biome list in '" + resourceLocation + "' populator.");
+                                } else {
+                                    biomeList.get().forEach(biome -> this.entryAppliers.applyAll(applyObject, database.getEntry(biome)));
+                                }
+                            }))
+                    .ifContains(WHITE, String.class, str -> {
+                        if (str.equalsIgnoreCase("all")) {
+                            database.getAllEntries().forEach(entry -> entry.setBlacklisted(false));
+                        } else if (str.equalsIgnoreCase("selected")) {
+                            biomeList.get().forEach(biome -> database.getEntry(biome).setBlacklisted(false));
+                        } else {
+                            LOGGER.warn("Unknown value for key 'white' in populator '" + resourceLocation + "': '" + str + "'.");
                         }
-                    }))
-            .ifContains(WHITE, String.class, str -> {
-                if (str.equalsIgnoreCase("all")) {
-                    database.getAllEntries().forEach(entry -> entry.setBlacklisted(false));
-                } else if (str.equalsIgnoreCase("selected")) {
-                    biomeList.get().forEach(biome -> database.getEntry(biome).setBlacklisted(false));
-                } else
-                    LOGGER.warn("Unknown value for key 'white' in populator '" + resourceLocation + "': '" + str + "'.");
-            }).elseWarn("Error parsing key 'white' in populator '" + resourceLocation + "': ");
+                    }).elseWarn("Error parsing key 'white' in populator '" + resourceLocation + "': ");
         }
 
         if (database == this.defaultDatabase) {
@@ -300,8 +311,9 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                 biomeList.get().forEach(biome -> {
                     BiomePropertySelectors.FeatureCancellations currentFeatureCancellations = database.getEntry(biome).getFeatureCancellations();
 
-                    if (operation.get() == BiomeDatabase.Operation.REPLACE)
+                    if (operation.get() == BiomeDatabase.Operation.REPLACE) {
                         currentFeatureCancellations.reset();
+                    }
 
                     currentFeatureCancellations.copyFrom(featureCancellations);
                 });
@@ -320,21 +332,21 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     }
 
     /**
-     * Returns the {@link BiomeDatabase} object for the given dimension registry name,
-     * or the default database if one did not exist for the dimension.
+     * Returns the {@link BiomeDatabase} object for the given dimension registry name, or the default database if one
+     * did not exist for the dimension.
      *
      * @param dimensionRegistryName The dimension registry name.
      * @return The dimension's {@link BiomeDatabase} object, or the default one.
      */
-    public BiomeDatabase getDimensionDatabase (ResourceLocation dimensionRegistryName) {
+    public BiomeDatabase getDimensionDatabase(ResourceLocation dimensionRegistryName) {
         return this.dimensionDatabases.getOrDefault(dimensionRegistryName, this.defaultDatabase);
     }
 
-    public boolean validateDatabases () {
+    public boolean validateDatabases() {
         return this.defaultDatabase.isValid() && this.dimensionDatabases.values().stream().allMatch(BiomeDatabase::isValid);
     }
 
-    public boolean isDimensionBlacklisted (ResourceLocation resourceLocation) {
+    public boolean isDimensionBlacklisted(ResourceLocation resourceLocation) {
         return this.blacklistedDimensions.contains(resourceLocation);
     }
 
@@ -346,7 +358,8 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
      */
     @Override
     public CompletableFuture<Void> load(TreesResourceManager resourceManager) {
-        return CompletableFuture.runAsync(() -> {});
+        return CompletableFuture.runAsync(() -> {
+        });
     }
 
 }

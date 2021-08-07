@@ -56,8 +56,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * Holds {@link JsonDeserialiser} objects, which can be used to obtain objects from
- * {@link JsonElement} objects.
+ * Holds {@link JsonDeserialiser} objects, which can be used to obtain objects from {@link JsonElement} objects.
  *
  * @author Harley O'Connor
  */
@@ -83,14 +82,16 @@ public final class JsonDeserialisers {
         }
     }
 
-    /** Returned by {@link #get(Class)} if an object getter wasn't found. */
+    /**
+     * Returned by {@link #get(Class)} if an object getter wasn't found.
+     */
     public static final JsonDeserialiser<?> NULL = new NullDeserialiser<>();
 
     /**
      * Gets the {@link JsonDeserialiser} for the given class type.
      *
      * @param objectClass The {@link Class} of the object to get.
-     * @param <T> The type of the object.
+     * @param <T>         The type of the object.
      * @return The {@link JsonDeserialiser} for the class, or {@link #NULL} if it wasn't found.
      */
     @SuppressWarnings("unchecked")
@@ -101,9 +102,9 @@ public final class JsonDeserialisers {
     /**
      * Registers an {@link JsonDeserialiser} to the registry.
      *
-     * @param outputClass The {@link Class} of the object that will be obtained.
+     * @param outputClass  The {@link Class} of the object that will be obtained.
      * @param deserialiser The {@link JsonDeserialiser} to register.
-     * @param <T> The type of the object getter.
+     * @param <T>          The type of the object getter.
      * @return The {@link JsonDeserialiser} given.
      */
     public static <T> JsonDeserialiser<T> register(final Class<T> outputClass, final JsonDeserialiser<T> deserialiser) {
@@ -138,7 +139,9 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<Double> DOUBLE = register(Double.class, jsonElement -> NUMBER.deserialise(jsonElement).map(Number::doubleValue));
 
     public static final JsonDeserialiser<ResourceLocation> RESOURCE_LOCATION = register(ResourceLocation.class, ResourceLocationDeserialiser.create());
-    /** Alternative to {@link #RESOURCE_LOCATION}, defaulting the namespace to {@code dynamictrees}.  */
+    /**
+     * Alternative to {@link #RESOURCE_LOCATION}, defaulting the namespace to {@code dynamictrees}.
+     */
     public static final JsonDeserialiser<ResourceLocation> DT_RESOURCE_LOCATION = ResourceLocationDeserialiser.create(DynamicTrees.MOD_ID);
 
     public static JsonDeserialiser<Block> BLOCK;
@@ -208,8 +211,8 @@ public final class JsonDeserialisers {
             STRING.deserialise(jsonElement).map(TOOL_TYPES::get, "Could not get tool type from '{previous_value}'."));
 
     /**
-     * Registers {@link ForgeRegistryEntryDeserialiser} objects. This should be called after the registries are initiated to avoid
-     * giving null to the getters.
+     * Registers {@link ForgeRegistryEntryDeserialiser} objects. This should be called after the registries are
+     * initiated to avoid giving null to the getters.
      */
     public static void registerForgeEntryGetters() {
         BLOCK = register(Block.class, new ForgeRegistryEntryDeserialiser<>(ForgeRegistries.BLOCKS, "block", Blocks.AIR));
@@ -224,6 +227,7 @@ public final class JsonDeserialisers {
     /**
      * This event is posted for add-ons to register custom Json object getters at the right time.
      */
-    public static final class RegistryEvent extends Event implements IModBusEvent { }
+    public static final class RegistryEvent extends Event implements IModBusEvent {
+    }
 
 }

@@ -71,11 +71,9 @@ public class DropContext {
     }
 
     /**
-     * Returns the fertility of the relevant tree, or {@code -1} if it
-     * was not available.
+     * Returns the fertility of the relevant tree, or {@code -1} if it was not available.
      *
-     * @return The fertility of the related tree, or {@code -1} if it
-     *         was unavailable.
+     * @return The fertility of the related tree, or {@code -1} if it was unavailable.
      */
     public int fertility() {
         return fertility;

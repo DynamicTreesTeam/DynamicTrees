@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.worldgen.deserialisation;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -39,11 +39,16 @@ public final class DensitySelectorDeserialiser implements JsonBiomeDatabaseDeser
         }
 
         switch (parameters.size()) {
-            case 0: return (rnd, n) -> n;
-            case 1: return (rnd, n) -> n * parameters.get(0);
-            case 2: return (rnd, n) -> (n * parameters.get(0)) + parameters.get(1);
-            case 3: return (rnd, n) -> ((n * parameters.get(0)) + parameters.get(1)) * parameters.get(2);
-            default: return (rnd, n) -> 0.0f;
+            case 0:
+                return (rnd, n) -> n;
+            case 1:
+                return (rnd, n) -> n * parameters.get(0);
+            case 2:
+                return (rnd, n) -> (n * parameters.get(0)) + parameters.get(1);
+            case 3:
+                return (rnd, n) -> ((n * parameters.get(0)) + parameters.get(1)) * parameters.get(2);
+            default:
+                return (rnd, n) -> 0.0f;
         }
     }
 

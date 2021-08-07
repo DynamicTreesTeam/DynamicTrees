@@ -46,9 +46,11 @@ public final class NetherFungusFamily extends Family {
     }
 
     @Override
-    public boolean isFireProof() { return true; }
+    public boolean isFireProof() {
+        return true;
+    }
 
-    public BlockBounds expandLeavesBlockBounds(BlockBounds bounds){
+    public BlockBounds expandLeavesBlockBounds(BlockBounds bounds) {
         return bounds.expand(1).expand(Direction.DOWN, 3);
     }
 

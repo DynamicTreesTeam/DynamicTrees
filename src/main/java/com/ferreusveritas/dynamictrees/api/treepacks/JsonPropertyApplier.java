@@ -26,8 +26,9 @@ public final class JsonPropertyApplier<O, V> extends PropertyApplier<O, V, JsonE
     protected <S, R> PropertyApplierResult applyIfShould(Object object, JsonElement input, Class<R> valueClass, Applier<S, R> applier) {
         final JsonDeserialiser<R> valueGetter = JsonDeserialisers.get(valueClass);
 
-        if (!valueGetter.isValid())
+        if (!valueGetter.isValid()) {
             return null;
+        }
 
         final DeserialisationResult<R> result = valueGetter.deserialise(input);
 

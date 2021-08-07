@@ -14,8 +14,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Stores the value or the error that came from trying to fetch an object from a
- * {@link com.google.gson.JsonElement}, mainly used by {@link JsonDeserialiser}.
+ * Stores the value or the error that came from trying to fetch an object from a {@link com.google.gson.JsonElement},
+ * mainly used by {@link JsonDeserialiser}.
  *
  * @author Harley O'Connor
  */
@@ -26,7 +26,8 @@ public final class DeserialisationResult<T> {
 
     private final List<String> warnings = new ArrayList<>();
 
-    public DeserialisationResult() {}
+    public DeserialisationResult() {
+    }
 
     public DeserialisationResult(final T value) {
         this.value = value;
@@ -36,31 +37,34 @@ public final class DeserialisationResult<T> {
         this.errorMessage = errorMessage;
     }
 
-    public boolean wasSuccessful () {
+    public boolean wasSuccessful() {
         return this.value != null;
     }
 
-    public <V> DeserialisationResult<V> map (final Function<T, V> conversionFunction) {
+    public <V> DeserialisationResult<V> map(final Function<T, V> conversionFunction) {
         final DeserialisationResult<V> mappedResult = new DeserialisationResult<V>().copyErrorsFrom(this);
-        if (this.value != null)
+        if (this.value != null) {
             mappedResult.value = conversionFunction.apply(this.value);
+        }
         return mappedResult;
     }
 
-    public <V> DeserialisationResult<V> map (final Function<T, V> conversionFunction, final String nullError) {
+    public <V> DeserialisationResult<V> map(final Function<T, V> conversionFunction, final String nullError) {
         // The validator returns true as there is already a null check.
         return this.map(conversionFunction, value -> true, nullError);
     }
 
-    public <V> DeserialisationResult<V> map (final Function<T, V> conversionFunction, final Predicate<V> validator, final String invalidError) {
+    public <V> DeserialisationResult<V> map(final Function<T, V> conversionFunction, final Predicate<V> validator, final String invalidError) {
         final DeserialisationResult<V> mappedResult = new DeserialisationResult<V>().copyErrorsFrom(this);
         if (this.value != null) {
             final String previousValue = this.value.toString();
             final V value = conversionFunction.apply(this.value);
 
-            if (value != null && validator.test(value))
+            if (value != null && validator.test(value)) {
                 mappedResult.setValue(value);
-            else mappedResult.setErrorMessage(invalidError.replace("{previous_value}", previousValue));
+            } else {
+                mappedResult.setErrorMessage(invalidError.replace("{previous_value}", previousValue));
+            }
         }
         return mappedResult;
     }
@@ -70,7 +74,9 @@ public final class DeserialisationResult<T> {
         if (this.value != null) {
             if (validator.test(this.value)) {
                 mappedResult = this.map(conversionFunction, "Internal error.");
-            } else mappedResult.setErrorMessage(invalidError.replace("{value}", this.value.toString()));
+            } else {
+                mappedResult.setErrorMessage(invalidError.replace("{value}", this.value.toString()));
+            }
         }
         return mappedResult;
     }
@@ -80,21 +86,24 @@ public final class DeserialisationResult<T> {
         return this;
     }
 
-    public DeserialisationResult<T> ifSuccessful (final Consumer<T> valueConsumer) {
-        if (this.wasSuccessful())
+    public DeserialisationResult<T> ifSuccessful(final Consumer<T> valueConsumer) {
+        if (this.wasSuccessful()) {
             valueConsumer.accept(this.value);
+        }
         return this;
     }
 
     public DeserialisationResult<T> elseIfError(final Consumer<String> errorConsumer) {
-        if (!this.wasSuccessful())
+        if (!this.wasSuccessful()) {
             errorConsumer.accept(this.errorMessage);
+        }
         return this;
     }
 
     public DeserialisationResult<T> elseIfError(final Runnable runnable) {
-        if (!this.wasSuccessful())
+        if (!this.wasSuccessful()) {
             runnable.run();
+        }
         return this;
     }
 
@@ -108,8 +117,9 @@ public final class DeserialisationResult<T> {
     }
 
     public DeserialisationResult<T> otherwiseWarn(final String warnPrefix) {
-        if (!this.wasSuccessful())
+        if (!this.wasSuccessful()) {
             LogManager.getLogger(StackLocatorUtil.getCallerClass(1)).warn(warnPrefix + this.getErrorMessage());
+        }
         return this;
     }
 
@@ -118,8 +128,8 @@ public final class DeserialisationResult<T> {
     }
 
     /**
-     * Gets the value. {@link #wasSuccessful()} should be checked first, as this will be null
-     * if the fetch was not successful.
+     * Gets the value. {@link #wasSuccessful()} should be checked first, as this will be null if the fetch was not
+     * successful.
      *
      * @return The value, or null if the fetch was unsuccessful.
      */
@@ -127,21 +137,23 @@ public final class DeserialisationResult<T> {
         return value;
     }
 
-    public DeserialisationResult<T> setValue (final T value) {
+    public DeserialisationResult<T> setValue(final T value) {
         this.value = value;
         return this;
     }
 
-    public DeserialisationResult<T> setValueOrFailure (@Nullable final T value, final String errorMessage) {
-        if (value == null)
+    public DeserialisationResult<T> setValueOrFailure(@Nullable final T value, final String errorMessage) {
+        if (value == null) {
             this.errorMessage = errorMessage;
-        else this.value = value;
+        } else {
+            this.value = value;
+        }
         return this;
     }
 
     /**
-     * Gets the error message. {@link #wasSuccessful()} should be checked first, as if the fetch
-     * succeeded this will be null.
+     * Gets the error message. {@link #wasSuccessful()} should be checked first, as if the fetch succeeded this will be
+     * null.
      *
      * @return The error message, or null if the fetch was successful.
      */
@@ -155,8 +167,9 @@ public final class DeserialisationResult<T> {
     }
 
     public DeserialisationResult<T> setErrorMessageIfUnsetAndNull(String errorMessage) {
-        if (this.value == null && this.errorMessage == null)
+        if (this.value == null && this.errorMessage == null) {
             this.setErrorMessage(errorMessage);
+        }
         return this;
     }
 
@@ -184,11 +197,11 @@ public final class DeserialisationResult<T> {
         return result;
     }
 
-    public static <T> DeserialisationResult<T> success (final T value) {
+    public static <T> DeserialisationResult<T> success(final T value) {
         return new DeserialisationResult<>(value);
     }
 
-    public static <T> DeserialisationResult<T> failure (final String errorMessage) {
+    public static <T> DeserialisationResult<T> failure(final String errorMessage) {
         return new DeserialisationResult<>(errorMessage);
     }
 
@@ -196,7 +209,7 @@ public final class DeserialisationResult<T> {
         return value == null ? DeserialisationResult.failure(errorMessage) : DeserialisationResult.success(value);
     }
 
-    public static <T> DeserialisationResult<T> failureFromOther (final DeserialisationResult<?> otherResult) {
+    public static <T> DeserialisationResult<T> failureFromOther(final DeserialisationResult<?> otherResult) {
         return DeserialisationResult.failure(otherResult.getErrorMessage());
     }
 

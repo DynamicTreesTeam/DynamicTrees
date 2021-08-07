@@ -32,30 +32,29 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     protected final Class<V> type;
 
     /**
-     * The name of this {@link IRegistry}. This will usually be obtained from calling
-     * {@link Class#getSimpleName()} on the {@link RegistryEntry}, but some registries
-     * may choose to use custom names.
+     * The name of this {@link IRegistry}. This will usually be obtained from calling {@link Class#getSimpleName()} on
+     * the {@link RegistryEntry}, but some registries may choose to use custom names.
      */
     protected final String name;
 
     /**
-     * The "null" value. This is what will be returned by {@link #get(ResourceLocation)} if the entry
-     * was not found in the registry.
+     * The "null" value. This is what will be returned by {@link #get(ResourceLocation)} if the entry was not found in
+     * the registry.
      */
     protected final V nullValue;
 
     /**
-     * If this {@link IRegistry} is clearable, {@link #clear()} can be called, which wipes all
-     * the values and locks the registry.
+     * If this {@link IRegistry} is clearable, {@link #clear()} can be called, which wipes all the values and locks the
+     * registry.
      */
     protected final boolean clearable;
 
     protected final Codec<V> getterCodec;
 
     /**
-     * A {@link List} of runnables that will be called on the next {@link #lock()} call. Allows
-     * for things to be run once all registries are "final" (at least for the time being). Note
-     * that these will be cleared after use (every time the registry is locked).
+     * A {@link List} of runnables that will be called on the next {@link #lock()} call. Allows for things to be run
+     * once all registries are "final" (at least for the time being). Note that these will be cleared after use (every
+     * time the registry is locked).
      */
     protected final List<Runnable> onLockRunnables = new LinkedList<>();
 
@@ -66,21 +65,20 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
             .compare(entry.getRegistryName().getPath(), entryToCompareTo.getRegistryName().getPath());
 
     /**
-     * Holds whether or not the {@link IRegistry} is currently locked. This is false (unlocked)
-     * by default, and should then be locked after all initial registries are created by
-     * {@link #postRegistryEvent()}.
+     * Holds whether or not the {@link IRegistry} is currently locked. This is false (unlocked) by default, and should
+     * then be locked after all initial registries are created by {@link #postRegistryEvent()}.
      *
      * <p>It can then be unlocked by calling {@link #unlock()} to register new values, but should
-     * always be locked after by calling {@link #lock()} again, which performs additional tasks
-     * like {@link #dump()}.</p>
+     * always be locked after by calling {@link #lock()} again, which performs additional tasks like {@link
+     * #dump()}.</p>
      */
     protected boolean locked = false;
 
     /**
      * Constructs a new {@link AbstractRegistry}.
      *
-     * @param name The {@link #name} for this {@link AbstractRegistry}.
-     * @param type The {@link Class} of the {@link RegistryEntry}.
+     * @param name      The {@link #name} for this {@link AbstractRegistry}.
+     * @param type      The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue A null entry. See {@link #nullValue} for more details.
      * @param clearable True if {@link #clear()} can be called to wipe the registry.
      */
@@ -109,16 +107,17 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     }
 
     /**
-     * Registers all the given {@link RegistryEntry} to this {@link IRegistry}. See
-     * {@link #register(RegistryEntry)} for more details on the specific registry objects.
+     * Registers all the given {@link RegistryEntry} to this {@link IRegistry}. See {@link #register(RegistryEntry)} for
+     * more details on the specific registry objects.
      *
      * @param values The {@link RegistryEntry} objects to register.
      */
     @Override
     @SafeVarargs
     public final void registerAll(final V... values) {
-        for (final V value : values)
+        for (final V value : values) {
             register(value);
+        }
     }
 
     @Override
@@ -157,8 +156,8 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     }
 
     /**
-     * Gets all the registry name {@link ResourceLocation} objects of all the entries currently in
-     * this {@link IRegistry}.
+     * Gets all the registry name {@link ResourceLocation} objects of all the entries currently in this {@link
+     * IRegistry}.
      *
      * @return The {@link Set} of registry names.
      */
@@ -218,16 +217,17 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
      */
     @Override
     public final void clear() {
-        if (!this.clearable)
+        if (!this.clearable) {
             return;
+        }
 
         this.lock();
         this.clearAll();
     }
 
     /**
-     * Clears all values. This method should <b>not</b> check {@link #clearable},
-     * that should be checked before calling!
+     * Clears all values. This method should <b>not</b> check {@link #clearable}, that should be checked before
+     * calling!
      */
     protected abstract void clearAll();
 
@@ -237,9 +237,8 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     }
 
     /**
-     * Generates a runnable that runs the given {@link Consumer} only if the {@link RegistryEntry}
-     * obtained from the given {@link ResourceLocation} is valid (not null), and if it's not runs
-     * the given {@link Runnable}.
+     * Generates a runnable that runs the given {@link Consumer} only if the {@link RegistryEntry} obtained from the
+     * given {@link ResourceLocation} is valid (not null), and if it's not runs the given {@link Runnable}.
      *
      * @param registryName The {@link ResourceLocation} of the {@link RegistryEntry}.
      * @param consumer     The {@link Consumer} to accept if the {@link RegistryEntry} is vaid.
@@ -256,8 +255,8 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     }
 
     /**
-     * Posts a {@link RegistryEvent} to the mod event bus for any programmatic
-     * registration. Should only be called once and during game start.
+     * Posts a {@link RegistryEvent} to the mod event bus for any programmatic registration. Should only be called once
+     * and during game start.
      */
     @Override
     public void postRegistryEvent() {
@@ -265,8 +264,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     }
 
     /**
-     * @return The {@link #comparator} for sorting the registry objects by their registry names
-     * in natural order.
+     * @return The {@link #comparator} for sorting the registry objects by their registry names in natural order.
      */
     @Override
     public final Comparator<V> getComparator() {
@@ -274,8 +272,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     }
 
     /**
-     * Dumps all entries with their registry names in the debug log, based off the
-     * {@link ForgeRegistry} dump method.
+     * Dumps all entries with their registry names in the debug log, based off the {@link ForgeRegistry} dump method.
      */
     @Override
     public final void dump() {

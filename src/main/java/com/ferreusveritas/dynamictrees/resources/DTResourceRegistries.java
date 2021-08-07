@@ -58,7 +58,7 @@ public final class DTResourceRegistries {
     public static final BiomeDatabaseManager BIOME_DATABASE_MANAGER = new BiomeDatabaseManager();
     public static final GlobalDropCreatorManager GLOBAL_DROP_CREATOR_MANAGER = new GlobalDropCreatorManager();
 
-    public static void setupTreesResourceManager () {
+    public static void setupTreesResourceManager() {
         TREES_RESOURCE_MANAGER.addReloadListeners(LEAVES_PROPERTIES_MANAGER, SOIL_PROPERTIES_MANAGER, FAMILY_MANAGER, SPECIES_MANAGER, JO_CODE_MANAGER, BIOME_DATABASE_MANAGER, GLOBAL_DROP_CREATOR_MANAGER);
 
         // Create and fire event so add-ons can register load listeners for custom tree resources.
@@ -73,8 +73,9 @@ public final class DTResourceRegistries {
             final String modId = modInfo.getModId();
             final IModFile modFile = ModList.get().getModFileById(modId).getFile();
 
-            if (!modFile.getLocator().isValid(modFile))
+            if (!modFile.getLocator().isValid(modFile)) {
                 return;
+            }
 
             registerModTreePack(modFile);
         });
@@ -96,12 +97,13 @@ public final class DTResourceRegistries {
         LogManager.getLogger().debug("Successfully loaded " + TREES_RESOURCE_MANAGER.listPacks().count() + " tree packs.");
     }
 
-    private static void registerModTreePack (IModFile modFile) {
+    private static void registerModTreePack(IModFile modFile) {
         final Path treesPath = modFile.getLocator().findPath(modFile, TREES).toAbsolutePath();
 
         // Only add resource pack if the trees file exists in the mod file.
-        if (Files.exists(treesPath))
+        if (Files.exists(treesPath)) {
             TREES_RESOURCE_MANAGER.addResourcePack(new ModTreeResourcePack(treesPath, modFile));
+        }
     }
 
     public static final class AddTreesLoadListenerEvent extends Event implements IModBusEvent {
@@ -122,8 +124,8 @@ public final class DTResourceRegistries {
     }
 
     /**
-     * Listens for datapack reloads for actions such as reloading the trees resource
-     * manager and registering dirt bucket recipes.
+     * Listens for datapack reloads for actions such as reloading the trees resource manager and registering dirt bucket
+     * recipes.
      */
     public static final class ReloadListener implements IFutureReloadListener {
         private final DataPackRegistries dataPackRegistries;
@@ -144,8 +146,9 @@ public final class DTResourceRegistries {
         }
 
         private void registerDirtBucketRecipes() {
-            if (!DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get())
+            if (!DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get()) {
                 return;
+            }
 
             final Map<IRecipeType<?>, Map<ResourceLocation, IRecipe<?>>> recipes = new HashMap<>();
 

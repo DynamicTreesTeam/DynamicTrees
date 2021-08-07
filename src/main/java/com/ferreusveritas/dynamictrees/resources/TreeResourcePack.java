@@ -15,9 +15,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Credits: A lot of the file reading code was based off {@link net.minecraftforge.fml.packs.ModFileResourcePack}.
@@ -36,8 +37,9 @@ public class TreeResourcePack extends ResourcePack {
     @Override
     public InputStream getResource(@Nullable ResourcePackType type, ResourceLocation location) throws IOException {
         final Path path = this.getPath(location.getNamespace(), location.getPath());
-        if (!Files.exists(path))
+        if (!Files.exists(path)) {
             throw new FileNotFoundException("Could not find tree resource for path '" + path + "'.");
+        }
         return Files.newInputStream(path, StandardOpenOption.READ);
     }
 
@@ -84,10 +86,10 @@ public class TreeResourcePack extends ResourcePack {
         try {
             Path root = this.getPath();
 
-            return Files.walk(root,1)
+            return Files.walk(root, 1)
                     .map(path -> root.relativize(path.toAbsolutePath()))
                     .filter(path -> path.getNameCount() > 0) // skip the root entry
-                    .map(p -> p.toString().replaceAll("/$","")) // remove the trailing slash, if present
+                    .map(p -> p.toString().replaceAll("/$", "")) // remove the trailing slash, if present
                     .filter(s -> !s.isEmpty()) // filter empty strings, otherwise empty strings default to minecraft in ResourceLocations
                     .collect(CommonCollectors.toLinkedSet());
         } catch (IOException e) {
@@ -100,6 +102,7 @@ public class TreeResourcePack extends ResourcePack {
     }
 
     @Override
-    public void close() { }
+    public void close() {
+    }
 
 }

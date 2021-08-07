@@ -15,27 +15,27 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Handles registries for the given mod ID in the constructor. Add-ons should instantiate
- * one of these in their constructor by calling {@link #setup(String)} with their mod ID.
+ * Handles registries for the given mod ID in the constructor. Add-ons should instantiate one of these in their
+ * constructor by calling {@link #setup(String)} with their mod ID.
  *
  * <p>The main purpose of this is to prevent Forge from complaining about blocks and items
- * for a different mod ID having their registry names set when the active mod container
- * is <tt>dynamictrees</tt>, but it also provides an easy way to register items and blocks.</p>
+ * for a different mod ID having their registry names set when the active mod container is <tt>dynamictrees</tt>, but it
+ * also provides an easy way to register items and blocks.</p>
  *
  * @author Harley O'Connor
  */
 public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     /**
-     * The central registry for {@link RegistryHandler}s. Stored in a {@link ConcurrentRegistry} as
-     * these are created from the mod constructor which are called from a Stream.
+     * The central registry for {@link RegistryHandler}s. Stored in a {@link ConcurrentRegistry} as these are created
+     * from the mod constructor which are called from a Stream.
      */
     public static final ConcurrentRegistry<RegistryHandler> REGISTRY = new ConcurrentRegistry<>(RegistryHandler.class, new RegistryHandler("null"), true);
 
     /**
-     * Sets up a {@link RegistryHandler} for the given {@code modId}. This includes instantiating,
-     * registering, and subscribing it to the {@code mod event bus}. This should be {@code only}
-     * be called from the relevant mod constructor!
+     * Sets up a {@link RegistryHandler} for the given {@code modId}. This includes instantiating, registering, and
+     * subscribing it to the {@code mod event bus}. This should be {@code only} be called from the relevant mod
+     * constructor!
      *
      * @param modId The {@code mod ID} to setup for.
      */
@@ -46,8 +46,7 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
     }
 
     /**
-     * Gets the {@link RegistryHandler} for the given mod ID, or the null registry handler
-     * if it doesn't exist.
+     * Gets the {@link RegistryHandler} for the given mod ID, or the null registry handler if it doesn't exist.
      *
      * @param modId The mod ID of the mod to get the {@link RegistryHandler} for.
      * @return The {@link RegistryHandler} object.
@@ -57,8 +56,7 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
     }
 
     /**
-     * Gets the {@link RegistryHandler} for the given mod ID, or defaults to the Dynamic Trees
-     * one if it doesn't exist.
+     * Gets the {@link RegistryHandler} for the given mod ID, or defaults to the Dynamic Trees one if it doesn't exist.
      *
      * @param modId The mod ID of the mod to get the {@link RegistryHandler} for.
      * @return The {@link RegistryHandler} object.
@@ -71,27 +69,27 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
     /**
      * Ensures the given registry name is 'correct'. This will change the namespace to
      * <tt>dynamictrees</tt> if the namespace for the given {@link ResourceLocation}
-     * doesn't have a {@link RegistryHandler} registered, so that we don't register
-     * blocks or items to mod without a {@link RegistryHandler} (non-add-on mods).
+     * doesn't have a {@link RegistryHandler} registered, so that we don't register blocks or items to mod without a
+     * {@link RegistryHandler} (non-add-on mods).
      *
      * @param registryName The {@link ResourceLocation} registry name.
      * @return The correct {@link ResourceLocation} registry name.
      */
-    public static ResourceLocation correctRegistryName (ResourceLocation registryName) {
-        if (!get(registryName.getNamespace()).isValid())
+    public static ResourceLocation correctRegistryName(ResourceLocation registryName) {
+        if (!get(registryName.getNamespace()).isValid()) {
             registryName = ResourceLocationUtils.namespace(registryName, DynamicTrees.MOD_ID);
+        }
         return registryName;
     }
 
     /**
-     * Adds a {@link Block} to be registered with the given registry name, for the namespace
-     * of that registry name. {@link Block#setRegistryName(ResourceLocation)} will be called
-     * by us on the correct registry event to prevent Forge from complaining - so it
-     * shouldn't have been called on the block already!
+     * Adds a {@link Block} to be registered with the given registry name, for the namespace of that registry name.
+     * {@link Block#setRegistryName(ResourceLocation)} will be called by us on the correct registry event to prevent
+     * Forge from complaining - so it shouldn't have been called on the block already!
      *
      * @param registryName The {@link ResourceLocation} registry name to set for the block.
-     * @param block The {@link Block} object to register.
-     * @param <T> The {@link Class} of the {@link Block}.
+     * @param block        The {@link Block} object to register.
+     * @param <T>          The {@link Class} of the {@link Block}.
      * @return The {@link Block}, allowing for this to be called in-line.
      */
     public static <T extends Block> T addBlock(ResourceLocation registryName, final T block) {
@@ -101,14 +99,13 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
     }
 
     /**
-     * Adds an {@link Item} to be registered with the given registry name, for the namespace
-     * of that registry name. {@link Item#setRegistryName(ResourceLocation)} will be called
-     * by us on the correct registry event to prevent Forge from complaining - so it
-     * shouldn't have been called on the block already!
+     * Adds an {@link Item} to be registered with the given registry name, for the namespace of that registry name.
+     * {@link Item#setRegistryName(ResourceLocation)} will be called by us on the correct registry event to prevent
+     * Forge from complaining - so it shouldn't have been called on the block already!
      *
      * @param registryName The {@link ResourceLocation} registry name to set for the block.
-     * @param item The {@link Item} object to register.
-     * @param <T> The {@link Class} of the {@link Item}.
+     * @param item         The {@link Item} object to register.
+     * @param <T>          The {@link Class} of the {@link Item}.
      * @return The {@link Item}, allowing for this to be called in-line.
      */
     public static <T extends Item> T addItem(ResourceLocation registryName, final T item) {
@@ -121,10 +118,9 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
     protected final Map<ResourceLocation, Item> items = new LinkedHashMap<>();
 
     /**
-     * Instantiates a new {@link RegistryHandler} object for the given mod ID. This should
-     * be registered using {@link Registry#register(RegistryEntry)} on {@link #REGISTRY}.
-     * It will also need to be registered to the mod event bus, which can be grabbed from
-     * {@link FMLJavaModLoadingContext#getModEventBus()}, so the registry events are fired.
+     * Instantiates a new {@link RegistryHandler} object for the given mod ID. This should be registered using {@link
+     * Registry#register(RegistryEntry)} on {@link #REGISTRY}. It will also need to be registered to the mod event bus,
+     * which can be grabbed from {@link FMLJavaModLoadingContext#getModEventBus()}, so the registry events are fired.
      *
      * @param modId The mod ID for the relevant mod.
      */
@@ -169,26 +165,26 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
     }
 
     /**
-     * Checks if this {@link RegistryHandler} is valid, and if not prints a warning to the
-     * console.
+     * Checks if this {@link RegistryHandler} is valid, and if not prints a warning to the console.
      *
-     * @param type The type of registry being added.
+     * @param type         The type of registry being added.
      * @param registryName The {@link ResourceLocation} registry name.
      * @return True if it was invalid.
      */
     private boolean warnIfInvalid(final String type, final ResourceLocation registryName) {
-        if (!this.isValid())
+        if (!this.isValid()) {
             LogManager.getLogger().warn("{} '{}' was added to null registry handler.", type, registryName);
+        }
         return !this.isValid();
     }
 
     @SubscribeEvent
-    public void onBlockRegistry (final RegistryEvent.Register<Block> event) {
+    public void onBlockRegistry(final RegistryEvent.Register<Block> event) {
         this.blocks.forEach((resourceLocation, block) -> event.getRegistry().register(block.setRegistryName(resourceLocation)));
     }
 
     @SubscribeEvent
-    public void onItemRegistry (final RegistryEvent.Register<Item> event) {
+    public void onItemRegistry(final RegistryEvent.Register<Item> event) {
         this.items.forEach(((resourceLocation, item) -> event.getRegistry().register(item.setRegistryName(resourceLocation))));
     }
 

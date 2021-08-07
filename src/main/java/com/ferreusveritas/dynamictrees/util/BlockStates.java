@@ -8,7 +8,8 @@ import net.minecraft.block.Blocks;
  */
 public final class BlockStates {
 
-    private BlockStates() { }
+    private BlockStates() {
+    }
 
     public static final BlockState AIR = Blocks.AIR.defaultBlockState();
     public static final BlockState DIRT = Blocks.DIRT.defaultBlockState();

@@ -43,7 +43,7 @@ public abstract class SubCommand {
     protected static final DynamicCommandExceptionType SPECIES_NOT_TRANSFORMABLE = new DynamicCommandExceptionType(nonTransformableSpecies -> new TranslationTextComponent("commands.dynamictrees.error.not_transformable", darkRed(nonTransformableSpecies)));
 
     private static Vector3i getVector3i(final Object vecObj) {
-        if (vecObj instanceof Vector3i)  {
+        if (vecObj instanceof Vector3i) {
             return ((Vector3i) vecObj);
         }
         return Vector3i.ZERO;
@@ -54,14 +54,14 @@ public abstract class SubCommand {
      *
      * @return - Name of command.
      */
-    protected abstract String getName ();
+    protected abstract String getName();
 
     /**
      * Returns the permission level required to use the command.
      *
      * @return Permission level required.
      */
-    protected abstract int getPermissionLevel ();
+    protected abstract int getPermissionLevel();
 
     public ArgumentBuilder<CommandSource, ?> register() {
         final LiteralArgumentBuilder<CommandSource> argumentBuilder = Commands.literal(this.getName())
@@ -128,21 +128,22 @@ public abstract class SubCommand {
         return BlockPosArgument.getLoadedBlockPos(context, CommandConstants.LOCATION);
     }
 
-    protected static BlockPos rootPosArgument (final CommandContext<CommandSource> context) throws CommandSyntaxException {
+    protected static BlockPos rootPosArgument(final CommandContext<CommandSource> context) throws CommandSyntaxException {
         final BlockPos pos = blockPosArgument(context);
         final BlockPos rootPos = TreeHelper.findRootNode(context.getSource().getLevel(), pos);
 
-        if (rootPos == BlockPos.ZERO)
+        if (rootPos == BlockPos.ZERO) {
             throw NO_TREE_FOUND.create(pos);
+        }
 
         return rootPos;
     }
 
-    protected static RequiredArgumentBuilder<CommandSource, ResourceLocation> speciesArgument () {
+    protected static RequiredArgumentBuilder<CommandSource, ResourceLocation> speciesArgument() {
         return resourceLocationArgument(CommandConstants.SPECIES, Species.REGISTRY::getRegistryNames);
     }
 
-    protected static RequiredArgumentBuilder<CommandSource, ResourceLocation> transformableSpeciesArgument () {
+    protected static RequiredArgumentBuilder<CommandSource, ResourceLocation> transformableSpeciesArgument() {
         return resourceLocationArgument(CommandConstants.SPECIES, TreeRegistry::getTransformableSpeciesLocations);
     }
 
@@ -150,13 +151,14 @@ public abstract class SubCommand {
         final ResourceLocation registryName = ResourceLocationArgument.getId(context, CommandConstants.SPECIES);
         final Species species = TreeRegistry.findSpecies(registryName);
 
-        if (!species.isValid())
+        if (!species.isValid()) {
             throw SPECIES_UNKNOWN.create(registryName.toString());
+        }
 
         return species;
     }
 
-    protected static RequiredArgumentBuilder<CommandSource, ResourceLocation> resourceLocationArgument (final String name, final Supplier<Collection<ResourceLocation>> suggestionsSupplier) {
+    protected static RequiredArgumentBuilder<CommandSource, ResourceLocation> resourceLocationArgument(final String name, final Supplier<Collection<ResourceLocation>> suggestionsSupplier) {
         return Commands.argument(name, ResourceLocationArgument.id())
                 .suggests((context, builder) -> ISuggestionProvider.suggestResource(suggestionsSupplier.get(), builder));
     }

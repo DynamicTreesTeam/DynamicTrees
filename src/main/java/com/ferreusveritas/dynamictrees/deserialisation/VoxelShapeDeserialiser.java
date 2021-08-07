@@ -17,13 +17,13 @@ public final class VoxelShapeDeserialiser implements JsonDeserialiser<VoxelShape
         final DeserialisationResult<VoxelShape> voxelShape = new DeserialisationResult<>();
 
         JsonHelper.JsonElementReader.of(jsonElement).ifOfType(String.class, string ->
-                voxelShape.setValue(CommonVoxelShapes.SHAPES.getOrDefault(string.toLowerCase(), VoxelShapes.block())))
+                        voxelShape.setValue(CommonVoxelShapes.SHAPES.getOrDefault(string.toLowerCase(), VoxelShapes.block())))
                 .elseIfOfType(AxisAlignedBB.class, axisAlignedBB -> voxelShape.setValue(VoxelShapes.create(axisAlignedBB)))
                 .elseIfOfType(JsonArray.class, jsonArray -> {
                     voxelShape.setValue(VoxelShapes.empty());
                     for (JsonElement element : jsonArray) {
                         JsonHelper.JsonElementReader.of(element).ifOfType(AxisAlignedBB.class, axisAlignedBB ->
-                                VoxelShapes.or(voxelShape.getValue(), VoxelShapes.create(axisAlignedBB)))
+                                        VoxelShapes.or(voxelShape.getValue(), VoxelShapes.create(axisAlignedBB)))
                                 .elseUnsupportedError(voxelShape::addWarning).ifFailed(voxelShape::addWarning);
                     }
                 }).elseUnsupportedError(voxelShape::setErrorMessage).ifFailed(voxelShape::setErrorMessage);
