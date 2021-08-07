@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
-import com.ferreusveritas.dynamictrees.util.json.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
 
 import java.util.Collections;
 import java.util.List;

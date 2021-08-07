@@ -4,8 +4,8 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
-import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.util.json.MapDeserialiser;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.MapDeserialiser;
 import com.google.common.collect.Maps;
 import net.minecraft.util.ResourceLocation;
 

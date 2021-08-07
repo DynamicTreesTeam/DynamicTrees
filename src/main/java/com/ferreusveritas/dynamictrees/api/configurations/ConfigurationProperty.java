@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.api.configurations;
 
-import com.ferreusveritas.dynamictrees.util.json.JsonDeserialiser;
-import com.ferreusveritas.dynamictrees.util.json.DeserialisationResult;
-import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialiser;
+import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;

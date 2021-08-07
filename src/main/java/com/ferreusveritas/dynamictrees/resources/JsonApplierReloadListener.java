@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
-import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
+import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -32,9 +32,6 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
             .disableHtmlEscaping()
             .create();
 
-    /** Holds appliers that should be applied both when loading and reloading. */
-    protected final JsonPropertyApplierList<V> loadReloadAppliers;
-
     /** Holds appliers that should only be applied when loading. */
     protected final JsonPropertyApplierList<V> loadAppliers;
 
@@ -45,12 +42,15 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
     /** Holds appliers that should only be applied when reloading. */
     protected final JsonPropertyApplierList<V> reloadAppliers;
 
+    /** Holds appliers that should be applied both when loading and reloading. */
+    protected final JsonPropertyApplierList<V> commonAppliers;
+
     protected final String applierListIdentifier;
 
     public JsonApplierReloadListener(final String folderName, final Class<V> objectType, final String applierListIdentifier) {
         super(folderName);
 
-        this.loadReloadAppliers = new JsonPropertyApplierList<>(objectType);
+        this.commonAppliers = new JsonPropertyApplierList<>(objectType);
         this.loadAppliers = new JsonPropertyApplierList<>(objectType);
         this.setupAppliers = new JsonPropertyApplierList<>(objectType);
         this.reloadAppliers = new JsonPropertyApplierList<>(objectType);
@@ -63,21 +63,14 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
      * posted properly.
      */
     public void registerAppliers() {
-        this.postApplierEvent(this.loadReloadAppliers, this.applierListIdentifier);
-        this.postApplierEvent(this.loadAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.LOAD_SUFFIX);
-        this.postApplierEvent(this.setupAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.SETUP_SUFFIX);
-        this.postApplierEvent(this.reloadAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.RELOAD_SUFFIX);
+        postApplierEvent(new ApplierRegistryEvent.Load<>(this.loadAppliers, this.applierListIdentifier));
+        postApplierEvent(new ApplierRegistryEvent.Setup<>(this.setupAppliers, this.applierListIdentifier));
+        postApplierEvent(new ApplierRegistryEvent.Reload<>(this.reloadAppliers, this.applierListIdentifier));
+        postApplierEvent(new ApplierRegistryEvent.Common<>(this.commonAppliers, this.applierListIdentifier));
     }
 
-    /**
-     * Creates a {@link JsonApplierRegistryEvent} instance for the given {@link JsonPropertyApplierList}
-     * and identifier, posting it to the mod event bus from {@link ModLoader}.
-     *
-     * @param applierList The {@link JsonPropertyApplierList} to post an applier event for.
-     * @param applierListIdentifier The identifier for the applier list.
-     */
-    protected void postApplierEvent (final JsonPropertyApplierList<?> applierList, final String applierListIdentifier) {
-        ModLoader.get().postEvent(new JsonApplierRegistryEvent<>(applierList, applierListIdentifier));
+    protected static void postApplierEvent(final ApplierRegistryEvent<?> event) {
+        ModLoader.get().postEvent(event);
     }
 
     /**
@@ -95,12 +88,12 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
     }
 
     /**
-     * Gets the {@link #loadReloadAppliers} for this {@link JsonApplierReloadListener} object.
+     * Gets the {@link #commonAppliers} for this {@link JsonApplierReloadListener} object.
      *
-     * @return The {@link #loadReloadAppliers} for this {@link JsonApplierReloadListener} object.
+     * @return The {@link #commonAppliers} for this {@link JsonApplierReloadListener} object.
      */
-    public JsonPropertyApplierList<V> getLoadReloadAppliers() {
-        return this.loadReloadAppliers;
+    public JsonPropertyApplierList<V> getCommonAppliers() {
+        return this.commonAppliers;
     }
 
     /**

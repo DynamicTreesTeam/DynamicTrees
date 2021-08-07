@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
@@ -13,9 +13,9 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreato
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
-import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
-import com.ferreusveritas.dynamictrees.util.json.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
+import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
@@ -48,7 +48,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
     private final Map<Species, Float> composterChances = new HashMap<>();
 
     public SpeciesManager() {
-        super(Species.REGISTRY, JsonApplierRegistryEvent.SPECIES);
+        super(Species.REGISTRY, ApplierRegistryEvent.SPECIES);
     }
 
     @Override

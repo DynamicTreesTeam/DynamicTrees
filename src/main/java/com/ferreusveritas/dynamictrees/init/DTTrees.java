@@ -17,7 +17,7 @@ import com.ferreusveritas.dynamictrees.trees.families.NetherFungusFamily;
 import com.ferreusveritas.dynamictrees.trees.species.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.PalmSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.SwampOakSpecies;
-import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import com.ferreusveritas.dynamictrees.api.events.AddFeatureCancellersEvent;
 import com.ferreusveritas.dynamictrees.api.events.PopulateDefaultDatabaseEvent;
 import com.ferreusveritas.dynamictrees.api.events.PopulateDimensionalDatabaseEvent;
+import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
@@ -11,10 +12,10 @@ import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.resources.MultiJsonReloadListener;
 import com.ferreusveritas.dynamictrees.resources.TreesResourceManager;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
-import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
-import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
-import com.ferreusveritas.dynamictrees.util.json.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
@@ -50,8 +51,8 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
     private BiomeDatabase defaultDatabase = new BiomeDatabase();
     private final Map<ResourceLocation, BiomeDatabase> dimensionDatabases = Maps.newHashMap();
 
-    private final JsonPropertyApplierList<BiomeDatabase.Entry> biomeDatabaseAppliers = new JsonPropertyApplierList<>(BiomeDatabase.Entry.class);
-    private final JsonPropertyApplierList<BiomePropertySelectors.FeatureCancellations> featureCancellationAppliers = new JsonPropertyApplierList<>(BiomePropertySelectors.FeatureCancellations.class);
+    private final JsonPropertyApplierList<BiomeDatabase.Entry> entryAppliers = new JsonPropertyApplierList<>(BiomeDatabase.Entry.class);
+    private final JsonPropertyApplierList<BiomePropertySelectors.FeatureCancellations> cancellationAppliers = new JsonPropertyApplierList<>(BiomePropertySelectors.FeatureCancellations.class);
 
     private final Set<ResourceLocation> blacklistedDimensions = Sets.newHashSet();
 
@@ -68,7 +69,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
 
     @Override
     public void registerAppliers() {
-        this.biomeDatabaseAppliers
+        this.entryAppliers
                 .register("species", JsonElement.class, (entry, jsonElement) -> {
                     return PropertyApplierResult.from(JsonDeserialisers.SPECIES_SELECTOR.deserialise(jsonElement)
                             .ifSuccessful(speciesSelector ->
@@ -133,15 +134,27 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                             .setMultipass(biome, pass -> (pass == 0 ? 0 : -1));
                 });
 
-        this.featureCancellationAppliers.register("namespace", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
+        this.cancellationAppliers.register("namespace", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
                 .registerArrayApplier("namespaces", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
                 .register("type", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller)
                 .registerArrayApplier("types", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller)
                 .register("stage", GenerationStage.Decoration.class, BiomePropertySelectors.FeatureCancellations::putStage)
                 .registerArrayApplier("stages", GenerationStage.Decoration.class, BiomePropertySelectors.FeatureCancellations::putStage);
 
-        this.postApplierEvent(this.biomeDatabaseAppliers, "entry_appliers");
-        this.postApplierEvent(this.featureCancellationAppliers, "feature_cancellations");
+        postApplierEvent(new EntryApplierRegistryEvent<>(this.entryAppliers, "entry_appliers"));
+        postApplierEvent(new CancellationApplierRegistryEvent<>(this.cancellationAppliers, "feature_cancellations"));
+    }
+
+    public static final class EntryApplierRegistryEvent<O> extends ApplierRegistryEvent<O> {
+        public EntryApplierRegistryEvent(JsonPropertyApplierList<O> applierList, String identifier) {
+            super(applierList, identifier);
+        }
+    }
+
+    public static final class CancellationApplierRegistryEvent<O> extends ApplierRegistryEvent<O> {
+        public CancellationApplierRegistryEvent(JsonPropertyApplierList<O> applierList, String identifier) {
+            super(applierList, identifier);
+        }
     }
 
     private static DeserialisationResult<BiomeDatabase.Operation> getOperation (final JsonElement jsonElement) {
@@ -258,7 +271,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                         if (biomeList.get() == null || biomeList.get().size() == 0)
                             LogManager.getLogger().warn("Tried to apply to null or empty biome list in '" + resourceLocation + "' populator.");
                         else {
-                            biomeList.get().forEach(biome -> this.biomeDatabaseAppliers.applyAll(applyObject, database.getEntry(biome)));
+                            biomeList.get().forEach(biome -> this.entryAppliers.applyAll(applyObject, database.getEntry(biome)));
                         }
                     }))
             .ifContains(WHITE, String.class, str -> {
@@ -275,7 +288,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
             reader.ifContains(CANCELLERS, JsonObject.class, cancellerObject -> {
                 final BiomePropertySelectors.FeatureCancellations featureCancellations = new BiomePropertySelectors.FeatureCancellations();
 
-                this.featureCancellationAppliers.applyAll(cancellerObject, featureCancellations)
+                this.cancellationAppliers.applyAll(cancellerObject, featureCancellations)
                         .forEach(failureResult -> LOGGER.error("Error whilst applying feature cancellations in '{}' populator: {}", resourceLocation, failureResult.getErrorMessage()));
 
                 featureCancellations.putDefaultStagesIfEmpty();

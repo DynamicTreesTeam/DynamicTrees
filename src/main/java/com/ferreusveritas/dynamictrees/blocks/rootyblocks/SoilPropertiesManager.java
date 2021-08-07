@@ -1,12 +1,13 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
-import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
-import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
-import com.ferreusveritas.dynamictrees.util.json.ResourceLocationDeserialiser;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 
 import java.util.function.Consumer;
 
@@ -16,12 +17,16 @@ import java.util.function.Consumer;
 public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilProperties> {
 
     public SoilPropertiesManager() {
-        super(SoilProperties.REGISTRY, JsonApplierRegistryEvent.SOIL_PROPERTIES);
+        super(SoilProperties.REGISTRY, ApplierRegistryEvent.SOIL_PROPERTIES);
     }
 
     @Override
     public void registerAppliers() {
-        this.loadReloadAppliers.registerArrayApplier("acceptable_soils", String.class, (soilProperties, acceptableSoil) -> {
+        this.setupAppliers.register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
+
+        this.registerSpreadableAppliers();
+
+        this.commonAppliers.registerArrayApplier("acceptable_soils", String.class, (soilProperties, acceptableSoil) -> {
             if (SoilHelper.getSoilFlags(acceptableSoil) == 0)
                 SoilHelper.createNewAdjective(acceptableSoil);
 
@@ -29,9 +34,15 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
             return PropertyApplierResult.success();
         });
 
-        this.setupAppliers.register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
-
         super.registerAppliers();
+    }
+
+    private void registerSpreadableAppliers() {
+        this.reloadAppliers
+                .register("required_light", SpreadableSoilProperties.class, Integer.class, SpreadableSoilProperties::setRequiredLight)
+                .register("spread_item", SpreadableSoilProperties.class, Item.class, SpreadableSoilProperties::setSpreadItem)
+                .registerArrayApplier("spreadable_soils", SpreadableSoilProperties.class, SoilProperties.class,
+                        (properties, soil) -> SoilProperties.REGISTRY.runOnNextLock(() -> properties.addSpreadableSoils(soil)));
     }
 
     @Override

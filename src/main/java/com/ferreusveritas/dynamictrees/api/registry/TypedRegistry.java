@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
-import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;

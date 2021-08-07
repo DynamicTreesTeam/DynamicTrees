@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.configurations.Configured;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 
 /**
  * A configured version of a {@link GenFeature}. This is used for holding {@link ConfigurationProperty}

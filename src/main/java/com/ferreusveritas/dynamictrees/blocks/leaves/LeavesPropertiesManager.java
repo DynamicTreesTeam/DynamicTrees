@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
-import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
-import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
-import com.ferreusveritas.dynamictrees.util.json.ResourceLocationDeserialiser;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 
@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListener<LeavesProperties> {
 
     public LeavesPropertiesManager() {
-        super(LeavesProperties.REGISTRY, JsonApplierRegistryEvent.LEAVES_PROPERTIES);
+        super(LeavesProperties.REGISTRY, ApplierRegistryEvent.LEAVES_PROPERTIES);
     }
 
     @Override

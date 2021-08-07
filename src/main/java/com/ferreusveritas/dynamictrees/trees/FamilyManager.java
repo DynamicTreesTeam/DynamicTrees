@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
-import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -24,12 +24,12 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
     private static final Logger LOGGER = LogManager.getLogger();
 
     public FamilyManager() {
-        super(Family.REGISTRY, "families", JsonApplierRegistryEvent.FAMILY);
+        super(Family.REGISTRY, "families", ApplierRegistryEvent.FAMILY);
     }
 
     @Override
     public void registerAppliers() {
-        this.loadReloadAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
+        this.commonAppliers.register("common_species", ResourceLocation.class, (family, registryName) -> {
             registryName = TreeRegistry.processResLoc(registryName);
             Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName, family::setupCommonSpecies, setCommonWarn(family, registryName))); })
                 .register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
