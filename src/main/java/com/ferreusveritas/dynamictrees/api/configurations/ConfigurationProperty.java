@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.api.configurations;
 
-import com.ferreusveritas.dynamictrees.util.json.JsonGetter;
-import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
-import com.ferreusveritas.dynamictrees.util.json.FetchResult;
+import com.ferreusveritas.dynamictrees.util.json.JsonDeserialiser;
+import com.ferreusveritas.dynamictrees.util.json.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
  * Class for custom configuration properties that can be deserialised from a
  * {@link JsonObject} using {@link #deserialise(JsonObject)}. Stores a property's
  * identifier and class type, handling getting properties of type {@link T}
- * using {@link JsonGetters}s.
+ * using {@link JsonDeserialiser}s.
  *
  * @param <T> The type of the property being held.
  * @author Harley O'Connor
@@ -38,26 +38,26 @@ public class ConfigurationProperty<T> {
     }
 
     /**
-     * Gets an {@link FetchResult} for the property's value from the given {@link JsonObject},
+     * Gets an {@link DeserialisationResult} for the property's value from the given {@link JsonObject},
      * or null if it was not found.
      *
      * @param jsonObject The {@link JsonObject} to fetch from.
-     * @return The an {@link FetchResult} for the property value, or null if it wasn't found.
+     * @return The an {@link DeserialisationResult} for the property value, or null if it wasn't found.
      */
     @Nullable
-    public FetchResult<T> deserialise(JsonObject jsonObject) {
+    public DeserialisationResult<T> deserialise(JsonObject jsonObject) {
         final JsonElement jsonElement = jsonObject.get(this.identifier);
 
         if (jsonElement == null)
             return null;
 
-        final JsonGetter<T> getter = JsonGetters.get(this.type);
+        final JsonDeserialiser<T> getter = JsonDeserialisers.get(this.type);
 
         if (!getter.isValid())
-            return FetchResult.failure("Tried to get class '" + (this.type == null ? "null" : this.type.getSimpleName()) +
+            return DeserialisationResult.failure("Tried to get class '" + (this.type == null ? "null" : this.type.getSimpleName()) +
                     "' for gen feature property '" + this.identifier + "', but object getter was not registered.");
 
-        return getter.get(jsonElement);
+        return getter.deserialise(jsonElement);
     }
 
     /**

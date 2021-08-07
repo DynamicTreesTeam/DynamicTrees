@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.util.json.ListGetter;
 import net.minecraft.item.Item;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

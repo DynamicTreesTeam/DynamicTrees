@@ -7,18 +7,18 @@ import net.minecraft.util.math.AxisAlignedBB;
 /**
  * @author Harley O'Connor
  */
-public final class AxisAlignedBBGetter implements JsonGetter<AxisAlignedBB> {
+public final class AxisAlignedBBDeserialiser implements JsonDeserialiser<AxisAlignedBB> {
 
     @Override
-    public FetchResult<AxisAlignedBB> get(JsonElement jsonElement) {
-        return JsonGetters.JSON_ARRAY.get(jsonElement).map(jsonArray -> {
+    public DeserialisationResult<AxisAlignedBB> deserialise(JsonElement jsonElement) {
+        return JsonDeserialisers.JSON_ARRAY.deserialise(jsonElement).map(jsonArray -> {
             if (jsonArray.size() != 6 || !this.allElementsNumber(jsonArray))
                 return null;
 
             final double[] params = new double[6];
 
             for (int i = 0; i < jsonArray.size(); i++) {
-                params[i] = JsonGetters.DOUBLE.get(jsonArray.get(i)).getValue();
+                params[i] = JsonDeserialisers.DOUBLE.deserialise(jsonArray.get(i)).getValue();
             }
 
             return new AxisAlignedBB(params[0], params[1], params[2], params[3], params[4], params[5]);

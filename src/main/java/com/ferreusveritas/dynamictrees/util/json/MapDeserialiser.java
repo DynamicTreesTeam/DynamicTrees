@@ -10,30 +10,30 @@ import java.util.function.Supplier;
 /**
  * @author Harley O'Connor
  */
-public final class MapGetter<K, V> implements JsonGetter<Map<K, V>> {
+public final class MapDeserialiser<K, V> implements JsonDeserialiser<Map<K, V>> {
 
-    private final JsonGetter<K> keyGetter;
-    private final JsonGetter<V> valueGetter;
+    private final JsonDeserialiser<K> keyGetter;
+    private final JsonDeserialiser<V> valueGetter;
     private final Supplier<Map<K, V>> mapSupplier;
 
-    public MapGetter(JsonGetter<K> keyGetter, JsonGetter<V> valueGetter) {
+    public MapDeserialiser(JsonDeserialiser<K> keyGetter, JsonDeserialiser<V> valueGetter) {
         this(keyGetter, valueGetter, HashMap::new);
     }
 
-    public MapGetter(JsonGetter<K> keyGetter, JsonGetter<V> valueGetter, Supplier<Map<K, V>> mapSupplier) {
+    public MapDeserialiser(JsonDeserialiser<K> keyGetter, JsonDeserialiser<V> valueGetter, Supplier<Map<K, V>> mapSupplier) {
         this.keyGetter = keyGetter;
         this.valueGetter = valueGetter;
         this.mapSupplier = mapSupplier;
     }
 
     @Override
-    public FetchResult<Map<K, V>> get(JsonElement jsonElement) {
+    public DeserialisationResult<Map<K, V>> deserialise(JsonElement jsonElement) {
         final String[] errorMsg = {null};
-        return JsonGetters.JSON_OBJECT.get(jsonElement).map(object -> {
+        return JsonDeserialisers.JSON_OBJECT.deserialise(jsonElement).map(object -> {
             final Map<K, V> map = this.mapSupplier.get();
             object.entrySet().forEach(entry ->
-                    this.valueGetter.get(entry.getValue()).ifSuccessful(value ->
-                            this.keyGetter.get(new JsonPrimitive(entry.getKey()))
+                    this.valueGetter.deserialise(entry.getValue()).ifSuccessful(value ->
+                            this.keyGetter.deserialise(new JsonPrimitive(entry.getKey()))
                                     .ifSuccessful(key -> map.put(key, value)).elseIfError(err -> errorMsg[0] = err)
                     ).elseIfError(err -> {if (errorMsg[0] == null) errorMsg[0] = err;} )
             );

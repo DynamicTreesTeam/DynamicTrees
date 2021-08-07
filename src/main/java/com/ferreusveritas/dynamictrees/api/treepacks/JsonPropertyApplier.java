@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
-import com.ferreusveritas.dynamictrees.util.json.JsonGetter;
-import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
-import com.ferreusveritas.dynamictrees.util.json.FetchResult;
+import com.ferreusveritas.dynamictrees.util.json.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.util.json.JsonDeserialiser;
+import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
 import com.google.gson.JsonElement;
 
 import javax.annotation.Nullable;
@@ -10,6 +10,8 @@ import javax.annotation.Nullable;
 /**
  * Manages applying a property (of type <tt>V</tt>) to an object (of type <tt>T</tt>).
  *
+ * @param <T> the object the property should be applied to
+ * @param <V> the type of the property to apply
  * @author Harley O'Connor
  */
 public class JsonPropertyApplier<T, V> {
@@ -52,15 +54,15 @@ public class JsonPropertyApplier<T, V> {
     @SuppressWarnings("unchecked")
     @Nullable
     protected <S, R> PropertyApplierResult applyIfShould(final Object object, final JsonElement jsonElement, final Class<R> valueClass, final IPropertyApplier<S, R> applier) {
-        final JsonGetter<R> valueGetter = JsonGetters.get(valueClass);
+        final JsonDeserialiser<R> valueGetter = JsonDeserialisers.get(valueClass);
 
         if (!valueGetter.isValid())
             return null;
 
-        final FetchResult<R> fetchResult = valueGetter.get(jsonElement);
+        final DeserialisationResult<R> result = valueGetter.deserialise(jsonElement);
 
-        return fetchResult.wasSuccessful() ? applier.apply((S) object, fetchResult.getValue()) :
-                PropertyApplierResult.failure(fetchResult);
+        return result.wasSuccessful() ? applier.apply((S) object, result.getValue()) :
+                PropertyApplierResult.failure(result);
     }
 
     public Class<T> getObjectClass() {

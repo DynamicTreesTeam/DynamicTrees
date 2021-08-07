@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
-import com.ferreusveritas.dynamictrees.util.json.ResourceLocationGetter;
+import com.ferreusveritas.dynamictrees.util.json.ResourceLocationDeserialiser;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 
@@ -44,7 +44,7 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
     protected void preLoad(JsonObject jsonObject, LeavesProperties leavesProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
         // If a custom block registry name was set, set and use it.
         JsonHelper.JsonObjectReader.of(jsonObject).ifContains("block_registry_name", jsonElement ->
-                ResourceLocationGetter.create(leavesProperties.getRegistryName().getNamespace()).get(jsonElement)
+                ResourceLocationDeserialiser.create(leavesProperties.getRegistryName().getNamespace()).deserialise(jsonElement)
                         .ifSuccessful(leavesProperties::setBlockRegistryName)
         );
 

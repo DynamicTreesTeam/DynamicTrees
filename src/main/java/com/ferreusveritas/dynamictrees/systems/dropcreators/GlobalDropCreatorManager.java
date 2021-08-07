@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.dropcreators;
 import com.ferreusveritas.dynamictrees.resources.JsonReloadListener;
 import com.ferreusveritas.dynamictrees.resources.TreesResourceManager;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
+import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
@@ -44,7 +44,7 @@ public final class GlobalDropCreatorManager extends JsonReloadListener<DropCreat
                 return;
             }
 
-            JsonGetters.CONFIGURED_DROP_CREATOR.get(element.getAsJsonObject())
+            JsonDeserialisers.CONFIGURED_DROP_CREATOR.deserialise(element.getAsJsonObject())
                     .ifSuccessful(result -> entries.put(registryName, result))
                     .elseIfError(error -> LOGGER.error("Error loading Global Drop Creator \"{}\": {}", registryName, error))
                     .forEachWarning(warning -> LOGGER.warn("Warning whilst loading Global Drop Creator \"{}\": {}", registryName, warning));

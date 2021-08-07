@@ -4,10 +4,9 @@ import com.ferreusveritas.dynamictrees.api.treepacks.JsonApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
-import com.ferreusveritas.dynamictrees.util.json.ResourceLocationGetter;
+import com.ferreusveritas.dynamictrees.util.json.ResourceLocationDeserialiser;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 
 import java.util.function.Consumer;
 
@@ -40,7 +39,7 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
 
         // If a custom block registry name was set, set and use it.
         JsonHelper.JsonObjectReader.of(jsonObject).ifContains("block_registry_name", jsonElement ->
-                ResourceLocationGetter.create(soilProperties.getRegistryName().getNamespace()).get(jsonElement)
+                ResourceLocationDeserialiser.create(soilProperties.getRegistryName().getNamespace()).deserialise(jsonElement)
                         .ifSuccessful(soilProperties::setBlockRegistryName)
         );
     }

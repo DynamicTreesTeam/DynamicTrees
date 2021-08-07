@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
-import com.ferreusveritas.dynamictrees.util.json.FetchResult;
+import com.ferreusveritas.dynamictrees.util.json.DeserialisationResult;
 
 import java.util.Collections;
 import java.util.List;
@@ -57,8 +57,8 @@ public final class PropertyApplierResult {
         return new PropertyApplierResult(null, warnings);
     }
 
-    public static PropertyApplierResult failure(final FetchResult<?> fetchResult) {
-        return new PropertyApplierResult(fetchResult.getErrorMessage(), fetchResult.getWarnings());
+    public static PropertyApplierResult failure(final DeserialisationResult<?> result) {
+        return new PropertyApplierResult(result.getErrorMessage(), result.getWarnings());
     }
 
     public static PropertyApplierResult failure(final String errorMessage) {
@@ -69,8 +69,8 @@ public final class PropertyApplierResult {
         return new PropertyApplierResult(errorMessage, warnings);
     }
 
-    public static PropertyApplierResult from(final FetchResult<?> fetchResult) {
-        return fetchResult.wasSuccessful() ? success() : failure(fetchResult.getErrorMessage());
+    public static PropertyApplierResult from(final DeserialisationResult<?> result) {
+        return result.wasSuccessful() ? success() : failure(result.getErrorMessage());
     }
 
 }

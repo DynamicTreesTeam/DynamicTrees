@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * @author Harley O'Connor
  */
-public final class BiomeListGetter implements JsonGetter<BiomeList> {
+public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> {
 
     private static final IVoidPropertyApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeString) ->
             biomeList.removeIf(biome -> {
@@ -46,7 +46,7 @@ public final class BiomeListGetter implements JsonGetter<BiomeList> {
 
     private final JsonPropertyApplierList<BiomeList> appliers = new JsonPropertyApplierList<>(BiomeList.class);
 
-    public BiomeListGetter() {
+    public BiomeListDeserialiser() {
         this.appliers.register("type", String.class, TYPE_APPLIER)
                 .registerArrayApplier("types", String.class, TYPE_APPLIER)
                 .register("category", String.class, CATEGORY_APPLIER)
@@ -55,16 +55,16 @@ public final class BiomeListGetter implements JsonGetter<BiomeList> {
     }
 
     @Override
-    public FetchResult<BiomeList> get (final JsonElement jsonElement) {
+    public DeserialisationResult<BiomeList> deserialise(final JsonElement jsonElement) {
         final BiomeList biomes;
 
-        final FetchResult<Biome> biomeFetchResult = JsonGetters.BIOME.get(jsonElement);
+        final DeserialisationResult<Biome> biomeResult = JsonDeserialisers.BIOME.deserialise(jsonElement);
 
-        if (biomeFetchResult.wasSuccessful()) {
-            biomes = new BiomeList(Collections.singletonList(biomeFetchResult.getValue()));
+        if (biomeResult.wasSuccessful()) {
+            biomes = new BiomeList(Collections.singletonList(biomeResult.getValue()));
         } else {
             if (!jsonElement.isJsonObject())
-                return FetchResult.failureFromOther(biomeFetchResult);
+                return DeserialisationResult.failureFromOther(biomeResult);
 
             // Start with a list of all biomes.
             biomes = BiomeList.getAll();
@@ -73,7 +73,7 @@ public final class BiomeListGetter implements JsonGetter<BiomeList> {
             this.appliers.applyAll(jsonElement.getAsJsonObject(), biomes);
         }
 
-        return FetchResult.success(biomes);
+        return DeserialisationResult.success(biomes);
     }
 
 }

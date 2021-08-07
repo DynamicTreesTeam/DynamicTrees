@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
-import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
+import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -91,7 +91,7 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
         final JsonElement typeElement = jsonObject.get("type");
 
         if (typeElement != null) {
-            JsonGetters.RESOURCE_LOCATION.get(typeElement)
+            JsonDeserialisers.RESOURCE_LOCATION.deserialise(typeElement)
                     .map(resourceLocation -> this.getType(TreeRegistry.processResLoc(resourceLocation)), "Could not find type for '{previous_value}' (will use default).")
                     .ifSuccessful(type::set)
                     .elseIfError(error -> LogManager.getLogger().error("Error constructing " + this.name + " '" + registryName + "': " + error));

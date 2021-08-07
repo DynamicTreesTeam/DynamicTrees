@@ -5,27 +5,27 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * An {@link JsonGetter} for {@link ResourceLocation}s, but if no namespace is
+ * An {@link JsonDeserialiser} for {@link ResourceLocation}s, but if no namespace is
  * defined it defaults to the specified {@link #defaultNamespace} given in
- * {@link #ResourceLocationGetter(String)}.
+ * {@link #ResourceLocationDeserialiser(String)}.
  *
- * Main instance stored in {@link JsonGetters#RESOURCE_LOCATION} for fetching
+ * Main instance stored in {@link JsonDeserialisers#RESOURCE_LOCATION} for fetching
  * resource locations with default namespace {@code minecraft}.
  *
  * @author Harley O'Connor
  */
-public final class ResourceLocationGetter implements JsonGetter<ResourceLocation> {
+public final class ResourceLocationDeserialiser implements JsonDeserialiser<ResourceLocation> {
 
     private final String defaultNamespace;
 
-    public ResourceLocationGetter(String defaultNamespace) {
+    public ResourceLocationDeserialiser(String defaultNamespace) {
         this.defaultNamespace = defaultNamespace;
     }
 
     @Override
-    public FetchResult<ResourceLocation> get(JsonElement jsonElement) {
-        return JsonGetters.STRING.get(jsonElement)
-                .mapIfValid(ResourceLocationGetter::isValidResourceLocation,
+    public DeserialisationResult<ResourceLocation> deserialise(JsonElement jsonElement) {
+        return JsonDeserialisers.STRING.deserialise(jsonElement)
+                .mapIfValid(ResourceLocationDeserialiser::isValidResourceLocation,
                         "Invalid resource location '{value}'. Namespace Constraints: [a-z0-9_.-] Path Constraints: [a-z0-9/._-]",
                         this::decode);
     }
@@ -49,12 +49,12 @@ public final class ResourceLocationGetter implements JsonGetter<ResourceLocation
         return new ResourceLocation(namespaceAndPath[0], namespaceAndPath[1]);
     }
 
-    public static ResourceLocationGetter create() {
-        return new ResourceLocationGetter("minecraft");
+    public static ResourceLocationDeserialiser create() {
+        return new ResourceLocationDeserialiser("minecraft");
     }
 
-    public static ResourceLocationGetter create(final String defaultNamespace) {
-        return new ResourceLocationGetter(defaultNamespace);
+    public static ResourceLocationDeserialiser create(final String defaultNamespace) {
+        return new ResourceLocationDeserialiser(defaultNamespace);
     }
 
 }

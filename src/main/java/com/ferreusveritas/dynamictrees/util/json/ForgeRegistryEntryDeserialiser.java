@@ -10,12 +10,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 /**
- * Implementation of {@link JsonGetter} that attempts to get a {@link ForgeRegistryEntry}
+ * Implementation of {@link JsonDeserialiser} that attempts to get a {@link ForgeRegistryEntry}
  * object from a {@link JsonElement}.
  *
  * @author Harley O'Connor
  */
-public final class ForgeRegistryEntryGetter<T extends ForgeRegistryEntry<T>> implements JsonGetter<T> {
+public final class ForgeRegistryEntryDeserialiser<T extends ForgeRegistryEntry<T>> implements JsonDeserialiser<T> {
 
     private final IForgeRegistry<T> registry;
     private final String registryDisplayName;
@@ -24,11 +24,11 @@ public final class ForgeRegistryEntryGetter<T extends ForgeRegistryEntry<T>> imp
     private final T nullValue;
     private final Predicate<T> validator;
 
-    public ForgeRegistryEntryGetter(final IForgeRegistry<T> registry, final String registryDisplayName) {
+    public ForgeRegistryEntryDeserialiser(final IForgeRegistry<T> registry, final String registryDisplayName) {
         this(registry, registryDisplayName, null);
     }
 
-    public ForgeRegistryEntryGetter(final IForgeRegistry<T> registry, final String registryDisplayName, @Nullable final T nullValue) {
+    public ForgeRegistryEntryDeserialiser(final IForgeRegistry<T> registry, final String registryDisplayName, @Nullable final T nullValue) {
         this.registry = registry;
         this.registryDisplayName = registryDisplayName;
         this.nullValue = nullValue;
@@ -36,9 +36,9 @@ public final class ForgeRegistryEntryGetter<T extends ForgeRegistryEntry<T>> imp
     }
 
     @Override
-    public FetchResult<T> get(JsonElement jsonElement) {
+    public DeserialisationResult<T> deserialise(JsonElement jsonElement) {
         final AtomicBoolean intentionallyNull = new AtomicBoolean();
-        return JsonGetters.RESOURCE_LOCATION.get(jsonElement).map(registryName -> {
+        return JsonDeserialisers.RESOURCE_LOCATION.deserialise(jsonElement).map(registryName -> {
             // If registry name is the null value's registry name then it was intentionally the null value, so don't warn.
             if (this.nullValue != null && Objects.equals(registryName, this.nullValue.getRegistryName())) {
                 intentionallyNull.set(true);

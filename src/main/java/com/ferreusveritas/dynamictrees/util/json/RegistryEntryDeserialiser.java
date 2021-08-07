@@ -9,17 +9,17 @@ import com.google.gson.JsonElement;
  *
  * @author Harley O'Connor
  */
-public final class RegistryEntryGetter<T extends RegistryEntry<T>> implements JsonGetter<T> {
+public final class RegistryEntryDeserialiser<T extends RegistryEntry<T>> implements JsonDeserialiser<T> {
 
     private final Registry<T> registry;
 
-    public RegistryEntryGetter(Registry<T> registry) {
+    public RegistryEntryDeserialiser(Registry<T> registry) {
         this.registry = registry;
     }
 
     @Override
-    public FetchResult<T> get(JsonElement jsonElement) {
-        return JsonGetters.DT_RESOURCE_LOCATION.get(jsonElement).map(this.registry::get,
+    public DeserialisationResult<T> deserialise(JsonElement jsonElement) {
+        return JsonDeserialisers.DT_RESOURCE_LOCATION.deserialise(jsonElement).map(this.registry::get,
                 RegistryEntry::isValid, "Could not find " + this.registry.getName() +
                         " for registry name '{previous_value}'.");
     }

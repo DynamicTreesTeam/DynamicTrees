@@ -4,8 +4,8 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
-import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
-import com.ferreusveritas.dynamictrees.util.json.MapGetter;
+import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.util.json.MapDeserialiser;
 import com.google.common.collect.Maps;
 import net.minecraft.util.ResourceLocation;
 
@@ -19,12 +19,12 @@ public final class NormalDropCreator extends DropCreator {
 
     @SuppressWarnings("all")
     public static final ConfigurationProperty<Map<DropType<DropContext>, Drops>> DROP_MAP = ConfigurationProperty.property("drops",
-            MapGetter.getMapClass(DropType.getGenericClass(), Drops.class, HashMap::new));
+            MapDeserialiser.getMapClass(DropType.getGenericClass(), Drops.class, HashMap::new));
 
     static {
-        JsonGetters.register(
-                MapGetter.getMapClass(DropType.getGenericClass(), Drops.class),
-                new MapGetter<>(JsonGetters.DROP_TYPE, JsonGetters.DROPS)
+        JsonDeserialisers.register(
+                MapDeserialiser.getMapClass(DropType.getGenericClass(), Drops.class),
+                new MapDeserialiser<>(JsonDeserialisers.DROP_TYPE, JsonDeserialisers.DROPS)
         );
     }
 

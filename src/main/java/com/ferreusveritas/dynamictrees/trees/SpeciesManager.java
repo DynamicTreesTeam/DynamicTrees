@@ -13,9 +13,9 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreato
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.BiomePredicate;
-import com.ferreusveritas.dynamictrees.util.json.JsonGetters;
+import com.ferreusveritas.dynamictrees.util.json.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.util.json.JsonPropertyApplierList;
-import com.ferreusveritas.dynamictrees.util.json.FetchResult;
+import com.ferreusveritas.dynamictrees.util.json.DeserialisationResult;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
@@ -56,15 +56,15 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
         BiomeDictionary.Type.getAll().stream().map(type -> new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
                 .forEach(this.environmentFactorAppliers::register);
 
-        JsonGetters.register(Species.ICommonOverride.class, jsonElement -> {
-            final FetchResult<BiomePredicate> biomePredicateFetchResult = JsonGetters.BIOME_PREDICATE.get(jsonElement);
+        JsonDeserialisers.register(Species.ICommonOverride.class, jsonElement -> {
+            final DeserialisationResult<BiomePredicate> biomePredicateResult = JsonDeserialisers.BIOME_PREDICATE.deserialise(jsonElement);
 
-            if (!biomePredicateFetchResult.wasSuccessful())
-                return FetchResult.failureFromOther(biomePredicateFetchResult);
+            if (!biomePredicateResult.wasSuccessful())
+                return DeserialisationResult.failureFromOther(biomePredicateResult);
 
-            return FetchResult.success((world, pos) ->
+            return DeserialisationResult.success((world, pos) ->
                 world instanceof IWorldReader &&
-                        biomePredicateFetchResult.getValue().test(((IWorldReader) world).getBiome(pos))
+                        biomePredicateResult.getValue().test(((IWorldReader) world).getBiome(pos))
             );
         });
 

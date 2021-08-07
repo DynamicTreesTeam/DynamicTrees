@@ -47,8 +47,8 @@ public class JsonHelper {
 	 * @return True if {@link JsonElement} is a comment.
 	 */
 	public static boolean isComment(final JsonElement jsonElement) {
-		final FetchResult<String> fetchResult = JsonGetters.STRING.get(jsonElement);
-		return fetchResult.wasSuccessful() && isComment(fetchResult.getValue());
+		final DeserialisationResult<String> result = JsonDeserialisers.STRING.deserialise(jsonElement);
+		return result.wasSuccessful() && isComment(result.getValue());
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class JsonHelper {
 		if (element == null)
 			return defaultValue;
 
-		final T result = JsonGetters.get(type).get(element).getValue();
+		final T result = JsonDeserialisers.get(type).deserialise(element).getValue();
 		return result == null ? defaultValue : result;
 	}
 
@@ -96,7 +96,7 @@ public class JsonHelper {
 		if (element == null)
 			return defaultValue;
 
-		final FetchResult<T> result = JsonGetters.get(type).get(element);
+		final DeserialisationResult<T> result = JsonDeserialisers.get(type).deserialise(element);
 
 		if (!result.wasSuccessful()) {
 			errorConsumer.accept(result.getErrorMessage());
@@ -128,14 +128,14 @@ public class JsonHelper {
 			return null;
 		}
 
-		final FetchResult<T> fetchResult = JsonGetters.get(classToGet).get(jsonObject.get(key));
+		final DeserialisationResult<T> result = JsonDeserialisers.get(classToGet).deserialise(jsonObject.get(key));
 
-		if (!fetchResult.wasSuccessful()) {
-			LOGGER.warn("{} {}", errorPrefix, fetchResult.getErrorMessage());
+		if (!result.wasSuccessful()) {
+			LOGGER.warn("{} {}", errorPrefix, result.getErrorMessage());
 			return null;
 		}
 
-		return fetchResult.getValue();
+		return result.getValue();
 	}
 
 	public static JsonObjectReader ifContains (final JsonObject jsonObject, final String key, final Consumer<JsonElement> elementConsumer) {
@@ -162,7 +162,7 @@ public class JsonHelper {
 		}
 
 		public <T> JsonElementReader ifOfType (final Class<T> typeClass, final Consumer<T> consumer) {
-			JsonGetters.get(typeClass).get(jsonElement).ifSuccessful(value -> {
+			JsonDeserialisers.get(typeClass).deserialise(jsonElement).ifSuccessful(value -> {
 				consumer.accept(value);
 				this.read = true;
 			}).elseIfError(errorMessage -> this.lastError = errorMessage).elseIfError(() -> this.attemptedClasses.add(typeClass));
@@ -170,8 +170,8 @@ public class JsonHelper {
 		}
 
 		public <T> JsonElementReader ifArrayForEach (final Class<T> typeClass, final Consumer<T> consumer) {
-			JsonGetters.JSON_ARRAY.get(jsonElement).ifSuccessful(jsonArray -> {
-				jsonArray.forEach(arrayElement -> JsonGetters.get(typeClass).get(arrayElement)
+			JsonDeserialisers.JSON_ARRAY.deserialise(jsonElement).ifSuccessful(jsonArray -> {
+				jsonArray.forEach(arrayElement -> JsonDeserialisers.get(typeClass).deserialise(arrayElement)
 						.ifSuccessful(consumer).elseIfError(errorMessage -> this.lastError = errorMessage));
 				this.read = true;
 			}).elseIfError(() -> this.attemptedClasses.add(typeClass));
@@ -187,7 +187,7 @@ public class JsonHelper {
 		@SuppressWarnings("unchecked")
 		public <T> JsonElementReader elseIfEquals(final T value, final Consumer<T> consumer) {
 			if (!this.read)
-				JsonGetters.get((Class<T>) value.getClass()).get(this.jsonElement)
+				JsonDeserialisers.get((Class<T>) value.getClass()).deserialise(this.jsonElement)
 						.ifSuccessful(obj -> {
 							if (Objects.equals(obj, value))
 								consumer.accept(obj);

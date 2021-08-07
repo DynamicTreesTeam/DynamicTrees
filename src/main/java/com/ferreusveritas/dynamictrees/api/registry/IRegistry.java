@@ -46,6 +46,7 @@ public interface IRegistry<V extends RegistryEntry<V>> extends Iterable<V> {
      *
      * @param values The {@link RegistryEntry} objects to register.
      */
+    @SuppressWarnings("unchecked")
     void registerAll(V... values);
 
     boolean has(ResourceLocation registryName);
