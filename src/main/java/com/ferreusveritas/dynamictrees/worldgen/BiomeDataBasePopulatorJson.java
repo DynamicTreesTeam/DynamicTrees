@@ -64,12 +64,47 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	public static void registerJsonCapabilities(BiomeDataBaseJsonCapabilityRegistryEvent event) {
 
 		event.register(NAME, jsonElement -> {
-			if (jsonElement != null && jsonElement.isJsonPrimitive()) {
+			if (jsonElement == null) {
+				return b -> false;
+			}
+
+			if (jsonElement.isJsonPrimitive()) {
 				JsonPrimitive primitive = jsonElement.getAsJsonPrimitive();
 				if (primitive.isString()) {
 					String biomeMatch = primitive.getAsString();
-					return b -> b.getRegistryName().toString().matches(biomeMatch);
+					if (biomeMatch.charAt(0) == '!') {
+						return biome -> !String.valueOf(biome.getRegistryName()).matches(biomeMatch.substring(1));
+					} else {
+						return biome -> String.valueOf(biome.getRegistryName()).matches(biomeMatch);
+					}
 				}
+			} else if (jsonElement.isJsonArray()) {
+				final List<String> namesWhitelist = new ArrayList<>();
+				final List<String> namesBlacklist = new ArrayList<>();
+
+				for (final JsonElement nameElement : jsonElement.getAsJsonArray()) {
+					if (!nameElement.isJsonPrimitive()) {
+						continue;
+					}
+					final JsonPrimitive primitive = jsonElement.getAsJsonPrimitive();
+					if (!primitive.isString()) {
+						continue;
+					}
+					final String biomeMatch = primitive.getAsString();
+					if (biomeMatch.charAt(0) == '!') {
+						namesBlacklist.add(biomeMatch.substring(1));
+					} else {
+						namesWhitelist.add(biomeMatch);
+					}
+				}
+
+				return biome -> {
+					final String regName = String.valueOf(biome.getRegistryName());
+
+					// Accept if the biome name matches any from the whilstlist and none from the blacklist. 
+					return namesWhitelist.stream().anyMatch(regName::matches) &&
+						namesBlacklist.stream().noneMatch(regName::matches);
+				};
 			}
 
 			return b -> false;
@@ -77,32 +112,34 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 
 		event.register(TYPE, jsonElement -> {
 			if (jsonElement != null) {
-				List<BiomeDictionary.Type> typesWhiteList = new ArrayList<>();
-				List<BiomeDictionary.Type> typesBlackList = new ArrayList<>();
+				List<BiomeDictionary.Type> typesWhitelist = new ArrayList<>();
+				List<BiomeDictionary.Type> typesBlacklist = new ArrayList<>();
 
 				if (jsonElement.isJsonPrimitive()) {
 					String typeMatch = jsonElement.getAsString();
 					List<String> matches = Arrays.stream(typeMatch.split(",")).collect(Collectors.toList());
 					for (String match : matches) {
-						if (match.toCharArray()[0] == '!') {
-							typesBlackList.add(BiomeDictionary.Type.getType(match.substring(1)));
+						if (match.charAt(0) == '!') {
+							typesBlacklist.add(BiomeDictionary.Type.getType(match.substring(1)));
 						} else {
-							typesWhiteList.add(BiomeDictionary.Type.getType(match));
+							typesWhitelist.add(BiomeDictionary.Type.getType(match));
 						}
 					}
 				} else if (jsonElement.isJsonArray()) {
 					for (JsonElement element : jsonElement.getAsJsonArray()) {
 						if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
 							String stringElem = element.getAsString();
-							if (stringElem.toCharArray()[0] == '!') {
-								typesBlackList.add(BiomeDictionary.Type.getType(stringElem.substring(1)));
+							if (stringElem.charAt(0) == '!') {
+								typesBlacklist.add(BiomeDictionary.Type.getType(stringElem.substring(1)));
 							} else {
-								typesWhiteList.add(BiomeDictionary.Type.getType(stringElem));
+								typesWhitelist.add(BiomeDictionary.Type.getType(stringElem));
 							}
 						}
 					}
 				}
-				return b -> biomeHasTypes(b, typesWhiteList) && (typesBlackList.size() == 0 || !biomeHasAnyType(b, typesBlackList));
+
+				// Accept if the biome has any types from the whitelist and no types from the blacklist.
+				return b -> biomeHasTypes(b, typesWhitelist) && (typesBlacklist.size() == 0 || !biomeHasAnyType(b, typesBlacklist));
 			}
 
 			return b -> false;
