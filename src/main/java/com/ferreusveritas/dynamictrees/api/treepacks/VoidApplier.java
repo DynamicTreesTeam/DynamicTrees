@@ -6,10 +6,10 @@ package com.ferreusveritas.dynamictrees.api.treepacks;
  *
  * @author Harley O'Connor
  */
-public interface VoidApplier<T, V> extends Applier<T, V> {
+public interface VoidApplier<O, V> extends Applier<O, V> {
 
     @Override
-    default PropertyApplierResult apply(final T object, final V value) {
+    default PropertyApplierResult apply(final O object, final V value) {
         this.applySuccessful(object, value);
         return PropertyApplierResult.success();
     }
@@ -20,6 +20,6 @@ public interface VoidApplier<T, V> extends Applier<T, V> {
      * @param object The object to apply the value to.
      * @param value  The value to apply.
      */
-    void applySuccessful(final T object, final V value);
+    void applySuccessful(final O object, final V value);
 
 }

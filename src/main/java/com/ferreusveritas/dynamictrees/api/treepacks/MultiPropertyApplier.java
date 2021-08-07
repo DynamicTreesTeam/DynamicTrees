@@ -29,8 +29,8 @@ public class MultiPropertyApplier<T, I> extends PropertyApplier<T, Object, I> {
 
     @Nullable
     @Override
-    public PropertyApplierResult applyIfShould(String keyIn, Object object, I input) {
-        if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object)) {
+    public PropertyApplierResult applyIfShould(String key, Object object, I input) {
+        if (!this.key.equalsIgnoreCase(key) || !this.objectClass.isInstance(object)) {
             return null;
         }
 

@@ -28,10 +28,10 @@ public class ArrayPropertyApplier<T, V, I> extends PropertyApplier<T, V, I> {
 
     @Nullable
     @Override
-    public PropertyApplierResult applyIfShould(String keyIn, Object object, I input) {
+    public PropertyApplierResult applyIfShould(String key, Object object, I input) {
         final DeserialisationResult<Iterator<I>> iteratorResult = this.iteratorDeserialiser.apply(input);
 
-        if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object) || !iteratorResult.wasSuccessful()) {
+        if (!this.key.equalsIgnoreCase(key) || !this.objectClass.isInstance(object) || !iteratorResult.wasSuccessful()) {
             return null;
         }
 

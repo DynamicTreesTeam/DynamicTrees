@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  * Manages a list of {@link PropertyApplier} objects of type {@link O}, allowing for an easy way of storing,
  * registering, and applying property appliers.
  *
- * @param <O> The type of {@link Object} the {@link PropertyApplier} for this list are applying to.
+ * @param <O> the type of object the appliers for this list handle applying to
  * @author Harley O'Connor
  */
 public final class JsonPropertyApplierList<O> {

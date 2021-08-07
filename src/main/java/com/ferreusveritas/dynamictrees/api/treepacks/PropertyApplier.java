@@ -30,18 +30,19 @@ public abstract class PropertyApplier<O, V, I> {
     }
 
     /**
-     * Calls {@link Applier#apply(Object, Object)} if it should be called - or in other words if the given key equaled
+     * Invokes {@link Applier#apply(Object, Object)} if it should be called - or in other words if the given key equaled
      * {@link #key} and the object given is an instance of the {@link #objectClass} value, and the {@link JsonElement}
      * given contained a value that can be converted to the {@link #valueClass}.
      *
-     * @param keyIn  The keyIn for the current {@link JsonElement}.
-     * @param object The {@link Object} being applied to.
-     * @param input  The {@link JsonElement} for the key given.
-     * @return The {@link PropertyApplierResult}, or null if application was not necessary.
+     * @param key    the key for the specified {@code input}
+     * @param object the object to apply to
+     * @param input  the json element corresponding to the specified {@code key}
+     * @return the result; otherwise {@code null} if the specified {@code key} mismatched or the specified
+     * {@code object} was not of type {@link O}.
      */
     @Nullable
-    public PropertyApplierResult applyIfShould(final String keyIn, final Object object, final I input) {
-        if (!this.key.equalsIgnoreCase(keyIn) || !this.objectClass.isInstance(object)) {
+    public PropertyApplierResult applyIfShould(final String key, final Object object, final I input) {
+        if (!this.key.equalsIgnoreCase(key) || !this.objectClass.isInstance(object)) {
             return null;
         }
 

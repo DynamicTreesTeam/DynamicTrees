@@ -141,7 +141,7 @@ public final class DTResourceRegistries {
             // Reload all reload listeners in the trees resource manager and registers dirt bucket recipes.
             return CompletableFuture.allOf(futures)
                     .thenCompose(stage::wait)
-                    .thenAcceptAsync(theVoid -> TREES_RESOURCE_MANAGER.reload(futures), gameExecutor)
+                    .thenAcceptAsync(v -> TREES_RESOURCE_MANAGER.reload(futures), gameExecutor)
                     .thenRunAsync(this::registerDirtBucketRecipes, gameExecutor);
         }
 

@@ -1,6 +1,10 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
 /**
+ * Represents a function that applies a value to an object, usually by assigning it to a field.
+ * <p>
+ * This is a {@link FunctionalInterface} whose functional method is {@link #apply(Object, Object)}.
+ *
  * @param <O> the type of the object to apply to
  * @param <V> the type of the value of the property
  * @author Harley O'Connor

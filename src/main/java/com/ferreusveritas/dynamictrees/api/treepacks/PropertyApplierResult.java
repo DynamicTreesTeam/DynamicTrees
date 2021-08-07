@@ -6,20 +6,17 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Stores an error message in the event of a property applier failure.
+ * Stores an error and warning messages resulting from {@link Applier#apply(Object, Object)}.
  *
  * @author Harley O'Connor
  */
 public final class PropertyApplierResult {
 
     /**
-     * Stores the error message, or null to signify there was none.
+     * The error message, or null to signify that there was none.
      */
     private String errorMessage;
 
-    /**
-     * Stores any warnings.
-     */
     private final List<String> warnings;
 
     private PropertyApplierResult(final String errorMessage) {
