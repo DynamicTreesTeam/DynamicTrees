@@ -103,4 +103,16 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
         return false;
     }
 
+    /**
+     * Called before this {@link GenFeature} is applied to a {@link Species}. Returns {@code false} if the application
+     * should be aborted.
+     *
+     * @param species       the species the feature is being added to
+     * @param configuration the configuration the feature is being added with
+     * @return {@code true} if it should be applied; otherwise {@code false} if the application should be aborted
+     */
+    public boolean onApplied(Species species, ConfiguredGenFeature<GenFeature> configuration) {
+        return true;
+    }
+
 }

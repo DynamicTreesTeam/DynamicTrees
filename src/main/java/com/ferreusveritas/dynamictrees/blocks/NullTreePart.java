@@ -33,7 +33,7 @@ public class NullTreePart implements ITreePart {
 
     @Override
     public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
-        //Connectable blocks such as bee nests and shroomlight will be handled here.
+        // Connectable blocks such as bee nests and shroomlight will be handled here.
         if (BranchConnectables.isBlockConnectable(state.getBlock())) {
             int rad = BranchConnectables.getConnectionRadiusForBlock(state, reader, pos, side);
             if (rad > 0) {
@@ -41,7 +41,6 @@ public class NullTreePart implements ITreePart {
             }
         }
 
-        }
         return 0;
     }
 

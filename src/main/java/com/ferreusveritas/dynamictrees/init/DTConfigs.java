@@ -177,10 +177,9 @@ public class DTConfigs {
 
         COMMON_BUILDER.comment("Mod Integration Settings").push("integration");
         PREFERRED_SEASON_MOD = COMMON_BUILDER.comment("The mod ID of preferred season mod. If a season provider for this mod ID is present, it will be used for integration with seasons. Set this to \"!\" to disable integration or \"*\" to accept the any integration (the first available).")
-                .define("preferredSeasonMod", CompatHandler.ANY);ENABLE_SEASONAL_SEED_DROP_FACTOR = COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
+                .define("preferredSeasonMod", CompatHandler.ANY);
+        ENABLE_SEASONAL_SEED_DROP_FACTOR = COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalSeedDropFactor", true);
-		ENABLE_SEASONAL_SEED_DROP_FACTOR = COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
-				define("enableSeasonalSeedDropFactor", true);
 		ENABLE_SEASONAL_GROWTH_FACTOR = COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalGrowthFactor", true);
         ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR = COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").

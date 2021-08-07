@@ -124,9 +124,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         @Override
         public float biomeSuitability(World world, BlockPos pos) {
             return 0.0f;
+        }
 
-
-        }@Override
+        @Override
         public Species addDropCreators(DropCreator... dropCreators) {
             return this;
         }
@@ -134,9 +134,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         @Override
         public Species setSeed(Seed seed) {
             return this;
+        }
 
-
-        }@Override
+        @Override
         public ItemStack getSeedStack(int qty) {
             return ItemStack.EMPTY;
         }
@@ -149,9 +149,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         @Override
         public ITextComponent getTextComponent() {
             return this.formatComponent(new TranslationTextComponent("gui.none"), TextFormatting.DARK_RED);
+        }
 
-
-        }@Override
+        @Override
         public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
             return false;
         }
@@ -348,9 +348,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     @Override
     public Species setPostReloadDefaults() {
         // If there is no acceptable soil set, use the standard soils.
-		if (!this.hasAcceptableSoil()) {
-			this.setStandardSoils();
-		}
+        if (!this.hasAcceptableSoil()) {
+            this.setStandardSoils();
+        }
         return this;
     }
 
@@ -569,9 +569,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     public void addValidLeafBlocks(LeavesProperties... leaves) {
         for (LeavesProperties leaf : leaves) {
-			if (!this.validLeaves.contains(leaf)) {
-				this.validLeaves.add(leaf);
-			}
+            if (!this.validLeaves.contains(leaf)) {
+                this.validLeaves.add(leaf);
+            }
         }
     }
 
@@ -590,9 +590,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     public DynamicLeavesBlock getValidLeafBlock(int index) {
         LeavesProperties properties = getValidLeavesProperties(index);
-		if (!properties.getDynamicLeavesBlock().isPresent()) {
-			return null;
-		}
+        if (!properties.getDynamicLeavesBlock().isPresent()) {
+            return null;
+        }
         return (DynamicLeavesBlock) properties.getDynamicLeavesState().getBlock();
     }
 
@@ -679,20 +679,20 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @return This {@link Species} object for chaining.
      */
     public Species setShouldGenerateSeedIfNull(boolean shouldGenerateSeed) {
-		if (this.shouldGenerateSeed == null) {
-			this.shouldGenerateSeed = shouldGenerateSeed;
-		}
+        if (this.shouldGenerateSeed == null) {
+            this.shouldGenerateSeed = shouldGenerateSeed;
+        }
         return this;
     }
 
     private String seedName = null;
 
     public ResourceLocation getSeedName() {
-		if (seedName == null) {
+        if (seedName == null) {
             return ResourceLocationUtils.suffix(getRegistryName(), "_seed");
         } else {
-			return new ResourceLocation(getRegistryName().getNamespace(), seedName);
-		}
+            return new ResourceLocation(getRegistryName().getNamespace(), seedName);
+        }
     }
 
     public void setSeedName(String name) {
@@ -928,9 +928,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @return This {@link Species} object for chaining.
      */
     public Species setShouldGenerateSaplingIfNull(boolean shouldGenerateSapling) {
-		if (this.shouldGenerateSapling == null) {
-			this.shouldGenerateSapling = shouldGenerateSapling;
-		}
+        if (this.shouldGenerateSapling == null) {
+            this.shouldGenerateSapling = shouldGenerateSapling;
+        }
         return this;
     }
 
@@ -1055,9 +1055,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
             if (doesRequireTileEntity(world, pos)) {
                 SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
                 world.setBlockEntity(pos.below(), speciesTE);
-				if (speciesTE != null) {
-					speciesTE.setSpecies(this);
-				}
+                if (speciesTE != null) {
+                    speciesTE.setSpecies(this);
+                }
             }
 
             return true;
@@ -1081,11 +1081,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     //This is used to load the sapling model
     public ResourceLocation getSaplingRegName() {
-		if (saplingName == null) {
+        if (saplingName == null) {
             return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
         } else {
-			return new ResourceLocation(getRegistryName().getNamespace(), saplingName);
-		}
+            return new ResourceLocation(getRegistryName().getNamespace(), saplingName);
+        }
     }
 
     public void setSaplingName(String name) {
@@ -1137,9 +1137,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     private void placeRootyDirtBlock(IWorld world, BlockPos rootPos, Block primitiveDirt, int fertility) {
         RootyBlock rootyBlock = SoilHelper.getProperties(primitiveDirt).getDynamicSoilBlock();
-		if (rootyBlock != null) {
-			this.placeRootyDirtBlock(world, rootPos, rootyBlock, fertility);
-		}
+        if (rootyBlock != null) {
+            this.placeRootyDirtBlock(world, rootPos, rootyBlock, fertility);
+        }
     }
 
     private void placeRootyDirtBlock(IWorld world, BlockPos rootPos, RootyBlock rootyBlock, int fertility) {
@@ -1339,9 +1339,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     private boolean doesRot = true;
 
-    public void setDoesRot (boolean doesRot){
+    public void setDoesRot(boolean doesRot) {
         this.doesRot = doesRot;
-    }/**
+    }
+
+    /**
      * Handles rotting branches.
      *
      * @param world         The world
@@ -1355,11 +1357,14 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @param growLeaves    {@code true} if this rot should attempt to grow leaves first.
      * @return true if the branch should rot
      */
-    public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {if (!doesRot) return false;
+    public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
+        if (!doesRot) {
+            return false;
+        }
         if (radius <= family.getPrimaryThickness()) {
-			if (!getLeavesProperties().getDynamicLeavesBlock().isPresent()) {
-				return false;
-			}
+            if (!getLeavesProperties().getDynamicLeavesBlock().isPresent()) {
+                return false;
+            }
 
             if (growLeaves) {
                 final DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
@@ -1375,7 +1380,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
         if (rapid || (DTConfigs.MAX_BRANCH_ROT_RADIUS.get() != 0 && radius <= DTConfigs.MAX_BRANCH_ROT_RADIUS.get())) {
             BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
-			if (branch != null) {
+            if (branch != null) {
                 branch.rot(world, pos);
             }
             this.postRot(new PostRotContext(world, pos, this, radius, neighborCount, fertility, rapid));
@@ -1413,9 +1418,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @return The chance this will postRot. 0.0(never) -> 1.0(always)
      */
     public float rotChance(IWorld world, BlockPos pos, Random rand, int radius) {
-		if (radius == 0) {
-			return 0;
-		}
+        if (radius == 0) {
+            return 0;
+        }
         return 0.3f + ((1f / radius));// Thicker branches take longer to postRot
     }
 
@@ -1504,9 +1509,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      */
     public Direction selectNewDirection(World world, BlockPos pos, BranchBlock branch, GrowSignal signal) {
         Direction growthLogicDir = getGrowthLogicKit().selectNewDirection(world, pos, this, branch, signal);
-		if (growthLogicDir != null) {
-			return growthLogicDir; //if the growth logic kit overrides selectNewDirection, use that
-		}
+        if (growthLogicDir != null) {
+            return growthLogicDir; //if the growth logic kit overrides selectNewDirection, use that
+        }
 
         Direction originDir = signal.dir.getOpposite();
 
@@ -1802,9 +1807,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     }
 
     public boolean testFlowerSeasonHold(Float seasonValue) {
-		if (seasonalFruitingOffset == null) {
-			return false;
-		}
+        if (seasonalFruitingOffset == null) {
+            return false;
+        }
         return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin + seasonalFruitingOffset, flowerSeasonHoldMax + seasonalFruitingOffset);
     }
 
@@ -1829,9 +1834,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
         //Tree fertilizer from the Create mod should do a bit more than bonemeal since its quite expensive to obtain.
         //So it just does the Burgeoning potion effect
-		if (itemStack.getItem().getRegistryName().equals(new ResourceLocation("create", "tree_fertilizer"))) {
-			return new GrowthSubstance();
-		}
+        if (itemStack.getItem().getRegistryName().equals(new ResourceLocation("create", "tree_fertilizer"))) {
+            return new GrowthSubstance();
+        }
 
         return null;
     }
@@ -1851,12 +1856,12 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
         if (effect != null) {
             boolean applied = effect.apply(world, rootPos);
-			if (applied && effect.isLingering()) {
-				world.addFreshEntity(new LingeringEffectorEntity(world, rootPos, effect));
-				return true;
-			} else {
-				return applied;
-			}
+            if (applied && effect.isLingering()) {
+                world.addFreshEntity(new LingeringEffectorEntity(world, rootPos, effect));
+                return true;
+            } else {
+                return applied;
+            }
         }
 
         return false;
@@ -1930,9 +1935,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     }
 
     public boolean showSpeciesOnWaila() {
-		if (alwaysShowOnWaila == null) {
-			return this != getFamily().getCommonSpecies();
-		}
+        if (alwaysShowOnWaila == null) {
+            return this != getFamily().getCommonSpecies();
+        }
         return this.alwaysShowOnWaila;
     }
 
@@ -2044,24 +2049,30 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     /**
      * Adds the default configuration of the {@link GenFeature} given.
+     * <p>
+     * Note that the {@link GenFeature} may abort its addition if {@link GenFeature#onApplied(Species,
+     * ConfiguredGenFeature)} returns {@code false}.
      *
-     * @param feature The {@link GenFeature} to add.
-     * @return This {@link Species} object.
+     * @param feature the {@link GenFeature} to add
+     * @return this {@link Species} object for chaining
      */
     public Species addGenFeature(GenFeature feature) {
         return this.addGenFeature(feature.getDefaultConfiguration());
     }
 
     /**
-     * Adds a {@link ConfiguredGenFeature} object to this species.The GenFeature can cancel its addition if {@link
-     * GenFeature#onGenFeatureAdded(Species, ConfiguredGenFeature)} returns false.
+     * Adds the specified {@code configuration} to this species.
+     * <p>
+     * Note that the {@link GenFeature} can abort its addition if {@link GenFeature#onApplied(Species,
+     * ConfiguredGenFeature)} returns {@code false}.
      *
-     * @param configuredGenFeature The {@link ConfiguredGenFeature} to add.
-     * @return This {@link Species} object.
+     * @param configuration the configured gen feature to add
+     * @return this {@link Species} object for chaining
      */
-    public Species addGenFeature(ConfiguredGenFeature<GenFeature> configuredGenFeature) {
-        if (configuredGenFeature.getGenFeature().onGenFeatureAdded(this, configuredGenFeature)) {
-        this.genFeatures.add(configuredGenFeature);}
+    public Species addGenFeature(ConfiguredGenFeature<GenFeature> configuration) {
+        if (configuration.getGenFeature().onApplied(this, configuration)) {
+            this.genFeatures.add(configuration);
+        }
         return this;
     }
 
@@ -2103,7 +2114,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * Allows the tree to decorate itself after it has been generated. Use this to add vines, add fruit, fix the soil,
      * add butress roots etc.
      *
-     * @param context           The {@link PostGenerationContext} instance.
+     * @param context The {@link PostGenerationContext} instance.
      */
     public void postGeneration(PostGenerationContext context) {
         this.genFeatures

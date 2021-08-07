@@ -142,10 +142,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
      * The {@link CellKit}, which is for leaves automata.
      */
     protected CellKit cellKit;
-    /**
-     * The {@link CellKit}, which is for leaves automata.
-     */
-    protected CellKit cellKit;
 
     protected Family family;
     protected BlockState[] dynamicLeavesBlockHydroStates = new BlockState[maxHydro + 1];
