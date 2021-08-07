@@ -13,7 +13,7 @@ import sereneseasons.season.SeasonHooks;
 
 import java.util.Objects;
 
-public class SeasonProviderSereneSeasons implements ISeasonProvider {
+public class SereneSeasonsSeasonProvider implements ISeasonProvider {
 
     private float seasonValue = 1.0f;
 
@@ -30,7 +30,7 @@ public class SeasonProviderSereneSeasons implements ISeasonProvider {
     @Override
     public boolean shouldSnowMelt(World world, BlockPos pos) {
         if (SeasonsConfig.generateSnowAndIce.get() && seasonValue < com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.WINTER) {
-            RegistryKey<Biome> biome = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getBiome(pos).getRegistryName()));
+            final RegistryKey<Biome> biome = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getBiome(pos).getRegistryName()));
             return BiomeConfig.enablesSeasonalEffects(biome) &&
                     SeasonHooks.getBiomeTemperature(world, biome, pos) >= 0.15f;
         }

@@ -1,7 +1,7 @@
 {
     "family": "jungle",
     "tapering": 0.2,
-    "signal_energy": 28.0,
+    "signal_energy": 24.0,
     "up_probability": 3,
     "lowest_branch_height": 2,
     "growth_rate": 1.0,

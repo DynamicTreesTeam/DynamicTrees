@@ -120,14 +120,30 @@ dependencies {
     // At runtime, use Patchouli mod (for the guide book, which is Json so we don"t need the API).
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
 
-    //At runtime use ComputerCraft for creating the growth chambers
+    // At runtime use, CC for creating growth chambers.
     runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3236650"))
 
-    // Compile full Serene Seasons mod and use in runtime.
-    implementation(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))
+    // Compile Serene Seasons.
+    compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))
+
+    // Compile Better Weather API.
+    compileOnly(fg.deobf("curse.maven:BetterWeatherAPI-400714:3403615"))
+
+//    useSereneSeasons(this)
+    useBetterWeather(this)
 
     // At runtime, use suggestion provider fix mod.
     runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${mcVersion}-${property("suggestionProviderFixVersion")}"))
+}
+
+fun useSereneSeasons(depHandler: DependencyHandlerScope) {
+    // At runtime, use full Serene Seasons mod.
+    depHandler.runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))
+}
+
+fun useBetterWeather(depHandler: DependencyHandlerScope) {
+    // At runtime, use the full Better Weather mod.
+    depHandler.runtimeOnly(fg.deobf("curse.maven:BetterWeather-400714:3403614"))
 }
 
 tasks.jar {
@@ -165,7 +181,7 @@ curseforge {
     if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
         apiKey = property("curseApiKey")
 
-        project(closureOf<CurseProject> {
+        project {
             id = "252818"
 
             addGameVersion("1.16.4")
@@ -177,13 +193,13 @@ curseforge {
 
             addArtifact(tasks.findByName("sourcesJar"))
 
-            mainArtifact(tasks.findByName("jar"), closureOf<CurseArtifact>{
-                relations(closureOf<CurseRelation> {
+            mainArtifact(tasks.findByName("jar")) {
+                relations {
                     optionalDependency("dynamictreesplus")
                     optionalDependency("chunk-saving-fix")
-                })
-            })
-        })
+                }
+            }
+        }
     } else {
         project.logger.log(LogLevel.WARN, "API Key and file type for CurseForge not detected; uploading will be disabled.")
     }
@@ -259,4 +275,18 @@ publishing {
             logger.log(LogLevel.WARN, "Credentials for maven not detected; it will be disabled.")
         }
     }
+}
+
+// Extensions to make CurseGradle extension slightly neater.
+
+fun com.matthewprenger.cursegradle.CurseExtension.project(action: CurseProject.() -> Unit) {
+    this.project(closureOf(action))
+}
+
+fun CurseProject.mainArtifact(artifact: Task?, action: CurseArtifact.() -> Unit) {
+    this.mainArtifact(artifact, closureOf(action))
+}
+
+fun CurseArtifact.relations(action: CurseRelation.() -> Unit) {
+    this.relations(closureOf(action))
 }

@@ -171,7 +171,7 @@ public class BiomePropertySelectors {
                 chance -= entry.weight;
             }
 
-			return decisionTable.get(decisionTable.size() - 1).decision;
+            return decisionTable.get(decisionTable.size() - 1).decision;
         }
 
     }

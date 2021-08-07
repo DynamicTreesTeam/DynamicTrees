@@ -33,8 +33,7 @@ public class BiomePredicateGenFeature extends GenFeature {
         final boolean worldGen = context.isWorldGen();
         final ConfiguredGenFeature<GenFeature> configuredGenFeatureToPlace = configuration.get(GEN_FEATURE);
 
-        if (configuration.getGenFeature().getRegistryName().equals(DTTrees.NULL)) // If the gen feature was null, do nothing.
-        {
+        if (configuration.getGenFeature().getRegistryName().equals(DTTrees.NULL)) { // If the gen feature was null, do nothing.
             return false;
         }
 

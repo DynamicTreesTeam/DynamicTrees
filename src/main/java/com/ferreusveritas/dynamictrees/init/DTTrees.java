@@ -128,8 +128,8 @@ public class DTTrees {
     private static void replaceFeatureConfigs(WeightedBlockStateProvider featureConfig, Block crimsonSapling, Block warpedSapling) {
         for (final WeightedList.Entry<BlockState> entry : featureConfig.weightedList.entries) {
 			if (entry.data.getBlock() == Blocks.CRIMSON_FUNGUS) {
-				entry.data = crimsonSapling.defaultBlockState();
-			}
+                entry.data = crimsonSapling.defaultBlockState();
+            }
 			if (entry.data.getBlock() == Blocks.WARPED_FUNGUS) {
 				entry.data = warpedSapling.defaultBlockState();
 			}

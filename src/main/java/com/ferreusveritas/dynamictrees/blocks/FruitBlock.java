@@ -197,7 +197,7 @@ public class FruitBlock extends Block implements IGrowable {
         return ActionResultType.FAIL;
     }
 
-    private void dropBlock(World worldIn, BlockState state, BlockPos pos) {
+    protected void dropBlock(World worldIn, BlockState state, BlockPos pos) {
         worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
         if (state.getValue(AGE) >= 3) {
             worldIn.addFreshEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, this.getFruitDrop(fruitDropCount(state, worldIn, pos))));

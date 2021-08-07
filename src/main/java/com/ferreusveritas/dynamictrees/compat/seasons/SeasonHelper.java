@@ -1,8 +1,11 @@
 package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import com.ferreusveritas.dynamictrees.api.seasons.ISeasonManager;
+import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.util.function.Supplier;
 
 public class SeasonHelper {
 
@@ -17,7 +20,7 @@ public class SeasonHelper {
     public static final float DRY = SUMMER;
     public static final float WET = WINTER;
 
-    private static ISeasonManager seasonManager = new SeasonManager();
+    private static ISeasonManager seasonManager = SeasonManager.NULL.get();
 
     static public ISeasonManager getSeasonManager() {
         return seasonManager;
@@ -25,6 +28,10 @@ public class SeasonHelper {
 
     /**
      * Maybe you don't like the global function season function.  Fine, do it all yourself then!
+     *
+     * <p>Add-ons should not use this method! {@link CompatHandler#registerSeasonManager(String, Supplier)}
+     * should be used to register a season manager for a corresponding mod to respect the preferred season mod
+     * configuration option.</p>
      */
     static public void setSeasonManager(ISeasonManager manager) {
         seasonManager = manager;

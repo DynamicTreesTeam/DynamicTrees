@@ -14,7 +14,8 @@ import net.minecraftforge.common.IPlantable;
 
 /**
  * A {@link GenFeature} handling the default post rot behaviour: turning the rotted branch into the {@link #MUSHROOM}
- * set in the {@link ConfiguredGenFeature} object.
+ * set
+ * in the {@link ConfiguredGenFeature} object.
  *
  * @author Harley O'Connor
  */

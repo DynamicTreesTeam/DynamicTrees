@@ -9,6 +9,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ToolType;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +37,7 @@ public class WartProperties extends SolidLeavesProperties {
 
     @Override
     public AbstractBlock.Properties getDefaultBlockProperties(Material material, MaterialColor materialColor) {
-        return AbstractBlock.Properties.of(material, materialColor).strength(1.0F).sound(SoundType.WART_BLOCK).randomTicks();
+        return AbstractBlock.Properties.of(material, materialColor).strength(1.0F).sound(SoundType.WART_BLOCK).harvestTool(ToolType.HOE).randomTicks();
     }
 
     @Override

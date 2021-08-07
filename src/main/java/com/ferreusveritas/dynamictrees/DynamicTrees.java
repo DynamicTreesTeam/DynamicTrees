@@ -40,6 +40,7 @@ public final class DynamicTrees {
     public static final String MINECRAFT = "minecraft";
     public static final String FORGE = "forge";
     public static final String SERENE_SEASONS = "sereneseasons";
+    public static final String BETTER_WEATHER = "betterweather";
     public static final String FAST_LEAF_DECAY = "fastleafdecay";
     public static final String PASSABLE_FOLIAGE = "passablefoliage";
 
@@ -85,7 +86,7 @@ public final class DynamicTrees {
         modEventBus.addListener(this::gatherData);
 
         EventHandlers.registerCommon();
-        CompatHandler.init();
+        CompatHandler.registerBuiltInSeasonManagers();
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {

@@ -7,12 +7,13 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGeneratio
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
-public class BottomFlareGenFeature extends GenFeature {
+public class BottomFlareGenFeature extends GenFeature  {
 
     // Min radius for the flare.
     public static final ConfigurationProperty<Integer> MIN_RADIUS = ConfigurationProperty.integer("min_radius");

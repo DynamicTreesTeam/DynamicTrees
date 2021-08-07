@@ -37,7 +37,7 @@ public class ConfigurationProperty<T> {
     }
 
     /**
-     * Gets an {@link DeserialisationResult} for the property's value from the given {@link JsonObject}, or null if it
+     * Gets a {@link DeserialisationResult} for the property's value from the given {@link JsonObject}, or null if it
      * was not found.
      *
      * @param jsonObject The {@link JsonObject} to fetch from.

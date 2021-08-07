@@ -84,7 +84,8 @@ public interface IRegistry<V extends RegistryEntry<V>> extends Iterable<V> {
     boolean isLocked();
 
     /**
-     * Locks the registries, dumping all registry objects to debug log and running any {@link #onLockRunnables}.
+     * Locks the registries, dumping all registry objects to debug log and running any on lock runnables given to {@link
+     * #runOnNextLock(Runnable)}.
      */
     void lock();
 

@@ -292,7 +292,7 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                         } else {
                             LOGGER.warn("Unknown value for key 'white' in populator '" + resourceLocation + "': '" + str + "'.");
                         }
-                    }).elseWarn("Error parsing key 'white' in populator '" + resourceLocation + "': ");
+                    }}).elseWarn("Error parsing key 'white' in populator '" + resourceLocation + "': ");
         }
 
         if (database == this.defaultDatabase) {

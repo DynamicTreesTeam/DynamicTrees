@@ -40,9 +40,7 @@ public class NullTreePart implements ITreePart {
                 return rad;
             }
         }
-        //Twigs connect to Vanilla leaves
-        if (fromRadius == 1) {
-            return from.getFamily().isCompatibleVanillaLeaves(from.getFamily().getCommonSpecies(), state, reader, pos) ? 1 : 0;
+
         }
         return 0;
     }
@@ -81,5 +79,4 @@ public class NullTreePart implements ITreePart {
     public final TreePartType getTreePartType() {
         return TreePartType.NULL;
     }
-
 }

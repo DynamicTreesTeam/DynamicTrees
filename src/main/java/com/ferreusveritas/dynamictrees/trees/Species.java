@@ -124,9 +124,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         @Override
         public float biomeSuitability(World world, BlockPos pos) {
             return 0.0f;
-        }
 
-        @Override
+
+        }@Override
         public Species addDropCreators(DropCreator... dropCreators) {
             return this;
         }
@@ -134,9 +134,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         @Override
         public Species setSeed(Seed seed) {
             return this;
-        }
 
-        @Override
+
+        }@Override
         public ItemStack getSeedStack(int qty) {
             return ItemStack.EMPTY;
         }
@@ -149,9 +149,9 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         @Override
         public ITextComponent getTextComponent() {
             return this.formatComponent(new TranslationTextComponent("gui.none"), TextFormatting.DARK_RED);
-        }
 
-        @Override
+
+        }@Override
         public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
             return false;
         }
@@ -689,8 +689,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     public ResourceLocation getSeedName() {
 		if (seedName == null) {
-			return ResourceLocationUtils.suffix(getRegistryName(), "_seed");
-		} else {
+            return ResourceLocationUtils.suffix(getRegistryName(), "_seed");
+        } else {
 			return new ResourceLocation(getRegistryName().getNamespace(), seedName);
 		}
     }
@@ -1082,8 +1082,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     //This is used to load the sapling model
     public ResourceLocation getSaplingRegName() {
 		if (saplingName == null) {
-			return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
-		} else {
+            return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
+        } else {
 			return new ResourceLocation(getRegistryName().getNamespace(), saplingName);
 		}
     }
@@ -1337,7 +1337,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     static private final Direction[] upFirst = {Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 
-    /**
+    private boolean doesRot = true;
+
+    public void setDoesRot (boolean doesRot){
+        this.doesRot = doesRot;
+    }/**
      * Handles rotting branches.
      *
      * @param world         The world
@@ -1351,7 +1355,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @param growLeaves    {@code true} if this rot should attempt to grow leaves first.
      * @return true if the branch should rot
      */
-    public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
+    public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {if (!doesRot) return false;
         if (radius <= family.getPrimaryThickness()) {
 			if (!getLeavesProperties().getDynamicLeavesBlock().isPresent()) {
 				return false;
@@ -1372,8 +1376,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         if (rapid || (DTConfigs.MAX_BRANCH_ROT_RADIUS.get() != 0 && radius <= DTConfigs.MAX_BRANCH_ROT_RADIUS.get())) {
             BranchBlock branch = TreeHelper.getBranch(world.getBlockState(pos));
 			if (branch != null) {
-				branch.rot(world, pos);
-			}
+                branch.rot(world, pos);
+            }
             this.postRot(new PostRotContext(world, pos, this, radius, neighborCount, fertility, rapid));
             return true;
         }
@@ -1761,20 +1765,20 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
             int seasonFlags = 0;
             for (int i = 0; i < 4; i++) {
                 boolean isValidSeason = false;
-				if (seasonalFruitingOffset != null) {
-					final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
-					final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonEnd - seasonalFruitingOffset) * 64.0f), 0), true);
-					if (Math.min(prod1, prod2) > threshold) {
-						isValidSeason = true;
-					}
+                if (seasonalFruitingOffset != null) {
+                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
+                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world, new BlockPos(0, (int) ((i + seasonEnd - seasonalFruitingOffset) * 64.0f), 0), true);
+                    if (Math.min(prod1, prod2) > threshold) {
+                        isValidSeason = true;
+                    }
 
-				} else {
-					isValidSeason = true;
-				}
+                } else {
+                    isValidSeason = true;
+                }
 
-				if (isValidSeason) {
-					seasonFlags |= 1 << i;
-				}
+                if (isValidSeason) {
+                    seasonFlags |= 1 << i;
+                }
 
             }
             return seasonFlags;
@@ -2049,13 +2053,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     }
 
     /**
-     * Adds a {@link ConfiguredGenFeature} object to this species.
+     * Adds a {@link ConfiguredGenFeature} object to this species.The GenFeature can cancel its addition if {@link
+     * GenFeature#onGenFeatureAdded(Species, ConfiguredGenFeature)} returns false.
      *
      * @param configuredGenFeature The {@link ConfiguredGenFeature} to add.
      * @return This {@link Species} object.
      */
     public Species addGenFeature(ConfiguredGenFeature<GenFeature> configuredGenFeature) {
-        this.genFeatures.add(configuredGenFeature);
+        if (configuredGenFeature.getGenFeature().onGenFeatureAdded(this, configuredGenFeature)) {
+        this.genFeatures.add(configuredGenFeature);}
         return this;
     }
 
@@ -2097,7 +2103,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * Allows the tree to decorate itself after it has been generated. Use this to add vines, add fruit, fix the soil,
      * add butress roots etc.
      *
-     * @param context The {@link PostGenerationContext} instance.
+     * @param context           The {@link PostGenerationContext} instance.
      */
     public void postGeneration(PostGenerationContext context) {
         this.genFeatures

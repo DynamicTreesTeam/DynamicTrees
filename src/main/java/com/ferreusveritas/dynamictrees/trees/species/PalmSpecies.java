@@ -22,6 +22,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -101,36 +102,39 @@ public class PalmSpecies extends Species {
     @Override
     public HashMap<BlockPos, BlockState> getFellingLeavesClusters(BranchDestructionData destructionData) {
 
-        if (destructionData.getNumEndpoints() < 1) {
+        int endPointsNum = destructionData.getNumEndpoints();
+
+        if (endPointsNum < 1) {
             return null;
         }
 
         HashMap<BlockPos, BlockState> leaves = new HashMap<>();
-        BlockPos relPos = destructionData.getEndPointRelPos(0).above(2);//A palm tree is only supposed to have one endpoint at it's top.
-        if (destructionData.trunkHeight == 1) {
+
+        for (int i = 0; i < endPointsNum; i++) {
+            BlockPos relPos = destructionData.getEndPointRelPos(i).above(2);//A palm tree is only supposed to have one endpoint at it's top.
             relPos = relPos.below();
-        }
-        LeavesProperties leavesProperties = destructionData.species.getLeavesProperties();
+            LeavesProperties leavesProperties = destructionData.species.getLeavesProperties();
 
-        Set<BlockPos> existingLeaves = new HashSet<>();
-        for (int i = 0; i < destructionData.getNumLeaves(); i++) {
-            existingLeaves.add(destructionData.getLeavesRelPos(i));
-        }
+            Set<BlockPos> existingLeaves = new HashSet<>();
+            for (int j = 0; j < destructionData.getNumLeaves(); j++) {
+                existingLeaves.add(destructionData.getLeavesRelPos(j));
+            }
 
-        if (existingLeaves.contains(relPos)) {
-            leaves.put(relPos, leavesProperties.getDynamicLeavesState(4));//The barky overlapping part of the palm frond cluster
-        }
-        if (existingLeaves.contains(relPos.above())) {
-            leaves.put(relPos.above(), leavesProperties.getDynamicLeavesState(3));//The leafy top of the palm frond cluster
-        }
+            if (existingLeaves.contains(relPos)) {
+                    leaves.put(relPos, leavesProperties.getDynamicLeavesState(4));//The barky overlapping part of the palm frond cluster
+                }
+            if (existingLeaves.contains(relPos.above())) {
+                leaves.put(relPos.above(), leavesProperties.getDynamicLeavesState(3));//The leafy top of the palm frond cluster
+            }
 
-        //The 4 corners and 4 sides of the palm frond cluster
-        for (int hydro = 1; hydro <= 2; hydro++) {
-            BlockState state = leavesProperties.getDynamicLeavesState(hydro);
-            for (CoordUtils.Surround surr : PalmLeavesProperties.DynamicPalmLeavesBlock.hydroSurroundMap[hydro]) {
-                BlockPos leafPos = relPos.above().offset(surr.getOpposite().getOffset());
-                if (existingLeaves.contains(leafPos)) {
-                    leaves.put(leafPos, PalmLeavesProperties.DynamicPalmLeavesBlock.getDirectionState(state, surr));
+            //The 4 corners and 4 sides of the palm frond cluster
+            for (int hydro = 1; hydro <= 2; hydro++) {
+                BlockState state = leavesProperties.getDynamicLeavesState(hydro);
+                for (CoordUtils.Surround surr : PalmLeavesProperties.DynamicPalmLeavesBlock.hydroSurroundMap[hydro]) {
+                    BlockPos leafPos = relPos.above().offset(surr.getOpposite().getOffset());
+                    if (existingLeaves.contains(leafPos)) {
+                        leaves.put(leafPos, PalmLeavesProperties.DynamicPalmLeavesBlock.getDirectionState(state, surr));
+                    }
                 }
             }
         }

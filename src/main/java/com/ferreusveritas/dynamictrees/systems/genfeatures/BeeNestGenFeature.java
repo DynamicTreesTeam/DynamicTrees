@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
+import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
@@ -47,10 +48,10 @@ public class BeeNestGenFeature extends GenFeature {
     public static final ConfigurationProperty<Block> NEST_BLOCK = ConfigurationProperty.block("nest");
     public static final ConfigurationProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = ConfigurationProperty.property("world_gen_chance", WorldGenChanceFunction.class);
 
-    private static final float PLAINS_CHANCE = 0.05f;
-    private static final float FLOWER_FOREST_CHANCE = 0.02f;
-    private static final float FOREST_CHANCE = 0.0005f;
-    private static final float CHANCE = 0.001f;
+    private static final double PLAINS_CHANCE = 0.05f;
+    private static final double FLOWER_FOREST_CHANCE = 0.02f;
+    private static final double FOREST_CHANCE = 0.0005f;
+    private static final double CHANCE = 0.001f;
 
     public BeeNestGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -86,7 +87,7 @@ public class BeeNestGenFeature extends GenFeature {
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST)) {
                 return FOREST_CHANCE;
             }
-            return 0F;
+            return 0D;
         }).with(MAX_COUNT, 1);
     }
 
@@ -225,7 +226,7 @@ public class BeeNestGenFeature extends GenFeature {
         return validSpaces;
     }
 
-    public interface WorldGenChanceFunction extends BiFunction<IWorld, BlockPos, Float> {
+    public interface WorldGenChanceFunction extends BiFunction<IWorld, BlockPos, Double> {
     }
 
 }

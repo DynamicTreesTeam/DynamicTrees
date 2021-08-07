@@ -1,12 +1,13 @@
 {
     "family": "jungle",
-    "tapering": 0.2,
-    "signal_energy": 32.0,
-    "up_probability": 5,
+    "tapering": 0.17,
+    "signal_energy": 35.0,
+    "up_probability": 10,
     "lowest_branch_height": 8,
     "growth_rate": 1.2,
-    "soil_longevity": 16,
+    "soil_longevity": 12,
     "max_branch_radius": 24,
+    "world_gen_leaf_map_height": 40,
     "growth_logic_kit": "jungle",
     "leaves_properties": "jungle",
     "environment_factors" : {
@@ -34,7 +35,7 @@
             "name": "roots",
             "properties": {
                 "min_trunk_radius": 9,
-                "scale_factor": 18
+                "scale_factor": 20
             }
         },
         "clear_volume",

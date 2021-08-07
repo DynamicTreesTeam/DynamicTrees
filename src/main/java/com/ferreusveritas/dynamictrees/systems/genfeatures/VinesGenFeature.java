@@ -101,7 +101,7 @@ public class VinesGenFeature extends GenFeature {
         final int fruitingRadius = configuration.get(FRUITING_RADIUS);
 
         if (fruitingRadius < 0 || context.fertility() < 1) {
-            return false;
+            return false;}
         }
 
         final BlockState blockState = world.getBlockState(context.treePos());

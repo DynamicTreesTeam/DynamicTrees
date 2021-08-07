@@ -12,11 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class SeasonManager implements ISeasonManager {
 
+	public static final Supplier<SeasonManager> NULL = SeasonManager::new;
+
     private final Map<ResourceLocation, SeasonContext> seasonContextMap = new HashMap<>();
-    private Function<World, Tuple<ISeasonProvider, ISeasonGrowthCalculator>> seasonMapper = w -> new Tuple<>(new SeasonProviderNull(), new SeasonGrowthCalculatorNull());
+    private Function<World, Tuple<ISeasonProvider, ISeasonGrowthCalculator>> seasonMapper = w -> new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator());
 
     public SeasonManager() {
     }

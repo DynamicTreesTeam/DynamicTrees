@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
+import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -69,6 +70,7 @@ public class DTConfigs {
 
     public static final ForgeConfigSpec.BooleanValue WORLD_GEN_DEBUG;
 
+    public static final ForgeConfigSpec.ConfigValue<String> PREFERRED_SEASON_MOD;
     public static final ForgeConfigSpec.BooleanValue ENABLE_SEASONAL_SEED_DROP_FACTOR;
     public static final ForgeConfigSpec.BooleanValue ENABLE_SEASONAL_GROWTH_FACTOR;
     public static final ForgeConfigSpec.BooleanValue ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR;
@@ -174,9 +176,12 @@ public class DTConfigs {
         COMMON_BUILDER.pop();
 
         COMMON_BUILDER.comment("Mod Integration Settings").push("integration");
-        ENABLE_SEASONAL_SEED_DROP_FACTOR = COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
+        PREFERRED_SEASON_MOD = COMMON_BUILDER.comment("The mod ID of preferred season mod. If a season provider for this mod ID is present, it will be used for integration with seasons. Set this to \"!\" to disable integration or \"*\" to accept the any integration (the first available).")
+                .define("preferredSeasonMod", CompatHandler.ANY);ENABLE_SEASONAL_SEED_DROP_FACTOR = COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalSeedDropFactor", true);
-        ENABLE_SEASONAL_GROWTH_FACTOR = COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
+		ENABLE_SEASONAL_SEED_DROP_FACTOR = COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
+				define("enableSeasonalSeedDropFactor", true);
+		ENABLE_SEASONAL_GROWTH_FACTOR = COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalGrowthFactor", true);
         ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR = COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalFruitProductionFactor", true);
@@ -201,11 +206,13 @@ public class DTConfigs {
     @SubscribeEvent
     public static void onLoad(final ModConfig.Loading event) {
         EventHandlers.configReload();
+    CompatHandler.reloadSeasonManager();
     }
 
     @SubscribeEvent
     public static void onReload(final ModConfig.Reloading event) {
         EventHandlers.configReload();
+        CompatHandler.reloadSeasonManager();
     }
 
 }

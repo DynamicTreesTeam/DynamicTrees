@@ -91,10 +91,6 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
         public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
             return Species.NULL_SPECIES;
         }
-
-        @Override
-        public void addConnectable(IConnectable connectable) {
-        }
     };
 
     /**
@@ -248,9 +244,9 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
      */
     public Species getSpeciesForLocation(IBlockReader world, BlockPos trunkPos, Species defaultSpecies) {
         for (final Species species : this.species) {
-			if (species.shouldOverrideCommon(world, trunkPos)) {
-				return species;
-			}
+            if (species.shouldOverrideCommon(world, trunkPos)) {
+                return species;
+            }
         }
 
         return defaultSpecies;
@@ -308,8 +304,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
     }
 
     public boolean stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
-		if (getStrippedBranch() != null) {
-			this.getBranch().stripBranch(state, world, pos, player, heldItem);
+        if (getStrippedBranch() != null) {
+            this.getBranch().stripBranch(state, world, pos, player, heldItem);
 
 			if (world.isClientSide) {
 				world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
@@ -731,37 +727,8 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
                 || species.isValidLeafBlock(leaves));
     }
 
-    public interface IConnectable {
-        boolean isConnectable(BlockState blockState);
-    }
-
-    LinkedList<IConnectable> vanillaConnectables = new LinkedList<>();
-
-    public void addConnectable(IConnectable connectable) {
-        this.vanillaConnectables.add(connectable);
-    }
-
-    public void removeConnectable(IConnectable connectable) {
-        this.vanillaConnectables.remove(connectable);
-    }
-
-    public boolean isCompatibleVanillaLeaves(Species species, BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
-
-        Block block = blockState.getBlock();
-
-        if (!(block instanceof DynamicLeavesBlock)) {
-            for (IConnectable connectable : vanillaConnectables) {
-                if (connectable.isConnectable(blockState)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     public boolean isCompatibleGenericLeaves(final Species species, BlockState blockState, IWorld blockAccess, BlockPos pos) {
-        return this.isCompatibleDynamicLeaves(species, blockState, blockAccess, pos) || this.isCompatibleVanillaLeaves(species, blockState, blockAccess, pos);
+        return this.isCompatibleDynamicLeaves(species, blockState, blockAccess, pos);
     }
 
     public LeavesProperties getCommonLeaves() {

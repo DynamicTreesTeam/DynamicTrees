@@ -18,6 +18,7 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.ToolTypes;
 import net.minecraft.block.*;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -491,7 +492,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
     public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
         if (signal.step()) // This is always placed at the beginning of every growSignal function.
         {
-            this.branchOut(world, pos, signal); // When a growth signal hits a leaf block it attempts to become a tree branch.
+            this.branchOut(world, pos, signal); // When a growth signal hits a leaf block it attempts to become a tree branch.}
         }
         return signal;
     }
@@ -505,14 +506,14 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
      * @param leavesProperties The {@link LeavesProperties} required.
      * @return {@code true} if the leaves are at the given {@link BlockPos}; {@code false} otherwise.
      */
-    public boolean needLeaves(World world, BlockPos pos, LeavesProperties leavesProperties) {
+    public boolean needLeaves(World world, BlockPos pos, LeavesProperties leavesProperties, Species species) {
         if (world.isEmptyBlock(pos)) { // Place leaves if air.
             return this.growLeavesIfLocationIsSuitable(world, leavesProperties, pos, leavesProperties.getCellKit().getDefaultHydration());
         } else { // Otherwise check if there's already this type of leaves there.
-            final BlockState blockState = world.getBlockState(pos);
-            final ITreePart treepart = TreeHelper.getTreePart(blockState);
+            final ITreePart treePart = TreeHelper.getTreePart(world.getBlockState(pos));
 
-            return treepart == this && leavesProperties == this.getProperties(blockState); // Check if this is the same type of leaves.
+
+            return treePart instanceof DynamicLeavesBlock && species.isValidLeafBlock((DynamicLeavesBlock) treePart); // Check if this leaves are valid for the species
         }
     }
 
@@ -521,7 +522,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
         LeavesProperties leavesProperties = signal.getSpecies().getLeavesProperties();
 
         //Check to be sure the placement for a branch is valid by testing to see if it would first support a leaves block
-        if (!needLeaves(world, pos, leavesProperties)) {
+        if (!needLeaves(world, pos, leavesProperties, signal.getSpecies())) {
             signal.success = false;
             return signal;
         }
@@ -535,7 +536,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
         boolean hasLeaves = false;
 
         for (Direction dir : Direction.values()) {
-            if (needLeaves(world, pos.relative(dir), leavesProperties)) {
+            if (needLeaves(world, pos.relative(dir), leavesProperties, signal.getSpecies())) {
                 hasLeaves = true;
                 break;
             }
@@ -601,13 +602,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
             return true;
         }
 
-        // Since shears don't have a ToolType, requireShears acts as an override.
+        // Since shears don't have a ToolType, requireShears acts as an override for shears not extending ShearsItem.
         if (this.getProperties(state).doRequireShears()) {
-            return item instanceof ShearsItem;
+            return item instanceof ShearsItem || item.getToolTypes(stack).contains(ToolTypes.SHEARS);
         }
 
-        final ToolType harvestTool = state.getHarvestTool();
-
+        final ToolType harvestTool = this.getHarvestTool(state);
         return harvestTool != null && item.getToolTypes(stack).contains(harvestTool);
     }
 

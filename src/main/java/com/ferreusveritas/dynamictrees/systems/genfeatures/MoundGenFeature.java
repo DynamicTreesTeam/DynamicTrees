@@ -47,7 +47,7 @@ public class MoundGenFeature extends GenFeature {
      * Used to create a 5x4x5 rounded mound that is one block higher than the ground surface. This is meant to replicate
      * the appearance of a root hill and gives generated surface roots a better appearance.
      *
-     * @param configuration The {@link ConfiguredGenFeature} instance.
+     * @param configuration                The {@link ConfiguredGenFeature} instance.
      * @param context       The {@link GenerationContext}.
      * @return The modified {@link BlockPos} of the rooty dirt that is one block higher.
      */
@@ -112,5 +112,4 @@ public class MoundGenFeature extends GenFeature {
 
         return false;
     }
-
 }
