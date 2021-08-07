@@ -22,7 +22,7 @@ public class SubstanceDeplete implements ISubstanceEffect {
 	}
 
 	@Override
-	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
+	public boolean update(World world, BlockPos rootPos, int deltaTicks, int fertility) {
 		return false;
 	}
 

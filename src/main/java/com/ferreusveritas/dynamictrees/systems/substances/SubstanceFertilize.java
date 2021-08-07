@@ -7,10 +7,13 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.function.Supplier;
+
 public class SubstanceFertilize implements ISubstanceEffect {
 
-	int amount = 1;
-	boolean grow;
+	private int amount = 2;
+	private boolean grow;
+	private int pulses = 1;
 
 	@Override
 	public boolean apply(World world, BlockPos rootPos) {
@@ -20,7 +23,9 @@ public class SubstanceFertilize implements ISubstanceEffect {
 				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.VILLAGER_HAPPY, 8);
 			} else {
 				if (grow) {
-					TreeHelper.growPulse(world, rootPos);
+					for (int i = 0; i < pulses; i++) {
+						TreeHelper.growPulse(world, rootPos);
+					}
 				}
 			}
 			return true;
@@ -29,7 +34,7 @@ public class SubstanceFertilize implements ISubstanceEffect {
 	}
 
 	@Override
-	public boolean update(World world, BlockPos rootPos, int deltaTicks) {
+	public boolean update(World world, BlockPos rootPos, int deltaTicks, int fertility) {
 		return false;
 	}
 
@@ -52,6 +57,11 @@ public class SubstanceFertilize implements ISubstanceEffect {
 	 */
 	public SubstanceFertilize setGrow(boolean grow) {
 		this.grow = grow;
+		return this;
+	}
+
+	public SubstanceFertilize setPulses(int pulses) {
+		this.pulses = pulses;
 		return this;
 	}
 

@@ -33,6 +33,15 @@ public class EntityLingeringEffector extends Entity {
 		}
 	}
 
+	public static boolean treeHasEffectorForEffect(World world, BlockPos pos, ISubstanceEffect effect) {
+		for (final EntityLingeringEffector effector : world.getEntitiesWithinAABB(EntityLingeringEffector.class, new AxisAlignedBB(pos))) {
+			if (effector.getEffect() != null && effector.getEffect().getName().equals(effect.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void setBlockPos(BlockPos pos) {
 		blockPos = pos;
 		setPosition(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
@@ -62,15 +71,25 @@ public class EntityLingeringEffector extends Entity {
 	protected void writeEntityToNBT(NBTTagCompound compound) {
 	}
 
+	private byte invalidTicks = 0;
+
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
 
-		if (effect != null) {
-			IBlockState blockState = world.getBlockState(blockPos);
+		if (this.effect == null) {
+			// If effect hasn't been set for 20 ticks then kill the entity.
+			if (++this.invalidTicks > 20) {
+				this.setDead();
+			}
+			return;
+		}
 
-			if (blockState.getBlock() instanceof BlockRooty) {
-				if (!effect.update(world, blockPos, ticksExisted)) {
+		if (effect != null) {
+			IBlockState state = world.getBlockState(blockPos);
+
+			if (state.getBlock() instanceof BlockRooty) {
+				if (!effect.update(world, blockPos, ticksExisted, state.getValue(BlockRooty.LIFE))) {
 					setDead();
 				}
 			} else {

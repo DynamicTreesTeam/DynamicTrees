@@ -1271,12 +1271,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 
 	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 
-		//Bonemeal fertilizes the soil and causes a single growth pulse
+		// Bonemeal fertilizes the soil and causes two growth pulses.
 		if (canBoneMeal() && itemStack.getItem() == Items.DYE && itemStack.getItemDamage() == 15) {
-			return new SubstanceFertilize().setAmount(1).setGrow(true);
+			return new SubstanceFertilize().setAmount(2).setGrow(true).setPulses(ModConfigs.boneMealGrowthPulses);
 		}
 
-		//Use substance provider interface if it's available
+		// Use substance provider interface if it's available.
 		if (itemStack.getItem() instanceof ISubstanceEffectProvider) {
 			ISubstanceEffectProvider provider = (ISubstanceEffectProvider) itemStack.getItem();
 			return provider.getSubstanceEffect(itemStack);
@@ -1300,11 +1300,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		ISubstanceEffect effect = getSubstanceEffect(itemStack);
 
 		if (effect != null) {
-			if (effect.isLingering()) {
+			if (effect.apply(world, rootPos) && effect.isLingering()) {
 				world.spawnEntity(new EntityLingeringEffector(world, rootPos, effect));
 				return true;
-			} else {
-				return effect.apply(world, rootPos);
 			}
 		}
 

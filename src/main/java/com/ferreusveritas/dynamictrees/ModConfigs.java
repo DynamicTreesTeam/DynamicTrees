@@ -38,6 +38,7 @@ public class ModConfigs {
 	public static float fallingTreeDamageMultiplier;
 	public static boolean dirtBucketPlacesDirt;
 	public static boolean enableAltLeavesSnow;
+	public static int boneMealGrowthPulses;
 
 	public static boolean replaceVanillaSapling;
 
@@ -91,6 +92,7 @@ public class ModConfigs {
 		fallingTreeDamageMultiplier = config.getFloat("fallingTreeDamageMultiplier", "interaction", 1.0f, 0.0f, 100.0f, "Multiplier for damage incurred by a falling tree");
 		dirtBucketPlacesDirt = config.getBoolean("dirtBucketPlacesDirt", "interaction", true, "If enabled the Dirt Bucket will place a dirt block on right-click");
 		enableAltLeavesSnow = config.getBoolean("enableAltLeavesSnow", "interaction", false, "If enabled then an alternate(non-vanilla) snow layer block will be used on top of leaves");
+		boneMealGrowthPulses = config.getInt("boneMealGrowthPulses", "interaction", 1, 1, 512, "The amount of growth pulses to send when bone meal is applied to a tree. Setting values higher than 64 is not recommended other than for testing purposes.");
 
 		//Vanilla
 		replaceVanillaSapling = config.getBoolean("replaceVanillaSapling", "vanilla", false, "Right clicking with a vanilla sapling places a dynamic sapling instead.");

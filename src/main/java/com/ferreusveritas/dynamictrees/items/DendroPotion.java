@@ -14,7 +14,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
@@ -38,8 +37,8 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 		DEPLETION(1, true, "depletion", 0x76be6d),
 		GIGAS(2, true, "gigas", 0xe3901d),
 		BURGEONING(3, true, "burgeoning", 0xa9bebe),
-		FERTILITY(4, true, "fertility", 0x4ad400),
-		PERSISTANCE(5, true, "persistance", 0x389aff),
+		FERTILITY(4, false, "fertility", 0x4ad400),
+		PERSISTANCE(5, false, "persistance", 0x389aff),
 		TRANSFORM(6, true, "transform", 0x7fb8a4);
 
 		private final int index;
@@ -53,9 +52,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 			this.name = name;
 			this.color = color;
 		}
-
-		ItemPotion p;
-
+		
 		public int getIndex() {
 			return index;
 		}
