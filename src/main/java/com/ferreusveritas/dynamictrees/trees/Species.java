@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.*;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -21,6 +22,7 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -90,6 +92,7 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 import static com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator.RARITY;
+import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
 
 public class Species extends RegistryEntry<Species> implements IResettable<Species> {
 
@@ -2166,6 +2169,31 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     public List<ITag.INamedTag<Item>> defaultSeedTags() {
         return Collections.singletonList(DTItemTags.SEEDS);
+    }
+
+    /**
+     * @return the location of the dynamic sapling smartmodel for this type of species
+     */
+    public ResourceLocation getSaplingSmartModelLocation() {
+        return DynamicTrees.resLoc("block/smartmodel/sapling");
+    }
+
+    public void registerStatesAndModels(DTBlockStateProvider provider) {
+        final Block primitiveLog = this.getFamily().getPrimitiveLog();
+        if (primitiveLog == Blocks.AIR) {
+            return;
+        }
+
+        final ResourceLocation leavesTextureLocation = provider.block(
+                Objects.requireNonNull(this.getLeavesProperties().getPrimitiveLeaves().getBlock().getRegistryName())
+        );
+        provider.simpleBlock(this.saplingBlock,
+                provider.models().getBuilder("block/saplings/" + this.getRegistryName().getPath())
+                        .parent(provider.models().getExistingFile(this.getSaplingSmartModelLocation()))
+                        .texture("particle", leavesTextureLocation)
+                        .texture("log", provider.block(primitiveLog.getRegistryName()))
+                        .texture("leaves", leavesTextureLocation)
+        );
     }
 
     @Override

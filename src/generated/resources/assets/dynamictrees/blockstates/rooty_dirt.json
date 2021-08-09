@@ -1,0 +1,24 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "minecraft:block/farmland"
+      }
+    },
+    {
+      "apply": {
+        "model": "dynamictrees:block/roots"
+      }
+    },
+    {
+      "apply": {
+        "model": "minecraft:block/dirt"
+      }
+    },
+    {
+      "apply": {
+        "model": "dynamictrees:block/roots"
+      }
+    }
+  ]
+}

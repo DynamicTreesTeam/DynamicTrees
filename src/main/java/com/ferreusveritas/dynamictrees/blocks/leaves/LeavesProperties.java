@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
@@ -468,6 +469,16 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     public List<ITag.INamedTag<Block>> defaultLeavesTags() {
         return Collections.singletonList(DTBlockTags.LEAVES);
+    }
+
+    public void registerStatesAndModels(DTBlockStateProvider provider) {
+        if (this.getPrimitiveLeaves().getBlock() == Blocks.AIR) {
+            return;
+        }
+
+        provider.simpleBlock(this.getDynamicLeavesState().getBlock(), provider.models().getExistingFile(
+                provider.block(this.getPrimitiveLeaves().getBlock().getRegistryName())
+        ));
     }
 
     ///////////////////////////////////////////

@@ -20,6 +20,7 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
 
     private ResourceLocation registryName;
     private boolean valid = true;
+    private boolean generateData;
 
     protected RegistryEntry() {
     }
@@ -103,6 +104,14 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
             return true;
         }
         return false;
+    }
+
+    public boolean shouldGenerateData() {
+        return generateData;
+    }
+
+    public void setGenerateData(boolean generateData) {
+        this.generateData = generateData;
     }
 
     public final ResourceLocation getRegistryName() {

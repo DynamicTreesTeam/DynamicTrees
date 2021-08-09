@@ -36,6 +36,10 @@ public final class FamilyManager extends JsonRegistryEntryReloadListener<Family>
                 .register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
                 .register("max_branch_radius", Integer.class, Family::setMaxBranchRadius);
 
+        // Primitive logs are needed before gathering data.
+        this.gatherDataAppliers.register("primitive_log", Block.class, Family::setPrimitiveLog)
+                .register("primitive_stripped_log", Block.class, Family::setPrimitiveStrippedLog);
+
         this.setupAppliers.register("primitive_log", Block.class, Family::setPrimitiveLog)
                 .register("primitive_stripped_log", Block.class, Family::setPrimitiveStrippedLog)
                 .register("stick", Item.class, Family::setStick);

@@ -1,6 +1,0 @@
-{
-  "loader": "dynamictrees:root",
-  "textures": {
-    "bark": "block/jungle_log"
-  }
-}

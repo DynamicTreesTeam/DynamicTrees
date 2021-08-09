@@ -3,11 +3,11 @@
   "values": [
     "#dynamictrees:fungus_caps",
     "dynamictrees:dark_oak_seed",
-    "dynamictrees:acacia_seed",
     "dynamictrees:jungle_seed",
-    "dynamictrees:birch_seed",
-    "dynamictrees:apple_oak_seed",
     "dynamictrees:spruce_seed",
-    "dynamictrees:oak_seed"
+    "dynamictrees:acacia_seed",
+    "dynamictrees:oak_seed",
+    "dynamictrees:apple_oak_seed",
+    "dynamictrees:birch_seed"
   ]
 }

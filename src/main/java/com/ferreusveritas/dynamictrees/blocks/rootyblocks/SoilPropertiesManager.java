@@ -30,6 +30,9 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
             return PropertyApplierResult.success();
         });
 
+        // Primitive soil is needed before gathering data.
+        this.gatherDataAppliers.register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
+
         this.setupAppliers.register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
 
         super.registerAppliers();

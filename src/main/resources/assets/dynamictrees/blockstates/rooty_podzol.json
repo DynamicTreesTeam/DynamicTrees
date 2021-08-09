@@ -1,6 +1,0 @@
-{
-	"multipart": [
-		{   "apply": { "model": "block/podzol" }},
-		{	"apply": { "model": "dynamictrees:block/roots" }}
-	]
-}

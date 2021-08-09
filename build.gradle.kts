@@ -22,6 +22,7 @@ repositories {
     maven("https://maven.tehnut.info")
     maven("https://www.cursemaven.com")
     maven("https://harleyoconnor.com/maven")
+    maven("https://squiddev.cc/maven/")
 }
 
 val modName = property("modName")
@@ -88,7 +89,7 @@ minecraft {
             property("mixin.env.remapRefMap", "true")
             property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
 
-            args("--mod", modId, "--all", "--output", file("src/generated/resources/"))
+            args("--mod", modId, "--all", "--output", file("src/generated/resources/"), "--existing", file("src/main/resources"))
 
             mods {
                 create(modId) {
@@ -121,7 +122,7 @@ dependencies {
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
 
     // At runtime use, CC for creating growth chambers.
-    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3236650"))
+    runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
 
     // Compile Serene Seasons.
     compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))

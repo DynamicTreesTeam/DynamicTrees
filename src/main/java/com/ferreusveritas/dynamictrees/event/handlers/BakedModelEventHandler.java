@@ -23,12 +23,16 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class BakedModelEventHandler {
 
+    public static final ResourceLocation BRANCH = DynamicTrees.resLoc("branch");
+    public static final ResourceLocation ROOT = DynamicTrees.resLoc("root");
+    public static final ResourceLocation THICK_BRANCH = DynamicTrees.resLoc("thick_branch");
+
     @SubscribeEvent
     public static void onModelRegistryEvent(ModelRegistryEvent event) {
         // Register model loaders for baked models.
-        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MOD_ID, "branch"), new BranchBlockModelLoader());
-        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MOD_ID, "root"), new RootBlockModelLoader());
-        ModelLoaderRegistry.registerLoader(new ResourceLocation(DynamicTrees.MOD_ID, "thick_branch"), new ThickBranchBlockModelLoader());
+        ModelLoaderRegistry.registerLoader(BRANCH, new BranchBlockModelLoader());
+        ModelLoaderRegistry.registerLoader(ROOT, new RootBlockModelLoader());
+        ModelLoaderRegistry.registerLoader(THICK_BRANCH, new ThickBranchBlockModelLoader());
     }
 
     @SubscribeEvent

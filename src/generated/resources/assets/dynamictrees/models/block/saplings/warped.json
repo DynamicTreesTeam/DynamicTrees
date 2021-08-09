@@ -1,0 +1,8 @@
+{
+  "parent": "dynamictrees:block/smartmodel/sapling",
+  "textures": {
+    "particle": "minecraft:block/warped_wart_block",
+    "log": "minecraft:block/warped_stem",
+    "leaves": "minecraft:block/warped_wart_block"
+  }
+}

@@ -58,6 +58,10 @@ public class SurfaceRootBlock extends Block implements IWaterLoggable {
         this.family = family;
     }
 
+    public Family getFamily() {
+        return family;
+    }
+
     public static class RootConnection {
         public RootConnections.ConnectionLevel level;
         public int radius;

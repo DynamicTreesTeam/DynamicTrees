@@ -19,4 +19,8 @@ public final class ResourceLocationUtils {
         return new ResourceLocation(resourceLocation.getNamespace(), resourceLocation.getPath() + suffix);
     }
 
+    public static ResourceLocation surround(final ResourceLocation resourceLocation, final String prefix, final String suffix) {
+        return new ResourceLocation(resourceLocation.getNamespace(), prefix + resourceLocation.getPath() + suffix);
+    }
+
 }

@@ -1,0 +1,6 @@
+{
+  "loader": "dynamictrees:root",
+  "textures": {
+    "bark": "minecraft:block/jungle_log"
+  }
+}

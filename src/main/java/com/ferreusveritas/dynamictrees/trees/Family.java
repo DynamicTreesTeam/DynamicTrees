@@ -13,6 +13,8 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.compat.waila.WailaOther;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.provider.BranchLoaderBuilder;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -36,13 +38,16 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.BiFunction;
 
 /**
  * This structure describes a Family whose member Species all have a common branch.
@@ -694,6 +699,10 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
         return this.surfaceRoot;
     }
 
+    public Optional<SurfaceRootBlock> getSurfaceRootOptional() {
+        return Optional.ofNullable(this.surfaceRoot);
+    }
+
     protected Family setSurfaceRoot(SurfaceRootBlock surfaceRoot) {
         this.surfaceRoot = surfaceRoot;
         return this;
@@ -748,6 +757,45 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
     public List<ITag.INamedTag<Block>> defaultStrippedBranchTags() {
         return this.isFireProof ? Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES) :
                 Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN);
+    }
+
+    /**
+     * @return a constructor for the relevant branch block model builder for the corresponding loader
+     */
+    public BiFunction<BlockModelBuilder, ExistingFileHelper, BranchLoaderBuilder> getBranchLoaderConstructor() {
+        return BranchLoaderBuilder::branch;
+    }
+
+    public void registerBranchStateAndModel(DTBlockStateProvider provider, BranchBlock branch, Block primitiveLog) {
+        if (primitiveLog == Blocks.AIR) {
+            return;
+        }
+
+        final ResourceLocation barkTexture = provider.block(Objects.requireNonNull(primitiveLog.getRegistryName()));
+        // All we can do here is guess the texture names, hoping most are consistent with Vanilla.
+        provider.simpleBlock(branch,
+                provider.models().getBuilder(Objects.requireNonNull(branch.getRegistryName()).getPath())
+                        .customLoader(branch.getFamily().getBranchLoaderConstructor())
+                        .texture("bark", barkTexture)
+                        .texture("rings", ResourceLocationUtils.suffix(barkTexture, "_top"))
+                        .end()
+        );
+    }
+
+    public void registerSurfaceRootStateAndModel(DTBlockStateProvider provider) {
+        final Family family = surfaceRoot.getFamily();
+        final Block primitiveLog = family.getPrimitiveLog();
+        if (primitiveLog == Blocks.AIR) {
+            return;
+        }
+
+        // All we can do here is guess the texture names, hoping most are consistent with Vanilla.
+        provider.simpleBlock(surfaceRoot,
+                provider.models().getBuilder(Objects.requireNonNull(surfaceRoot.getRegistryName()).getPath())
+                        .customLoader(BranchLoaderBuilder::root)
+                        .texture("bark", provider.block(Objects.requireNonNull(primitiveLog.getRegistryName())))
+                        .end()
+        );
     }
 
     //////////////////////////////

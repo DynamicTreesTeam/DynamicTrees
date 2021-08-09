@@ -1,8 +1,10 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -51,6 +53,16 @@ public class WaterSoilProperties extends SoilProperties {
     @Override
     public AbstractBlock.Properties getDefaultBlockProperties(Material material, MaterialColor materialColor) {
         return AbstractBlock.Properties.copy(Blocks.WATER);
+    }
+
+    @Override
+    public void registerStatesAndModels(DTBlockStateProvider provider) {
+        if (this.dynamicSoilBlock == Blocks.AIR || this.primitiveSoilBlock == Blocks.AIR) {
+            return;
+        }
+
+        // TODO: Smart model for water roots.
+        provider.simpleBlock(this.dynamicSoilBlock, provider.models().getExistingFile(DynamicTrees.resLoc("block/roots_water")));
     }
 
     public static class RootyWaterBlock extends RootyBlock implements IWaterLoggable {

@@ -1,9 +1,11 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
@@ -19,6 +21,10 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.Optional;
+
+import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
 
 /**
  * @author Max Hyper
@@ -117,13 +123,17 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
 
     private void setBlockRegistryNameIfNull() {
         if (this.blockRegistryName == null) {
-            this.blockRegistryName = ResourceLocationUtils.prefix(this.getRegistryName(), this.getBlockRegistryNamePrefix());
+            this.blockRegistryName = prefix(this.getRegistryName(), this.getBlockRegistryNamePrefix());
         }
     }
 
     @Nullable
     public RootyBlock getDynamicSoilBlock() {
         return dynamicSoilBlock;
+    }
+
+    public Optional<RootyBlock> getSoilBlock() {
+        return Optional.ofNullable(dynamicSoilBlock);
     }
 
     public void generateDynamicSoil(AbstractBlock.Properties blockProperties) {
@@ -167,6 +177,22 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
     public SoilProperties addSoilFlags(Integer adjFlag) {
         this.soilFlags |= adjFlag;
         return this;
+    }
+
+    public void registerStatesAndModels(DTBlockStateProvider provider) {
+        if (this.dynamicSoilBlock == Blocks.AIR || this.primitiveSoilBlock == Blocks.AIR) {
+            return;
+        }
+
+        provider.getMultipartBuilder(this.dynamicSoilBlock)
+                .part().modelFile(provider.models().getExistingFile(
+                        provider.block(Objects.requireNonNull(this.primitiveSoilBlock.getRegistryName()))
+                )).addModel().end()
+                .part().modelFile(provider.models().getExistingFile(this.getRootsOverlayLocation())).addModel().end();
+    }
+
+    public ResourceLocation getRootsOverlayLocation() {
+        return DynamicTrees.resLoc("block/roots");
     }
 
     //////////////////////////////
