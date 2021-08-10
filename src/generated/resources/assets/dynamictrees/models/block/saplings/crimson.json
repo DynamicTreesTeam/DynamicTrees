@@ -1,8 +1,8 @@
 {
-  "parent": "dynamictrees:block/smartmodel/sapling",
+  "parent": "dynamictrees:block/smartmodel/mushroom_round",
   "textures": {
-    "particle": "minecraft:block/nether_wart_block",
-    "log": "minecraft:block/crimson_stem",
-    "leaves": "minecraft:block/nether_wart_block"
+    "particle": "dynamictrees:block/crimson_cap",
+    "stem": "minecraft:block/crimson_stem",
+    "cap": "dynamictrees:block/crimson_cap"
   }
 }

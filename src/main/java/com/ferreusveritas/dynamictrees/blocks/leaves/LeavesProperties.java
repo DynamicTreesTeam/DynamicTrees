@@ -8,14 +8,14 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.provider.BiGenerator;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
+import com.ferreusveritas.dynamictrees.data.provider.Generator;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
-import com.ferreusveritas.dynamictrees.util.BlockStates;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import com.ferreusveritas.dynamictrees.util.ToolTypes;
+import com.ferreusveritas.dynamictrees.util.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.*;
@@ -190,6 +190,10 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
      */
     public BlockState getPrimitiveLeaves() {
         return primitiveLeaves;
+    }
+
+    public Optional<Block> getPrimitiveLeavesBlock() {
+        return Optionals.ofBlock(this.primitiveLeaves.getBlock());
     }
 
     public void setPrimitiveLeaves(final Block primitiveLeaves) {
@@ -471,14 +475,15 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return Collections.singletonList(DTBlockTags.LEAVES);
     }
 
-    public void registerStatesAndModels(DTBlockStateProvider provider) {
-        if (this.getPrimitiveLeaves().getBlock() == Blocks.AIR) {
-            return;
-        }
+    protected final MutableLazyValue<BiGenerator<DTBlockStateProvider, DynamicLeavesBlock, Block>> stateGenerator = MutableLazyValue.supplied(
+            () -> (provider, leaves, primitiveLeaves) ->
+                    provider.simpleBlock(leaves, provider.models().getExistingFile(
+                            provider.block(primitiveLeaves.getRegistryName())
+                    ))
+    );
 
-        provider.simpleBlock(this.getDynamicLeavesState().getBlock(), provider.models().getExistingFile(
-                provider.block(this.getPrimitiveLeaves().getBlock().getRegistryName())
-        ));
+    public BiGenerator<DTBlockStateProvider, DynamicLeavesBlock, Block> getStateGenerator() {
+        return stateGenerator.get();
     }
 
     ///////////////////////////////////////////

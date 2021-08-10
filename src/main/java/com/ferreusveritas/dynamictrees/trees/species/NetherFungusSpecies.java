@@ -23,10 +23,13 @@ import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.surround;
 
 /**
  * @author Harley O'Connor
@@ -39,7 +42,7 @@ public class NetherFungusSpecies extends Species {
         super(name, family, leavesProperties);
         this.setSaplingShape(CommonVoxelShapes.SAPLING);
 
-        addDropCreators(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")) {
+        this.addDropCreators(new DropCreator(new ResourceLocation(DynamicTrees.MOD_ID, "wart_block_drop")) {
             @Override
             protected void registerProperties() {
 
@@ -108,6 +111,19 @@ public class NetherFungusSpecies extends Species {
     @Override
     public List<ITag.INamedTag<Item>> defaultSeedTags() {
         return Collections.singletonList(DTItemTags.FUNGUS_CAPS);
+    }
+
+    @Override
+    public ResourceLocation getSaplingSmartModelLocation() {
+        return DynamicTrees.resLoc("block/smartmodel/mushroom_" + (this.getSaplingShape() == CommonVoxelShapes.FLAT_MUSHROOM ? "flat" : "round"));
+    }
+
+    @Override
+    protected void addTextures(BlockModelBuilder builder, ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
+        final ResourceLocation capLocation = surround(this.getRegistryName(), "block/", "_cap");
+        builder.texture("particle", capLocation)
+                .texture("stem", barkTextureLocation)
+                .texture("cap", capLocation);
     }
 
 }

@@ -1,8 +1,10 @@
 package com.ferreusveritas.dynamictrees.data.provider;
 
+import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.event.handlers.BakedModelEventHandler;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.CustomLoaderBuilder;
@@ -10,6 +12,11 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiConsumer;
+
+import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
+import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.suffix;
 
 /**
  * @author Harley O'Connor
@@ -25,6 +32,20 @@ public final class BranchLoaderBuilder extends CustomLoaderBuilder<BlockModelBui
     public BranchLoaderBuilder texture(String key, ResourceLocation location) {
         this.textures.put(key, location.toString());
         return this;
+    }
+
+    public BranchLoaderBuilder texturesFor(Block primitiveLog) {
+        texturesFor(primitiveLog, this::texture);
+        return this;
+    }
+
+    public static void texturesFor(Block primitiveLog, BiConsumer<String, ResourceLocation> textureConsumer) {
+        final ResourceLocation barkTextureLocation = prefix(
+                Objects.requireNonNull(primitiveLog.getRegistryName()),
+                "block/"
+        );
+        textureConsumer.accept("bark", barkTextureLocation);
+        textureConsumer.accept("rings", suffix(barkTextureLocation, "_top"));
     }
 
     @Override

@@ -1,7 +1,0 @@
-{
-    "parent": "dynamictrees:item/branch",
-    "textures": {
-        "bark": "block/acacia_log",
-        "rings": "block/acacia_log_top"
-    }
-}

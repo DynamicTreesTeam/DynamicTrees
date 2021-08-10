@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.Optionals;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
@@ -25,31 +26,37 @@ public class DTBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        SoilProperties.REGISTRY.getAllFor(this.modId).forEach(soilProperties -> {
-            if (soilProperties.shouldGenerateData()) {
-                soilProperties.getSoilBlock().ifPresent(soil -> soilProperties.registerStatesAndModels(this));
-            }
+        // Generate rooty soil block states and models.
+        SoilProperties.REGISTRY.dataGenerationStream(this.modId).forEach(soilProperties ->
+                soilProperties.getSoilStateGenerator().generate(this, soilProperties.getSoilBlock(),
+                        soilProperties.getPrimitiveSoilBlockOptional())
+        );
+
+        Family.REGISTRY.dataGenerationStream(this.modId).forEach(family -> {
+            // Generate branch block state and model.
+            family.getBranchStateGenerator().generate(this, family.getBranchOptional(),
+                    family.getPrimitiveLogOptional());
+
+            // Generate stripped branch block state and model.
+            family.getBranchStateGenerator().generate(this, family.getStrippedBranchOptional(),
+                    family.getPrimitiveStrippedLogOptional());
+
+            // Generate surface root block state and model.
+            family.getSurfaceRootStateGenerator().generate(this, family.getSurfaceRootOptional(),
+                    family.getPrimitiveLogOptional());
         });
 
-        Family.REGISTRY.getAllFor(this.modId).forEach(family -> {
-            if (family.shouldGenerateData()) {
-                family.getBranchOptional().ifPresent(branch -> family.registerBranchStateAndModel(this, branch, family.getPrimitiveLog()));
-                family.getStrippedBranchOptional().ifPresent(branch -> family.registerBranchStateAndModel(this, branch, family.getPrimitiveStrippedLog()));
-                family.getSurfaceRootOptional().ifPresent(surfaceRoot -> family.registerSurfaceRootStateAndModel(this));
-            }
-        });
+        // Generate sapling block state and model.
+        Species.REGISTRY.dataGenerationStream(this.modId).forEach(species ->
+                species.getSaplingStateGenerator().generate(this, species.getSapling(),
+                        species.getFamily().getPrimitiveLogOptional(), species.getPrimitiveLeaves())
+        );
 
-        Species.REGISTRY.getAllFor(this.modId).forEach(species -> {
-            if (species.shouldGenerateData()) {
-                species.getSapling().ifPresent(sapling -> species.registerStatesAndModels(this));
-            }
-        });
-
-        LeavesProperties.REGISTRY.getAllFor(this.modId).forEach(leavesProperties -> {
-            if (leavesProperties.shouldGenerateData()) {
-                leavesProperties.getDynamicLeavesBlock().ifPresent(leaves -> leavesProperties.registerStatesAndModels(this));
-            }
-        });
+        // Generate leaves block state and model.
+        LeavesProperties.REGISTRY.dataGenerationStream(this.modId).forEach(leavesProperties ->
+                leavesProperties.getStateGenerator().generate(this, leavesProperties.getDynamicLeavesBlock(),
+                        leavesProperties.getPrimitiveLeavesBlock())
+        );
     }
 
     public ResourceLocation block(ResourceLocation blockLocation) {

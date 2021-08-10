@@ -5,11 +5,13 @@ import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.data.provider.BiGenerator;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
+import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
+import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.AbstractBlock;
@@ -97,6 +99,10 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
         return primitiveSoilBlock;
     }
 
+    public Optional<Block> getPrimitiveSoilBlockOptional() {
+        return Optionals.ofBlock(primitiveSoilBlock);
+    }
+
     protected void setPrimitiveSoilBlock(final Block primitiveSoil) {
         if (this.primitiveSoilBlock == null || primitiveSoil != this.primitiveSoilBlock.getBlock()) {
             this.primitiveSoilBlock = primitiveSoil;
@@ -133,7 +139,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
     }
 
     public Optional<RootyBlock> getSoilBlock() {
-        return Optional.ofNullable(dynamicSoilBlock);
+        return Optional.ofNullable(this.dynamicSoilBlock == Blocks.AIR ? null : this.dynamicSoilBlock);
     }
 
     public void generateDynamicSoil(AbstractBlock.Properties blockProperties) {
@@ -179,16 +185,17 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
         return this;
     }
 
-    public void registerStatesAndModels(DTBlockStateProvider provider) {
-        if (this.dynamicSoilBlock == Blocks.AIR || this.primitiveSoilBlock == Blocks.AIR) {
-            return;
-        }
+    protected final MutableLazyValue<BiGenerator<DTBlockStateProvider, RootyBlock, Block>> soilStateGenerator = MutableLazyValue.supplied(
+            () -> (provider, soil, primitiveSoil) ->
+                    provider.getMultipartBuilder(soil)
+                            .part().modelFile(provider.models().getExistingFile(
+                                    provider.block(Objects.requireNonNull(primitiveSoil.getRegistryName()))
+                            )).addModel().end()
+                            .part().modelFile(provider.models().getExistingFile(this.getRootsOverlayLocation())).addModel().end()
+    );
 
-        provider.getMultipartBuilder(this.dynamicSoilBlock)
-                .part().modelFile(provider.models().getExistingFile(
-                        provider.block(Objects.requireNonNull(this.primitiveSoilBlock.getRegistryName()))
-                )).addModel().end()
-                .part().modelFile(provider.models().getExistingFile(this.getRootsOverlayLocation())).addModel().end();
+    public final BiGenerator<DTBlockStateProvider, RootyBlock, Block> getSoilStateGenerator() {
+        return this.soilStateGenerator.get();
     }
 
     public ResourceLocation getRootsOverlayLocation() {

@@ -2,11 +2,11 @@
   "replace": false,
   "values": [
     "dynamictrees:dark_oak_sapling",
+    "dynamictrees:birch_sapling",
+    "dynamictrees:apple_oak_sapling",
     "dynamictrees:jungle_sapling",
     "dynamictrees:spruce_sapling",
     "dynamictrees:acacia_sapling",
-    "dynamictrees:oak_sapling",
-    "dynamictrees:apple_oak_sapling",
-    "dynamictrees:birch_sapling"
+    "dynamictrees:oak_sapling"
   ]
 }

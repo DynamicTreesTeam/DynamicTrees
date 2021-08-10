@@ -80,6 +80,9 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("sapling_name", String.class, Species::setSaplingName)
                 .register("seed_name", String.class, Species::setSeedName);
 
+        // We need the sapling shape to know which parent smartmodel the sapling model should use.
+        this.gatherDataAppliers.register("sapling_shape", VoxelShape.class, Species::setSaplingShape);
+
         this.reloadAppliers.register("always_show_on_waila", Boolean.class, Species::setAlwaysShowOnWaila)
                 .register("tapering", Float.class, Species::setTapering)
                 .register("up_probability", Integer.class, Species::setUpProbability)

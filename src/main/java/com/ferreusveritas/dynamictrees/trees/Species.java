@@ -23,6 +23,9 @@ import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
+import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
+import com.ferreusveritas.dynamictrees.data.provider.Generator;
+import com.ferreusveritas.dynamictrees.data.provider.TriGenerator;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -78,6 +81,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -92,7 +96,6 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 import static com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator.RARITY;
-import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
 
 public class Species extends RegistryEntry<Species> implements IResettable<Species> {
 
@@ -564,6 +567,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     public Optional<DynamicLeavesBlock> getLeavesBlock() {
         return this.leavesProperties.getDynamicLeavesBlock();
+    }
+
+    public Optional<Block> getPrimitiveLeaves() {
+        return Optionals.ofBlock(this.leavesProperties.getPrimitiveLeaves().getBlock());
     }
 
     public void addValidLeafBlocks(LeavesProperties... leaves) {
@@ -2178,22 +2185,44 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         return DynamicTrees.resLoc("block/smartmodel/sapling");
     }
 
-    public void registerStatesAndModels(DTBlockStateProvider provider) {
-        final Block primitiveLog = this.getFamily().getPrimitiveLog();
-        if (primitiveLog == Blocks.AIR) {
-            return;
-        }
+    protected final MutableLazyValue<TriGenerator<DTBlockStateProvider, DynamicSaplingBlock, Block, Block>> saplingStateGenerator = MutableLazyValue.supplied(
+            () -> (provider, sapling, primitiveLog, primitiveLeaves) -> {
+                final ResourceLocation leavesTextureLocation = provider.block(
+                        Objects.requireNonNull(primitiveLeaves.getRegistryName())
+                );
+                final BlockModelBuilder builder = provider.models().getBuilder(
+                        "block/saplings/" + this.getRegistryName().getPath()
+                ).parent(provider.models().getExistingFile(this.getSaplingSmartModelLocation()));
+                this.addTextures(builder, leavesTextureLocation, provider.block(primitiveLog.getRegistryName()));
+                provider.simpleBlock(sapling, builder);
+            }
+    );
 
-        final ResourceLocation leavesTextureLocation = provider.block(
-                Objects.requireNonNull(this.getLeavesProperties().getPrimitiveLeaves().getBlock().getRegistryName())
-        );
-        provider.simpleBlock(this.saplingBlock,
-                provider.models().getBuilder("block/saplings/" + this.getRegistryName().getPath())
-                        .parent(provider.models().getExistingFile(this.getSaplingSmartModelLocation()))
-                        .texture("particle", leavesTextureLocation)
-                        .texture("log", provider.block(primitiveLog.getRegistryName()))
-                        .texture("leaves", leavesTextureLocation)
-        );
+    protected void addTextures(BlockModelBuilder builder, ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
+        builder.texture("particle", leavesTextureLocation)
+                .texture("log", barkTextureLocation)
+                .texture("leaves", leavesTextureLocation);
+    }
+
+    public TriGenerator<DTBlockStateProvider, DynamicSaplingBlock, Block, Block> getSaplingStateGenerator() {
+        return saplingStateGenerator.get();
+    }
+
+    /**
+     * @return the location of the parent model of the seed item model
+     */
+    public ResourceLocation getSeedParentLocation() {
+        return DynamicTrees.resLoc("item/standard_seed");
+    }
+
+    protected final MutableLazyValue<Generator<DTItemModelProvider, Seed>> seedModelGenerator = MutableLazyValue.supplied(
+            () -> (provider, seed) ->
+                    provider.withExistingParent(String.valueOf(seed.getRegistryName()), seed.getSpecies().getSeedParentLocation())
+                            .texture("layer0", provider.item(seed.getRegistryName()))
+    );
+
+    public Generator<DTItemModelProvider, Seed> getSeedModelGenerator() {
+        return this.seedModelGenerator.get();
     }
 
     @Override

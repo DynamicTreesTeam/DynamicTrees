@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
@@ -13,13 +14,17 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.compat.waila.WailaOther;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.provider.BiGenerator;
 import com.ferreusveritas.dynamictrees.data.provider.BranchLoaderBuilder;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
+import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
+import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
+import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -39,6 +44,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
+import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.tuple.Pair;
@@ -429,6 +435,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
         return Optional.ofNullable(strippedBranch);
     }
 
+    @Nullable
     public Item getBranchItem() {
         return branchItem;
     }
@@ -517,8 +524,16 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
         return primitiveLog;
     }
 
+    public Optional<Block> getPrimitiveLogOptional() {
+        return Optionals.ofBlock(this.primitiveLog);
+    }
+
     public Block getPrimitiveStrippedLog() {
         return primitiveStrippedLog;
+    }
+
+    public Optional<Block> getPrimitiveStrippedLogOptional() {
+        return Optionals.ofBlock(primitiveStrippedLog);
     }
 
     private List<ItemStack> getLogDropsForBranch(float volume, int branch) {
@@ -700,7 +715,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
     }
 
     public Optional<SurfaceRootBlock> getSurfaceRootOptional() {
-        return Optional.ofNullable(this.surfaceRoot);
+        return Optionals.ofBlock(this.surfaceRoot);
     }
 
     protected Family setSurfaceRoot(SurfaceRootBlock surfaceRoot) {
@@ -766,36 +781,48 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
         return BranchLoaderBuilder::branch;
     }
 
-    public void registerBranchStateAndModel(DTBlockStateProvider provider, BranchBlock branch, Block primitiveLog) {
-        if (primitiveLog == Blocks.AIR) {
-            return;
-        }
+    protected final MutableLazyValue<BiGenerator<DTBlockStateProvider, BranchBlock, Block>> branchStateGenerator = MutableLazyValue.supplied(
+            () -> (provider, branch, primitiveLog) ->
+                    provider.simpleBlock(branch,
+                            provider.models().getBuilder(Objects.requireNonNull(branch.getRegistryName()).getPath())
+                                    .customLoader(branch.getFamily().getBranchLoaderConstructor())
+                                    .texturesFor(primitiveLog)
+                                    .end()
+            )
+    );
 
-        final ResourceLocation barkTexture = provider.block(Objects.requireNonNull(primitiveLog.getRegistryName()));
-        // All we can do here is guess the texture names, hoping most are consistent with Vanilla.
-        provider.simpleBlock(branch,
-                provider.models().getBuilder(Objects.requireNonNull(branch.getRegistryName()).getPath())
-                        .customLoader(branch.getFamily().getBranchLoaderConstructor())
-                        .texture("bark", barkTexture)
-                        .texture("rings", ResourceLocationUtils.suffix(barkTexture, "_top"))
-                        .end()
-        );
+    public final BiGenerator<DTBlockStateProvider, BranchBlock, Block> getBranchStateGenerator() {
+        return branchStateGenerator.get();
     }
 
-    public void registerSurfaceRootStateAndModel(DTBlockStateProvider provider) {
-        final Family family = surfaceRoot.getFamily();
-        final Block primitiveLog = family.getPrimitiveLog();
-        if (primitiveLog == Blocks.AIR) {
-            return;
-        }
+    protected final MutableLazyValue<BiGenerator<DTBlockStateProvider, SurfaceRootBlock, Block>> surfaceRootStateGenerator = MutableLazyValue.supplied(
+            () -> (provider, surfaceRoot, primitiveLog) ->
+                    provider.simpleBlock(surfaceRoot,
+                            provider.models().getBuilder(Objects.requireNonNull(surfaceRoot.getRegistryName()).getPath())
+                                    .customLoader(BranchLoaderBuilder::root)
+                                    .texture("bark", provider.block(Objects.requireNonNull(primitiveLog.getRegistryName())))
+                                    .end()
+                    )
+    );
 
-        // All we can do here is guess the texture names, hoping most are consistent with Vanilla.
-        provider.simpleBlock(surfaceRoot,
-                provider.models().getBuilder(Objects.requireNonNull(surfaceRoot.getRegistryName()).getPath())
-                        .customLoader(BranchLoaderBuilder::root)
-                        .texture("bark", provider.block(Objects.requireNonNull(primitiveLog.getRegistryName())))
-                        .end()
-        );
+    public final BiGenerator<DTBlockStateProvider, SurfaceRootBlock, Block> getSurfaceRootStateGenerator() {
+        return this.surfaceRootStateGenerator.get();
+    }
+
+    public ResourceLocation getBranchItemParentLocation() {
+        return DynamicTrees.resLoc("item/branch");
+    }
+
+    protected final MutableLazyValue<BiGenerator<DTItemModelProvider, Block, Item>> branchItemModelGenerator = MutableLazyValue.supplied(
+            () -> (provider, primitiveLog, branchItem) -> {
+                final ItemModelBuilder builder = provider.withExistingParent(String.valueOf(branchItem.getRegistryName()),
+                        this.getBranchItemParentLocation());
+                BranchLoaderBuilder.texturesFor(primitiveLog, builder::texture);
+            }
+    );
+
+    public final BiGenerator<DTItemModelProvider, Block, Item> getBranchItemModelGenerator() {
+        return this.branchItemModelGenerator.get();
     }
 
     //////////////////////////////
