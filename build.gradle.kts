@@ -126,7 +126,8 @@ dependencies {
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
 
     // At runtime use, CC for creating growth chambers.
-    runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
+    //runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
+    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3236650"))
 
     // Compile Serene Seasons.
     compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))
