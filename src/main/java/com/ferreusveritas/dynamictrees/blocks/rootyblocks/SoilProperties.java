@@ -68,6 +68,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
     protected RootyBlock dynamicSoilBlock;
     protected Integer soilFlags = 0;
     private ResourceLocation blockRegistryName;
+    protected boolean substitute;
 
     //used for null soil properties
     protected SoilProperties() {
@@ -155,6 +156,14 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
         this.dynamicSoilBlock = rootyBlock;
     }
 
+    public boolean isSubstitute() {
+        return substitute;
+    }
+
+    public void setSubstitute(boolean substitute) {
+        this.substitute = substitute;
+    }
+
     ///////////////////////////////////////////
     // MATERIAL
     ///////////////////////////////////////////
@@ -184,6 +193,10 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
         this.soilFlags |= adjFlag;
         return this;
     }
+
+    ///////////////////////////////////////////
+    // DATA GEN
+    ///////////////////////////////////////////
 
     protected final MutableLazyValue<Generator<DTBlockStateProvider, SoilProperties>> soilStateGenerator =
             MutableLazyValue.supplied(SoilStateGenerator::new);

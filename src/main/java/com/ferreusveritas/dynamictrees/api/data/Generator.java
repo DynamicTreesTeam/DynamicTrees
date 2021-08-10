@@ -20,14 +20,17 @@ import java.util.Optional;
 public interface Generator<P extends IDataProvider & DTDataProvider, I> {
 
     /**
-     * Gathers dependencies from the specified {@code input}, then generating the relevant files.
+     * Gathers dependencies from the specified {@code input}, then generating the relevant files if dependencies and
+     * input are valid.
      *
      * @param provider the provider to use to generate
      * @param input the input to gather dependencies and generate from
+     * @see #verifyInput(Object)
+     * @see #verifyDependencies(Dependencies)
      */
     default void generate(P provider, I input) {
         final Dependencies dependencies = this.gatherDependencies(input);
-        if (this.verifyDependencies(dependencies)) {
+        if (this.verifyInput(input) && this.verifyDependencies(dependencies)) {
             this.generate(provider, input, dependencies);
         }
     }
@@ -49,6 +52,17 @@ public interface Generator<P extends IDataProvider & DTDataProvider, I> {
      * @return the gathered dependencies
      */
     Dependencies gatherDependencies(I input);
+
+    /**
+     * Verifies that the specified {@code input} is valid. Can be used for setting certain conditions that input must
+     * meet to be generated.
+     *
+     * @param input the input object to verify
+     * @return {@code true} if the input is valid; {@code false} if not
+     */
+    default boolean verifyInput(I input) {
+        return true;
+    }
 
     /**
      * Verifies that all the specified {@code dependencies} are valid. A dependency will be considered invalid if its
