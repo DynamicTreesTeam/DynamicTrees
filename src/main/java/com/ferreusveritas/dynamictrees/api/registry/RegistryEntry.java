@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
+import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -112,6 +114,12 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
 
     public void setGenerateData(boolean generateData) {
         this.generateData = generateData;
+    }
+
+    public void generateStateData(DTBlockStateProvider provider) {
+    }
+
+    public void generateItemModelData(DTItemModelProvider provider) {
     }
 
     public final ResourceLocation getRegistryName() {

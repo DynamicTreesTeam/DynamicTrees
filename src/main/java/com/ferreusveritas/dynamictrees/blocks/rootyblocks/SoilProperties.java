@@ -1,11 +1,12 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.data.Generator;
+import com.ferreusveritas.dynamictrees.api.data.SoilStateGenerator;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.data.provider.BiGenerator;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
@@ -23,7 +24,6 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
@@ -185,17 +185,13 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements IRe
         return this;
     }
 
-    protected final MutableLazyValue<BiGenerator<DTBlockStateProvider, RootyBlock, Block>> soilStateGenerator = MutableLazyValue.supplied(
-            () -> (provider, soil, primitiveSoil) ->
-                    provider.getMultipartBuilder(soil)
-                            .part().modelFile(provider.models().getExistingFile(
-                                    provider.block(Objects.requireNonNull(primitiveSoil.getRegistryName()))
-                            )).addModel().end()
-                            .part().modelFile(provider.models().getExistingFile(this.getRootsOverlayLocation())).addModel().end()
-    );
+    protected final MutableLazyValue<Generator<DTBlockStateProvider, SoilProperties>> soilStateGenerator =
+            MutableLazyValue.supplied(SoilStateGenerator::new);
 
-    public final BiGenerator<DTBlockStateProvider, RootyBlock, Block> getSoilStateGenerator() {
-        return this.soilStateGenerator.get();
+    @Override
+    public void generateStateData(DTBlockStateProvider provider) {
+        // Generate soil state and model.
+        this.soilStateGenerator.get().generate(provider, this);
     }
 
     public ResourceLocation getRootsOverlayLocation() {

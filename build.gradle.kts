@@ -20,7 +20,11 @@ plugins {
 repositories {
     maven("https://ldtteam.jfrog.io/ldtteam/modding/")
     maven("https://maven.tehnut.info")
-    maven("https://www.cursemaven.com")
+    maven("https://www.cursemaven.com") {
+        content {
+            includeGroup("curse.maven")
+        }
+    }
     maven("https://harleyoconnor.com/maven")
     maven("https://squiddev.cc/maven/")
 }

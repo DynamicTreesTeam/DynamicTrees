@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.data.Generator;
+import com.ferreusveritas.dynamictrees.api.data.LeavesStateGenerator;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
@@ -8,9 +10,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
-import com.ferreusveritas.dynamictrees.data.provider.BiGenerator;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
-import com.ferreusveritas.dynamictrees.data.provider.Generator;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
@@ -475,15 +475,13 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return Collections.singletonList(DTBlockTags.LEAVES);
     }
 
-    protected final MutableLazyValue<BiGenerator<DTBlockStateProvider, DynamicLeavesBlock, Block>> stateGenerator = MutableLazyValue.supplied(
-            () -> (provider, leaves, primitiveLeaves) ->
-                    provider.simpleBlock(leaves, provider.models().getExistingFile(
-                            provider.block(primitiveLeaves.getRegistryName())
-                    ))
-    );
+    protected final MutableLazyValue<Generator<DTBlockStateProvider, LeavesProperties>> stateGenerator =
+            MutableLazyValue.supplied(LeavesStateGenerator::new);
 
-    public BiGenerator<DTBlockStateProvider, DynamicLeavesBlock, Block> getStateGenerator() {
-        return stateGenerator.get();
+    @Override
+    public void generateStateData(DTBlockStateProvider provider) {
+        // Generate leaves block state and model.
+        this.stateGenerator.get().generate(provider, this);
     }
 
     ///////////////////////////////////////////

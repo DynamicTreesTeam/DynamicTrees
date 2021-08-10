@@ -1,13 +1,11 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
-import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistry;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * A custom registry which can be safely unlocked at any point. Largely based off {@link ForgeRegistry}.
@@ -102,17 +100,6 @@ public class Registry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
     @Override
     public final Set<V> getAll() {
         return Collections.unmodifiableSet(this.entries);
-    }
-
-    public final Set<V> getAllFor(final String namespace) {
-        return this.entries.stream()
-                .filter(entry -> entry.getRegistryName().getNamespace().equals(namespace))
-                .collect(CommonCollectors.toUnmodifiableLinkedSet());
-    }
-
-    public final Stream<V> dataGenerationStream(final String modId) {
-        return this.getAllFor(modId).stream()
-                .filter(RegistryEntry::shouldGenerateData);
     }
 
     @Override

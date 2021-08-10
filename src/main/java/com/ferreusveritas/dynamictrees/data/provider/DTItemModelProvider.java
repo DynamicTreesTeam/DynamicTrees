@@ -1,44 +1,31 @@
 package com.ferreusveritas.dynamictrees.data.provider;
 
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.Optionals;
+import com.ferreusveritas.dynamictrees.api.registry.IRegistry;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
+import java.util.List;
 
 /**
  * @author Harley O'Connor
  */
-public class DTItemModelProvider extends ItemModelProvider {
+public class DTItemModelProvider extends ItemModelProvider implements DTDataProvider {
 
-    public DTItemModelProvider(DataGenerator generator, String modId, ExistingFileHelper existingFileHelper) {
+    private final List<IRegistry<?>> registries;
+
+    public DTItemModelProvider(DataGenerator generator, String modId, ExistingFileHelper existingFileHelper, List<IRegistry<?>> registries) {
         super(generator, modId, existingFileHelper);
+        this.registries = registries;
     }
 
     @Override
     protected void registerModels() {
-        // Generate branch item models.
-        Family.REGISTRY.dataGenerationStream(this.modid).forEach(family ->
-                family.getBranchItemModelGenerator().generate(this, family.getPrimitiveLogOptional(),
-                        Optionals.ofItem(family.getBranchItem()))
+        this.registries.forEach(registry ->
+                registry.dataGenerationStream(this.modid).forEach(entry ->
+                        entry.generateItemModelData(this)
+                )
         );
-
-        // Generate seed models.
-        Species.REGISTRY.dataGenerationStream(this.modid).forEach(species ->
-                species.getSeedModelGenerator().generate(this, species.getSeed())
-        );
-    }
-
-    public ResourceLocation block(ResourceLocation blockLocation) {
-        return prefix(blockLocation, "block/");
-    }
-
-    public ResourceLocation item(ResourceLocation resourceLocation) {
-        return prefix(resourceLocation, "item/");
     }
 
 }

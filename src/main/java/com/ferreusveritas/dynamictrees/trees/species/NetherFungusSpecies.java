@@ -23,11 +23,11 @@ import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.surround;
 
@@ -119,11 +119,12 @@ public class NetherFungusSpecies extends Species {
     }
 
     @Override
-    protected void addTextures(BlockModelBuilder builder, ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
+    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
+                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
         final ResourceLocation capLocation = surround(this.getRegistryName(), "block/", "_cap");
-        builder.texture("particle", capLocation)
-                .texture("stem", barkTextureLocation)
-                .texture("cap", capLocation);
+        textureConsumer.accept("particle", capLocation);
+        textureConsumer.accept("stem", barkTextureLocation);
+        textureConsumer.accept("cap", capLocation);
     }
 
 }
