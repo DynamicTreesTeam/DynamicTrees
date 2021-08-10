@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
+import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 
 import java.util.function.Consumer;
 
@@ -49,6 +50,11 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
      */
     protected final JsonPropertyApplierList<V> reloadAppliers;
 
+    /**
+     * Holds appliers that should only be applied on {@link GatherDataEvent}.
+     */
+    protected final JsonPropertyApplierList<V> gatherDataAppliers;
+
     protected final String applierListIdentifier;
 
     public JsonApplierReloadListener(final String folderName, final Class<V> objectType, final String applierListIdentifier) {
@@ -58,6 +64,7 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
         this.loadAppliers = new JsonPropertyApplierList<>(objectType);
         this.setupAppliers = new JsonPropertyApplierList<>(objectType);
         this.reloadAppliers = new JsonPropertyApplierList<>(objectType);
+        this.gatherDataAppliers = new JsonPropertyApplierList<>(objectType);
         this.applierListIdentifier = applierListIdentifier;
     }
 
@@ -70,6 +77,7 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
         this.postApplierEvent(this.loadAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.LOAD_SUFFIX);
         this.postApplierEvent(this.setupAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.SETUP_SUFFIX);
         this.postApplierEvent(this.reloadAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.RELOAD_SUFFIX);
+        this.postApplierEvent(this.gatherDataAppliers, this.applierListIdentifier + JsonApplierRegistryEvent.GATHER_DATA_SUFFIX);
     }
 
     /**

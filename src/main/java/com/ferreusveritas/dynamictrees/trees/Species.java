@@ -1,6 +1,10 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.*;
+import com.ferreusveritas.dynamictrees.api.data.Generator;
+import com.ferreusveritas.dynamictrees.api.data.SaplingStateGenerator;
+import com.ferreusveritas.dynamictrees.api.data.SeedItemModelGenerator;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
@@ -21,6 +25,8 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
+import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -87,6 +93,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -559,6 +566,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     public Optional<DynamicLeavesBlock> getLeavesBlock() {
         return this.leavesProperties.getDynamicLeavesBlock();
+    }
+
+    public Optional<Block> getPrimitiveLeaves() {
+        return Optionals.ofBlock(this.leavesProperties.getPrimitiveLeaves().getBlock());
     }
 
     public void addValidLeafBlocks(LeavesProperties... leaves) {
@@ -2171,6 +2182,49 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     public List<ITag.INamedTag<Item>> defaultSeedTags() {
         return Collections.singletonList(DTItemTags.SEEDS);
+    }
+
+    /**
+     * @return the location of the dynamic sapling smartmodel for this type of species
+     */
+    public ResourceLocation getSaplingSmartModelLocation() {
+        return DynamicTrees.resLoc("block/smartmodel/sapling");
+    }
+
+    protected final MutableLazyValue<Generator<DTBlockStateProvider, Species>> saplingStateGenerator =
+            MutableLazyValue.supplied(SaplingStateGenerator::new);
+
+    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
+                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
+        textureConsumer.accept("particle", leavesTextureLocation);
+        textureConsumer.accept("log", barkTextureLocation);
+        textureConsumer.accept("leaves", leavesTextureLocation);
+    }
+
+    @Override
+    public void generateStateData(DTBlockStateProvider provider) {
+        // Generate sapling block state and model.
+        this.saplingStateGenerator.get().generate(provider, this);
+    }
+
+    /**
+     * @return the location of the parent model of the seed item model
+     */
+    public ResourceLocation getSeedParentLocation() {
+        return DynamicTrees.resLoc("item/standard_seed");
+    }
+
+    protected final MutableLazyValue<Generator<DTItemModelProvider, Species>> seedModelGenerator =
+            MutableLazyValue.supplied(SeedItemModelGenerator::new);
+
+    public Generator<DTItemModelProvider, Species> getSeedModelGenerator() {
+        return this.seedModelGenerator.get();
+    }
+
+    @Override
+    public void generateItemModelData(DTItemModelProvider provider) {
+        // Generate seed models.
+        this.seedModelGenerator.get().generate(provider, this);
     }
 
     @Override

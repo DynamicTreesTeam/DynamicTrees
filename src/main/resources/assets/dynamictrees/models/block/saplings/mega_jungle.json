@@ -1,8 +1,0 @@
-{
-  "parent": "dynamictrees:block/sapling",
-  "textures": {
-    "particle": "block/jungle_leaves",
-    "log": "block/jungle_log",
-    "leaves": "block/jungle_leaves"
-  }
-}

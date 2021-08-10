@@ -21,6 +21,10 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
 
     @Override
     public void registerAppliers() {
+        this.loadAppliers.register("substitute_soil", String.class, (soilProperties, substitute) ->
+                soilProperties.setSubstitute(true)
+        );
+
         this.loadReloadAppliers.registerArrayApplier("acceptable_soils", String.class, (soilProperties, acceptableSoil) -> {
             if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
                 SoilHelper.createNewAdjective(acceptableSoil);
@@ -29,6 +33,9 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
             SoilHelper.registerSoil(soilProperties, acceptableSoil);
             return PropertyApplierResult.success();
         });
+
+        // Primitive soil is needed before gathering data.
+        this.gatherDataAppliers.register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
 
         this.setupAppliers.register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
 

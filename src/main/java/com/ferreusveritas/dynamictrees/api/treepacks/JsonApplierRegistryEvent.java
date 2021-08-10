@@ -18,6 +18,7 @@ public class JsonApplierRegistryEvent<T> extends GenericEvent<T> implements IMod
     public static final String LOAD_SUFFIX = "_load";
     public static final String SETUP_SUFFIX = "_setup";
     public static final String RELOAD_SUFFIX = "_reload";
+    public static final String GATHER_DATA_SUFFIX = "_gather_data";
 
     public final JsonPropertyApplierList<T> applierList;
     private final String applierListIdentifier;

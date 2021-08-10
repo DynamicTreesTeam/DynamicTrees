@@ -1,7 +1,0 @@
-{
-    "parent": "dynamictrees:item/branch",
-    "textures": {
-        "bark": "block/crimson_stem",
-        "rings": "block/crimson_stem_top"
-    }
-}

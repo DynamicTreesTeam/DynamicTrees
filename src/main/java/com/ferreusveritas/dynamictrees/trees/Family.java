@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.trees;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.data.*;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
@@ -13,12 +15,16 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.compat.waila.WailaOther;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.provider.BranchLoaderBuilder;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
+import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
+import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
+import com.ferreusveritas.dynamictrees.util.Optionals;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -36,13 +42,20 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+
+import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
+import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.suffix;
 
 /**
  * This structure describes a Family whose member Species all have a common branch.
@@ -343,7 +356,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
      * @return The {@link ResourceLocation} registry name for the branch.
      */
     private ResourceLocation getBranchRegName(final String prefix) {
-        return ResourceLocationUtils.suffix(ResourceLocationUtils.prefix(this.getRegistryName(), prefix), "_branch");
+        return suffix(prefix(this.getRegistryName(), prefix), "_branch");
     }
 
     /**
@@ -424,6 +437,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
         return Optional.ofNullable(strippedBranch);
     }
 
+    @Nullable
     public Item getBranchItem() {
         return branchItem;
     }
@@ -512,8 +526,16 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
         return primitiveLog;
     }
 
+    public Optional<Block> getPrimitiveLogOptional() {
+        return Optionals.ofBlock(this.primitiveLog);
+    }
+
     public Block getPrimitiveStrippedLog() {
         return primitiveStrippedLog;
+    }
+
+    public Optional<Block> getPrimitiveStrippedLogOptional() {
+        return Optionals.ofBlock(primitiveStrippedLog);
     }
 
     private List<ItemStack> getLogDropsForBranch(float volume, int branch) {
@@ -687,11 +709,15 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
     }
 
     public SurfaceRootBlock createSurfaceRoot() {
-        return RegistryHandler.addBlock(ResourceLocationUtils.suffix(this.getRegistryName(), "_root"), new SurfaceRootBlock(this));
+        return RegistryHandler.addBlock(suffix(this.getRegistryName(), "_root"), new SurfaceRootBlock(this));
     }
 
     public SurfaceRootBlock getSurfaceRoot() {
         return this.surfaceRoot;
+    }
+
+    public Optional<SurfaceRootBlock> getSurfaceRootOptional() {
+        return Optionals.ofBlock(this.surfaceRoot);
     }
 
     protected Family setSurfaceRoot(SurfaceRootBlock surfaceRoot) {
@@ -748,6 +774,50 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
     public List<ITag.INamedTag<Block>> defaultStrippedBranchTags() {
         return this.isFireProof ? Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES) :
                 Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN);
+    }
+
+    /**
+     * @return a constructor for the relevant branch block model builder for the corresponding loader
+     */
+    public BiFunction<BlockModelBuilder, ExistingFileHelper, BranchLoaderBuilder> getBranchLoaderConstructor() {
+        return BranchLoaderBuilder::branch;
+    }
+
+    protected final MutableLazyValue<Generator<DTBlockStateProvider, Family>> branchStateGenerator =
+            MutableLazyValue.supplied(BranchStateGenerator::new);
+
+    protected final MutableLazyValue<Generator<DTBlockStateProvider, Family>> strippedBranchStateGenerator =
+            MutableLazyValue.supplied(StrippedBranchStateGenerator::new);
+
+    protected final MutableLazyValue<Generator<DTBlockStateProvider, Family>> surfaceRootStateGenerator =
+            MutableLazyValue.supplied(SurfaceRootStateGenerator::new);
+
+    @Override
+    public void generateStateData(DTBlockStateProvider provider) {
+        // Generate branch block state and model.
+        this.branchStateGenerator.get().generate(provider, this);
+        this.strippedBranchStateGenerator.get().generate(provider, this);
+
+        // Generate surface root block state and model.
+        this.surfaceRootStateGenerator.get().generate(provider, this);
+    }
+
+    public ResourceLocation getBranchItemParentLocation() {
+        return DynamicTrees.resLoc("item/branch");
+    }
+
+    protected final MutableLazyValue<Generator<DTItemModelProvider, Family>> branchItemModelGenerator =
+            MutableLazyValue.supplied(BranchItemModelGenerator::new);
+
+    public void addBranchTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {
+        textureConsumer.accept("bark", primitiveLogLocation);
+        textureConsumer.accept("rings", suffix(primitiveLogLocation, "_top"));
+    }
+
+    @Override
+    public void generateItemModelData(DTItemModelProvider provider) {
+        // Generate branch item models.
+        this.branchItemModelGenerator.get().generate(provider, this);
     }
 
     //////////////////////////////

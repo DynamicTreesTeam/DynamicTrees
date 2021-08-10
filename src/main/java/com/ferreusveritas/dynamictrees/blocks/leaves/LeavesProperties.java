@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.data.Generator;
+import com.ferreusveritas.dynamictrees.api.data.LeavesStateGenerator;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
@@ -8,13 +10,12 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.IResettable;
-import com.ferreusveritas.dynamictrees.util.BlockStates;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import com.ferreusveritas.dynamictrees.util.ToolTypes;
+import com.ferreusveritas.dynamictrees.util.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.*;
@@ -189,6 +190,10 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
      */
     public BlockState getPrimitiveLeaves() {
         return primitiveLeaves;
+    }
+
+    public Optional<Block> getPrimitiveLeavesBlock() {
+        return Optionals.ofBlock(this.primitiveLeaves.getBlock());
     }
 
     public void setPrimitiveLeaves(final Block primitiveLeaves) {
@@ -468,6 +473,15 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     public List<ITag.INamedTag<Block>> defaultLeavesTags() {
         return Collections.singletonList(DTBlockTags.LEAVES);
+    }
+
+    protected final MutableLazyValue<Generator<DTBlockStateProvider, LeavesProperties>> stateGenerator =
+            MutableLazyValue.supplied(LeavesStateGenerator::new);
+
+    @Override
+    public void generateStateData(DTBlockStateProvider provider) {
+        // Generate leaves block state and model.
+        this.stateGenerator.get().generate(provider, this);
     }
 
     ///////////////////////////////////////////

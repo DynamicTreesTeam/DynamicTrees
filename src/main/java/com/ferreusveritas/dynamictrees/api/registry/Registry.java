@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
-import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistry;
 
@@ -101,12 +100,6 @@ public class Registry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
     @Override
     public final Set<V> getAll() {
         return Collections.unmodifiableSet(this.entries);
-    }
-
-    public final Set<V> getAllFor(final String namespace) {
-        return this.entries.stream()
-                .filter(entry -> entry.getRegistryName().getNamespace().equals(namespace))
-                .collect(CommonCollectors.toUnmodifiableLinkedSet());
     }
 
     @Override
