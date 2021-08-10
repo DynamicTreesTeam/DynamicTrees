@@ -13,8 +13,10 @@
         "hot": 0.75,
         "dry": 0.25
     },
-    "primitive_sapling_item": "apple",
-    "can_craft_seed_to_sapling": false,
+    "primitive_sapling": {
+        "sapling_item": "apple",
+        "can_craft_seed_to_sapling": false
+    },
     "perfect_biomes": { "name": "minecraft:plains" },
     "features" : [
         "fruit"

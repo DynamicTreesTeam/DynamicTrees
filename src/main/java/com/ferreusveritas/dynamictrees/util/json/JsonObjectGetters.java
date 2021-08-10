@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
@@ -187,6 +188,8 @@ public final class JsonObjectGetters {
     public static final IJsonObjectGetter<ConfiguredDropCreator<DropCreator>> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, new ConfiguredGetter<>("Drop Creator", DropCreator.class));
 
     public static final IJsonObjectGetter<Drops> DROPS = register(Drops.class, new DropsGetter());
+
+    public static final IJsonObjectGetter<SeedSaplingRecipe> SEED_SAPLING_RECIPE = register(SeedSaplingRecipe.class, new SeedSaplingRecipeGetter());
 
     public static final IJsonObjectGetter<Seed> SEED = register(Seed.class, jsonElement -> ITEM.get(jsonElement).mapIfValid(item -> item instanceof Seed, "Item '{value}' is not a seed.", item -> (Seed) item));
 

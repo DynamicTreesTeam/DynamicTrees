@@ -33,6 +33,7 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
@@ -244,10 +245,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * The seed used to reproduce this species.  Drops from the tree and can plant itself
      */
     protected Seed seed;
-    /**
-     * Valid primitive sapling {@link Item}s. Used for dirt bucket recipes.
-     */
-    protected final Set<Item> primitiveSaplingItems = new HashSet<>();
+
     /**
      * A blockState that will turn itself into this tree
      */
@@ -316,7 +314,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         this.genFeatures.clear();
         this.dropCreators.clear();
         this.acceptableBlocksForGrowth.clear();
-        this.primitiveSaplingItems.clear();
+        this.primitiveSaplingRecipe.clear();
         this.perfectBiomes.clear();
 
         this.clearAcceptableSoils();
@@ -862,16 +860,23 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     // SAPLING
     ///////////////////////////////////////////
 
+    /**
+     * Valid primitive sapling {@link Item}s. Used for dirt bucket recipes.
+     */
+    protected final Set<SeedSaplingRecipe> primitiveSaplingRecipe = new HashSet<>();
 
-    public Set<Item> getPrimitiveSaplingItems() {
-        final Set<Item> saplingItems = new HashSet<>(this.primitiveSaplingItems);
-        saplingItems.addAll(TreeRegistry.SAPLING_REPLACERS.entrySet().stream().filter(entry -> entry.getValue() == this).map(Map.Entry::getKey)
-                .map(BlockState::getBlock).map(Block::asItem).filter(item -> item != Items.AIR).collect(Collectors.toSet()));
-        return saplingItems;
+    public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe){
+        recipe.getSaplingBlock()
+                .ifPresent(block -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), this));
+        primitiveSaplingRecipe.add(recipe);
+    }
+
+    public Set<SeedSaplingRecipe> getPrimitiveSaplingRecipes() {
+        return new HashSet<>(this.primitiveSaplingRecipe);
     }
 
     public Species addPrimitiveSaplingItem(final Item primitiveSaplingItem) {
-        this.primitiveSaplingItems.add(primitiveSaplingItem);
+        this.primitiveSaplingRecipe.add(new SeedSaplingRecipe(primitiveSaplingItem));
         return this;
     }
 
@@ -880,27 +885,27 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         return this;
     }
 
-    private boolean canCraftSeedToSapling = true;
-
-    public Species setCanCraftSeedToSapling(boolean truth) {
-        this.canCraftSeedToSapling = truth;
-        return this;
-    }
-
-    public boolean canCraftSeedToSapling() {
-        return canCraftSeedToSapling;
-    }
-
-    private boolean canCraftSaplingToSeed = true;
-
-    public Species setCanCraftSaplingToSeed(boolean truth) {
-        this.canCraftSaplingToSeed = truth;
-        return this;
-    }
-
-    public boolean canCraftSaplingToSeed() {
-        return canCraftSaplingToSeed;
-    }
+//    private boolean canCraftSeedToSapling = true;
+//
+//    public Species setCanCraftSeedToSapling(boolean truth) {
+//        this.canCraftSeedToSapling = truth;
+//        return this;
+//    }
+//
+//    public boolean canCraftSeedToSapling() {
+//        return canCraftSeedToSapling;
+//    }
+//
+//    private boolean canCraftSaplingToSeed = true;
+//
+//    public Species setCanCraftSaplingToSeed(boolean truth) {
+//        this.canCraftSaplingToSeed = truth;
+//        return this;
+//    }
+//
+//    public boolean canCraftSaplingToSeed() {
+//        return canCraftSaplingToSeed;
+//    }
 
     /**
      * Holds whether or not a {@link Seed} should be generated. Stored as a {@code non-primitive} so its default value
