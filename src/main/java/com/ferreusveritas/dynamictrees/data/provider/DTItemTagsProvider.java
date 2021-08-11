@@ -37,7 +37,7 @@ public class DTItemTagsProvider extends ItemTagsProvider {
     }
 
     protected void addDTTags() {
-        Species.REGISTRY.getAllFor(this.modId).forEach(species -> {
+        Species.REGISTRY.dataGenerationStream(this.modId).forEach(species -> {
             // Some species return the common seed, so only return if the species has its own seed.
             if (!species.hasSeed()) {
                 return;
