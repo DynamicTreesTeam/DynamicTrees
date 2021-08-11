@@ -127,12 +127,12 @@ public final class TreeRegistry {
      * @param configuredDropCreator The {@link DropCreator} to register.
      */
     public static boolean registerDropCreator(final ResourceLocation speciesName,
-                                              final ConfiguredDropCreator<DropCreator> configuredDropCreator) {
+                                              final ConfiguredDropCreator configuredDropCreator) {
         return findSpecies(speciesName).addDropCreators(configuredDropCreator);
     }
 
     public static void registerGlobalDropCreator(final ResourceLocation registryName,
-                                                 final ConfiguredDropCreator<DropCreator> configuredDropCreator) {
+                                                 final ConfiguredDropCreator configuredDropCreator) {
         DTResourceRegistries.GLOBAL_DROP_CREATOR_MANAGER.put(registryName, configuredDropCreator);
     }
 
@@ -141,8 +141,8 @@ public final class TreeRegistry {
         return findSpecies(speciesName).removeDropCreator(dropCreatorName);
     }
 
-    public static Map<ResourceLocation, List<ConfiguredDropCreator<DropCreator>>> getDropCreatorsMap() {
-        final Map<ResourceLocation, List<ConfiguredDropCreator<DropCreator>>> dir = new HashMap<>();
+    public static Map<ResourceLocation, List<ConfiguredDropCreator>> getDropCreatorsMap() {
+        final Map<ResourceLocation, List<ConfiguredDropCreator>> dir = new HashMap<>();
         dir.put(GLOBAL, DTResourceRegistries.GLOBAL_DROP_CREATOR_MANAGER.getAll());
         Species.REGISTRY.forEach(species -> dir.put(species.getRegistryName(), species.getDropCreators()));
         return dir;

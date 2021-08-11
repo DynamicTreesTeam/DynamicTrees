@@ -11,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 
 /**
  * @author Harley O'Connor
- * @deprecated Once systems are feature complete this can be defined in Json.
+ * @deprecated once systems are feature complete this can be defined in Json
  */
 @Deprecated
 public final class WartBlockDropCreator extends DropCreator {
@@ -29,13 +29,13 @@ public final class WartBlockDropCreator extends DropCreator {
     }
 
     @Override
-    protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
+    protected ConfiguredDropCreator createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(BLOCK, Blocks.AIR)
                 .with(HARVEST_CHANCE, 10);
     }
 
-    private Block getWartBlock(final ConfiguredDropCreator<DropCreator> configuration, final Species species) {
+    private Block getWartBlock(final ConfiguredDropCreator configuration, final Species species) {
         final Block wartBlock = configuration.get(BLOCK);
         return wartBlock == Blocks.AIR ? species.getLeavesBlock()
                 .map(leaves -> (Block) leaves)
@@ -43,12 +43,12 @@ public final class WartBlockDropCreator extends DropCreator {
     }
 
     @Override
-    public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendHarvestDrops(ConfiguredDropCreator configuration, DropContext context) {
         StackDrops.create(1F, configuration.get(HARVEST_CHANCE), new ItemStack(this.getWartBlock(configuration, context.species())));
     }
 
     @Override
-    public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendLeavesDrops(ConfiguredDropCreator configuration, DropContext context) {
         StackDrops.create(1F, 1, new ItemStack(this.getWartBlock(configuration, context.species())));
     }
 

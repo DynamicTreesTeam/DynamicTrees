@@ -18,7 +18,7 @@ import org.apache.logging.log4j.util.TriConsumer;
  *
  * @author ferreusveritas
  */
-public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator, ConfiguredDropCreator<DropCreator>> implements IResettable<DropCreator> {
+public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator, ConfiguredDropCreator> implements IResettable<DropCreator> {
 
     public static final ConfigurationProperty<Float> RARITY = ConfigurationProperty.floatProperty("rarity");
 
@@ -41,14 +41,14 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
             return dropType;
         }
 
-        private final TriConsumer<DropCreator, ConfiguredDropCreator<DropCreator>, C> appendDropConsumer;
+        private final TriConsumer<DropCreator, ConfiguredDropCreator, C> appendDropConsumer;
 
-        public DropType(ResourceLocation registryName, TriConsumer<DropCreator, ConfiguredDropCreator<DropCreator>, C> appendDropConsumer) {
+        public DropType(ResourceLocation registryName, TriConsumer<DropCreator, ConfiguredDropCreator, C> appendDropConsumer) {
             super(registryName);
             this.appendDropConsumer = appendDropConsumer;
         }
 
-        public void appendDrops(ConfiguredDropCreator<DropCreator> configuration, C context) {
+        public void appendDrops(ConfiguredDropCreator configuration, C context) {
             this.appendDropConsumer.accept(configuration.getConfigurable(), configuration, context);
         }
 
@@ -71,24 +71,24 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
     }
 
     @Override
-    protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
-        return new ConfiguredDropCreator<>(this);
+    protected ConfiguredDropCreator createDefaultConfiguration() {
+        return new ConfiguredDropCreator(this);
     }
 
-    public <C extends DropContext> void appendDrops(final ConfiguredDropCreator<DropCreator> configuration, final DropType<C> dropType, final C context) {
+    public <C extends DropContext> void appendDrops(final ConfiguredDropCreator configuration, final DropType<C> dropType, final C context) {
         dropType.appendDrops(configuration, context);
     }
 
-    public void appendHarvestDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendHarvestDrops(final ConfiguredDropCreator configuration, DropContext context) {
     }
 
-    public void appendVoluntaryDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendVoluntaryDrops(final ConfiguredDropCreator configuration, DropContext context) {
     }
 
-    public void appendLeavesDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendLeavesDrops(final ConfiguredDropCreator configuration, DropContext context) {
     }
 
-    public void appendLogDrops(final ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) {
+    public void appendLogDrops(final ConfiguredDropCreator configuration, LogDropContext context) {
     }
 
 }

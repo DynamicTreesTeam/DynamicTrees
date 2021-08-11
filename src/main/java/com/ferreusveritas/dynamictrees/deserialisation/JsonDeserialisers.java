@@ -169,7 +169,7 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<List<SoilProperties>> SOIL_PROPERTIES_LIST = register(ListDeserialiser.getListClass(SoilProperties.class), new ListDeserialiser<>(SOIL_PROPERTIES));
 
     public static final JsonDeserialiser<ConfiguredGenFeature<GenFeature>> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class));
-    public static final JsonDeserialiser<ConfiguredDropCreator<DropCreator>> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class));
+    public static final JsonDeserialiser<ConfiguredDropCreator> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class));
 
     public static final JsonDeserialiser<Drops> DROPS = register(Drops.class, new DropsDeserialiser());
 

@@ -27,7 +27,7 @@ public final class GlobalDropCreatorManager extends JsonReloadListener<DropCreat
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final Map<ResourceLocation, ConfiguredDropCreator<DropCreator>> entries = Maps.newHashMap();
+    private final Map<ResourceLocation, ConfiguredDropCreator> entries = Maps.newHashMap();
 
     public GlobalDropCreatorManager() {
         super("drop_creators/global", DropCreator.class, "");
@@ -52,7 +52,7 @@ public final class GlobalDropCreatorManager extends JsonReloadListener<DropCreat
         });
     }
 
-    public List<ConfiguredDropCreator<DropCreator>> getAll() {
+    public List<ConfiguredDropCreator> getAll() {
         return Lists.newLinkedList(this.entries.values());
     }
 
@@ -61,11 +61,11 @@ public final class GlobalDropCreatorManager extends JsonReloadListener<DropCreat
                 .appendDrops(configuration, dropType, context));
     }
 
-    public ConfiguredDropCreator<DropCreator> get(final ResourceLocation registryName) {
+    public ConfiguredDropCreator get(final ResourceLocation registryName) {
         return this.entries.get(registryName);
     }
 
-    public void put(final ResourceLocation registryName, final ConfiguredDropCreator<DropCreator> configuredDropCreator) {
+    public void put(final ResourceLocation registryName, final ConfiguredDropCreator configuredDropCreator) {
         this.entries.put(registryName, configuredDropCreator);
     }
 

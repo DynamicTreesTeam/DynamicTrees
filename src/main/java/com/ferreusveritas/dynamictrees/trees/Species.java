@@ -255,7 +255,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      */
     protected DynamicSaplingBlock saplingBlock;
 
-    protected List<ConfiguredDropCreator<DropCreator>> dropCreators = new ArrayList<>();
+    protected List<ConfiguredDropCreator> dropCreators = new ArrayList<>();
 
     //WorldGen
     /**
@@ -772,11 +772,10 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         return this;
     }
 
-    @SafeVarargs
     @SuppressWarnings("unchecked")
-    public final <DC extends DropCreator> boolean addDropCreators(ConfiguredDropCreator<DC>... dropCreators) {
+    public final boolean addDropCreators(ConfiguredDropCreator... dropCreators) {
         Arrays.stream(dropCreators).forEach(configuration ->
-                this.dropCreators.add(((ConfiguredDropCreator<DropCreator>) configuration)));
+                this.dropCreators.add(((ConfiguredDropCreator) configuration)));
         return true;
     }
 
@@ -785,7 +784,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
                 dropCreator.getConfigurable().getRegistryName().equals(registryName));
     }
 
-    public List<ConfiguredDropCreator<DropCreator>> getDropCreators() {
+    public List<ConfiguredDropCreator> getDropCreators() {
         return this.dropCreators;
     }
 

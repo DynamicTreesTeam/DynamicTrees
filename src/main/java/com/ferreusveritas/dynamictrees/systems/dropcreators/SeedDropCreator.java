@@ -24,7 +24,7 @@ public class SeedDropCreator extends DropCreator {
     }
 
     // Allows for overriding species seed drop if a custom seed is set.
-    protected ItemStack getSeedStack(Species species, ConfiguredDropCreator<DropCreator> configuration) {
+    protected ItemStack getSeedStack(Species species, ConfiguredDropCreator configuration) {
         final ItemStack customSeed = configuration.get(SEED);
         return customSeed.isEmpty() ? species.getSeedStack(1) : customSeed;
     }
@@ -35,7 +35,7 @@ public class SeedDropCreator extends DropCreator {
     }
 
     @Override
-    protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
+    protected ConfiguredDropCreator createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(RARITY, 1f)
                 .with(HARVEST_RARITY, -1f)
@@ -44,13 +44,13 @@ public class SeedDropCreator extends DropCreator {
                 .with(SEED, ItemStack.EMPTY);
     }
 
-    private float rarityOrDefault(ConfiguredDropCreator<DropCreator> configuration, ConfigurationProperty<Float> rarityProperty) {
+    private float rarityOrDefault(ConfiguredDropCreator configuration, ConfigurationProperty<Float> rarityProperty) {
         final float rarityOverride = configuration.get(rarityProperty);
         return rarityOverride == -1f ? configuration.get(RARITY) : rarityOverride;
     }
 
     @Override
-    public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendHarvestDrops(ConfiguredDropCreator configuration, DropContext context) {
         float rarity = this.rarityOrDefault(configuration, HARVEST_RARITY);
         rarity *= (context.fortune() + 1) / 64f;
         rarity *= Math.min(context.species().seasonalSeedDropFactor(context.world(), context.pos()) + 0.15f, 1.0);
@@ -61,7 +61,7 @@ public class SeedDropCreator extends DropCreator {
     }
 
     @Override
-    public void appendVoluntaryDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendVoluntaryDrops(ConfiguredDropCreator configuration, DropContext context) {
         if (this.rarityOrDefault(configuration, VOLUNTARY_RARITY) * DTConfigs.SEED_DROP_RATE.get() *
                 context.species().seasonalSeedDropFactor(context.world(), context.pos())
                 > context.random().nextFloat()) {
@@ -75,7 +75,7 @@ public class SeedDropCreator extends DropCreator {
     }
 
     @Override
-    public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendLeavesDrops(ConfiguredDropCreator configuration, DropContext context) {
         int chance = 20; // See BlockLeaves#getSaplingDropChance(state);
         // Hokey fortune stuff here to match Vanilla logic.
         if (context.fortune() > 0) {
