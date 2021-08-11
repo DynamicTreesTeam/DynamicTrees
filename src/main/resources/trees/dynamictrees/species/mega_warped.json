@@ -8,7 +8,12 @@
     "growth_rate": 0.9,
     "soil_longevity": 8,
     "max_branch_radius": 20,
-    "growth_logic_kit": "nether_fungus",
+    "growth_logic_kit": {
+        "name": "nether_fungus",
+        "properties": {
+            "min_cap_height": 6
+        }
+    },
     "leaves_properties": "warped",
     "environment_factors" : {
         "cold": 0.25,

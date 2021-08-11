@@ -1,12 +1,11 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
-import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.EnergyContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.LowestBranchHeightContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class DarkOakLogic extends GrowthLogicKit {
 
@@ -15,18 +14,19 @@ public class DarkOakLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap) {
+    public int[] directionManipulation(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
+        final int[] probMap = context.probMap();
         probMap[Direction.UP.get3DDataValue()] = 4;
 
         //Disallow up/down turns after having turned out of the trunk once.
-        if (!signal.isInTrunk()) {
+        if (!context.signal().isInTrunk()) {
             probMap[Direction.UP.get3DDataValue()] = 0;
             probMap[Direction.DOWN.get3DDataValue()] = 0;
-            probMap[signal.dir.ordinal()] *= 0.35;//Promotes the zag of the horizontal branches
+            probMap[context.signal().dir.ordinal()] *= 0.35;//Promotes the zag of the horizontal branches
         }
 
         //Amplify cardinal directions to encourage spread the higher we get
-        float energyRatio = signal.delta.getY() / species.getEnergy(world, pos);
+        float energyRatio = context.signal().delta.getY() / context.species().getEnergy(context.world(), context.pos());
         float spreadPush = energyRatio * 2;
         spreadPush = Math.max(spreadPush, 1.0f);
         for (Direction dir : CoordUtils.HORIZONTALS) {
@@ -34,24 +34,24 @@ public class DarkOakLogic extends GrowthLogicKit {
         }
 
         //Ensure that the branch gets out of the trunk at least two blocks so it won't interfere with new side branches at the same level
-        if (signal.numTurns == 1 && signal.delta.distSqr(0, signal.delta.getY(), 0, true) == 1.0) {
+        if (context.signal().numTurns == 1 && context.signal().delta.distSqr(0, context.signal().delta.getY(), 0, true) == 1.0) {
             for (Direction dir : CoordUtils.HORIZONTALS) {
-                if (signal.dir != dir) {
+                if (context.signal().dir != dir) {
                     probMap[dir.ordinal()] = 0;
                 }
             }
         }
 
         //If the side branches are too swole then give some other branches a chance
-        if (signal.isInTrunk()) {
+        if (context.signal().isInTrunk()) {
             for (Direction dir : CoordUtils.HORIZONTALS) {
                 if (probMap[dir.ordinal()] >= 7) {
                     probMap[dir.ordinal()] = 2;
                 }
             }
-            if (signal.delta.getY() > species.getLowestBranchHeight() + 5) {
+            if (context.signal().delta.getY() > context.species().getLowestBranchHeight() + 5) {
                 probMap[Direction.UP.ordinal()] = 0;
-                signal.energy = 2;
+                context.signal().energy = 2;
             }
         }
 
@@ -59,17 +59,12 @@ public class DarkOakLogic extends GrowthLogicKit {
     }
 
     @Override
-    public Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal) {
-        return newDir;
+    public float getEnergy(ConfiguredGrowthLogicKit configuration, EnergyContext context) {
+        return context.signalEnergy() * context.species().biomeSuitability(context.world(), context.pos());
     }
 
     @Override
-    public float getEnergy(World world, BlockPos pos, Species species, float signalEnergy) {
-        return signalEnergy * species.biomeSuitability(world, pos);
-    }
-
-    @Override
-    public int getLowestBranchHeight(World world, BlockPos pos, Species species, int lowestBranchHeight) {
-        return (int) (lowestBranchHeight * species.biomeSuitability(world, pos));
+    public int getLowestBranchHeight(ConfiguredGrowthLogicKit configuration, LowestBranchHeightContext context) {
+        return (int) (context.lowestBranchHeight() * context.species().biomeSuitability(context.world(), context.pos()));
     }
 }

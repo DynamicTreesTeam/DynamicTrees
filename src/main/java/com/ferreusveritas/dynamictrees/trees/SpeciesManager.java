@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
@@ -89,7 +89,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("soil_longevity", Integer.class, Species::setSoilLongevity)
                 .register("max_branch_radius", Integer.class, Species::setMaxBranchRadius)
                 .register("transformable", Boolean.class, Species::setTransformable)
-                .register("growth_logic_kit", GrowthLogicKit.class, Species::setGrowthLogicKit)
+                .register("growth_logic_kit", ConfiguredGrowthLogicKit.class, Species::setGrowthLogicKit)
                 .register("leaves_properties", LeavesProperties.class, Species::setLeavesProperties)
                 .register("world_gen_leaf_map_height", Integer.class, Species::setWorldGenLeafMapHeight)
                 .register("environment_factors", JsonObject.class, (species, jsonObject) ->
@@ -123,9 +123,8 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                     species.addAcceptableSoils(acceptableSoil);
                     return PropertyApplierResult.success();
                 })
-                .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreators)
-                .registerArrayApplier("features", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, Species::addGenFeature)
-                .registerArrayApplier("drop_creators", ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, Species::addDropCreators)
+                .registerArrayApplier("features", ConfiguredGenFeature.class, Species::addGenFeature)
+                .registerArrayApplier("drop_creators", ConfiguredDropCreator.class, Species::addDropCreators)
                 .register("does_rot", Boolean.class, Species::setDoesRot);
 
         super.registerAppliers();

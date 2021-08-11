@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
+import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
@@ -168,8 +169,9 @@ public final class JsonDeserialisers {
 
     public static final JsonDeserialiser<List<SoilProperties>> SOIL_PROPERTIES_LIST = register(ListDeserialiser.getListClass(SoilProperties.class), new ListDeserialiser<>(SOIL_PROPERTIES));
 
-    public static final JsonDeserialiser<ConfiguredGenFeature> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS, new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class));
-    public static final JsonDeserialiser<ConfiguredDropCreator> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.NULL_CONFIGURED_DROP_CREATOR_CLASS, new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class));
+    public static final JsonDeserialiser<ConfiguredGenFeature> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.class, new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class));
+    public static final JsonDeserialiser<ConfiguredDropCreator> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.class, new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class));
+    public static final JsonDeserialiser<ConfiguredGrowthLogicKit> CONFIGURED_GROWTH_LOGIC_KIT = register(ConfiguredGrowthLogicKit.class, new ConfiguredDeserialiser<>("Growth Logic Kit", GrowthLogicKit.class));
 
     public static final JsonDeserialiser<Drops> DROPS = register(Drops.class, new DropsDeserialiser());
 

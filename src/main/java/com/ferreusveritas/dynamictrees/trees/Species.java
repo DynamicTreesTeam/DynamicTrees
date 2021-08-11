@@ -26,7 +26,12 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
+import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.EnergyContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.LowestBranchHeightContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.NewDirectionContext;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
@@ -186,7 +191,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     /**
      * Logic kit for standardized extended growth behavior
      */
-    protected GrowthLogicKit logicKit = GrowthLogicKit.NULL_LOGIC;
+    protected ConfiguredGrowthLogicKit logicKit = ConfiguredGrowthLogicKit.NULL_LOGIC_KIT;
 
     /**
      * How quickly the branch thickens on it's own without branch merges [default = 0.3]
@@ -463,7 +468,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     }
 
     public float getEnergy(World world, BlockPos rootPos) {
-        return getGrowthLogicKit().getEnergy(world, rootPos, this, signalEnergy);
+        return this.logicKit.getConfigurable().getEnergy(this.logicKit, new EnergyContext(world, rootPos, this, signalEnergy));
     }
 
     public float getGrowthRate(World world, BlockPos rootPos) {
@@ -494,7 +499,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @return The lowest number of blocks from the RootyDirtBlock that a branch can form.
      */
     public int getLowestBranchHeight(World world, BlockPos pos) {
-        return getGrowthLogicKit().getLowestBranchHeight(world, pos, this, lowestBranchHeight);
+        return this.logicKit.getConfigurable().getLowestBranchHeight(this.logicKit, new LowestBranchHeightContext(world, pos, this, lowestBranchHeight));
     }
 
     public float getTapering() {
@@ -772,10 +777,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public final boolean addDropCreators(ConfiguredDropCreator... dropCreators) {
-        Arrays.stream(dropCreators).forEach(configuration ->
-                this.dropCreators.add(((ConfiguredDropCreator) configuration)));
+    public boolean addDropCreators(ConfiguredDropCreator... dropCreators) {
+        this.dropCreators.addAll(Arrays.asList(dropCreators));
         return true;
     }
 
@@ -1466,6 +1469,11 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         return true;
     }
 
+    public Species setGrowthLogicKit(GrowthLogicKit logicKit) {
+        this.logicKit = logicKit.getDefaultConfiguration();
+        return this;
+    }
+
     /**
      * Set the logic kit used to determine how the tree branch network expands. Provides an alternate and more modular
      * method to override a trees growth logic.
@@ -1473,12 +1481,12 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @param logicKit A growth logic kit
      * @return this species for chaining
      */
-    public Species setGrowthLogicKit(GrowthLogicKit logicKit) {
+    public Species setGrowthLogicKit(ConfiguredGrowthLogicKit logicKit) {
         this.logicKit = logicKit;
         return this;
     }
 
-    public GrowthLogicKit getGrowthLogicKit() {
+    public ConfiguredGrowthLogicKit getGrowthLogicKit() {
         return logicKit;
     }
 
@@ -1507,7 +1515,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @return The selected {@link Direction}.
      */
     public Direction selectNewDirection(World world, BlockPos pos, BranchBlock branch, GrowSignal signal) {
-        Direction growthLogicDir = getGrowthLogicKit().selectNewDirection(world, pos, this, branch, signal);
+        Direction growthLogicDir = this.logicKit.getConfigurable().selectNewDirection(this.logicKit, world, pos, this, branch, signal);
         if (growthLogicDir != null) {
             return growthLogicDir; //if the growth logic kit overrides selectNewDirection, use that
         }
@@ -1547,14 +1555,15 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * Species can override the probability map here
      **/
     protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int[] probMap) {
-        return getGrowthLogicKit().directionManipulation(world, pos, this, radius, signal, probMap);
+        // TODO: Convenience methods in ConfiguredGrowhtLogicKit to shorten this.
+        return this.logicKit.getConfigurable().directionManipulation(this.logicKit, new DirectionManipulationContext(world, pos, this, radius, signal, probMap));
     }
 
     /**
      * Species can override to take action once a new direction is selected
      **/
     protected Direction newDirectionSelected(Direction newDir, GrowSignal signal) {
-        return getGrowthLogicKit().newDirectionSelected(this, newDir, signal);
+        return this.logicKit.getConfigurable().newDirectionSelected(this.logicKit, new NewDirectionContext(this, newDir, signal));
     }
 
     /**

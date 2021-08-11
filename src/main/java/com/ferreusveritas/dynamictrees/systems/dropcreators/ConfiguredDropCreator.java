@@ -9,10 +9,6 @@ public final class ConfiguredDropCreator extends Configured<ConfiguredDropCreato
 
     public static final ConfiguredDropCreator NULL_CONFIGURED_DROP_CREATOR = new ConfiguredDropCreator(DropCreator.NULL_DROP_CREATOR);
 
-    @SuppressWarnings("unchecked")
-    public static final Class<ConfiguredDropCreator> NULL_CONFIGURED_DROP_CREATOR_CLASS =
-            (Class<ConfiguredDropCreator>) NULL_CONFIGURED_DROP_CREATOR.getClass();
-
     public ConfiguredDropCreator(DropCreator dropCreator) {
         super(dropCreator);
     }

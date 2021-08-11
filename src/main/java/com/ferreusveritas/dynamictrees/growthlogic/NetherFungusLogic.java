@@ -1,8 +1,11 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.EnergyContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.LowestBranchHeightContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.NewDirectionContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -11,22 +14,33 @@ import net.minecraft.world.World;
 
 public class NetherFungusLogic extends GrowthLogicKit {
 
-    private static final int minCapHeight = 3;
-    private static final int minCapHeightMega = 6;
-    private static final int heightVariation = 8;
+    public static final ConfigurationProperty<Integer> MIN_CAP_HEIGHT = ConfigurationProperty.integer("min_cap_height");
 
     public NetherFungusLogic(final ResourceLocation registryName) {
         super(registryName);
     }
 
     @Override
-    public int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap) {
-        if (signal.isInTrunk()) {
-            if (TreeHelper.isBranch(world.getBlockState(pos.above())) && !TreeHelper.isBranch(world.getBlockState(pos.above(3)))) {
-                probMap = new int[]{0, 0, 0, 0, 0, 0};
-            } else if (!species.isMegaSpecies()) {
+    protected ConfiguredGrowthLogicKit createDefaultConfiguration() {
+        return super.createDefaultConfiguration()
+                .with(MIN_CAP_HEIGHT, 3)
+                .with(HEIGHT_VARIATION, 8);
+    }
+
+    @Override
+    protected void registerProperties() {
+        this.register(MIN_CAP_HEIGHT, HEIGHT_VARIATION);
+    }
+
+    @Override
+    public int[] directionManipulation(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
+        final int[] probMap = context.probMap();
+        if (context.signal().isInTrunk()) {
+            if (TreeHelper.isBranch(context.world().getBlockState(context.pos().above())) && !TreeHelper.isBranch(context.world().getBlockState(context.pos().above(3)))) {
+                context.probMap(new int[]{0, 0, 0, 0, 0, 0});
+            } else if (!context.species().isMegaSpecies()) {
                 for (Direction direction : CoordUtils.HORIZONTALS) {
-                    if (TreeHelper.isBranch(world.getBlockState(pos.offset(direction.getOpposite().getNormal())))) {
+                    if (TreeHelper.isBranch(context.world().getBlockState(context.pos().offset(direction.getOpposite().getNormal())))) {
                         probMap[direction.get3DDataValue()] = 0;
                     }
                 }
@@ -39,18 +53,11 @@ public class NetherFungusLogic extends GrowthLogicKit {
     }
 
     @Override
-    public Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal) {
-        if (signal.isInTrunk() && newDir != Direction.UP) {//Turned out of trunk
-            signal.energy = Math.min(signal.energy, species.isMegaSpecies() ? 3 : 2);
+    public Direction newDirectionSelected(ConfiguredGrowthLogicKit configuration, NewDirectionContext context) {
+        if (context.signal().isInTrunk() && context.newDir() != Direction.UP) {//Turned out of trunk
+            context.signal().energy = Math.min(context.signal().energy, context.species().isMegaSpecies() ? 3 : 2);
         }
-        return newDir;
-    }
-
-    private int getMinCapHeight(Species species) {
-        if (species.isMegaSpecies()) {
-            return minCapHeightMega;
-        }
-        return minCapHeight;
+        return context.newDir();
     }
 
     //Weird hack for getting different heights inside the growth chamber
@@ -61,19 +68,22 @@ public class NetherFungusLogic extends GrowthLogicKit {
 //		return i - 1;
 //	}
 
-    private float getHashedVariation(World world, BlockPos pos) {
+    private float getHashedVariation(ConfiguredGrowthLogicKit configuration, World world, BlockPos pos) {
         long day = world.getGameTime() / 24000L;
         int month = (int) day / 30;//Change the hashs every in-game month
-        return (CoordUtils.coordHashCode(pos.above(month), 2) % heightVariation);//Vary the height energy by a psuedorandom hash function
+        return (CoordUtils.coordHashCode(pos.above(month), 2) % configuration.get(HEIGHT_VARIATION));//Vary the height energy by a psuedorandom hash function
     }
 
     @Override
-    public float getEnergy(World world, BlockPos pos, Species species, float signalEnergy) {
-        return Math.min(getLowestBranchHeight(world, pos, species, species.getLowestBranchHeight()) + getMinCapHeight(species) + getHashedVariation(world, pos) / 1.5f, signalEnergy);
+    public float getEnergy(ConfiguredGrowthLogicKit configuration, EnergyContext context) {
+        return Math.min(getLowestBranchHeight(configuration, new LowestBranchHeightContext(context.world(), context.pos(), context.species(), context.species().getLowestBranchHeight())) +
+                configuration.get(MIN_CAP_HEIGHT) + getHashedVariation(configuration, context.world(), context.pos()) / 1.5f, context.signalEnergy());
     }
 
     @Override
-    public int getLowestBranchHeight(World world, BlockPos pos, Species species, int lowestBranchHeight) {
-        return (int) (lowestBranchHeight * species.biomeSuitability(world, pos) + getHashedVariation(world, pos));//Vary the lowest branch height by a psuedorandom hash function
+    public int getLowestBranchHeight(ConfiguredGrowthLogicKit configuration, LowestBranchHeightContext context) {
+        // Vary the lowest branch height by a psuedorandom hash function
+        return (int) (context.lowestBranchHeight() * context.species().biomeSuitability(context.world(), context.pos()) + getHashedVariation(configuration, context.world(), context.pos()));
     }
+
 }

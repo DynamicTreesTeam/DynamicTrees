@@ -10,7 +10,7 @@ import net.minecraft.util.ResourceLocation;
 public class RandomPredicateGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Boolean> ONLY_WORLD_GEN = ConfigurationProperty.bool("only_world_gen");
-    public static final ConfigurationProperty<ConfiguredGenFeature> GEN_FEATURE = ConfigurationProperty.property("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
+    public static final ConfigurationProperty<ConfiguredGenFeature> GEN_FEATURE = ConfigurationProperty.property("gen_feature", ConfiguredGenFeature.class);
 
     public RandomPredicateGenFeature(ResourceLocation registryName) {
         super(registryName);
