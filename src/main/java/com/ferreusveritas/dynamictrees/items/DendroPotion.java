@@ -27,6 +27,7 @@ import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmptiable {
 
@@ -59,6 +60,12 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 
 		public boolean getActive() {
 			return active;
+		}
+		
+		public void ifActive(Consumer<DendroPotionType> typeConsumer) {
+			if (this.getActive()) {
+				typeConsumer.accept(this);
+			}
 		}
 
 		public String getName() {
@@ -159,18 +166,24 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 	public DendroPotion registerRecipes(IForgeRegistry<IRecipe> registry) {
 		ItemStack awkwardStack = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), PotionType.REGISTRY.getObject(new ResourceLocation("awkward")));
 
-		this.addRecipe(awkwardStack, new ItemStack(Items.COAL, 1, 1), this.getPotionStack(DendroPotionType.BIOCHAR)); // Ingredient: charcoal
-		this.addRecipe(Items.SLIME_BALL, DendroPotionType.DEPLETION);
-		this.addRecipe(Items.PUMPKIN_SEEDS, DendroPotionType.GIGAS);
-		this.addRecipe(Items.GHAST_TEAR, DendroPotionType.BURGEONING);
-		this.addRecipe(Items.FISH, DendroPotionType.FERTILITY);
-		this.addRecipe(Blocks.RED_FLOWER, 1, DendroPotionType.PERSISTANCE); // Ingredient: blue orchid. 
-		this.addRecipe(Items.PRISMARINE_CRYSTALS, DendroPotionType.TRANSFORM);
+		DendroPotionType.BIOCHAR.ifActive(type -> this.addRecipe(
+			awkwardStack, 
+			new ItemStack(Items.COAL, 1, 1), // Ingredient: charcoal 
+			this.getPotionStack(type)
+		));
+		DendroPotionType.DEPLETION.ifActive(type -> this.addRecipe(Items.SLIME_BALL, type));
+		DendroPotionType.GIGAS.ifActive(type -> this.addRecipe(Items.PUMPKIN_SEEDS, type));
+		DendroPotionType.BURGEONING.ifActive(type -> this.addRecipe(Items.GHAST_TEAR, type));
+		DendroPotionType.FERTILITY.ifActive(type -> this.addRecipe(Items.FISH, type));
+		DendroPotionType.PERSISTANCE.ifActive(type -> this.addRecipe(Blocks.RED_FLOWER, 1, type)); // Ingredient: blue orchid. 
+		DendroPotionType.TRANSFORM.ifActive(type -> {
+			this.addRecipe(Items.PRISMARINE_CRYSTALS, type);
 
-		for (Species species : TreeRegistry.getPotionTransformableSpecies()) {
-			ItemStack outputStack = setTargetSpecies(new ItemStack(this, 1, DendroPotionType.TRANSFORM.getIndex()), species);
-			this.addRecipe(this.getPotionStack(DendroPotionType.TRANSFORM), species.getSeedStack(1), outputStack);
-		}
+			for (Species species : TreeRegistry.getPotionTransformableSpecies()) {
+				ItemStack outputStack = setTargetSpecies(new ItemStack(this, 1, type.getIndex()), species);
+				this.addRecipe(this.getPotionStack(type), species.getSeedStack(1), outputStack);
+			}
+		});
 
 		return this;
 	}
