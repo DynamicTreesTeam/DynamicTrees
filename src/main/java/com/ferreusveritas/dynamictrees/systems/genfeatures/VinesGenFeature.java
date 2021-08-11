@@ -55,7 +55,7 @@ public class VinesGenFeature extends GenFeature {
     }
 
     @Override
-    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    public ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(QUANTITY, 4)
                 .with(MAX_LENGTH, 8)
@@ -68,7 +68,7 @@ public class VinesGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         if (!context.isWorldGen() || context.endPoints().isEmpty()) {
             return false;
         }
@@ -94,7 +94,7 @@ public class VinesGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
         final World world = context.world();
         final BlockPos rootPos = context.pos();
         final Species species = context.species();
@@ -131,7 +131,7 @@ public class VinesGenFeature extends GenFeature {
         return true;
     }
 
-    protected void addSideVines(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds, boolean worldgen) {
+    protected void addSideVines(ConfiguredGenFeature configuredGenFeature, IWorld world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds, boolean worldgen) {
         // Uses branch ray tracing to find a place on the side of the tree to begin generating vines.
         final BlockRayTraceResult result = CoordUtils.branchRayTrace(world, species, rootPos, branchPos, 90, configuredGenFeature.get(VERTICAL_SPREAD), configuredGenFeature.get(RAY_DISTANCE), safeBounds);
 
@@ -153,7 +153,7 @@ public class VinesGenFeature extends GenFeature {
         this.placeVines(world, vinePos, vineState, configuredGenFeature.get(MAX_LENGTH), null, configuredGenFeature.get(VINE_TYPE), worldgen);
     }
 
-    protected void addVerticalVines(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds, boolean worldgen) {
+    protected void addVerticalVines(ConfiguredGenFeature configuredGenFeature, IWorld world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds, boolean worldgen) {
         // Uses fruit ray trace method to grab a position under the tree's leaves.
         BlockPos vinePos = CoordUtils.getRayTraceFruitPos(world, species, rootPos, branchPos, safeBounds);
 

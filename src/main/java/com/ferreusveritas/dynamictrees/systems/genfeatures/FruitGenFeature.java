@@ -36,7 +36,7 @@ public class FruitGenFeature extends GenFeature {
     }
 
     @Override
-    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    public ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
                 .with(VERTICAL_SPREAD, 30f)
@@ -46,7 +46,7 @@ public class FruitGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         if (!context.endPoints().isEmpty()) {
             int qty = configuration.get(QUANTITY);
             qty *= context.fruitProductionFactor();
@@ -61,7 +61,7 @@ public class FruitGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
         final World world = context.world();
         final BlockState blockState = world.getBlockState(context.treePos());
         final BranchBlock branch = TreeHelper.getBranch(blockState);
@@ -88,7 +88,7 @@ public class FruitGenFeature extends GenFeature {
         return true;
     }
 
-    protected void addFruit(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds, Float seasonValue) {
+    protected void addFruit(ConfiguredGenFeature configuredGenFeature, IWorld world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds, Float seasonValue) {
         final BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
         if (fruitPos != BlockPos.ZERO &&
                 (!enableHash || ((CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0)) &&

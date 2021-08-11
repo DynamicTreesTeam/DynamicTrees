@@ -47,7 +47,7 @@ public class RootsGenFeature extends GenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    protected ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MIN_TRUNK_RADIUS, 13)
                 .with(LEVEL_LIMIT, 2)
@@ -75,7 +75,7 @@ public class RootsGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         final BlockPos treePos = context.pos().above();
         final int trunkRadius = TreeHelper.getRadius(context.world(), treePos);
         return trunkRadius >= configuration.get(MIN_TRUNK_RADIUS) &&
@@ -83,7 +83,7 @@ public class RootsGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
         final World world = context.world();
         final BlockPos treePos = context.treePos();
         final int trunkRadius = TreeHelper.getRadius(world, treePos);
@@ -101,7 +101,7 @@ public class RootsGenFeature extends GenFeature {
         return true;
     }
 
-    public boolean startRoots(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos treePos, Species species, int trunkRadius) {
+    public boolean startRoots(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos treePos, Species species, int trunkRadius) {
         int hash = CoordUtils.coordHashCode(treePos, 2);
         SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
         this.nextRoot(world, rootMap, treePos, species, trunkRadius, configuredGenFeature.get(MIN_TRUNK_RADIUS), configuredGenFeature.get(SCALE_FACTOR), BlockPos.ZERO, 0,

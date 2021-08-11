@@ -43,7 +43,7 @@ public class ShroomlightGenFeature extends GenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    protected ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(SHROOMLIGHT_BLOCK, Blocks.SHROOMLIGHT)
                 .with(MAX_HEIGHT, 32)
@@ -54,17 +54,17 @@ public class ShroomlightGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         return this.placeShroomlightsInValidPlace(configuration, context.world(), context.pos(), true);
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
         return context.natural() && configuration.get(CAN_GROW_PREDICATE).test(context.world(), context.pos().above())
                 && context.fertility() != 0 && this.placeShroomlightsInValidPlace(configuration, context.world(), context.pos(), false);
     }
 
-    private boolean placeShroomlightsInValidPlace(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen) {
+    private boolean placeShroomlightsInValidPlace(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen) {
         int treeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
         Block shroomlightBlock = configuredGenFeature.get(SHROOMLIGHT_BLOCK);
 
@@ -104,7 +104,7 @@ public class ShroomlightGenFeature extends GenFeature {
 
     //Like the BeeNestGenFeature, the valid places are empty blocks under branches next to the trunk.
     @Nullable
-    private List<BlockPos> findBranchPits(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, int maxHeight) {
+    private List<BlockPos> findBranchPits(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos rootPos, int maxHeight) {
         int existingBlocks = 0;
         List<BlockPos> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++) {

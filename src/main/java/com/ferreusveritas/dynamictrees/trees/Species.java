@@ -265,7 +265,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
 
     protected List<Biome> perfectBiomes = new ArrayList<>();
 
-    protected final List<ConfiguredGenFeature<GenFeature>> genFeatures = new ArrayList<>();
+    protected final List<ConfiguredGenFeature> genFeatures = new ArrayList<>();
 
     /**
      * A {@link BiPredicate} that returns true if this species should override the common in the given position.
@@ -2068,7 +2068,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @param configuration the configured gen feature to add
      * @return this {@link Species} object for chaining
      */
-    public Species addGenFeature(ConfiguredGenFeature<GenFeature> configuration) {
+    public Species addGenFeature(ConfiguredGenFeature configuration) {
         if (configuration.getGenFeature().onApplied(this, configuration)) {
             this.genFeatures.add(configuration);
         }
@@ -2079,7 +2079,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         return this.genFeatures.size() > 0;
     }
 
-    public List<ConfiguredGenFeature<GenFeature>> getGenFeatures() {
+    public List<ConfiguredGenFeature> getGenFeatures() {
         return this.genFeatures;
     }
 

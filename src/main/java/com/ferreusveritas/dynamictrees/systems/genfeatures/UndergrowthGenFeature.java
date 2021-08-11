@@ -27,7 +27,7 @@ public class UndergrowthGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         final boolean worldGen = context.isWorldGen();
         final int radius = context.radius();
 

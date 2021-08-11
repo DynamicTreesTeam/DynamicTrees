@@ -22,7 +22,7 @@ public class CocoaGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
         if (context.fertility() == 0 && context.random().nextInt() % 16 == 0) {
             final World world = context.world();
             if (context.species().seasonalFruitProductionFactor(world, context.treePos()) > context.random().nextFloat()) {
@@ -33,7 +33,7 @@ public class CocoaGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         if (context.random().nextInt() % 8 == 0) {
             this.addCocoa(context.world(), context.pos(), true);
             return true;

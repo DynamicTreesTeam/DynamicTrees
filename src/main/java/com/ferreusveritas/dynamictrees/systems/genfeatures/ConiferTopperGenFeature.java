@@ -26,13 +26,13 @@ public class ConiferTopperGenFeature extends GenFeature {
     }
 
     @Override
-    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    public ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(LEAVES_PROPERTIES, LeavesProperties.NULL_PROPERTIES);
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         if (context.endPoints().isEmpty()) {
             return false;
         }

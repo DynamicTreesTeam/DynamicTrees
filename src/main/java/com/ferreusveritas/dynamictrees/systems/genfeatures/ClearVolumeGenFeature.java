@@ -21,13 +21,13 @@ public class ClearVolumeGenFeature extends GenFeature {
     }
 
     @Override
-    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    public ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(HEIGHT, 8);
     }
 
     @Override
-    protected BlockPos preGenerate(ConfiguredGenFeature<GenFeature> configuration, PreGenerationContext context) {
+    protected BlockPos preGenerate(ConfiguredGenFeature configuration, PreGenerationContext context) {
         final BlockPos rootPos = context.pos();
 
         // Erase a volume of blocks that could potentially get in the way.

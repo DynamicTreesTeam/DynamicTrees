@@ -10,7 +10,7 @@ import net.minecraft.util.ResourceLocation;
 public class RandomPredicateGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Boolean> ONLY_WORLD_GEN = ConfigurationProperty.bool("only_world_gen");
-    public static final ConfigurationProperty<ConfiguredGenFeature<GenFeature>> GEN_FEATURE = ConfigurationProperty.property("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
+    public static final ConfigurationProperty<ConfiguredGenFeature> GEN_FEATURE = ConfigurationProperty.property("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
 
     public RandomPredicateGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -22,7 +22,7 @@ public class RandomPredicateGenFeature extends GenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    protected ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(PLACE_CHANCE, 0.5f)
                 .with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE)
@@ -30,27 +30,27 @@ public class RandomPredicateGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         if (configuration.get(ONLY_WORLD_GEN) && !context.isWorldGen() ||
                 Math.abs(CoordUtils.coordHashCode(context.pos(), 2) / (float) 0xFFFF) > configuration.get(PLACE_CHANCE)) {
             // If the chance is not met, do nothing.
             return false;
         }
 
-        final ConfiguredGenFeature<GenFeature> configurationToPlace = configuration.get(GEN_FEATURE);
+        final ConfiguredGenFeature configurationToPlace = configuration.get(GEN_FEATURE);
         return configuration.getGenFeature().isValid() &&
                 configurationToPlace.getGenFeature().postGenerate(configurationToPlace, context);
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
         if (configuration.get(ONLY_WORLD_GEN)
                 || Math.abs(CoordUtils.coordHashCode(context.pos(), 2) / (float) 0xFFFF) > configuration.get(PLACE_CHANCE)) {
             // If the chance is not met, or its only for world gen, do nothing.
             return false;
         }
 
-        final ConfiguredGenFeature<GenFeature> configurationToPlace = configuration.get(GEN_FEATURE);
+        final ConfiguredGenFeature configurationToPlace = configuration.get(GEN_FEATURE);
         return configuration.getGenFeature().isValid() &&
                 configurationToPlace.getGenFeature().postGrow(configurationToPlace, context);
     }

@@ -54,7 +54,7 @@ public class BushGenFeature extends GenFeature {
     }
 
     @Override
-    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    public ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(BIOME_PREDICATE, i -> true)
                 .with(LOG, Blocks.OAK_LOG)
@@ -64,13 +64,13 @@ public class BushGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean generate(ConfiguredGenFeature<GenFeature> configuration, FullGenerationContext context) {
+    protected boolean generate(ConfiguredGenFeature configuration, FullGenerationContext context) {
         this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(), context.radius(), context.bounds());
         return true;
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         if (context.bounds() != SafeChunkBounds.ANY && configuration.get(BIOME_PREDICATE).test(context.biome())) {
             this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(), context.radius(), context.bounds());
             return true;
@@ -78,7 +78,7 @@ public class BushGenFeature extends GenFeature {
         return false;
     }
 
-    protected void commonGen(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Random random, int radius, SafeChunkBounds safeBounds) {
+    protected void commonGen(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Random random, int radius, SafeChunkBounds safeBounds) {
         if (radius <= 2) {
             return;
         }

@@ -35,7 +35,7 @@ public class MushroomRotGenFeature extends GenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    protected ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MUSHROOM, Blocks.BROWN_MUSHROOM)
                 .with(ALTERNATE_MUSHROOM, Blocks.RED_MUSHROOM)
@@ -43,7 +43,7 @@ public class MushroomRotGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postRot(ConfiguredGenFeature<GenFeature> configuration, PostRotContext context) {
+    protected boolean postRot(ConfiguredGenFeature configuration, PostRotContext context) {
         final IWorld world = context.world();
         final BlockPos pos = context.pos();
         final Block mushroom = configuration.get(ALTERNATE_MUSHROOM_CHANCE) > context.random().nextFloat() ?

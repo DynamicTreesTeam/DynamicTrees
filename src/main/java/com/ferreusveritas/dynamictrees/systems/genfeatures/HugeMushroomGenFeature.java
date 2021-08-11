@@ -41,7 +41,7 @@ public class HugeMushroomGenFeature extends GenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    protected ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MUSHROOM_BLOCK, Blocks.RED_MUSHROOM_BLOCK)
                 .with(STEM_BLOCK, Blocks.MUSHROOM_STEM);
@@ -183,7 +183,7 @@ public class HugeMushroomGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean generate(ConfiguredGenFeature<GenFeature> configuration, FullGenerationContext context) {
+    protected boolean generate(ConfiguredGenFeature configuration, FullGenerationContext context) {
         final IWorld world = context.world();
         final BlockPos rootPos = context.pos();
 

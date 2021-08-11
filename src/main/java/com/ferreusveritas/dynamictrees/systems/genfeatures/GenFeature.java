@@ -20,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
  *
  * @author Harley O'Connor
  */
-public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, ConfiguredGenFeature<GenFeature>> {
+public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, ConfiguredGenFeature> {
 
     // Common properties.
     public static final ConfigurationProperty<Float> VERTICAL_SPREAD = ConfigurationProperty.floatProperty("vertical_spread");
@@ -49,8 +49,8 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
     }
 
     @Override
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
-        return new ConfiguredGenFeature<>(this);
+    protected ConfiguredGenFeature createDefaultConfiguration() {
+        return new ConfiguredGenFeature(this);
     }
 
     public static final class Type<C extends GenerationContext<?>, R> {
@@ -60,34 +60,34 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
         public static final Type<PostRotContext, Boolean> POST_ROT = new Type<>(GenFeature::postRot);
         public static final Type<FullGenerationContext, Boolean> FULL = new Type<>(GenFeature::generate);
 
-        private final TriFunction<GenFeature, ConfiguredGenFeature<GenFeature>, C, R> generateConsumer;
+        private final TriFunction<GenFeature, ConfiguredGenFeature, C, R> generateConsumer;
 
-        public Type(TriFunction<GenFeature, ConfiguredGenFeature<GenFeature>, C, R> generateConsumer) {
+        public Type(TriFunction<GenFeature, ConfiguredGenFeature, C, R> generateConsumer) {
             this.generateConsumer = generateConsumer;
         }
 
-        public R generate(ConfiguredGenFeature<GenFeature> configuration, C context) {
+        public R generate(ConfiguredGenFeature configuration, C context) {
             return generateConsumer.apply(configuration.getGenFeature(), configuration, context);
         }
     }
 
-    public <C extends GenerationContext<?>, R> R generate(ConfiguredGenFeature<GenFeature> configuration, Type<C, R> type, C context) {
+    public <C extends GenerationContext<?>, R> R generate(ConfiguredGenFeature configuration, Type<C, R> type, C context) {
         return type.generate(configuration, context);
     }
 
-    protected BlockPos preGenerate(ConfiguredGenFeature<GenFeature> configuration, PreGenerationContext context) {
+    protected BlockPos preGenerate(ConfiguredGenFeature configuration, PreGenerationContext context) {
         return context.pos();
     }
 
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         return true;
     }
 
-    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
         return true;
     }
 
-    protected boolean postRot(ConfiguredGenFeature<GenFeature> configuration, PostRotContext context) {
+    protected boolean postRot(ConfiguredGenFeature configuration, PostRotContext context) {
         return true;
     }
 
@@ -99,7 +99,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * @return {@code true} if this {@link GenFeature} handles full generation and so generation from a {@link JoCode}
      * should <b>not</b> proceed; {@code false} otherwise.
      */
-    protected boolean generate(ConfiguredGenFeature<GenFeature> configuration, FullGenerationContext context) {
+    protected boolean generate(ConfiguredGenFeature configuration, FullGenerationContext context) {
         return false;
     }
 
@@ -111,7 +111,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * @param configuration the configuration the feature is being added with
      * @return {@code true} if it should be applied; otherwise {@code false} if the application should be aborted
      */
-    public boolean onApplied(Species species, ConfiguredGenFeature<GenFeature> configuration) {
+    public boolean onApplied(Species species, ConfiguredGenFeature configuration) {
         return true;
     }
 

@@ -12,22 +12,22 @@ import com.ferreusveritas.dynamictrees.trees.Species;
  *
  * @author Harley O'Connor
  */
-public class ConfiguredGenFeature<GF extends GenFeature> extends Configured<ConfiguredGenFeature<GF>, GF> {
+public class ConfiguredGenFeature extends Configured<ConfiguredGenFeature, GenFeature> {
 
     /**
      * A null configured gen feature. Mainly used for getting the class with the {@link GenFeature} parameter for {@link
      * JsonDeserialisers#CONFIGURED_GEN_FEATURE}.
      */
-    public static final ConfiguredGenFeature<GenFeature> NULL_CONFIGURED_FEATURE = new ConfiguredGenFeature<>(GenFeature.NULL_GEN_FEATURE);
+    public static final ConfiguredGenFeature NULL_CONFIGURED_FEATURE = new ConfiguredGenFeature(GenFeature.NULL_GEN_FEATURE);
 
     @SuppressWarnings("unchecked")
-    public static final Class<ConfiguredGenFeature<GenFeature>> NULL_CONFIGURED_FEATURE_CLASS = (Class<ConfiguredGenFeature<GenFeature>>) NULL_CONFIGURED_FEATURE.getClass();
+    public static final Class<ConfiguredGenFeature> NULL_CONFIGURED_FEATURE_CLASS = (Class<ConfiguredGenFeature>) NULL_CONFIGURED_FEATURE.getClass();
 
-    public ConfiguredGenFeature(GF genFeature) {
+    public ConfiguredGenFeature(GenFeature genFeature) {
         super(genFeature);
     }
 
-    public GF getGenFeature() {
+    public GenFeature getGenFeature() {
         return this.configurable;
     }
 
@@ -37,8 +37,8 @@ public class ConfiguredGenFeature<GF extends GenFeature> extends Configured<Conf
      * @return The copy of this {@link ConfiguredGenFeature}.
      */
     @Override
-    public ConfiguredGenFeature<GF> copy() {
-        final ConfiguredGenFeature<GF> duplicateGenFeature = new ConfiguredGenFeature<>(this.configurable);
+    public ConfiguredGenFeature copy() {
+        final ConfiguredGenFeature duplicateGenFeature = new ConfiguredGenFeature(this.configurable);
         duplicateGenFeature.properties.putAll(this.properties);
         return duplicateGenFeature;
     }

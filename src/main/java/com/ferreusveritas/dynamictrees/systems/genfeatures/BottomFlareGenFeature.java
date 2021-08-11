@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGeneratio
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -28,13 +27,13 @@ public class BottomFlareGenFeature extends GenFeature  {
     }
 
     @Override
-    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    public ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MIN_RADIUS, 6);
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
         if (context.fertility() > 0) {
             this.flareBottom(configuration, context.world(), context.pos(), context.species());
             return true;
@@ -43,7 +42,7 @@ public class BottomFlareGenFeature extends GenFeature  {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         this.flareBottom(configuration, context.world(), context.pos(), context.species());
         return true;
     }
@@ -54,7 +53,7 @@ public class BottomFlareGenFeature extends GenFeature  {
      * @param world   The world
      * @param rootPos The position of the rooty dirt block of the tree
      */
-    public void flareBottom(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species) {
+    public void flareBottom(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos rootPos, Species species) {
         Family family = species.getFamily();
 
         //Put a cute little flare on the bottom of the dark oaks

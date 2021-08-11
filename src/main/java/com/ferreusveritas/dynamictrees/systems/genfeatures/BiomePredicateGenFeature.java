@@ -9,7 +9,7 @@ import net.minecraft.util.ResourceLocation;
 public class BiomePredicateGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Boolean> ONLY_WORLD_GEN = ConfigurationProperty.bool("only_world_gen");
-    public static final ConfigurationProperty<ConfiguredGenFeature<GenFeature>> GEN_FEATURE = ConfigurationProperty.property("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
+    public static final ConfigurationProperty<ConfiguredGenFeature> GEN_FEATURE = ConfigurationProperty.property("gen_feature", ConfiguredGenFeature.NULL_CONFIGURED_FEATURE_CLASS);
 
     public BiomePredicateGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -21,7 +21,7 @@ public class BiomePredicateGenFeature extends GenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    protected ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(BIOME_PREDICATE, i -> true)
                 .with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE)
@@ -29,9 +29,9 @@ public class BiomePredicateGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         final boolean worldGen = context.isWorldGen();
-        final ConfiguredGenFeature<GenFeature> configuredGenFeatureToPlace = configuration.get(GEN_FEATURE);
+        final ConfiguredGenFeature configuredGenFeatureToPlace = configuration.get(GEN_FEATURE);
 
         if (configuration.getGenFeature().getRegistryName().equals(DTTrees.NULL)) { // If the gen feature was null, do nothing.
             return false;

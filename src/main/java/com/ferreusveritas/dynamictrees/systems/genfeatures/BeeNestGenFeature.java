@@ -62,7 +62,7 @@ public class BeeNestGenFeature extends GenFeature {
     }
 
     @Override
-    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    public ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos) -> {
             if (world.getRandom().nextFloat() > CHANCE) {
                 return false;
@@ -91,7 +91,7 @@ public class BeeNestGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature<GenFeature> configuration, PostGenerationContext context) {
+    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
         final IWorld world = context.world();
         final BlockPos rootPos = context.pos();
         return !(world.getRandom().nextFloat() > configuration.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos)) &&
@@ -99,7 +99,7 @@ public class BeeNestGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature<GenFeature> configuration, PostGrowContext context) {
+    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
         if (!context.natural() || !configuration.get(CAN_GROW_PREDICATE).test(context.world(), context.pos().above()) ||
                 context.fertility() == 0) {
             return false;
@@ -108,7 +108,7 @@ public class BeeNestGenFeature extends GenFeature {
         return this.placeBeeNestInValidPlace(configuration, context.world(), context.pos(), false);
     }
 
-    private boolean placeBeeNestInValidPlace(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen) {
+    private boolean placeBeeNestInValidPlace(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen) {
         Block nestBlock = configuredGenFeature.get(NEST_BLOCK);
 
         int treeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
@@ -196,7 +196,7 @@ public class BeeNestGenFeature extends GenFeature {
 
     //The valid places this genFeature looks for are empty blocks under branches next to the trunk, similar to armpits lol
     @Nullable
-    private List<Pair<BlockPos, List<Direction>>> findBranchPits(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, int maxHeight) {
+    private List<Pair<BlockPos, List<Direction>>> findBranchPits(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos rootPos, int maxHeight) {
         int existingBlocks = 0;
         List<Pair<BlockPos, List<Direction>>> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++) {
