@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.deserialisation;
 
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 
 /**
@@ -18,10 +19,13 @@ public final class RegistryEntryDeserialiser<T extends RegistryEntry<T>> impleme
     }
 
     @Override
-    public DeserialisationResult<T> deserialise(JsonElement jsonElement) {
-        return JsonDeserialisers.DT_RESOURCE_LOCATION.deserialise(jsonElement).map(this.registry::get,
-                RegistryEntry::isValid, "Could not find " + this.registry.getName() +
-                        " for registry name '{previous_value}'.");
+    public Result<T, JsonElement> deserialise(JsonElement jsonElement) {
+        return JsonDeserialisers.DT_RESOURCE_LOCATION.deserialise(jsonElement)
+                .map(
+                        this.registry::get,
+                        RegistryEntry::isValid,
+                        "Could not find " + this.registry.getName() + " for registry name '{}'."
+                );
     }
 
 }

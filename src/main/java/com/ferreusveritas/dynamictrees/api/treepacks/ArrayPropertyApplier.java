@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
-import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.Null;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -18,9 +18,9 @@ import java.util.function.Function;
 public class ArrayPropertyApplier<T, V, I> extends PropertyApplier<T, V, I> {
 
     private final PropertyApplier<T, V, I> applier;
-    private final Function<I, DeserialisationResult<Iterator<I>>> iteratorDeserialiser;
+    private final Function<I, Result<Iterator<I>, I>> iteratorDeserialiser;
 
-    public ArrayPropertyApplier(String key, Class<T> objectClass, Class<V> valueClass, PropertyApplier<T, V, I> applier, Function<I, DeserialisationResult<Iterator<I>>> iteratorDeserialiser) {
+    public ArrayPropertyApplier(String key, Class<T> objectClass, Class<V> valueClass, PropertyApplier<T, V, I> applier, Function<I, Result<Iterator<I>, I>> iteratorDeserialiser) {
         super(key, objectClass, valueClass, applier.applier);
         this.applier = applier;
         this.iteratorDeserialiser = iteratorDeserialiser;
@@ -29,17 +29,22 @@ public class ArrayPropertyApplier<T, V, I> extends PropertyApplier<T, V, I> {
     @Nullable
     @Override
     public PropertyApplierResult applyIfShould(String key, Object object, I input) {
-        final DeserialisationResult<Iterator<I>> iteratorResult = this.iteratorDeserialiser.apply(input);
+        final Result<Iterator<I>, I> iteratorResult = this.iteratorDeserialiser.apply(input);
 
-        if (!this.key.equalsIgnoreCase(key) || !this.objectClass.isInstance(object) || !iteratorResult.wasSuccessful()) {
+        if (!this.key.equalsIgnoreCase(key) || !this.objectClass.isInstance(object) || !iteratorResult.success()) {
             return null;
         }
 
         final List<String> warnings = new ArrayList<>();
 
-        for (Iterator<I> it = iteratorResult.getValue(); it.hasNext(); ) {
-            Null.consumeIfNonnull(this.applier.applyIfShould(object, it.next(), this.valueClass, this.applier.applier),
-                    result -> warnings.addAll(result.getWarnings()));
+        for (Iterator<I> it = iteratorResult.get(); it.hasNext(); ) {
+            Null.consumeIfNonnull(
+                    this.applier.applyIfShould(object, it.next(), this.valueClass, this.applier.applier),
+                    result -> {
+                        result.getError().ifPresent(warnings::add);
+                        warnings.addAll(result.getWarnings());
+                    }
+            );
         }
 
         return PropertyApplierResult.success(warnings);

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems;
 
-import com.ferreusveritas.dynamictrees.util.TetraFunction;
+import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;

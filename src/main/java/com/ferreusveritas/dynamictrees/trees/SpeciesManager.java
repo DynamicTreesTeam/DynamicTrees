@@ -6,16 +6,14 @@ import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
-import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
-import com.ferreusveritas.dynamictrees.util.BiomePredicate;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
@@ -56,18 +54,11 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
         BiomeDictionary.Type.getAll().stream().map(type -> new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
                 .forEach(this.environmentFactorAppliers::register);
 
-        JsonDeserialisers.register(Species.ICommonOverride.class, jsonElement -> {
-            final DeserialisationResult<BiomePredicate> biomePredicateResult = JsonDeserialisers.BIOME_PREDICATE.deserialise(jsonElement);
-
-            if (!biomePredicateResult.wasSuccessful()) {
-                return DeserialisationResult.failureFromOther(biomePredicateResult);
-            }
-
-            return DeserialisationResult.success((world, pos) ->
-                    world instanceof IWorldReader &&
-                            biomePredicateResult.getValue().test(((IWorldReader) world).getBiome(pos))
-            );
-        });
+        JsonDeserialisers.register(Species.ICommonOverride.class, input ->
+                JsonDeserialisers.BIOME_PREDICATE.deserialise(input)
+                        .map(biomePredicate -> (world, pos) -> world instanceof IWorldReader &&
+                                biomePredicate.test(((IWorldReader) world).getBiome(pos)))
+        );
 
         this.loadAppliers.register("use_seed_of_other_species", ResourceLocation.class, (species, registryName) -> {
                     final ResourceLocation processedRegName = TreeRegistry.processResLoc(registryName);
@@ -93,7 +84,14 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("leaves_properties", LeavesProperties.class, Species::setLeavesProperties)
                 .register("world_gen_leaf_map_height", Integer.class, Species::setWorldGenLeafMapHeight)
                 .register("environment_factors", JsonObject.class, (species, jsonObject) ->
-                        this.environmentFactorAppliers.applyAll(jsonObject, species).forEach(failureMessage -> LOGGER.warn("Error applying environment factor for species '{}': {}", species.getRegistryName(), failureMessage)))
+                        this.environmentFactorAppliers.applyAll(jsonObject, species)
+                                .forEachErrorWarning(
+                                        error -> LOGGER.error("Error applying environment factor for " +
+                                                "species '{}': {}", species.getRegistryName(), error),
+                                        warning -> LOGGER.warn("Warning applying environment factor for " +
+                                                "species '{}': {}", species.getRegistryName(), warning)
+                                )
+                )
                 .register("seed_drop_rarity", Float.class, Species::setupStandardSeedDropping)
                 .register("stick_drop_rarity", Float.class, Species::setupStandardStickDropping)
                 .register("mega_species", ResourceLocation.class, (species, registryName) -> {

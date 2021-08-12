@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +23,7 @@ public final class ResourceLocationDeserialiser implements JsonDeserialiser<Reso
     }
 
     @Override
-    public DeserialisationResult<ResourceLocation> deserialise(JsonElement jsonElement) {
+    public Result<ResourceLocation, JsonElement> deserialise(JsonElement jsonElement) {
         return JsonDeserialisers.STRING.deserialise(jsonElement)
                 .mapIfValid(ResourceLocationDeserialiser::isValidResourceLocation,
                         "Invalid resource location '{value}'. Namespace Constraints: [a-z0-9_.-] Path Constraints: [a-z0-9/._-]",

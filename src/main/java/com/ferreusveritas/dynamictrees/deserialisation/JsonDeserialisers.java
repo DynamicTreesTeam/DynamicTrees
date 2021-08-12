@@ -8,6 +8,8 @@ import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
+import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
@@ -15,9 +17,9 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreato
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
@@ -73,13 +75,13 @@ public final class JsonDeserialisers {
         }
 
         @Override
-        public boolean deserialiseIfValid(JsonElement input, Consumer<DeserialisationResult<O>> consumer) {
+        public boolean deserialiseIfValid(JsonElement input, Consumer<Result<O, JsonElement>> consumer) {
             return false;
         }
 
         @Override
-        public DeserialisationResult<O> deserialise(JsonElement input) {
-            return DeserialisationResult.failure("Could not get Json deserialiser for json element: " + input + ".");
+        public Result<O, JsonElement> deserialise(JsonElement input) {
+            return JsonResult.failure(input, "Could not get Json deserialiser for json element: " + input + ".");
         }
     }
 
@@ -91,13 +93,27 @@ public final class JsonDeserialisers {
     /**
      * Gets the {@link JsonDeserialiser} for the given class type.
      *
-     * @param objectClass The {@link Class} of the object to get.
+     * @param type The {@link Class} of the object to get.
      * @param <T>         The type of the object.
      * @return The {@link JsonDeserialiser} for the class, or {@link #NULL} if it wasn't found.
      */
     @SuppressWarnings("unchecked")
-    public static <T> JsonDeserialiser<T> get(final Class<T> objectClass) {
-        return (JsonDeserialiser<T>) DESERIALISERS.getOrDefault(objectClass, NULL);
+    public static <T> JsonDeserialiser<T> get(final Class<T> type) {
+        return (JsonDeserialiser<T>) DESERIALISERS.getOrDefault(type, NULL);
+    }
+
+    public static <T> JsonDeserialiser<T> getOrThrow(final Class<T> type) throws NoSuchDeserialiserException {
+        return getOrThrow(type, "No Json deserialiser found for type \"" + type.getName() + "\".");
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> JsonDeserialiser<T> getOrThrow(Class<T> type, String errorMessage)
+            throws NoSuchDeserialiserException {
+        final JsonDeserialiser<?> deserialiser = DESERIALISERS.get(type);
+        if (deserialiser == null) {
+            throw new NoSuchDeserialiserException(errorMessage);
+        }
+        return ((JsonDeserialiser<T>) deserialiser);
     }
 
     /**
@@ -113,44 +129,82 @@ public final class JsonDeserialisers {
         return deserialiser;
     }
 
-    public static final JsonDeserialiser<JsonElement> JSON_ELEMENT = register(JsonElement.class, DeserialisationResult::success);
+    public static final JsonDeserialiser<JsonElement> JSON_ELEMENT = register(JsonElement.class, input ->
+            JsonResult.success(input, input)
+    );
 
-    public static final JsonDeserialiser<JsonPrimitive> JSON_PRIMITIVE = register(JsonPrimitive.class, jsonElement ->
-            jsonElement.isJsonPrimitive() ? DeserialisationResult.success(jsonElement.getAsJsonPrimitive()) :
-                    DeserialisationResult.failure("Json element was not a json primitive."));
+    public static final JsonDeserialiser<JsonPrimitive> JSON_PRIMITIVE = register(JsonPrimitive.class, input ->
+            input.isJsonPrimitive() ? JsonResult.success(input, input.getAsJsonPrimitive()) :
+                    JsonResult.failure(input, "Json element was not a json primitive.")
+    );
 
-    public static final JsonDeserialiser<JsonObject> JSON_OBJECT = register(JsonObject.class, jsonElement ->
-            jsonElement.isJsonObject() ? DeserialisationResult.success(jsonElement.getAsJsonObject()) :
-                    DeserialisationResult.failure("Json element was not a json object."));
+    public static final JsonDeserialiser<JsonObject> JSON_OBJECT = register(JsonObject.class, input ->
+            input.isJsonObject() ? JsonResult.success(input, input.getAsJsonObject()) :
+                    JsonResult.failure(input, "Json element was not a json object.")
+    );
 
-    public static final JsonDeserialiser<JsonArray> JSON_ARRAY = register(JsonArray.class, jsonElement ->
-            jsonElement.isJsonArray() ? DeserialisationResult.success(jsonElement.getAsJsonArray()) :
-                    DeserialisationResult.failure("Json element was not a json array."));
+    public static final JsonDeserialiser<JsonArray> JSON_ARRAY = register(JsonArray.class, input ->
+            input.isJsonArray() ? JsonResult.success(input, input.getAsJsonArray()) :
+                    JsonResult.failure(input, "Json element was not a json array.")
+    );
 
-    public static final JsonDeserialiser<Boolean> BOOLEAN = register(Boolean.class, jsonElement -> JSON_PRIMITIVE.deserialise(jsonElement).mapIfValid(JsonPrimitive::isBoolean, "Could not get boolean from '{value}'.", JsonPrimitive::getAsBoolean));
-    public static final JsonDeserialiser<Number> NUMBER = register(Number.class, jsonElement -> JSON_PRIMITIVE.deserialise(jsonElement).mapIfValid(JsonPrimitive::isNumber, "Could not get number from '{value}'.", JsonPrimitive::getAsNumber));
-    public static final JsonDeserialiser<String> STRING = register(String.class, jsonElement -> JSON_PRIMITIVE.deserialise(jsonElement).mapIfValid(JsonPrimitive::isString, "Could not get string from '{value}'.", JsonPrimitive::getAsString));
+    public static final JsonDeserialiser<Boolean> BOOLEAN = register(Boolean.class, input ->
+            JSON_PRIMITIVE.deserialise(input).mapIfValid(
+                    JsonPrimitive::isBoolean,
+                    "Could not get boolean from '{}'.",
+                    JsonPrimitive::getAsBoolean
+            )
+    );
+    public static final JsonDeserialiser<Number> NUMBER = register(Number.class, input ->
+            JSON_PRIMITIVE.deserialise(input).mapIfValid(
+                    JsonPrimitive::isNumber,
+                    "Could not get number from '{}'.",
+                    JsonPrimitive::getAsNumber
+            )
+    );
+    public static final JsonDeserialiser<String> STRING = register(String.class, input ->
+            JSON_PRIMITIVE.deserialise(input).mapIfValid(
+                    JsonPrimitive::isString,
+                    "Could not get string from '{}'.",
+                    JsonPrimitive::getAsString
+            )
+    );
 
-    public static final JsonDeserialiser<Byte> BYTE = register(Byte.class, jsonElement -> NUMBER.deserialise(jsonElement).map(Number::byteValue));
-    public static final JsonDeserialiser<Short> SHORT = register(Short.class, jsonElement -> NUMBER.deserialise(jsonElement).map(Number::shortValue));
-    public static final JsonDeserialiser<Integer> INTEGER = register(Integer.class, jsonElement -> NUMBER.deserialise(jsonElement).map(Number::intValue));
-    public static final JsonDeserialiser<Long> LONG = register(Long.class, jsonElement -> NUMBER.deserialise(jsonElement).map(Number::longValue));
+    public static final JsonDeserialiser<Byte> BYTE = register(Byte.class, input ->
+            NUMBER.deserialise(input).map(Number::byteValue)
+    );
+    public static final JsonDeserialiser<Short> SHORT = register(Short.class, input ->
+            NUMBER.deserialise(input).map(Number::shortValue)
+    );
+    public static final JsonDeserialiser<Integer> INTEGER = register(Integer.class, input ->
+            NUMBER.deserialise(input).map(Number::intValue)
+    );
+    public static final JsonDeserialiser<Long> LONG = register(Long.class, input ->
+            NUMBER.deserialise(input).map(Number::longValue)
+    );
 
-    public static final JsonDeserialiser<Float> FLOAT = register(Float.class, jsonElement -> NUMBER.deserialise(jsonElement).map(Number::floatValue));
-    public static final JsonDeserialiser<Double> DOUBLE = register(Double.class, jsonElement -> NUMBER.deserialise(jsonElement).map(Number::doubleValue));
+    public static final JsonDeserialiser<Float> FLOAT = register(Float.class, input ->
+            NUMBER.deserialise(input).map(Number::floatValue)
+    );
+    public static final JsonDeserialiser<Double> DOUBLE = register(Double.class, input ->
+            NUMBER.deserialise(input).map(Number::doubleValue)
+    );
 
-    public static final JsonDeserialiser<ResourceLocation> RESOURCE_LOCATION = register(ResourceLocation.class, ResourceLocationDeserialiser.create());
+    public static final JsonDeserialiser<ResourceLocation> RESOURCE_LOCATION =
+            register(ResourceLocation.class, ResourceLocationDeserialiser.create());
+
     /**
      * Alternative to {@link #RESOURCE_LOCATION}, defaulting the namespace to {@code dynamictrees}.
      */
-    public static final JsonDeserialiser<ResourceLocation> DT_RESOURCE_LOCATION = ResourceLocationDeserialiser.create(DynamicTrees.MOD_ID);
+    public static final JsonDeserialiser<ResourceLocation> DT_RESOURCE_LOCATION =
+            ResourceLocationDeserialiser.create(DynamicTrees.MOD_ID);
 
     public static JsonDeserialiser<Block> BLOCK;
     public static JsonDeserialiser<Item> ITEM;
     public static JsonDeserialiser<Biome> BIOME;
 
     // TODO: Read json object for quantity and NBT.
-    public static JsonDeserialiser<ItemStack> ITEM_STACK = register(ItemStack.class, jsonElement -> ITEM.deserialise(jsonElement).map(ItemStack::new));
+    public static JsonDeserialiser<ItemStack> ITEM_STACK = register(ItemStack.class, input -> ITEM.deserialise(input).map((Result.SimpleMapper<Item, ItemStack>) ItemStack::new));
 
     public static final JsonDeserialiser<AxisAlignedBB> AXIS_ALIGNED_BB = register(AxisAlignedBB.class, new AxisAlignedBBDeserialiser());
     public static final JsonDeserialiser<VoxelShape> VOXEL_SHAPE = register(VoxelShape.class, new VoxelShapeDeserialiser());
@@ -169,9 +223,9 @@ public final class JsonDeserialisers {
 
     public static final JsonDeserialiser<List<SoilProperties>> SOIL_PROPERTIES_LIST = register(ListDeserialiser.getListClass(SoilProperties.class), new ListDeserialiser<>(SOIL_PROPERTIES));
 
-    public static final JsonDeserialiser<ConfiguredGenFeature> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.class, new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class));
-    public static final JsonDeserialiser<ConfiguredDropCreator> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.class, new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class));
-    public static final JsonDeserialiser<ConfiguredGrowthLogicKit> CONFIGURED_GROWTH_LOGIC_KIT = register(ConfiguredGrowthLogicKit.class, new ConfiguredDeserialiser<>("Growth Logic Kit", GrowthLogicKit.class));
+    public static final JsonDeserialiser<ConfiguredGenFeature> CONFIGURED_GEN_FEATURE = register(ConfiguredGenFeature.class, new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class, GenFeature.NULL_GEN_FEATURE));
+    public static final JsonDeserialiser<ConfiguredDropCreator> CONFIGURED_DROP_CREATOR = register(ConfiguredDropCreator.class, new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class, DropCreator.NULL_DROP_CREATOR));
+    public static final JsonDeserialiser<ConfiguredGrowthLogicKit> CONFIGURED_GROWTH_LOGIC_KIT = register(ConfiguredGrowthLogicKit.class, new ConfiguredDeserialiser<>("Growth Logic Kit", GrowthLogicKit.class, GrowthLogicKit.NULL_LOGIC));
 
     public static final JsonDeserialiser<Drops> DROPS = register(Drops.class, new DropsDeserialiser());
 

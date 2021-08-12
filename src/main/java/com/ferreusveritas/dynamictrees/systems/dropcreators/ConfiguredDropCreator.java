@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.api.configurations.Configured;
  */
 public final class ConfiguredDropCreator extends Configured<ConfiguredDropCreator, DropCreator> {
 
-    public static final ConfiguredDropCreator NULL_CONFIGURED_DROP_CREATOR = new ConfiguredDropCreator(DropCreator.NULL_DROP_CREATOR);
+    public static final ConfiguredDropCreator NULL = new ConfiguredDropCreator(DropCreator.NULL_DROP_CREATOR);
 
     public ConfiguredDropCreator(DropCreator dropCreator) {
         super(dropCreator);

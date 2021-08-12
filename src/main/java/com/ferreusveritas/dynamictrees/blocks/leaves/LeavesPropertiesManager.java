@@ -57,8 +57,8 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
     protected void preLoad(JsonObject jsonObject, LeavesProperties leavesProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
         // If a custom block registry name was set, set and use it.
         JsonHelper.JsonObjectReader.of(jsonObject).ifContains("block_registry_name", jsonElement ->
-                ResourceLocationDeserialiser.create(leavesProperties.getRegistryName().getNamespace()).deserialise(jsonElement)
-                        .ifSuccessful(leavesProperties::setBlockRegistryName)
+                ResourceLocationDeserialiser.create(leavesProperties.getRegistryName().getNamespace())
+                        .deserialise(jsonElement).ifSuccess(leavesProperties::setBlockRegistryName)
         );
 
         // Generate block by default, but allow it to be turned off.

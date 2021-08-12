@@ -2,14 +2,18 @@ package com.ferreusveritas.dynamictrees.worldgen.deserialisation;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 /**
  * Gets an {@link BiomePropertySelectors.ISpeciesSelector} object from a {@link JsonElement}.
@@ -19,68 +23,81 @@ import java.util.Map;
 public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeserialiser<BiomePropertySelectors.ISpeciesSelector> {
 
     @Override
-    public DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> deserialise(final JsonElement jsonElement) {
-        final DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> speciesSelectorResult = this.getStaticSelector(jsonElement);
-
-        if (speciesSelectorResult.wasSuccessful()) {
-            return speciesSelectorResult;
-        }
-
-        JsonHelper.JsonElementReader.of(jsonElement).ifOfType(JsonObject.class, jsonObject -> {
-            JsonHelper.JsonObjectReader.of(jsonObject).ifContains(STATIC, staticElement -> speciesSelectorResult.copyFrom(this.getStaticSelector(staticElement)))
-                    .elseIfContains(RANDOM, randomElement -> speciesSelectorResult.copyFrom(this.getRandomSpeciesSelector(randomElement)))
-                    .elseRun(() -> speciesSelectorResult.setErrorMessage("Species selector did not have one of either elements '" + STATIC + "' or '" + RANDOM + "'."));
-        });
-
-        return speciesSelectorResult;
+    public Result<BiomePropertySelectors.ISpeciesSelector, JsonElement> deserialise(final JsonElement input) {
+        return JsonResult.forInput(input)
+                .mapIfType(Species.class, this::readStatic)
+                .elseMapIfType(String.class, this::readStatic)
+                .elseMapIfType(JsonObject.class, this::readSelector)
+                .elseTypeError();
     }
 
-    private DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> getStaticSelector(final JsonElement jsonElement) {
-        final DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> speciesSelectorResult = new DeserialisationResult<>();
-
-        JsonHelper.JsonElementReader.of(jsonElement).ifOfType(Species.class, species ->
-                        speciesSelectorResult.setValue(new BiomePropertySelectors.StaticSpeciesSelector(new BiomePropertySelectors.SpeciesSelection(species))))
-                .elseIfOfType(String.class, str -> {
-                    if (this.isDefault(str)) {
-                        speciesSelectorResult.setValue(new BiomePropertySelectors.StaticSpeciesSelector());
-                    } else {
-                        speciesSelectorResult.setErrorMessage("'" + str + " is not a supported parameter for a static species selector.");
-                    }
-                }).elseUnsupportedError(speciesSelectorResult::setErrorMessage);
-
-        return speciesSelectorResult;
+    private BiomePropertySelectors.ISpeciesSelector readStatic(Species species) {
+        return new BiomePropertySelectors.StaticSpeciesSelector(
+                new BiomePropertySelectors.SpeciesSelection(species)
+        );
     }
 
-    private DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> getRandomSpeciesSelector(final JsonElement jsonElement) {
-        final DeserialisationResult<BiomePropertySelectors.ISpeciesSelector> selectorResult = new DeserialisationResult<>();
-        final DeserialisationResult<JsonObject> result = JsonDeserialisers.JSON_OBJECT.deserialise(jsonElement);
-
-        if (!result.wasSuccessful()) {
-            return DeserialisationResult.failureFromOther(result);
+    private BiomePropertySelectors.ISpeciesSelector readStatic(String string) throws DeserialisationException {
+        if (this.isDefault(string)) {
+            return new BiomePropertySelectors.StaticSpeciesSelector();
         }
+        throw new DeserialisationException("\"" + string + "\" is not a supported parameter for a " +
+                "static species selector.");
+    }
 
-        final BiomePropertySelectors.RandomSpeciesSelector randomSelector = new BiomePropertySelectors.RandomSpeciesSelector();
-        selectorResult.setValue(randomSelector);
+    private BiomePropertySelectors.ISpeciesSelector readSelector(JsonObject object, Consumer<String> warningConsumer) {
+        final AtomicReference<BiomePropertySelectors.ISpeciesSelector> selection = new AtomicReference<>();
 
-        for (final Map.Entry<String, JsonElement> entry : result.getValue().entrySet()) {
-            final String speciesName = entry.getKey();
+        JsonHelper.JsonObjectReader.of(object)
+                .ifContains(STATIC, staticElement ->
+                        JsonResult.forInput(staticElement)
+                                .mapIfType(Species.class, this::readStatic)
+                                .elseMapIfType(String.class, this::readStatic)
+                                .elseTypeError()
+                                .ifSuccessOrElse(selection::set, warningConsumer, warningConsumer)
+                )
+                .elseIfContains(RANDOM, randomElement ->
+                        selection.set(this.getRandomSpeciesSelector(randomElement, warningConsumer))
+                ).elseRun(() -> warningConsumer.accept("Species selector did not have one of either elements '" +
+                        STATIC + "' or '" + RANDOM + "'."));
 
-            JsonHelper.JsonElementReader.of(entry.getValue()).ifOfType(Integer.class, weight -> {
-                if (weight > 0) {
-                    if (this.isDefault(speciesName)) {
-                        randomSelector.add(weight);
+        return selection.get();
+    }
+
+    @Nullable
+    private BiomePropertySelectors.ISpeciesSelector getRandomSpeciesSelector(JsonElement input,
+                                                                             Consumer<String> warningConsumer) {
+        final AtomicReference<BiomePropertySelectors.ISpeciesSelector> selectorResult = new AtomicReference<>();
+
+        JsonDeserialisers.JSON_OBJECT.deserialise(input).ifSuccessOrElse(
+                object -> {
+                    final BiomePropertySelectors.RandomSpeciesSelector randomSelector = new BiomePropertySelectors.RandomSpeciesSelector();
+                    object.entrySet().forEach(entry -> {
+                        final String speciesName = entry.getKey();
+
+                        JsonDeserialisers.INTEGER.deserialise(entry.getValue()).ifSuccessOrElse(weight -> {
+                            if (weight > 0) {
+                                if (this.isDefault(speciesName)) {
+                                    randomSelector.add(weight);
+                                } else {
+                                    TreeRegistry.findSpeciesSloppy(speciesName).ifValid((species) -> randomSelector.add(species, weight));
+                                }
+                            }
+                        }, warningConsumer, warningConsumer);
+                    });
+
+                    if (randomSelector.getSize() < 1) {
+                        // TODO: Object reader that allows for errors and cleans up this mess.
+                        warningConsumer.accept("No species were selected in random selector '" + input + "'.");
                     } else {
-                        TreeRegistry.findSpeciesSloppy(speciesName).ifValid((species) -> randomSelector.add(species, weight));
+                        selectorResult.set(randomSelector);
                     }
-                }
-            }).ifFailed(selectorResult::addWarning);
-        }
+                },
+                warningConsumer,
+                warningConsumer
+        );
 
-        if (randomSelector.getSize() > 0) {
-            return selectorResult;
-        } else {
-            return selectorResult.setErrorMessage("No species were selected in random selector '" + jsonElement + "'.");
-        }
+        return selectorResult.get();
     }
 
 }

@@ -57,7 +57,7 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
             final Consumer<String> warningConsumer = warning -> LOGGER.warn("Warning whilst loading {} '{}': {}", this.registryName, registryName, warning);
 
             // Skip the current entry if it shouldn't load.
-            if (!this.shouldLoad(jsonObject, errorConsumer)) {
+            if (!this.shouldLoad(jsonObject, errorConsumer, warningConsumer)) {
                 return;
             }
 

@@ -1,9 +1,8 @@
-package com.ferreusveritas.dynamictrees.systems.genfeatures.config;
+package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.configurations.Configured;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 /**
@@ -18,10 +17,7 @@ public class ConfiguredGenFeature extends Configured<ConfiguredGenFeature, GenFe
      * A null configured gen feature. Mainly used for getting the class with the {@link GenFeature} parameter for {@link
      * JsonDeserialisers#CONFIGURED_GEN_FEATURE}.
      */
-    public static final ConfiguredGenFeature NULL_CONFIGURED_FEATURE = new ConfiguredGenFeature(GenFeature.NULL_GEN_FEATURE);
-
-    @SuppressWarnings("unchecked")
-    public static final Class<ConfiguredGenFeature> NULL_CONFIGURED_FEATURE_CLASS = (Class<ConfiguredGenFeature>) NULL_CONFIGURED_FEATURE.getClass();
+    public static final ConfiguredGenFeature NULL = new ConfiguredGenFeature(GenFeature.NULL_GEN_FEATURE);
 
     public ConfiguredGenFeature(GenFeature genFeature) {
         super(genFeature);

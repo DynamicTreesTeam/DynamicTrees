@@ -1,15 +1,19 @@
 package com.ferreusveritas.dynamictrees.worldgen.deserialisation;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 /**
  * Gets an {@link BiomePropertySelectors.IDensitySelector} object from a {@link JsonElement}.
@@ -19,23 +23,28 @@ import java.util.List;
 public final class DensitySelectorDeserialiser implements JsonBiomeDatabaseDeserialiser<BiomePropertySelectors.IDensitySelector> {
 
     @Override
-    public DeserialisationResult<BiomePropertySelectors.IDensitySelector> deserialise(JsonElement jsonElement) {
-        final DeserialisationResult<BiomePropertySelectors.IDensitySelector> densitySelector = new DeserialisationResult<>();
-
-        JsonHelper.JsonElementReader.of(jsonElement).ifOfType(JsonObject.class, jsonObject -> densitySelector.copyFrom(this.readDensitySelector(jsonObject)))
-                .elseIfOfType(JsonArray.class, jsonArray -> densitySelector.setValue(this.createScaleDensitySelector(jsonArray)))
-                .elseIfOfType(Float.class, density -> densitySelector.setValue((rnd, n) -> density))
-                .elseUnsupportedError(densitySelector::setErrorMessage);
-
-        return densitySelector;
+    public Result<BiomePropertySelectors.IDensitySelector, JsonElement> deserialise(JsonElement input) {
+        return JsonResult.forInput(input)
+                .mapIfType(JsonObject.class, this::readDensitySelector)
+                .elseMapIfType(JsonArray.class, this::createScaleDensitySelector)
+                .elseMapIfType(Float.class, this::createStaticDensitySelector)
+                .elseTypeError();
     }
 
-    private BiomePropertySelectors.IDensitySelector createScaleDensitySelector(final JsonArray jsonArray) {
+    private BiomePropertySelectors.IDensitySelector createStaticDensitySelector(float density) {
+        return (rnd, n) -> density;
+    }
+
+    private BiomePropertySelectors.IDensitySelector createScaleDensitySelector(JsonArray jsonArray,
+                                                                               Consumer<String> warningConsumer) {
         final List<Float> parameters = new ArrayList<>();
 
         for (final JsonElement element : jsonArray) {
-            JsonDeserialisers.FLOAT.deserialise(element).ifSuccessful(parameters::add)
-                    .otherwiseWarn("Error whilst applying density selector: ");
+            JsonDeserialisers.FLOAT.deserialise(element).ifSuccessOrElse(
+                    parameters::add,
+                    warningConsumer,
+                    warningConsumer
+            );
         }
 
         switch (parameters.size()) {
@@ -52,22 +61,30 @@ public final class DensitySelectorDeserialiser implements JsonBiomeDatabaseDeser
         }
     }
 
-    private DeserialisationResult<BiomePropertySelectors.IDensitySelector> readDensitySelector(final JsonObject jsonObject) {
-        final DeserialisationResult<BiomePropertySelectors.IDensitySelector> densitySelector = new DeserialisationResult<>();
+    @Nullable
+    private BiomePropertySelectors.IDensitySelector readDensitySelector(JsonObject jsonObject,
+                                                                        Consumer<String> warningConsumer) {
+        final AtomicReference<BiomePropertySelectors.IDensitySelector> densitySelector =
+                new AtomicReference<>();
 
         JsonHelper.JsonObjectReader.of(jsonObject)
-                .ifContains(SCALE, jsonElement -> JsonHelper.JsonElementReader.of(jsonElement)
-                        .ifOfType(JsonArray.class, jsonArray -> densitySelector.setValue(this.createScaleDensitySelector(jsonArray)))
-                        .ifFailed(densitySelector::addWarning))
-                .elseIfContains(STATIC, jsonElement -> JsonHelper.JsonElementReader.of(jsonElement)
-                        .ifOfType(Float.class, density -> densitySelector.setValue((rnd, n) -> density))
-                        .ifFailed(densitySelector::addWarning))
-                .elseIfContains(MATH, jsonElement -> {
+                .ifContains(SCALE, jsonElement ->
+                        JsonDeserialisers.JSON_ARRAY.deserialise(jsonElement)
+                                .map(this::createScaleDensitySelector)
+                                .ifSuccessOrElse(densitySelector::set, warningConsumer, warningConsumer)
+                ).elseIfContains(STATIC, jsonElement ->
+                        JsonDeserialisers.FLOAT.deserialise(jsonElement)
+                                .map(this::createStaticDensitySelector)
+                                .ifSuccessOrElse(densitySelector::set, warningConsumer, warningConsumer)
+                ).elseIfContains(MATH, jsonElement -> {
                     final JsonMath jsonMath = new JsonMath(jsonElement);
-                    densitySelector.setValue((rnd, n) -> jsonMath.apply(rnd, (float) n));
-                });
+                    densitySelector.set((rnd, n) -> jsonMath.apply(rnd, (float) n));
+                }).elseRun(() ->
+                        warningConsumer.accept("Could not get Json object chance selector as it did not contain " +
+                                "key '" + SCALE + "', '" + STATIC + "' or '" + MATH + "'.")
+                );
 
-        return densitySelector;
+        return densitySelector.get();
     }
 
 }

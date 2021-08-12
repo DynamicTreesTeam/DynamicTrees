@@ -1,4 +1,7 @@
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 package com.ferreusveritas.dynamictrees.worldgen.deserialisation;
+
+import mcp.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
@@ -27,22 +28,17 @@ public final class MapDeserialiser<K, V> implements JsonDeserialiser<Map<K, V>> 
     }
 
     @Override
-    public DeserialisationResult<Map<K, V>> deserialise(JsonElement jsonElement) {
-        final String[] errorMsg = {null};
-        return JsonDeserialisers.JSON_OBJECT.deserialise(jsonElement).map(object -> {
+    public Result<Map<K, V>, JsonElement> deserialise(JsonElement jsonElement) {
+        return JsonDeserialisers.JSON_OBJECT.deserialise(jsonElement).map((object, warningConsumer) -> {
             final Map<K, V> map = this.mapSupplier.get();
-            object.entrySet().forEach(entry ->
-                    this.valueGetter.deserialise(entry.getValue()).ifSuccessful(value ->
-                            this.keyGetter.deserialise(new JsonPrimitive(entry.getKey()))
-                                    .ifSuccessful(key -> map.put(key, value)).elseIfError(err -> errorMsg[0] = err)
-                    ).elseIfError(err -> {
-                        if (errorMsg[0] == null) {
-                            errorMsg[0] = err;
-                        }
-                    })
-            );
+            for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+                this.valueGetter.deserialise(entry.getValue()).map(
+                        value -> this.keyGetter.deserialise(new JsonPrimitive(entry.getKey()))
+                                .ifSuccessOrElseThrow(key -> map.put(key, value), warningConsumer)
+                ).orElseThrow();
+            }
             return map;
-        }).setErrorMessage(errorMsg[0]);
+        });
     }
 
     public static <K, V> Class<Map<K, V>> getMapClass(Class<K> keyClass, Class<V> valueClass) {

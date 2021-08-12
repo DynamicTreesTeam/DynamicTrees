@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -25,7 +24,7 @@ public class RandomPredicateGenFeature extends GenFeature {
     protected ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(PLACE_CHANCE, 0.5f)
-                .with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE)
+                .with(GEN_FEATURE, ConfiguredGenFeature.NULL)
                 .with(ONLY_WORLD_GEN, false);
     }
 

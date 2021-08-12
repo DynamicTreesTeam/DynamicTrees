@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
 import com.electronwill.nightconfig.core.EnumGetMethod;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 
 /**
@@ -18,7 +19,7 @@ public final class EnumDeserialiser<T extends Enum<T>> implements JsonDeserialis
     }
 
     @Override
-    public DeserialisationResult<T> deserialise(JsonElement jsonElement) {
+    public Result<T, JsonElement> deserialise(JsonElement jsonElement) {
         return JsonDeserialisers.STRING.deserialise(jsonElement).map(enumStr -> EnumGetMethod.NAME_IGNORECASE.get(enumStr, this.enumType),
                 "Couldn't get enum " + this.enumType + " from value '{previous_value}'.");
     }

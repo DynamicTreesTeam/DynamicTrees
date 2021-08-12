@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 
 import java.util.LinkedList;
@@ -21,10 +22,12 @@ public final class ListDeserialiser<T> implements JsonDeserialiser<List<T>> {
     }
 
     @Override
-    public DeserialisationResult<List<T>> deserialise(JsonElement jsonElement) {
+    public Result<List<T>, JsonElement> deserialise(JsonElement jsonElement) {
         return JsonDeserialisers.JSON_ARRAY.deserialise(jsonElement).map(array -> {
             final List<T> getterList = this.listSupplier.get();
-            array.forEach(elem -> thisGetter.deserialise(elem).ifSuccessful(getterList::add));
+            array.forEach(elem -> {
+                thisGetter.deserialise(elem).ifSuccess(getterList::add);
+            });
             return getterList;
         });
     }

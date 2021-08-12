@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 import org.apache.logging.log4j.LogManager;
 
@@ -24,7 +25,7 @@ public final class StaticFieldDeserialiser<T> implements JsonDeserialiser<T> {
     }
 
     @Override
-    public DeserialisationResult<T> deserialise(JsonElement jsonElement) {
+    public Result<T, JsonElement> deserialise(JsonElement jsonElement) {
         return JsonDeserialisers.STRING.deserialise(jsonElement)
                 .map(string -> Stream.of(this.type.getFields())
                                 .filter(field -> Modifier.isStatic(field.getModifiers()) && field.getName().equals(string))

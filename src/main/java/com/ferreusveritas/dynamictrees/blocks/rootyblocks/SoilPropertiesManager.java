@@ -51,8 +51,8 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
 
         // If a custom block registry name was set, set and use it.
         JsonHelper.JsonObjectReader.of(jsonObject).ifContains("block_registry_name", jsonElement ->
-                ResourceLocationDeserialiser.create(soilProperties.getRegistryName().getNamespace()).deserialise(jsonElement)
-                        .ifSuccessful(soilProperties::setBlockRegistryName)
+                ResourceLocationDeserialiser.create(soilProperties.getRegistryName().getNamespace())
+                        .deserialise(jsonElement).ifSuccess(soilProperties::setBlockRegistryName)
         );
     }
 

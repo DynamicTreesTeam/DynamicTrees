@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import net.minecraft.util.ResourceLocation;
 
@@ -24,7 +23,7 @@ public class BiomePredicateGenFeature extends GenFeature {
     protected ConfiguredGenFeature createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(BIOME_PREDICATE, i -> true)
-                .with(GEN_FEATURE, ConfiguredGenFeature.NULL_CONFIGURED_FEATURE)
+                .with(GEN_FEATURE, ConfiguredGenFeature.NULL)
                 .with(ONLY_WORLD_GEN, false);
     }
 

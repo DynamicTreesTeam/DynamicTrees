@@ -12,9 +12,6 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -44,9 +41,11 @@ public class JsonHelper {
      * @param jsonElement The {@link JsonElement} object.
      * @return True if {@link JsonElement} is a comment.
      */
+    @SuppressWarnings("Convert2MethodRef") // Can't use method ref, "ambiguous call".
     public static boolean isComment(final JsonElement jsonElement) {
-        final DeserialisationResult<String> result = JsonDeserialisers.STRING.deserialise(jsonElement);
-        return result.wasSuccessful() && isComment(result.getValue());
+        return JsonDeserialisers.STRING.deserialise(jsonElement)
+                .map(string -> isComment(string))
+                .orElse(false);
     }
 
     /**
@@ -71,71 +70,37 @@ public class JsonHelper {
     public static <T> T getOrDefault(final JsonObject jsonObject, final String elementName, final Class<T> type, final T defaultValue) {
         final JsonElement element = jsonObject.get(elementName);
 
-		if (element == null) {
-			return defaultValue;
-		}
+        if (element == null) {
+            return defaultValue;
+        }
 
-        final T result = JsonDeserialisers.get(type).deserialise(element).getValue();
-        return result == null ? defaultValue : result;
+        return JsonDeserialisers.get(type).deserialise(element).orElse(defaultValue);
     }
 
     /**
      * Gets the boolean value from the element name of the {@link JsonObject} given, or returns the default value given
      * if the element was not found or wasn't a boolean.
      *
-     * @param jsonObject    The {@link JsonObject}.
-     * @param elementName   The name of the element to get.
-     * @param defaultValue  The default value if it couldn't be obtained.
-     * @param errorConsumer The {@link Consumer<String>} to accept if there is an error.
+     * @param jsonObject      The {@link JsonObject}.
+     * @param elementName     The name of the element to get.
+     * @param defaultValue    The default value if it couldn't be obtained.
+     * @param errorConsumer   The {@link Consumer<String>} to accept if there is an error.
+     * @param warningConsumer The {@link Consumer<String>} to accept if there is a warning.
      * @return The boolean value.
      */
-    public static <T> T getOrDefault(final JsonObject jsonObject, final String elementName, final Class<T> type, final T defaultValue, final Consumer<String> errorConsumer) {
+    public static <T> T getOrDefault(final JsonObject jsonObject, final String elementName, final Class<T> type, final T defaultValue, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
         final JsonElement element = jsonObject.get(elementName);
 
-		if (element == null) {
-			return defaultValue;
-		}
-
-        final DeserialisationResult<T> result = JsonDeserialisers.get(type).deserialise(element);
-
-        if (!result.wasSuccessful()) {
-            errorConsumer.accept(result.getErrorMessage());
+        if (element == null) {
             return defaultValue;
         }
 
-        return result.getValue();
-    }
-
-    /**
-     * Gets the value of type {@link T} from the {@link JsonObject} using the given key, or null if it was not found. It
-     * also prints a warning with the given <tt>errorPrefix</tt> if it was unsuccessful in fetching the type {@link T},
-     * or if the element was not found for the key if the <tt>required</tt> parameter is true.
-     *
-     * @param jsonObject  The {@link JsonObject} to get from.
-     * @param key         The key of the value to get.
-     * @param classToGet  The {@link Class} object of type {@link T}.
-     * @param errorPrefix The message to display as a prefix to the warning.
-     * @param required    True if the user should be warned if the element doesn't exist.
-     * @param <T>         The type of the {@link Object} to fetch.
-     * @return The {@link Object} of type {@link T}, or null if it was not found or unsuccessful.
-     */
-    @Nullable
-    public static <T> T getFromObjectOrWarn(final JsonObject jsonObject, final String key, final Class<T> classToGet, final String errorPrefix, final boolean required) {
-        if (!jsonObject.has(key)) {
-			if (required) {
-				LOGGER.warn("{} {}", errorPrefix, "Element didn't exist.");
-			}
-            return null;
-        }
-
-        final DeserialisationResult<T> result = JsonDeserialisers.get(classToGet).deserialise(jsonObject.get(key));
-
-        if (!result.wasSuccessful()) {
-            LOGGER.warn("{} {}", errorPrefix, result.getErrorMessage());
-            return null;
-        }
-
-        return result.getValue();
+        return JsonDeserialisers.get(type).deserialise(element)
+                .orElse(
+                        defaultValue,
+                        errorConsumer,
+                        warningConsumer
+                );
     }
 
     public static JsonObjectReader ifContains(final JsonObject jsonObject, final String key, final Consumer<JsonElement> elementConsumer) {
@@ -149,88 +114,6 @@ public class JsonHelper {
 
         JsonPropertyApplierLists.PROPERTIES.applyAll(jsonObject, properties).forEachErrorWarning(errorConsumer, warningConsumer);
         return properties;
-    }
-
-    public static final class JsonElementReader {
-        private final JsonElement jsonElement;
-        private boolean read = false;
-        private String lastError;
-        private final List<Class<?>> attemptedClasses = new ArrayList<>();
-
-        private JsonElementReader(JsonElement jsonElement) {
-            this.jsonElement = jsonElement;
-        }
-
-        public <T> JsonElementReader ifOfType(final Class<T> typeClass, final Consumer<T> consumer) {
-            JsonDeserialisers.get(typeClass).deserialise(jsonElement).ifSuccessful(value -> {
-                consumer.accept(value);
-                this.read = true;
-            }).elseIfError(errorMessage -> this.lastError = errorMessage).elseIfError(() -> this.attemptedClasses.add(typeClass));
-            return this;
-        }
-
-        public <T> JsonElementReader ifArrayForEach(final Class<T> typeClass, final Consumer<T> consumer) {
-            JsonDeserialisers.JSON_ARRAY.deserialise(jsonElement).ifSuccessful(jsonArray -> {
-                jsonArray.forEach(arrayElement -> JsonDeserialisers.get(typeClass).deserialise(arrayElement)
-                        .ifSuccessful(consumer).elseIfError(errorMessage -> this.lastError = errorMessage));
-                this.read = true;
-            }).elseIfError(() -> this.attemptedClasses.add(typeClass));
-            return this;
-        }
-
-        public <T> JsonElementReader elseIfOfType(final Class<T> typeClass, final Consumer<T> consumer) {
-			if (!this.read) {
-				this.ifOfType(typeClass, consumer);
-			}
-            return this;
-        }
-
-        @SuppressWarnings("unchecked")
-        public <T> JsonElementReader elseIfEquals(final T value, final Consumer<T> consumer) {
-			if (!this.read) {
-				JsonDeserialisers.get((Class<T>) value.getClass()).deserialise(this.jsonElement)
-						.ifSuccessful(obj -> {
-							if (Objects.equals(obj, value)) {
-								consumer.accept(obj);
-							}
-						});
-			}
-            return this;
-        }
-
-        public JsonElementReader ifFailed(final Consumer<String> errorConsumer) {
-			if (!this.read && this.lastError != null) {
-				errorConsumer.accept(this.lastError);
-			}
-            return this;
-        }
-
-        public JsonElementReader elseWarn(final String warningMessage) {
-			if (!this.read) {
-				LogManager.getLogger().warn(warningMessage);
-			}
-            return this;
-        }
-
-        public JsonElementReader elseUnsupportedError(final Consumer<String> errorConsumer) {
-            if (!this.read) {
-                final StringBuilder stringBuilder = new StringBuilder("Element was not one of the following types: ");
-                for (int i = 0; i < this.attemptedClasses.size(); i++) {
-                    stringBuilder.append(this.attemptedClasses.get(i)).append(i != this.attemptedClasses.size() - 1 ? ", " : "");
-                }
-                errorConsumer.accept(stringBuilder.toString());
-            }
-            return this;
-        }
-
-        public String getLastError() {
-            return lastError;
-        }
-
-        public static JsonElementReader of(final JsonElement jsonElement) {
-            return new JsonElementReader(jsonElement);
-        }
-
     }
 
     public static final class JsonObjectReader {
@@ -252,23 +135,25 @@ public class JsonHelper {
 
         public <T> JsonObjectReader ifContains(final String key, final Class<T> type, final Consumer<T> typeConsumer) {
             if (this.jsonObject.has(key)) {
-                this.lastError = JsonElementReader.of(this.jsonObject.get(key)).ifOfType(type, typeConsumer).getLastError();
+                this.lastError = JsonDeserialisers.getOrThrow(type)
+                        .deserialise(this.jsonObject.get(key)).ifSuccess(typeConsumer)
+                        .getError();
                 this.read = true;
             }
             return this;
         }
 
         public JsonObjectReader elseIfContains(final String key, final Consumer<JsonElement> elementConsumer) {
-			if (!this.read) {
-				this.ifContains(key, elementConsumer);
-			}
+            if (!this.read) {
+                this.ifContains(key, elementConsumer);
+            }
             return this;
         }
 
         public <T> JsonObjectReader elseIfContains(final String key, final Class<T> type, final Consumer<T> typeConsumer) {
-			if (!this.read) {
-				this.ifContains(key, type, typeConsumer);
-			}
+            if (!this.read) {
+                this.ifContains(key, type, typeConsumer);
+            }
             return this;
         }
 
@@ -280,9 +165,9 @@ public class JsonHelper {
         }
 
         public JsonObjectReader elseRun(final Runnable runnable) {
-			if (!this.read) {
-				runnable.run();
-			}
+            if (!this.read) {
+                runnable.run();
+            }
             return this;
         }
 

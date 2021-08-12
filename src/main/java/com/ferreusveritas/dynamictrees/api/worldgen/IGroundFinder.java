@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * Implementations will find a suitable area to generate a tree on the ground.
  */
+@FunctionalInterface
 public interface IGroundFinder {
 
     /**

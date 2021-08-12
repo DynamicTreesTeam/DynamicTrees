@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.StackDrops;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.WeightedDrops;
@@ -30,7 +31,7 @@ public final class DropsDeserialiser implements JsonDeserialiser<Drops> {
     }
 
     @Override
-    public DeserialisationResult<Drops> deserialise(JsonElement jsonElement) {
+    public Result<Drops, JsonElement> deserialise(JsonElement jsonElement) {
         return JsonDeserialisers.JSON_OBJECT.deserialise(jsonElement).map(object -> {
             final String id = JsonHelper.getOrDefault(object, "id", String.class, null);
             if (id == null) {

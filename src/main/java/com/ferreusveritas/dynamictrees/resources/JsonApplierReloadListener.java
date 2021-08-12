@@ -84,13 +84,14 @@ public abstract class JsonApplierReloadListener<T, V> extends ReloadListener<T> 
      * entries to only load if the given mod ID is loaded, which can be used by add-ons to create custom species types
      * if, for example, dynamic trees plus is installed.
      *
-     * @param jsonObject    The {@link JsonObject} to check.
-     * @param errorConsumer The {@link Consumer<String>} to accept if there is an error.
+     * @param jsonObject      The {@link JsonObject} to check.
+     * @param errorConsumer   The {@link Consumer<String>} to accept if there is an error.
+     * @param warningConsumer The {@link Consumer<String>} to accept if there is a warning.
      * @return Whether or not the given entry should load.
      */
-    protected boolean shouldLoad(final JsonObject jsonObject, final Consumer<String> errorConsumer) {
+    protected boolean shouldLoad(final JsonObject jsonObject, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
         return ModList.get().isLoaded(JsonHelper.getOrDefault(jsonObject, "only_if_loaded",
-                String.class, DynamicTrees.MOD_ID, errorConsumer));
+                String.class, DynamicTrees.MOD_ID, errorConsumer, warningConsumer));
     }
 
     /**

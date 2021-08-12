@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
+
 import java.util.function.Consumer;
 
 /**
@@ -9,7 +11,6 @@ import java.util.function.Consumer;
  * @param <O> the type of the output to deserialise to
  * @author Harley O'Connor
  */
-@FunctionalInterface
 public interface Deserialiser<I, O> {
 
     /**
@@ -18,7 +19,7 @@ public interface Deserialiser<I, O> {
      * @param input the input object to deserialise
      * @return the deserialisation result
      */
-    DeserialisationResult<O> deserialise(I input);
+    Result<O, I> deserialise(I input);
 
     /**
      * Returns {@code true} if this {@link Deserialiser} is valid. A deserialiser is considered invalid if {@link
@@ -39,7 +40,7 @@ public interface Deserialiser<I, O> {
      * @return {@code true} if this {@link Deserialiser} is valid; {@code false} otherwise
      * @see #isValid()
      */
-    default boolean deserialiseIfValid(I input, Consumer<DeserialisationResult<O>> consumer) {
+    default boolean deserialiseIfValid(I input, Consumer<Result<O, I>> consumer) throws DeserialisationException {
         if (this.isValid()) {
             consumer.accept(this.deserialise(input));
             return true;

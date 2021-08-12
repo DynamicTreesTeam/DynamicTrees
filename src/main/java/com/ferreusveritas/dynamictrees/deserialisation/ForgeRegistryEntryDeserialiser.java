@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -36,7 +37,7 @@ public final class ForgeRegistryEntryDeserialiser<T extends ForgeRegistryEntry<T
     }
 
     @Override
-    public DeserialisationResult<T> deserialise(JsonElement jsonElement) {
+    public Result<T, JsonElement> deserialise(JsonElement jsonElement) {
         final AtomicBoolean intentionallyNull = new AtomicBoolean();
         return JsonDeserialisers.RESOURCE_LOCATION.deserialise(jsonElement).map(registryName -> {
                     // If registry name is the null value's registry name then it was intentionally the null value, so don't warn.
@@ -47,7 +48,7 @@ public final class ForgeRegistryEntryDeserialiser<T extends ForgeRegistryEntry<T
 
                     return this.registry.getValue(registryName);
                 }, value -> intentionallyNull.get() || this.validator.test(value),
-                "Could not find " + this.registryDisplayName + " for registry name '{previous_value}'.");
+                "Could not find " + this.registryDisplayName + " for registry name '{}'.");
     }
 
 }

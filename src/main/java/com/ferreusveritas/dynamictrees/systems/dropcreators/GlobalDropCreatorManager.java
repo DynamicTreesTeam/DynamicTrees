@@ -46,9 +46,11 @@ public final class GlobalDropCreatorManager extends JsonReloadListener<DropCreat
             }
 
             JsonDeserialisers.CONFIGURED_DROP_CREATOR.deserialise(element.getAsJsonObject())
-                    .ifSuccessful(result -> entries.put(registryName, result))
-                    .elseIfError(error -> LOGGER.error("Error loading Global Drop Creator \"{}\": {}", registryName, error))
-                    .forEachWarning(warning -> LOGGER.warn("Warning whilst loading Global Drop Creator \"{}\": {}", registryName, warning));
+                    .ifSuccessOrElse(
+                            result -> entries.put(registryName, result),
+                            error -> LOGGER.error("Error loading Global Drop Creator \"{}\": {}", registryName, error),
+                            warning -> LOGGER.warn("Warning whilst loading Global Drop Creator \"{}\": {}", registryName, warning)
+                    );
         });
     }
 

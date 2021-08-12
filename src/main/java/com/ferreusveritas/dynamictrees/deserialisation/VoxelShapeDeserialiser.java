@@ -1,5 +1,7 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -13,22 +15,22 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 public final class VoxelShapeDeserialiser implements JsonDeserialiser<VoxelShape> {
 
     @Override
-    public DeserialisationResult<VoxelShape> deserialise(JsonElement jsonElement) {
-        final DeserialisationResult<VoxelShape> voxelShape = new DeserialisationResult<>();
-
-        JsonHelper.JsonElementReader.of(jsonElement).ifOfType(String.class, string ->
-                        voxelShape.setValue(CommonVoxelShapes.SHAPES.getOrDefault(string.toLowerCase(), VoxelShapes.block())))
-                .elseIfOfType(AxisAlignedBB.class, axisAlignedBB -> voxelShape.setValue(VoxelShapes.create(axisAlignedBB)))
-                .elseIfOfType(JsonArray.class, jsonArray -> {
-                    voxelShape.setValue(VoxelShapes.empty());
-                    for (JsonElement element : jsonArray) {
-                        JsonHelper.JsonElementReader.of(element).ifOfType(AxisAlignedBB.class, axisAlignedBB ->
-                                        VoxelShapes.or(voxelShape.getValue(), VoxelShapes.create(axisAlignedBB)))
-                                .elseUnsupportedError(voxelShape::addWarning).ifFailed(voxelShape::addWarning);
+    public Result<VoxelShape, JsonElement> deserialise(JsonElement input) {
+        return JsonResult.forInput(input)
+                .mapIfType(String.class, name ->
+                        CommonVoxelShapes.SHAPES.getOrDefault(name.toLowerCase(), VoxelShapes.block())
+                ).elseMapIfType(AxisAlignedBB.class, VoxelShapes::create)
+                .elseMapIfType(JsonArray.class, array -> {
+                    VoxelShape shape = VoxelShapes.empty();
+                    for (JsonElement element : array) {
+                        shape = VoxelShapes.or(
+                                JsonDeserialisers.AXIS_ALIGNED_BB.deserialise(element)
+                                        .map(VoxelShapes::create)
+                                        .orElseThrow()
+                        );
                     }
-                }).elseUnsupportedError(voxelShape::setErrorMessage).ifFailed(voxelShape::setErrorMessage);
-
-        return voxelShape;
+                    return shape;
+                }).elseTypeError();
     }
 
 }

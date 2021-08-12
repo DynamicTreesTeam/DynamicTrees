@@ -1,10 +1,16 @@
 package com.ferreusveritas.dynamictrees.worldgen.deserialisation;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
+import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import javax.annotation.Nullable;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 /**
  * Gets an {@link BiomePropertySelectors.IChanceSelector} object from a {@link JsonElement}.
@@ -14,17 +20,17 @@ import com.google.gson.JsonObject;
 public final class ChanceSelectorDeserialiser implements JsonBiomeDatabaseDeserialiser<BiomePropertySelectors.IChanceSelector> {
 
     @Override
-    public DeserialisationResult<BiomePropertySelectors.IChanceSelector> deserialise(JsonElement jsonElement) {
-        final DeserialisationResult<BiomePropertySelectors.IChanceSelector> chanceSelector = new DeserialisationResult<>();
-
-        JsonHelper.JsonElementReader.of(jsonElement).ifOfType(JsonObject.class, jsonObject -> chanceSelector.copyFrom(this.readChanceSelector(jsonObject)))
-                .elseIfOfType(Float.class, chance -> chanceSelector.setValue(createSimpleChanceSelector(chance)))
-                .elseIfEquals("standard", str ->
-                        chanceSelector.setValue((rnd, spc, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ?
-                                BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL)
-                ).elseUnsupportedError(chanceSelector::setErrorMessage);
-
-        return chanceSelector;
+    public Result<BiomePropertySelectors.IChanceSelector, JsonElement> deserialise(JsonElement input) {
+        return JsonResult.forInput(input)
+                .mapIfType(JsonObject.class, this::readChanceSelector)
+                .elseMapIfType(Float.class, ChanceSelectorDeserialiser::createSimpleChanceSelector)
+                .elseMapIfType(String.class, name -> {
+                    if (name.equalsIgnoreCase("standard")) {
+                        return (rnd, spc, rad) -> rnd.nextFloat() < (rad > 3 ? 2.0f / rad : 1.0f) ?
+                                BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
+                    }
+                    throw new DeserialisationException("Unrecognised named chance selector \"" + name + "\".");
+                }).elseTypeError();
     }
 
     private static BiomePropertySelectors.IChanceSelector createSimpleChanceSelector(float value) {
@@ -33,28 +39,36 @@ public final class ChanceSelectorDeserialiser implements JsonBiomeDatabaseDeseri
         } else if (value >= 1) {
             return (rnd, spc, rad) -> BiomePropertySelectors.Chance.OK;
         }
-        return (rnd, spc, rad) -> rnd.nextFloat() < value ? BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
+        return (rnd, spc, rad) -> rnd.nextFloat() < value ?
+                BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL;
     }
 
-    private DeserialisationResult<BiomePropertySelectors.IChanceSelector> readChanceSelector(final JsonObject jsonObject) {
-        final DeserialisationResult<BiomePropertySelectors.IChanceSelector> chanceSelector = new DeserialisationResult<>();
+    @Nullable
+    private BiomePropertySelectors.IChanceSelector readChanceSelector(JsonObject jsonObject,
+                                                                      Consumer<String> warningConsumer) {
+        final AtomicReference<BiomePropertySelectors.IChanceSelector> chanceSelector = new AtomicReference<>();
 
         JsonHelper.JsonObjectReader.of(jsonObject)
                 .ifContains(STATIC, jsonElement ->
-                        JsonHelper.JsonElementReader.of(jsonElement)
-                                .ifOfType(Float.class, chance -> chanceSelector.setValue(createSimpleChanceSelector(chance))).ifFailed(chanceSelector::addWarning)
-                                .elseIfOfType(String.class, str -> {
-                                    if (this.isDefault(str)) {
-                                        chanceSelector.setValue((rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED);
+                        JsonResult.forInput(jsonElement)
+                                .mapIfType(Float.class, ChanceSelectorDeserialiser::createSimpleChanceSelector)
+                                .elseMapIfType(String.class, name -> {
+                                    if (this.isDefault(name)) {
+                                        return (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
                                     }
-                                }).ifFailed(chanceSelector::setErrorMessage))
-                .elseIfContains(MATH, jsonElement -> {
+                                    throw new DeserialisationException("Unrecognised named chance selector \"" + name + "\".");
+                                }).elseTypeError()
+                                .ifSuccessOrElse(chanceSelector::set, warningConsumer, warningConsumer)
+                ).elseIfContains(MATH, jsonElement -> {
                     final JsonMath jsonMath = new JsonMath(jsonElement);
-                    chanceSelector.setValue((rnd, spc, rad) -> rnd.nextFloat() < jsonMath.apply(rnd, spc, rad) ?
+                    chanceSelector.set((rnd, spc, rad) -> rnd.nextFloat() < jsonMath.apply(rnd, spc, rad) ?
                             BiomePropertySelectors.Chance.OK : BiomePropertySelectors.Chance.CANCEL);
-                }).elseRun(() -> chanceSelector.setErrorMessage("Could not get Json object chance selector as it did not contain key '" + STATIC + "' or '" + MATH + "'."));
+                }).elseRun(() ->
+                        warningConsumer.accept("Could not get Json object chance selector as it did not contain " +
+                                "key '" + STATIC + "' or '" + MATH + "'.")
+                );
 
-        return chanceSelector;
+        return chanceSelector.get();
     }
 
 }

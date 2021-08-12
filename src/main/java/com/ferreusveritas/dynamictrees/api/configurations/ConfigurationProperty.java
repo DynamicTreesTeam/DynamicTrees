@@ -1,14 +1,16 @@
 package com.ferreusveritas.dynamictrees.api.configurations;
 
-import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationResult;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Class for custom configuration properties that can be deserialised from a {@link JsonObject} using {@link
@@ -37,28 +39,23 @@ public class ConfigurationProperty<T> {
     }
 
     /**
-     * Gets a {@link DeserialisationResult} for the property's value from the given {@link JsonObject}, or null if it
+     * Gets a {@link Result} for the property's value from the given {@link JsonObject}, or null if it
      * was not found.
      *
      * @param jsonObject The {@link JsonObject} to fetch from.
-     * @return The an {@link DeserialisationResult} for the property value, or null if it wasn't found.
+     * @return The an {@link Result} for the property value, or null if it wasn't found.
      */
-    @Nullable
-    public DeserialisationResult<T> deserialise(JsonObject jsonObject) {
+    public Optional<Result<T, JsonElement>> deserialise(JsonObject jsonObject) {
         final JsonElement jsonElement = jsonObject.get(this.identifier);
 
         if (jsonElement == null) {
-            return null;
+            return Optional.empty();
         }
 
-        final JsonDeserialiser<T> getter = JsonDeserialisers.get(this.type);
-
-        if (!getter.isValid()) {
-            return DeserialisationResult.failure("Tried to get class '" + (this.type == null ? "null" : this.type.getSimpleName()) +
-                    "' for gen feature property '" + this.identifier + "', but object getter was not registered.");
-        }
-
-        return getter.deserialise(jsonElement);
+        final JsonDeserialiser<T> getter = JsonDeserialisers.getOrThrow(this.type, "Tried to get class " +
+                "\"" + this.type.getName() + "\" for gen feature property \"" + this.identifier + "\", but " +
+                "deserialiser was not registered.");
+        return Optional.ofNullable(getter.deserialise(jsonElement));
     }
 
     /**
@@ -69,7 +66,8 @@ public class ConfigurationProperty<T> {
      * @param <T>        The value the property will store.
      * @return The new {@link ConfigurationProperty} object.
      */
-    public static <T> ConfigurationProperty<T> property(String identifier, Class<T> type) {
+    public static <T> ConfigurationProperty<T> property(String identifier, @Nonnull Class<T> type) {
+        Objects.requireNonNull(type);
         return new ConfigurationProperty<>(identifier, type);
     }
 

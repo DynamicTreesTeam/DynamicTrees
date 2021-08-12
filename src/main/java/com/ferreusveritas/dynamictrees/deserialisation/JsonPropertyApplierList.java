@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -19,24 +20,23 @@ import java.util.function.Consumer;
  */
 public final class JsonPropertyApplierList<O> {
 
-    public static final class PropertyApplierResultList extends ArrayList<PropertyApplierResult> {
+    public static final class ResultList extends LinkedList<PropertyApplierResult> {
 
-        public PropertyApplierResultList forEachError(final Consumer<String> errorConsumer) {
-            this.forEach(propertyApplierResult -> errorConsumer.accept(propertyApplierResult.getErrorMessage()));
+        public ResultList forEachError(final Consumer<String> errorConsumer) {
+            this.forEach(result -> result.getError().ifPresent(errorConsumer));
             return this;
         }
 
-        public PropertyApplierResultList forEachWarning(final Consumer<String> warningConsumer) {
-            this.forEach(propertyApplierResult -> propertyApplierResult.getWarnings().forEach(warningConsumer));
+        public ResultList forEachWarning(final Consumer<String> warningConsumer) {
+            this.forEach(result -> result.getWarnings().forEach(warningConsumer));
             return this;
         }
 
-        public PropertyApplierResultList forEachErrorWarning(final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
-            this.forEach(propertyApplierResult -> {
-                errorConsumer.accept(propertyApplierResult.getErrorMessage());
-                propertyApplierResult.getWarnings().forEach(warningConsumer);
+        public void forEachErrorWarning(final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
+            this.forEach(result -> {
+                result.getError().ifPresent(errorConsumer);
+                result.getWarnings().forEach(warningConsumer);
             });
-            return this;
         }
 
     }
@@ -48,18 +48,14 @@ public final class JsonPropertyApplierList<O> {
         this.objectType = objectType;
     }
 
-    public PropertyApplierResultList applyAll(final JsonObject jsonObject, final O object) {
-        final PropertyApplierResultList failureResults = new PropertyApplierResultList();
+    public ResultList applyAll(final JsonObject jsonObject, final O object) {
+        final ResultList results = new ResultList();
 
         for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-            final PropertyApplierResult result = this.apply(object, entry.getKey(), entry.getValue());
-
-            if (!result.wasSuccessful()) {
-                failureResults.add(result);
-            }
+            results.add(this.apply(object, entry.getKey(), entry.getValue()));
         }
 
-        return failureResults;
+        return results;
     }
 
     public PropertyApplierResult apply(final O object, final String key, final JsonElement jsonElement) {

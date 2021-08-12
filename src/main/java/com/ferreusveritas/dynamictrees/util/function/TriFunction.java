@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.util.function;
 
 /**
  * Similar to {@link java.util.function.BiFunction}, but takes 3 parameters in apply.

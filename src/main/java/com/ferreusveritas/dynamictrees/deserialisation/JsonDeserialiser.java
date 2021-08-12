@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 
 import java.util.function.Consumer;
@@ -23,7 +24,7 @@ public interface JsonDeserialiser<O> extends Deserialiser<JsonElement, O> {
      * and return {@code false}.
      */
     @Override
-    default boolean deserialiseIfValid(JsonElement input, Consumer<DeserialisationResult<O>> consumer) {
+    default boolean deserialiseIfValid(JsonElement input, Consumer<Result<O, JsonElement>> consumer) {
         consumer.accept(this.deserialise(input));
         return true;
     }
