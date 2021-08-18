@@ -1523,7 +1523,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         Direction originDir = signal.dir.getOpposite();
 
         // prevent branches on the ground
-        if (signal.numSteps + 1 <= getLowestBranchHeight(world, signal.rootPos)) {
+        if (signal.numSteps + 1 <= getLowestBranchHeight(world, signal.rootPos) && !signal.getSpecies().getLeavesProperties().canGrowOnGround()) {
             return Direction.UP;
         }
 
@@ -1548,7 +1548,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         probMap = customDirectionManipulation(world, pos, branch.getRadius(world.getBlockState(pos)), signal, probMap);
 
         int choice = com.ferreusveritas.dynamictrees.util.MathHelper.selectRandomFromDistribution(signal.rand, probMap); // Select a direction from the probability map.
-        return newDirectionSelected(Direction.values()[choice != -1 ? choice : 1], signal); // Default to up if things are screwy
+        return newDirectionSelected(world, pos, Direction.values()[choice != -1 ? choice : 1], signal); // Default to up if things are screwy
     }
 
     /**
@@ -1561,8 +1561,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     /**
      * Species can override to take action once a new direction is selected
      **/
-    protected Direction newDirectionSelected(Direction newDir, GrowSignal signal) {
-        return getGrowthLogicKit().newDirectionSelected(this, newDir, signal);
+    protected Direction newDirectionSelected(World world, BlockPos pos, Direction newDir, GrowSignal signal) {
+        return getGrowthLogicKit().newDirectionSelected(world, pos,this, newDir, signal);
     }
 
     /**

@@ -50,10 +50,17 @@ public abstract class GrowthLogicKit extends RegistryEntry<GrowthLogicKit> {
 
     public abstract int[] directionManipulation(World world, BlockPos pos, Species species, int radius, GrowSignal signal, int[] probMap);
 
-    public abstract Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal);
+    public Direction newDirectionSelected(World world, BlockPos pos, Species species, Direction newDir, GrowSignal signal){
+        return this.newDirectionSelected(species, newDir, signal);
+    }
+    /**
+     * @deprecated When possible override the version that includes {@link World} and {@link BlockPos}
+     */
+    @Deprecated
+    public Direction newDirectionSelected(Species species, Direction newDir, GrowSignal signal) { return newDir; }
 
-    public abstract float getEnergy(World world, BlockPos pos, Species species, float signalEnergy);
+    public float getEnergy(World world, BlockPos pos, Species species, float signalEnergy) { return signalEnergy; };
 
-    public abstract int getLowestBranchHeight(World world, BlockPos pos, Species species, int lowestBranchHeight);
+    public int getLowestBranchHeight(World world, BlockPos pos, Species species, int lowestBranchHeight) { return lowestBranchHeight; };
 
 }

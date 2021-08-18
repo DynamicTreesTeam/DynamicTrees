@@ -616,7 +616,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
     public int getRadiusForCellKit(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, BranchBlock branch) {
         int radius = branch.getRadius(blockState);
         int meta = MetadataCell.NONE;
-        if (hasConiferVariants && radius == 1) {
+        if (hasConiferVariants && radius == getPrimaryThickness()) {
             if (blockAccess.getBlockState(pos.below()).getBlock() == branch) {
                 meta = MetadataCell.CONIFERTOP;
             }
