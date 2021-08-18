@@ -12,6 +12,7 @@ fun property(key: String) = project.findProperty(key).toString()
 plugins {
     id("java")
     id("net.minecraftforge.gradle")
+    id("org.parchmentmc.librarian.forgegradle")
     id("idea")
     id("maven-publish")
     id("com.matthewprenger.cursegradle") version "1.4.0"
@@ -38,7 +39,7 @@ version = "$mcVersion-$modVersion"
 group = property("group")
 
 minecraft {
-    mappings("official", mcVersion)
+    mappings("parchment", "${property("mappingsVersion")}-$mcVersion")
     accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
 
     runs {
