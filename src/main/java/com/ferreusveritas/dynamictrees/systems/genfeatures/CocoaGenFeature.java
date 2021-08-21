@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
+import com.ferreusveritas.dynamictrees.api.GeneratesFruit;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
@@ -10,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
+@GeneratesFruit
 public class CocoaGenFeature extends GenFeature {
 
     public CocoaGenFeature(ResourceLocation registryName) {

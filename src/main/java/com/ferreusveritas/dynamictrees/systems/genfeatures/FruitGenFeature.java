@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
+import com.ferreusveritas.dynamictrees.api.GeneratesFruit;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -21,6 +22,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
+@GeneratesFruit
 public class FruitGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<FruitBlock> FRUIT_BLOCK = ConfigurationProperty.property("fruit_block", FruitBlock.class);

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.substances;
 
-import com.ferreusveritas.dynamictrees.api.IFruitGenFeature;
+import com.ferreusveritas.dynamictrees.api.GeneratesFruit;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
@@ -138,7 +138,7 @@ public class HarvestSubstance implements ISubstanceEffect {
             // Force a growth attempt of all fruit gen features.
             if (spawnAttempt) {
                 this.species.getGenFeatures().stream()
-                        .filter(configuration -> configuration.getGenFeature() instanceof IFruitGenFeature)
+                        .filter(configuration -> configuration.getGenFeature().getClass().isAnnotationPresent(GeneratesFruit.class))
                         .forEach(configuration -> configuration.getGenFeature().generate(
                                 configuration,
                                 GenFeature.Type.POST_GROW,
