@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
@@ -45,8 +45,8 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
@@ -353,6 +353,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     @Override
     public Species setPostReloadDefaults() {
+        // If no seed has been set, use the common seed.
+        if (!this.hasSeed()) {
+            this.seed = this.getCommonSpecies().seed;
+        }
+
         // If there is no acceptable soil set, use the standard soils.
         if (!this.hasAcceptableSoil()) {
             this.setStandardSoils();
@@ -620,16 +625,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     //SEEDS
     ///////////////////////////////////////////
 
-    private Species otherSpeciesForSeed = null;
-
-    public void setOtherSpeciesForSeed(Species otherSpecies) {
-        otherSpeciesForSeed = otherSpecies;
-    }
-
-    public boolean hasSeedFromOtherSpecies() {
-        return otherSpeciesForSeed != null;
-    }
-
     /**
      * Get an ItemStack of the species {@link Seed} with the supplied quantity.
      *
@@ -637,15 +632,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return An {@link ItemStack} with the {@link Seed} inside.
      */
     public ItemStack getSeedStack(int qty) {
-        return this.hasSeed() ?
-                new ItemStack(this.seed, qty) :
-                (hasSeedFromOtherSpecies() ?
-                        otherSpeciesForSeed.getSeedStack(qty) :
-                        (!this.isCommonSpecies() ?
-                                this.family.getCommonSpecies().getSeedStack(qty) :
-                                ItemStack.EMPTY
-                        )
-                );
+        return !this.hasSeed() ? ItemStack.EMPTY : new ItemStack(this.seed, qty);
     }
 
     public boolean hasSeed() {
@@ -653,15 +640,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public Optional<Seed> getSeed() {
-        return this.hasSeed() ?
-                Optional.of(this.seed) :
-                (hasSeedFromOtherSpecies() ?
-                        otherSpeciesForSeed.getSeed() :
-                        (!this.isCommonSpecies() ?
-                                this.family.getCommonSpecies().getSeed() :
-                                Optional.empty()
-                        )
-                );
+        return Optional.ofNullable(this.seed);
     }
 
     /**

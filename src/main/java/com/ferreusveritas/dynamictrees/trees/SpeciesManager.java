@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
+import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
@@ -23,6 +24,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IWorldReader;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,11 +62,19 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                                 biomePredicate.test(((IWorldReader) world).getBiome(pos)))
         );
 
-        this.loadAppliers.register("use_seed_of_other_species", ResourceLocation.class, (species, registryName) -> {
-                    final ResourceLocation processedRegName = TreeRegistry.processResLoc(registryName);
+        this.loadAppliers
+                .register("seed", ResourceLocation.class, (species, seedName) -> {
+                    final ResourceLocation processedSeedName = TreeRegistry.processResLoc(seedName);
                     species.setShouldGenerateSeed(false);
                     species.setShouldGenerateSapling(false);
-                    Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(processedRegName, species::setOtherSpeciesForSeed, () -> LOGGER.warn("Could not set seed of other species for '" + species + "' as Species '" + processedRegName + "' was not found.")));
+                    CommonSetup.runOnCommonSetup(event -> {
+                        final Item seed = ForgeRegistries.ITEMS.getValue(processedSeedName);
+                        if (seed instanceof Seed) {
+                            species.setSeed((Seed) seed);
+                        } else {
+                            LOGGER.warn("Could not find valid seed item from registry name \"" + seedName + "\".");
+                        }
+                    });
                 })
                 .register("generate_seed", Boolean.class, Species::setShouldGenerateSeed)
                 .register("generate_sapling", Boolean.class, Species::setShouldGenerateSapling)

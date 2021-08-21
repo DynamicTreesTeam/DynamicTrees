@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.data.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
@@ -84,6 +85,7 @@ public final class DynamicTrees {
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::onCommonSetup);
         modEventBus.addListener(this::gatherData);
+        modEventBus.addListener(CommonSetup::onCommonSetup);
 
         EventHandlers.registerCommon();
         CompatHandler.registerBuiltInSeasonManagers();
