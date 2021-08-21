@@ -420,9 +420,9 @@ public class JoCode {
 					do {
 						IBlockState state = world.getBlockState(iPos);
 						if (state.getMaterial() == Material.AIR) {
-							world.setBlockState(iPos, ModBlocks.blockStates.snowLayer, 2);
+							world.setBlockState(iPos, ModBlocks.blockStates.snowLayer.get(), 2);
 							break;
-						} else if (state.getBlock() == ModBlocks.blockLeavesSnow || state.getBlock() == Blocks.SNOW_LAYER) {
+						} else if (state.getBlock() == ModBlocks.blockLeavesSnow.get() || state.getBlock() == Blocks.SNOW_LAYER) {
 							break;
 						}
 						iPos.setY(iPos.getY() + 1);

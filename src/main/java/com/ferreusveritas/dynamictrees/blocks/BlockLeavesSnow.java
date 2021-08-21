@@ -2,11 +2,11 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.ModConstants;
 import com.ferreusveritas.dynamictrees.seasons.SeasonHelper;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockSnow;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
+import java.util.Objects;
 import java.util.Random;
 
 public class BlockLeavesSnow extends BlockSnow {
@@ -30,7 +31,7 @@ public class BlockLeavesSnow extends BlockSnow {
 
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-		return new ItemStack(ItemBlock.getItemFromBlock(Blocks.SNOW_LAYER));
+		return new ItemStack(ItemBlock.getItemFromBlock(Objects.requireNonNull(Block.getBlockFromName("snow_layer"))));
 	}
 
 	@Override

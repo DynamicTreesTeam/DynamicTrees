@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.systems.DirtHelper;
+import com.ferreusveritas.dynamictrees.util.LazyValue;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockSnow;
@@ -34,7 +35,7 @@ public class ModBlocks {
 	public static BlockBonsaiPot blockBonsaiPot;
 	public static BlockTrunkShell blockTrunkShell;
 
-	public static BlockSnow blockLeavesSnow;
+	public static LazyValue<BlockSnow> blockLeavesSnow;
 
 	public static Map<String, ILeavesProperties> leaves = new HashMap<>();
 
@@ -53,7 +54,8 @@ public class ModBlocks {
 		blockApple = new BlockFruit().setDroppedItem(new ItemStack(Items.APPLE));//Apple
 		blockTrunkShell = new BlockTrunkShell();
 
-		blockLeavesSnow = ModConfigs.enableAltLeavesSnow ? new BlockLeavesSnow() : (BlockSnow) Blocks.SNOW_LAYER;
+		blockLeavesSnow = ModConfigs.enableAltLeavesSnow ? LazyValue.of(new BlockLeavesSnow()) : 
+			LazyValue.supplied(() -> (BlockSnow) Block.getBlockFromName("snow_layer"));
 
 		blockStates = new CommonBlockStates();
 
@@ -87,7 +89,7 @@ public class ModBlocks {
 		);
 
 		if (ModConfigs.enableAltLeavesSnow) {
-			registry.register(blockLeavesSnow);
+			registry.register(blockLeavesSnow.get());
 		}
 
 		registry.registerAll(treeBlocks.toArray(new Block[0]));
@@ -118,7 +120,8 @@ public class ModBlocks {
 		public final IBlockState podzol = dirt.withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL);
 		public final IBlockState redMushroom = Blocks.RED_MUSHROOM.getDefaultState();
 		public final IBlockState brownMushroom = Blocks.BROWN_MUSHROOM.getDefaultState();
-		public final IBlockState snowLayer = blockLeavesSnow.getDefaultState();
+		public final LazyValue<IBlockState> snowLayer = LazyValue.supplied(() -> 
+			blockLeavesSnow.get().getDefaultState());
 
 	}
 
