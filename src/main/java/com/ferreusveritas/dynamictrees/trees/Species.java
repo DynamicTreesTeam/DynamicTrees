@@ -404,6 +404,22 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public void addValidLeavesBlocks(ILeavesProperties... leaves) {
 		this.validLeaves.addAll(Arrays.asList(leaves));
 	}
+	
+	public boolean isCompatibleLeaves(World world, BlockPos pos, IBlockState state) {
+		if (!this.treeFamily.isCompatibleGenericLeaves(state, world, pos)) {
+			return false;
+		}
+		final BlockDynamicLeaves leaves = TreeHelper.getLeaves(state);
+		if (leaves == null) {
+			return false;
+		}
+		final ILeavesProperties properties = leaves.getProperties(state);
+		return this.leavesProperties == properties || this.isValidLeaves(properties);
+	}
+	
+	public boolean isValidLeaves(ILeavesProperties leaves) {
+		return this.validLeaves.contains(leaves);
+	}
 
 	/**
 	 * @return the index in the validLeaves List of the blockState passed. If the block is not in the list, the index

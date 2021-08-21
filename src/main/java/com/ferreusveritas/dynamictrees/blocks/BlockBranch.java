@@ -334,14 +334,14 @@ public abstract class BlockBranch extends Block implements ITreePart, IFutureBre
 			//Destroy all family compatible leaves
 			for (Cell cell : vmap.getAllNonZeroCells()) {
 				MutableBlockPos pos = cell.getPos();
-				IBlockState blockState = world.getBlockState(pos);
-				if (family.isCompatibleGenericLeaves(blockState, world, pos)) {
+				IBlockState state = world.getBlockState(pos);
+				if (species.isCompatibleLeaves(world, pos, state)) {
 					dropList.clear();
 					species.getTreeHarvestDrops(world, pos, dropList, world.rand);
 					BlockPos imPos = pos.toImmutable();//We are storing this so it must be immutable
 					BlockPos relPos = imPos.subtract(cutPos);
 					world.setBlockState(imPos, ModBlocks.blockStates.air, 0);//Covertly destroy the leaves on the server side
-					destroyedLeaves.put(relPos, blockState);
+					destroyedLeaves.put(relPos, state);
 					dropList.forEach(i -> drops.add(new BlockItemStack(i, relPos)));
 				}
 			}

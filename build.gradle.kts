@@ -1,6 +1,6 @@
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.matthewprenger.cursegradle.CurseProject
+import com.matthewprenger.cursegradle.*
 import org.apache.tools.ant.filters.ReplaceTokens
 import java.io.FileInputStream
 import java.io.InputStreamReader
@@ -163,7 +163,7 @@ curseforge {
     if (project.hasProperty("curseApiKey")) {
         apiKey = project.property("curseApiKey")
 
-        project(closureOf<CurseProject> {
+        project {
             id = "252818"
 
             addGameVersion(mcVersion)
@@ -174,7 +174,7 @@ curseforge {
 
             addArtifact(tasks.findByName("sourcesJar"))
             addArtifact(deobfJar.get())
-        })
+        }
     } else {
         project.logger.log(LogLevel.WARN, "API Key and file type for CurseForge not detected; uploading will be disabled.")
     }
@@ -252,4 +252,18 @@ publishing {
             logger.log(LogLevel.WARN, "Credentials for maven not detected; it will be disabled.")
         }
     }
+}
+
+// Extensions to make CurseGradle extension slightly neater.
+
+fun CurseExtension.project(action: CurseProject.() -> Unit) {
+    this.project(closureOf(action))
+}
+
+fun CurseProject.mainArtifact(artifact: Task?, action: CurseArtifact.() -> Unit) {
+    this.mainArtifact(artifact, closureOf(action))
+}
+
+fun CurseArtifact.relations(action: CurseRelation.() -> Unit) {
+    this.relations(closureOf(action))
 }
