@@ -1,8 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
+import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ISeedReader;
@@ -15,10 +14,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This class is used to find a suitable area to generate a tree on the ground. It does this based on whether the biome
- * is marked as subterranean or not, which can be done by the {@link BiomeDatabase}.
+ * Handles finding a suitable ground block on which a tree can generate in subterranean locations, such as the Nether. 
  */
-public class GroundFinder implements IGroundFinder {
+public class SubterraneanGroundFinder implements GroundFinder {
 
     private static final List<BlockPos> NO_LAYERS = Collections.singletonList(BlockPos.ZERO);
 
@@ -64,7 +62,8 @@ public class GroundFinder implements IGroundFinder {
         return layers;
     }
 
-    protected List<BlockPos> findSubterraneanGround(final IWorld world, final BlockPos start) {
+    @Override
+    public List<BlockPos> findGround(ISeedReader world, BlockPos start) {
         final ArrayList<Integer> layers = findSubterraneanLayerHeights(world, start);
         if (layers.size() < 1) {
             return NO_LAYERS;
@@ -75,15 +74,6 @@ public class GroundFinder implements IGroundFinder {
         }
 
         return positions;
-    }
-
-    protected List<BlockPos> findOverworldGround(final IWorld world, final BlockPos pos) {
-        return Collections.singletonList(CoordUtils.findWorldSurface(world, pos, true));
-    }
-
-    @Override
-    public List<BlockPos> findGround(final BiomeDatabase.Entry entry, final ISeedReader world, final BlockPos start) {
-        return entry.isSubterraneanBiome() ? findSubterraneanGround(world, start) : findOverworldGround(world, start);
     }
 
 }

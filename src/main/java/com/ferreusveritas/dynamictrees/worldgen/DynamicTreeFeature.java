@@ -46,7 +46,7 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
         // Generate trees.
         treeGenerator.getCircleProvider().getPoissonDiscs(serverWorld, world, chunkPos)
-                .forEach(c -> treeGenerator.makeTrees(world, biomeDatabase, c, new GroundFinder(), chunkBounds));
+                .forEach(c -> treeGenerator.makeTrees(world, biomeDatabase, c, chunkBounds));
 
 //		final long endTime = System.nanoTime();
 //		final long duration = (endTime - startTime) / 1000000;

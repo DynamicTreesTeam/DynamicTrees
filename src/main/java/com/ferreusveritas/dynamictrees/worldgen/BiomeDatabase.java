@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.*;
+import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
@@ -84,6 +85,7 @@ public class BiomeDatabase {
         private float forestness = 0.0f;
         private final static Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
         private Function<Integer, Integer> multipass = defaultMultipass;
+        private GroundFinder groundFinder = GroundFinder.OVERWORLD;
 
         public Entry() {
             this.database = null;
@@ -137,6 +139,7 @@ public class BiomeDatabase {
 
         public void setSubterraneanBiome(boolean is) {
             this.isSubterranean = is;
+            this.groundFinder = is ? GroundFinder.SUBTERRANEAN : GroundFinder.OVERWORLD;
         }
 
         public boolean isBlacklisted() {
@@ -161,6 +164,14 @@ public class BiomeDatabase {
 
         public Function<Integer, Integer> getMultipass() {
             return multipass;
+        }
+
+        public GroundFinder getGroundFinder() {
+            return groundFinder;
+        }
+
+        public void setGroundFinder(GroundFinder groundFinder) {
+            this.groundFinder = groundFinder;
         }
 
     }

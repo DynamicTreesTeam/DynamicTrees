@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Chance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
-import com.ferreusveritas.dynamictrees.api.worldgen.IGroundFinder;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
@@ -95,11 +94,11 @@ public class TreeGenerator {
         }
     }
 
-    public void makeTrees(ISeedReader world, BiomeDatabase biomeDataBase, PoissonDisc circle, IGroundFinder groundFinder, SafeChunkBounds safeBounds) {
+    public void makeTrees(ISeedReader world, BiomeDatabase biomeDataBase, PoissonDisc circle, SafeChunkBounds safeBounds) {
         circle.add(8, 8); // Move the circle into the "stage".
         BlockPos pos = new BlockPos(circle.x, 0, circle.z);
         final Entry entry = biomeDataBase.getEntry(world.getBiome(pos));
-        for (BlockPos groundPos : groundFinder.findGround(entry, world, pos)) {
+        for (BlockPos groundPos : entry.getGroundFinder().findGround(world, pos)) {
             makeTree(world, entry, circle, groundPos, safeBounds);
         }
         circle.sub(8, 8); // Move the circle back to normal coords.
