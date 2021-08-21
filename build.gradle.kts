@@ -12,6 +12,7 @@ fun property(key: String) = project.findProperty(key).toString()
 plugins {
     id("java")
     id("net.minecraftforge.gradle")
+    id("org.parchmentmc.librarian.forgegradle")
     id("idea")
     id("maven-publish")
     id("com.matthewprenger.cursegradle") version "1.4.0"
@@ -33,7 +34,7 @@ version = "$mcVersion-$modVersion"
 group = property("group")
 
 minecraft {
-    mappings("official", mcVersion)
+    mappings("parchment", "${property("mappingsVersion")}-$mcVersion")
     accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
 
     runs {
@@ -105,7 +106,7 @@ sourceSets.main.get().resources {
 
 dependencies {
     // Not sure if we need this one, what is a "forge" anyway?
-    minecraft("net.minecraftforge:forge:${mcVersion}-${property("forgeVersion")}")
+    minecraft("net.minecraftforge:forge:$mcVersion-${property("forgeVersion")}")
 
     // Compile Hwyla API, but don"t include in runtime.
     compileOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api"))
@@ -113,9 +114,9 @@ dependencies {
     runtimeOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}"))
 
     // Compile JEI API, but don"t include in runtime.
-    compileOnly(fg.deobf("mezz.jei:jei-${mcVersion}:${property("jeiVersion")}:api"))
+    compileOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}:api"))
     // At runtime, use the full JEI mod.
-    runtimeOnly(fg.deobf("mezz.jei:jei-${mcVersion}:${property("jeiVersion")}"))
+    runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}"))
 
     // At runtime, use Patchouli mod (for the guide book, which is Json so we don"t need the API).
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
@@ -133,7 +134,7 @@ dependencies {
     useBetterWeather(this)
 
     // At runtime, use suggestion provider fix mod.
-    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:${mcVersion}-${property("suggestionProviderFixVersion")}"))
+    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:$mcVersion-${property("suggestionProviderFixVersion")}"))
 }
 
 fun useSereneSeasons(depHandler: DependencyHandlerScope) {
