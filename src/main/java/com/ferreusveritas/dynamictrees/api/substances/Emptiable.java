@@ -8,7 +8,8 @@ import net.minecraft.item.ItemStack;
  *
  * @author ferreusveritas
  */
-public interface IEmptiable {
+@FunctionalInterface
+public interface Emptiable {
 
     /**
      * The container item this object returns when a substance is emptied.

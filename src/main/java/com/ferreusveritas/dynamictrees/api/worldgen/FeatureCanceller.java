@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.worldgen;
 
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import net.minecraft.util.ResourceLocation;
@@ -18,7 +18,7 @@ public abstract class FeatureCanceller extends RegistryEntry<FeatureCanceller> {
         }
     };
 
-    public static final Registry<FeatureCanceller> REGISTRY = new Registry<>(FeatureCanceller.class, NULL_CANCELLER);
+    public static final SimpleRegistry<FeatureCanceller> REGISTRY = new SimpleRegistry<>(FeatureCanceller.class, NULL_CANCELLER);
 
     public FeatureCanceller(final ResourceLocation registryName) {
         super(registryName);

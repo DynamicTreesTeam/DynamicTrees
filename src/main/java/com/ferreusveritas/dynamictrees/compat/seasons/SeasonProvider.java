@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.compat.seasons;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public interface ISeasonProvider {
+public interface SeasonProvider {
 
     /**
      * A season provider returns a float value from 0(Inclusive) to 4(Exclusive) that signifies one of the four classic

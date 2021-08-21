@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.substances;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.waila.WailaOther;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -10,7 +10,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class MegaSubstance implements ISubstanceEffect {
+public class MegaSubstance implements SubstanceEffect {
 
     @Override
     public boolean apply(World world, BlockPos rootPos) {

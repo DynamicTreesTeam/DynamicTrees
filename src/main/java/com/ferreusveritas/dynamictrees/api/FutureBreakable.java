@@ -5,7 +5,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public interface IFutureBreakable {
+@FunctionalInterface
+public interface FutureBreakable {
 
     void futureBreak(BlockState state, World world, BlockPos pos, LivingEntity player);
 

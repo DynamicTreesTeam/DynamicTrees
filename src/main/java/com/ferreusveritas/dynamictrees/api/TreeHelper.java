@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.NullTreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
@@ -27,7 +27,7 @@ import java.util.Optional;
 
 public class TreeHelper {
 
-    public static final ITreePart NULL_TREE_PART = new NullTreePart();
+    public static final TreePart NULL_TREE_PART = new NullTreePart();
 
     ///////////////////////////////////////////
     //CONVENIENCE METHODS
@@ -71,7 +71,7 @@ public class TreeHelper {
                 Block block = blockState.getBlock();
                 if (block instanceof DynamicLeavesBlock) {//Special case for leaves
                     int prevHydro = leafMap.getVoxel(iPos);//The leafMap should contain accurate hydro data
-                    int newHydro = ((IAgeable) block).age(world, iPos, blockState, world.getRandom(), safeBounds);//Get new values from neighbors
+                    int newHydro = ((Ageable) block).age(world, iPos, blockState, world.getRandom(), safeBounds);//Get new values from neighbors
                     if (newHydro == -1) {
                         //Leaf block died.  Take it out of the leafMap and iterMap
                         leafMap.setVoxel(iPos, (byte) 0);
@@ -91,8 +91,8 @@ public class TreeHelper {
                             }
                         }
                     }
-                } else if (block instanceof IAgeable) {//Treat as just a regular ageable block
-                    ((IAgeable) block).age(world, iPos, blockState, world.getRandom(), safeBounds);
+                } else if (block instanceof Ageable) {//Treat as just a regular ageable block
+                    ((Ageable) block).age(world, iPos, blockState, world.getRandom(), safeBounds);
                 } else {//You're not supposed to be here
                     leafMap.setVoxel(iPos, (byte) 0);
                     iterMap.setVoxel(iPos, (byte) 0);
@@ -119,8 +119,8 @@ public class TreeHelper {
             for (BlockPos iPos : iterable) {
                 BlockState blockState = world.getBlockState(iPos);
                 Block block = blockState.getBlock();
-                if (block instanceof IAgeable) {
-                    ((IAgeable) block).age(world, iPos, blockState, world.getRandom(), safeBounds);//Treat as just a regular ageable block
+                if (block instanceof Ageable) {
+                    ((Ageable) block).age(world, iPos, blockState, world.getRandom(), safeBounds);//Treat as just a regular ageable block
                 }
             }
         }
@@ -208,7 +208,7 @@ public class TreeHelper {
 
         pos = dereferenceTrunkShell(world, pos);
         BlockState state = world.getBlockState(pos);
-        ITreePart treePart = TreeHelper.getTreePart(world.getBlockState(pos));
+        TreePart treePart = TreeHelper.getTreePart(world.getBlockState(pos));
 
         switch (treePart.getTreePartType()) {
             case BRANCH:
@@ -230,19 +230,19 @@ public class TreeHelper {
      * Sets a custom rooty block decay (what dirt it becomes when the tree is gone) algorithm for mods that have special
      * requirements.
      *
-     * @param decay The {@link ICustomRootDecay} implementation.
+     * @param decay The {@link RootyBlockDecayer} implementation.
      */
-    public static void setCustomRootBlockDecay(ICustomRootDecay decay) {
-        RootyBlock.customRootDecay = decay;
+    public static void setCustomRootBlockDecay(RootyBlockDecayer decay) {
+        RootyBlock.rootyBlockDecayer = decay;
     }
 
     /**
      * Provided as a means for an implementation to chain the handlers.
      *
-     * @return The currently defined {@link ICustomRootDecay} handler.
+     * @return The currently defined {@link RootyBlockDecayer} handler.
      */
-    public static ICustomRootDecay getCustomRootBlockDecay() {
-        return RootyBlock.customRootDecay;
+    public static RootyBlockDecayer getCustomRootBlockDecay() {
+        return RootyBlock.rootyBlockDecayer;
     }
 
     /**
@@ -288,7 +288,7 @@ public class TreeHelper {
     //Treeparts
 
     public static boolean isTreePart(Block block) {
-        return block instanceof ITreePart;
+        return block instanceof TreePart;
     }
 
     public static boolean isTreePart(BlockState blockState) {
@@ -299,11 +299,11 @@ public class TreeHelper {
         return isTreePart(blockAccess.getBlockState(pos).getBlock());
     }
 
-    public static ITreePart getTreePart(Block block) {
-        return isTreePart(block) ? (ITreePart) block : NULL_TREE_PART;
+    public static TreePart getTreePart(Block block) {
+        return isTreePart(block) ? (TreePart) block : NULL_TREE_PART;
     }
 
-    public static ITreePart getTreePart(BlockState blockState) {
+    public static TreePart getTreePart(BlockState blockState) {
         return getTreePart(blockState.getBlock());
     }
 
@@ -324,7 +324,7 @@ public class TreeHelper {
     }
 
     @Nullable
-    public static BranchBlock getBranch(ITreePart treepart) {
+    public static BranchBlock getBranch(TreePart treepart) {
         return treepart instanceof BranchBlock ? (BranchBlock) treepart : null;
     }
 
@@ -347,7 +347,7 @@ public class TreeHelper {
         return isBranch(block) ? Optional.of((BranchBlock) block) : Optional.empty();
     }
 
-    public static Optional<BranchBlock> getBranchOpt(ITreePart treepart) {
+    public static Optional<BranchBlock> getBranchOpt(TreePart treepart) {
         return treepart instanceof BranchBlock ? Optional.of((BranchBlock) treepart) : Optional.empty();
     }
 
@@ -372,7 +372,7 @@ public class TreeHelper {
     }
 
     @Nullable
-    public static DynamicLeavesBlock getLeaves(ITreePart treepart) {
+    public static DynamicLeavesBlock getLeaves(TreePart treepart) {
         return treepart instanceof DynamicLeavesBlock ? (DynamicLeavesBlock) treepart : null;
     }
 
@@ -397,7 +397,7 @@ public class TreeHelper {
     }
 
     @Nullable
-    public static RootyBlock getRooty(ITreePart treepart) {
+    public static RootyBlock getRooty(TreePart treepart) {
         return treepart instanceof RootyBlock ? (RootyBlock) treepart : null;
     }
 

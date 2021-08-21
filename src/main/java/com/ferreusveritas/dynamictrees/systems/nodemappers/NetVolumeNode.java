@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
@@ -11,7 +11,7 @@ import net.minecraft.world.IWorld;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NetVolumeNode implements INodeInspector {
+public class NetVolumeNode implements NodeInspector {
 
     public static final class Volume {
         public static final int VOXELSPERLOG = 4096; //A log contains 4096 voxels of wood material(16x16x16 pixels)

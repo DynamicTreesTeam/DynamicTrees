@@ -3,9 +3,9 @@ package com.ferreusveritas.dynamictrees.blocks.branches;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.api.cells.Cell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
@@ -238,7 +238,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     ///////////////////////////////////////////
 
     @Override
-    public ICell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
+    public Cell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
         final Family thisTree = getFamily();
 
         // The requesting leaves must match the tree for hydration to occur, and the branch must not be stripped.
@@ -321,7 +321,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
             final BlockState deltaState = world.getBlockState(deltaPos);
 
             // Pass grow signal to next block in path
-            final ITreePart treepart = TreeHelper.getTreePart(deltaState);
+            final TreePart treepart = TreeHelper.getTreePart(deltaState);
             if (treepart != TreeHelper.NULL_TREE_PART) {
                 signal = treepart.growSignal(world, deltaPos, signal);// Recurse
             } else if (world.isEmptyBlock(deltaPos) || deltaState.getBlock() instanceof TrunkShellBlock) {
@@ -341,7 +341,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
                 // derived from BlockBranch and this works perfectly. Should even work with
                 // tileEntity blocks derived from BlockBranch.
                 BlockState blockState = world.getBlockState(deltaPos);
-                ITreePart treepart = TreeHelper.getTreePart(blockState);
+                TreePart treepart = TreeHelper.getTreePart(blockState);
                 if (isSameTree(treepart)) {
                     int branchRadius = treepart.getRadius(blockState);
                     areaAccum += branchRadius * branchRadius;
@@ -458,7 +458,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
                     BlockPos deltaPos = pos.relative(dir);
 
                     BlockState deltaState = world.getBlockState(deltaPos);
-                    ITreePart treePart = TreeHelper.getTreePart(deltaState);
+                    TreePart treePart = TreeHelper.getTreePart(deltaState);
 
                     if (treePart.shouldAnalyse(deltaState, world, deltaPos)) {
                         signal = treePart.analyse(deltaState, world, deltaPos, dir.getOpposite(), signal);

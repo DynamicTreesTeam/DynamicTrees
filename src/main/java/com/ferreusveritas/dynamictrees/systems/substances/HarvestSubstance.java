@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.substances;
 import com.ferreusveritas.dynamictrees.api.GeneratesFruit;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTClient;
@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * @author Harley O'Connor
  */
-public class HarvestSubstance implements ISubstanceEffect {
+public class HarvestSubstance implements SubstanceEffect {
 
     private Species species = Species.NULL_SPECIES;
     private final int duration;

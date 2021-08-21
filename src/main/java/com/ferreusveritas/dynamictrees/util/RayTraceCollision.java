@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
 @FunctionalInterface
-public interface IRayTraceCollision {
+public interface RayTraceCollision {
     boolean isRayTraceCollidable();
 }

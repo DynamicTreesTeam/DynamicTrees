@@ -1,22 +1,22 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
-public class SpeciesNode implements INodeInspector {
+public class SpeciesNode implements NodeInspector {
 
     private Species determination = Species.NULL_SPECIES;
 
     @Override
     public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
 
-        ITreePart treePart = TreeHelper.getTreePart(blockState);
+        TreePart treePart = TreeHelper.getTreePart(blockState);
 
         switch (treePart.getTreePartType()) {
             case BRANCH:

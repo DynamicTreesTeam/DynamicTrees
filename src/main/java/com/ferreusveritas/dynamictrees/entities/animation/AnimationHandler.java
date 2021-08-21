@@ -5,7 +5,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public interface IAnimationHandler {
+public interface AnimationHandler {
     String getName();
 
     void initMotion(FallingTreeEntity entity);

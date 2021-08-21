@@ -2,12 +2,12 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.BiomePredicate;
-import com.ferreusveritas.dynamictrees.util.CanGrowPredicate;
+import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
+import com.ferreusveritas.dynamictrees.util.function.CanGrowPredicate;
 import com.ferreusveritas.dynamictrees.util.function.TriFunction;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.util.ResourceLocation;
@@ -41,7 +41,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
     /**
      * Central registry for all {@link GenFeature} objects.
      */
-    public static final Registry<GenFeature> REGISTRY = new Registry<>(GenFeature.class, NULL_GEN_FEATURE);
+    public static final SimpleRegistry<GenFeature> REGISTRY = new SimpleRegistry<>(GenFeature.class, NULL_GEN_FEATURE);
 
     public GenFeature(final ResourceLocation registryName) {
         super(registryName);

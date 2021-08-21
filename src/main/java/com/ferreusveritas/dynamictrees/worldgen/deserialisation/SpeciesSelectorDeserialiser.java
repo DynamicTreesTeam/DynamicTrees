@@ -16,14 +16,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
- * Gets an {@link BiomePropertySelectors.ISpeciesSelector} object from a {@link JsonElement}.
+ * Gets an {@link BiomePropertySelectors.SpeciesSelector} object from a {@link JsonElement}.
  *
  * @author Harley O'Connor
  */
-public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeserialiser<BiomePropertySelectors.ISpeciesSelector> {
+public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeserialiser<BiomePropertySelectors.SpeciesSelector> {
 
     @Override
-    public Result<BiomePropertySelectors.ISpeciesSelector, JsonElement> deserialise(final JsonElement input) {
+    public Result<BiomePropertySelectors.SpeciesSelector, JsonElement> deserialise(final JsonElement input) {
         return JsonResult.forInput(input)
                 .mapIfType(Species.class, this::readStatic)
                 .elseMapIfType(String.class, this::readStatic)
@@ -31,13 +31,13 @@ public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeser
                 .elseTypeError();
     }
 
-    private BiomePropertySelectors.ISpeciesSelector readStatic(Species species) {
+    private BiomePropertySelectors.SpeciesSelector readStatic(Species species) {
         return new BiomePropertySelectors.StaticSpeciesSelector(
                 new BiomePropertySelectors.SpeciesSelection(species)
         );
     }
 
-    private BiomePropertySelectors.ISpeciesSelector readStatic(String string) throws DeserialisationException {
+    private BiomePropertySelectors.SpeciesSelector readStatic(String string) throws DeserialisationException {
         if (this.isDefault(string)) {
             return new BiomePropertySelectors.StaticSpeciesSelector();
         }
@@ -45,8 +45,8 @@ public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeser
                 "static species selector.");
     }
 
-    private BiomePropertySelectors.ISpeciesSelector readSelector(JsonObject object, Consumer<String> warningConsumer) {
-        final AtomicReference<BiomePropertySelectors.ISpeciesSelector> selection = new AtomicReference<>();
+    private BiomePropertySelectors.SpeciesSelector readSelector(JsonObject object, Consumer<String> warningConsumer) {
+        final AtomicReference<BiomePropertySelectors.SpeciesSelector> selection = new AtomicReference<>();
 
         JsonHelper.JsonObjectReader.of(object)
                 .ifContains(STATIC, staticElement ->
@@ -65,9 +65,9 @@ public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeser
     }
 
     @Nullable
-    private BiomePropertySelectors.ISpeciesSelector getRandomSpeciesSelector(JsonElement input,
-                                                                             Consumer<String> warningConsumer) {
-        final AtomicReference<BiomePropertySelectors.ISpeciesSelector> selectorResult = new AtomicReference<>();
+    private BiomePropertySelectors.SpeciesSelector getRandomSpeciesSelector(JsonElement input,
+                                                                            Consumer<String> warningConsumer) {
+        final AtomicReference<BiomePropertySelectors.SpeciesSelector> selectorResult = new AtomicReference<>();
 
         JsonDeserialisers.JSON_OBJECT.deserialise(input).ifSuccessOrElse(
                 object -> {

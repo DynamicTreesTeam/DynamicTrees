@@ -13,7 +13,7 @@ import sereneseasons.season.SeasonHooks;
 
 import java.util.Objects;
 
-public class SereneSeasonsSeasonProvider implements ISeasonProvider {
+public class SereneSeasonsSeasonProvider implements SeasonProvider {
 
     private float seasonValue = 1.0f;
 

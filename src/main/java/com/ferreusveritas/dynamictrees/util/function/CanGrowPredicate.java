@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.util;
+package com.ferreusveritas.dynamictrees.util.function;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import net.minecraft.util.math.BlockPos;

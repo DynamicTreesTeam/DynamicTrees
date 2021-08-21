@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.cells;
 
 import net.minecraft.util.Direction;
 
-public interface ICell {
+public interface Cell {
 
     /**
      * @return The actual value of the cell.

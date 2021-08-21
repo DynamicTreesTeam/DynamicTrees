@@ -22,13 +22,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 /**
- * An extension of {@link Registry} that allows for custom {@link EntryType}.
+ * An extension of {@link SimpleRegistry} that allows for custom {@link EntryType}.
  *
  * @param <V> The {@link RegistryEntry} type that will be registered.
  * @author Harley O'Connor
  */
 // TODO: Update Javadoc
-public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
+public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V> {
 
     /**
      * A {@link Map} of {@link EntryType} objects and their registry names. These handle construction of the {@link
@@ -58,7 +58,7 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
     /**
      * Constructs a new {@link TypedRegistry}.
      *
-     * @param name        The {@link #name} for this {@link Registry}.
+     * @param name        The {@link #name} for this {@link SimpleRegistry}.
      * @param type        The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue   A null entry. See {@link #nullValue} for more details.
      * @param defaultType The default {@link EntryType<V>}.

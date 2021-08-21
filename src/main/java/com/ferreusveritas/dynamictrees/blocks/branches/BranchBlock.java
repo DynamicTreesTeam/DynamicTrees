@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.IFutureBreakable;
+import com.ferreusveritas.dynamictrees.api.FutureBreakable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
@@ -53,7 +53,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
-public abstract class BranchBlock extends BlockWithDynamicHardness implements ITreePart, IFutureBreakable {
+public abstract class BranchBlock extends BlockWithDynamicHardness implements TreePart, FutureBreakable {
 
     public static final int MAX_RADIUS = 8;
     public static DynamicTrees.DestroyMode destroyMode = DynamicTrees.DestroyMode.SLOPPY;
@@ -95,7 +95,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
         return getFamily();
     }
 
-    public boolean isSameTree(ITreePart treepart) {
+    public boolean isSameTree(TreePart treepart) {
         return isSameTree(TreeHelper.getBranch(treepart));
     }
 

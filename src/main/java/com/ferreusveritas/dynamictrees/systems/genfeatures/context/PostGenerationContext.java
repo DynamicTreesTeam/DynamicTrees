@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.context;
 
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
-import com.ferreusveritas.dynamictrees.compat.seasons.ISeasonProvider;
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonProvider;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -36,7 +36,7 @@ public class PostGenerationContext extends GenerationContext<IWorld> {
      * @param endPoints             A {@link List} of {@link BlockPos} in the world designating branch endpoints.
      * @param bounds                The {@link SafeChunkBounds} to generate in.
      * @param initialDirtState      The {@link BlockState} of the dirt that became rooty. Useful for matching terrain.
-     * @param seasonValue           The current season value, as obtained from {@link ISeasonProvider#getSeasonValue(World,
+     * @param seasonValue           The current season value, as obtained from {@link SeasonProvider#getSeasonValue(World,
      *                              BlockPos)}.
      * @param fruitProductionFactor The current fruit production factor, as obtained from {@link
      *                              Species#seasonalFruitProductionFactor(World, BlockPos)}.

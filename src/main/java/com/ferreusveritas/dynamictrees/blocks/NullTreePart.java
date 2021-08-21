@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.api.cells.Cell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
@@ -16,13 +16,13 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
-public class NullTreePart implements ITreePart {
+public class NullTreePart implements TreePart {
 
     //This is a safe dump for blocks that aren't tree parts
     //Handles some vanilla blocks
 
     @Override
-    public ICell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
+    public Cell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
         return CellNull.NULL_CELL;
     }
 

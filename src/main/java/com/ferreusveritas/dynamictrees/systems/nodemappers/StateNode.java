@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.util.BranchConnectionData;
 import com.ferreusveritas.dynamictrees.util.Connections;
@@ -18,7 +18,7 @@ import java.util.Map;
  *
  * @author ferreusveritas
  */
-public class StateNode implements INodeInspector {
+public class StateNode implements NodeInspector {
 
     private final Map<BlockPos, BranchConnectionData> map = new HashMap<>();
     private final BlockPos origin;

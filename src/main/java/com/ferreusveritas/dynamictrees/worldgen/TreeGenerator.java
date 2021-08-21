@@ -122,7 +122,7 @@ public class TreeGenerator {
 
         GeneratorResult result = GeneratorResult.GENERATED;
 
-        final BiomePropertySelectors.ISpeciesSelector speciesSelector = biomeEntry.getSpeciesSelector();
+        final BiomePropertySelectors.SpeciesSelector speciesSelector = biomeEntry.getSpeciesSelector();
         final SpeciesSelection speciesSelection = speciesSelector.getSpecies(groundPos, dirtState, random);
 
         if (speciesSelection.isHandled()) {

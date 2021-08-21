@@ -11,7 +11,7 @@ import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.IResettable;
+import com.ferreusveritas.dynamictrees.trees.Resettable;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.util.ToolTypes;
@@ -52,7 +52,7 @@ import java.util.*;
  *
  * @author ferreusveritas
  */
-public class LeavesProperties extends RegistryEntry<LeavesProperties> implements IResettable<LeavesProperties> {
+public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties> {
 
     public static final Codec<LeavesProperties> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(ResourceLocation.CODEC.fieldOf(DTResourceRegistries.RESOURCE_LOCATION.toString()).forGetter(LeavesProperties::getRegistryName))

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.compat.seasons;
 
-import com.ferreusveritas.dynamictrees.api.seasons.ISeasonManager;
+import com.ferreusveritas.dynamictrees.api.seasons.SeasonManager;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -20,9 +20,9 @@ public class SeasonHelper {
     public static final float DRY = SUMMER;
     public static final float WET = WINTER;
 
-    private static ISeasonManager seasonManager = SeasonManager.NULL.get();
+    private static SeasonManager seasonManager = NormalSeasonManager.NULL.get();
 
-    static public ISeasonManager getSeasonManager() {
+    static public SeasonManager getSeasonManager() {
         return seasonManager;
     }
 
@@ -33,7 +33,7 @@ public class SeasonHelper {
      * should be used to register a season manager for a corresponding mod to respect the preferred season mod
      * configuration option.</p>
      */
-    static public void setSeasonManager(ISeasonManager manager) {
+    static public void setSeasonManager(SeasonManager manager) {
         seasonManager = manager;
     }
 

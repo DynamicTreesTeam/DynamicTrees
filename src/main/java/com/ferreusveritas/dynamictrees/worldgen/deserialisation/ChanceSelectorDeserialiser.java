@@ -13,14 +13,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
- * Gets an {@link BiomePropertySelectors.IChanceSelector} object from a {@link JsonElement}.
+ * Gets an {@link BiomePropertySelectors.ChanceSelector} object from a {@link JsonElement}.
  *
  * @author Harley O'Connor
  */
-public final class ChanceSelectorDeserialiser implements JsonBiomeDatabaseDeserialiser<BiomePropertySelectors.IChanceSelector> {
+public final class ChanceSelectorDeserialiser implements JsonBiomeDatabaseDeserialiser<BiomePropertySelectors.ChanceSelector> {
 
     @Override
-    public Result<BiomePropertySelectors.IChanceSelector, JsonElement> deserialise(JsonElement input) {
+    public Result<BiomePropertySelectors.ChanceSelector, JsonElement> deserialise(JsonElement input) {
         return JsonResult.forInput(input)
                 .mapIfType(JsonObject.class, this::readChanceSelector)
                 .elseMapIfType(Float.class, ChanceSelectorDeserialiser::createSimpleChanceSelector)
@@ -33,7 +33,7 @@ public final class ChanceSelectorDeserialiser implements JsonBiomeDatabaseDeseri
                 }).elseTypeError();
     }
 
-    private static BiomePropertySelectors.IChanceSelector createSimpleChanceSelector(float value) {
+    private static BiomePropertySelectors.ChanceSelector createSimpleChanceSelector(float value) {
         if (value <= 0) {
             return (rnd, spc, rad) -> BiomePropertySelectors.Chance.CANCEL;
         } else if (value >= 1) {
@@ -44,9 +44,9 @@ public final class ChanceSelectorDeserialiser implements JsonBiomeDatabaseDeseri
     }
 
     @Nullable
-    private BiomePropertySelectors.IChanceSelector readChanceSelector(JsonObject jsonObject,
-                                                                      Consumer<String> warningConsumer) {
-        final AtomicReference<BiomePropertySelectors.IChanceSelector> chanceSelector = new AtomicReference<>();
+    private BiomePropertySelectors.ChanceSelector readChanceSelector(JsonObject jsonObject,
+                                                                     Consumer<String> warningConsumer) {
+        final AtomicReference<BiomePropertySelectors.ChanceSelector> chanceSelector = new AtomicReference<>();
 
         JsonHelper.JsonObjectReader.of(jsonObject)
                 .ifContains(STATIC, jsonElement ->

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -15,7 +15,7 @@ import net.minecraft.world.IWorld;
 /**
  * @author Harley O'Connor
  */
-public class DenuderNode implements INodeInspector {
+public class DenuderNode implements NodeInspector {
 
     private final Species species;
     private final Family family;

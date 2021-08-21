@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
-import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDebug;
-import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
-import com.ferreusveritas.dynamictrees.api.worldgen.IRadiusCoordinator;
+import com.ferreusveritas.dynamictrees.api.worldgen.PoissonDebug;
+import com.ferreusveritas.dynamictrees.api.worldgen.PoissonDiscProvider;
+import com.ferreusveritas.dynamictrees.api.worldgen.RadiusCoordinator;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import net.minecraft.util.math.BlockPos;
@@ -14,23 +14,23 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * Manages and creates all the Poisson discs in a single dimension.
+ * Manages and creates all the Poisson discs in a single level (world).
  *
  * @author ferreusveritas
  */
-public class PoissonDiscProvider implements IPoissonDiscProvider {
+public class LevelPoissonDiscProvider implements PoissonDiscProvider {
 
-    private final IRadiusCoordinator radiusCoordinator;
+    private final RadiusCoordinator radiusCoordinator;
     private final HashMap<ChunkPos, PoissonDiscChunkSet> chunkDiscs;
     private RandomXOR random = new RandomXOR();
-    private IPoissonDebug debug = IPoissonDebug.EMPTY_POISSON_DEBUG;
+    private PoissonDebug debug = PoissonDebug.EMPTY_POISSON_DEBUG;
 
-    public PoissonDiscProvider(IRadiusCoordinator radCoord) {
+    public LevelPoissonDiscProvider(RadiusCoordinator radCoord) {
         this.chunkDiscs = new HashMap<>();
         this.radiusCoordinator = radCoord;
     }
 
-    public PoissonDiscProvider setSeed(Long seed) {
+    public LevelPoissonDiscProvider setSeed(Long seed) {
         if (seed != null) {
             this.random = new RandomXOR(seed);
         }
@@ -38,7 +38,7 @@ public class PoissonDiscProvider implements IPoissonDiscProvider {
     }
 
     @SuppressWarnings("unused")
-    public void setDebug(IPoissonDebug debug) {
+    public void setDebug(PoissonDebug debug) {
         this.debug = debug;
     }
 

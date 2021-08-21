@@ -24,25 +24,25 @@ import java.util.function.Supplier;
  */
 public final class CompatHandler {
 
-    private static final LinkedHashMap<String, Supplier<SeasonManager>> SEASON_MANAGERS = Maps.newLinkedHashMap();
+    private static final LinkedHashMap<String, Supplier<NormalSeasonManager>> SEASON_MANAGERS = Maps.newLinkedHashMap();
 
     /**
-     * Registers the specified {@link SeasonManager} supplier for the specified {@code modId}. Given as a supplier for
+     * Registers the specified {@link NormalSeasonManager} supplier for the specified {@code modId}. Given as a supplier for
      * lazy initialisation.
      *
      * <p>The season manager to use is then selected by {@link DTConfigs#PREFERRED_SEASON_MOD}
      * on config reload.</p>
      *
      * @param modId    The mod ID the season manager handles.
-     * @param supplier The {@link SeasonManager} supplier.
+     * @param supplier The {@link NormalSeasonManager} supplier.
      */
-    public static void registerSeasonManager(final String modId, Supplier<SeasonManager> supplier) {
+    public static void registerSeasonManager(final String modId, Supplier<NormalSeasonManager> supplier) {
         SEASON_MANAGERS.put(modId, supplier);
     }
 
     public static void registerBuiltInSeasonManagers() {
         registerSeasonManager(DynamicTrees.SERENE_SEASONS, () -> {
-            SeasonManager seasonManager = new SeasonManager(
+            NormalSeasonManager seasonManager = new NormalSeasonManager(
                     world -> SeasonsConfig.isDimensionWhitelisted(world.dimension()) ?
                             new Tuple<>(new SereneSeasonsSeasonProvider(), new ActiveSeasonGrowthCalculator()) :
                             new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator())
@@ -54,7 +54,7 @@ public final class CompatHandler {
             return seasonManager;
         });
 
-        registerSeasonManager(DynamicTrees.BETTER_WEATHER, () -> new SeasonManager(
+        registerSeasonManager(DynamicTrees.BETTER_WEATHER, () -> new NormalSeasonManager(
                 world -> Season.getSeason(world) == null ?
                         new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator()) :
                         new Tuple<>(new BetterWeatherSeasonProvider(), new ActiveSeasonGrowthCalculator())
@@ -69,7 +69,7 @@ public final class CompatHandler {
 
         // If disabled, use null manager.
         if (Objects.equals(modId, DISABLED)) {
-            SeasonHelper.setSeasonManager(SeasonManager.NULL.get());
+            SeasonHelper.setSeasonManager(NormalSeasonManager.NULL.get());
             return;
         }
 
@@ -80,7 +80,7 @@ public final class CompatHandler {
                             .filter(entry -> ModList.get().isLoaded(entry.getKey()))
                             .map(Map.Entry::getValue)
                             .findFirst()
-                            .orElse(SeasonManager.NULL)
+                            .orElse(NormalSeasonManager.NULL)
                             .get()
             );
             return;

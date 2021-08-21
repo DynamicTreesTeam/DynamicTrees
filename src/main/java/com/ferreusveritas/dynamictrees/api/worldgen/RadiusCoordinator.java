@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.worldgen;
 
-public interface IRadiusCoordinator {
+public interface RadiusCoordinator {
 
     int getRadiusAtCoords(int x, int z);
 

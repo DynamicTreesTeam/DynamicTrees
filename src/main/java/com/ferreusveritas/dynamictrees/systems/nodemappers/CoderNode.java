@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.block.BlockState;
@@ -10,7 +10,7 @@ import net.minecraft.world.IWorld;
 
 import java.util.ArrayList;
 
-public class CoderNode implements INodeInspector {
+public class CoderNode implements NodeInspector {
 
     private class Link {
         BlockPos pos;

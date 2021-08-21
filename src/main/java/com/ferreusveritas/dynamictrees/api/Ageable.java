@@ -7,7 +7,8 @@ import net.minecraft.world.IWorld;
 
 import java.util.Random;
 
-public interface IAgeable {
+@FunctionalInterface
+public interface Ageable {
 
     /**
      * @param world The world

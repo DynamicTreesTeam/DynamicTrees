@@ -5,12 +5,12 @@ import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import java.util.List;
 import java.util.Map;
 
-public interface IPoissonDebug {
+public interface PoissonDebug {
 
     /**
-     * An empty implementation of {@link IPoissonDebug} that doesn't do anything.
+     * An empty implementation of {@link PoissonDebug} that doesn't do anything.
      */
-    IPoissonDebug EMPTY_POISSON_DEBUG = new IPoissonDebug() {
+    PoissonDebug EMPTY_POISSON_DEBUG = new PoissonDebug() {
         @Override
         public void begin(int chunkX, int chunkZ) {
 

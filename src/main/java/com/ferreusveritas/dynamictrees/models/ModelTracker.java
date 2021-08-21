@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.models;
 
-public interface IModelTracker {
+public interface ModelTracker {
 
     default void modelCleanup() {
     }

@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 
 import java.util.List;
 
-public interface IPoissonDiscProvider {
+public interface PoissonDiscProvider {
 
     List<PoissonDisc> getPoissonDiscs(int chunkX, int chunkY, int chunkZ);
 

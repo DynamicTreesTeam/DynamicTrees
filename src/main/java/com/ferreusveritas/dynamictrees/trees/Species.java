@@ -2,15 +2,15 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.substances.Emptiable;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffectProvider;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
@@ -19,12 +19,13 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
+import com.ferreusveritas.dynamictrees.compat.seasons.NormalSeasonManager;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
-import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
+import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
@@ -98,7 +99,7 @@ import java.util.stream.Collectors;
 
 import static com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator.RARITY;
 
-public class Species extends RegistryEntry<Species> implements IResettable<Species> {
+public class Species extends RegistryEntry<Species> implements Resettable<Species> {
 
     public static final Species NULL_SPECIES = new Species() {
         @Override
@@ -157,7 +158,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         }
 
         @Override
-        public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
+        public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
             return false;
         }
     };
@@ -275,7 +276,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     /**
      * A {@link BiPredicate} that returns true if this species should override the common in the given position.
      */
-    protected ICommonOverride commonOverride;
+    protected CommonOverride commonOverride;
 
     private String unlocalizedName = "";
 
@@ -542,7 +543,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         return this.commonOverride != null;
     }
 
-    public void setCommonOverride(final ICommonOverride commonOverride) {
+    public void setCommonOverride(final CommonOverride commonOverride) {
         this.commonOverride = commonOverride;
     }
 
@@ -550,7 +551,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         return this.hasCommonOverride() && this.commonOverride.test(world, trunkPos);
     }
 
-    public interface ICommonOverride extends BiPredicate<IBlockReader, BlockPos> {
+    @FunctionalInterface
+    public interface CommonOverride extends BiPredicate<IBlockReader, BlockPos> {
     }
 
     ///////////////////////////////////////////
@@ -1265,7 +1267,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
      * is on)
      */
-    public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+    public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 
         //Analyze structure to gather all of the endpoints.  They will be useful for this entire update
         List<BlockPos> ends = getEnds(world, treePos, treeBase);
@@ -1296,7 +1298,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @param treeBase The tree part that is the base of the {@link Family} trunk.  Provided for easy analysis.
      * @return A list of all branch endpoints for the {@link Family}
      */
-    final protected List<BlockPos> getEnds(World world, BlockPos treePos, ITreePart treeBase) {
+    final protected List<BlockPos> getEnds(World world, BlockPos treePos, TreePart treeBase) {
         FindEndsNode endFinder = new FindEndsNode();
         treeBase.analyse(world.getBlockState(treePos), world, treePos, null, new MapSignal(endFinder));
         return endFinder.getEnds();
@@ -1441,7 +1443,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
      * is on)
      */
-    public boolean grow(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+    public boolean grow(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 
         float growthRate = (float) (getGrowthRate(world, rootPos) * DTConfigs.TREE_GROWTH_MULTIPLIER.get() * DTConfigs.TREE_GROWTH_FOLDING.get());
         do {
@@ -1597,7 +1599,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @param random
      * @return true if the tree became diseased
      */
-    public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int fertility) {
+    public boolean handleDisease(World world, TreePart baseTreePart, BlockPos treePos, Random random, int fertility) {
         if (fertility == 0 && DTConfigs.DISEASE_CHANCE.get() > random.nextFloat()) {
             baseTreePart.analyse(world.getBlockState(treePos), world, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
             return true;
@@ -1744,7 +1746,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     }
 
     /**
-     * Pulls data from the {@link com.ferreusveritas.dynamictrees.compat.seasons.SeasonManager} to determine the rate of
+     * Pulls data from the {@link NormalSeasonManager} to determine the rate of
      * tree growth for the current season.
      *
      * @param world   The {@link World} object.
@@ -1827,7 +1829,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     //////////////////////////////
 
     @Nullable
-    public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
+    public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 
         // Bonemeal fertilizes the soil and causes a single growth pulse
         if (canBoneMealTree() && itemStack.getItem() == Items.BONE_MEAL) {
@@ -1835,8 +1837,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         }
 
         // Use substance provider interface if it's available
-        if (itemStack.getItem() instanceof ISubstanceEffectProvider) {
-            ISubstanceEffectProvider provider = (ISubstanceEffectProvider) itemStack.getItem();
+        if (itemStack.getItem() instanceof SubstanceEffectProvider) {
+            SubstanceEffectProvider provider = (SubstanceEffectProvider) itemStack.getItem();
             return provider.getSubstanceEffect(itemStack);
         }
 
@@ -1860,7 +1862,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      * @return true if item was used, false otherwise
      */
     public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, PlayerEntity player, Hand hand, ItemStack itemStack) {
-        final ISubstanceEffect effect = getSubstanceEffect(itemStack);
+        final SubstanceEffect effect = getSubstanceEffect(itemStack);
 
         if (effect != null) {
             boolean applied = effect.apply(world, rootPos);
@@ -1909,8 +1911,8 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
      */
     public static void consumePlayerItem(PlayerEntity player, Hand hand, ItemStack heldItem) {
         if (!player.isCreative()) {
-            if (heldItem.getItem() instanceof IEmptiable) { // A substance deployed from a refillable container.
-                final IEmptiable emptiable = (IEmptiable) heldItem.getItem();
+            if (heldItem.getItem() instanceof Emptiable) { // A substance deployed from a refillable container.
+                final Emptiable emptiable = (Emptiable) heldItem.getItem();
                 player.setItemInHand(hand, emptiable.getEmptyContainer());
             } else if (heldItem.getItem() == Items.POTION) { // An actual potion.
                 player.setItemInHand(hand, new ItemStack(Items.GLASS_BOTTLE));
@@ -1973,7 +1975,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
     // FALL ANIMATION HANDLING
     ///////////////////////////////////////////
 
-    public IAnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
+    public AnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
         return getFamily().selectAnimationHandler(fallingEntity);
     }
 
@@ -2157,7 +2159,7 @@ public class Species extends RegistryEntry<Species> implements IResettable<Speci
         return 3;
     }
 
-    public INodeInspector getNodeInflator(SimpleVoxmap leafMap) {
+    public NodeInspector getNodeInflator(SimpleVoxmap leafMap) {
         return new InflatorNode(this, leafMap);
     }
 

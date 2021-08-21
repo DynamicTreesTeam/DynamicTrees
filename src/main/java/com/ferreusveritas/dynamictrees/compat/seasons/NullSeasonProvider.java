@@ -8,7 +8,7 @@ import net.minecraft.world.World;
  *
  * @author ferreusveritas
  */
-public class NullSeasonProvider implements ISeasonProvider {
+public class NullSeasonProvider implements SeasonProvider {
 
     public NullSeasonProvider() {
     }

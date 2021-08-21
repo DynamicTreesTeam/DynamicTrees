@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
-import com.ferreusveritas.dynamictrees.trees.IResettable;
+import com.ferreusveritas.dynamictrees.trees.Resettable;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 /**
  * @author Max Hyper
  */
-public class SoilProperties extends RegistryEntry<SoilProperties> implements IResettable<SoilProperties> {
+public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties> {
 
     public static final Codec<SoilProperties> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(ResourceLocation.CODEC.fieldOf(DTResourceRegistries.RESOURCE_LOCATION.toString()).forGetter(SoilProperties::getRegistryName))

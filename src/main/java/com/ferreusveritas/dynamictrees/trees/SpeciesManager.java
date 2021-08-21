@@ -54,7 +54,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
         BiomeDictionary.Type.getAll().stream().map(type -> new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
                 .forEach(this.environmentFactorAppliers::register);
 
-        JsonDeserialisers.register(Species.ICommonOverride.class, input ->
+        JsonDeserialisers.register(Species.CommonOverride.class, input ->
                 JsonDeserialisers.BIOME_PREDICATE.deserialise(input)
                         .map(biomePredicate -> (world, pos) -> world instanceof IWorldReader &&
                                 biomePredicate.test(((IWorldReader) world).getBiome(pos)))
@@ -109,7 +109,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .registerArrayApplier("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
                 .register("can_craft_sapling_to_seed", Boolean.class, Species::setCanCraftSaplingToSeed)
                 .register("can_craft_seed_to_sapling", Boolean.class, Species::setCanCraftSeedToSapling)
-                .register("common_override", Species.ICommonOverride.class, Species::setCommonOverride)
+                .register("common_override", Species.CommonOverride.class, Species::setCommonOverride)
                 .register("perfect_biomes", BiomeList.class, (species, biomeList) -> species.getPerfectBiomes().addAll(biomeList))
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)

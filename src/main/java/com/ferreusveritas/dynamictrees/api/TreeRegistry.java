@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Contains various utility functions relating to {@link Object}s with a {@link Registry}.
+ * Contains various utility functions relating to {@link Object}s with a {@link SimpleRegistry}.
  *
  * @author ferreusveritas
  */

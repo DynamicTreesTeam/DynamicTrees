@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
@@ -9,7 +9,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
-public class ShrinkerNode implements INodeInspector {
+public class ShrinkerNode implements NodeInspector {
 
     private float radius;
     Species species;

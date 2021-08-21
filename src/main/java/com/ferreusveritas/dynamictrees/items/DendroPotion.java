@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.items;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffectProvider;
+import com.ferreusveritas.dynamictrees.api.substances.Emptiable;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.substances.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmptiable {
+public class DendroPotion extends Item implements SubstanceEffectProvider, Emptiable {
 
     public static final List<DendroBrewingRecipe> brewingRecipes = new ArrayList<>();
 
@@ -123,7 +123,7 @@ public class DendroPotion extends Item implements ISubstanceEffectProvider, IEmp
 
     @Nullable
     @Override
-    public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
+    public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
         switch (getPotionType(itemStack)) {
             default:
             case BIOCHAR:

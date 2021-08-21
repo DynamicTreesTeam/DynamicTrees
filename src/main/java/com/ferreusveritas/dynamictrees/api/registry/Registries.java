@@ -20,7 +20,7 @@ import java.util.List;
  */
 public final class Registries {
 
-    public static final List<IRegistry<?>> REGISTRIES = new ArrayList<>(
+    public static final List<Registry<?>> REGISTRIES = new ArrayList<>(
             Arrays.asList(
                     RegistryHandler.REGISTRY,
                     CellKit.REGISTRY,

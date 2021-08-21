@@ -13,9 +13,10 @@ import net.minecraft.world.biome.Biome;
  *
  * @author ferreusveritas
  */
-public interface IBiomeSuitabilityDecider {
+@FunctionalInterface
+public interface BiomeSuitabilityDecider {
 
-    Decision getBiomeSuitability(World world, Biome biome, Species tree, BlockPos pos);
+    Decision getSuitability(World world, Biome biome, Species tree, BlockPos pos);
 
     /**
      * Decision interface for handling the event

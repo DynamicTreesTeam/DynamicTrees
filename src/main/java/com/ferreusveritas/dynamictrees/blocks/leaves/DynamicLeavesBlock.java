@@ -1,12 +1,12 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.IAgeable;
+import com.ferreusveritas.dynamictrees.api.Ageable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.api.cells.Cell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -16,7 +16,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.IRayTraceCollision;
+import com.ferreusveritas.dynamictrees.util.RayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.ToolTypes;
 import net.minecraft.block.*;
@@ -60,7 +60,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 @SuppressWarnings("deprecation")
-public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeable, IRayTraceCollision {
+public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable, RayTraceCollision {
 
     public LeavesProperties properties = LeavesProperties.NULL_PROPERTIES;
 
@@ -452,7 +452,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
      */
     public static boolean isBottom(IWorld world, BlockPos pos) {
         final BlockState belowBlockState = world.getBlockState(pos.below());
-        final ITreePart belowTreepart = TreeHelper.getTreePart(belowBlockState);
+        final TreePart belowTreepart = TreeHelper.getTreePart(belowBlockState);
 
         if (belowTreepart != TreeHelper.NULL_TREE_PART) {
             return belowTreepart.getRadius(belowBlockState) > 1; // False for leaves, twigs, and dirt. True for stocky branches.
@@ -470,12 +470,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
      * @return The hydration from the solved cells.
      */
     public int getHydrationLevelFromNeighbors(IWorld world, BlockPos pos, LeavesProperties leavesProperties) {
-        final ICell[] cells = new ICell[6];
+        final Cell[] cells = new Cell[6];
 
         for (Direction dir : Direction.values()) {
             final BlockPos deltaPos = pos.relative(dir);
             final BlockState state = world.getBlockState(deltaPos);
-            final ITreePart part = TreeHelper.getTreePart(state);
+            final TreePart part = TreeHelper.getTreePart(state);
 
             cells[dir.ordinal()] = part.getHydrationCell(world, deltaPos, state, dir, leavesProperties);
         }
@@ -484,7 +484,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
     }
 
     @Override
-    public ICell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
+    public Cell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
         return dir != null ? leavesProperties.getCellKit().getCellForLeaves(state.getValue(LeavesBlock.DISTANCE)) : CellNull.NULL_CELL;
     }
 
@@ -510,7 +510,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements ITreePart, IAgeab
         if (world.isEmptyBlock(pos)) { // Place leaves if air.
             return this.growLeavesIfLocationIsSuitable(world, leavesProperties, pos, leavesProperties.getCellKit().getDefaultHydration());
         } else { // Otherwise check if there's already this type of leaves there.
-            final ITreePart treePart = TreeHelper.getTreePart(world.getBlockState(pos));
+            final TreePart treePart = TreeHelper.getTreePart(world.getBlockState(pos));
 
 
             return treePart instanceof DynamicLeavesBlock && species.isValidLeafBlock((DynamicLeavesBlock) treePart); // Check if this leaves are valid for the species

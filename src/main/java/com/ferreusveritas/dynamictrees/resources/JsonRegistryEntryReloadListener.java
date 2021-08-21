@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import com.ferreusveritas.dynamictrees.trees.IResettable;
+import com.ferreusveritas.dynamictrees.trees.Resettable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
@@ -14,13 +14,13 @@ import java.util.function.Consumer;
 
 /**
  * An abstract extension of {@link JsonReloadListener} implementing {@link ReloadListener#apply(Object,
- * TreesResourceManager, ApplicationType)} for {@link RegistryEntry} (and {@link IResettable}) objects to be loaded,
+ * TreesResourceManager, ApplicationType)} for {@link RegistryEntry} (and {@link Resettable}) objects to be loaded,
  * setup, and registered from Json.
  *
  * @param <V> The type of the {@link RegistryEntry}.
  * @author Harley O'Connor
  */
-public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V> & IResettable<V>> extends JsonReloadListener<V> {
+public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V> & Resettable<V>> extends JsonReloadListener<V> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

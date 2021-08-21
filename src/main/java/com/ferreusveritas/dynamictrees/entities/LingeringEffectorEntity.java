@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.entities;
 
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.substances.LingeringSubstances;
@@ -20,7 +20,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 public class LingeringEffectorEntity extends Entity implements IEntityAdditionalSpawnData {
 
     private BlockPos blockPos;
-    private ISubstanceEffect effect;
+    private SubstanceEffect effect;
 
     public LingeringEffectorEntity(EntityType<? extends LingeringEffectorEntity> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
@@ -32,7 +32,7 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
         super(DTRegistries.LINGERING_EFFECTOR, world);
     }
 
-    public LingeringEffectorEntity(World world, BlockPos pos, ISubstanceEffect effect) {
+    public LingeringEffectorEntity(World world, BlockPos pos, SubstanceEffect effect) {
         this(DTRegistries.LINGERING_EFFECTOR, world);
         this.maxUpStep = 1f;
         this.noPhysics = true;
@@ -49,7 +49,7 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
         }
     }
 
-    public static boolean treeHasEffectorForEffect(IWorld world, BlockPos pos, ISubstanceEffect effect) {
+    public static boolean treeHasEffectorForEffect(IWorld world, BlockPos pos, SubstanceEffect effect) {
         for (final LingeringEffectorEntity effector : world.getEntitiesOfClass(LingeringEffectorEntity.class, new AxisAlignedBB(pos))) {
             if (effector.getEffect() != null && effector.getEffect().getName().equals(effect.getName())) {
                 return true;
@@ -67,7 +67,7 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
         return blockPos;
     }
 
-    public ISubstanceEffect getEffect() {
+    public SubstanceEffect getEffect() {
         return this.effect;
     }
 

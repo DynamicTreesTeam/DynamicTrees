@@ -16,14 +16,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
- * Gets an {@link BiomePropertySelectors.IDensitySelector} object from a {@link JsonElement}.
+ * Gets an {@link BiomePropertySelectors.DensitySelector} object from a {@link JsonElement}.
  *
  * @author Harley O'Connor
  */
-public final class DensitySelectorDeserialiser implements JsonBiomeDatabaseDeserialiser<BiomePropertySelectors.IDensitySelector> {
+public final class DensitySelectorDeserialiser implements JsonBiomeDatabaseDeserialiser<BiomePropertySelectors.DensitySelector> {
 
     @Override
-    public Result<BiomePropertySelectors.IDensitySelector, JsonElement> deserialise(JsonElement input) {
+    public Result<BiomePropertySelectors.DensitySelector, JsonElement> deserialise(JsonElement input) {
         return JsonResult.forInput(input)
                 .mapIfType(JsonObject.class, this::readDensitySelector)
                 .elseMapIfType(JsonArray.class, this::createScaleDensitySelector)
@@ -31,12 +31,12 @@ public final class DensitySelectorDeserialiser implements JsonBiomeDatabaseDeser
                 .elseTypeError();
     }
 
-    private BiomePropertySelectors.IDensitySelector createStaticDensitySelector(float density) {
+    private BiomePropertySelectors.DensitySelector createStaticDensitySelector(float density) {
         return (rnd, n) -> density;
     }
 
-    private BiomePropertySelectors.IDensitySelector createScaleDensitySelector(JsonArray jsonArray,
-                                                                               Consumer<String> warningConsumer) {
+    private BiomePropertySelectors.DensitySelector createScaleDensitySelector(JsonArray jsonArray,
+                                                                              Consumer<String> warningConsumer) {
         final List<Float> parameters = new ArrayList<>();
 
         for (final JsonElement element : jsonArray) {
@@ -62,9 +62,9 @@ public final class DensitySelectorDeserialiser implements JsonBiomeDatabaseDeser
     }
 
     @Nullable
-    private BiomePropertySelectors.IDensitySelector readDensitySelector(JsonObject jsonObject,
-                                                                        Consumer<String> warningConsumer) {
-        final AtomicReference<BiomePropertySelectors.IDensitySelector> densitySelector =
+    private BiomePropertySelectors.DensitySelector readDensitySelector(JsonObject jsonObject,
+                                                                       Consumer<String> warningConsumer) {
+        final AtomicReference<BiomePropertySelectors.DensitySelector> densitySelector =
                 new AtomicReference<>();
 
         JsonHelper.JsonObjectReader.of(jsonObject)

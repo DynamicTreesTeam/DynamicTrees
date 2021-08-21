@@ -14,7 +14,7 @@ import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.compat.waila.WailaOther;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
-import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
+import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
@@ -58,7 +58,7 @@ import java.util.*;
  *
  * @author ferreusveritas
  */
-public class Family extends RegistryEntry<Family> implements IResettable<Family> {
+public class Family extends RegistryEntry<Family> implements Resettable<Family> {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(Family::new);
 
@@ -703,7 +703,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
     // FALL ANIMATION HANDLING
     ///////////////////////////////////////////
 
-    public IAnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
+    public AnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
         return fallingEntity.defaultAnimationHandler();
     }
 

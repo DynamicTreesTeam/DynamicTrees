@@ -21,15 +21,18 @@ import java.util.Random;
  */
 public class BiomePropertySelectors {
 
-    public interface IChanceSelector {
+    @FunctionalInterface
+    public interface ChanceSelector {
         Chance getChance(Random random, @Nonnull Species species, int radius);
     }
 
-    public interface IDensitySelector {
+    @FunctionalInterface
+    public interface DensitySelector {
         double getDensity(Random random, double noiseDensity);
     }
 
-    public interface ISpeciesSelector {
+    @FunctionalInterface
+    public interface SpeciesSelector {
         SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, Random random);
     }
 
@@ -108,7 +111,7 @@ public class BiomePropertySelectors {
         }
     }
 
-    public static class StaticSpeciesSelector implements ISpeciesSelector {
+    public static class StaticSpeciesSelector implements SpeciesSelector {
         final SpeciesSelection decision;
 
         public StaticSpeciesSelector(SpeciesSelection decision) {
@@ -129,7 +132,7 @@ public class BiomePropertySelectors {
         }
     }
 
-    public static class RandomSpeciesSelector implements ISpeciesSelector {
+    public static class RandomSpeciesSelector implements SpeciesSelector {
 
         private class Entry {
             public Entry(SpeciesSelection d, int w) {

@@ -8,7 +8,7 @@ import net.minecraft.world.World;
  *
  * @author ferreusveritas
  */
-public interface ISeasonManager {
+public interface SeasonManager {
 
     void updateTick(World world, long worldTicks);
 

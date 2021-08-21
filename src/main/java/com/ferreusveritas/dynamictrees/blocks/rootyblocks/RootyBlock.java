@@ -1,12 +1,12 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.ICustomRootDecay;
+import com.ferreusveritas.dynamictrees.api.RootyBlockDecayer;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.api.cells.Cell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
@@ -66,9 +66,9 @@ import java.util.Random;
  * @author ferreusveritas
  */
 @SuppressWarnings("deprecation")
-public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
+public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
 
-    public static ICustomRootDecay customRootDecay = null;
+    public static RootyBlockDecayer rootyBlockDecayer = null;
 
     public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
     public static final BooleanProperty IS_VARIANT = BooleanProperty.create("is_variant");
@@ -236,7 +236,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 
             if (species.isValid()) {
                 BlockPos treePos = rootPos.relative(getTrunkDirection(world, rootPos));
-                ITreePart treeBase = TreeHelper.getTreePart(world.getBlockState(treePos));
+                TreePart treeBase = TreeHelper.getTreePart(world.getBlockState(treePos));
                 if (treeBase != TreeHelper.NULL_TREE_PART) {
                     viable = species.update(world, this, rootPos, getFertility(rootyState, world, rootPos), treeBase, treePos, random, natural);
                 }
@@ -264,7 +264,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 
     /**
      * Forces the {@link RootyBlock} to decay if it's there, turning it back to its primitive soil block. Custom decay
-     * logic is also supported, see {@link ICustomRootDecay} for details.
+     * logic is also supported, see {@link RootyBlockDecayer} for details.
      *
      * @param world      The {@link World} instance.
      * @param rootPos    The {@link BlockPos} of the {@link RootyBlock}.
@@ -280,7 +280,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
         final BlockState newState = world.getBlockState(rootPos);
 
         // Make sure we're not still a rooty block and return if custom decay returns true.
-        if (TreeHelper.isRooty(newState) || (customRootDecay != null && customRootDecay.doDecay(world, rootPos, rootyState, species))) {
+        if (TreeHelper.isRooty(newState) || (rootyBlockDecayer != null && rootyBlockDecayer.decay(world, rootPos, rootyState, species))) {
             return;
         }
 
@@ -369,7 +369,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
     }
 
     @Override
-    public ICell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
+    public Cell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
         return CellNull.NULL_CELL;
     }
 

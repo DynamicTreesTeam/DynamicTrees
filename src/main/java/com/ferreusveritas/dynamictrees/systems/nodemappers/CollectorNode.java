@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * @author ferreusveritas
  */
-public class CollectorNode implements INodeInspector {
+public class CollectorNode implements NodeInspector {
 
     private final Set<BlockPos> nodeSet;
 

@@ -8,7 +8,7 @@ import net.minecraft.world.World;
  *
  * @author ferreusveritas
  */
-public interface ISubstanceEffect {
+public interface SubstanceEffect {
 
     /**
      * For an instant effect.

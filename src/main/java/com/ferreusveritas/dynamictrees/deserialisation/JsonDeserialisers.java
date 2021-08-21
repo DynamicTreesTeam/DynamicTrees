@@ -23,7 +23,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
-import com.ferreusveritas.dynamictrees.util.BiomePredicate;
+import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
 import com.ferreusveritas.dynamictrees.util.ReflectionHelper;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.ChanceSelectorDeserialiser;
@@ -250,12 +250,12 @@ public final class JsonDeserialisers {
                     ))
             ));
 
-    public static final JsonDeserialiser<BiomePropertySelectors.ISpeciesSelector> SPECIES_SELECTOR = register(
-            BiomePropertySelectors.ISpeciesSelector.class, new SpeciesSelectorDeserialiser());
-    public static final JsonDeserialiser<BiomePropertySelectors.IDensitySelector> DENSITY_SELECTOR = register(
-            BiomePropertySelectors.IDensitySelector.class, new DensitySelectorDeserialiser());
-    public static final JsonDeserialiser<BiomePropertySelectors.IChanceSelector> CHANCE_SELECTOR = register(
-            BiomePropertySelectors.IChanceSelector.class, new ChanceSelectorDeserialiser());
+    public static final JsonDeserialiser<BiomePropertySelectors.SpeciesSelector> SPECIES_SELECTOR = register(
+            BiomePropertySelectors.SpeciesSelector.class, new SpeciesSelectorDeserialiser());
+    public static final JsonDeserialiser<BiomePropertySelectors.DensitySelector> DENSITY_SELECTOR = register(
+            BiomePropertySelectors.DensitySelector.class, new DensitySelectorDeserialiser());
+    public static final JsonDeserialiser<BiomePropertySelectors.ChanceSelector> CHANCE_SELECTOR = register(
+            BiomePropertySelectors.ChanceSelector.class, new ChanceSelectorDeserialiser());
 
     public static final JsonDeserialiser<Material> MATERIAL = register(Material.class, new StaticFieldDeserialiser<>(Material.class));
     public static final JsonDeserialiser<MaterialColor> MATERIAL_COLOR = register(MaterialColor.class, new StaticFieldDeserialiser<>(MaterialColor.class));

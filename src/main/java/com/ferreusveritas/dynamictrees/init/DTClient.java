@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
@@ -240,7 +240,7 @@ public class DTClient {
     public static void crushLeavesBlock(World world, BlockPos pos, BlockState blockState, Entity entity) {
         if (world.isClientSide) {
             Random random = world.random;
-            ITreePart treePart = TreeHelper.getTreePart(blockState);
+            TreePart treePart = TreeHelper.getTreePart(blockState);
             if (treePart instanceof DynamicLeavesBlock) {
                 DynamicLeavesBlock leaves = (DynamicLeavesBlock) treePart;
                 LeavesProperties leavesProperties = leaves.getProperties(blockState);

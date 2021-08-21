@@ -11,11 +11,12 @@ import net.minecraft.world.World;
  * fallen.
  *
  * <p>The implementation should be registered via
- * {@link TreeHelper#setCustomRootBlockDecay(ICustomRootDecay)}.</p>
+ * {@link TreeHelper#setCustomRootBlockDecay(RootyBlockDecayer)}.</p>
  *
  * @author ferreusveritas
  */
-public interface ICustomRootDecay {
+@FunctionalInterface
+public interface RootyBlockDecayer {
 
     /**
      * Implementations perform their custom {@link RootyBlock} decay logic.
@@ -26,6 +27,6 @@ public interface ICustomRootDecay {
      * @param species    The {@link Species} of the tree that was removed.
      * @return {@code true} if handled; otherwise {@code false} to run the default decay algorithm.
      */
-    boolean doDecay(World world, BlockPos rootPos, BlockState rootyState, Species species);
+    boolean decay(World world, BlockPos rootPos, BlockState rootyState, Species species);
 
 }

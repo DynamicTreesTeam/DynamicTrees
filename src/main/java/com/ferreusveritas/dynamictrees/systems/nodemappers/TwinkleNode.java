@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import net.minecraft.block.BlockState;
 import net.minecraft.particles.BasicParticleType;
@@ -9,7 +9,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
-public class TwinkleNode implements INodeInspector {
+public class TwinkleNode implements NodeInspector {
 
     private final BasicParticleType particleType;
     private final int numParticles;

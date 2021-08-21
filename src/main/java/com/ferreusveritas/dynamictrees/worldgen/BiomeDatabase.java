@@ -18,15 +18,15 @@ public class BiomeDatabase {
 
     public static final Entry BAD_ENTRY = new Entry() {
         @Override
-        public void setChanceSelector(IChanceSelector chanceSelector) {
+        public void setChanceSelector(ChanceSelector chanceSelector) {
         }
 
         @Override
-        public void setDensitySelector(IDensitySelector densitySelector) {
+        public void setDensitySelector(DensitySelector densitySelector) {
         }
 
         @Override
-        public void setSpeciesSelector(ISpeciesSelector speciesSelector) {
+        public void setSpeciesSelector(SpeciesSelector speciesSelector) {
         }
 
         @Override
@@ -76,9 +76,9 @@ public class BiomeDatabase {
     public static class Entry {
         private final BiomeDatabase database;
         private final Biome biome;
-        private IChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
-        private IDensitySelector densitySelector = (rnd, nd) -> -1;
-        private ISpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
+        private ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
+        private DensitySelector densitySelector = (rnd, nd) -> -1;
+        private SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
         private final FeatureCancellations featureCancellations = new FeatureCancellations();
         private boolean blacklisted = false;
         private boolean isSubterranean = false;
@@ -105,27 +105,27 @@ public class BiomeDatabase {
             return biome;
         }
 
-        public IChanceSelector getChanceSelector() {
+        public ChanceSelector getChanceSelector() {
             return chanceSelector;
         }
 
-        public IDensitySelector getDensitySelector() {
+        public DensitySelector getDensitySelector() {
             return densitySelector;
         }
 
-        public ISpeciesSelector getSpeciesSelector() {
+        public SpeciesSelector getSpeciesSelector() {
             return speciesSelector;
         }
 
-        public void setChanceSelector(IChanceSelector chanceSelector) {
+        public void setChanceSelector(ChanceSelector chanceSelector) {
             this.chanceSelector = chanceSelector;
         }
 
-        public void setDensitySelector(IDensitySelector densitySelector) {
+        public void setDensitySelector(DensitySelector densitySelector) {
             this.densitySelector = densitySelector;
         }
 
-        public void setSpeciesSelector(ISpeciesSelector speciesSelector) {
+        public void setSpeciesSelector(SpeciesSelector speciesSelector) {
             this.speciesSelector = speciesSelector;
         }
 
@@ -176,15 +176,15 @@ public class BiomeDatabase {
 
     }
 
-    public ISpeciesSelector getSpecies(Biome biome) {
+    public SpeciesSelector getSpecies(Biome biome) {
         return getEntry(biome).speciesSelector;
     }
 
-    public IChanceSelector getChance(Biome biome) {
+    public ChanceSelector getChance(Biome biome) {
         return getEntry(biome).chanceSelector;
     }
 
-    public IDensitySelector getDensitySelector(Biome biome) {
+    public DensitySelector getDensitySelector(Biome biome) {
         return getEntry(biome).densitySelector;
     }
 
@@ -196,13 +196,13 @@ public class BiomeDatabase {
         return getEntry(biome).getMultipass();
     }
 
-    public BiomeDatabase setSpeciesSelector(final Biome biome, @Nullable final ISpeciesSelector selector, final Operation op) {
+    public BiomeDatabase setSpeciesSelector(final Biome biome, @Nullable final SpeciesSelector selector, final Operation op) {
 		if (selector == null) {
 			return this;
 		}
 
         final Entry entry = getEntry(biome);
-        final ISpeciesSelector existing = entry.getSpeciesSelector();
+        final SpeciesSelector existing = entry.getSpeciesSelector();
 
         switch (op) {
             case REPLACE:
@@ -225,13 +225,13 @@ public class BiomeDatabase {
         return this;
     }
 
-    public BiomeDatabase setChanceSelector(final Biome biome, @Nullable final IChanceSelector selector, final Operation op) {
+    public BiomeDatabase setChanceSelector(final Biome biome, @Nullable final ChanceSelector selector, final Operation op) {
 		if (selector == null) {
 			return this;
 		}
 
         final Entry entry = getEntry(biome);
-        final IChanceSelector existing = entry.getChanceSelector();
+        final ChanceSelector existing = entry.getChanceSelector();
 
         switch (op) {
             case REPLACE:
@@ -254,13 +254,13 @@ public class BiomeDatabase {
         return this;
     }
 
-    public BiomeDatabase setDensitySelector(final Biome biome, @Nullable final IDensitySelector selector, final Operation op) {
+    public BiomeDatabase setDensitySelector(final Biome biome, @Nullable final DensitySelector selector, final Operation op) {
 		if (selector == null) {
 			return this;
 		}
 
         final Entry entry = getEntry(biome);
-        final IDensitySelector existing = entry.getDensitySelector();
+        final DensitySelector existing = entry.getDensitySelector();
 
         switch (op) {
             case REPLACE:

@@ -17,14 +17,14 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * A skeletal implementation of {@link IRegistry}.
+ * A skeletal implementation of {@link Registry}.
  *
  * @author Harley O'Connor
- * @see IRegistry
  * @see Registry
+ * @see SimpleRegistry
  * @see ConcurrentRegistry
  */
-public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IRegistry<V> {
+public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Registry<V> {
 
     protected static final Marker REGISTRY_DUMP = MarkerManager.getMarker("REGISTRY_DUMP");
     protected static final Comparator<String> STRING_COMPARATOR = Comparator.naturalOrder();
@@ -32,7 +32,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     protected final Class<V> type;
 
     /**
-     * The name of this {@link IRegistry}. This will usually be obtained from calling {@link Class#getSimpleName()} on
+     * The name of this {@link Registry}. This will usually be obtained from calling {@link Class#getSimpleName()} on
      * the {@link RegistryEntry}, but some registries may choose to use custom names.
      */
     protected final String name;
@@ -44,7 +44,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     protected final V nullValue;
 
     /**
-     * If this {@link IRegistry} is clearable, {@link #clear()} can be called, which wipes all the values and locks the
+     * If this {@link Registry} is clearable, {@link #clear()} can be called, which wipes all the values and locks the
      * registry.
      */
     protected final boolean clearable;
@@ -65,7 +65,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
             .compare(entry.getRegistryName().getPath(), entryToCompareTo.getRegistryName().getPath());
 
     /**
-     * Holds whether or not the {@link IRegistry} is currently locked. This is false (unlocked) by default, and should
+     * Holds whether or not the {@link Registry} is currently locked. This is false (unlocked) by default, and should
      * then be locked after all initial registries are created by {@link #postRegistryEvent()}.
      *
      * <p>It can then be unlocked by calling {@link #unlock()} to register new values, but should
@@ -107,7 +107,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     }
 
     /**
-     * Registers all the given {@link RegistryEntry} to this {@link IRegistry}. See {@link #register(RegistryEntry)} for
+     * Registers all the given {@link RegistryEntry} to this {@link Registry}. See {@link #register(RegistryEntry)} for
      * more details on the specific registry objects.
      *
      * @param values The {@link RegistryEntry} objects to register.
@@ -157,7 +157,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
 
     /**
      * Gets all the registry name {@link ResourceLocation} objects of all the entries currently in this {@link
-     * IRegistry}.
+     * Registry}.
      *
      * @return The {@link Set} of registry names.
      */
@@ -203,7 +203,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements IR
     }
 
     /**
-     * Runs the {@link Runnable} next time this {@link IRegistry} is locked.
+     * Runs the {@link Runnable} next time this {@link Registry} is locked.
      *
      * @param runnable The {@link Runnable} to run on lock.
      */

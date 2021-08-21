@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.items;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -93,7 +93,7 @@ public class Staff extends Item {
         BlockState state = world.getBlockState(pos);
 
         BlockPos rootPos = TreeHelper.findRootNode(world, pos);
-        ITreePart treePart = TreeHelper.getTreePart(world.getBlockState(rootPos));
+        TreePart treePart = TreeHelper.getTreePart(world.getBlockState(rootPos));
 
         // Get the code from a tree or rooty dirt and set it in the staff
         if (!isReadOnly(heldStack) && treePart.isRootNode()) {

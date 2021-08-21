@@ -152,7 +152,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
         }
 
         final Block block = museState.getBlock();
-        if (block instanceof IMusable && ((IMusable) block).isMusable(access, museState, musePos)) {
+        if (block instanceof Musable && ((Musable) block).isMusable(access, museState, musePos)) {
             return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));
         } else if (block instanceof TrunkShellBlock) { // If its another trunkshell, then this trunkshell is on another layer. IF they share a common direction, we return that shell's muse.
             final Vector3i offset = ((TrunkShellBlock) block).getMuseDir(museState, musePos).getOffset();
@@ -223,7 +223,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
         for (Surround s : Surround.values()) {
             final BlockState state = world.getBlockState(pos.offset(s.getOffset()));
 
-            if (state.getBlock() instanceof IMusable) {
+            if (state.getBlock() instanceof Musable) {
                 return s;
             }
         }

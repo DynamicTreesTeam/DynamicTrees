@@ -5,7 +5,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
-public interface INodeInspector {
+public interface NodeInspector {
 
     boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir);
 

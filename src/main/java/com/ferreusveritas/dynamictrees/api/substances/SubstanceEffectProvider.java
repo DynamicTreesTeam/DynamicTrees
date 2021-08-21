@@ -7,8 +7,9 @@ import net.minecraft.item.ItemStack;
  *
  * @author ferreusveritas
  */
-public interface ISubstanceEffectProvider {
+@FunctionalInterface
+public interface SubstanceEffectProvider {
 
-    ISubstanceEffect getSubstanceEffect(ItemStack itemStack);
+    SubstanceEffect getSubstanceEffect(ItemStack itemStack);
 
 }

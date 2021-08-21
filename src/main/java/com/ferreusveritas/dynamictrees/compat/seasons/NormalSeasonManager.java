@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import com.ferreusveritas.dynamictrees.api.seasons.ClimateZoneType;
-import com.ferreusveritas.dynamictrees.api.seasons.ISeasonGrowthCalculator;
-import com.ferreusveritas.dynamictrees.api.seasons.ISeasonManager;
+import com.ferreusveritas.dynamictrees.api.seasons.SeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.api.seasons.SeasonManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
@@ -14,27 +14,27 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class SeasonManager implements ISeasonManager {
+public class NormalSeasonManager implements SeasonManager {
 
-	public static final Supplier<SeasonManager> NULL = SeasonManager::new;
+	public static final Supplier<NormalSeasonManager> NULL = NormalSeasonManager::new;
 
     private final Map<ResourceLocation, SeasonContext> seasonContextMap = new HashMap<>();
-    private Function<World, Tuple<ISeasonProvider, ISeasonGrowthCalculator>> seasonMapper = w -> new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator());
+    private Function<World, Tuple<SeasonProvider, SeasonGrowthCalculator>> seasonMapper = w -> new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator());
 
-    public SeasonManager() {
+    public NormalSeasonManager() {
     }
 
-    public SeasonManager(Function<World, Tuple<ISeasonProvider, ISeasonGrowthCalculator>> seasonMapper) {
+    public NormalSeasonManager(Function<World, Tuple<SeasonProvider, SeasonGrowthCalculator>> seasonMapper) {
         this.seasonMapper = seasonMapper;
     }
 
-    private Tuple<ISeasonProvider, ISeasonGrowthCalculator> createProvider(World world) {
+    private Tuple<SeasonProvider, SeasonGrowthCalculator> createProvider(World world) {
         return seasonMapper.apply(world);
     }
 
     private SeasonContext getContext(World world) {
         return seasonContextMap.computeIfAbsent(world.dimension().location(), d -> {
-            Tuple<ISeasonProvider, ISeasonGrowthCalculator> tuple = createProvider(world);
+            Tuple<SeasonProvider, SeasonGrowthCalculator> tuple = createProvider(world);
             return new SeasonContext(tuple.getA(), tuple.getB());
         });
     }
@@ -108,7 +108,7 @@ public class SeasonManager implements ISeasonManager {
             boolean tropical = rootPos.getZ() >= 1.0f;
             if (seasonContextMap.containsKey(dimLoc)) {
                 SeasonContext context = seasonContextMap.get(dimLoc);
-                ISeasonGrowthCalculator calculator = context.getCalculator();
+                SeasonGrowthCalculator calculator = context.getCalculator();
                 return calculator.calcFruitProduction(seasonValue + offset, tropical ? ClimateZoneType.TROPICAL : ClimateZoneType.TEMPERATE);
             }
         }
