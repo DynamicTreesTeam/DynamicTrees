@@ -55,11 +55,13 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 	protected Vec3d geomCenter = Vec3d.ZERO;
 	protected Vec3d massCenter = Vec3d.ZERO;
 	protected AxisAlignedBB normAABB = new AxisAlignedBB(BlockPos.ORIGIN);
+	protected AxisAlignedBB renderNormAABB = new AxisAlignedBB(BlockPos.ORIGIN);
 	protected boolean clientBuilt = false;
 	protected boolean firstUpdate = true;
 	public boolean landed = false;
 	public DestroyType destroyType = DestroyType.HARVEST;
 	public boolean onFire = false;
+	protected AxisAlignedBB renderBB = new AxisAlignedBB(BlockPos.ORIGIN);
 
 	public static IAnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
 	public static IAnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
@@ -159,8 +161,8 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		destroyType = DestroyType.values()[tag.getInteger("destroytype")];
 		geomCenter = new Vec3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
 		massCenter = new Vec3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
-		buildAABBFromDestroyData(destroyData);
-		setEntityBoundingBox(normAABB.offset(posX, posY, posZ));
+		this.setEntityBoundingBox(this.buildAABBFromDestroyData(destroyData).offset(posX, posY, posZ));
+		this.renderBB = renderNormAABB.offset(posX, posY, posZ);
 		onFire = tag.getBoolean("onfire");
 	}
 
@@ -213,6 +215,11 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		}
 	}
 
+	@Override
+	public AxisAlignedBB getRenderBoundingBox() {
+		return this.renderBB;
+	}
+
 	public AxisAlignedBB buildAABBFromDestroyData(BranchDestructionData destroyData) {
 		normAABB = new AxisAlignedBB(BlockPos.ORIGIN);
 
@@ -224,7 +231,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		double height = normAABB.maxY - normAABB.minY;
 		double width = MathHelper.absMax(normAABB.maxX - normAABB.minX, normAABB.maxZ - normAABB.minZ);
 		double grow = Math.max(0, height - (width / 2)) + 2;
-		normAABB = normAABB.grow(grow + 4, 4, grow + 4);
+		renderNormAABB = normAABB.grow(grow + 4, 4, grow + 4);
 
 		return normAABB;
 	}
@@ -253,6 +260,7 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 		this.posZ = z;
 		//This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
 		this.setEntityBoundingBox(normAABB != null ? normAABB.offset(posX, posY, posZ) : new AxisAlignedBB(BlockPos.ORIGIN));
+		this.renderBB = renderNormAABB != null ? renderNormAABB.offset(posX, posY, posZ) : new AxisAlignedBB(BlockPos.ORIGIN);
 	}
 
 	@Override
@@ -272,7 +280,8 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 
 		handleMotion();
 
-		setEntityBoundingBox(normAABB.offset(posX, posY, posZ));
+		this.setEntityBoundingBox(this.normAABB.offset(posX, posY, posZ));
+		this.renderBB = this.renderNormAABB.offset(posX, posY, posZ);
 
 		if (shouldDie()) {
 			dropPayLoad();
@@ -423,7 +432,8 @@ public class EntityFallingTree extends Entity implements IModelTracker {
 
 	//This is shipped off to the clients
 	public void setVoxelData(NBTTagCompound tag) {
-		setEntityBoundingBox(buildAABBFromDestroyData(destroyData).offset(posX, posY, posZ));
+		this.setEntityBoundingBox(this.buildAABBFromDestroyData(destroyData).offset(posX, posY, posZ));
+		this.renderBB = this.renderNormAABB.offset(posX, posY, posZ);
 		getDataManager().set(voxelDataParameter, tag);
 	}
 
