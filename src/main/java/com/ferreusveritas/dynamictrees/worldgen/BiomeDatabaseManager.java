@@ -171,8 +171,8 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
                 .removeError() // Remove error at this point as we don't want to warn when element is not Json object.
                 .map(jsonObject -> jsonObject.has(METHOD) ? jsonObject.get(METHOD) : null)
                 .map(JsonDeserialisers.OPERATION::deserialise)
-                .orElseApply(error -> JsonResult.failure(input, "Error getting operation (defaulting to replace): " +
-                                error),
+                .orElseApply(error -> JsonResult.failure(input, "Error getting operation (defaulting to " +
+                                "replace): " + error),
                         JsonResult.success(input, BiomeDatabase.Operation.REPLACE));
     }
 

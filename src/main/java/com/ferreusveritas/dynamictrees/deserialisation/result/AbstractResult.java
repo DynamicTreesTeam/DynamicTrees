@@ -9,6 +9,12 @@ import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 /**
+ * Skeletal implementation of {@link Result} minimising effort required to implement it.
+ * <p>
+ * This is a generic result and can be extended by a class providing a result for any input type.
+ *
+ * @param <T> the type of the deserialised value
+ * @param <I> the type of the original input
  * @author Harley O'Connor
  */
 public abstract class AbstractResult<T, I> implements Result<T, I> {
@@ -31,11 +37,18 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
         this.warnings = warnings;
     }
 
+    /**
+     * @return the original input object
+     */
     @Override
     public I getInput() {
         return this.input;
     }
 
+    /**
+     * @return the deserialised value
+     * @throws NoSuchElementException if this is an unsuccessful result
+     */
     @Override
     public T get() throws NoSuchElementException {
         if (this.value == null) {
@@ -44,16 +57,34 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
         return this.value;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param other the value to return if this is an unsuccessful result
+     * @return the deserialised value, or {@code other} if this is an unsuccessful result
+     */
     @Override
     public T orElse(T other) {
         return this.value == null ? other : this.value;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param other the value to return if this is an unsuccessful result
+     * @return the deserialised value, or the result of invoking {@code other} if this is an unsuccessful result
+     */
     @Override
     public T orElseGet(Supplier<T> other) {
         return this.value == null ? other.get() : this.value;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the deserialised value
+     * @throws DeserialisationException if this is an unsuccessful result
+     */
     @Override
     public T orElseThrow() throws DeserialisationException {
         if (this.value == null) {
@@ -62,17 +93,26 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
         return this.value;
     }
 
+    /**
+     * @return the error if this is an unsuccessful result; otherwise {@code null}
+     */
     @Nullable
     @Override
     public String getError() {
         return this.error;
     }
 
+    /**
+     * @return a list of warnings associated with this result
+     */
     @Override
     public List<String> getWarnings() {
         return this.warnings;
     }
 
+    /**
+     * @return {@code true} if this result is successful; {@code false} otherwise
+     */
     @Override
     public boolean success() {
         return this.value != null;
