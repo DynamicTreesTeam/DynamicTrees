@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.resources;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
+import com.ferreusveritas.dynamictrees.util.json.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
@@ -110,6 +111,11 @@ public abstract class JsonRegistryEntryReloadListener<V extends RegistryEntry<V>
                 this.registry.register(registryEntry);
                 LOGGER.debug("Loaded and registered {}: {}.", this.registryName, registryEntry.toLoadDataString());
             } else {
+                if (applicationType == ApplicationType.GATHER_DATA) {
+                    this.gatherDataAppliers.applyAll(jsonObject, registryEntry).forEachErrorWarning(errorConsumer, warningConsumer);
+                    registryEntry.setGenerateData(JsonHelper.getOrDefault(jsonObject, "generate_data", Boolean.class, true));
+                }
+
                 this.postReload(jsonObject, registryEntry, errorConsumer, warningConsumer);
                 LOGGER.debug("Loaded {} data: {}.", this.registryName, registryEntry.toReloadDataString());
             }

@@ -1,6 +1,0 @@
-{
-	"multipart": [
-		{   "apply": { "model": "block/netherrack" }},
-		{	"apply": { "model": "dynamictrees:block/roots" }}
-	]
-}

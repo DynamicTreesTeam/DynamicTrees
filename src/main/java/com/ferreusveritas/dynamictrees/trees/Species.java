@@ -1,7 +1,11 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.*;
+import com.ferreusveritas.dynamictrees.api.data.Generator;
+import com.ferreusveritas.dynamictrees.api.data.SaplingStateGenerator;
+import com.ferreusveritas.dynamictrees.api.data.SeedItemModelGenerator;
+import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
@@ -23,6 +27,8 @@ import com.ferreusveritas.dynamictrees.compat.seasons.NormalSeasonManager;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
+import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
@@ -40,6 +46,7 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
@@ -94,6 +101,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -252,10 +260,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * The seed used to reproduce this species.  Drops from the tree and can plant itself
      */
     protected Seed seed;
-    /**
-     * Valid primitive sapling {@link Item}s. Used for dirt bucket recipes.
-     */
-    protected final Set<Item> primitiveSaplingItems = new HashSet<>();
+
     /**
      * A blockState that will turn itself into this tree
      */
@@ -324,7 +329,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.genFeatures.clear();
         this.dropCreators.clear();
         this.acceptableBlocksForGrowth.clear();
-        this.primitiveSaplingItems.clear();
+        this.primitiveSaplingRecipe.clear();
         this.perfectBiomes.clear();
 
         this.clearAcceptableSoils();
@@ -577,6 +582,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public Optional<DynamicLeavesBlock> getLeavesBlock() {
         return this.leavesProperties.getDynamicLeavesBlock();
+    }
+
+    public Optional<Block> getPrimitiveLeaves() {
+        return Optionals.ofBlock(this.leavesProperties.getPrimitiveLeaves().getBlock());
     }
 
     public void addValidLeafBlocks(LeavesProperties... leaves) {
@@ -849,16 +858,23 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     // SAPLING
     ///////////////////////////////////////////
 
+    /**
+     * Valid primitive sapling {@link Item}s. Used for dirt bucket recipes.
+     */
+    protected final Set<SeedSaplingRecipe> primitiveSaplingRecipe = new HashSet<>();
 
-    public Set<Item> getPrimitiveSaplingItems() {
-        final Set<Item> saplingItems = new HashSet<>(this.primitiveSaplingItems);
-        saplingItems.addAll(TreeRegistry.SAPLING_REPLACERS.entrySet().stream().filter(entry -> entry.getValue() == this).map(Map.Entry::getKey)
-                .map(BlockState::getBlock).map(Block::asItem).filter(item -> item != Items.AIR).collect(Collectors.toSet()));
-        return saplingItems;
+    public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe){
+        recipe.getSaplingBlock()
+                .ifPresent(block -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), this));
+        primitiveSaplingRecipe.add(recipe);
+    }
+
+    public Set<SeedSaplingRecipe> getPrimitiveSaplingRecipes() {
+        return new HashSet<>(this.primitiveSaplingRecipe);
     }
 
     public Species addPrimitiveSaplingItem(final Item primitiveSaplingItem) {
-        this.primitiveSaplingItems.add(primitiveSaplingItem);
+        this.primitiveSaplingRecipe.add(new SeedSaplingRecipe(primitiveSaplingItem));
         return this;
     }
 
@@ -867,27 +883,27 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
-    private boolean canCraftSeedToSapling = true;
-
-    public Species setCanCraftSeedToSapling(boolean truth) {
-        this.canCraftSeedToSapling = truth;
-        return this;
-    }
-
-    public boolean canCraftSeedToSapling() {
-        return canCraftSeedToSapling;
-    }
-
-    private boolean canCraftSaplingToSeed = true;
-
-    public Species setCanCraftSaplingToSeed(boolean truth) {
-        this.canCraftSaplingToSeed = truth;
-        return this;
-    }
-
-    public boolean canCraftSaplingToSeed() {
-        return canCraftSaplingToSeed;
-    }
+//    private boolean canCraftSeedToSapling = true;
+//
+//    public Species setCanCraftSeedToSapling(boolean truth) {
+//        this.canCraftSeedToSapling = truth;
+//        return this;
+//    }
+//
+//    public boolean canCraftSeedToSapling() {
+//        return canCraftSeedToSapling;
+//    }
+//
+//    private boolean canCraftSaplingToSeed = true;
+//
+//    public Species setCanCraftSaplingToSeed(boolean truth) {
+//        this.canCraftSaplingToSeed = truth;
+//        return this;
+//    }
+//
+//    public boolean canCraftSaplingToSeed() {
+//        return canCraftSaplingToSeed;
+//    }
 
     /**
      * Holds whether or not a {@link Seed} should be generated. Stored as a {@code non-primitive} so its default value
@@ -1504,7 +1520,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         Direction originDir = signal.dir.getOpposite();
 
         // prevent branches on the ground
-        if (signal.numSteps + 1 <= getLowestBranchHeight(world, signal.rootPos)) {
+        if (signal.numSteps + 1 <= getLowestBranchHeight(world, signal.rootPos) && !signal.getSpecies().getLeavesProperties().canGrowOnGround()) {
             return Direction.UP;
         }
 
@@ -1529,7 +1545,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         probMap = customDirectionManipulation(world, pos, branch.getRadius(world.getBlockState(pos)), signal, probMap);
 
         int choice = com.ferreusveritas.dynamictrees.util.MathHelper.selectRandomFromDistribution(signal.rand, probMap); // Select a direction from the probability map.
-        return newDirectionSelected(Direction.values()[choice != -1 ? choice : 1], signal); // Default to up if things are screwy
+        return newDirectionSelected(world, pos, Direction.values()[choice != -1 ? choice : 1], signal); // Default to up if things are screwy
     }
 
     /**
@@ -1543,8 +1559,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * Species can override to take action once a new direction is selected
      **/
-    protected Direction newDirectionSelected(Direction newDir, GrowSignal signal) {
-        return this.logicKit.getConfigurable().newDirectionSelected(this.logicKit, new NewDirectionContext(this, newDir, signal));
+    protected Direction newDirectionSelected(World world, BlockPos pos, Direction newDir, GrowSignal signal) {
+        return this.logicKit.getConfigurable().newDirectionSelected(world, pos,this.logicKit, new NewDirectionContext(this, newDir, signal));
     }
 
     /**
@@ -2158,6 +2174,49 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public List<ITag.INamedTag<Item>> defaultSeedTags() {
         return Collections.singletonList(DTItemTags.SEEDS);
+    }
+
+    /**
+     * @return the location of the dynamic sapling smartmodel for this type of species
+     */
+    public ResourceLocation getSaplingSmartModelLocation() {
+        return DynamicTrees.resLoc("block/smartmodel/sapling");
+    }
+
+    protected final MutableLazyValue<Generator<DTBlockStateProvider, Species>> saplingStateGenerator =
+            MutableLazyValue.supplied(SaplingStateGenerator::new);
+
+    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
+                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
+        textureConsumer.accept("particle", leavesTextureLocation);
+        textureConsumer.accept("log", barkTextureLocation);
+        textureConsumer.accept("leaves", leavesTextureLocation);
+    }
+
+    @Override
+    public void generateStateData(DTBlockStateProvider provider) {
+        // Generate sapling block state and model.
+        this.saplingStateGenerator.get().generate(provider, this);
+    }
+
+    /**
+     * @return the location of the parent model of the seed item model
+     */
+    public ResourceLocation getSeedParentLocation() {
+        return DynamicTrees.resLoc("item/standard_seed");
+    }
+
+    protected final MutableLazyValue<Generator<DTItemModelProvider, Species>> seedModelGenerator =
+            MutableLazyValue.supplied(SeedItemModelGenerator::new);
+
+    public Generator<DTItemModelProvider, Species> getSeedModelGenerator() {
+        return this.seedModelGenerator.get();
+    }
+
+    @Override
+    public void generateItemModelData(DTItemModelProvider provider) {
+        // Generate seed models.
+        this.seedModelGenerator.get().generate(provider, this);
     }
 
     @Override

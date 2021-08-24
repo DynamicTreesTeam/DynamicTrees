@@ -18,7 +18,8 @@ public abstract class ReloadListener<T> {
     public enum ApplicationType {
         LOAD,
         SETUP,
-        RELOAD
+        RELOAD,
+        GATHER_DATA
     }
 
     protected final String folderName;
@@ -42,6 +43,11 @@ public abstract class ReloadListener<T> {
     public CompletableFuture<Void> setup(final TreesResourceManager resourceManager) {
         return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), Util.backgroundExecutor())
                 .thenAccept(preparedObject -> this.apply(preparedObject, resourceManager, ApplicationType.SETUP));
+    }
+
+    public CompletableFuture<Void> gatherData(final TreesResourceManager resourceManager) {
+        return CompletableFuture.supplyAsync(() -> this.prepare(resourceManager), Util.backgroundExecutor())
+                .thenAccept(preparedObject -> this.apply(preparedObject, resourceManager, ApplicationType.GATHER_DATA));
     }
 
     /**

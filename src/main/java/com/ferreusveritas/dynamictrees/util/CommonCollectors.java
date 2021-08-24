@@ -50,13 +50,13 @@ public final class CommonCollectors {
 
     @SuppressWarnings("unchecked")
     public static <T> Collector<T, ?, Set<T>> toUnmodifiableLinkedSet() {
-        return Collector.of(HashSet::new, Set::add,
+        return Collector.of(LinkedHashSet::new, Set::add,
                 (left, right) -> {
                     left.addAll(right);
                     return left;
                 },
                 set -> (Set<T>) Collections.unmodifiableSet(set),
-                UNORDERED, IDENTITY_FINISH);
+                IDENTITY_FINISH);
     }
 
 }

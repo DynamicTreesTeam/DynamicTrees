@@ -1,6 +1,0 @@
-{
-	"multipart": [
-		{   "apply": { "model": "block/crimson_nylium" }},
-		{	"apply": { "model": "dynamictrees:block/roots" }}
-	]
-}

@@ -45,6 +45,9 @@ public final class LeavesPropertiesManager extends JsonRegistryEntryReloadListen
                 .register("does_age", String.class, LeavesProperties::setDoesAge)
                 .register("can_grow_on_ground", Boolean.class, LeavesProperties::setCanGrowOnGround);
 
+        // Primitive leaves are needed before gathering data.
+        this.gatherDataAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves);
+
         // Primitive leaves are needed both client and server (so cannot be done on load).
         this.setupAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
                 .register("family", ResourceLocation.class, (leavesProperties, registryName) -> {

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.data.WaterRootGenerator;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -36,6 +37,8 @@ public class WaterSoilProperties extends SoilProperties {
 
     public WaterSoilProperties(final ResourceLocation registryName) {
         super(null, registryName);
+
+        this.soilStateGenerator.reset(WaterRootGenerator::new);
     }
 
     @Override

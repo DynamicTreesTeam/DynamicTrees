@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.util.ResourceLocation;
@@ -15,6 +16,7 @@ import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A skeletal implementation of {@link Registry}.
@@ -287,6 +289,19 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
     @Override
     public final Iterator<V> iterator() {
         return this.getAll().iterator();
+    }
+
+    @Override
+    public final Set<V> getAllFor(final String namespace) {
+        return this.getAll().stream()
+                .filter(entry -> entry.getRegistryName().getNamespace().equals(namespace))
+                .collect(CommonCollectors.toUnmodifiableLinkedSet());
+    }
+
+    @Override
+    public Stream<V> dataGenerationStream(String namespace) {
+        return this.getAllFor(namespace).stream()
+                .filter(RegistryEntry::shouldGenerateData);
     }
 
 }

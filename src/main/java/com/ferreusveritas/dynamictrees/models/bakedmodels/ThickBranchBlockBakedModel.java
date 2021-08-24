@@ -199,10 +199,11 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
             quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, forceRingDir, rand, extraData));
         }
 
+        boolean branchesAround = connections[2] + connections[3] + connections[4] + connections[5] != 0;
         for (Direction face : Direction.values()) {
             quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData));
             if (face == Direction.UP || face == Direction.DOWN) {
-                if (connections[face.get3DDataValue()] < twigRadius) {
+                if (connections[face.get3DDataValue()] < twigRadius && !branchesAround) {
                     quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
                 } else if (connections[face.get3DDataValue()] < coreRadius) {
                     quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));

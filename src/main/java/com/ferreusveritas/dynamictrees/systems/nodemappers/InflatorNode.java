@@ -15,6 +15,7 @@ public class InflatorNode implements NodeInspector {
 
     private float radius;
     private BlockPos last;
+    private BlockPos highestTrunkBlock;
 
     Species species;
     SimpleVoxmap leafMap;
@@ -23,6 +24,7 @@ public class InflatorNode implements NodeInspector {
         this.species = species;
         this.leafMap = leafMap;
         last = BlockPos.ZERO;
+        highestTrunkBlock = null;
     }
 
     @Override
@@ -31,6 +33,9 @@ public class InflatorNode implements NodeInspector {
 
         if (branch != null) {
             radius = species.getFamily().getPrimaryThickness();
+            //Store the last block to be part of the trunk
+            if (highestTrunkBlock == null && !TreeHelper.isBranch(world.getBlockState(pos.above())))
+                highestTrunkBlock = pos;
         }
 
         return false;
@@ -80,6 +85,15 @@ public class InflatorNode implements NodeInspector {
                 int maxRadius = species.getMaxBranchRadius();
                 if (radius > maxRadius) {
                     radius = maxRadius;
+                }
+
+                if (highestTrunkBlock != null){
+                    //Ensure branches dont grow over 1 block thick if it isnt in the trunk
+                    int blockRadius = 8;
+                    boolean isInTrunk = (pos.getX() == highestTrunkBlock.getX() && pos.getY() <= highestTrunkBlock.getY() && pos.getZ() == highestTrunkBlock.getZ());
+                    if (radius > blockRadius && !isInTrunk){
+                        radius = blockRadius;
+                    }
                 }
 
                 //Ensure non-twig branches are at least radius 2

@@ -61,8 +61,13 @@ public class TreesResourceManager implements IResourceManager {
         this.reloadListeners.forEach(reloadListener -> reloadListener.setup(this).join());
     }
 
+    public void gatherData() {
+        this.reloadListeners.forEach(reloadListener ->  reloadListener.gatherData(this).join());
+    }
+
     public CompletableFuture<?>[] prepareReload(final Executor backgroundExecutor, final Executor gameExecutor) {
-        return this.reloadListeners.stream().map(reloadListener -> reloadListener.prepareReload(this, backgroundExecutor)).toArray(CompletableFuture<?>[]::new);
+        return this.reloadListeners.stream()
+                .map(reloadListener -> reloadListener.prepareReload(this, backgroundExecutor)).toArray(CompletableFuture<?>[]::new);
     }
 
     /**

@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
 import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
+import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.ConfiguredGenFeature;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
@@ -19,7 +20,6 @@ import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
 import net.minecraft.block.SoundType;
-import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IWorldReader;
@@ -81,6 +81,9 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("sapling_name", String.class, Species::setSaplingName)
                 .register("seed_name", String.class, Species::setSeedName);
 
+        // We need the sapling shape to know which parent smartmodel the sapling model should use.
+        this.gatherDataAppliers.register("sapling_shape", VoxelShape.class, Species::setSaplingShape);
+
         this.reloadAppliers.register("always_show_on_waila", Boolean.class, Species::setAlwaysShowOnWaila)
                 .register("tapering", Float.class, Species::setTapering)
                 .register("up_probability", Integer.class, Species::setUpProbability)
@@ -113,12 +116,15 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("sapling_grows_naturally", Boolean.class, Species::setCanSaplingGrowNaturally)
                 .register("sapling_sound", SoundType.class, Species::setSaplingSound)
                 .register("sapling_shape", VoxelShape.class, Species::setSaplingShape)
-                .register("primitive_sapling_item", Item.class, Species::addPrimitiveSaplingItem)
-                .registerArrayApplier("primitive_sapling_items", Item.class, Species::addPrimitiveSaplingItem)
-                .register("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
-                .registerArrayApplier("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
-                .register("can_craft_sapling_to_seed", Boolean.class, Species::setCanCraftSaplingToSeed)
-                .register("can_craft_seed_to_sapling", Boolean.class, Species::setCanCraftSeedToSapling)
+
+                .register("primitive_sapling", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
+                .registerArrayApplier("primitive_saplings", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
+//                .register("primitive_sapling_item", Item.class, Species::addPrimitiveSaplingItem)
+//                .registerArrayApplier("primitive_sapling_items", Item.class, Species::addPrimitiveSaplingItem)
+//                .register("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
+//                .registerArrayApplier("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
+//                .register("can_craft_sapling_to_seed", Boolean.class, Species::setCanCraftSaplingToSeed)
+//                .register("can_craft_seed_to_sapling", Boolean.class, Species::setCanCraftSeedToSapling)
                 .register("common_override", Species.CommonOverride.class, Species::setCommonOverride)
                 .register("perfect_biomes", BiomeList.class, (species, biomeList) -> species.getPerfectBiomes().addAll(biomeList))
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)

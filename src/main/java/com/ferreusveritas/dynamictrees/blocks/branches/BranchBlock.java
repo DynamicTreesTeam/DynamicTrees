@@ -114,6 +114,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return branch != null && this.getFamily() == branch.getFamily();
     }
 
+    public Block getPrimitiveLog() {
+        return this.isStrippedBranch() ? this.family.getPrimitiveStrippedLog() : this.family.getPrimitiveLog();
+    }
+
     public boolean isStrippedBranch() {
         return this.getFamily().hasStrippedBranch() && this.getFamily().getStrippedBranch() == this;
     }

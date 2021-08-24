@@ -399,4 +399,16 @@ public final class BiomeDatabaseManager extends MultiJsonReloadListener<Object> 
         });
     }
 
+    /**
+     * Do nothing on gather data, since we don't need to set anything up on gather data here.
+     *
+     * @param resourceManager The {@link IResourceManager} object.
+     * @return A {@link CompletableFuture} that does nothing.
+     */
+    @Override
+    public CompletableFuture<Void> gatherData(TreesResourceManager resourceManager) {
+        return CompletableFuture.runAsync(() -> {
+        });
+    }
+
 }

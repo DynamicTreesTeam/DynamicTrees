@@ -23,6 +23,9 @@ import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
+
+import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.surround;
 
 /**
  * @author Harley O'Connor
@@ -87,6 +90,20 @@ public class NetherFungusSpecies extends Species {
     @Override
     public List<ITag.INamedTag<Item>> defaultSeedTags() {
         return Collections.singletonList(DTItemTags.FUNGUS_CAPS);
+    }
+
+    @Override
+    public ResourceLocation getSaplingSmartModelLocation() {
+        return DynamicTrees.resLoc("block/smartmodel/mushroom_" + (this.getSaplingShape() == CommonVoxelShapes.FLAT_MUSHROOM ? "flat" : "round"));
+    }
+
+    @Override
+    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
+                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
+        final ResourceLocation capLocation = surround(this.getRegistryName(), "block/", "_cap");
+        textureConsumer.accept("particle", capLocation);
+        textureConsumer.accept("stem", barkTextureLocation);
+        textureConsumer.accept("cap", capLocation);
     }
 
 }

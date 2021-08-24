@@ -1,7 +1,0 @@
-{
-    "loader": "dynamictrees:thick_branch",
-    "textures": {
-        "bark": "block/warped_stem",
-        "rings": "block/warped_stem_top"
-    }
-}

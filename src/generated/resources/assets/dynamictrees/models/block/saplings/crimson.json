@@ -1,0 +1,8 @@
+{
+  "parent": "dynamictrees:block/smartmodel/mushroom_round",
+  "textures": {
+    "particle": "dynamictrees:block/crimson_cap",
+    "stem": "minecraft:block/crimson_stem",
+    "cap": "dynamictrees:block/crimson_cap"
+  }
+}

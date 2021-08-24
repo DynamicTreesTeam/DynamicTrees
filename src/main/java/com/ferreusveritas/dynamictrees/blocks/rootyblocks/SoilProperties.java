@@ -1,13 +1,18 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.data.Generator;
+import com.ferreusveritas.dynamictrees.api.data.SoilStateGenerator;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
+import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
+import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.AbstractBlock;
@@ -19,6 +24,9 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
+
+import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
 
 /**
  * @author Max Hyper
@@ -60,6 +68,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     protected RootyBlock dynamicSoilBlock;
     protected Integer soilFlags = 0;
     private ResourceLocation blockRegistryName;
+    protected boolean substitute;
 
     //used for null soil properties
     protected SoilProperties() {
@@ -91,6 +100,10 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         return primitiveSoilBlock;
     }
 
+    public Optional<Block> getPrimitiveSoilBlockOptional() {
+        return Optionals.ofBlock(primitiveSoilBlock);
+    }
+
     protected void setPrimitiveSoilBlock(final Block primitiveSoil) {
         if (this.primitiveSoilBlock == null || primitiveSoil != this.primitiveSoilBlock.getBlock()) {
             this.primitiveSoilBlock = primitiveSoil;
@@ -117,13 +130,17 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
 
     private void setBlockRegistryNameIfNull() {
         if (this.blockRegistryName == null) {
-            this.blockRegistryName = ResourceLocationUtils.prefix(this.getRegistryName(), this.getBlockRegistryNamePrefix());
+            this.blockRegistryName = prefix(this.getRegistryName(), this.getBlockRegistryNamePrefix());
         }
     }
 
     @Nullable
     public RootyBlock getDynamicSoilBlock() {
         return dynamicSoilBlock;
+    }
+
+    public Optional<RootyBlock> getSoilBlock() {
+        return Optional.ofNullable(this.dynamicSoilBlock == Blocks.AIR ? null : this.dynamicSoilBlock);
     }
 
     public void generateDynamicSoil(AbstractBlock.Properties blockProperties) {
@@ -137,6 +154,14 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
 
     public void setDynamicSoilBlock(RootyBlock rootyBlock) {
         this.dynamicSoilBlock = rootyBlock;
+    }
+
+    public boolean isSubstitute() {
+        return substitute;
+    }
+
+    public void setSubstitute(boolean substitute) {
+        this.substitute = substitute;
     }
 
     ///////////////////////////////////////////
@@ -167,6 +192,23 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     public SoilProperties addSoilFlags(Integer adjFlag) {
         this.soilFlags |= adjFlag;
         return this;
+    }
+
+    ///////////////////////////////////////////
+    // DATA GEN
+    ///////////////////////////////////////////
+
+    protected final MutableLazyValue<Generator<DTBlockStateProvider, SoilProperties>> soilStateGenerator =
+            MutableLazyValue.supplied(SoilStateGenerator::new);
+
+    @Override
+    public void generateStateData(DTBlockStateProvider provider) {
+        // Generate soil state and model.
+        this.soilStateGenerator.get().generate(provider, this);
+    }
+
+    public ResourceLocation getRootsOverlayLocation() {
+        return DynamicTrees.resLoc("block/roots");
     }
 
     //////////////////////////////

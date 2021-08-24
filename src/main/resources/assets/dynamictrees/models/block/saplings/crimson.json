@@ -1,8 +1,0 @@
-{
-	"parent": "dynamictrees:block/smartmodel/mushroom_round",
-	"textures": {
-		"cap": "dynamictrees:block/mushroom_crimson",
-		"stem": "dynamictrees:block/mushroom_crimson",
-		"particle": "dynamictrees:block/mushroom_crimson"
-	}
-}

@@ -73,7 +73,7 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
     }
 
     protected void addDTTags() {
-        LeavesProperties.REGISTRY.getAllFor(this.modId).forEach(leavesProperties -> {
+        LeavesProperties.REGISTRY.dataGenerationStream(this.modId).forEach(leavesProperties -> {
             // Create dynamic leaves block tag.
             leavesProperties.getDynamicLeavesBlock().ifPresent(leaves ->
                     leavesProperties.defaultLeavesTags().forEach(tag ->
@@ -81,7 +81,7 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
             );
         });
 
-        Family.REGISTRY.getAllFor(this.modId).forEach(family -> {
+        Family.REGISTRY.dataGenerationStream(this.modId).forEach(family -> {
             // Create branch tag if a branch exists.
             family.getBranchOptional().ifPresent(branch ->
                     family.defaultBranchTags().forEach(tag ->
@@ -95,7 +95,7 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
             );
         });
 
-        Species.REGISTRY.getAllFor(this.modId).forEach(species -> {
+        Species.REGISTRY.dataGenerationStream(this.modId).forEach(species -> {
             // Create dynamic sapling block tags.
             species.getSapling().ifPresent(sapling ->
                     species.defaultSaplingTags().forEach(tag ->
