@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.worldgen.deserialisation;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
+import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonArray;
@@ -12,7 +12,6 @@ import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
@@ -63,28 +62,18 @@ public final class DensitySelectorDeserialiser implements JsonBiomeDatabaseDeser
 
     @Nullable
     private BiomePropertySelectors.DensitySelector readDensitySelector(JsonObject jsonObject,
-                                                                       Consumer<String> warningConsumer) {
-        final AtomicReference<BiomePropertySelectors.DensitySelector> densitySelector =
-                new AtomicReference<>();
+                                                                       Consumer<String> warningConsumer)
+            throws DeserialisationException {
 
-        JsonHelper.JsonObjectReader.of(jsonObject)
-                .ifContains(SCALE, jsonElement ->
-                        JsonDeserialisers.JSON_ARRAY.deserialise(jsonElement)
-                                .map(this::createScaleDensitySelector)
-                                .ifSuccessOrElse(densitySelector::set, warningConsumer, warningConsumer)
-                ).elseIfContains(STATIC, jsonElement ->
-                        JsonDeserialisers.FLOAT.deserialise(jsonElement)
-                                .map(this::createStaticDensitySelector)
-                                .ifSuccessOrElse(densitySelector::set, warningConsumer, warningConsumer)
-                ).elseIfContains(MATH, jsonElement -> {
-                    final JsonMath jsonMath = new JsonMath(jsonElement);
-                    densitySelector.set((rnd, n) -> jsonMath.apply(rnd, (float) n));
-                }).elseRun(() ->
-                        warningConsumer.accept("Could not get Json object chance selector as it did not contain " +
-                                "key '" + SCALE + "', '" + STATIC + "' or '" + MATH + "'.")
-                );
-
-        return densitySelector.get();
+        return JsonResult.forInput(jsonObject)
+                .mapIfContains(SCALE, JsonArray.class, this::createScaleDensitySelector)
+                .elseMapIfContains(STATIC, Float.class, this::createStaticDensitySelector)
+                .elseMapIfContains(MATH, JsonElement.class, input -> {
+                    final JsonMath jsonMath = new JsonMath(input);
+                    return (rnd, n) -> jsonMath.apply(rnd, (float) n);
+                }).elseTypeError()
+                .forEachWarning(warningConsumer)
+                .orElseThrow();
     }
 
 }

@@ -43,6 +43,65 @@ public interface MappedResult<T, I> extends Result<T, I> {
     <V> MappedResult<T, I> elseMapIfType(Class<V> type, Mapper<V, T> mapper);
 
     /**
+     * If this is not already successful, gets the value for the specified {@code key} if the input is a map-like
+     * structure, attempting to map it to the specified {@code type} and then to type {@link T} using the specified
+     * {@code mapper}.
+     *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link T}
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    default <V> MappedResult<T, I> elseMapIfContains(String key, Class<V> type, SimpleMapper<V, T> mapper) {
+        return this.mapIfContains(key, type, mapper.fullMapper());
+    }
+
+    /**
+     * If this is not already successful, gets the value for the specified {@code key} if the input is a map-like
+     * structure, attempting to map it to the specified {@code type} and then to type {@link T} using the specified
+     * {@code mapper}.
+     *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link T}
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    <V> MappedResult<T, I> elseMapIfContains(String key, Class<V> type, Mapper<V, T> mapper);
+
+    /**
+     * If this is not already successful, gets the value for the specified {@code key} if the input is a map-like
+     * structure, attempting to map it to the specified {@code type} and then to type {@link T} using the specified
+     * {@code mapper}.
+     *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link T}
+     * @param defaultValue the value to use if the map-like structure doesn't contain the {@code key}
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    default <V> MappedResult<T, I> elseMapIfContains(String key, Class<V> type, SimpleMapper<V, T> mapper,
+                                                     T defaultValue) {
+        return this.mapIfContains(key, type, mapper.fullMapper(), defaultValue);
+    }
+
+    /**
+     * If this is not already successful, gets the value for the specified {@code key} if the input is a map-like
+     * structure, attempting to map it to the specified {@code type} and then to type {@link T} using the specified
+     * {@code mapper}.
+     *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link T}
+     * @param defaultValue the value to use if the map-like structure doesn't contain the {@code key}
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    <V> MappedResult<T, I> elseMapIfContains(String key, Class<V> type, Mapper<V, T> mapper, T defaultValue);
+
+    /**
      * Sets a type error as this result's error if a value could not be deserialised from the input.
      *
      * @return the mapped result

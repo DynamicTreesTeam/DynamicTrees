@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -12,7 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import javax.annotation.Nullable;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -45,59 +44,54 @@ public final class SpeciesSelectorDeserialiser implements JsonBiomeDatabaseDeser
                 "static species selector.");
     }
 
-    private BiomePropertySelectors.SpeciesSelector readSelector(JsonObject object, Consumer<String> warningConsumer) {
-        final AtomicReference<BiomePropertySelectors.SpeciesSelector> selection = new AtomicReference<>();
+    private BiomePropertySelectors.SpeciesSelector readSelector(JsonObject object, Consumer<String> warningConsumer)
+            throws DeserialisationException {
 
-        JsonHelper.JsonObjectReader.of(object)
-                .ifContains(STATIC, staticElement ->
-                        JsonResult.forInput(staticElement)
+        return JsonResult.forInput(object)
+                .mapIfContains(STATIC, JsonElement.class, input ->
+                        JsonResult.forInput(input)
                                 .mapIfType(Species.class, this::readStatic)
                                 .elseMapIfType(String.class, this::readStatic)
                                 .elseTypeError()
-                                .ifSuccessOrElse(selection::set, warningConsumer, warningConsumer)
-                )
-                .elseIfContains(RANDOM, randomElement ->
-                        selection.set(this.getRandomSpeciesSelector(randomElement, warningConsumer))
-                ).elseRun(() -> warningConsumer.accept("Species selector did not have one of either elements '" +
-                        STATIC + "' or '" + RANDOM + "'."));
-
-        return selection.get();
+                                .forEachWarning(warningConsumer)
+                                .orElseThrow()
+                ).elseMapIfContains(RANDOM, JsonElement.class, input ->
+                        this.getRandomSpeciesSelector(input, warningConsumer)
+                ).forEachWarning(warningConsumer)
+                .orElseThrow();
     }
 
     @Nullable
     private BiomePropertySelectors.SpeciesSelector getRandomSpeciesSelector(JsonElement input,
-                                                                            Consumer<String> warningConsumer) {
-        final AtomicReference<BiomePropertySelectors.SpeciesSelector> selectorResult = new AtomicReference<>();
+                                                                            Consumer<String> warningConsumer)
+            throws DeserialisationException {
 
-        JsonDeserialisers.JSON_OBJECT.deserialise(input).ifSuccessOrElse(
-                object -> {
-                    final BiomePropertySelectors.RandomSpeciesSelector randomSelector = new BiomePropertySelectors.RandomSpeciesSelector();
-                    object.entrySet().forEach(entry -> {
-                        final String speciesName = entry.getKey();
+        return JsonDeserialisers.JSON_OBJECT.deserialise(input).map(object -> {
+            final BiomePropertySelectors.RandomSpeciesSelector randomSelector = new BiomePropertySelectors.RandomSpeciesSelector();
 
-                        JsonDeserialisers.INTEGER.deserialise(entry.getValue()).ifSuccessOrElse(weight -> {
-                            if (weight > 0) {
-                                if (this.isDefault(speciesName)) {
-                                    randomSelector.add(weight);
-                                } else {
-                                    TreeRegistry.findSpeciesSloppy(speciesName).ifValid((species) -> randomSelector.add(species, weight));
-                                }
-                            }
-                        }, warningConsumer, warningConsumer);
-                    });
+            for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+                final String speciesName = entry.getKey();
 
-                    if (randomSelector.getSize() < 1) {
-                        // TODO: Object reader that allows for errors and cleans up this mess.
-                        warningConsumer.accept("No species were selected in random selector '" + input + "'.");
-                    } else {
-                        selectorResult.set(randomSelector);
+                JsonDeserialisers.INTEGER.deserialise(entry.getValue()).ifSuccessOrElseThrow(weight -> {
+                    if (weight > 0) {
+                        if (this.isDefault(speciesName)) {
+                            randomSelector.add(weight);
+                        } else {
+                            TreeRegistry.findSpeciesSloppy(speciesName).ifValid(species ->
+                                    randomSelector.add(species, weight)
+                            );
+                        }
                     }
-                },
-                warningConsumer,
-                warningConsumer
-        );
+                }, warningConsumer);
+            }
 
-        return selectorResult.get();
+            if (randomSelector.getSize() < 1) {
+                throw new DeserialisationException("No species were selected in random selector '" + input + "'.");
+            }
+            return randomSelector;
+        })
+                .forEachWarning(warningConsumer)
+                .orElseThrow();
     }
 
 }

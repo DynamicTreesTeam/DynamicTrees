@@ -4,7 +4,9 @@ import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
+import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -26,7 +28,8 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
 
         this.registerSpreadableAppliers();
 
-        this.commonAppliers.registerArrayApplier("acceptable_soils", String.class, (soilProperties, acceptableSoil) -> {
+        this.commonAppliers.registerArrayApplier("acceptable_soils", String.class,
+                (soilProperties, acceptableSoil) -> {
             if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
                 SoilHelper.createNewAdjective(acceptableSoil);
             }
@@ -40,24 +43,31 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
 
     private void registerSpreadableAppliers() {
         this.reloadAppliers
-                .register("required_light", SpreadableSoilProperties.class, Integer.class, SpreadableSoilProperties::setRequiredLight)
-                .register("spread_item", SpreadableSoilProperties.class, Item.class, SpreadableSoilProperties::setSpreadItem)
+                .register("required_light", SpreadableSoilProperties.class, Integer.class,
+                        SpreadableSoilProperties::setRequiredLight)
+                .register("spread_item", SpreadableSoilProperties.class, Item.class,
+                        SpreadableSoilProperties::setSpreadItem)
                 .registerArrayApplier("spreadable_soils", SpreadableSoilProperties.class, SoilProperties.class,
-                        (properties, soil) -> SoilProperties.REGISTRY.runOnNextLock(() -> properties.addSpreadableSoils(soil)));
+                        (properties, soil) -> SoilProperties.REGISTRY.runOnNextLock(
+                                () -> properties.addSpreadableSoils(soil)
+                        ));
     }
 
     @Override
-    protected void preLoad(JsonObject jsonObject, SoilProperties soilProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
+    protected void preLoad(JsonObject jsonObject, SoilProperties soilProperties, Consumer<String> errorConsumer,
+                           Consumer<String> warningConsumer) {
 
         // If a custom block registry name was set, set and use it.
-        JsonHelper.JsonObjectReader.of(jsonObject).ifContains("block_registry_name", jsonElement ->
-                ResourceLocationDeserialiser.create(soilProperties.getRegistryName().getNamespace())
-                        .deserialise(jsonElement).ifSuccess(soilProperties::setBlockRegistryName)
-        );
+        JsonResult.forInput(jsonObject)
+                .mapIfContains("block_registry_name", JsonElement.class, input ->
+                        ResourceLocationDeserialiser.create(soilProperties.getRegistryName().getNamespace())
+                                .deserialise(input).orElseThrow(), soilProperties.getBlockRegistryName()
+                ).ifSuccessOrElse(soilProperties::setBlockRegistryName, errorConsumer, warningConsumer);
     }
 
     @Override
-    protected void postLoad(JsonObject jsonObject, SoilProperties soilProperties, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
+    protected void postLoad(JsonObject jsonObject, SoilProperties soilProperties, Consumer<String> errorConsumer,
+                            Consumer<String> warningConsumer) {
 
         //set the substitute soil if one exists and is valid
         // dont generate block if the there is a substitute.

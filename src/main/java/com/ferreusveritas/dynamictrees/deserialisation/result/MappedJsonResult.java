@@ -40,6 +40,37 @@ public class MappedJsonResult<T> extends JsonResult<T> implements MappedResult<T
     /**
      * {@inheritDoc}
      *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link T}
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    @Override
+    public <V> MappedResult<T, JsonElement> elseMapIfContains(String key, Class<V> type, Mapper<V, T> mapper) {
+        return this.value != null ? map(this.value, this) : super.mapIfContains(key, type, mapper);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link T}
+     * @param defaultValue the value to use if the map-like structure doesn't contain the {@code key}
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    @Override
+    public <V> MappedResult<T, JsonElement> elseMapIfContains(String key, Class<V> type, Mapper<V, T> mapper,
+                                                              T defaultValue) {
+        return this.value != null ? map(this.value, this) :
+                super.mapIfContains(key, type, mapper, defaultValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @param validator the predicate by which to test the deserialised value
      * @param invalidError the error message to set if the {@code validator} is not passed
      * @return the mapped result

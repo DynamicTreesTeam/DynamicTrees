@@ -103,10 +103,6 @@ public class JsonHelper {
                 );
     }
 
-    public static JsonObjectReader ifContains(final JsonObject jsonObject, final String key, final Consumer<JsonElement> elementConsumer) {
-        return new JsonObjectReader(jsonObject).ifContains(key, elementConsumer);
-    }
-
     public static AbstractBlock.Properties getBlockProperties(final JsonObject jsonObject, final Material defaultMaterial, final MaterialColor defaultMaterialColor, final BiFunction<Material, MaterialColor, AbstractBlock.Properties> defaultPropertiesGetter, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
         final Material material = JsonHelper.getOrDefault(jsonObject, "material", Material.class, defaultMaterial);
         final AbstractBlock.Properties properties = defaultPropertiesGetter.apply(material,
@@ -114,73 +110,6 @@ public class JsonHelper {
 
         JsonPropertyApplierLists.PROPERTIES.applyAll(jsonObject, properties).forEachErrorWarning(errorConsumer, warningConsumer);
         return properties;
-    }
-
-    public static final class JsonObjectReader {
-        private final JsonObject jsonObject;
-        private boolean read = false;
-        private String lastError;
-
-        private JsonObjectReader(JsonObject jsonObject) {
-            this.jsonObject = jsonObject;
-        }
-
-        public JsonObjectReader ifContains(final String key, final Consumer<JsonElement> elementConsumer) {
-            if (this.jsonObject.has(key)) {
-                elementConsumer.accept(this.jsonObject.get(key));
-                this.read = true;
-            }
-            return this;
-        }
-
-        public <T> JsonObjectReader ifContains(final String key, final Class<T> type, final Consumer<T> typeConsumer) {
-            if (this.jsonObject.has(key)) {
-                this.lastError = JsonDeserialisers.getOrThrow(type)
-                        .deserialise(this.jsonObject.get(key)).ifSuccess(typeConsumer)
-                        .getError();
-                this.read = true;
-            }
-            return this;
-        }
-
-        public JsonObjectReader elseIfContains(final String key, final Consumer<JsonElement> elementConsumer) {
-            if (!this.read) {
-                this.ifContains(key, elementConsumer);
-            }
-            return this;
-        }
-
-        public <T> JsonObjectReader elseIfContains(final String key, final Class<T> type, final Consumer<T> typeConsumer) {
-            if (!this.read) {
-                this.ifContains(key, type, typeConsumer);
-            }
-            return this;
-        }
-
-        public JsonObjectReader elseWarn(final String errorPrefix) {
-            if (this.lastError != null) {
-                LogManager.getLogger().warn(errorPrefix + this.lastError);
-            }
-            return this;
-        }
-
-        public JsonObjectReader elseRun(final Runnable runnable) {
-            if (!this.read) {
-                runnable.run();
-            }
-            return this;
-        }
-
-        public JsonObjectReader reset() {
-            this.read = false;
-            this.lastError = null;
-            return this;
-        }
-
-        public static JsonObjectReader of(final JsonObject jsonObject) {
-            return new JsonObjectReader(jsonObject);
-        }
-
     }
 
 }

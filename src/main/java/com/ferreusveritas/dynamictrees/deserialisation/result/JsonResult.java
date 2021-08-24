@@ -94,7 +94,8 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     @Override
     public <V> MappedResult<V, JsonElement> mapIfValid(Predicate<T> validator, String invalidError, Mapper<T, V> mapper) {
         return this.value == null ? MappedJsonResult.mapErrorneous(this) :
-                validator.test(this.value) ? this.map(mapper, "Unexpected error occurred.") :
+                validator.test(this.value) ?
+                        this.map(mapper, "Unexpected error occurred. This should not be possible.") :
                         MappedJsonResult.errorneousMap(
                                 invalidError.replaceFirst("\\{}", this.value.toString()),
                                 this
@@ -160,6 +161,48 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
             }
 
             return list;
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link V}
+     * @param <E> the type to attempt to deserialise the key's corresponding value to
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    @Override
+    public <E, V> MappedResult<V, JsonElement> mapIfContains(String key, Class<E> type, Mapper<E, V> mapper) {
+        return JsonDeserialisers.JSON_OBJECT.deserialise(this.input).map(object -> {
+            final JsonElement element = object.get(key);
+
+            if (element == null) {
+                throw new DeserialisationException("No value for key \"" + key + "\".");
+            }
+
+            return mapper.apply(
+                    JsonDeserialisers.getOrThrow(type).deserialise(element).orElseThrow(),
+                    this.warnings::add
+            );
+        });
+    }
+
+    @Override
+    public <E, V> MappedResult<V, JsonElement> mapIfContains(String key, Class<E> type, Mapper<E, V> mapper, V defaultValue) {
+        return JsonDeserialisers.JSON_OBJECT.deserialise(this.input).map(object -> {
+            final JsonElement element = object.get(key);
+
+            if (element == null) {
+                return defaultValue;
+            }
+
+            return mapper.apply(
+                    JsonDeserialisers.getOrThrow(type).deserialise(element).orElseThrow(),
+                    this.warnings::add
+            );
         });
     }
 

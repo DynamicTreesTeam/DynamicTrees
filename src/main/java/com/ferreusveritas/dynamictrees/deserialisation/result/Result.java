@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation.result;
 
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
-import com.ferreusveritas.dynamictrees.deserialisation.Deserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.NoSuchDeserialiserException;
 import com.ferreusveritas.dynamictrees.util.function.ThrowableBiFunction;
 import com.ferreusveritas.dynamictrees.util.function.ThrowableFunction;
@@ -64,7 +63,7 @@ public interface Result<T, I> {
                                          Consumer<String> warningConsumer) {
         if (this.success()) {
             consumer.accept(this.get());
-        } else {
+        } else if (this.getError() != null) {
             errorConsumer.accept(this.getError());
         }
         this.getWarnings().forEach(warningConsumer);
@@ -84,7 +83,7 @@ public interface Result<T, I> {
             throws DeserialisationException {
         if (this.success()) {
             consumer.accept(this.get());
-        } else {
+        } else if (this.getError() != null) {
             throw new DeserialisationException(this.getError());
         }
         this.getWarnings().forEach(warningConsumer);
@@ -181,6 +180,14 @@ public interface Result<T, I> {
      */
     @Nullable
     String getError();
+
+    /**
+     * Performs the specified {@code action} for each warning associated with this result.
+     *
+     * @param action the action to accept for each warning
+     * @return this result for chaining
+     */
+    Result<T, I> forEachWarning(Consumer<String> action);
 
     /**
      * @return a list of warnings associated with this result
@@ -403,6 +410,65 @@ public interface Result<T, I> {
      * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
      */
     <V, E> MappedResult<List<E>, I> mapEachIfArray(Class<V> elementType, Class<E> mappedType, Mapper<V, E> mapper);
+
+    /**
+     * Gets the value for the specified {@code key} if the input is a map-like structure, attempting to map it to the
+     * specified {@code type} and then to type {@link V} using the specified {@code mapper}.
+     *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link V}
+     * @param <E> the type to attempt to deserialise the key's corresponding value to
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    default <E, V> MappedResult<V, I> mapIfContains(String key, Class<E> type, SimpleMapper<E, V> mapper) {
+        return this.mapIfContains(key, type, mapper.fullMapper());
+    }
+
+    /**
+     * Gets the value for the specified {@code key} if the input is a map-like structure, attempting to map it to the
+     * specified {@code type} and then to type {@link V} using the specified {@code mapper}.
+     *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link V}
+     * @param <E> the type to attempt to deserialise the key's corresponding value to
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    <E, V> MappedResult<V, I> mapIfContains(String key, Class<E> type, Mapper<E, V> mapper);
+
+    /**
+     * Gets the value for the specified {@code key} if the input is a map-like structure, attempting to map it to the
+     * specified {@code type} and then to type {@link V} using the specified {@code mapper}.
+     *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link V}
+     * @param defaultValue the value to use if the map-like structure doesn't contain the {@code key}
+     * @param <E> the type to attempt to deserialise the key's corresponding value to
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    default <E, V> MappedResult<V, I> mapIfContains(String key, Class<E> type, SimpleMapper<E, V> mapper,
+                                                    V defaultValue) {
+        return this.mapIfContains(key, type, mapper.fullMapper(), defaultValue);
+    }
+
+    /**
+     * Gets the value for the specified {@code key} if the input is a map-like structure, attempting to map it to the
+     * specified {@code type} and then to type {@link V} using the specified {@code mapper}.
+     *
+     * @param key the key for the value to map
+     * @param type the required type to be mapped
+     * @param mapper a mapper that maps the deserialised value to type {@link V}
+     * @param defaultValue the value to use if the map-like structure doesn't contain the {@code key}
+     * @param <E> the type to attempt to deserialise the key's corresponding value to
+     * @param <V> the type to map the deserialised value to
+     * @return the mapped result
+     */
+    <E, V> MappedResult<V, I> mapIfContains(String key, Class<E> type, Mapper<E, V> mapper, V defaultValue);
 
     /**
      * A {@link ThrowableBiFunction} that handles mapping a deserialised value to another value. The input is the

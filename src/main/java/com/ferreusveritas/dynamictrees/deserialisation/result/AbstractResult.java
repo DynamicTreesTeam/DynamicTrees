@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -100,6 +101,18 @@ public abstract class AbstractResult<T, I> implements Result<T, I> {
     @Override
     public String getError() {
         return this.error;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param action the action to accept for each warning
+     * @return this result for chaining
+     */
+    @Override
+    public Result<T, I> forEachWarning(Consumer<String> action) {
+        this.warnings.forEach(action);
+        return this;
     }
 
     /**
