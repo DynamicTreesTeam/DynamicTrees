@@ -17,7 +17,6 @@ import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.RenderType;
@@ -86,11 +85,11 @@ public class DTClient {
             family.woodRingColor = 0xFFF1AE;
             family.woodBarkColor = 0xB3A979;
             if (family != Family.NULL_FAMILY) {
-                BlockState state = family.getPrimitiveLog().defaultBlockState();
-                if (state.getBlock() != Blocks.AIR) {
+                family.getPrimitiveLog().ifPresent(branch -> {
+                    BlockState state = branch.defaultBlockState();
                     family.woodRingColor = getFaceColor(state, Direction.DOWN, bakedTextureGetter);
                     family.woodBarkColor = getFaceColor(state, Direction.NORTH, bakedTextureGetter);
-                }
+                });
             }
         }
     }

@@ -208,7 +208,8 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     @Override
     public float getHardness(IBlockReader worldIn, BlockPos pos) {
         final int radius = this.getRadius(worldIn.getBlockState(pos));
-        final float hardness = this.getFamily().getPrimitiveLog().defaultBlockState().getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
+        final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
+                .getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
         return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
     }
 

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.data.provider;
 
-import com.ferreusveritas.dynamictrees.api.registry.IRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
@@ -15,10 +15,10 @@ import java.util.List;
 public class DTBlockStateProvider extends BlockStateProvider implements DTDataProvider {
 
     private final String modId;
-    private final List<IRegistry<?>> registries;
+    private final List<Registry<?>> registries;
 
     public DTBlockStateProvider(DataGenerator generator, String modId, ExistingFileHelper existingFileHelper,
-                                Collection<IRegistry<?>> registries) {
+                                Collection<Registry<?>> registries) {
         super(generator, modId, existingFileHelper);
         this.modId = modId;
         this.registries = ImmutableList.copyOf(registries);

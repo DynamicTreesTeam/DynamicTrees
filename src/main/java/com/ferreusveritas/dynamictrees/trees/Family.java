@@ -48,7 +48,6 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -317,14 +316,15 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public boolean stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
-        if (getStrippedBranch() != null) {
-            this.getBranch().stripBranch(state, world, pos, player, heldItem);
-
-			if (world.isClientSide) {
-				world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
-				WailaOther.invalidateWailaPosition();
-			}
-			return true;
+        if (this.hasStrippedBranch()) {
+            this.getBranch().ifPresent(branch -> {
+                branch.stripBranch(state, world, pos, player, heldItem);
+                if (world.isClientSide) {
+                    world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    WailaOther.invalidateWailaPosition();
+                }
+            });
+			return this.getBranch().isPresent();
 		} else {
 			return false;
 		}
@@ -416,30 +416,16 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return this;
     }
 
-    @Nonnull
-    public BranchBlock getBranch() {
-		if (branch == null) {
-			throw new UnsupportedOperationException("getBranch() for Family " + getRegistryName() + " was called too early!");
-		}
-        return branch;
+    public Optional<BranchBlock> getBranch() {
+        return Optionals.ofBlock(branch);
     }
 
-    public Optional<BranchBlock> getBranchOptional() {
-        return Optional.ofNullable(this.branch);
+    public Optional<BranchBlock> getStrippedBranch() {
+        return Optionals.ofBlock(strippedBranch);
     }
 
-    @Nullable
-    public BranchBlock getStrippedBranch() {
-        return strippedBranch;
-    }
-
-    public Optional<BranchBlock> getStrippedBranchOptional() {
-        return Optional.ofNullable(strippedBranch);
-    }
-
-    @Nullable
-    public Item getBranchItem() {
-        return branchItem;
+    public Optional<Item> getBranchItem() {
+        return Optionals.ofItem(branchItem);
     }
 
     public boolean isThick() {
@@ -522,19 +508,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      *
      * @return Block of the primitive log.
      */
-    public Block getPrimitiveLog() {
-        return primitiveLog;
+    public Optional<Block> getPrimitiveLog() {
+        return Optionals.ofBlock(primitiveLog);
     }
 
-    public Optional<Block> getPrimitiveLogOptional() {
-        return Optionals.ofBlock(this.primitiveLog);
-    }
-
-    public Block getPrimitiveStrippedLog() {
-        return primitiveStrippedLog;
-    }
-
-    public Optional<Block> getPrimitiveStrippedLogOptional() {
+    public Optional<Block> getPrimitiveStrippedLog() {
         return Optionals.ofBlock(primitiveStrippedLog);
     }
 
@@ -712,11 +690,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return RegistryHandler.addBlock(suffix(this.getRegistryName(), "_root"), new SurfaceRootBlock(this));
     }
 
-    public SurfaceRootBlock getSurfaceRoot() {
-        return this.surfaceRoot;
-    }
-
-    public Optional<SurfaceRootBlock> getSurfaceRootOptional() {
+    public Optional<SurfaceRootBlock> getSurfaceRoot() {
         return Optionals.ofBlock(this.surfaceRoot);
     }
 

@@ -30,8 +30,8 @@ public class BranchItemModelGenerator implements Generator<DTItemModelProvider, 
     @Override
     public Dependencies gatherDependencies(Family input) {
         return new Dependencies()
-                .append(PRIMITIVE_LOG_BLOCK, input.getPrimitiveLogOptional())
-                .append(PRIMITIVE_LOG_ITEM, Optionals.ofItem(input.getBranchItem()));
+                .append(PRIMITIVE_LOG_BLOCK, input.getPrimitiveLog())
+                .append(PRIMITIVE_LOG_ITEM, input.getBranchItem());
     }
 
 }

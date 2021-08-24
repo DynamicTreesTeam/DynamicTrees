@@ -6,6 +6,8 @@ import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.NoSuchDeserialiserException;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
 
 import javax.annotation.Nullable;
 import java.util.LinkedList;
@@ -252,6 +254,18 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
      */
     public static <T> JsonResult<T> failure(JsonElement json, String error, List<String> warnings) {
         return new JsonResult<>(json, null, error, warnings);
+    }
+
+    public static <T> Result<T, JsonElement> from(final DataResult<Pair<T, JsonElement>> dataResult,
+                                                  JsonElement input) {
+        try {
+            return dataResult.get()
+                    .mapLeft(
+                            pair -> JsonResult.success(pair.getSecond(), pair.getFirst())
+                    ).orThrow();
+        } catch (RuntimeException e) {
+            return JsonResult.failure(input, e.getMessage());
+        }
     }
 
 }

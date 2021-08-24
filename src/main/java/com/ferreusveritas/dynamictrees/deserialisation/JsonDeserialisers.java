@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
@@ -256,6 +257,10 @@ public final class JsonDeserialisers {
             BiomePropertySelectors.DensitySelector.class, new DensitySelectorDeserialiser());
     public static final JsonDeserialiser<BiomePropertySelectors.ChanceSelector> CHANCE_SELECTOR = register(
             BiomePropertySelectors.ChanceSelector.class, new ChanceSelectorDeserialiser());
+
+    public static final JsonDeserialiser<SeedSaplingRecipe> SEED_SAPLING_RECIPE = register(
+            SeedSaplingRecipe.class, new SeedSaplingRecipeDeserialiser()
+    );
 
     public static final JsonDeserialiser<Material> MATERIAL = register(Material.class, new StaticFieldDeserialiser<>(Material.class));
     public static final JsonDeserialiser<MaterialColor> MATERIAL_COLOR = register(MaterialColor.class, new StaticFieldDeserialiser<>(MaterialColor.class));

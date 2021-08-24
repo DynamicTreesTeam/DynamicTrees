@@ -59,8 +59,10 @@ public class BottomFlareGenFeature extends GenFeature  {
         int radius3 = TreeHelper.getRadius(world, rootPos.above(3));
 
         if (radius3 > configuredGenFeature.get(MIN_RADIUS)) {
-            family.getBranch().setRadius(world, rootPos.above(2), radius3 + 1, Direction.UP);
-            family.getBranch().setRadius(world, rootPos.above(1), radius3 + 2, Direction.UP);
+            family.getBranch().ifPresent(branch -> {
+                branch.setRadius(world, rootPos.above(2), radius3 + 1, Direction.UP);
+                branch.setRadius(world, rootPos.above(1), radius3 + 2, Direction.UP);
+            });
         }
     }
 

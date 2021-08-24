@@ -119,7 +119,9 @@ public class RootsGenFeature extends GenFeature {
 
             if (pos == BlockPos.ZERO || isReplaceableWithRoots(world, placeState, currPos) && (depth == 1 || onNormalCube)) {
                 if (radius > 0) {
-                    species.getFamily().getSurfaceRoot().setRadius(world, currPos, radius, 3);
+                    species.getFamily().getSurfaceRoot().ifPresent(root ->
+                            root.setRadius(world, currPos, radius, 3)
+                    );
                 }
                 if (onNormalCube) {
                     for (Direction dir : CoordUtils.HORIZONTALS) {

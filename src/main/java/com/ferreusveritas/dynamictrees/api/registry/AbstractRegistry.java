@@ -285,12 +285,6 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
         }));
     }
 
-    @Nonnull
-    @Override
-    public final Iterator<V> iterator() {
-        return this.getAll().iterator();
-    }
-
     @Override
     public final Set<V> getAllFor(final String namespace) {
         return this.getAll().stream()
@@ -302,6 +296,12 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
     public Stream<V> dataGenerationStream(String namespace) {
         return this.getAllFor(namespace).stream()
                 .filter(RegistryEntry::shouldGenerateData);
+    }
+
+    @Nonnull
+    @Override
+    public final Iterator<V> iterator() {
+        return this.getAll().iterator();
     }
 
 }

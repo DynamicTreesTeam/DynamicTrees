@@ -114,12 +114,12 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return branch != null && this.getFamily() == branch.getFamily();
     }
 
-    public Block getPrimitiveLog() {
+    public Optional<Block> getPrimitiveLog() {
         return this.isStrippedBranch() ? this.family.getPrimitiveStrippedLog() : this.family.getPrimitiveLog();
     }
 
     public boolean isStrippedBranch() {
-        return this.getFamily().hasStrippedBranch() && this.getFamily().getStrippedBranch() == this;
+        return this.getFamily().getStrippedBranch().map(other -> other == this).orElse(false);
     }
 
     @Override
@@ -203,13 +203,19 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     }
 
     public void stripBranch(BlockState state, IWorld world, BlockPos pos, int radius) {
-        assert this.getFamily().getStrippedBranch() != null;
-        this.getFamily().getStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get() ? 1 : 0)), null);
+        this.getFamily().getStrippedBranch().ifPresent(strippedBranch ->
+                strippedBranch.setRadius(
+                        world,
+                        pos,
+                        Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get() ? 1 : 0)),
+                        null
+                )
+        );
     }
 
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        return new ItemStack(getFamily().getBranchItem());
+        return this.getFamily().getBranchItem().map(ItemStack::new).orElse(ItemStack.EMPTY);
     }
 
     /**
@@ -393,7 +399,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         }
 
         final Family family = species.getFamily();
-        final BranchBlock familyBranch = family.getBranch();
+        final BranchBlock familyBranch = family.getBranch().get();
         final int primaryThickness = family.getPrimaryThickness();
 
         // Expand the volume yet again in all directions and search for other non-destroyed endpoints.

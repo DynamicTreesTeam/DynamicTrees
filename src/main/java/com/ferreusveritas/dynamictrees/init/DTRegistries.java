@@ -54,6 +54,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
@@ -197,7 +198,13 @@ public class DTRegistries {
     public static TileEntityType<PottedSaplingTileEntity> bonsaiTE;
 
     public static void setupTileEntities() {
-        RootyBlock[] rootyBlocks = SoilProperties.REGISTRY.getAll().stream().map(SoilProperties::getDynamicSoilBlock).filter(Objects::nonNull).distinct().toArray(RootyBlock[]::new);
+        RootyBlock[] rootyBlocks = SoilProperties.REGISTRY.getAll().stream()
+                .map(SoilProperties::getBlock)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .distinct()
+                .toArray(RootyBlock[]::new);
+
         speciesTE = TileEntityType.Builder.of(SpeciesTileEntity::new, rootyBlocks).build(null);
         bonsaiTE = TileEntityType.Builder.of(PottedSaplingTileEntity::new, POTTED_SAPLING).build(null);
     }

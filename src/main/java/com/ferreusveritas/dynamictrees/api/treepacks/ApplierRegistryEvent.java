@@ -5,6 +5,7 @@ import net.minecraft.command.Commands;
 import net.minecraft.resources.DataPackRegistries;
 import net.minecraftforge.eventbus.api.GenericEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 
 import java.util.List;
@@ -51,6 +52,7 @@ public class ApplierRegistryEvent<O> extends GenericEvent<O> implements IModBusE
      * @see Setup
      * @see Reload
      * @see Common
+     * @see GatherData
      */
     public static class Load<O> extends ApplierRegistryEvent<O> {
         public Load(JsonPropertyApplierList<O> applierList, String applierListIdentifier) {
@@ -67,6 +69,7 @@ public class ApplierRegistryEvent<O> extends GenericEvent<O> implements IModBusE
      * @see Load
      * @see Reload
      * @see Common
+     * @see GatherData
      */
     public static class Setup<O> extends ApplierRegistryEvent<O> {
         public Setup(JsonPropertyApplierList<O> applierList, String applierListIdentifier) {
@@ -84,6 +87,7 @@ public class ApplierRegistryEvent<O> extends GenericEvent<O> implements IModBusE
      * @see Load
      * @see Setup
      * @see Common
+     * @see GatherData
      */
     public static class Reload<O> extends ApplierRegistryEvent<O> {
         public Reload(JsonPropertyApplierList<O> applierList, String applierListIdentifier) {
@@ -100,9 +104,27 @@ public class ApplierRegistryEvent<O> extends GenericEvent<O> implements IModBusE
      * @see Load
      * @see Setup
      * @see Reload
+     * @see GatherData
      */
     public static class Common<O> extends ApplierRegistryEvent<O> {
         public Common(JsonPropertyApplierList<O> applierList, String applierListIdentifier) {
+            super(applierList, applierListIdentifier);
+        }
+    }
+
+    /**
+     * An {@link ApplierRegistryEvent} that is fired when registering appliers that are invoked on gather data. This
+     * refers to when {@link GatherDataEvent} is fired.
+     *
+     * @param <O> the type of object the appliers being registered handle applying to
+     * @see ApplierRegistryEvent
+     * @see Load
+     * @see Setup
+     * @see Reload
+     * @see Common
+     */
+    public static class GatherData<O> extends ApplierRegistryEvent<O> {
+        public GatherData(JsonPropertyApplierList<O> applierList, String applierListIdentifier) {
             super(applierList, applierListIdentifier);
         }
     }

@@ -29,7 +29,7 @@ public class DenuderNode implements NodeInspector {
     public boolean run(BlockState state, IWorld world, BlockPos pos, Direction fromDir) {
         final BranchBlock branch = TreeHelper.getBranch(state);
 
-        if (branch == null || branch != this.family.getBranch()) {
+        if (branch == null || this.family.getBranch().map(other -> branch != other).orElse(false)) {
             return false;
         }
 

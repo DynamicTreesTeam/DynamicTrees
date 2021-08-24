@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * A custom registry which can be safely unlocked at any point. Largely based off {@link
@@ -131,6 +132,10 @@ public interface Registry<V extends RegistryEntry<V>> extends Iterable<V> {
      * Dumps all entries with their registry names in the debug log, based off the {@link ForgeRegistry} dump method.
      */
     void dump();
+
+    Set<V> getAllFor(String namespace);
+
+    Stream<V> dataGenerationStream(String namespace);
 
     @Override
     Iterator<V> iterator();

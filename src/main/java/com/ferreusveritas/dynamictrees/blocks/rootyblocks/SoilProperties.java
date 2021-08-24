@@ -43,10 +43,9 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
             return Blocks.AIR;
         }
 
-        @Nullable
         @Override
-        public RootyBlock getDynamicSoilBlock() {
-            return null;
+        public Optional<RootyBlock> getBlock() {
+            return Optional.empty();
         }
 
         @Override
@@ -55,7 +54,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         }
 
         @Override
-        public void generateDynamicSoil(AbstractBlock.Properties properties) {
+        public void generateBlock(AbstractBlock.Properties properties) {
         }
     }.setRegistryName(DTTrees.NULL).setBlockRegistryName(DTTrees.NULL);
 
@@ -65,7 +64,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     public static final TypedRegistry<SoilProperties> REGISTRY = new TypedRegistry<>(SoilProperties.class, NULL_SOIL_PROPERTIES, new TypedRegistry.EntryType<>(CODEC));
 
     protected Block primitiveSoilBlock;
-    protected RootyBlock dynamicSoilBlock;
+    protected RootyBlock block;
     protected Integer soilFlags = 0;
     private ResourceLocation blockRegistryName;
     protected boolean substitute;
@@ -79,7 +78,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         this(primitiveBlock, name);
         this.soilFlags = soilFlags;
         if (generate) {
-            generateDynamicSoil(AbstractBlock.Properties.copy(primitiveBlock));
+            generateBlock(AbstractBlock.Properties.copy(primitiveBlock));
         }
     }
 
@@ -134,26 +133,21 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         }
     }
 
-    @Nullable
-    public RootyBlock getDynamicSoilBlock() {
-        return dynamicSoilBlock;
+    public Optional<RootyBlock> getBlock() {
+        return Optionals.ofBlock(block);
     }
 
-    public Optional<RootyBlock> getSoilBlock() {
-        return Optional.ofNullable(this.dynamicSoilBlock == Blocks.AIR ? null : this.dynamicSoilBlock);
-    }
-
-    public void generateDynamicSoil(AbstractBlock.Properties blockProperties) {
+    public void generateBlock(AbstractBlock.Properties blockProperties) {
         setBlockRegistryNameIfNull();
-        this.dynamicSoilBlock = RegistryHandler.addBlock(this.blockRegistryName, this.createDynamicSoil(blockProperties));
+        this.block = RegistryHandler.addBlock(this.blockRegistryName, this.createBlock(blockProperties));
     }
 
-    protected RootyBlock createDynamicSoil(AbstractBlock.Properties blockProperties) {
+    protected RootyBlock createBlock(AbstractBlock.Properties blockProperties) {
         return new RootyBlock(this, blockProperties);
     }
 
-    public void setDynamicSoilBlock(RootyBlock rootyBlock) {
-        this.dynamicSoilBlock = rootyBlock;
+    public void setBlock(RootyBlock rootyBlock) {
+        this.block = rootyBlock;
     }
 
     public boolean isSubstitute() {

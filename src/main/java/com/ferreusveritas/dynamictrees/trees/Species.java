@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.*;
+import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.data.Generator;
 import com.ferreusveritas.dynamictrees.api.data.SaplingStateGenerator;
 import com.ferreusveritas.dynamictrees.api.data.SeedItemModelGenerator;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
@@ -1047,9 +1047,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         //Ensure planting conditions are right
         Family family = getFamily();
         if (world.isEmptyBlock(pos.above()) && isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()))) {
-            family.getBranch().setRadius(world, pos, family.getPrimaryThickness(), null);//set to a single branch with 1 radius
-            world.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
-            placeRootyDirtBlock(world, pos.below(), 15);//Set to fully fertilized rooty dirt underneath
+            // Set to a single branch with 1 radius.
+            family.getBranch().ifPresent(branch -> branch.setRadius(world, pos, family.getPrimaryThickness(), null));
+            // Place a single leaf block on top.
+            world.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState());
+            // Set to fully fertilized rooty dirt underneath.
+            placeRootyDirtBlock(world, pos.below(), 15);
 
             if (doesRequireTileEntity(world, pos)) {
                 SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
@@ -1135,10 +1138,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     private void placeRootyDirtBlock(IWorld world, BlockPos rootPos, Block primitiveDirt, int fertility) {
-        RootyBlock rootyBlock = SoilHelper.getProperties(primitiveDirt).getDynamicSoilBlock();
-        if (rootyBlock != null) {
-            this.placeRootyDirtBlock(world, rootPos, rootyBlock, fertility);
-        }
+        SoilHelper.getProperties(primitiveDirt).getBlock().ifPresent(rootyBlock ->
+                this.placeRootyDirtBlock(world, rootPos, rootyBlock, fertility)
+        );
     }
 
     private void placeRootyDirtBlock(IWorld world, BlockPos rootPos, RootyBlock rootyBlock, int fertility) {
@@ -1553,14 +1555,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      **/
     protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int[] probMap) {
         // TODO: Convenience methods in ConfiguredGrowhtLogicKit to shorten this.
-        return this.logicKit.getConfigurable().directionManipulation(this.logicKit, new DirectionManipulationContext(world, pos, this, radius, signal, probMap));
+        return this.logicKit.getConfigurable().directionManipulation(this.logicKit,
+                new DirectionManipulationContext(world, pos, this, radius, signal, probMap));
     }
 
     /**
      * Species can override to take action once a new direction is selected
      **/
     protected Direction newDirectionSelected(World world, BlockPos pos, Direction newDir, GrowSignal signal) {
-        return this.logicKit.getConfigurable().newDirectionSelected(world, pos,this.logicKit, new NewDirectionContext(this, newDir, signal));
+        return this.logicKit.getConfigurable().newDirectionSelected(this.logicKit,
+                new NewDirectionContext(world, pos, this, newDir, signal));
     }
 
     /**

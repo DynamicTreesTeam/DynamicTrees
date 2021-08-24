@@ -42,7 +42,7 @@ public class WaterSoilProperties extends SoilProperties {
     }
 
     @Override
-    protected RootyBlock createDynamicSoil(AbstractBlock.Properties blockProperties) {
+    protected RootyBlock createBlock(AbstractBlock.Properties blockProperties) {
         return new RootyWaterBlock(this, blockProperties);
     }
 
@@ -80,7 +80,9 @@ public class WaterSoilProperties extends SoilProperties {
         public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
             BlockState upState = world.getBlockState(pos.above());
             if (TreeHelper.isBranch(upState)) {
-                return new ItemStack(TreeHelper.getBranch(upState).getFamily().getBranchItem());
+                return TreeHelper.getBranch(upState).getFamily().getBranchItem()
+                        .map(ItemStack::new)
+                        .orElse(ItemStack.EMPTY);
             }
             return ItemStack.EMPTY;
         }

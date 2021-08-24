@@ -29,8 +29,8 @@ public class BranchStateGenerator implements Generator<DTBlockStateProvider, Fam
     @Override
     public Dependencies gatherDependencies(Family input) {
         return new Dependencies()
-                .append(BRANCH, input.getBranchOptional())
-                .append(PRIMITIVE_LOG, input.getPrimitiveLogOptional());
+                .append(BRANCH, input.getBranch())
+                .append(PRIMITIVE_LOG, input.getPrimitiveLog());
     }
 
 }

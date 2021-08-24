@@ -80,9 +80,9 @@ public class SoilPropertiesManager extends JsonRegistryEntryReloadListener<SoilP
         // dont generate block if the there is a substitute.
         SoilProperties substitute = JsonHelper.getOrDefault(jsonObject, "substitute_soil", SoilProperties.class, SoilProperties.NULL_SOIL_PROPERTIES);
         if (substitute != SoilProperties.NULL_SOIL_PROPERTIES) {
-            soilProperties.setDynamicSoilBlock(substitute.dynamicSoilBlock);
+            soilProperties.setBlock(substitute.block);
         } else {
-            soilProperties.generateDynamicSoil(JsonHelper.getBlockProperties(jsonObject,
+            soilProperties.generateBlock(JsonHelper.getBlockProperties(jsonObject,
                     soilProperties.getDefaultMaterial(), soilProperties.getDefaultMaterial().getColor(),
                     soilProperties::getDefaultBlockProperties, errorConsumer, warningConsumer));
         }

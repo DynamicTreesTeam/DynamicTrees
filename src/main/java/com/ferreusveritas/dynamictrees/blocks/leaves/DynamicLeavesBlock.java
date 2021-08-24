@@ -545,7 +545,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         if (hasLeaves) {
             //Finally set the leaves block to a branch
             Family family = signal.getSpecies().getFamily();
-            family.getBranch().setRadius(world, pos, family.getPrimaryThickness(), null);
+            family.getBranch().ifPresent(branch ->
+                    branch.setRadius(world, pos, family.getPrimaryThickness(), null)
+            );
             signal.radius = family.getSecondaryThickness();//For the benefit of the parent branch
         }
 

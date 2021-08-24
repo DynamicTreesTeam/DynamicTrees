@@ -32,7 +32,7 @@ public class SoilStateGenerator implements Generator<DTBlockStateProvider, SoilP
     @Override
     public Dependencies gatherDependencies(SoilProperties input) {
         return new Dependencies()
-                .append(SOIL, input.getSoilBlock())
+                .append(SOIL, input.getBlock())
                 .append(PRIMITIVE_SOIL, input.getPrimitiveSoilBlockOptional());
     }
 

@@ -28,11 +28,11 @@ public class TransformNode implements NodeInspector {
         if (branch != null && fromSpecies.getFamily() == branch.getFamily()) {
             int radius = branch.getRadius(blockState);
             if (radius > 0) {
-                BranchBlock newBranchBlock = toSpecies.getFamily().getBranch();
+                BranchBlock newBranchBlock = toSpecies.getFamily().getBranch().orElse(null);
 
                 // If the branch is stripped, make the replacement branch stripped.
-                if (fromSpecies.getFamily().getStrippedBranch().equals(branch)) {
-                    newBranchBlock = toSpecies.getFamily().getStrippedBranch();
+                if (fromSpecies.getFamily().getStrippedBranch().orElse(null) == branch) {
+                    newBranchBlock = toSpecies.getFamily().getStrippedBranch().get();
                 }
 
                 newBranchBlock.setRadius(world, pos, radius, null);

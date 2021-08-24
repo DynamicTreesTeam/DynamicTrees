@@ -83,13 +83,13 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
 
         Family.REGISTRY.dataGenerationStream(this.modId).forEach(family -> {
             // Create branch tag if a branch exists.
-            family.getBranchOptional().ifPresent(branch ->
+            family.getBranch().ifPresent(branch ->
                     family.defaultBranchTags().forEach(tag ->
                             this.tag(tag).add(branch))
             );
 
             // Create stripped branch tag if the family has a stripped branch.
-            family.getStrippedBranchOptional().ifPresent(strippedBranch ->
+            family.getStrippedBranch().ifPresent(strippedBranch ->
                     family.defaultStrippedBranchTags().forEach(tag ->
                             this.tag(tag).add(strippedBranch))
             );

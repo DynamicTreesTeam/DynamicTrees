@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
@@ -385,8 +385,9 @@ public class JoCode {
                 world.getBlockState(pos).getBlock().is(DTBlockTags.FOLIAGE) ||
                 world.getBlockState(pos).getBlock().is(BlockTags.FLOWERS)) &&
                 (!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-            Objects.requireNonNull(species.getFamily().getBranch())
-                    .setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
+            species.getFamily().getBranch().ifPresent(branch ->
+                    branch.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)
+            );
             return false;
         }
         return true;
