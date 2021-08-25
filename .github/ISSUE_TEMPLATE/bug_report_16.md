@@ -44,4 +44,5 @@ Include relevant versions below. If this issue relates to add-ons then include t
 
 - Dynamic Trees:
 - Forge:
+- Java: 
 - OS:

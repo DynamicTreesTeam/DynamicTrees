@@ -12,7 +12,7 @@ This is just a template to help you post a useful issue.  Erase these rules and 
 
 - Only submit issues related to the latest version of the mod for the Minecraft version specified by the template.
 - When referring to versions always use the actual version number; never "latest".
-- Inlude all version in the [version](#versions) section. 
+- Inlude all version in the [version](#versions) section.
 - Use a paste site, preferably [Gist](https://gist.github.com), to dump any logs or crash reports.
 - Do not open bug reports for add-ons! These should be reported to their respective issue trackers.
 - Do not use this template for feature requests, there's a separate template for that.
@@ -45,4 +45,5 @@ Include relevant versions below. If this issue relates to add-ons then include t
 
 - Dynamic Trees:
 - Forge:
+- Java: 
 - OS:
