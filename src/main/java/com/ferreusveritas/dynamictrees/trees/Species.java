@@ -35,10 +35,7 @@ import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
 import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
-import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
-import com.ferreusveritas.dynamictrees.growthlogic.context.EnergyContext;
-import com.ferreusveritas.dynamictrees.growthlogic.context.LowestBranchHeightContext;
-import com.ferreusveritas.dynamictrees.growthlogic.context.NewDirectionContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
@@ -479,7 +476,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public float getEnergy(World world, BlockPos rootPos) {
-        return this.logicKit.getConfigurable().getEnergy(this.logicKit, new EnergyContext(world, rootPos, this, signalEnergy));
+        return this.logicKit.getEnergy(new PositionalSpeciesContext(world, rootPos, this));
     }
 
     public float getGrowthRate(World world, BlockPos rootPos) {
@@ -496,21 +493,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * Probability reinforcer for current travel direction
      */
-    public int getReinfTravel() {
+    public int getProbabilityForCurrentDir() {
         return 1;
     }
 
     public int getLowestBranchHeight() {
         return lowestBranchHeight;
-    }
-
-    /**
-     * @param world
-     * @param pos
-     * @return The lowest number of blocks from the RootyDirtBlock that a branch can form.
-     */
-    public int getLowestBranchHeight(World world, BlockPos pos) {
-        return this.logicKit.getConfigurable().getLowestBranchHeight(this.logicKit, new LowestBranchHeightContext(world, pos, this, lowestBranchHeight));
     }
 
     public float getTapering() {
@@ -781,10 +769,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this.dropCreators;
     }
 
-    public <C extends DropContext> List<ItemStack> getDrops(final DropCreator.DropType<C> dropType, final C context) {
-        DTResourceRegistries.GLOBAL_DROP_CREATOR_MANAGER.appendAll(dropType, context);
-        this.dropCreators.forEach(configuration -> configuration.getConfigurable()
-                .appendDrops(configuration, dropType, context));
+    public <C extends DropContext> List<ItemStack> getDrops(final DropCreator.Type<C> type, final C context) {
+        DTResourceRegistries.GLOBAL_DROP_CREATOR_MANAGER.appendAll(type, context);
+        this.dropCreators.forEach(configuration -> configuration.appendDrops(type, context));
         return context.drops();
     }
 
@@ -827,7 +814,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
             if (world.random.nextDouble() < slowFactor) {
                 final List<ItemStack> drops = this.getDrops(
-                        DropCreator.DropType.VOLUNTARY,
+                        DropCreator.Type.VOLUNTARY,
                         new DropContext(world, world.random, rootPos, this, new LinkedList<>(), fertility, 0)
                 );
 
@@ -1401,12 +1388,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public void postRot(PostRotContext context) {
-        this.genFeatures.forEach(configuration -> configuration.getGenFeature()
-                .generate(
-                        configuration,
-                        GenFeature.Type.POST_ROT,
-                        context
-                ));
+        this.genFeatures.forEach(configuration -> configuration.generate(GenFeature.Type.POST_ROT, context));
     }
 
     /**
@@ -1489,7 +1471,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return logicKit;
     }
 
-
     private boolean canBoneMealTree = true;
 
     public void setCanBoneMealTree(boolean canBoneMealTree) {
@@ -1498,73 +1479,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public boolean canBoneMealTree() {
         return canBoneMealTree;
-    }
-
-    /**
-     * Selects a new direction for the branch(grow) signal to turn to.
-     *
-     * <p>This function uses a probability map to make the decision and is acted upon by the
-     * GrowSignal() function in the branch block. Can be overridden for different species but it's preferable to
-     * override customDirectionManipulation.</p>
-     *
-     * @param world  The {@link World} object.
-     * @param pos    The {@link BlockPos} of the branch.
-     * @param branch The branch block the GrowSignal is traveling in.
-     * @param signal The grow signal.
-     * @return The selected {@link Direction}.
-     */
-    public Direction selectNewDirection(World world, BlockPos pos, BranchBlock branch, GrowSignal signal) {
-        Direction growthLogicDir = this.logicKit.getConfigurable().selectNewDirection(this.logicKit, world, pos, this, branch, signal);
-        if (growthLogicDir != null) {
-            return growthLogicDir; //if the growth logic kit overrides selectNewDirection, use that
-        }
-
-        Direction originDir = signal.dir.getOpposite();
-
-        // prevent branches on the ground
-        if (signal.numSteps + 1 <= getLowestBranchHeight(world, signal.rootPos) && !signal.getSpecies().getLeavesProperties().canGrowOnGround()) {
-            return Direction.UP;
-        }
-
-        int[] probMap = new int[6]; // 6 directions possible DUNSWE
-
-        // Probability taking direction into account
-        probMap[Direction.UP.ordinal()] = signal.dir != Direction.DOWN ? getUpProbability() : 0; // Favor up
-        probMap[signal.dir.ordinal()] += getReinfTravel(); // Favor current direction
-
-        // Create probability map for direction change
-        for (Direction dir : Direction.values()) {
-            if (!dir.equals(originDir)) {
-                BlockPos deltaPos = pos.relative(dir);
-                // Check probability for surrounding blocks
-                // Typically Air:1, Leaves:2, Branches: 2+r
-                BlockState deltaBlockState = world.getBlockState(deltaPos);
-                probMap[dir.get3DDataValue()] += TreeHelper.getTreePart(deltaBlockState).probabilityForBlock(deltaBlockState, world, deltaPos, branch);
-            }
-        }
-
-        // Do custom stuff or override probability map for various species
-        probMap = customDirectionManipulation(world, pos, branch.getRadius(world.getBlockState(pos)), signal, probMap);
-
-        int choice = com.ferreusveritas.dynamictrees.util.MathHelper.selectRandomFromDistribution(signal.rand, probMap); // Select a direction from the probability map.
-        return newDirectionSelected(world, pos, Direction.values()[choice != -1 ? choice : 1], signal); // Default to up if things are screwy
-    }
-
-    /**
-     * Species can override the probability map here
-     **/
-    protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int[] probMap) {
-        // TODO: Convenience methods in ConfiguredGrowhtLogicKit to shorten this.
-        return this.logicKit.getConfigurable().directionManipulation(this.logicKit,
-                new DirectionManipulationContext(world, pos, this, radius, signal, probMap));
-    }
-
-    /**
-     * Species can override to take action once a new direction is selected
-     **/
-    protected Direction newDirectionSelected(World world, BlockPos pos, Direction newDir, GrowSignal signal) {
-        return this.logicKit.getConfigurable().newDirectionSelected(this.logicKit,
-                new NewDirectionContext(world, pos, this, newDir, signal));
     }
 
     /**
@@ -1580,9 +1494,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      *                  the potion of burgeoning.
      */
     public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
-        this.genFeatures.forEach(configuration -> configuration.getGenFeature()
-                .generate(
-                        configuration,
+        this.genFeatures.forEach(configuration ->
+                configuration.generate(
                         GenFeature.Type.POST_GROW,
                         new PostGrowContext(world, rootPos, this, treePos, fertility, natural)
                 ));
@@ -2023,13 +1936,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         final FullGenerationContext context = new FullGenerationContext(world, rootPos, this, biome, radius, safeBounds);
 
         this.genFeatures.forEach(configuration ->
-                fullGen.set(fullGen.get() || configuration.getGenFeature()
-                        .generate(
-                                configuration,
-                                GenFeature.Type.FULL,
-                                context
-                        )
-                ));
+                fullGen.set(fullGen.get() || configuration.generate(GenFeature.Type.FULL, context))
+        );
 
         if (fullGen.get()) {
             return true;
@@ -2059,7 +1967,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * Adds the default configuration of the {@link GenFeature} given.
      * <p>
-     * Note that the {@link GenFeature} may abort its addition if {@link GenFeature#onApplied(Species,
+     * Note that the {@link GenFeature} may abort its addition if {@link GenFeature#shouldApply(Species,
      * ConfiguredGenFeature)} returns {@code false}.
      *
      * @param feature the {@link GenFeature} to add
@@ -2072,14 +1980,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * Adds the specified {@code configuration} to this species.
      * <p>
-     * Note that the {@link GenFeature} can abort its addition if {@link GenFeature#onApplied(Species,
+     * Note that the {@link GenFeature} can abort its addition if {@link GenFeature#shouldApply(Species,
      * ConfiguredGenFeature)} returns {@code false}.
      *
      * @param configuration the configured gen feature to add
      * @return this {@link Species} object for chaining
      */
     public Species addGenFeature(ConfiguredGenFeature configuration) {
-        if (configuration.getGenFeature().onApplied(this, configuration)) {
+        if (configuration.shouldApply(this)) {
             this.genFeatures.add(configuration);
         }
         return this;
@@ -2109,8 +2017,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         final AtomicReference<BlockPos> rootPos = new AtomicReference<>(rootPosition);
 
         this.genFeatures.forEach(configuration -> rootPos.set(
-                configuration.getGenFeature().generate(
-                        configuration,
+                configuration.generate(
                         GenFeature.Type.PRE_GENERATION,
                         new PreGenerationContext(world, rootPos.get(), this, radius, facing, safeBounds, joCode)
                 )
@@ -2126,12 +2033,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param context The {@link PostGenerationContext} instance.
      */
     public void postGeneration(PostGenerationContext context) {
-        this.genFeatures
-                .forEach(configuration -> configuration.getConfigurable().generate(
-                        configuration,
-                        GenFeature.Type.POST_GENERATION,
-                        context
-                ));
+        this.genFeatures.forEach(configuration ->
+                configuration.generate(GenFeature.Type.POST_GENERATION, context)
+        );
     }
 
     /**

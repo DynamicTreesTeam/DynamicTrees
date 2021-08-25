@@ -22,28 +22,32 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
 
     public static final ConfigurationProperty<Float> RARITY = ConfigurationProperty.floatProperty("rarity");
 
-    public static final class DropType<C extends DropContext> extends RegistryEntry<DropType<C>> {
-        public static final DropType<DropContext> NULL = new DropType<>(DTTrees.NULL, (dropCreator, configured, context) -> {
+    public static final class Type<C extends DropContext> extends RegistryEntry<Type<C>> {
+        public static final Type<DropContext> NULL = new Type<>(DTTrees.NULL, (dropCreator, configured, context) -> {
         });
 
         @SuppressWarnings("unchecked")
-        public static final Class<DropType<DropContext>> TYPE = (Class<DropType<DropContext>>) NULL.getClass();
-        public static final SimpleRegistry<DropType<DropContext>> REGISTRY = new SimpleRegistry<>(TYPE, NULL);
+        public static final Class<Type<DropContext>> TYPE = (Class<Type<DropContext>>) NULL.getClass();
+        public static final SimpleRegistry<Type<DropContext>> REGISTRY = new SimpleRegistry<>(TYPE, NULL);
 
-        public static final DropType<DropContext> HARVEST = register(new DropType<>(DynamicTrees.resLoc("harvest"), DropCreator::appendHarvestDrops));
-        public static final DropType<DropContext> VOLUNTARY = register(new DropType<>(DynamicTrees.resLoc("voluntary"), DropCreator::appendVoluntaryDrops));
-        public static final DropType<DropContext> LEAVES = register(new DropType<>(DynamicTrees.resLoc("leaves"), DropCreator::appendLeavesDrops));
-        public static final DropType<LogDropContext> LOGS = register(new DropType<>(DynamicTrees.resLoc("logs"), DropCreator::appendLogDrops));
+        public static final Type<DropContext> HARVEST = register(new Type<>(DynamicTrees.resLoc("harvest"),
+                DropCreator::appendHarvestDrops));
+        public static final Type<DropContext> VOLUNTARY = register(new Type<>(DynamicTrees.resLoc("voluntary"),
+                DropCreator::appendVoluntaryDrops));
+        public static final Type<DropContext> LEAVES = register(new Type<>(DynamicTrees.resLoc("leaves"),
+                DropCreator::appendLeavesDrops));
+        public static final Type<LogDropContext> LOGS = register(new Type<>(DynamicTrees.resLoc("logs"),
+                DropCreator::appendLogDrops));
 
         @SuppressWarnings("unchecked")
-        private static <C extends DropContext> DropType<C> register(DropType<C> dropType) {
-            REGISTRY.register((DropType<DropContext>) dropType);
-            return dropType;
+        private static <C extends DropContext> Type<C> register(Type<C> type) {
+            REGISTRY.register((Type<DropContext>) type);
+            return type;
         }
 
         private final TriConsumer<DropCreator, ConfiguredDropCreator, C> appendDropConsumer;
 
-        public DropType(ResourceLocation registryName, TriConsumer<DropCreator, ConfiguredDropCreator, C> appendDropConsumer) {
+        public Type(ResourceLocation registryName, TriConsumer<DropCreator, ConfiguredDropCreator, C> appendDropConsumer) {
             super(registryName);
             this.appendDropConsumer = appendDropConsumer;
         }
@@ -53,8 +57,8 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
         }
 
         @SuppressWarnings("unchecked")
-        public static Class<DropType<DropContext>> getGenericClass() {
-            return (Class<DropType<DropContext>>) NULL.getClass();
+        public static Class<Type<DropContext>> getGenericClass() {
+            return (Class<Type<DropContext>>) NULL.getClass();
         }
     }
 
@@ -75,20 +79,20 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
         return new ConfiguredDropCreator(this);
     }
 
-    public <C extends DropContext> void appendDrops(final ConfiguredDropCreator configuration, final DropType<C> dropType, final C context) {
-        dropType.appendDrops(configuration, context);
+    public <C extends DropContext> void appendDrops(final ConfiguredDropCreator configuration, final Type<C> type, final C context) {
+        type.appendDrops(configuration, context);
     }
 
-    public void appendHarvestDrops(final ConfiguredDropCreator configuration, DropContext context) {
+    protected void appendHarvestDrops(final ConfiguredDropCreator configuration, DropContext context) {
     }
 
-    public void appendVoluntaryDrops(final ConfiguredDropCreator configuration, DropContext context) {
+    protected void appendVoluntaryDrops(final ConfiguredDropCreator configuration, DropContext context) {
     }
 
-    public void appendLeavesDrops(final ConfiguredDropCreator configuration, DropContext context) {
+    protected void appendLeavesDrops(final ConfiguredDropCreator configuration, DropContext context) {
     }
 
-    public void appendLogDrops(final ConfiguredDropCreator configuration, LogDropContext context) {
+    protected void appendLogDrops(final ConfiguredDropCreator configuration, LogDropContext context) {
     }
 
 }

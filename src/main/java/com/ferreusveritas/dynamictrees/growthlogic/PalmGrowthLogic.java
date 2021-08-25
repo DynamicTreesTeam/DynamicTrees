@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
-import com.ferreusveritas.dynamictrees.growthlogic.context.EnergyContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -13,8 +13,9 @@ public class PalmGrowthLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int[] directionManipulation(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
-        final int[] probMap = context.probMap();
+    public int[] populateDirectionProbabilityMap(ConfiguredGrowthLogicKit configuration,
+                                                 DirectionManipulationContext context) {
+        final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
         Direction originDir = context.signal().dir.getOpposite();
 
         // Alter probability map for direction change
@@ -27,10 +28,13 @@ public class PalmGrowthLogic extends GrowthLogicKit {
     }
 
     @Override
-    public float getEnergy(ConfiguredGrowthLogicKit configuration, EnergyContext context) {
+    public float getEnergy(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
         long day = context.world().getGameTime() / 24000L;
         int month = (int) day / 30; // Change the hashs every in-game month
-        return context.signalEnergy() * context.species().biomeSuitability(context.world(), context.pos()) + (CoordUtils.coordHashCode(context.pos().above(month), 3) % 3); // Vary the height energy by a psuedorandom hash function
+        return super.getEnergy(configuration, context) *
+                context.species().biomeSuitability(context.world(), context.pos()) +
+                (CoordUtils.coordHashCode(context.pos().above(month), 3) %
+                        3); // Vary the height energy by a psuedorandom hash function
 
     }
 

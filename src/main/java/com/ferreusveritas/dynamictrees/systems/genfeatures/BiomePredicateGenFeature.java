@@ -36,14 +36,8 @@ public class BiomePredicateGenFeature extends GenFeature {
             return false;
         }
 
-        final GenFeature genFeatureToPlace = configuredGenFeatureToPlace.getGenFeature();
-
         if (!(configuration.get(ONLY_WORLD_GEN) && !worldGen) && configuration.get(BIOME_PREDICATE).test(context.biome())) {
-            return genFeatureToPlace.generate(
-                    configuredGenFeatureToPlace,
-                    Type.POST_GENERATION,
-                    context
-            );
+            return configuredGenFeatureToPlace.generate(Type.POST_GENERATION, context);
         }
 
         return false;

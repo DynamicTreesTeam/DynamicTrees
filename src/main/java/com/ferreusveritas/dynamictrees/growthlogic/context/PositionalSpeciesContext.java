@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 /**
  * @author Harley O'Connor
  */
-public abstract class PositionalSpeciesContext {
+public class PositionalSpeciesContext {
     private final World world;
     private final BlockPos pos;
     private final Species species;

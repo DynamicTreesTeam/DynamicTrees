@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.growthlogic;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
-import com.ferreusveritas.dynamictrees.growthlogic.context.EnergyContext;
-import com.ferreusveritas.dynamictrees.growthlogic.context.NewDirectionContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -30,9 +30,18 @@ public class JungleLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int[] directionManipulation(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
+    public Direction selectNewDirection(ConfiguredGrowthLogicKit configuration, DirectionSelectionContext context) {
+        final Direction newDir = super.selectNewDirection(configuration, context);
+        if (context.signal().isInTrunk() && newDir != Direction.UP) { // Turned out of trunk
+            context.signal().energy = 4.0f;
+        }
+        return newDir;
+    }
 
-        final int[] probMap = context.probMap();
+    @Override
+    public int[] populateDirectionProbabilityMap(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
+
+        final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
         Direction originDir = context.signal().dir.getOpposite();
 
         int treeHash = CoordUtils.coordHashCode(context.signal().rootPos, 2);
@@ -59,18 +68,11 @@ public class JungleLogic extends GrowthLogicKit {
         return probMap;
     }
 
-    @Override
-    public Direction newDirectionSelected(ConfiguredGrowthLogicKit configuration, NewDirectionContext context) {
-        if (context.signal().isInTrunk() && context.newDir() != Direction.UP) {//Turned out of trunk
-            context.signal().energy = 4.0f;
-        }
-        return context.newDir();
-    }
-
     //Jungle trees grow taller in suitable biomes
     @Override
-    public float getEnergy(ConfiguredGrowthLogicKit configuration, EnergyContext context) {
-        return context.signalEnergy() * context.species().biomeSuitability(context.world(), context.pos());
+    public float getEnergy(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+        return super.getEnergy(configuration, context) *
+                context.species().biomeSuitability(context.world(), context.pos());
     }
 
 }

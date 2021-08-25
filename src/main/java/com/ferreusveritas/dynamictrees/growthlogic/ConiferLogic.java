@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.growthlogic;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
-import com.ferreusveritas.dynamictrees.growthlogic.context.EnergyContext;
-import com.ferreusveritas.dynamictrees.growthlogic.context.NewDirectionContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -38,9 +38,21 @@ public class ConiferLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int[] directionManipulation(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
+    public Direction selectNewDirection(ConfiguredGrowthLogicKit configuration, DirectionSelectionContext context) {
+        final Direction newDir = super.selectNewDirection(configuration, context);
+        if (context.signal().isInTrunk() && newDir != Direction.UP) { // Turned out of trunk.
+            context.signal().energy /= configuration.get(ENERGY_DIVISOR);
+            final Float horizontalLimiter = configuration.get(HORIZONTAL_LIMITER);
+            if (context.signal().energy > horizontalLimiter) {
+                context.signal().energy = horizontalLimiter;
+            }
+        }
+        return newDir;
+    }
 
-        final int[] probMap = context.probMap();
+    @Override
+    public int[] populateDirectionProbabilityMap(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
+        final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
         Direction originDir = context.signal().dir.getOpposite();
 
         //Alter probability map for direction change
@@ -54,27 +66,15 @@ public class ConiferLogic extends GrowthLogicKit {
         return probMap;
     }
 
-    @Override
-    public Direction newDirectionSelected(ConfiguredGrowthLogicKit configuration, NewDirectionContext context) {
-        if (context.signal().isInTrunk() && context.newDir() != Direction.UP) {//Turned out of trunk
-            context.signal().energy /= configuration.get(ENERGY_DIVISOR);
-            final Float horizontalLimiter = configuration.get(HORIZONTAL_LIMITER);
-            if (context.signal().energy > horizontalLimiter) {
-                context.signal().energy = horizontalLimiter;
-            }
-        }
-        return context.newDir();
-    }
-
     //Spruce trees are so similar that it makes sense to randomize their height for a little variation
     //but we don't want the trees to always be the same height all the time when planted in the same location
     //so we feed the hash function the in-game month
     @Override
-    public float getEnergy(ConfiguredGrowthLogicKit configuration, EnergyContext context) {
+    public float getEnergy(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
         long day = context.world().getGameTime() / 24000L;
         int month = (int) day / 30;//Change the hashs every in-game month
 
-        return context.signalEnergy() * context.species().biomeSuitability(context.world(), context.pos()) +
+        return super.getEnergy(configuration, context) * context.species().biomeSuitability(context.world(), context.pos()) +
                 (CoordUtils.coordHashCode(context.pos().above(month), 2) % configuration.get(HEIGHT_VARIATION)); // Vary the height energy by a psuedorandom hash function
     }
 

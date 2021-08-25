@@ -70,7 +70,8 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
         }
     }
 
-    public <C extends GenerationContext<?>, R> R generate(ConfiguredGenFeature configuration, Type<C, R> type, C context) {
+    public <C extends GenerationContext<?>, R> R generate(ConfiguredGenFeature configuration, Type<C, R> type,
+                                                          C context) {
         return type.generate(configuration, context);
     }
 
@@ -110,7 +111,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * @param configuration the configuration the feature is being added with
      * @return {@code true} if it should be applied; otherwise {@code false} if the application should be aborted
      */
-    public boolean onApplied(Species species, ConfiguredGenFeature configuration) {
+    public boolean shouldApply(Species species, ConfiguredGenFeature configuration) {
         return true;
     }
 

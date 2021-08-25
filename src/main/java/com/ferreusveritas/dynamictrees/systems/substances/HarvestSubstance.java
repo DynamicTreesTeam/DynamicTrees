@@ -138,11 +138,19 @@ public class HarvestSubstance implements SubstanceEffect {
             // Force a growth attempt of all fruit gen features.
             if (spawnAttempt) {
                 this.species.getGenFeatures().stream()
-                        .filter(configuration -> configuration.getGenFeature().getClass().isAnnotationPresent(GeneratesFruit.class))
-                        .forEach(configuration -> configuration.getGenFeature().generate(
-                                configuration,
+                        .filter(configuration ->
+                                configuration.getGenFeature().getClass().isAnnotationPresent(GeneratesFruit.class)
+                        )
+                        .forEach(configuration -> configuration.generate(
                                 GenFeature.Type.POST_GROW,
-                                new PostGrowContext(world, rootPos, species, rootPos.relative(rootyBlock.getTrunkDirection(world, rootPos)), fertility, true)
+                                new PostGrowContext(
+                                        world,
+                                        rootPos,
+                                        species,
+                                        rootPos.relative(rootyBlock.getTrunkDirection(world, rootPos)),
+                                        fertility,
+                                        true
+                                )
                         ));
             }
         }

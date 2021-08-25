@@ -1,8 +1,7 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
-import com.ferreusveritas.dynamictrees.growthlogic.context.EnergyContext;
-import com.ferreusveritas.dynamictrees.growthlogic.context.LowestBranchHeightContext;
+import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -14,8 +13,8 @@ public class DarkOakLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int[] directionManipulation(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
-        final int[] probMap = context.probMap();
+    public int[] populateDirectionProbabilityMap(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
+        final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
         probMap[Direction.UP.get3DDataValue()] = 4;
 
         //Disallow up/down turns after having turned out of the trunk once.
@@ -59,12 +58,14 @@ public class DarkOakLogic extends GrowthLogicKit {
     }
 
     @Override
-    public float getEnergy(ConfiguredGrowthLogicKit configuration, EnergyContext context) {
-        return context.signalEnergy() * context.species().biomeSuitability(context.world(), context.pos());
+    public float getEnergy(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+        return super.getEnergy(configuration, context) *
+                context.species().biomeSuitability(context.world(), context.pos());
     }
 
     @Override
-    public int getLowestBranchHeight(ConfiguredGrowthLogicKit configuration, LowestBranchHeightContext context) {
-        return (int) (context.lowestBranchHeight() * context.species().biomeSuitability(context.world(), context.pos()));
+    public int getLowestBranchHeight(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+        return (int) (super.getLowestBranchHeight(configuration, context) *
+                context.species().biomeSuitability(context.world(), context.pos()));
     }
 }

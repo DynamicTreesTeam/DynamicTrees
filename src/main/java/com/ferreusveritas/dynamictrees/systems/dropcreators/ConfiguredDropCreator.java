@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
 import com.ferreusveritas.dynamictrees.api.configurations.Configured;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 
 /**
  * @author Harley O'Connor
@@ -23,6 +24,10 @@ public final class ConfiguredDropCreator extends Configured<ConfiguredDropCreato
         final ConfiguredDropCreator duplicateGenFeature = new ConfiguredDropCreator(this.configurable);
         duplicateGenFeature.properties.putAll(this.properties);
         return duplicateGenFeature;
+    }
+
+    public <C extends DropContext> void appendDrops(DropCreator.Type<C> type, C context) {
+        this.configurable.appendDrops(this, type, context);
     }
 
 }

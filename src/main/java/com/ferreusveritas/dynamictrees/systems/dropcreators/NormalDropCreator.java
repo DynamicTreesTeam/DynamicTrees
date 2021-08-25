@@ -18,12 +18,12 @@ import java.util.Map;
 public final class NormalDropCreator extends DropCreator {
 
     @SuppressWarnings("all")
-    public static final ConfigurationProperty<Map<DropType<DropContext>, Drops>> DROP_MAP = ConfigurationProperty.property("drops",
-            MapDeserialiser.getMapClass(DropType.getGenericClass(), Drops.class, HashMap::new));
+    public static final ConfigurationProperty<Map<Type<DropContext>, Drops>> DROP_MAP = ConfigurationProperty.property("drops",
+            MapDeserialiser.getMapClass(Type.getGenericClass(), Drops.class, HashMap::new));
 
     static {
         JsonDeserialisers.register(
-                MapDeserialiser.getMapClass(DropType.getGenericClass(), Drops.class),
+                MapDeserialiser.getMapClass(Type.getGenericClass(), Drops.class),
                 new MapDeserialiser<>(JsonDeserialisers.DROP_TYPE, JsonDeserialisers.DROPS)
         );
     }
@@ -45,25 +45,25 @@ public final class NormalDropCreator extends DropCreator {
 
     @Override
     public void appendHarvestDrops(ConfiguredDropCreator configuration, DropContext context) {
-        configuration.get(DROP_MAP).getOrDefault(DropType.HARVEST, Drops.NONE)
+        configuration.get(DROP_MAP).getOrDefault(Type.HARVEST, Drops.NONE)
                 .appendDrops(context.drops(), context.random(), context.fortune());
     }
 
     @Override
     public void appendVoluntaryDrops(ConfiguredDropCreator configuration, DropContext context) {
-        configuration.get(DROP_MAP).getOrDefault(DropType.VOLUNTARY, Drops.NONE)
+        configuration.get(DROP_MAP).getOrDefault(Type.VOLUNTARY, Drops.NONE)
                 .appendDrops(context.drops(), context.random(), 0);
     }
 
     @Override
     public void appendLeavesDrops(ConfiguredDropCreator configuration, DropContext context) {
-        configuration.get(DROP_MAP).getOrDefault(DropType.LEAVES, Drops.NONE)
+        configuration.get(DROP_MAP).getOrDefault(Type.LEAVES, Drops.NONE)
                 .appendDrops(context.drops(), context.random(), context.fortune());
     }
 
     @Override
     public void appendLogDrops(ConfiguredDropCreator configuration, LogDropContext context) {
-        configuration.get(DROP_MAP).getOrDefault(DropType.LOGS, Drops.NONE)
+        configuration.get(DROP_MAP).getOrDefault(Type.LOGS, Drops.NONE)
                 .appendDrops(context.drops(), context.random(), 0);
     }
 

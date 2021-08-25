@@ -210,7 +210,7 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<AxisAlignedBB> AXIS_ALIGNED_BB = register(AxisAlignedBB.class, new AxisAlignedBBDeserialiser());
     public static final JsonDeserialiser<VoxelShape> VOXEL_SHAPE = register(VoxelShape.class, new VoxelShapeDeserialiser());
 
-    public static final JsonDeserialiser<DropCreator.DropType<DropContext>> DROP_TYPE = register(DropCreator.DropType.getGenericClass(), new RegistryEntryDeserialiser<>(DropCreator.DropType.REGISTRY));
+    public static final JsonDeserialiser<DropCreator.Type<DropContext>> DROP_TYPE = register(DropCreator.Type.getGenericClass(), new RegistryEntryDeserialiser<>(DropCreator.Type.REGISTRY));
 
     public static final JsonDeserialiser<CellKit> CELL_KIT = register(CellKit.class, new RegistryEntryDeserialiser<>(CellKit.REGISTRY));
     public static final JsonDeserialiser<LeavesProperties> LEAVES_PROPERTIES = register(LeavesProperties.class, new RegistryEntryDeserialiser<>(LeavesProperties.REGISTRY));

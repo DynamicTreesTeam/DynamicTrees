@@ -635,7 +635,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
         final Species species = this.getExactSpecies(builder.getLevel(), builderBlockPos, getProperties(state));
         return species.getDrops(
-                DropCreator.DropType.LEAVES,
+                DropCreator.Type.LEAVES,
                 new DropContext(builder.getLevel(), builderBlockPos, species, ret,
                         Optional.ofNullable(builder.getOptionalParameter(LootParameters.TOOL)).orElse(ItemStack.EMPTY),
                         -1, fortuneLevel)

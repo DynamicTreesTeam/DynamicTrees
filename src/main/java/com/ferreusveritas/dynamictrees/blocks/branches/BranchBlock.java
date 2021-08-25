@@ -422,7 +422,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
             if (family.isCompatibleGenericLeaves(species, blockState, world, pos)) {
                 dropList.clear();
                 species.getDrops(
-                        DropCreator.DropType.HARVEST,
+                        DropCreator.Type.HARVEST,
                         new DropContext(world, pos, species, dropList)
                 );
                 final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
@@ -449,7 +449,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NetVolumeNode.Volume volume, ItemStack handStack) {
         volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
         return species.getDrops(
-                DropCreator.DropType.LOGS,
+                DropCreator.Type.LOGS,
                 new LogDropContext(world, pos, species, new ArrayList<>(), volume, handStack)
         );
     }

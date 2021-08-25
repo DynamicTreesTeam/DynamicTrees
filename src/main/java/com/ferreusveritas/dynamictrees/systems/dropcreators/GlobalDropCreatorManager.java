@@ -58,9 +58,8 @@ public final class GlobalDropCreatorManager extends JsonReloadListener<DropCreat
         return Lists.newLinkedList(this.entries.values());
     }
 
-    public <C extends DropContext> void appendAll(final DropCreator.DropType<C> dropType, final C context) {
-        this.getAll().forEach(configuration -> configuration.getConfigurable()
-                .appendDrops(configuration, dropType, context));
+    public <C extends DropContext> void appendAll(final DropCreator.Type<C> type, final C context) {
+        this.getAll().forEach(configuration -> configuration.appendDrops(type, context));
     }
 
     public ConfiguredDropCreator get(final ResourceLocation registryName) {

@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.configurations.Configured;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.GenerationContext;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
 /**
@@ -37,6 +38,21 @@ public class ConfiguredGenFeature extends Configured<ConfiguredGenFeature, GenFe
         final ConfiguredGenFeature duplicateGenFeature = new ConfiguredGenFeature(this.configurable);
         duplicateGenFeature.properties.putAll(this.properties);
         return duplicateGenFeature;
+    }
+
+    public <C extends GenerationContext<?>, R> R generate(GenFeature.Type<C, R> type, C context) {
+        return this.configurable.generate(this, type, context);
+    }
+
+    /**
+     * Called before this {@link GenFeature} is applied to a {@link Species}. Returns {@code false} if the application
+     * should be aborted.
+     *
+     * @param species       the species the feature is being added to
+     * @return {@code true} if it should be applied; otherwise {@code false} if the application should be aborted
+     */
+    public boolean shouldApply(Species species) {
+        return this.configurable.shouldApply(species, this);
     }
 
 }

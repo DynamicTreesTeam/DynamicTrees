@@ -44,7 +44,7 @@ public class AlternativeLeavesGenFeature extends GenFeature {
     }
 
     @Override
-    public boolean onApplied(Species species, ConfiguredGenFeature configuration) {
+    public boolean shouldApply(Species species, ConfiguredGenFeature configuration) {
         configuration.get(ALT_LEAVES).ifValid(properties -> {
             properties.setFamily(species.getFamily());
             species.addValidLeafBlocks(properties);

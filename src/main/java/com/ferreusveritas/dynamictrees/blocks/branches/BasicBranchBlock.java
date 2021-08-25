@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
+import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Family;
@@ -314,7 +315,9 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
         final boolean inTrunk = signal.isInTrunk();
 
         final Direction originDir = signal.dir.getOpposite();// Direction this signal originated from
-        final Direction targetDir = species.selectNewDirection(world, pos, this, signal);// This must be cached on the stack for proper recursion
+        final Direction targetDir = species.getGrowthLogicKit().selectNewDirection( // This must be cached on the stack for proper recursion
+                new DirectionSelectionContext(world, pos, species, this, signal)
+        );
         signal.doTurn(targetDir);
 
         {
