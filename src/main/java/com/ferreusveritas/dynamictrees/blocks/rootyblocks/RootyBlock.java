@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.RootyBlockDecayer;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.Cell;
+import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
@@ -223,9 +223,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
         return Direction.UP;
     }
 
-    /**
-     * //	 * //	 * @param world //	 * @param rootPos //	 * @param random //	 * @param natural //
-     */
     public void updateTree(BlockState rootyState, World world, BlockPos rootPos, Random random, boolean natural) {
 
         if (CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {

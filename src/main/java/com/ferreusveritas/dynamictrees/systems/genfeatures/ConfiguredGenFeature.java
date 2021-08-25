@@ -40,6 +40,16 @@ public class ConfiguredGenFeature extends Configured<ConfiguredGenFeature, GenFe
         return duplicateGenFeature;
     }
 
+    /**
+     * Invokes {@link GenFeature#generate(ConfiguredGenFeature, GenFeature.Type, GenerationContext)} for this configured
+     * feature's gen feature.
+     *
+     * @param type    the type of generation to perform
+     * @param context the context
+     * @param <C>     the type of the context
+     * @param <R>     the return type of the action
+     * @return the return of the executed action
+     */
     public <C extends GenerationContext<?>, R> R generate(GenFeature.Type<C, R> type, C context) {
         return this.configurable.generate(this, type, context);
     }
@@ -48,7 +58,7 @@ public class ConfiguredGenFeature extends Configured<ConfiguredGenFeature, GenFe
      * Called before this {@link GenFeature} is applied to a {@link Species}. Returns {@code false} if the application
      * should be aborted.
      *
-     * @param species       the species the feature is being added to
+     * @param species the species the feature is being added to
      * @return {@code true} if it should be applied; otherwise {@code false} if the application should be aborted
      */
     public boolean shouldApply(Species species) {
