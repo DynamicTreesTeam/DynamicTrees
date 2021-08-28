@@ -7,16 +7,14 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.function.Supplier;
-
 public class SubstanceFertilize implements ISubstanceEffect {
 
 	private int amount = 2;
 	private boolean grow;
 	private int pulses = 1;
-
+	
 	@Override
-	public boolean apply(World world, BlockPos rootPos) {
+	public Result apply(World world, BlockPos rootPos, BlockPos hitPos) {
 		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 		if (dirt != null && dirt.fertilize(world, rootPos, amount) || grow) {
 			if (world.isRemote) {
@@ -28,9 +26,9 @@ public class SubstanceFertilize implements ISubstanceEffect {
 					}
 				}
 			}
-			return true;
+			return Result.successful();
 		}
-		return false;
+		return Result.failure();
 	}
 
 	@Override

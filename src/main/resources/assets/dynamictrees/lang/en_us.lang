@@ -106,3 +106,10 @@ tooltip.woodland_staff.tree_not_set=§7none
 
 # Falling tree death message
 death.attack.fallingtree=%1$s was crushed by a falling tree
+
+substance.dynamictrees.deplete.error.already_depleted=The selected tree has already depleted.
+substance.dynamictrees.growth.error.already_has_effect=The selected tree already has the effect applied.
+substance.dynamictrees.mega.error.no_mega_species=The %s species does not have a mega variant.
+substance.dynamictrees.transform.error.not_transformable=The %s species is not transformable.
+substance.dynamictrees.transform.error.already_transformed=The selected tree is already a %s species.
+substance.dynamictrees.transform.error.not_brewed=The transform potion must be brewed with the seed of the target species.

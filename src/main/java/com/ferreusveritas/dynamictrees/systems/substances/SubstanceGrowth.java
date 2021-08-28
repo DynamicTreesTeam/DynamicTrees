@@ -28,21 +28,21 @@ public class SubstanceGrowth implements ISubstanceEffect {
 		this.ticksPerParticlePulse = ticksPerParticlePulse;
 		this.fillFertility = fillFertility;
 	}
-
+	
 	@Override
-	public boolean apply(World world, BlockPos rootPos) {
+	public Result apply(World world, BlockPos rootPos, BlockPos hitPos) {
 		// Don't apply if there is already a growth substance.
 		if (EntityLingeringEffector.treeHasEffectorForEffect(world, rootPos, this)) {
-			return false;
+			return Result.failure("substance.dynamictrees.growth.error.already_has_effect");
 		}
 		if (this.fillFertility) {
-			new SubstanceFertilize().setAmount(15).apply(world, rootPos);
+			new SubstanceFertilize().setAmount(15).apply(world, rootPos, hitPos);
 		}
 
 		TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.SPELL, 8);
-		return true;
+		return Result.successful();
 	}
-	
+
 	private int pulseCount;
 
 	@Override

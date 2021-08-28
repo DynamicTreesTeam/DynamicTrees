@@ -11,10 +11,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SubstanceMega implements ISubstanceEffect {
-
+	
 	@Override
-	public boolean apply(World world, BlockPos rootPos) {
-
+	public Result apply(World world, BlockPos rootPos, BlockPos hitPos) {
 		IBlockState blockState = world.getBlockState(rootPos);
 		BlockRooty dirt = TreeHelper.getRooty(blockState);
 		Species species = dirt.getSpecies(blockState, world, rootPos);
@@ -30,11 +29,11 @@ public class SubstanceMega implements ISubstanceEffect {
 			if (dirt.getSpecies(blockState, world, rootPos) == megaSpecies) {
 				TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.DRAGON_BREATH, 8);
 				WailaOther.invalidateWailaPosition();
-				return true;
+				return Result.successful();
 			}
 		}
 
-		return false;
+		return Result.failure("substance.dynamictrees.mega.error.no_mega_species", species.getLocalizedName());
 	}
 
 	@Override

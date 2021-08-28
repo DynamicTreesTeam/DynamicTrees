@@ -34,15 +34,13 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.Deprecatron;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -57,6 +55,9 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -1316,12 +1317,19 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		ISubstanceEffect effect = getSubstanceEffect(itemStack);
 
 		if (effect != null) {
-			boolean applied = effect.apply(world, rootPos);
-			if (applied && effect.isLingering()) {
+			ISubstanceEffect.Result result = effect.apply(world, rootPos, hitPos);
+			if (!result.success() && world.isRemote && !result.getErrorKey().isEmpty()) {
+				Minecraft.getMinecraft().ingameGUI.setOverlayMessage(
+					new TextComponentTranslation(result.getErrorKey(), result.getArgs()).setStyle(Styles.ERROR), 
+					false
+				);
+				return false;
+			}
+			if (result.success() && effect.isLingering()) {
 				world.spawnEntity(new EntityLingeringEffector(world, rootPos, effect));
 				return true;
 			} else {
-				return applied;
+				return result.success();
 			}
 		}
 

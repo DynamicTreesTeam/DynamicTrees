@@ -12,13 +12,13 @@ public class SubstanceDeplete implements ISubstanceEffect {
 	int amount;
 
 	@Override
-	public boolean apply(World world, BlockPos rootPos) {
+	public Result apply(World world, BlockPos rootPos, BlockPos hitPos) {
 		BlockRooty dirt = TreeHelper.getRooty(world.getBlockState(rootPos));
 		if (dirt.fertilize(world, rootPos, -amount)) {
 			TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.VILLAGER_ANGRY, 8);
-			return true;
+			return Result.successful();
 		}
-		return false;
+		return Result.failure("substance.dynamictrees.deplete.error.already_depleted");
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 public class SubstanceFreeze implements ISubstanceEffect {
 
 	@Override
-	public boolean apply(World world, BlockPos rootPos) {
+	public Result apply(World world, BlockPos rootPos, BlockPos hitPos) {
 		IBlockState rootyState = world.getBlockState(rootPos);
 		BlockRooty dirt = TreeHelper.getRooty(rootyState);
 		Species species = dirt.getSpecies(rootyState, world, rootPos);
@@ -25,9 +25,9 @@ public class SubstanceFreeze implements ISubstanceEffect {
 				dirt.startAnalysis(world, rootPos, new MapSignal(new NodeFreezer(species)));
 				dirt.fertilize(world, rootPos, -15);//destroy the soil life so it can no longer grow
 			}
-			return true;
+			return Result.successful();
 		}
-		return false;
+		return Result.failure();
 	}
 
 	@Override

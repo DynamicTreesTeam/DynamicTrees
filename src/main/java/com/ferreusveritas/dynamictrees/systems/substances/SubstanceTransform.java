@@ -21,29 +21,39 @@ public class SubstanceTransform implements ISubstanceEffect {
 	}
 
 	@Override
-	public boolean apply(World world, BlockPos rootPos) {
-
+	public Result apply(World world, BlockPos rootPos, BlockPos hitPos) {
 		IBlockState rootyState = world.getBlockState(rootPos);
 		BlockRooty dirt = TreeHelper.getRooty(rootyState);
-
-		if (dirt != null && toSpecies != null) {
-			Species fromSpecies = dirt.getSpecies(rootyState, world, rootPos);
-			if (fromSpecies.isTransformable() && fromSpecies != toSpecies) {
-				if (world.isRemote) {
-					TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
-					WailaOther.invalidateWailaPosition();
-				} else {
-					dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
-
-					if (dirt.getSpecies(rootyState, world, rootPos) != toSpecies) {
-						toSpecies.placeRootyDirtBlock(world, rootPos, dirt.getSoilLife(rootyState, world, rootPos));
-					}
-				}
-				return true;
-			}
+		
+		if (this.toSpecies == null) {
+			return Result.failure("substance.dynamictrees.transform.error.not_brewed");
+		}
+		if (dirt == null) {
+			return Result.failure();
 		}
 
-		return false;
+		final Species fromSpecies = dirt.getSpecies(rootyState, world, rootPos);
+		
+		if (!fromSpecies.isTransformable()) {
+			return Result.failure("substance.dynamictrees.transform.error.not_transformable", 
+				fromSpecies.getLocalizedName());
+		}
+		if (fromSpecies == toSpecies) {
+			return Result.failure("substance.dynamictrees.transform.error.already_transformed", 
+				fromSpecies.getLocalizedName());
+		}
+		
+		if (world.isRemote) {
+			TreeHelper.treeParticles(world, rootPos, EnumParticleTypes.FIREWORKS_SPARK, 8);
+			WailaOther.invalidateWailaPosition();
+		} else {
+			dirt.startAnalysis(world, rootPos, new MapSignal(new NodeTransform(fromSpecies, toSpecies)));
+
+			if (dirt.getSpecies(rootyState, world, rootPos) != toSpecies) {
+				toSpecies.placeRootyDirtBlock(world, rootPos, dirt.getSoilLife(rootyState, world, rootPos));
+			}
+		}
+		return Result.successful();
 	}
 
 	@Override
