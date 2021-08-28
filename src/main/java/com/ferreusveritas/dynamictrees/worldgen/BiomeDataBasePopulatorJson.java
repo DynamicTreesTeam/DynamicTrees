@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.util.JsonHelper;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase.Operation;
 import com.ferreusveritas.dynamictrees.worldgen.json.*;
 import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -15,6 +16,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
@@ -39,13 +41,18 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 	public static final String APPLY = "apply";
 	public static final String NAME = "name";
 	public static final String TYPE = "type";
-
-	private final JsonElement jsonElement;
-
+	public static Set<Biome> blacklistedBiomes = new HashSet<>();
 	private static Map<String, IJsonBiomeSelector> jsonBiomeSelectorMap = new HashMap<>();
 	private static Map<String, IJsonBiomeApplier> jsonBiomeApplierMap = new HashMap<>();
+	private final JsonElement jsonElement;
 
-	public static Set<Biome> blacklistedBiomes = new HashSet<>();
+	public BiomeDataBasePopulatorJson(ResourceLocation jsonLocation) {
+		this(JsonHelper.load(jsonLocation));
+	}
+
+	public BiomeDataBasePopulatorJson(JsonElement jsonElement) {
+		this.jsonElement = jsonElement;
+	}
 
 	public static void addJsonBiomeSelector(String name, IJsonBiomeSelector selector) {
 		jsonBiomeSelectorMap.put(name, selector);
@@ -68,43 +75,10 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 				return b -> false;
 			}
 
-			if (jsonElement.isJsonPrimitive()) {
-				JsonPrimitive primitive = jsonElement.getAsJsonPrimitive();
-				if (primitive.isString()) {
-					String biomeMatch = primitive.getAsString();
-					if (biomeMatch.charAt(0) == '!') {
-						return biome -> !String.valueOf(biome.getRegistryName()).matches(biomeMatch.substring(1));
-					} else {
-						return biome -> String.valueOf(biome.getRegistryName()).matches(biomeMatch);
-					}
-				}
+			if (jsonElement.isJsonPrimitive() && jsonElement.getAsJsonPrimitive().isString()) {
+				return readNameSelector(jsonElement.getAsString());
 			} else if (jsonElement.isJsonArray()) {
-				final List<String> namesWhitelist = new ArrayList<>();
-				final List<String> namesBlacklist = new ArrayList<>();
-
-				for (final JsonElement nameElement : jsonElement.getAsJsonArray()) {
-					if (!nameElement.isJsonPrimitive()) {
-						continue;
-					}
-					final JsonPrimitive primitive = jsonElement.getAsJsonPrimitive();
-					if (!primitive.isString()) {
-						continue;
-					}
-					final String biomeMatch = primitive.getAsString();
-					if (biomeMatch.charAt(0) == '!') {
-						namesBlacklist.add(biomeMatch.substring(1));
-					} else {
-						namesWhitelist.add(biomeMatch);
-					}
-				}
-
-				return biome -> {
-					final String regName = String.valueOf(biome.getRegistryName());
-
-					// Accept if the biome name matches any from the whilstlist and none from the blacklist. 
-					return namesWhitelist.stream().anyMatch(regName::matches) &&
-						namesBlacklist.stream().noneMatch(regName::matches);
-				};
+				return readArrayNameSelector(jsonElement.getAsJsonArray());
 			}
 
 			return b -> false;
@@ -115,31 +89,15 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 				List<BiomeDictionary.Type> typesWhitelist = new ArrayList<>();
 				List<BiomeDictionary.Type> typesBlacklist = new ArrayList<>();
 
-				if (jsonElement.isJsonPrimitive()) {
-					String typeMatch = jsonElement.getAsString();
-					List<String> matches = Arrays.stream(typeMatch.split(",")).collect(Collectors.toList());
-					for (String match : matches) {
-						if (match.charAt(0) == '!') {
-							typesBlacklist.add(BiomeDictionary.Type.getType(match.substring(1)));
-						} else {
-							typesWhitelist.add(BiomeDictionary.Type.getType(match));
-						}
-					}
+				if (jsonElement.isJsonPrimitive() && jsonElement.getAsJsonPrimitive().isString()) {
+					readTypeSelector(jsonElement.getAsString(), typesWhitelist, typesBlacklist);
 				} else if (jsonElement.isJsonArray()) {
-					for (JsonElement element : jsonElement.getAsJsonArray()) {
-						if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-							String stringElem = element.getAsString();
-							if (stringElem.charAt(0) == '!') {
-								typesBlacklist.add(BiomeDictionary.Type.getType(stringElem.substring(1)));
-							} else {
-								typesWhitelist.add(BiomeDictionary.Type.getType(stringElem));
-							}
-						}
-					}
+					readArrayTypeSelector(jsonElement.getAsJsonArray(), typesWhitelist, typesBlacklist);
 				}
 
 				// Accept if the biome has any types from the whitelist and no types from the blacklist.
-				return b -> biomeHasTypes(b, typesWhitelist) && (typesBlacklist.size() == 0 || !biomeHasAnyType(b, typesBlacklist));
+				return b -> biomeHasTypes(b, typesWhitelist) &&
+					(typesBlacklist.size() == 0 || !biomeHasAnyType(b, typesBlacklist));
 			}
 
 			return b -> false;
@@ -224,12 +182,79 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 
 	}
 
-	public BiomeDataBasePopulatorJson(ResourceLocation jsonLocation) {
-		this(JsonHelper.load(jsonLocation));
+	private static void readArrayTypeSelector(JsonArray typeArray, List<BiomeDictionary.Type> typesWhitelist,
+											  List<BiomeDictionary.Type> typesBlacklist) {
+		for (JsonElement element : typeArray) {
+			if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+				String stringElem = element.getAsString();
+				if (stringElem.charAt(0) == '!') {
+					typesBlacklist.add(BiomeDictionary.Type.getType(stringElem.substring(1)));
+				} else {
+					typesWhitelist.add(BiomeDictionary.Type.getType(stringElem));
+				}
+			}
+		}
 	}
 
-	public BiomeDataBasePopulatorJson(JsonElement jsonElement) {
-		this.jsonElement = jsonElement;
+	private static void readTypeSelector(String typeMatch, List<BiomeDictionary.Type> typesWhitelist,
+										 List<BiomeDictionary.Type> typesBlacklist) {
+		List<String> matches = Arrays.stream(typeMatch.split(",")).collect(Collectors.toList());
+		for (String match : matches) {
+			if (match.charAt(0) == '!') {
+				typesBlacklist.add(BiomeDictionary.Type.getType(match.substring(1)));
+			} else {
+				typesWhitelist.add(BiomeDictionary.Type.getType(match));
+			}
+		}
+	}
+
+	private static Predicate<Biome> readArrayNameSelector(JsonArray nameArray) {
+		final List<String> namesWhitelist = new ArrayList<>();
+		final List<String> namesBlacklist = new ArrayList<>();
+
+		for (final JsonElement nameElement : nameArray) {
+			if (!nameElement.isJsonPrimitive()) {
+				continue;
+			}
+			final JsonPrimitive primitive = nameElement.getAsJsonPrimitive();
+			if (!primitive.isString()) {
+				continue;
+			}
+			final String biomeMatch = primitive.getAsString();
+			if (biomeMatch.charAt(0) == '!') {
+				namesBlacklist.add(biomeMatch.substring(1));
+			} else {
+				namesWhitelist.add(biomeMatch);
+			}
+		}
+
+		return biome -> {
+			final String regName = String.valueOf(biome.getRegistryName());
+
+			// Accept if the biome name matches any from the whilstlist and none from the blacklist. 
+			return namesWhitelist.stream().anyMatch(regName::matches) &&
+				namesBlacklist.stream().noneMatch(regName::matches);
+		};
+	}
+
+	private static Predicate<Biome> readNameSelector(String biomeMatch) {
+		if (biomeMatch.charAt(0) == '!') {
+			return biome -> !String.valueOf(biome.getRegistryName()).matches(biomeMatch.substring(1));
+		} else {
+			return biome -> String.valueOf(biome.getRegistryName()).matches(biomeMatch);
+		}
+	}
+
+	public static boolean biomeHasAnyType(Biome biome, List<BiomeDictionary.Type> types) {
+		return types.stream().anyMatch(t -> BiomeDictionary.hasType(biome, t));
+	}
+
+	public static boolean biomeHasTypes(Biome biome, List<BiomeDictionary.Type> types) {
+		return types.stream().allMatch(t -> BiomeDictionary.hasType(biome, t));
+	}
+
+	public static boolean isComment(String s) {
+		return s.startsWith("__");//Allow for comments.  Comments are anything starting with "__"
 	}
 
 	@Override
@@ -244,12 +269,73 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 		}
 	}
 
-	public static boolean biomeHasAnyType(Biome biome, List<BiomeDictionary.Type> types) {
-		return types.stream().anyMatch(t -> BiomeDictionary.hasType(biome, t));
-	}
+	private void readSection(JsonObject section, BiomeDataBase dbase) {
 
-	public static boolean biomeHasTypes(Biome biome, List<BiomeDictionary.Type> types) {
-		return types.stream().allMatch(t -> BiomeDictionary.hasType(biome, t));
+		List<JsonBiomeSelectorData> selectors = new LinkedList<>();
+		List<JsonBiomeApplierData> appliers = new LinkedList<>();
+
+		for (Entry<String, JsonElement> entry : section.entrySet()) {
+
+			String key = entry.getKey();
+			JsonElement element = entry.getValue();
+
+			if (!isComment(key)) {
+				if (WHITE.equals(key)) {
+					if (element.isJsonPrimitive()) {
+						if ("all".equals(element.getAsString())) {
+							blacklistedBiomes.clear();
+						}
+					}
+				} else if (SELECT.equals(key)) {
+					if (element.isJsonObject()) {
+						for (Entry<String, JsonElement> selectElement : element.getAsJsonObject().entrySet()) {
+							String selectorName = selectElement.getKey();
+							if (!isComment(selectorName)) {
+								IJsonBiomeSelector selector = jsonBiomeSelectorMap.get(selectorName);
+								if (selector != null) {
+									selectors.add(new JsonBiomeSelectorData(selector, selectElement.getValue()));
+								} else {
+									System.err.println(
+										"Json Error: Undefined selector property \"" + selectorName + "\"");
+								}
+							}
+						}
+					}
+				} else if (APPLY.equals(key)) {
+					if (element.isJsonObject()) {
+						for (Entry<String, JsonElement> selectElement : element.getAsJsonObject().entrySet()) {
+							String applierName = selectElement.getKey();
+							if (!isComment(applierName)) {
+								IJsonBiomeApplier applier = jsonBiomeApplierMap.get(applierName);
+								if (applier != null) {
+									appliers.add(new JsonBiomeApplierData(applier, selectElement.getValue()));
+								} else {
+									System.err.println(
+										"Json Error: Undefined applier property \"" + applierName + "\"");
+								}
+							}
+						}
+					}
+				} else {
+					System.err.println("Json Error: Undefined operation \"" + key + "\"");
+				}
+			}
+
+		}
+
+		//Filter biomes by selector predicates
+		Stream<Biome> stream = Lists.newArrayList(Biome.REGISTRY).stream();
+		for (JsonBiomeSelectorData s : selectors) {
+			stream = stream.filter(s.getFilter());
+		}
+
+		//Filter blacklisted biomes
+		stream = stream.filter(b -> !blacklistedBiomes.contains(b));
+
+		//Apply all of the applicators to the database
+		stream.forEach(biome -> {
+			appliers.forEach(a -> a.apply(dbase, biome));
+		});
 	}
 
 	private class JsonBiomeSelectorData {
@@ -282,77 +368,6 @@ public class BiomeDataBasePopulatorJson implements IBiomeDataBasePopulator {
 			this.applier.apply(dbase, elementData, biome);
 		}
 
-	}
-
-	public static boolean isComment(String s) {
-		return s.startsWith("__");//Allow for comments.  Comments are anything starting with "__"
-	}
-
-	private void readSection(JsonObject section, BiomeDataBase dbase) {
-
-		List<JsonBiomeSelectorData> selectors = new LinkedList<>();
-		List<JsonBiomeApplierData> appliers = new LinkedList<>();
-
-		for (Entry<String, JsonElement> entry : section.entrySet()) {
-
-			String key = entry.getKey();
-			JsonElement element = entry.getValue();
-
-			if (!isComment(key)) {
-				if (WHITE.equals(key)) {
-					if (element.isJsonPrimitive()) {
-						if ("all".equals(element.getAsString())) {
-							blacklistedBiomes.clear();
-						}
-					}
-				} else if (SELECT.equals(key)) {
-					if (element.isJsonObject()) {
-						for (Entry<String, JsonElement> selectElement : element.getAsJsonObject().entrySet()) {
-							String selectorName = selectElement.getKey();
-							if (!isComment(selectorName)) {
-								IJsonBiomeSelector selector = jsonBiomeSelectorMap.get(selectorName);
-								if (selector != null) {
-									selectors.add(new JsonBiomeSelectorData(selector, selectElement.getValue()));
-								} else {
-									System.err.println("Json Error: Undefined selector property \"" + selectorName + "\"");
-								}
-							}
-						}
-					}
-				} else if (APPLY.equals(key)) {
-					if (element.isJsonObject()) {
-						for (Entry<String, JsonElement> selectElement : element.getAsJsonObject().entrySet()) {
-							String applierName = selectElement.getKey();
-							if (!isComment(applierName)) {
-								IJsonBiomeApplier applier = jsonBiomeApplierMap.get(applierName);
-								if (applier != null) {
-									appliers.add(new JsonBiomeApplierData(applier, selectElement.getValue()));
-								} else {
-									System.err.println("Json Error: Undefined applier property \"" + applierName + "\"");
-								}
-							}
-						}
-					}
-				} else {
-					System.err.println("Json Error: Undefined operation \"" + key + "\"");
-				}
-			}
-
-		}
-
-		//Filter biomes by selector predicates
-		Stream<Biome> stream = Lists.newArrayList(Biome.REGISTRY).stream();
-		for (JsonBiomeSelectorData s : selectors) {
-			stream = stream.filter(s.getFilter());
-		}
-
-		//Filter blacklisted biomes
-		stream = stream.filter(b -> !blacklistedBiomes.contains(b));
-
-		//Apply all of the applicators to the database
-		stream.forEach(biome -> {
-			appliers.forEach(a -> a.apply(dbase, biome));
-		});
 	}
 
 }
