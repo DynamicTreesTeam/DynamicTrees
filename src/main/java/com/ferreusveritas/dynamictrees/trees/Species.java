@@ -1316,9 +1316,12 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		ISubstanceEffect effect = getSubstanceEffect(itemStack);
 
 		if (effect != null) {
-			if (effect.apply(world, rootPos) && effect.isLingering()) {
+			boolean applied = effect.apply(world, rootPos);
+			if (applied && effect.isLingering()) {
 				world.spawnEntity(new EntityLingeringEffector(world, rootPos, effect));
 				return true;
+			} else {
+				return applied;
 			}
 		}
 
