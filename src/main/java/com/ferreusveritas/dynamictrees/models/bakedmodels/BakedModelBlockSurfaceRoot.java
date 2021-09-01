@@ -307,7 +307,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 
 	@Override
 	public ItemOverrideList getOverrides() {
-		return null;
+		return ItemOverrideList.NONE;
 	}
 
 }
