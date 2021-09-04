@@ -5,6 +5,7 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.ReportedException;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -76,6 +77,10 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
         }
 
         return property.getType().cast(this.properties.get(property).getValue());
+    }
+
+    public <V> Optional<V> getAsOptional(ConfigurationProperty<V> property) {
+        return Optional.ofNullable(this.get(property));
     }
 
     public <V> V getOrInvalidDefault(ConfigurationProperty<V> property, Predicate<V> validator, V invalidDefault) {
