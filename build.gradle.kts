@@ -16,7 +16,7 @@ plugins {
     id("idea")
     id("maven-publish")
     id("com.matthewprenger.cursegradle") version "1.4.0"
-    id("com.harleyoconnor.translationsheet") version "0.1.0"
+    id("com.harleyoconnor.translationsheet") version "0.1.1"
 }
 
 repositories {
