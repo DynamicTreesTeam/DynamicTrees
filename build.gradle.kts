@@ -16,6 +16,7 @@ plugins {
     id("idea")
     id("maven-publish")
     id("com.matthewprenger.cursegradle") version "1.4.0"
+    id("com.harleyoconnor.translationsheet") version "0.1.1"
 }
 
 repositories {
@@ -151,6 +152,15 @@ fun useSereneSeasons(depHandler: DependencyHandlerScope) {
 fun useBetterWeather(depHandler: DependencyHandlerScope) {
     // At runtime, use the full Better Weather mod.
     depHandler.runtimeOnly(fg.deobf("curse.maven:BetterWeather-400714:3403614"))
+}
+
+translationSheet {
+    this.sheetId.set("1xjxEh2NdbeV_tQc6fDHPgcRmtchqCZJKt--6oifq1qc")
+    this.sectionColour.set(0xF9CB9C)
+    this.sectionPattern.set("Dynamic Trees")
+    this.outputDir("src/generated/resources/assets/dynamictrees/lang/")
+
+    this.useJson()
 }
 
 tasks.jar {
