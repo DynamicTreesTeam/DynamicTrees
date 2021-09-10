@@ -38,7 +38,7 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 
         this.entityRenderDispatcher.textureManager.bind(this.getTextureLocation(entity));
 
-        final FallingTreeEntityModel treeModel = FallingTreeEntityModelTrackerCache.getModel(entity);
+        final FallingTreeEntityModel treeModel = FallingTreeEntityModelTrackerCache.getOrCreateModel(entity);
 
         matrixStack.pushPose();
 
