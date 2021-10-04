@@ -254,6 +254,10 @@ publishing {
     }
 }
 
+tasks.register("publishToAllPlatforms") {
+    this.dependsOn("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
+}
+
 // Extensions to make CurseGradle extension slightly neater.
 
 fun CurseExtension.project(action: CurseProject.() -> Unit) {
