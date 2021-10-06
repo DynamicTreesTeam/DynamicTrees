@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
 import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
 import com.ferreusveritas.dynamictrees.util.Optionals;
@@ -34,7 +34,7 @@ import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
 public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties> {
 
     public static final Codec<SoilProperties> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(ResourceLocation.CODEC.fieldOf(DTResourceRegistries.RESOURCE_LOCATION.toString()).forGetter(SoilProperties::getRegistryName))
+            .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString()).forGetter(SoilProperties::getRegistryName))
             .apply(instance, SoilProperties::new));
 
     public static final SoilProperties NULL_SOIL_PROPERTIES = new SoilProperties() {
@@ -103,7 +103,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         return Optionals.ofBlock(primitiveSoilBlock);
     }
 
-    protected void setPrimitiveSoilBlock(final Block primitiveSoil) {
+    public void setPrimitiveSoilBlock(final Block primitiveSoil) {
         if (this.primitiveSoilBlock == null || primitiveSoil != this.primitiveSoilBlock.getBlock()) {
             this.primitiveSoilBlock = primitiveSoil;
         }

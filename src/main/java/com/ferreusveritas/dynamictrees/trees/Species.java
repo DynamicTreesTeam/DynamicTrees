@@ -41,12 +41,13 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.GlobalDropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.ConfiguredGenFeature;
@@ -58,6 +59,7 @@ import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
@@ -176,7 +178,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public static Codec<Species> createDefaultCodec(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
         return RecordCodecBuilder.create(instance -> instance
-                .group(ResourceLocation.CODEC.fieldOf(DTResourceRegistries.RESOURCE_LOCATION.toString())
+                .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString())
                                 .forGetter(Species::getRegistryName),
                         Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
                         LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
@@ -770,7 +772,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public <C extends DropContext> List<ItemStack> getDrops(final DropCreator.Type<C> type, final C context) {
-        DTResourceRegistries.GLOBAL_DROP_CREATOR_MANAGER.appendAll(type, context);
+        GlobalDropCreators.appendAll(type, context);
         this.dropCreators.forEach(configuration -> configuration.appendDrops(type, context));
         return context.drops();
     }
@@ -1944,8 +1946,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         final Direction facing = CoordUtils.getRandomDir(random);
-        if (!DTResourceRegistries.JO_CODE_MANAGER.getCodes(this).isEmpty()) {
-            final JoCode code = DTResourceRegistries.JO_CODE_MANAGER.getRandomCode(this, radius, random);
+        if (!JoCodeRegistry.getCodes(this.getRegistryName()).isEmpty()) {
+            final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), radius, random);
             if (code != null) {
                 code.generate(worldObj, world, this, rootPos, biome, facing, radius, safeBounds, false);
                 return true;
@@ -1960,7 +1962,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public Collection<JoCode> getJoCodes() {
-        return DTResourceRegistries.JO_CODE_MANAGER.getCodes(this).values().stream().flatMap(Collection::stream)
+        return JoCodeRegistry.getCodes(this.getRegistryName()).values().stream().flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 

@@ -455,7 +455,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @param item An itemstack of the stick
      * @return {@link Family} for chaining calls
      */
-    protected Family setStick(Item item) {
+    public Family setStick(Item item) {
         stick = item;
         return this;
     }
@@ -482,7 +482,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @param primitiveLog An itemStack of the log item
      * @return {@link Family} for chaining calls
      */
-    protected Family setPrimitiveLog(Block primitiveLog) {
+    public Family setPrimitiveLog(Block primitiveLog) {
         this.primitiveLog = primitiveLog;
 
 		if (this.branch != null) {
@@ -492,7 +492,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return this;
     }
 
-    protected Family setPrimitiveStrippedLog(Block primitiveStrippedLog) {
+    public Family setPrimitiveStrippedLog(Block primitiveStrippedLog) {
         this.primitiveStrippedLog = primitiveStrippedLog;
 
 		if (this.strippedBranch != null) {

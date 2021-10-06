@@ -76,6 +76,7 @@ public final class DTRecipes {
     private static Ingredient[] ingredients(Collection<Item> items) {
         return ingredients(items.toArray(new Item[]{}));
     }
+
     private static Ingredient[] ingredients(final Item... items) {
         if (items.length == 0) return new Ingredient[]{Ingredient.EMPTY};
         return Arrays.stream(items).map(item->Ingredient.of(new ItemStack(item))).collect(Collectors.toSet()).toArray(new Ingredient[]{});

@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.api.events;
+package com.ferreusveritas.dynamictrees.api.event;
 
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import net.minecraft.util.ResourceLocation;

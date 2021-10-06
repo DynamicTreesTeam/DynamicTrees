@@ -1,8 +1,13 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.*;
 import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.google.common.collect.Maps;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -30,7 +35,7 @@ public class BiomeDatabase {
         }
 
         @Override
-        public void setSubterraneanBiome(boolean is) {
+        public void setSubterranean(boolean is) {
         }
     };
 
@@ -81,7 +86,7 @@ public class BiomeDatabase {
         private SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
         private final FeatureCancellations featureCancellations = new FeatureCancellations();
         private boolean blacklisted = false;
-        private boolean isSubterranean = false;
+        private boolean subterranean = false;
         private float forestness = 0.0f;
         private final static Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
         private Function<Integer, Integer> multipass = defaultMultipass;
@@ -137,8 +142,8 @@ public class BiomeDatabase {
             this.blacklisted = blacklisted;
         }
 
-        public void setSubterraneanBiome(boolean is) {
-            this.isSubterranean = is;
+        public void setSubterranean(boolean is) {
+            this.subterranean = is;
             this.groundFinder = is ? GroundFinder.SUBTERRANEAN : GroundFinder.OVERWORLD;
         }
 
@@ -146,8 +151,8 @@ public class BiomeDatabase {
             return blacklisted;
         }
 
-        public boolean isSubterraneanBiome() {
-            return isSubterranean;
+        public boolean isSubterranean() {
+            return subterranean;
         }
 
         public void setForestness(float forestness) {
@@ -172,6 +177,56 @@ public class BiomeDatabase {
 
         public void setGroundFinder(GroundFinder groundFinder) {
             this.groundFinder = groundFinder;
+        }
+
+        public void enableDefaultMultipass() {
+            this.multipass = pass -> {
+                switch (pass) {
+                    case 0:
+                        return 0; // Zero means to run as normal.
+                    case 1:
+                        return 5; // Return only radius 5 on pass 1.
+                    case 2:
+                        return 3; // Return only radius 3 on pass 2.
+                    default:
+                        return -1; // A negative number means to terminate.
+                }
+            };
+        }
+
+        public void setCustomMultipass(JsonObject json) {
+            final Map<Integer, Integer> passMap = this.deserialiseCustomMultipass(json);
+            this.multipass = pass -> passMap.getOrDefault(pass, -1);
+        }
+
+        private Map<Integer, Integer> deserialiseCustomMultipass(JsonObject json) {
+            final Map<Integer, Integer> passMap = Maps.newHashMap();
+
+            for (final Map.Entry<String, JsonElement> passEntry : json.entrySet()) {
+                try {
+                    final int pass = Integer.parseInt(passEntry.getKey());
+                    final int radius = JsonDeserialisers.INTEGER.deserialise(passEntry.getValue())
+                            .orElse(-1);
+
+                    // Terminate when radius is -1.
+                    if (radius == -1) {
+                        break;
+                    }
+
+                    passMap.put(pass, radius);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            return passMap;
+        }
+
+        public void reset() {
+            this.speciesSelector = (pos, dirt, rnd) -> new BiomePropertySelectors.SpeciesSelection();
+            this.densitySelector = (rnd, nd) -> -1;
+            this.chanceSelector = (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
+            this.forestness = 0.0F;
+            this.subterranean = false;
+            this.multipass = pass -> (pass == 0 ? 0 : -1);
         }
 
     }
@@ -284,7 +339,7 @@ public class BiomeDatabase {
     }
 
     public BiomeDatabase setIsSubterranean(Biome biome, boolean is) {
-        getEntry(biome).setSubterraneanBiome(is);
+        getEntry(biome).setSubterranean(is);
         return this;
     }
 

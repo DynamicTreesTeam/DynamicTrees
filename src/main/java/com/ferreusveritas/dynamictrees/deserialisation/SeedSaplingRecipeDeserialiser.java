@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.deserialisation;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
+import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
@@ -11,7 +12,7 @@ import net.minecraft.item.Item;
 
 public final class SeedSaplingRecipeDeserialiser implements JsonDeserialiser<SeedSaplingRecipe> {
 
-    private final JsonPropertyApplierList<SeedSaplingRecipe> appliers = new JsonPropertyApplierList<>(SeedSaplingRecipe.class);
+    private final JsonPropertyAppliers<SeedSaplingRecipe> appliers = new JsonPropertyAppliers<>(SeedSaplingRecipe.class);
 
     public SeedSaplingRecipeDeserialiser() {
         this.appliers
@@ -31,7 +32,7 @@ public final class SeedSaplingRecipeDeserialiser implements JsonDeserialiser<See
                 .elseMapIfType(JsonObject.class, (object, warningConsumer) -> {
                     return JsonResult.from(SeedSaplingRecipe.CODEC.decode(JsonOps.INSTANCE, input), input)
                             .map(recipe -> {
-                                this.appliers.applyAll(object, recipe)
+                                this.appliers.applyAll(new JsonMapWrapper(object), recipe)
                                         .forEachErrorWarning(warningConsumer, warningConsumer);
                                 return recipe;
                             })

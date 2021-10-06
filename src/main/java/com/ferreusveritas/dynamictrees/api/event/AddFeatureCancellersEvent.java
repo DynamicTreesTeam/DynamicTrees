@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.api.events;
+package com.ferreusveritas.dynamictrees.api.event;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;

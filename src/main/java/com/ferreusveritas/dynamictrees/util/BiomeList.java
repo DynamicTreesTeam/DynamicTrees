@@ -3,13 +3,13 @@ package com.ferreusveritas.dynamictrees.util;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * @author Harley O'Connor
  */
-public final class BiomeList extends ArrayList<Biome> {
+public final class BiomeList extends LinkedList<Biome> {
 
     public BiomeList() {
     }

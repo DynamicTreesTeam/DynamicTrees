@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -160,13 +160,13 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V>
     }
 
     public static JsonObject putJsonRegistryName(final JsonObject jsonObject, final ResourceLocation registryName) {
-        jsonObject.add(DTResourceRegistries.RESOURCE_LOCATION.toString(), new JsonPrimitive(registryName.toString()));
+        jsonObject.add(Resources.RESOURCE_LOCATION.toString(), new JsonPrimitive(registryName.toString()));
         return jsonObject;
     }
 
     public static <V extends RegistryEntry<V>> Codec<V> createDefaultCodec(final Function<ResourceLocation, V> constructor) {
         return RecordCodecBuilder.create(instance -> instance
-                .group(ResourceLocation.CODEC.fieldOf(DTResourceRegistries.RESOURCE_LOCATION.toString()).forGetter(RegistryEntry::getRegistryName))
+                .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString()).forGetter(RegistryEntry::getRegistryName))
                 .apply(instance, constructor));
     }
 

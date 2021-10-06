@@ -11,7 +11,7 @@ import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -101,7 +101,7 @@ public final class DynamicTrees {
 
         DTRegistries.DENDRO_POTION.registerRecipes();
 
-        DTResourceRegistries.TREES_RESOURCE_MANAGER.setup();
+        Resources.MANAGER.setup();
 
         if (DTConfigs.REPLACE_NYLIUM_FUNGI.get()) {
             DTTrees.replaceNyliumFungiFeatures();
@@ -111,7 +111,7 @@ public final class DynamicTrees {
     }
 
     private void gatherData(final GatherDataEvent event) {
-        DTResourceRegistries.TREES_RESOURCE_MANAGER.gatherData();
+        Resources.MANAGER.gatherData();
         GatherDataHelper.gatherAllData(
                 MOD_ID,
                 event,

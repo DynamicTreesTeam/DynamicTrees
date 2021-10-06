@@ -9,32 +9,32 @@ import javax.annotation.Nullable;
  */
 public class SimpleBitmap {
 
-    private final int h;
-    private final int w;
+    private final int height;
+    private final int width;
     private int[] bits;
 
     public boolean touched; // Useful for ruling out entire layers for the VoxelMap.
 
     /**
-     * @param w Width not to exceed 32
-     * @param h Height
+     * @param width  Width not to exceed 32
+     * @param height Height
      */
-    public SimpleBitmap(int w, int h) {
-        this.w = net.minecraft.util.math.MathHelper.clamp(w, 1, 32);
-        this.h = Math.max(1, h);
-        this.bits = new int[this.h];
+    public SimpleBitmap(int width, int height) {
+        this.width = net.minecraft.util.math.MathHelper.clamp(width, 1, 32);
+        this.height = Math.max(1, height);
+        this.bits = new int[this.height];
         this.touched = false;
     }
 
     /**
-     * @param w    Width not to exceed 32
-     * @param h    Height
-     * @param bits The pixels
+     * @param width  Width not to exceed 32
+     * @param height Height
+     * @param bits   The pixels
      */
-    public SimpleBitmap(final int w, final int h, @Nullable final int[] bits) {
-        this(w, h);
+    public SimpleBitmap(final int width, final int height, @Nullable final int[] bits) {
+        this(width, height);
         if (bits != null) {
-            int size = Math.min(bits.length, this.h);
+            int size = Math.min(bits.length, this.height);
             if (size >= 0) {
                 System.arraycopy(bits, 0, this.bits, 0, size);
             }
@@ -43,7 +43,7 @@ public class SimpleBitmap {
     }
 
     public SimpleBitmap(SimpleBitmap bmp) {
-        this(bmp.w, bmp.h);
+        this(bmp.width, bmp.height);
         System.arraycopy(bmp.bits, 0, this.bits, 0, this.bits.length);
         this.touched = bmp.touched;
     }
@@ -52,16 +52,16 @@ public class SimpleBitmap {
         return bits;
     }
 
-    public int getH() {
-        return h;
+    public int getHeight() {
+        return height;
     }
 
-    public int getW() {
-        return w;
+    public int getWidth() {
+        return width;
     }
 
     public SimpleBitmap clear() {
-        this.bits = new int[h];
+        this.bits = new int[height];
         this.touched = false;
         return this;
     }
@@ -148,7 +148,8 @@ public class SimpleBitmap {
 
     private BlitPreparationResult prepBlit(int relX, int relY, SimpleBitmap src) {
 
-        if (relX <= -src.w || relX >= this.w || relY <= -src.h || relY >= this.h || (!touched && !src.touched)) {
+        if (relX <= -src.width || relX >= this.width || relY <= -src.height || relY >= this.height ||
+                (!touched && !src.touched)) {
             return BlitPreparationResult.failure();
         }
 
@@ -163,7 +164,7 @@ public class SimpleBitmap {
             srcOffsetY = -relY;
         }
 
-        final int runH = Math.min(this.h - dstOffsetY, Math.min(src.h, this.h - relY) - srcOffsetY);
+        final int runH = Math.min(this.height - dstOffsetY, Math.min(src.height, this.height - relY) - srcOffsetY);
 
         return BlitPreparationResult.success(dstOffsetY, srcOffsetY, runH);
     }
@@ -201,7 +202,7 @@ public class SimpleBitmap {
      * @param mode The value to set 0 or 1
      */
     public void setPixel(int x, int y, int mode) {
-        if (x >= 0 && y >= 0 && x < w && y < h) {
+        if (x >= 0 && y >= 0 && x < width && y < height) {
             mode &= 1;
             bits[y] = (bits[y] & ~(mode << x)) | mode << x;
             touched = true;
@@ -209,18 +210,18 @@ public class SimpleBitmap {
     }
 
     public boolean isPixelOn(int x, int y) {
-        return x >= 0 && y >= 0 && x < w && y < h && ((bits[y] >> x) & 1) == 1;
+        return x >= 0 && y >= 0 && x < width && y < height && ((bits[y] >> x) & 1) == 1;
     }
 
     public boolean isRowBlank(int y) {
-        return y >= 0 && y < h && bits[y] == 0;
+        return y >= 0 && y < height && bits[y] == 0;
     }
 
     public void print() {
         StringBuilder buff;
-        for (int y = 0; y < h; y++) {
+        for (int y = 0; y < height; y++) {
             buff = new StringBuilder();
-            for (int x = 0; x < w; x++) {
+            for (int x = 0; x < width; x++) {
                 buff.append(isPixelOn(x, y) ? "█" : "░");
             }
             System.out.println(buff);

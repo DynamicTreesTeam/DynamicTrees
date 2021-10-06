@@ -1,11 +1,14 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
+import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,6 +17,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class JsonHelper {
 
@@ -108,8 +112,28 @@ public class JsonHelper {
         final AbstractBlock.Properties properties = defaultPropertiesGetter.apply(material,
                 JsonHelper.getOrDefault(jsonObject, "material_color", MaterialColor.class, defaultMaterialColor));
 
-        JsonPropertyApplierLists.PROPERTIES.applyAll(jsonObject, properties).forEachErrorWarning(errorConsumer, warningConsumer);
+        JsonPropertyApplierLists.PROPERTIES.applyAll(new JsonMapWrapper(jsonObject), properties)
+                .forEachErrorWarning(errorConsumer, warningConsumer);
         return properties;
+    }
+
+    public static <T extends Throwable> void throwIfNotJsonObject(JsonElement json, Supplier<T> throwableSupplier)
+            throws T {
+        if (!json.isJsonObject()) {
+            throw throwableSupplier.get();
+        }
+    }
+
+    public static void throwIfShouldNotLoad(JsonObject json) throws IgnoreThrowable {
+        final String key = "only_if_loaded";
+        if (json.has(key)) {
+            final boolean continueLoading = JsonDeserialisers.STRING.deserialise(json.get(key))
+                    .map(modId -> ModList.get().isLoaded(modId))
+                    .orElse(true);
+            if (!continueLoading) {
+                throw IgnoreThrowable.INSTANCE;
+            }
+        }
     }
 
 }

@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
@@ -36,13 +36,14 @@ public final class WorldGenEventHandler {
         // This may just have to be an unfortunate consequence to Dynamic Trees for now, as without making an overly complex system I can't see any other
         // way of removing features to rectify this.
 
-        final ResourceLocation biomeResLoc = event.getName();
+        final ResourceLocation biomeName = event.getName();
 
-        if (biomeResLoc == null) {
+        if (biomeName == null) {
             return;
         }
 
-        final BiomePropertySelectors.FeatureCancellations featureCancellations = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDefaultDatabase().getEntry(biomeResLoc).getFeatureCancellations();
+        final BiomePropertySelectors.FeatureCancellations featureCancellations = BiomeDatabases.getDefault()
+                .getEntry(biomeName).getFeatureCancellations();
 
         featureCancellations.getStages().forEach(stage -> {
             event.getGeneration().getFeatures(stage).removeIf(configuredFeatureSupplier -> {

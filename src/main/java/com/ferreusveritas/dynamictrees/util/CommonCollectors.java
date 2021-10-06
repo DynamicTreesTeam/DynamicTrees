@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.util;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Collector;
 
@@ -57,6 +58,14 @@ public final class CommonCollectors {
                 },
                 set -> (Set<T>) Collections.unmodifiableSet(set),
                 IDENTITY_FINISH);
+    }
+
+    public static <T> Collector<T, ?, LinkedList<T>> toLinkedList() {
+        return Collector.of(LinkedList::new, LinkedList::add,
+                (left, right) -> {
+                    left.addAll(right);
+                    return left;
+                }, IDENTITY_FINISH);
     }
 
 }

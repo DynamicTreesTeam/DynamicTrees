@@ -5,13 +5,13 @@ import net.minecraft.block.SoundType;
 import net.minecraftforge.common.ToolType;
 
 /**
- * Holds common {@link JsonPropertyApplierList} objects.
+ * Holds common {@link JsonPropertyAppliers} objects.
  *
  * @author Harley O'Connor
  */
 public final class JsonPropertyApplierLists {
 
-    public static final JsonPropertyApplierList<AbstractBlock.Properties> PROPERTIES = new JsonPropertyApplierList<>(AbstractBlock.Properties.class)
+    public static final JsonPropertyAppliers<AbstractBlock.Properties> PROPERTIES = new JsonPropertyAppliers<>(AbstractBlock.Properties.class)
             .registerIfTrueApplier("does_not_block_movement", AbstractBlock.Properties::noCollission)
             .registerIfTrueApplier("not_solid", AbstractBlock.Properties::noOcclusion)
             .register("harvest_level", Integer.class, AbstractBlock.Properties::harvestLevel)

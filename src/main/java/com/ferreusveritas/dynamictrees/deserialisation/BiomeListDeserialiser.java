@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.treepacks.VoidApplier;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
+import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.RegistryKey;
@@ -49,7 +50,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
                 }
             });
 
-    private final JsonPropertyApplierList<BiomeList> appliers = new JsonPropertyApplierList<>(BiomeList.class);
+    private final JsonPropertyAppliers<BiomeList> appliers = new JsonPropertyAppliers<>(BiomeList.class);
 
     public BiomeListDeserialiser() {
         this.appliers.register("type", String.class, TYPE_APPLIER)
@@ -67,7 +68,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
                     // Start with a list of all biomes.
                     final BiomeList biomes = BiomeList.getAll();
                     // Apply from all appliers, filtering the list.
-                    this.appliers.applyAll(selectorObject, biomes);
+                    this.appliers.applyAll(new JsonMapWrapper(selectorObject), biomes);
 
                     return biomes;
                 }).elseTypeError();

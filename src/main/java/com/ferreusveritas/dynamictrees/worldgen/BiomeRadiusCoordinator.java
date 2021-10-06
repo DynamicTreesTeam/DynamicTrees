@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.RadiusCoordinator;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.MathHelper;
@@ -40,7 +40,8 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
         final Biome biome = this.world.getUncachedNoiseBiome((x + 8) >> 2, 0, (z + 8) >> 2); // Placement is offset by +8,+8
 
         final double noiseDensity = (this.noiseGenerator.getSurfaceNoiseValue(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
-        final double density = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(this.dimRegName).getDensitySelector(biome).getDensity(this.world.getRandom(), noiseDensity);
+        final double density = BiomeDatabases.getDimensionalOrDefault(this.dimRegName)
+                .getDensitySelector(biome).getDensity(this.world.getRandom(), noiseDensity);
         final double size = ((1.0 - density) * 9); // Size is the inverse of density (gives 0 to 9)
 
         // Oh Joy. Random can potentially start with the same number for each chunk. Let's just
@@ -58,7 +59,7 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
 
         if (pass == 0) {
             final Biome biome = this.world.getUncachedNoiseBiome(((chunkX << 4) + 8) >> 2, 0, ((chunkZ << 4) + 8) >> 2); // Aim at center of chunk
-            this.chunkMultipass = DTResourceRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(this.dimRegName).getMultipass(biome);
+            this.chunkMultipass = BiomeDatabases.getDimensionalOrDefault(this.dimRegName).getMultipass(biome);
         }
 
         return this.chunkMultipass.apply(pass) >= 0;

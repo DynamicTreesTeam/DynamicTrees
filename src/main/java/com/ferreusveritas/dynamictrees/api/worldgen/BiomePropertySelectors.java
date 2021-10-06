@@ -63,7 +63,7 @@ public class BiomePropertySelectors {
             }
         }
 
-        public void copyFrom(final FeatureCancellations featureCancellations) {
+        public void addAllFrom(final FeatureCancellations featureCancellations) {
             this.namespaces.addAll(featureCancellations.namespaces);
             this.featureCancellers.addAll(featureCancellations.featureCancellers);
             this.stages.addAll(featureCancellations.stages);

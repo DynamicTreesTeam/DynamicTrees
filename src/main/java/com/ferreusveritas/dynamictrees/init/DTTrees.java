@@ -14,7 +14,7 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableSoilProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.WaterSoilProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Mushroom;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -99,14 +99,14 @@ public class DTTrees {
         // Post registry events.
         registries.forEach(SimpleRegistry::postRegistryEvent);
 
-        DTResourceRegistries.setupTreesResourceManager();
+        Resources.setupTreesResourceManager();
 
         // Register Forge registry entry getters and add-on Json object getters.
         JsonDeserialisers.registerForgeEntryGetters();
         JsonDeserialisers.postRegistryEvent();
 
         // Register any registry entries from Json files.
-        DTResourceRegistries.TREES_RESOURCE_MANAGER.load();
+        Resources.MANAGER.load();
 
         // Lock all the registries.
         registries.forEach(SimpleRegistry::lock);

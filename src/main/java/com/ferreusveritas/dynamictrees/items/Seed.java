@@ -4,9 +4,10 @@ import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -108,7 +109,7 @@ public class Seed extends Item implements IPlantable {
         float plantChance = (float) (getSpecies().biomeSuitability(world, pos) * DTConfigs.SEED_PLANT_RATE.get());
 
         if (DTConfigs.SEED_ONLY_FOREST.get()) {
-            plantChance *= DTResourceRegistries.BIOME_DATABASE_MANAGER.getDimensionDatabase(world.dimension().location())
+            plantChance *= BiomeDatabases.getDimensionalOrDefault(world.dimension().location())
                     .getForestness(world.getBiome(pos));
         }
 

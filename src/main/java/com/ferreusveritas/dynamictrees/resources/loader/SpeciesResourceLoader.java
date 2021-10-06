@@ -1,21 +1,23 @@
-package com.ferreusveritas.dynamictrees.trees;
+package com.ferreusveritas.dynamictrees.resources.loader;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyApplierList;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
 import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.resources.JsonRegistryEntryReloadListener;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
+import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
@@ -31,29 +33,28 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * @author Harley O'Connor
  */
-public final class SpeciesManager extends JsonRegistryEntryReloadListener<Species> {
+public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Species> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * A {@link JsonPropertyApplierList} for applying environment factors to {@link Species} objects. (based on {@link
+     * A {@link JsonPropertyAppliers} for applying environment factors to {@link Species} objects. (based on {@link
      * net.minecraftforge.common.BiomeManager.BiomeType}).
      */
-    private final JsonPropertyApplierList<Species> environmentFactorAppliers = new JsonPropertyApplierList<>(Species.class);
+    private final JsonPropertyAppliers<Species> environmentFactorAppliers = new JsonPropertyAppliers<>(Species.class);
 
-    private final Map<Species, Float> composterChances = new HashMap<>();
+    private final Map<Species, Float> composterChanceCache = new HashMap<>();
 
-    public SpeciesManager() {
+    public SpeciesResourceLoader() {
         super(Species.REGISTRY, ApplierRegistryEvent.SPECIES);
     }
 
     @Override
-    public void registerAppliers() {
+    public void registerAppliers () {
         BiomeDictionary.Type.getAll().stream().map(type -> new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
                 .forEach(this.environmentFactorAppliers::register);
 
@@ -98,7 +99,7 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                 .register("leaves_properties", LeavesProperties.class, Species::setLeavesProperties)
                 .register("world_gen_leaf_map_height", Integer.class, Species::setWorldGenLeafMapHeight)
                 .register("environment_factors", JsonObject.class, (species, jsonObject) ->
-                        this.environmentFactorAppliers.applyAll(jsonObject, species)
+                        this.environmentFactorAppliers.applyAll(new JsonMapWrapper(jsonObject), species)
                                 .forEachErrorWarning(
                                         error -> LOGGER.error("Error applying environment factor for " +
                                                 "species '{}': {}", species.getRegistryName(), error),
@@ -113,19 +114,12 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
                     Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(processedRegName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '" + species + "' as Species '" + processedRegName + "' was not found.")));
                 })
                 .register("seed", Seed.class, Species::setSeed)
-                .register("seed_composter_chance", Float.class, this.composterChances::put)
+                .register("seed_composter_chance", Float.class, this.composterChanceCache::put)
                 .register("sapling_grows_naturally", Boolean.class, Species::setCanSaplingGrowNaturally)
                 .register("sapling_sound", SoundType.class, Species::setSaplingSound)
                 .register("sapling_shape", VoxelShape.class, Species::setSaplingShape)
-
                 .register("primitive_sapling", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .registerArrayApplier("primitive_saplings", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
-//                .register("primitive_sapling_item", Item.class, Species::addPrimitiveSaplingItem)
-//                .registerArrayApplier("primitive_sapling_items", Item.class, Species::addPrimitiveSaplingItem)
-//                .register("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
-//                .registerArrayApplier("primitive_sapling", Block.class, (species, block) -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), species))
-//                .register("can_craft_sapling_to_seed", Boolean.class, Species::setCanCraftSaplingToSeed)
-//                .register("can_craft_seed_to_sapling", Boolean.class, Species::setCanCraftSeedToSapling)
                 .register("common_override", Species.CommonOverride.class, Species::setCommonOverride)
                 .register("perfect_biomes", BiomeList.class, (species, biomeList) -> species.getPerfectBiomes().addAll(biomeList))
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
@@ -146,27 +140,33 @@ public final class SpeciesManager extends JsonRegistryEntryReloadListener<Specie
     }
 
     @Override
-    protected void postLoad(JsonObject jsonObject, Species species, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
-        // Generates seeds and saplings if should.
-        species.generateSeed().generateSapling();
+    protected void postLoadOnLoad(LoadData loadData, JsonObject json) {
+        loadData.getResource().generateSeed().generateSapling();
+        super.postLoadOnLoad(loadData, json);
     }
 
     @Override
-    protected void preReload(JsonObject jsonObject, Species species, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
-        this.composterChances.put(species, species.defaultSeedComposterChance());
-        if (jsonObject.has("drop_creators") && jsonObject.get("drop_creators").isJsonArray()) {
-            species.dropCreators.clear();
+    protected void postLoadOnReload(LoadData loadData, JsonObject json) {
+        final Species species = loadData.getResource();
+        this.composterChanceCache.put(species, species.defaultSeedComposterChance());
+        if (this.shouldClearDropCreators(json)) {
+            species.getDropCreators().clear();
         }
+        super.postLoadOnReload(loadData, json);
+        this.registerComposterChances();
     }
 
-    @Override
-    protected void postReload(JsonObject jsonObject, Species registryEntry, Consumer<String> errorConsumer, Consumer<String> warningConsumer) {
-        this.composterChances.forEach((species, chance) -> {
+    private void registerComposterChances() {
+        this.composterChanceCache.forEach((species, chance) -> {
             if (species.getSeed().isPresent() && chance > 0) {
                 ComposterBlock.add(chance, species.getSeed().get());
             }
         });
-        this.composterChances.clear();
+        this.composterChanceCache.clear();
+    }
+
+    private boolean shouldClearDropCreators(JsonObject json) {
+        return json.has("drop_creators") && json.get("drop_creators").isJsonArray();
     }
 
 }
