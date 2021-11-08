@@ -6,6 +6,8 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropConte
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
+
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 public class LogDropCreator extends DropCreator {
@@ -45,7 +47,13 @@ public class LogDropCreator extends DropCreator {
         }
         int numSticks = las.sticks;
         if (numSticks > 0) {
-            context.drops().add(species.getFamily().getStick(numSticks));
+            final ItemStack stack = species.getFamily().getStick(numSticks);
+            while (numSticks > 0) {
+                ItemStack drop = stack.copy();
+                drop.setCount(Math.min(numSticks, stack.getMaxStackSize()));
+                context.drops().add(drop);
+                numSticks -= stack.getMaxStackSize();
+            }
         }
     }
 
