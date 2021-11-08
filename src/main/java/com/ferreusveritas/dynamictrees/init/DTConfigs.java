@@ -163,10 +163,10 @@ public class DTConfigs {
                 define("podzolGen", true);
         SERVER_BUILDER.pop();
 
-        SERVER_BUILDER.comment("Miscellaneous Settings").push("misc");
-        GENERATE_DIRT_BUCKET_RECIPES = SERVER_BUILDER.comment("If enabled, dirt bucket recipes will be automatically generated.")
+        COMMON_BUILDER.comment("Miscellaneous Settings").push("misc");
+        GENERATE_DIRT_BUCKET_RECIPES = COMMON_BUILDER.comment("If enabled, dirt bucket recipes will be automatically generated.")
                 .define("generateDirtBucketRecipes", true);
-        SERVER_BUILDER.pop();
+        COMMON_BUILDER.pop();
 
         COMMON_BUILDER.comment("World Generation Settings").push("world");
         WORLD_GEN = COMMON_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
