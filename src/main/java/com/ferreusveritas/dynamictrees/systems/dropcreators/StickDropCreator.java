@@ -55,10 +55,17 @@ public class StickDropCreator extends DropCreator {
             }
         }
         if (context.random().nextInt((int) (chance / configuration.get(RARITY))) == 0) {
-            final ItemStack drop = configuration.getOrInvalidDefault(STICK, stick -> stick != ItemStack.EMPTY,
-                    context.species().getSeedStack(1)).copy();
-            drop.setCount(1 + context.random().nextInt(configuration.get(MAX_COUNT)));
-            context.drops().add(drop);
+            int num = 1 + context.random().nextInt(configuration.get(MAX_COUNT));
+            if (num > 0) {
+                final ItemStack stack = configuration.getOrInvalidDefault(STICK, stick -> stick != ItemStack.EMPTY,
+                        context.species().getSeedStack(1));
+                while (num > 0) {
+                    ItemStack drop = stack.copy();
+                    drop.setCount(Math.min(num, stack.getMaxStackSize()));
+                    context.drops().add(drop);
+                    num -= stack.getMaxStackSize();
+                }
+            }
         }
     }
 
