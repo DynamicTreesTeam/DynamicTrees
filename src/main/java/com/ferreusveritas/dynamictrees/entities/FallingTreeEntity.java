@@ -61,12 +61,14 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
     protected BranchDestructionData destroyData = new BranchDestructionData();
     protected Vector3d geomCenter = Vector3d.ZERO;
     protected Vector3d massCenter = Vector3d.ZERO;
-    protected AxisAlignedBB normAABB = new AxisAlignedBB(BlockPos.ZERO);
+    protected AxisAlignedBB normalBB = new AxisAlignedBB(BlockPos.ZERO);
+    protected AxisAlignedBB cullingNormalBB = new AxisAlignedBB(BlockPos.ZERO);
     protected boolean clientBuilt = false;
     protected boolean firstUpdate = true;
     public boolean landed = false;
     public DestroyType destroyType = DestroyType.HARVEST;
     public boolean onFire = false;
+    protected AxisAlignedBB cullingBB;
 
     public static IAnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
     public static IAnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
@@ -170,8 +172,10 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
         destroyType = DestroyType.values()[tag.getInt("destroytype")];
         geomCenter = new Vector3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
         massCenter = new Vector3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
-        buildAABBFromDestroyData(destroyData);
-        setBoundingBox(normAABB.move(this.getX(), this.getY(), this.getZ()));
+
+        this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
+        this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
+
         onFire = tag.getBoolean("onfire");
     }
 
@@ -229,19 +233,24 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 
     public AxisAlignedBB buildAABBFromDestroyData(BranchDestructionData destroyData) {
 
-        normAABB = new AxisAlignedBB(BlockPos.ZERO);
+        normalBB = new AxisAlignedBB(BlockPos.ZERO);
 
         for (BlockPos relPos : destroyData.getPositions(BranchDestructionData.PosType.BRANCHES, false)) {
-            normAABB = normAABB.minmax(new AxisAlignedBB(relPos));
+            normalBB = normalBB.minmax(new AxisAlignedBB(relPos));
         }
 
         //Adjust the bounding box to account for the tree falling over
-        double height = normAABB.maxY - normAABB.minY;
-        double width = MathHelper.absMax(normAABB.maxX - normAABB.minX, normAABB.maxZ - normAABB.minZ);
+        double height = normalBB.maxY - normalBB.minY;
+        double width = MathHelper.absMax(normalBB.maxX - normalBB.minX, normalBB.maxZ - normalBB.minZ);
         double grow = Math.max(0, height - (width / 2)) + 2;
-        normAABB = normAABB.inflate(grow + 4, 4, grow + 4);
+        cullingNormalBB = normalBB.inflate(grow + 4, 4, grow + 4);
 
-        return normAABB;
+        return normalBB;
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBoxForCulling() {
+        return this.cullingBB;
     }
 
     public BranchDestructionData getDestroyData() {
@@ -265,7 +274,8 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
         //This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
         this.setPosRaw(x, y, z);
         //This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
-        this.setBoundingBox(normAABB != null ? normAABB.move(x, y, z) : new AxisAlignedBB(BlockPos.ZERO));
+        this.setBoundingBox(this.normalBB != null ? this.normalBB.move(x, y, z) : new AxisAlignedBB(BlockPos.ZERO));
+        this.cullingBB = cullingNormalBB != null ? cullingNormalBB.move(x, y, z) : new AxisAlignedBB(BlockPos.ZERO);
     }
 
     @Override
@@ -285,7 +295,8 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 
         this.handleMotion();
 
-        this.setBoundingBox(normAABB.move(this.getX(), this.getY(), this.getZ()));
+        this.setBoundingBox(this.normalBB.move(this.getX(), this.getY(), this.getZ()));
+        this.cullingBB = cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
 
         if (this.shouldDie()) {
             this.dropPayLoad();
@@ -435,7 +446,8 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
 
     //This is shipped off to the clients
     public void setVoxelData(CompoundNBT tag) {
-        setBoundingBox(buildAABBFromDestroyData(destroyData).move(this.getX(), this.getY(), this.getZ()));
+        this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
+        this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
         getEntityData().set(voxelDataParameter, tag);
     }
 

@@ -18,6 +18,8 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.*;
+import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
 
 import javax.annotation.Nonnull;
@@ -85,11 +87,16 @@ public final class CoordUtils {
     }
 
     @SuppressWarnings("deprecation")
-    public static boolean isBlockLoaded(IBlockReader blockReader, BlockPos pos) {
-        if (blockReader instanceof IWorldReader) {
+    public static boolean canAccessStateSafely(IBlockReader blockReader, BlockPos pos) {
+        if (blockReader instanceof IWorldReader) { // Handles most cases.
             return ((IWorldReader) blockReader).hasChunkAt(pos);
+        } else if (blockReader instanceof Region) { // Handles Region.
+            return !(((Region) blockReader).getChunk(pos) instanceof EmptyChunk);
         } else {
-            return (blockReader instanceof EmptyBlockReader ||
+            // Handles other instances where it should be safe.
+            return (blockReader instanceof IChunk ||
+                    blockReader instanceof EmptyBlockReader ||
+                    blockReader instanceof Blockreader ||
                     blockReader.getClass().getSimpleName().contains("ChunkRenderCache") || // Check for ChunkRenderCache (we can't call instanceof as this a client-side only class).
                     blockReader.getClass().getSimpleName().contains("ChunkCache")); // Checks for OptiFine's custom ChunkRenderCache.
         }
@@ -104,7 +111,7 @@ public final class CoordUtils {
      */
     @Nullable
     public static BlockState getStateSafe(IBlockReader blockReader, BlockPos blockPos) {
-        return isBlockLoaded(blockReader, blockPos) ? blockReader.getBlockState(blockPos) : null;
+        return canAccessStateSafely(blockReader, blockPos) ? blockReader.getBlockState(blockPos) : null;
     }
 
     public static Direction getRandomDir(Random rand) {

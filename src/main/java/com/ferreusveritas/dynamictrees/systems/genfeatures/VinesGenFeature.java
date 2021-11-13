@@ -165,8 +165,11 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
             return;
         }
 
-        this.placeVines(world, vinePos, configuredGenFeature.get(BLOCK).defaultBlockState(), configuredGenFeature.get(MAX_LENGTH),
-                configuredGenFeature.get(TIP_BLOCK).defaultBlockState().setValue(AbstractTopPlantBlock.AGE, worldgen ? 25 : 0),
+        this.placeVines(world, vinePos, configuredGenFeature.get(BLOCK).defaultBlockState(),
+                configuredGenFeature.get(MAX_LENGTH),
+                configuredGenFeature.getAsOptional(TIP_BLOCK)
+                        .map(block -> block.defaultBlockState().setValue(AbstractTopPlantBlock.AGE, worldgen ? 25 : 0))
+                        .orElse(null),
                 configuredGenFeature.get(VINE_TYPE), worldgen);
     }
 
@@ -188,18 +191,18 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
         final int len = worldgen ? MathHelper.clamp(world.getRandom().nextInt(maxLength) + 3, 3, maxLength) : 1;
         final BlockPos.Mutable mPos = new BlockPos.Mutable(vinePos.getX(), vinePos.getY(), vinePos.getZ());
 
-        BlockState tip = tipState == null ? vinesState : tipState;
+        tipState = tipState == null ? vinesState : tipState;
 
         for (int i = 0; i < len; i++) {
             if (world.isEmptyBlock(mPos)) {
                 // Set the current block either to a vine block or a tip block if it's set.
-                world.setBlock(mPos, (i == len - 1) ? tip : vinesState, 3);
+                world.setBlock(mPos, (i == len - 1) ? tipState : vinesState, 3);
                 // Move current position down/up depending on vine type.
                 mPos.setY(mPos.getY() + (vineType == VineType.FLOOR ? 1 : -1));
             } else {
                 if (i > 0 && vineType != VineType.SIDE) {
                     mPos.setY(mPos.getY() + (vineType == VineType.FLOOR ? -1 : 1)); //if the vine is cut short set the tip on the last block
-                    world.setBlock(mPos, tip, 3);
+                    world.setBlock(mPos, tipState, 3);
                 }
                 break;
             }
