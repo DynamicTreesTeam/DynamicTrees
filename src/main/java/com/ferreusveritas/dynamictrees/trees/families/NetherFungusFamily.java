@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * @author Harley O'Connor
  */
-public final class NetherFungusFamily extends Family {
+public class NetherFungusFamily extends Family {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(NetherFungusFamily::new);
 

@@ -14,7 +14,7 @@ import net.minecraft.world.biome.Biome;
 
 import java.util.Random;
 
-public final class SwampOakSpecies extends Species {
+public class SwampOakSpecies extends Species {
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(SwampOakSpecies::new);
 
