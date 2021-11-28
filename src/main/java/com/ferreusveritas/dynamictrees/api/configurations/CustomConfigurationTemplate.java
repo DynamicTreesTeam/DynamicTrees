@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -40,11 +41,17 @@ public final class CustomConfigurationTemplate<C extends Configuration<C, ?>> im
     @Override
     public Result<C, JsonElement> apply(PropertiesAccessor properties) {
         String json = this.processJson(properties);
-        System.out.println(json);
-        // TODO: Catch MalformedJsonException
-        return JsonDeserialisers.getOrThrow(this.configurationClass).deserialise(
-                JsonHelper.getGson().fromJson(json, JsonObject.class)
-        );
+        return this.deserialiseJson(json);
+    }
+
+    private Result<C, JsonElement> deserialiseJson(String json) {
+        try {
+            return JsonDeserialisers.getOrThrow(this.configurationClass).deserialise(
+                    JsonHelper.getGson().fromJson(json, JsonObject.class)
+            );
+        } catch (JsonSyntaxException e) {
+            throw new RuntimeException("Failed to deserialise processed Json:\n " + json, e);
+        }
     }
 
     private String processJson(PropertiesAccessor properties) {
