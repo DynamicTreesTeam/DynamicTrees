@@ -26,13 +26,13 @@ public class BottomFlareGenFeature extends GenFeature  {
     }
 
     @Override
-    public ConfiguredGenFeature createDefaultConfiguration() {
+    public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MIN_RADIUS, 6);
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         if (context.fertility() > 0) {
             this.flareBottom(configuration, context.world(), context.pos(), context.species());
             return true;
@@ -41,7 +41,7 @@ public class BottomFlareGenFeature extends GenFeature  {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         this.flareBottom(configuration, context.world(), context.pos(), context.species());
         return true;
     }
@@ -52,13 +52,13 @@ public class BottomFlareGenFeature extends GenFeature  {
      * @param world   The world
      * @param rootPos The position of the rooty dirt block of the tree
      */
-    public void flareBottom(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos rootPos, Species species) {
+    public void flareBottom(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, Species species) {
         Family family = species.getFamily();
 
         //Put a cute little flare on the bottom of the dark oaks
         int radius3 = TreeHelper.getRadius(world, rootPos.above(3));
 
-        if (radius3 > configuredGenFeature.get(MIN_RADIUS)) {
+        if (radius3 > configuration.get(MIN_RADIUS)) {
             family.getBranch().ifPresent(branch -> {
                 branch.setRadius(world, rootPos.above(2), radius3 + 1, Direction.UP);
                 branch.setRadius(world, rootPos.above(1), radius3 + 2, Direction.UP);

@@ -1,7 +1,8 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import com.ferreusveritas.dynamictrees.api.configurations.Configured;
+import com.ferreusveritas.dynamictrees.api.configurations.Configuration;
+import com.ferreusveritas.dynamictrees.api.configurations.TemplateRegistry;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.GenerationContext;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -12,15 +13,17 @@ import com.ferreusveritas.dynamictrees.trees.Species;
  *
  * @author Harley O'Connor
  */
-public class ConfiguredGenFeature extends Configured<ConfiguredGenFeature, GenFeature> {
+public class GenFeatureConfiguration extends Configuration<GenFeatureConfiguration, GenFeature> {
 
     /**
      * A null configured gen feature. Mainly used for getting the class with the {@link GenFeature} parameter for {@link
      * JsonDeserialisers#CONFIGURED_GEN_FEATURE}.
      */
-    public static final ConfiguredGenFeature NULL = new ConfiguredGenFeature(GenFeature.NULL_GEN_FEATURE);
+    public static final GenFeatureConfiguration NULL = new GenFeatureConfiguration(GenFeature.NULL);
 
-    public ConfiguredGenFeature(GenFeature genFeature) {
+    public static final TemplateRegistry<GenFeatureConfiguration> TEMPLATES = new TemplateRegistry<>();
+
+    public GenFeatureConfiguration(GenFeature genFeature) {
         super(genFeature);
     }
 
@@ -31,17 +34,17 @@ public class ConfiguredGenFeature extends Configured<ConfiguredGenFeature, GenFe
     /**
      * {@inheritDoc}
      *
-     * @return The copy of this {@link ConfiguredGenFeature}.
+     * @return The copy of this {@link GenFeatureConfiguration}.
      */
     @Override
-    public ConfiguredGenFeature copy() {
-        final ConfiguredGenFeature duplicateGenFeature = new ConfiguredGenFeature(this.configurable);
+    public GenFeatureConfiguration copy() {
+        final GenFeatureConfiguration duplicateGenFeature = new GenFeatureConfiguration(this.configurable);
         duplicateGenFeature.properties.putAll(this.properties);
         return duplicateGenFeature;
     }
 
     /**
-     * Invokes {@link GenFeature#generate(ConfiguredGenFeature, GenFeature.Type, GenerationContext)} for this configured
+     * Invokes {@link GenFeature#generate(GenFeatureConfiguration, GenFeature.Type, GenerationContext)} for this configured
      * feature's gen feature.
      *
      * @param type    the type of generation to perform

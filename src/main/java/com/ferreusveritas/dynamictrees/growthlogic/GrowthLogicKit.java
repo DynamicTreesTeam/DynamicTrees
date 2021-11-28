@@ -2,8 +2,9 @@ package com.ferreusveritas.dynamictrees.growthlogic;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
-import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistry;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistryEntry;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
@@ -22,7 +23,7 @@ import net.minecraft.world.IBlockReader;
 /**
  * A growth logic kit defines how/in what shape a tree should grow.
  */
-public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLogicKit, ConfiguredGrowthLogicKit> {
+public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLogicKit, GrowthLogicKitConfiguration> {
 
     /**
      * Sets the amount of psuedorandom height variation added to a tree. Helpful to prevent all trees from turning out
@@ -31,22 +32,22 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
     public static final ConfigurationProperty<Integer> HEIGHT_VARIATION =
             ConfigurationProperty.integer("height_variation");
 
-    public static final GrowthLogicKit NULL_LOGIC = new GrowthLogicKit(DTTrees.NULL) {
+    public static final GrowthLogicKit NULL = new GrowthLogicKit(DTTrees.NULL) {
     };
 
     /**
      * Central registry for all {@link GrowthLogicKit} objects.
      */
-    public static final SimpleRegistry<GrowthLogicKit> REGISTRY =
-            new SimpleRegistry<>(GrowthLogicKit.class, NULL_LOGIC);
+    public static final Registry<GrowthLogicKit> REGISTRY =
+            new ConfigurableRegistry<>(GrowthLogicKit.class, NULL, GrowthLogicKitConfiguration.TEMPLATES);
 
     public GrowthLogicKit(final ResourceLocation registryName) {
         super(registryName);
     }
 
     @Override
-    protected ConfiguredGrowthLogicKit createDefaultConfiguration() {
-        return new ConfiguredGrowthLogicKit(this);
+    protected GrowthLogicKitConfiguration createDefaultConfiguration() {
+        return new GrowthLogicKitConfiguration(this);
     }
 
     @Override
@@ -57,14 +58,14 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
      * Selects and returns a new direction for the branch {@linkplain GrowSignal signal} to turn to.
      * <p>
      * This function uses a probability map to make the decision, populating it via {@link
-     * #populateDirectionProbabilityMap(ConfiguredGrowthLogicKit, DirectionManipulationContext)}. See that method for
+     * #populateDirectionProbabilityMap(GrowthLogicKitConfiguration, DirectionManipulationContext)}. See that method for
      * more information on this map.
      *
      * @param configuration the configuration
      * @param context       the context
      * @return the direction for the signal to turn to
      */
-    public Direction selectNewDirection(ConfiguredGrowthLogicKit configuration, DirectionSelectionContext context) {
+    public Direction selectNewDirection(GrowthLogicKitConfiguration configuration, DirectionSelectionContext context) {
         // Prevent branches growing on the ground.
         if (context.signal().numSteps + 1 <= configuration.getLowestBranchHeight(
                 new PositionalSpeciesContext(context.world(), context.signal().rootPos, context.species())
@@ -99,7 +100,7 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
      * @param context       the context
      * @return the populated probability map
      */
-    public int[] populateDirectionProbabilityMap(ConfiguredGrowthLogicKit configuration,
+    public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration,
                                                  DirectionManipulationContext context) {
         final int[] probMap = context.probMap();
         final Direction originDir = context.signal().dir.getOpposite();
@@ -135,7 +136,7 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
      * @param context       the context
      * @return the energy for the current branch
      */
-    public float getEnergy(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+    public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return context.species().getSignalEnergy();
     }
 
@@ -149,7 +150,7 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
      * @param context       the context
      * @return the lowest branch height for the tree
      */
-    public int getLowestBranchHeight(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+    public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return context.species().getLowestBranchHeight();
     }
 

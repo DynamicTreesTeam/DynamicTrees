@@ -62,4 +62,24 @@ public abstract class AbstractResourceLoader<R> implements ResourceLoader<R> {
         this.applyOnReload(future.join(), resourceManager);
     }
 
+    @Override
+    public void applyOnLoad(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager) {
+
+    }
+
+    @Override
+    public void applyOnGatherData(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager) {
+
+    }
+
+    @Override
+    public void applyOnSetup(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager) {
+
+    }
+
+    @Override
+    public void applyOnReload(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager) {
+
+    }
+
 }

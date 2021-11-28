@@ -25,7 +25,7 @@ public class ConiferLogic extends GrowthLogicKit {
     }
 
     @Override
-    protected ConfiguredGrowthLogicKit createDefaultConfiguration() {
+    protected GrowthLogicKitConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(ENERGY_DIVISOR, 3F)
                 .with(HORIZONTAL_LIMITER, 16F)
@@ -38,7 +38,7 @@ public class ConiferLogic extends GrowthLogicKit {
     }
 
     @Override
-    public Direction selectNewDirection(ConfiguredGrowthLogicKit configuration, DirectionSelectionContext context) {
+    public Direction selectNewDirection(GrowthLogicKitConfiguration configuration, DirectionSelectionContext context) {
         final Direction newDir = super.selectNewDirection(configuration, context);
         if (context.signal().isInTrunk() && newDir != Direction.UP) { // Turned out of trunk.
             context.signal().energy /= configuration.get(ENERGY_DIVISOR);
@@ -51,7 +51,7 @@ public class ConiferLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int[] populateDirectionProbabilityMap(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
+    public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration, DirectionManipulationContext context) {
         final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
         Direction originDir = context.signal().dir.getOpposite();
 
@@ -70,7 +70,7 @@ public class ConiferLogic extends GrowthLogicKit {
     //but we don't want the trees to always be the same height all the time when planted in the same location
     //so we feed the hash function the in-game month
     @Override
-    public float getEnergy(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+    public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         long day = context.world().getGameTime() / 24000L;
         int month = (int) day / 30;//Change the hashs every in-game month
 

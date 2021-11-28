@@ -33,7 +33,7 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
-import com.ferreusveritas.dynamictrees.growthlogic.ConfiguredGrowthLogicKit;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -44,13 +44,13 @@ import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.GlobalDropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
@@ -199,7 +199,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * Logic kit for standardized extended growth behavior
      */
-    protected ConfiguredGrowthLogicKit logicKit = ConfiguredGrowthLogicKit.NULL_LOGIC_KIT;
+    protected GrowthLogicKitConfiguration logicKit = GrowthLogicKitConfiguration.NULL;
 
     /**
      * How quickly the branch thickens on it's own without branch merges [default = 0.3]
@@ -265,7 +265,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     protected DynamicSaplingBlock saplingBlock;
 
-    protected List<ConfiguredDropCreator> dropCreators = new ArrayList<>();
+    protected List<DropCreatorConfiguration> dropCreators = new ArrayList<>();
 
     //WorldGen
     /**
@@ -275,7 +275,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     protected List<Biome> perfectBiomes = new ArrayList<>();
 
-    protected final List<ConfiguredGenFeature> genFeatures = new ArrayList<>();
+    protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
 
     /**
      * A {@link BiPredicate} that returns true if this species should override the common in the given position.
@@ -757,7 +757,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
-    public boolean addDropCreators(ConfiguredDropCreator... dropCreators) {
+    public boolean addDropCreators(DropCreatorConfiguration... dropCreators) {
         this.dropCreators.addAll(Arrays.asList(dropCreators));
         return true;
     }
@@ -767,7 +767,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 dropCreator.getConfigurable().getRegistryName().equals(registryName));
     }
 
-    public List<ConfiguredDropCreator> getDropCreators() {
+    public List<DropCreatorConfiguration> getDropCreators() {
         return this.dropCreators;
     }
 
@@ -1464,12 +1464,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param logicKit A growth logic kit
      * @return this species for chaining
      */
-    public Species setGrowthLogicKit(ConfiguredGrowthLogicKit logicKit) {
+    public Species setGrowthLogicKit(GrowthLogicKitConfiguration logicKit) {
         this.logicKit = logicKit;
         return this;
     }
 
-    public ConfiguredGrowthLogicKit getGrowthLogicKit() {
+    public GrowthLogicKitConfiguration getGrowthLogicKit() {
         return logicKit;
     }
 
@@ -1970,7 +1970,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Adds the default configuration of the {@link GenFeature} given.
      * <p>
      * Note that the {@link GenFeature} may abort its addition if {@link GenFeature#shouldApply(Species,
-     * ConfiguredGenFeature)} returns {@code false}.
+     * com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration)} returns {@code false}.
      *
      * @param feature the {@link GenFeature} to add
      * @return this {@link Species} object for chaining
@@ -1983,12 +1983,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Adds the specified {@code configuration} to this species.
      * <p>
      * Note that the {@link GenFeature} can abort its addition if {@link GenFeature#shouldApply(Species,
-     * ConfiguredGenFeature)} returns {@code false}.
+     * com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration)} returns {@code false}.
      *
      * @param configuration the configured gen feature to add
      * @return this {@link Species} object for chaining
      */
-    public Species addGenFeature(ConfiguredGenFeature configuration) {
+    public Species addGenFeature(GenFeatureConfiguration configuration) {
         if (configuration.shouldApply(this)) {
             this.genFeatures.add(configuration);
         }
@@ -1999,7 +1999,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this.genFeatures.size() > 0;
     }
 
-    public List<ConfiguredGenFeature> getGenFeatures() {
+    public List<GenFeatureConfiguration> getGenFeatures() {
         return this.genFeatures;
     }
 

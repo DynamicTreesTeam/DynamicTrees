@@ -29,13 +29,13 @@ public final class WartBlockDropCreator extends DropCreator {
     }
 
     @Override
-    protected ConfiguredDropCreator createDefaultConfiguration() {
+    protected DropCreatorConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(BLOCK, Blocks.AIR)
                 .with(HARVEST_CHANCE, 10);
     }
 
-    private Block getWartBlock(final ConfiguredDropCreator configuration, final Species species) {
+    private Block getWartBlock(final DropCreatorConfiguration configuration, final Species species) {
         final Block wartBlock = configuration.get(BLOCK);
         return wartBlock == Blocks.AIR ? species.getLeavesBlock()
                 .map(leaves -> (Block) leaves)
@@ -43,12 +43,12 @@ public final class WartBlockDropCreator extends DropCreator {
     }
 
     @Override
-    public void appendHarvestDrops(ConfiguredDropCreator configuration, DropContext context) {
+    public void appendHarvestDrops(DropCreatorConfiguration configuration, DropContext context) {
         StackDrops.create(1F, configuration.get(HARVEST_CHANCE), new ItemStack(this.getWartBlock(configuration, context.species())));
     }
 
     @Override
-    public void appendLeavesDrops(ConfiguredDropCreator configuration, DropContext context) {
+    public void appendLeavesDrops(DropCreatorConfiguration configuration, DropContext context) {
         StackDrops.create(1F, 1, new ItemStack(this.getWartBlock(configuration, context.species())));
     }
 

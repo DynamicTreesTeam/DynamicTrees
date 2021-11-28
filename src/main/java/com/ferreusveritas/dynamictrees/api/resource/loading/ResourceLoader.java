@@ -21,9 +21,9 @@ public interface ResourceLoader<R> {
 
     void reload(CompletableFuture<ResourceAccessor<R>> future, IResourceManager resourceManager);
 
-    void applyOnGatherData(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager);
-
     void applyOnLoad(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager);
+
+    void applyOnGatherData(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager);
 
     void applyOnSetup(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager);
 

@@ -28,34 +28,21 @@ public final class GlobalDropCreatorResourceLoader extends AbstractResourceLoade
     }
 
     @Override
-    public void applyOnGatherData(ResourceAccessor<JsonElement> resourceAccessor, IResourceManager resourceManager) {
-
-    }
-
-    @Override
-    public void applyOnLoad(ResourceAccessor<JsonElement> resourceAccessor, IResourceManager resourceManager) {
-
-    }
-
-    @Override
-    public void applyOnSetup(ResourceAccessor<JsonElement> resourceAccessor, IResourceManager resourceManager) {
-
-    }
-
-    @Override
     public void applyOnReload(ResourceAccessor<JsonElement> resourceAccessor, IResourceManager resourceManager) {
-        resourceAccessor.forEach(resource -> {
-            try {
-                this.readEntry(resource);
-            } catch (ApplicationException e) {
-                LOGGER.error("Error loading global drop creator \"{}\": {}",
-                        resource.getLocation(), e.getMessage());
-            }
-        });
+        resourceAccessor.forEach(this::tryReadEntry);
+    }
+
+    private void tryReadEntry(Resource<JsonElement> resource) {
+        try {
+            this.readEntry(resource);
+        } catch (ApplicationException e) {
+            LOGGER.error("Error loading global drop creator \"{}\": {}",
+                    resource.getLocation(), e.getMessage());
+        }
     }
 
     private void readEntry(Resource<JsonElement> resource) throws ApplicationException {
-        throwIfNotJsonObject(resource.getResource(), () -> new ApplicationException("Root json is not a Json object."));
+        throwIfNotJsonObject(resource.getResource(), () -> new ApplicationException("Root element is not a Json object."));
         this.deserialiseAndPutEntry(resource.getLocation(), resource.getResource().getAsJsonObject());
     }
 

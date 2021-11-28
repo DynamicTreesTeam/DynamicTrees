@@ -156,18 +156,6 @@ public final class BiomeDatabaseResourceLoader
     }
 
     @Override
-    public void applyOnGatherData(ResourceAccessor<Iterable<JsonElement>> preparedResources,
-                                  IResourceManager resourceManager) {
-
-    }
-
-    @Override
-    public void applyOnLoad(ResourceAccessor<Iterable<JsonElement>> preparedResources,
-                            IResourceManager resourceManager) {
-
-    }
-
-    @Override
     public void applyOnSetup(ResourceAccessor<Iterable<JsonElement>> resourceAccessor,
                              IResourceManager resourceManager) {
         BiomeDatabases.reset();

@@ -7,7 +7,7 @@ import net.minecraft.world.IWorld;
 /**
  * @author Harley O'Connor
  */
-public final class PostRotContext extends GenerationContext<IWorld> {
+public class PostRotContext extends GenerationContext<IWorld> {
 
     private final int radius;
     private final int neighbourCount;

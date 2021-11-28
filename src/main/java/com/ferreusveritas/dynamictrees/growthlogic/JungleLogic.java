@@ -18,7 +18,7 @@ public class JungleLogic extends GrowthLogicKit {
     }
 
     @Override
-    protected ConfiguredGrowthLogicKit createDefaultConfiguration() {
+    protected GrowthLogicKitConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(CANOPY_HEIGHT, 14)
                 .with(BRANCH_OUT_CHANCE, 5);
@@ -30,7 +30,7 @@ public class JungleLogic extends GrowthLogicKit {
     }
 
     @Override
-    public Direction selectNewDirection(ConfiguredGrowthLogicKit configuration, DirectionSelectionContext context) {
+    public Direction selectNewDirection(GrowthLogicKitConfiguration configuration, DirectionSelectionContext context) {
         final Direction newDir = super.selectNewDirection(configuration, context);
         if (context.signal().isInTrunk() && newDir != Direction.UP) { // Turned out of trunk
             context.signal().energy = 4.0f;
@@ -39,7 +39,7 @@ public class JungleLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int[] populateDirectionProbabilityMap(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
+    public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration, DirectionManipulationContext context) {
 
         final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
         Direction originDir = context.signal().dir.getOpposite();
@@ -70,7 +70,7 @@ public class JungleLogic extends GrowthLogicKit {
 
     //Jungle trees grow taller in suitable biomes
     @Override
-    public float getEnergy(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+    public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return super.getEnergy(configuration, context) *
                 context.species().biomeSuitability(context.world(), context.pos());
     }

@@ -37,7 +37,7 @@ public class FruitGenFeature extends GenFeature {
     }
 
     @Override
-    public ConfiguredGenFeature createDefaultConfiguration() {
+    public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(FRUIT_BLOCK, DTRegistries.APPLE_FRUIT)
                 .with(VERTICAL_SPREAD, 30f)
@@ -47,7 +47,7 @@ public class FruitGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (!context.endPoints().isEmpty()) {
             int qty = configuration.get(QUANTITY);
             qty *= context.fruitProductionFactor();
@@ -62,7 +62,7 @@ public class FruitGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         final World world = context.world();
         final BlockState blockState = world.getBlockState(context.treePos());
         final BranchBlock branch = TreeHelper.getBranch(blockState);
@@ -89,12 +89,12 @@ public class FruitGenFeature extends GenFeature {
         return true;
     }
 
-    protected void addFruit(ConfiguredGenFeature configuredGenFeature, IWorld world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds, Float seasonValue) {
+    protected void addFruit(GenFeatureConfiguration configuration, IWorld world, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen, boolean enableHash, SafeChunkBounds safeBounds, Float seasonValue) {
         final BlockPos fruitPos = CoordUtils.getRayTraceFruitPos(world, species, treePos, branchPos, safeBounds);
         if (fruitPos != BlockPos.ZERO &&
                 (!enableHash || ((CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0)) &&
-                world.getRandom().nextFloat() <= configuredGenFeature.get(PLACE_CHANCE)) {
-            FruitBlock fruitBlock = configuredGenFeature.get(FRUIT_BLOCK);
+                world.getRandom().nextFloat() <= configuration.get(PLACE_CHANCE)) {
+            FruitBlock fruitBlock = configuration.get(FRUIT_BLOCK);
             BlockState setState = fruitBlock.getStateForAge(worldGen ? fruitBlock.getAgeForSeasonalWorldGen(world, fruitPos, seasonValue) : 0);
             world.setBlock(fruitPos, setState, 3);
         }

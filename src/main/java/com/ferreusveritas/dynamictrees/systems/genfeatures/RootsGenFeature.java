@@ -46,7 +46,7 @@ public class RootsGenFeature extends GenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature createDefaultConfiguration() {
+    protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MIN_TRUNK_RADIUS, 13)
                 .with(LEVEL_LIMIT, 2)
@@ -74,7 +74,7 @@ public class RootsGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         final BlockPos treePos = context.pos().above();
         final int trunkRadius = TreeHelper.getRadius(context.world(), treePos);
         return trunkRadius >= configuration.get(MIN_TRUNK_RADIUS) &&
@@ -82,7 +82,7 @@ public class RootsGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         final World world = context.world();
         final BlockPos treePos = context.treePos();
         final int trunkRadius = TreeHelper.getRadius(world, treePos);
@@ -100,11 +100,11 @@ public class RootsGenFeature extends GenFeature {
         return true;
     }
 
-    public boolean startRoots(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos treePos, Species species, int trunkRadius) {
+    public boolean startRoots(GenFeatureConfiguration configuration, IWorld world, BlockPos treePos, Species species, int trunkRadius) {
         int hash = CoordUtils.coordHashCode(treePos, 2);
         SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
-        this.nextRoot(world, rootMap, treePos, species, trunkRadius, configuredGenFeature.get(MIN_TRUNK_RADIUS), configuredGenFeature.get(SCALE_FACTOR), BlockPos.ZERO, 0,
-                -1, null, 0, configuredGenFeature.get(LEVEL_LIMIT));
+        this.nextRoot(world, rootMap, treePos, species, trunkRadius, configuration.get(MIN_TRUNK_RADIUS), configuration.get(SCALE_FACTOR), BlockPos.ZERO, 0,
+                -1, null, 0, configuration.get(LEVEL_LIMIT));
         return true;
     }
 

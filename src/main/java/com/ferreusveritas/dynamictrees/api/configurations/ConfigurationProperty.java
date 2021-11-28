@@ -22,16 +22,19 @@ import java.util.Optional;
  */
 public class ConfigurationProperty<T> {
 
-    protected final String identifier;
-    protected final Class<T> type;
+    public static final ConfigurationProperty<Object> NULL =
+            new ConfigurationProperty<>("null", Object.class);
 
-    protected ConfigurationProperty(String identifier, Class<T> type) {
-        this.identifier = identifier;
+    private final String key;
+    private final Class<T> type;
+
+    protected ConfigurationProperty(String key, Class<T> type) {
+        this.key = key;
         this.type = type;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getKey() {
+        return key;
     }
 
     public Class<T> getType() {
@@ -46,14 +49,14 @@ public class ConfigurationProperty<T> {
      * @return The an {@link Result} for the property value, or null if it wasn't found.
      */
     public Optional<Result<T, JsonElement>> deserialise(JsonObject jsonObject) {
-        final JsonElement jsonElement = jsonObject.get(this.identifier);
+        final JsonElement jsonElement = jsonObject.get(this.key);
 
         if (jsonElement == null) {
             return Optional.empty();
         }
 
         final JsonDeserialiser<T> getter = JsonDeserialisers.getOrThrow(this.type, "Tried to get class " +
-                "\"" + this.type.getName() + "\" for gen feature property \"" + this.identifier + "\", but " +
+                "\"" + this.type.getName() + "\" for gen feature property \"" + this.key + "\", but " +
                 "deserialiser was not registered.");
         return Optional.ofNullable(getter.deserialise(jsonElement));
     }
@@ -103,11 +106,27 @@ public class ConfigurationProperty<T> {
         return property(identifier, Item.class);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ConfigurationProperty<?> that = (ConfigurationProperty<?>) o;
+        return Objects.equals(key, that.key) && Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key, type);
+    }
 
     @Override
     public String toString() {
         return "ConfigurationProperty{" +
-                "identifier='" + identifier + '\'' +
+                "identifier='" + key + '\'' +
                 ", type=" + type +
                 '}';
     }

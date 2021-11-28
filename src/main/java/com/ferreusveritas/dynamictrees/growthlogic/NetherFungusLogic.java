@@ -20,7 +20,7 @@ public class NetherFungusLogic extends GrowthLogicKit {
     }
 
     @Override
-    protected ConfiguredGrowthLogicKit createDefaultConfiguration() {
+    protected GrowthLogicKitConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MIN_CAP_HEIGHT, 3)
                 .with(HEIGHT_VARIATION, 8);
@@ -32,7 +32,7 @@ public class NetherFungusLogic extends GrowthLogicKit {
     }
 
     @Override
-    public Direction selectNewDirection(ConfiguredGrowthLogicKit configuration, DirectionSelectionContext context) {
+    public Direction selectNewDirection(GrowthLogicKitConfiguration configuration, DirectionSelectionContext context) {
         final Direction newDir = super.selectNewDirection(configuration, context);
         if (context.signal().isInTrunk() && newDir != Direction.UP) { // Turned out of trunk
             context.signal().energy = Math.min(context.signal().energy, context.species().isMegaSpecies() ? 3 : 2);
@@ -41,7 +41,7 @@ public class NetherFungusLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int[] populateDirectionProbabilityMap(ConfiguredGrowthLogicKit configuration,
+    public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration,
                                                  DirectionManipulationContext context) {
         final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
 
@@ -64,7 +64,7 @@ public class NetherFungusLogic extends GrowthLogicKit {
         return probMap;
     }
 
-    private float getHashedVariation(ConfiguredGrowthLogicKit configuration, World world, BlockPos pos) {
+    private float getHashedVariation(GrowthLogicKitConfiguration configuration, World world, BlockPos pos) {
         long day = world.getGameTime() / 24000L;
         int month = (int) day / 30;//Change the hashs every in-game month
         return (CoordUtils.coordHashCode(pos.above(month), 2) %
@@ -72,7 +72,7 @@ public class NetherFungusLogic extends GrowthLogicKit {
     }
 
     @Override
-    public float getEnergy(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+    public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return Math.min(configuration.getLowestBranchHeight(
                         new PositionalSpeciesContext(context.world(), context.pos(), context.species())) +
                         configuration.get(MIN_CAP_HEIGHT) +
@@ -81,7 +81,7 @@ public class NetherFungusLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int getLowestBranchHeight(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+    public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         // Vary the lowest branch height by a psuedorandom hash function
         return (int) (super.getLowestBranchHeight(configuration, context) *
                 context.species().biomeSuitability(context.world(), context.pos()) +

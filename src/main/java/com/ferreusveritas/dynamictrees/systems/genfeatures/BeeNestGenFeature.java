@@ -61,7 +61,7 @@ public class BeeNestGenFeature extends GenFeature {
     }
 
     @Override
-    public ConfiguredGenFeature createDefaultConfiguration() {
+    public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos) -> {
             if (world.getRandom().nextFloat() > CHANCE) {
                 return false;
@@ -90,7 +90,7 @@ public class BeeNestGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         final IWorld world = context.world();
         final BlockPos rootPos = context.pos();
         return !(world.getRandom().nextFloat() > configuration.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos)) &&
@@ -98,7 +98,7 @@ public class BeeNestGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         if (!context.natural() || !configuration.get(CAN_GROW_PREDICATE).test(context.world(), context.pos().above()) ||
                 context.fertility() == 0) {
             return false;
@@ -107,10 +107,10 @@ public class BeeNestGenFeature extends GenFeature {
         return this.placeBeeNestInValidPlace(configuration, context.world(), context.pos(), false);
     }
 
-    private boolean placeBeeNestInValidPlace(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen) {
-        Block nestBlock = configuredGenFeature.get(NEST_BLOCK);
+    private boolean placeBeeNestInValidPlace(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, boolean worldGen) {
+        Block nestBlock = configuration.get(NEST_BLOCK);
 
-        int treeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
+        int treeHeight = getTreeHeight(world, rootPos, configuration.get(MAX_HEIGHT));
         //This prevents trees from having multiple bee nests. There should be only one per tree.
         if (nestAlreadyPresent(world, nestBlock, rootPos, treeHeight)) {
             return false;
@@ -118,7 +118,7 @@ public class BeeNestGenFeature extends GenFeature {
 
         //Finds the valid places next to the trunk and under an existing branch.
         //The places are mapped to a direction list that hold the valid orientations with an air block in front
-        List<Pair<BlockPos, List<Direction>>> validSpaces = findBranchPits(configuredGenFeature, world, rootPos, treeHeight);
+        List<Pair<BlockPos, List<Direction>>> validSpaces = findBranchPits(configuration, world, rootPos, treeHeight);
         if (validSpaces == null) {
             return false;
         }
@@ -195,7 +195,7 @@ public class BeeNestGenFeature extends GenFeature {
 
     //The valid places this genFeature looks for are empty blocks under branches next to the trunk, similar to armpits lol
     @Nullable
-    private List<Pair<BlockPos, List<Direction>>> findBranchPits(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos rootPos, int maxHeight) {
+    private List<Pair<BlockPos, List<Direction>>> findBranchPits(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, int maxHeight) {
         int existingBlocks = 0;
         List<Pair<BlockPos, List<Direction>>> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++) {
@@ -213,9 +213,9 @@ public class BeeNestGenFeature extends GenFeature {
                     if (validDirs.size() > 0) {
                         validSpaces.add(Pair.of(sidePos, validDirs));
                     }
-                } else if (world.getBlockState(sidePos).getBlock() == configuredGenFeature.get(NEST_BLOCK)) {
+                } else if (world.getBlockState(sidePos).getBlock() == configuration.get(NEST_BLOCK)) {
                     existingBlocks++;
-                    if (existingBlocks > configuredGenFeature.get(MAX_COUNT)) {
+                    if (existingBlocks > configuration.get(MAX_COUNT)) {
                         return null;
                     }
                 }

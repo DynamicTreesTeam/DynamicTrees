@@ -182,7 +182,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
 
     private void applyReloadAppliers(LoadData loadData, JsonObject json) {
         final ResourceLocation resourceName = loadData.getResourceName();
-        this.loadAppliers.applyAll(new JsonMapWrapper(json), loadData.resource)
+        this.reloadAppliers.applyAll(new JsonMapWrapper(json), loadData.resource)
                 .forEachError(error -> this.logError(resourceName, error))
                 .forEachWarning(warning -> this.logWarning(resourceName, warning));
     }

@@ -38,13 +38,13 @@ public class AlternativeLeavesGenFeature extends GenFeature {
         this.register(ALT_LEAVES, ALT_LEAVES_BLOCK, PLACE_CHANCE, QUANTITY);
     }
 
-    public ConfiguredGenFeature createDefaultConfiguration() {
+    public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(ALT_LEAVES, LeavesProperties.NULL_PROPERTIES).with(ALT_LEAVES_BLOCK, Blocks.AIR)
                 .with(PLACE_CHANCE, 0.5f).with(QUANTITY, 5);
     }
 
     @Override
-    public boolean shouldApply(Species species, ConfiguredGenFeature configuration) {
+    public boolean shouldApply(Species species, GenFeatureConfiguration configuration) {
         configuration.get(ALT_LEAVES).ifValid(properties -> {
             properties.setFamily(species.getFamily());
             species.addValidLeafBlocks(properties);
@@ -53,13 +53,13 @@ public class AlternativeLeavesGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         final BlockBounds bounds = context.species().getFamily().expandLeavesBlockBounds(new BlockBounds(context.endPoints()));
         return this.setAltLeaves(configuration, context.world(), bounds, context.bounds(), context.species());
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         if (context.fertility() == 0) {
             return false;
         }
@@ -80,7 +80,7 @@ public class AlternativeLeavesGenFeature extends GenFeature {
         return setAltLeaves(configuration, world, bounds, SafeChunkBounds.ANY, species);
     }
 
-    private Block getAltLeavesBlock(ConfiguredGenFeature conifuration) {
+    private Block getAltLeavesBlock(GenFeatureConfiguration conifuration) {
         LeavesProperties properties = conifuration.get(ALT_LEAVES);
         if (!properties.isValid() || !properties.getDynamicLeavesBlock().isPresent()) {
             return conifuration.get(ALT_LEAVES_BLOCK);
@@ -88,7 +88,7 @@ public class AlternativeLeavesGenFeature extends GenFeature {
         return properties.getDynamicLeavesBlock().get();
     }
 
-    private BlockState getSwapBlockState(ConfiguredGenFeature configuration, IWorld world, Species species, BlockState state, boolean worldgen) {
+    private BlockState getSwapBlockState(GenFeatureConfiguration configuration, IWorld world, Species species, BlockState state, boolean worldgen) {
         DynamicLeavesBlock originalLeaves = species.getLeavesBlock().orElse(null);
         Block alt = getAltLeavesBlock(configuration);
         DynamicLeavesBlock altLeaves = alt instanceof DynamicLeavesBlock ? (DynamicLeavesBlock) alt : null;
@@ -106,14 +106,14 @@ public class AlternativeLeavesGenFeature extends GenFeature {
         return state;
     }
 
-    private boolean setAltLeaves(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockBounds leafPositions, SafeChunkBounds safeBounds, Species species) {
+    private boolean setAltLeaves(GenFeatureConfiguration configuration, IWorld world, BlockBounds leafPositions, SafeChunkBounds safeBounds, Species species) {
         boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
         if (worldGen) {
             AtomicBoolean isSet = new AtomicBoolean(false);
             leafPositions.iterator().forEachRemaining((pos) -> {
-                if (safeBounds.inBounds(pos, true) && world.getRandom().nextFloat() < configuredGenFeature.get(PLACE_CHANCE)) {
-                    if (world.setBlock(pos, getSwapBlockState(configuredGenFeature, world, species, world.getBlockState(pos), true), 2)) {
+                if (safeBounds.inBounds(pos, true) && world.getRandom().nextFloat() < configuration.get(PLACE_CHANCE)) {
+                    if (world.setBlock(pos, getSwapBlockState(configuration, world, species, world.getBlockState(pos), true), 2)) {
                         isSet.set(true);
                     }
                 }
@@ -128,9 +128,9 @@ public class AlternativeLeavesGenFeature extends GenFeature {
             if (posList.isEmpty()) {
                 return false;
             }
-            for (int i = 0; i < configuredGenFeature.get(QUANTITY); i++) {
+            for (int i = 0; i < configuration.get(QUANTITY); i++) {
                 BlockPos pos = posList.get(world.getRandom().nextInt(posList.size()));
-                if (world.setBlock(pos, getSwapBlockState(configuredGenFeature, world, species, world.getBlockState(pos), false), 2)) {
+                if (world.setBlock(pos, getSwapBlockState(configuration, world, species, world.getBlockState(pos), false), 2)) {
                     isSet = true;
                 }
             }

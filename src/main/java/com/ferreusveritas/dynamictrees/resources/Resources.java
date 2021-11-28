@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationTemplateResourceLoader;
 import com.ferreusveritas.dynamictrees.api.event.Hooks;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceManager;
 import com.ferreusveritas.dynamictrees.data.DTRecipes;
@@ -12,6 +13,10 @@ import com.ferreusveritas.dynamictrees.resources.loader.JoCodeResourceLoader;
 import com.ferreusveritas.dynamictrees.resources.loader.LeavesPropertiesResourceLoader;
 import com.ferreusveritas.dynamictrees.resources.loader.SoilPropertiesResourceLoader;
 import com.ferreusveritas.dynamictrees.resources.loader.SpeciesResourceLoader;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
@@ -53,11 +58,21 @@ public final class Resources {
     public static final LeavesPropertiesResourceLoader LEAVES_PROPERTIES_LOADER = new LeavesPropertiesResourceLoader();
     public static final SoilPropertiesResourceLoader SOIL_PROPERTIES_LOADER = new SoilPropertiesResourceLoader();
     public static final FamilyResourceLoader FAMILY_LOADER = new FamilyResourceLoader();
+
+    public static final ConfigurationTemplateResourceLoader<DropCreatorConfiguration, DropCreator>
+            DROP_CREATOR_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
+            "drop_creators/configurations",
+            DropCreator.REGISTRY,
+            DropCreatorConfiguration.TEMPLATES
+    );
+
     public static final SpeciesResourceLoader SPECIES_LOADER = new SpeciesResourceLoader();
+
 
     public static final JoCodeResourceLoader JO_CODE_LOADER = new JoCodeResourceLoader();
     public static final BiomeDatabaseResourceLoader BIOME_DATABASE_LOADER = new BiomeDatabaseResourceLoader();
-    public static final GlobalDropCreatorResourceLoader GLOBAL_DROP_CREATOR_LOADER = new GlobalDropCreatorResourceLoader();
+    public static final GlobalDropCreatorResourceLoader GLOBAL_DROP_CREATOR_LOADER =
+            new GlobalDropCreatorResourceLoader();
 
     public static void setupTreesResourceManager() {
         addDefaultLoaders();
@@ -75,6 +90,7 @@ public final class Resources {
                 LEAVES_PROPERTIES_LOADER,
                 SOIL_PROPERTIES_LOADER,
                 FAMILY_LOADER,
+                DROP_CREATOR_TEMPLATE_LOADER,
                 SPECIES_LOADER,
                 JO_CODE_LOADER,
                 BIOME_DATABASE_LOADER,
@@ -137,7 +153,9 @@ public final class Resources {
         }
 
         @Override
-        public CompletableFuture<Void> reload(IStage stage, IResourceManager resourceManager, IProfiler preparationsProfiler, IProfiler reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
+        public CompletableFuture<Void> reload(IStage stage, IResourceManager resourceManager,
+                                              IProfiler preparationsProfiler, IProfiler reloadProfiler,
+                                              Executor backgroundExecutor, Executor gameExecutor) {
             final CompletableFuture<?>[] futures = MANAGER.prepareReload(gameExecutor, backgroundExecutor);
 
             // Reload all reload listeners in the trees resource manager and registers dirt bucket recipes.
@@ -162,7 +180,8 @@ public final class Resources {
             DTRecipes.registerDirtBucketRecipes(recipes.get(IRecipeType.CRAFTING));
 
             // Revert each type's recipes back to immutable.
-            recipes.forEach(((recipeType, currentRecipes) -> recipes.put(recipeType, ImmutableMap.copyOf(currentRecipes))));
+            recipes.forEach(
+                    ((recipeType, currentRecipes) -> recipes.put(recipeType, ImmutableMap.copyOf(currentRecipes))));
 
             // Set the new recipes.
             dataPackRegistries.getRecipeManager().recipes = ImmutableMap.copyOf(recipes);

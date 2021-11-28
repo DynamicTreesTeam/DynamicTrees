@@ -13,7 +13,7 @@ public class DarkOakLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int[] populateDirectionProbabilityMap(ConfiguredGrowthLogicKit configuration, DirectionManipulationContext context) {
+    public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration, DirectionManipulationContext context) {
         final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
         probMap[Direction.UP.get3DDataValue()] = 4;
 
@@ -58,13 +58,13 @@ public class DarkOakLogic extends GrowthLogicKit {
     }
 
     @Override
-    public float getEnergy(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+    public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return super.getEnergy(configuration, context) *
                 context.species().biomeSuitability(context.world(), context.pos());
     }
 
     @Override
-    public int getLowestBranchHeight(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+    public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return (int) (super.getLowestBranchHeight(configuration, context) *
                 context.species().biomeSuitability(context.world(), context.pos()));
     }

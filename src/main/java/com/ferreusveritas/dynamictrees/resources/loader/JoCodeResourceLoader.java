@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.resources.loader;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
+import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
@@ -27,21 +27,6 @@ public final class JoCodeResourceLoader extends AbstractResourceLoader<List<Stri
 
     public JoCodeResourceLoader() {
         super(new JoCodeResourcePreparer("jo_codes"));
-    }
-
-    @Override
-    public void applyOnGatherData(ResourceAccessor<List<String>> resourceAccessor, IResourceManager resourceManager) {
-
-    }
-
-    @Override
-    public void applyOnLoad(ResourceAccessor<List<String>> resourceAccessor, IResourceManager resourceManager) {
-
-    }
-
-    @Override
-    public void applyOnSetup(ResourceAccessor<List<String>> resourceAccessor, IResourceManager resourceManager) {
-
     }
 
     @Override

@@ -26,13 +26,13 @@ public class LogDropCreator extends DropCreator {
     }
 
     @Override
-    protected ConfiguredDropCreator createDefaultConfiguration() {
+    protected DropCreatorConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MULTIPLIER, 1.0f);
     }
 
     @Override
-    public void appendLogDrops(ConfiguredDropCreator configuration, LogDropContext context) {
+    public void appendLogDrops(DropCreatorConfiguration configuration, LogDropContext context) {
         final Species species = context.species();
         final NetVolumeNode.Volume volume = context.volume();
         volume.multiplyVolume(configuration.get(MULTIPLIER));

@@ -53,7 +53,7 @@ public class BushGenFeature extends GenFeature {
     }
 
     @Override
-    public ConfiguredGenFeature createDefaultConfiguration() {
+    public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(BIOME_PREDICATE, i -> true)
                 .with(LOG, Blocks.OAK_LOG)
@@ -63,13 +63,13 @@ public class BushGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean generate(ConfiguredGenFeature configuration, FullGenerationContext context) {
+    protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
         this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(), context.radius(), context.bounds());
         return true;
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (context.bounds() != SafeChunkBounds.ANY && configuration.get(BIOME_PREDICATE).test(context.biome())) {
             this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(), context.radius(), context.bounds());
             return true;
@@ -77,7 +77,7 @@ public class BushGenFeature extends GenFeature {
         return false;
     }
 
-    protected void commonGen(ConfiguredGenFeature configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Random random, int radius, SafeChunkBounds safeBounds) {
+    protected void commonGen(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, Species species, Random random, int radius, SafeChunkBounds safeBounds) {
         if (radius <= 2) {
             return;
         }
@@ -100,16 +100,16 @@ public class BushGenFeature extends GenFeature {
 
             final BlockPos pos = groundPos.above();
             if (!world.getBlockState(groundPos).getMaterial().isLiquid() && species.isAcceptableSoil(world, groundPos, soilBlockState)) {
-                world.setBlock(pos, configuredGenFeature.get(LOG).defaultBlockState(), 3);
+                world.setBlock(pos, configuration.get(LOG).defaultBlockState(), 3);
 
                 SimpleVoxmap leafMap = LeafClusters.BUSH;
                 BlockPos.Mutable leafPos = new BlockPos.Mutable();
                 for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
                     leafPos.set(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ());
                     if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getMaterial().isReplaceable()) {
-                        Block leaf = ((configuredGenFeature.get(SECONDARY_LEAVES) == null ||
-                                random.nextInt(configuredGenFeature.get(SECONDARY_LEAVES_CHANCE)) != 0) ?
-                                configuredGenFeature.get(LEAVES) : configuredGenFeature.get(SECONDARY_LEAVES));
+                        Block leaf = ((configuration.get(SECONDARY_LEAVES) == null ||
+                                random.nextInt(configuration.get(SECONDARY_LEAVES_CHANCE)) != 0) ?
+                                configuration.get(LEAVES) : configuration.get(SECONDARY_LEAVES));
                         BlockState leafState = leaf.defaultBlockState();
                         if (leaf instanceof LeavesBlock) {
                             leafState = leafState.setValue(LeavesBlock.PERSISTENT, true);

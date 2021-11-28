@@ -1,7 +1,8 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
-import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
+import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 
@@ -12,9 +13,9 @@ import com.google.gson.JsonElement;
  */
 public final class RegistryEntryDeserialiser<T extends RegistryEntry<T>> implements JsonDeserialiser<T> {
 
-    private final SimpleRegistry<T> registry;
+    private final Registry<T> registry;
 
-    public RegistryEntryDeserialiser(SimpleRegistry<T> registry) {
+    public RegistryEntryDeserialiser(Registry<T> registry) {
         this.registry = registry;
     }
 

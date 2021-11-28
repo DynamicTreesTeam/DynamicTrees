@@ -9,4 +9,7 @@ public class PreparationException extends Exception {
         super(message);
     }
 
+    public PreparationException(Throwable cause) {
+        super(cause);
+    }
 }

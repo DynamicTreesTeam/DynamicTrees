@@ -1,13 +1,11 @@
-package com.ferreusveritas.dynamictrees.api.registry;
+package com.ferreusveritas.dynamictrees.api.configurations;
 
-import com.ferreusveritas.dynamictrees.api.configurations.Configurable;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationPropertyValue;
-import com.ferreusveritas.dynamictrees.api.configurations.Configured;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.google.common.collect.Sets;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -15,7 +13,8 @@ import java.util.Set;
 /**
  * @author Harley O'Connor
  */
-public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEntry<T, C>, C extends Configured<C, T>> extends RegistryEntry<T> implements Configurable {
+public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEntry<T, C>, C extends Configuration<C, T>>
+        extends RegistryEntry<T> implements Configurable {
 
     protected final C defaultConfiguration;
 
@@ -32,7 +31,7 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
         super(registryName);
         this.registerProperties();
 
-        this.defaultConfiguration = this.createDefaultConfiguration();
+        this.defaultConfiguration = this.createDefaultConfiguration().setRegistryName(registryName);
     }
 
     /**
@@ -67,7 +66,7 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
      * @return {@code true} if it is registered, {@code false} if not.
      */
     @Override
-    public boolean isPropertyRegistered(ConfigurationProperty<?> property) {
+    public boolean isPropertyRegistered(@Nonnull ConfigurationProperty<?> property) {
         return this.properties.contains(property);
     }
 
@@ -96,10 +95,10 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
     /**
      * Gets the default configuration, adding the specified {@code property} with the specified {@code value}.
      *
-     * @param property The {@link ConfigurationProperty} to add.
-     * @param value    The {@link ConfigurationPropertyValue} to set.
+     * @param property the property to set
+     * @param value    the corresponding value
      * @param <V>      The type of the value being added.
-     * @return The {@link Configured} object created.
+     * @return The {@link Configuration} object created.
      */
     public <V> C with(final ConfigurationProperty<V> property, final V value) {
         return this.getDefaultConfiguration().with(property, value);

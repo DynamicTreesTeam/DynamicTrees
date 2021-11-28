@@ -65,7 +65,6 @@ public class SimpleRegistry<V extends RegistryEntry<V>> extends AbstractRegistry
      */
     public SimpleRegistry(final String name, final Class<V> type, final V nullValue, final boolean clearable) {
         super(name, type, nullValue, clearable);
-
         this.register(nullValue);
     }
 
@@ -83,9 +82,8 @@ public class SimpleRegistry<V extends RegistryEntry<V>> extends AbstractRegistry
      * @return This {@link SimpleRegistry} object for chaining.
      */
     @Override
-    public final SimpleRegistry<V> register(final V value) {
+    public SimpleRegistry<V> register(final V value) {
         this.assertValid(value);
-
         this.entries.add(value);
         return this;
     }

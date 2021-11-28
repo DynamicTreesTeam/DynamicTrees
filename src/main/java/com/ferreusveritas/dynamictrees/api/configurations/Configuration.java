@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.api.configurations;
 
-import com.google.common.collect.Maps;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.ReportedException;
 
-import java.util.Map;
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -14,35 +14,42 @@ import java.util.function.Predicate;
  *
  * @author Harley O'Connor
  */
-public abstract class Configured<T extends Configured<T, C>, C extends Configurable> {
+public abstract class Configuration<T extends Configuration<T, C>, C extends Configurable>
+        extends RegistryEntry<T> {
 
     protected final C configurable;
-    protected final Map<ConfigurationProperty<?>, ConfigurationPropertyValue<?>> properties = Maps.newHashMap();
+    protected final Properties properties = new Properties();
 
-    public Configured(C configurable) {
+    public Configuration(C configurable) {
         this.configurable = configurable;
     }
 
     /**
-     * Adds the given {@link ConfigurationProperty} to this {@link Configured} object's properties.
+     * Adds the given {@link ConfigurationProperty} to this {@link Configuration} object's properties.
      *
      * @param property The {@link ConfigurationProperty} to set.
      * @param value    The value to register.
      * @param <V>      The type of value to register.
-     * @return This {@link Configured} after adding the property.
+     * @return This {@link Configuration} after adding the property.
      * @throws ReportedException If the property given is not registered to the {@link Configurable}.
      */
     @SuppressWarnings("unchecked")
     public <V> T with(ConfigurationProperty<V> property, V value) {
         if (!this.configurable.isPropertyRegistered(property)) {
             final CrashReport crashReport = CrashReport.forThrowable(new IllegalArgumentException(), "Tried to add " +
-                    "unregistered property with identifier '" + property.getIdentifier() + "' and type '" +
+                    "unregistered property with identifier '" + property.getKey() + "' and type '" +
                     property.getType() + "' configurable '" + this.configurable + "'.");
             crashReport.addCategory("Adding property to a gen feature.");
             throw new ReportedException(crashReport);
         }
 
-        this.properties.put(property, new ConfigurationPropertyValue<>(value));
+        this.properties.put(property, value);
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withAll(PropertiesAccessor properties) {
+        properties.forEach(this::with);
         return (T) this;
     }
 
@@ -53,11 +60,11 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
      * @return {@code true} if it does, {@code false} if not.
      */
     public boolean has(ConfigurationProperty<?> property) {
-        return this.properties.containsKey(property);
+        return this.properties.has(property);
     }
 
     /**
-     * Gets the {@link ConfigurationPropertyValue} object's value for the given {@link ConfigurationProperty}. This
+     * Gets the value for the given {@link ConfigurationProperty}. This
      * method expects that the feature will be set, so call {@link #has(ConfigurationProperty)} first if it is
      * optional.
      *
@@ -67,16 +74,16 @@ public abstract class Configured<T extends Configured<T, C>, C extends Configura
      * @throws ReportedException If the property did not exist. If a property is optional. {@link
      *                           #has(ConfigurationProperty)} should be checked before calling this.
      */
+    @Nullable
     public <V> V get(ConfigurationProperty<V> property) {
         if (!this.has(property)) {
             final CrashReport crashReport = CrashReport.forThrowable(new IllegalStateException(), "Tried to obtain " +
-                    "gen feature property '" + property.getIdentifier() + "' from '" + this.configurable + "' " +
-                    "that did not exist.");
-            crashReport.addCategory("Getting property from a configured gen feature.");
+                    "property '" + property.getKey() + "' from '" + this.configurable + "' " + "that did not exist.");
+            crashReport.addCategory("Getting property from a configuration");
             throw new ReportedException(crashReport);
         }
 
-        return property.getType().cast(this.properties.get(property).getValue());
+        return this.properties.get(property);
     }
 
     public <V> Optional<V> getAsOptional(ConfigurationProperty<V> property) {

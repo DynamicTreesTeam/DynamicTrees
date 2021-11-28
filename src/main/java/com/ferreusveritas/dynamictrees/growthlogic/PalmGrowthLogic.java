@@ -13,7 +13,7 @@ public class PalmGrowthLogic extends GrowthLogicKit {
     }
 
     @Override
-    public int[] populateDirectionProbabilityMap(ConfiguredGrowthLogicKit configuration,
+    public int[] populateDirectionProbabilityMap(GrowthLogicKitConfiguration configuration,
                                                  DirectionManipulationContext context) {
         final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
         Direction originDir = context.signal().dir.getOpposite();
@@ -28,7 +28,7 @@ public class PalmGrowthLogic extends GrowthLogicKit {
     }
 
     @Override
-    public float getEnergy(ConfiguredGrowthLogicKit configuration, PositionalSpeciesContext context) {
+    public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         long day = context.world().getGameTime() / 24000L;
         int month = (int) day / 30; // Change the hashs every in-game month
         return super.getEnergy(configuration, context) *

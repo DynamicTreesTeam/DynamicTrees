@@ -1,8 +1,9 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
-import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistry;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistryEntry;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
@@ -27,19 +28,19 @@ import java.util.Random;
  * depending on which methods are overridden. The default actions consist of:
  *
  * <ul>
- *     <li>{@linkplain #preGenerate(ConfiguredGenFeature, PreGenerationContext) Pre-generation}</li>
- *     <li>{@linkplain #postGenerate(ConfiguredGenFeature, PostGenerationContext) Post-generation}</li>
- *     <li>{@linkplain #postGrow(ConfiguredGenFeature, PostGrowContext) Post-growth}</li>
- *     <li>{@linkplain #postRot(ConfiguredGenFeature, PostRotContext) Post-rot}</li>
- *     <li>{@linkplain #generate(ConfiguredGenFeature, FullGenerationContext) Full-generation}</li>
+ *     <li>{@linkplain #preGenerate(GenFeatureConfiguration, PreGenerationContext) Pre-generation}</li>
+ *     <li>{@linkplain #postGenerate(GenFeatureConfiguration, PostGenerationContext) Post-generation}</li>
+ *     <li>{@linkplain #postGrow(GenFeatureConfiguration, PostGrowContext) Post-growth}</li>
+ *     <li>{@linkplain #postRot(GenFeatureConfiguration, PostRotContext) Post-rot}</li>
+ *     <li>{@linkplain #generate(GenFeatureConfiguration, FullGenerationContext) Full-generation}</li>
  * </ul>
  * <p>
- * Each of these should be invoked by {@link GenFeature#generate(ConfiguredGenFeature, Type, GenerationContext)} with
+ * Each of these should be invoked by {@link GenFeature#generate(GenFeatureConfiguration, Type, GenerationContext)} with
  * their corresponding type.
  *
  * @author Harley O'Connor
  */
-public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, ConfiguredGenFeature> {
+public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, GenFeatureConfiguration> {
 
     ///////////////////////////////////////////
     // COMMON PROPERTIES                     //
@@ -63,7 +64,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
     // REGISTRY                              //
     ///////////////////////////////////////////
 
-    public static final GenFeature NULL_GEN_FEATURE = new GenFeature(DTTrees.NULL) {
+    public static final GenFeature NULL = new GenFeature(DTTrees.NULL) {
         @Override
         protected void registerProperties() {
         }
@@ -72,7 +73,8 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
     /**
      * Central registry for all {@link GenFeature} objects.
      */
-    public static final SimpleRegistry<GenFeature> REGISTRY = new SimpleRegistry<>(GenFeature.class, NULL_GEN_FEATURE);
+    public static final Registry<GenFeature> REGISTRY = new ConfigurableRegistry<>(GenFeature.class, NULL,
+            GenFeatureConfiguration.TEMPLATES);
 
     public GenFeature(final ResourceLocation registryName) {
         super(registryName);
@@ -83,8 +85,8 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
     ///////////////////////////////////////////
 
     @Override
-    protected ConfiguredGenFeature createDefaultConfiguration() {
-        return new ConfiguredGenFeature(this);
+    protected GenFeatureConfiguration createDefaultConfiguration() {
+        return new GenFeatureConfiguration(this);
     }
 
     ///////////////////////////////////////////
@@ -101,7 +103,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * @param <R>           the return type of the action
      * @return the return of the executed action
      */
-    public <C extends GenerationContext<?>, R> R generate(ConfiguredGenFeature configuration, Type<C, R> type,
+    public <C extends GenerationContext<?>, R> R generate(GenFeatureConfiguration configuration, Type<C, R> type,
                                                           C context) {
         return type.generate(configuration, context);
     }
@@ -114,7 +116,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * @param context       the context
      * @return the position at which to place the root block
      */
-    protected BlockPos preGenerate(ConfiguredGenFeature configuration, PreGenerationContext context) {
+    protected BlockPos preGenerate(GenFeatureConfiguration configuration, PreGenerationContext context) {
         return context.pos();
     }
 
@@ -126,7 +128,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * @param context       the context
      * @return {@code true} if the action was successful; {@code false} otherwise
      */
-    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         return true;
     }
 
@@ -138,7 +140,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * @param context       the context
      * @return {@code true} if the action was successful; {@code false} otherwise
      */
-    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         return true;
     }
 
@@ -150,7 +152,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * @param context       the context
      * @return {@code true} if the action was successful; {@code false} otherwise
      */
-    protected boolean postRot(ConfiguredGenFeature configuration, PostRotContext context) {
+    protected boolean postRot(GenFeatureConfiguration configuration, PostRotContext context) {
         return true;
     }
 
@@ -164,7 +166,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * @return {@code true} if this {@link GenFeature} handles full generation and so generation from a {@link JoCode}
      * should <b>not</b> proceed; {@code false} otherwise
      */
-    protected boolean generate(ConfiguredGenFeature configuration, FullGenerationContext context) {
+    protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
         return false;
     }
 
@@ -176,7 +178,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
      * @param configuration the configuration
      * @return {@code true} if it should be applied; otherwise {@code false} if the application should be aborted
      */
-    public boolean shouldApply(Species species, ConfiguredGenFeature configuration) {
+    public boolean shouldApply(Species species, GenFeatureConfiguration configuration) {
         return true;
     }
 
@@ -191,13 +193,13 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, C
         public static final Type<PostRotContext, Boolean> POST_ROT = new Type<>(GenFeature::postRot);
         public static final Type<FullGenerationContext, Boolean> FULL = new Type<>(GenFeature::generate);
 
-        private final TriFunction<GenFeature, ConfiguredGenFeature, C, R> generateConsumer;
+        private final TriFunction<GenFeature, GenFeatureConfiguration, C, R> generateConsumer;
 
-        public Type(TriFunction<GenFeature, ConfiguredGenFeature, C, R> generateConsumer) {
+        public Type(TriFunction<GenFeature, GenFeatureConfiguration, C, R> generateConsumer) {
             this.generateConsumer = generateConsumer;
         }
 
-        public R generate(ConfiguredGenFeature configuration, C context) {
+        public R generate(GenFeatureConfiguration configuration, C context) {
             return generateConsumer.apply(configuration.getGenFeature(), configuration, context);
         }
     }

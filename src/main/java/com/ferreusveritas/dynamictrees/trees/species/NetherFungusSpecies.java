@@ -57,7 +57,7 @@ public class NetherFungusSpecies extends Species {
                 .setSaplingShape(CommonVoxelShapes.FLAT_MUSHROOM)
                 .setSaplingSound(SoundType.FUNGUS)
                 .setCanSaplingGrowNaturally(false)
-                .addDropCreators(DropCreators.LOG, DropCreators.WART_BLOCK)
+                .addDropCreators(DropCreators.LOG)
                 .envFactor(BiomeDictionary.Type.COLD, 0.25f)
                 .envFactor(BiomeDictionary.Type.WET, 0.75f);
     }

@@ -37,7 +37,7 @@ public class MoundGenFeature extends GenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature createDefaultConfiguration() {
+    protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MOUND_CUTOFF_RADIUS, 5);
     }
@@ -46,12 +46,12 @@ public class MoundGenFeature extends GenFeature {
      * Used to create a 5x4x5 rounded mound that is one block higher than the ground surface. This is meant to replicate
      * the appearance of a root hill and gives generated surface roots a better appearance.
      *
-     * @param configuration                The {@link ConfiguredGenFeature} instance.
+     * @param configuration                The {@link GenFeatureConfiguration} instance.
      * @param context       The {@link GenerationContext}.
      * @return The modified {@link BlockPos} of the rooty dirt that is one block higher.
      */
     @Override
-    protected BlockPos preGenerate(ConfiguredGenFeature configuration, PreGenerationContext context) {
+    protected BlockPos preGenerate(GenFeatureConfiguration configuration, PreGenerationContext context) {
         final IWorld world = context.world();
         BlockPos rootPos = context.pos();
 
@@ -87,7 +87,7 @@ public class MoundGenFeature extends GenFeature {
      * the radius is greater than 8.
      */
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         // A mound was already generated in preGen and worldgen test
         if (context.radius() >= configuration.get(MOUND_CUTOFF_RADIUS) || !context.isWorldGen()) {
             return false;

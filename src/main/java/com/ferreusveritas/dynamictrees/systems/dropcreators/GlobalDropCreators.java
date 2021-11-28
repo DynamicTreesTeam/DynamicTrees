@@ -15,9 +15,9 @@ public final class GlobalDropCreators {
 
     private GlobalDropCreators() {}
 
-    private static final Map<ResourceLocation, ConfiguredDropCreator> ENTRIES = Maps.newHashMap();
+    private static final Map<ResourceLocation, DropCreatorConfiguration> ENTRIES = Maps.newHashMap();
 
-    public static List<ConfiguredDropCreator> getAll() {
+    public static List<DropCreatorConfiguration> getAll() {
         return Lists.newLinkedList(ENTRIES.values());
     }
 
@@ -25,12 +25,12 @@ public final class GlobalDropCreators {
         getAll().forEach(configuration -> configuration.appendDrops(type, context));
     }
 
-    public static ConfiguredDropCreator get(final ResourceLocation registryName) {
+    public static DropCreatorConfiguration get(final ResourceLocation registryName) {
         return ENTRIES.get(registryName);
     }
 
-    public static void put(final ResourceLocation registryName, final ConfiguredDropCreator configuredDropCreator) {
-        ENTRIES.put(registryName, configuredDropCreator);
+    public static void put(final ResourceLocation registryName, final DropCreatorConfiguration configuration) {
+        ENTRIES.put(registryName, configuration);
     }
 
 }

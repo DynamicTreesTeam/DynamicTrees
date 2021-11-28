@@ -30,7 +30,7 @@ public class PodzolGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postGrow(ConfiguredGenFeature configuration, PostGrowContext context) {
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         if (!DTConfigs.PODZOL_GEN.get()) {
             return false;
         }

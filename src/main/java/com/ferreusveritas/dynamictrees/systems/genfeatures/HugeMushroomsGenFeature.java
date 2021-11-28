@@ -35,14 +35,14 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature createDefaultConfiguration() {
+    protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MAX_MUSHROOMS, 2)
                 .with(MAX_ATTEMPTS, 4);
     }
 
     @Override
-    protected boolean postGenerate(ConfiguredGenFeature configuration, PostGenerationContext context) {
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (context.endPoints().isEmpty() || !context.isWorldGen() || context.radius() < 5) {
             return false;
         }

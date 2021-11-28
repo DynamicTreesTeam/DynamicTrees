@@ -29,12 +29,12 @@ public class RotSoilGenFeature extends GenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature createDefaultConfiguration() {
+    protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(ROTTEN_SOIL, Blocks.DIRT);
     }
 
     @Override
-    protected boolean postRot(ConfiguredGenFeature configuration, PostRotContext context) {
+    protected boolean postRot(GenFeatureConfiguration configuration, PostRotContext context) {
         final IWorld world = context.world();
         final BlockPos belowPos = context.pos().below();
 

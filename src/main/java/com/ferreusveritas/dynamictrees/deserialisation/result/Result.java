@@ -488,7 +488,7 @@ public interface Result<T, I> {
     @FunctionalInterface
     interface SimpleMapper<T, V> extends ThrowableFunction<T, V, DeserialisationException> {
         /**
-         * @return this wrapper in a {@link Mapper}
+         * @return this wrapped in a {@link Mapper}
          */
         default Mapper<T, V> fullMapper() {
             return (value, warningConsumer) -> this.apply(value);

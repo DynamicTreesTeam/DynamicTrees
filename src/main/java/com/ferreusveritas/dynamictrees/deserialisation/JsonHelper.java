@@ -2,9 +2,7 @@ package com.ferreusveritas.dynamictrees.deserialisation;
 
 import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -15,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -22,6 +21,15 @@ import java.util.function.Supplier;
 public class JsonHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final Gson GSON = (new GsonBuilder())
+            .setPrettyPrinting()
+            .disableHtmlEscaping()
+            .create();
+
+    public static Gson getGson() {
+        return GSON;
+    }
 
     @Nullable
     public static JsonElement load(@Nullable final File file) {
@@ -105,6 +113,14 @@ public class JsonHelper {
                         errorConsumer,
                         warningConsumer
                 );
+    }
+
+    public static <T> Optional<T> getAsOptional(JsonObject object, String key, JsonDeserialiser<T> deserialiser) throws DeserialisationException {
+        final JsonElement element = object.get(key);
+        return element == null ? Optional.empty() :
+                deserialiser.deserialise(element)
+                        .map(Optional::ofNullable)
+                        .orElseThrow();
     }
 
     public static AbstractBlock.Properties getBlockProperties(final JsonObject jsonObject, final Material defaultMaterial, final MaterialColor defaultMaterialColor, final BiFunction<Material, MaterialColor, AbstractBlock.Properties> defaultPropertiesGetter, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {

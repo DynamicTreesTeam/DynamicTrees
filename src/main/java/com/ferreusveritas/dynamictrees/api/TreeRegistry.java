@@ -7,8 +7,7 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.ConfiguredDropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.GlobalDropCreators;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
@@ -128,16 +127,16 @@ public final class TreeRegistry {
     /**
      * This exists so that mods not interested in making Dynamic Trees can still add drops to all trees.
      *
-     * @param configuredDropCreator The {@link DropCreator} to register.
+     * @param configuration the drop creator configuration to register
      */
     public static boolean registerDropCreator(final ResourceLocation speciesName,
-                                              final ConfiguredDropCreator configuredDropCreator) {
-        return findSpecies(speciesName).addDropCreators(configuredDropCreator);
+                                              final DropCreatorConfiguration configuration) {
+        return findSpecies(speciesName).addDropCreators(configuration);
     }
 
     public static void registerGlobalDropCreator(final ResourceLocation registryName,
-                                                 final ConfiguredDropCreator configuredDropCreator) {
-        GlobalDropCreators.put(registryName, configuredDropCreator);
+                                                 final DropCreatorConfiguration configuration) {
+        GlobalDropCreators.put(registryName, configuration);
     }
 
     public static boolean removeDropCreators(final ResourceLocation speciesName,
@@ -145,8 +144,8 @@ public final class TreeRegistry {
         return findSpecies(speciesName).removeDropCreator(dropCreatorName);
     }
 
-    public static Map<ResourceLocation, List<ConfiguredDropCreator>> getDropCreatorsMap() {
-        final Map<ResourceLocation, List<ConfiguredDropCreator>> dir = new HashMap<>();
+    public static Map<ResourceLocation, List<DropCreatorConfiguration>> getDropCreatorsMap() {
+        final Map<ResourceLocation, List<DropCreatorConfiguration>> dir = new HashMap<>();
         dir.put(GLOBAL, GlobalDropCreators.getAll());
         Species.REGISTRY.forEach(species -> dir.put(species.getRegistryName(), species.getDropCreators()));
         return dir;

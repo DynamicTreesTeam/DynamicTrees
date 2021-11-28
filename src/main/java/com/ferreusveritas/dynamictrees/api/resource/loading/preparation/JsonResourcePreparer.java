@@ -2,15 +2,19 @@ package com.ferreusveritas.dynamictrees.api.resource.loading.preparation;
 
 import com.ferreusveritas.dynamictrees.api.resource.ResourceCollector;
 import com.ferreusveritas.dynamictrees.api.resource.Resource;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import net.minecraft.resources.IResource;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -21,11 +25,6 @@ import java.nio.charset.StandardCharsets;
 public final class JsonResourcePreparer extends AbstractResourcePreparer<JsonElement> {
 
     private static final String JSON_EXTENSION = ".json";
-
-    private static final Gson GSON = (new GsonBuilder())
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .create();
 
     public JsonResourcePreparer(String folderName) {
         this(folderName, ResourceCollector.ordered());
@@ -43,14 +42,26 @@ public final class JsonResourcePreparer extends AbstractResourcePreparer<JsonEle
 
     @Nonnull
     static JsonElement readResource(IResource resource) throws PreparationException {
-        final Reader reader =
-                new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
-        final JsonElement json = JSONUtils.fromJson(GSON, reader, JsonElement.class);
+        final Reader reader = getReader(resource);
+        final JsonElement json = tryParseJson(reader);
 
         if (json == null) {
             throw new PreparationException("Couldn't load file as it's null or empty");
         }
         return json;
+    }
+
+    private static BufferedReader getReader(IResource resource) {
+        return new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
+    }
+
+    @Nullable
+    private static JsonElement tryParseJson(Reader reader) throws PreparationException {
+        try {
+            return JSONUtils.fromJson(JsonHelper.getGson(), reader, JsonElement.class);
+        } catch (JsonParseException e) {
+            throw new PreparationException(e);
+        }
     }
 
 }

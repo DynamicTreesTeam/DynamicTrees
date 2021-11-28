@@ -14,7 +14,7 @@ import net.minecraftforge.common.IPlantable;
 /**
  * A {@link GenFeature} handling the default post rot behaviour: turning the rotted branch into the {@link #MUSHROOM}
  * set
- * in the {@link ConfiguredGenFeature} object.
+ * in the {@link GenFeatureConfiguration} object.
  *
  * @author Harley O'Connor
  */
@@ -34,7 +34,7 @@ public class MushroomRotGenFeature extends GenFeature {
     }
 
     @Override
-    protected ConfiguredGenFeature createDefaultConfiguration() {
+    protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MUSHROOM, Blocks.BROWN_MUSHROOM)
                 .with(ALTERNATE_MUSHROOM, Blocks.RED_MUSHROOM)
@@ -42,7 +42,7 @@ public class MushroomRotGenFeature extends GenFeature {
     }
 
     @Override
-    protected boolean postRot(ConfiguredGenFeature configuration, PostRotContext context) {
+    protected boolean postRot(GenFeatureConfiguration configuration, PostRotContext context) {
         final IWorld world = context.world();
         final BlockPos pos = context.pos();
         final Block mushroom = configuration.get(ALTERNATE_MUSHROOM_CHANCE) > context.random().nextFloat() ?
