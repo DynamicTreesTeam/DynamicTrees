@@ -1,10 +1,9 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistry;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistryEntry;
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
@@ -38,7 +37,7 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
     /**
      * Central registry for all {@link GrowthLogicKit} objects.
      */
-    public static final Registry<GrowthLogicKit> REGISTRY =
+    public static final ConfigurableRegistry<GrowthLogicKit, GrowthLogicKitConfiguration> REGISTRY =
             new ConfigurableRegistry<>(GrowthLogicKit.class, NULL, GrowthLogicKitConfiguration.TEMPLATES);
 
     public GrowthLogicKit(final ResourceLocation registryName) {

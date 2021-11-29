@@ -5,6 +5,8 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationTemplateR
 import com.ferreusveritas.dynamictrees.api.event.Hooks;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceManager;
 import com.ferreusveritas.dynamictrees.data.DTRecipes;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.resources.loader.BiomeDatabaseResourceLoader;
 import com.ferreusveritas.dynamictrees.resources.loader.FamilyResourceLoader;
@@ -66,6 +68,20 @@ public final class Resources {
             DropCreatorConfiguration.TEMPLATES
     );
 
+    public static final ConfigurationTemplateResourceLoader<GenFeatureConfiguration, GenFeature>
+            GEN_FEATURE_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
+            "gen_features/configurations",
+            GenFeature.REGISTRY,
+            GenFeatureConfiguration.TEMPLATES
+    );
+
+    public static final ConfigurationTemplateResourceLoader<GrowthLogicKitConfiguration, GrowthLogicKit>
+            GROWTH_LOGIC_KIT_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
+            "growth_logic_kits/configurations",
+            GrowthLogicKit.REGISTRY,
+            GrowthLogicKitConfiguration.TEMPLATES
+    );
+
     public static final SpeciesResourceLoader SPECIES_LOADER = new SpeciesResourceLoader();
 
 
@@ -91,6 +107,8 @@ public final class Resources {
                 SOIL_PROPERTIES_LOADER,
                 FAMILY_LOADER,
                 DROP_CREATOR_TEMPLATE_LOADER,
+                GEN_FEATURE_TEMPLATE_LOADER,
+                GROWTH_LOGIC_KIT_TEMPLATE_LOADER,
                 SPECIES_LOADER,
                 JO_CODE_LOADER,
                 BIOME_DATABASE_LOADER,

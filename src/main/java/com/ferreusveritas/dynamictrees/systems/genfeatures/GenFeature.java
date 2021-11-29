@@ -73,8 +73,8 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     /**
      * Central registry for all {@link GenFeature} objects.
      */
-    public static final Registry<GenFeature> REGISTRY = new ConfigurableRegistry<>(GenFeature.class, NULL,
-            GenFeatureConfiguration.TEMPLATES);
+    public static final ConfigurableRegistry<GenFeature, GenFeatureConfiguration> REGISTRY =
+            new ConfigurableRegistry<>(GenFeature.class, NULL, GenFeatureConfiguration.TEMPLATES);
 
     public GenFeature(final ResourceLocation registryName) {
         super(registryName);
