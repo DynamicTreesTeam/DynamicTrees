@@ -259,7 +259,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
      * @return
      */
     public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
-        return getPrimitiveSoilBlock().defaultBlockState();
+        return properties.getPrimitiveSoilState(state);
     }
 
     /**
@@ -284,19 +284,9 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
             return;
         }
 
-//		final Biome biome = world.getBiome(rootPos);
-        final BlockState primitiveDirt = this.getPrimitiveSoilBlock().defaultBlockState();
+        final BlockState primitiveDirt = getDecayBlockState(rootyState, world, rootPos);
 
-//		final BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
-//		final BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnderMaterial();
-
-        //if (primitiveDirt == topBlock || primitiveDirt == fillerBlock) {
         world.setBlock(rootPos, primitiveDirt, Constants.BlockFlags.DEFAULT);
-//		} else if (topBlock.getMaterial() == newState.getMaterial()) {
-//			world.setBlock(rootPos, topBlock, Constants.BlockFlags.DEFAULT);
-//		} else if (fillerBlock.getMaterial() == newState.getMaterial()) {
-//			world.setBlock(rootPos, fillerBlock, Constants.BlockFlags.DEFAULT);
-//		}
     }
 
     @Override
