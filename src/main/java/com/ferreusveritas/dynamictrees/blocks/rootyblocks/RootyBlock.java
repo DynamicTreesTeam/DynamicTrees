@@ -135,8 +135,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
     }
 
     @Override
-    public VoxelShape getShape(BlockState p_220053_1_, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_) {
-        return getPrimitiveSoilBlock().getShape(getPrimitiveSoilBlock().defaultBlockState(), p_220053_2_, p_220053_3_, p_220053_4_);
+    public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
+        return getPrimitiveSoilBlock().getShape(getDecayBlockState(state, reader, pos), reader, pos, context);
     }
 
     @Override
@@ -258,7 +258,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
      * @param pos    The position of the {@link RootyBlock}
      * @return
      */
-    public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
+    public BlockState getDecayBlockState(BlockState state, IBlockReader access, BlockPos pos) {
         return properties.getPrimitiveSoilState(state);
     }
 
