@@ -29,6 +29,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -312,7 +313,8 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if (entity instanceof EntityItem || passableLeavesModLoaded || ModConfigs.vanillaLeavesCollision) {
+		if (entity instanceof EntityItem || entity instanceof IProjectile ||
+			passableLeavesModLoaded || ModConfigs.vanillaLeavesCollision) {
 			super.onEntityCollidedWithBlock(world, pos, state, entity);
 		} else {
 			if (entity.motionY < 0.0D && entity.fallDistance < 2.0f) {
