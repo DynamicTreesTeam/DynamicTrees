@@ -14,6 +14,7 @@ plugins {
     id("idea")
     id("maven-publish")
     id("com.matthewprenger.cursegradle") version "1.4.0"
+    id("wtf.gofancy.fancygradle") version "1.1.0-0"
 }
 
 repositories {
@@ -83,11 +84,10 @@ dependencies {
     runtimeOnly("vazkii.patchouli:Patchouli:1.0-19.96")
 }
 
-// Workaround for resources issue. Use gradle tasks rather than generated runs for now.
-sourceSets {
-    main {
-        output.setResourcesDir(file("build/combined"))
-        java.destinationDirectory.set(file("build/combined"))
+fancyGradle {
+    patches {
+        resources
+        asm
     }
 }
 

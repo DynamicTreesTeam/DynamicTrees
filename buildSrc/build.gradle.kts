@@ -6,6 +6,7 @@ plugins {
 repositories {
     mavenCentral()
     maven("https://files.minecraftforge.net/maven")
+    maven("https://gitlab.com/api/v4/projects/26758973/packages/maven")
 }
 
 dependencies {
