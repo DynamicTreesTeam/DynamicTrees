@@ -124,11 +124,22 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockItemUseContext useContext) {
-        return this.getMuse(useContext.getLevel(), useContext.getClickedPos()) == null;
+        final World world = useContext.getLevel();
+        final BlockPos clickedPos = useContext.getClickedPos();
+        if (this.museDoesNotExist(world, state, clickedPos)) {
+            this.scheduleUpdateTick(world, clickedPos);
+            return false;
+        }
+        return false;
     }
 
     public Surround getMuseDir(BlockState state, BlockPos pos) {
         return state.getValue(CORE_DIR);
+    }
+
+    public boolean museDoesNotExist(IBlockReader world, BlockState state, BlockPos pos) {
+        final BlockPos musePos = pos.offset(this.getMuseDir(state, pos).getOffset());
+        return CoordUtils.getStateSafe(world, musePos) == null;
     }
 
     @Nullable
@@ -194,7 +205,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
 
     @Override
     public void neighborChanged(BlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean p_220069_6_) {
-        scheduleUpdateTick(world, pos);
+        this.scheduleUpdateTick(world, pos);
     }
 
     @Override
@@ -209,7 +220,11 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
 
     @Override
     public boolean isAir(BlockState state, IBlockReader access, BlockPos pos) {
-        return this.getMuse(access, state, pos) == null;
+        if (this.museDoesNotExist(access, state, pos)) {
+            this.scheduleUpdateTick(access, pos);
+            return false;
+        }
+        return false;
     }
 
     @Override

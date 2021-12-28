@@ -443,8 +443,13 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
 
     @Nullable
     private SpeciesTileEntity getTileEntitySpecies(IWorld world, BlockPos pos) {
+<<<<<<< HEAD
         final TileEntity blockEntity = world.getBlockEntity(pos);
         return blockEntity instanceof SpeciesTileEntity ? (SpeciesTileEntity) blockEntity : null;
+=======
+        final TileEntity tileEntity = world.getBlockEntity(pos);
+        return tileEntity instanceof SpeciesTileEntity ? (SpeciesTileEntity) tileEntity : null;
+>>>>>>> develop/1.16.5
     }
 
     /**

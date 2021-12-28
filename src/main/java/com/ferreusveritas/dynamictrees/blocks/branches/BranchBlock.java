@@ -459,8 +459,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         for (ItemStack stack : primitiveLogDrops) {
             int num = numLogs * stack.getCount();
             while (num > 0) {
-                drops.add(new ItemStack(stack.getItem(), Math.min(num, 64)));
-                num -= 64;
+                ItemStack drop = stack.copy();
+                drop.setCount(Math.min(num, stack.getMaxStackSize()));
+                drops.add(drop);
+                num -= stack.getMaxStackSize();
             }
         }
         return volumeIn - numLogs;
