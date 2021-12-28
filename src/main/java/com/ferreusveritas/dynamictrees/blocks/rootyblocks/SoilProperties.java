@@ -15,10 +15,7 @@ import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
 import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.util.ResourceLocation;
@@ -67,7 +64,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     protected RootyBlock block;
     protected Integer soilFlags = 0;
     private ResourceLocation blockRegistryName;
-    protected boolean substitute;
+    protected boolean hasSubstitute;
 
     //used for null soil properties
     protected SoilProperties() {
@@ -110,6 +107,28 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         SoilHelper.addSoilPropertiesToMap(this);
     }
 
+    /**
+     * Allows to veto a soil block based on the blockstate.
+     */
+    public boolean isValidState(BlockState primitiveSoilState){
+        return true;
+    }
+
+    /**
+     * primitiveSoilState should always be this soil's primitive block, but if used on, verify anyways.
+     * @return the BlockState of the rooty soil.
+     */
+    public BlockState getSoilState (BlockState primitiveSoilState, int fertility, boolean requireTileEntity){
+        return dynamicSoilBlock.defaultBlockState().setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, requireTileEntity);
+    }
+
+    /**
+     * @return the BlockState of the primitive soil that is set when it is no longer supporting a tree.
+     */
+    public BlockState getPrimitiveSoilState (BlockState currentSoilState){
+        return primitiveSoilBlock.defaultBlockState();
+    }
+
     ///////////////////////////////////////////
     // ROOTY BLOCK
     ///////////////////////////////////////////
@@ -137,9 +156,13 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         return Optionals.ofBlock(block);
     }
 
-    public void generateBlock(AbstractBlock.Properties blockProperties) {
-        setBlockRegistryNameIfNull();
-        this.block = RegistryHandler.addBlock(this.blockRegistryName, this.createBlock(blockProperties));
+    public Optional<RootyBlock> getSoilBlock() {
+        return Optional.ofNullable(this.dynamicSoilBlock == Blocks.AIR ? null : this.dynamicSoilBlock);
+    }
+
+    public void generateDynamicSoil(AbstractBlock.Properties blockProperties) {
+            setBlockRegistryNameIfNull();
+            this.dynamicSoilBlock = RegistryHandler.addBlock(this.blockRegistryName, this.createDynamicSoil(blockProperties));
     }
 
     protected RootyBlock createBlock(AbstractBlock.Properties blockProperties) {
@@ -150,12 +173,12 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         this.block = rootyBlock;
     }
 
-    public boolean isSubstitute() {
-        return substitute;
+    public boolean hasSubstitute() {
+        return hasSubstitute;
     }
 
-    public void setSubstitute(boolean substitute) {
-        this.substitute = substitute;
+    public void setHasSubstitute(boolean hasSubstitute) {
+        this.hasSubstitute = hasSubstitute;
     }
 
     ///////////////////////////////////////////

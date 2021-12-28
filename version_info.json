@@ -1,7 +1,8 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
   "1.16.5": {
-    "1.16.5-0.10.0-Beta25": "New Features:\n- Added block state, block model, and item model generators.\n\nEnhancements:\n- Accept `shears` ToolType rather than relying on type-bound `ShearsItem` detection.\n- GrowthLogicKit.newDirectionSelected now takes `World` and `BlockPos` parameter.\n- Shrunk falling tree entity bounding box to reduce lag (culling bounding box is kept large to prevent it disappearing at a distance).\n\nBug Fixes:\n- Fixed crash whilst generating vines (#618).\n- Fixed CME whilst exploding a large amount of trees (#620).\n- Fixed pathfinding issues around dynamic trees (#592).\n- Fixed world ticking exception with SnowRealMagic (#617).",
+    "1.16.5-0.10.0-Beta26": "New Features:\n+ Added `\"OR\"` and `\"AND\"` appliers to datapack worldgen biome selectors.\n+ Added `\"names_or\"` applier to datapack worldgen biome selectors.\n+ Allowed rooty soils to read blockstate of primitive soil for checking validity and deciding the proper soil block to use.\n\nEnhancements:\n- Moved generateDirtBucketRecipes to common config\n\nBug Fixes:\n- Fixed logs and sticks dropping above the max stack size.\n- Fixed substitute soils not assigning properly",
+    "1.16.5-0.10.0-Beta25": "New Features:\n+ Added block state, block model, and item model generators.\n\nEnhancements:\n+ Accept `shears` ToolType rather than relying on type-bound `ShearsItem` detection.\n- GrowthLogicKit.newDirectionSelected now takes `World` and `BlockPos` parameter.\n- Shrunk falling tree entity bounding box to reduce lag (culling bounding box is kept large to prevent it disappearing at a distance).\n\nBug Fixes:\n- Fixed crash whilst generating vines (#618).\n- Fixed CME whilst exploding a large amount of trees (#620).\n- Fixed pathfinding issues around dynamic trees (#592).\n- Fixed world ticking exception with SnowRealMagic (#617).",
     "1.16.5-0.10.0-Beta24": "New Features:\n+ Added mega jungle trees to jungle biomes\n+ Added alternativeLeavesGenFeature\n+ Added randomPredicateGenFeature\nEnhancements:\n- Removed vanilla leaves connecting to dynamic trees\n- Reverted growPulse command to work instantly again\nBug Fixes:\n- Fixed palm type trees not rendering correctly sometimes\n- Fixed trunk shell blocks sometimes staying behind when chopping down thick trees",
     "1.16.5-0.10.0-Beta23": "Enhancements:\n- Built-in integration with Better Weather seasons.\n- `preferredSeasonMod` config option for selecting which season provider should be used.",
     "1.16.5-0.10.0-Beta22": "Bug Fixes:\n- Fixed NoSuchElementException when generating a conifer topper.",
@@ -23,7 +24,7 @@
     "1.16.5-0.10.0-Beta6": "Initial 1.16.5 beta for CF."
   },
   "promos": {
-    "1.16.5-latest": "1.16.5-0.10.0-Beta25",
-    "1.16.5-recommended": "1.16.5-0.10.0-Beta25"
+    "1.16.5-latest": "1.16.5-0.10.0-Beta26",
+    "1.16.5-recommended": "1.16.5-0.10.0-Beta26"
   }
 }

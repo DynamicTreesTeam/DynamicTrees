@@ -40,7 +40,7 @@ version = "$mcVersion-$modVersion"
 group = property("group")
 
 minecraft {
-    mappings("parchment", "${property("mappingsVersion")}-$mcVersion")
+    mappings("official", mcVersion)
     accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
 
     runs {

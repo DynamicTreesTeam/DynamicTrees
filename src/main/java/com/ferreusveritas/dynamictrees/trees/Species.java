@@ -24,6 +24,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.compat.seasons.NormalSeasonManager;
+import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
@@ -1103,18 +1104,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     ///////////////////////////////////////////
 
     public boolean placeRootyDirtBlock(IWorld world, BlockPos rootPos, int fertility) {
-        Block dirt = world.getBlockState(rootPos).getBlock();
+        BlockState dirtState = world.getBlockState(rootPos);
+        Block dirt = dirtState.getBlock();
 
         if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock)) {
+            //soil is not valid so we default to dirt
             LogManager.getLogger().warn("Rooty Dirt block NOT FOUND for soil " + dirt.getRegistryName()); //default to dirt and print error
-            this.placeRootyDirtBlock(world, rootPos, Blocks.DIRT, fertility);
+            this.placeRootyDirtBlock(world, rootPos, Blocks.DIRT.defaultBlockState(), fertility);
             return false;
         }
 
         if (dirt instanceof RootyBlock) {
-            this.placeRootyDirtBlock(world, rootPos, (RootyBlock) dirt, fertility);
+            //dirt block is already a soil, so we just update it
+            this.updateRootyDirtBlock(world, rootPos, dirtState, fertility);
         } else if (SoilHelper.isSoilRegistered(dirt)) {
-            this.placeRootyDirtBlock(world, rootPos, dirt, fertility);
+            this.placeRootyDirtBlock(world, rootPos, dirtState, fertility);
         }
 
         TileEntity tileEntity = world.getBlockEntity(rootPos);
@@ -1126,14 +1130,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return true;
     }
 
-    private void placeRootyDirtBlock(IWorld world, BlockPos rootPos, Block primitiveDirt, int fertility) {
-        SoilHelper.getProperties(primitiveDirt).getBlock().ifPresent(rootyBlock ->
-                this.placeRootyDirtBlock(world, rootPos, rootyBlock, fertility)
-        );
+    private void placeRootyDirtBlock(IWorld world, BlockPos rootPos, BlockState primitiveDirtState, int fertility) {
+        SoilProperties soilProperties = SoilHelper.getProperties(primitiveDirtState.getBlock());
+        if (soilProperties.getDynamicSoilBlock() != null) {
+            world.setBlock(rootPos, soilProperties.getSoilState(primitiveDirtState, fertility, this.doesRequireTileEntity(world, rootPos)), 3);
+        }
     }
 
-    private void placeRootyDirtBlock(IWorld world, BlockPos rootPos, RootyBlock rootyBlock, int fertility) {
-        world.setBlock(rootPos, rootyBlock.defaultBlockState().setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(world, rootPos)), 3);
+    private void updateRootyDirtBlock(IWorld world, BlockPos rootPos, BlockState soilState, int fertility) {
+        if (soilState.getBlock() instanceof RootyBlock)
+            world.setBlock(rootPos, soilState.setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(world, rootPos)), 3);
     }
 
     public Species setSoilLongevity(int longevity) {
@@ -1190,7 +1196,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return
      */
     public boolean isAcceptableSoil(BlockState soilBlockState) {
-        return SoilHelper.isSoilAcceptable(soilBlockState.getBlock(), soilTypeFlags);
+        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags);
     }
 
     /**
@@ -1229,7 +1235,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     protected boolean isWater(BlockState soilBlockState) {
-        return SoilHelper.isSoilAcceptable(soilBlockState.getBlock(), SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE));
+        return SoilHelper.isSoilAcceptable(soilBlockState, SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE));
     }
 
 

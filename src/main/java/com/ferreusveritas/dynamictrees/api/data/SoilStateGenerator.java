@@ -26,7 +26,7 @@ public class SoilStateGenerator implements Generator<DTBlockStateProvider, SoilP
 
     @Override
     public boolean verifyInput(SoilProperties input) {
-        return !input.isSubstitute(); // Don't create states for substitutes as they use another soil's block.
+        return !input.hasSubstitute(); // Don't create states for substitutes as they use another soil's block.
     }
 
     @Override

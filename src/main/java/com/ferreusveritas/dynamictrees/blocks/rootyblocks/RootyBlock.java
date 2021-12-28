@@ -135,8 +135,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public VoxelShape getShape(BlockState p_220053_1_, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_) {
-        return getPrimitiveSoilBlock().getShape(getPrimitiveSoilBlock().defaultBlockState(), p_220053_2_, p_220053_3_, p_220053_4_);
+    public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
+        return getPrimitiveSoilBlock().getShape(getDecayBlockState(state, reader, pos), reader, pos, context);
     }
 
     @Override
@@ -255,8 +255,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
      * @param pos    The position of the {@link RootyBlock}
      * @return
      */
-    public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
-        return getPrimitiveSoilBlock().defaultBlockState();
+    public BlockState getDecayBlockState(BlockState state, IBlockReader access, BlockPos pos) {
+        return properties.getPrimitiveSoilState(state);
     }
 
     /**
@@ -281,19 +281,9 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
             return;
         }
 
-//		final Biome biome = world.getBiome(rootPos);
-        final BlockState primitiveDirt = this.getPrimitiveSoilBlock().defaultBlockState();
+        final BlockState primitiveDirt = getDecayBlockState(rootyState, world, rootPos);
 
-//		final BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
-//		final BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnderMaterial();
-
-        //if (primitiveDirt == topBlock || primitiveDirt == fillerBlock) {
         world.setBlock(rootPos, primitiveDirt, Constants.BlockFlags.DEFAULT);
-//		} else if (topBlock.getMaterial() == newState.getMaterial()) {
-//			world.setBlock(rootPos, topBlock, Constants.BlockFlags.DEFAULT);
-//		} else if (fillerBlock.getMaterial() == newState.getMaterial()) {
-//			world.setBlock(rootPos, fillerBlock, Constants.BlockFlags.DEFAULT);
-//		}
     }
 
     @Override
