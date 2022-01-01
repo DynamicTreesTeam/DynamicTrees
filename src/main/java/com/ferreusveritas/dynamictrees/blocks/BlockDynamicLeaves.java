@@ -148,11 +148,18 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 	}
 
 	protected void doTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-		if ((pos.getX() != 0 && pos.getX() != 15 & pos.getZ() != 0 & pos.getZ() != 15) || worldIn.isAreaLoaded(pos, 1)) {
-			if (getProperties(state).updateTick(worldIn, pos, state, rand)) {
-				age(worldIn, pos, state, rand, SafeChunkBounds.ANY);
-			}
+		if (canTickAt(worldIn, pos) && getProperties(state).updateTick(worldIn, pos, state, rand)) {
+			age(worldIn, pos, state, rand, SafeChunkBounds.ANY);
 		}
+	}
+
+	protected boolean canTickAt(World worldIn, BlockPos pos) {
+		//Must check 2 blocks away for loaded chunks
+		int xm = pos.getX() - ((pos.getX() >> 4) << 4);
+		int zm = pos.getZ() - ((pos.getZ() >> 4) << 4);
+		if (xm > 1 && xm < 14 && zm > 1 && zm < 14)
+			return worldIn.isBlockLoaded(pos);
+		return worldIn.isAreaLoaded(pos, 2);
 	}
 
 	@Override
