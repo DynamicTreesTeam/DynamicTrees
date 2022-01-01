@@ -26,7 +26,6 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 /**
@@ -122,7 +121,7 @@ public class WaterSoilProperties extends SoilProperties {
         }
 
         @Override
-        public BlockState getDecayBlockState(BlockState state, IBlockReader access, BlockPos pos) {
+        public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
             if (state.hasProperty(WATERLOGGED) && !state.getValue(WATERLOGGED)) {
                 return Blocks.AIR.defaultBlockState();
             }

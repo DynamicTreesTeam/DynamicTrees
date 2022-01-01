@@ -554,6 +554,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     @FunctionalInterface
     public interface CommonOverride extends BiPredicate<IBlockReader, BlockPos> {
+
     }
 
     ///////////////////////////////////////////
@@ -779,6 +780,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public static class LogsAndSticks {
+
         public List<ItemStack> logs;
         public final int sticks;
 
@@ -786,6 +788,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             this.logs = logs;
             this.sticks = DTConfigs.DROP_STICKS.get() ? sticks : 0;
         }
+
     }
 
     public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume) {
@@ -853,7 +856,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     protected final Set<SeedSaplingRecipe> primitiveSaplingRecipe = new HashSet<>();
 
-    public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe){
+    public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe) {
         recipe.getSaplingBlock()
                 .ifPresent(block -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), this));
         primitiveSaplingRecipe.add(recipe);
@@ -1131,10 +1134,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     private void placeRootyDirtBlock(IWorld world, BlockPos rootPos, BlockState primitiveDirtState, int fertility) {
-        SoilProperties soilProperties = SoilHelper.getProperties(primitiveDirtState.getBlock());
-        if (soilProperties.getDynamicSoilBlock() != null) {
-            world.setBlock(rootPos, soilProperties.getSoilState(primitiveDirtState, fertility, this.doesRequireTileEntity(world, rootPos)), 3);
-        }
+        final SoilProperties soilProperties = SoilHelper.getProperties(primitiveDirtState.getBlock());
+        soilProperties.getBlock().ifPresent(block ->
+                world.setBlock(rootPos, soilProperties.getSoilState(primitiveDirtState, fertility, this.doesRequireTileEntity(world, rootPos)), 3)
+        );
     }
 
     private void updateRootyDirtBlock(IWorld world, BlockPos rootPos, BlockState soilState, int fertility) {

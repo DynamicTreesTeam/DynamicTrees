@@ -1,7 +1,13 @@
 package com.ferreusveritas.dynamictrees.util.json;
 
-import com.ferreusveritas.dynamictrees.api.treepacks.IVoidPropertyApplier;
+import com.ferreusveritas.dynamictrees.api.treepacks.VoidApplier;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialiser;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
+import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
+import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,9 +22,9 @@ import java.util.Set;
 /**
  * @author Harley O'Connor
  */
-public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
+public final class BiomeListGetter implements JsonDeserialiser<BiomeList> {
 
-    private static final IVoidPropertyApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeString) ->
+    private static final VoidApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeString) ->
             biomeList.removeIf(biome -> {
                         final Set<BiomeDictionary.Type> biomeTypes = BiomeDictionary.getTypes(RegistryKey.create(ForgeRegistries.Keys.BIOMES, biome.getRegistryName()));
                 if (typeString.toCharArray()[0] == '!') {
@@ -29,7 +35,7 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
                     }
             );
 
-    private static final IVoidPropertyApplier<BiomeList, String> CATEGORY_APPLIER = (biomeList, categoryString) ->
+    private static final VoidApplier<BiomeList, String> CATEGORY_APPLIER = (biomeList, categoryString) ->
             biomeList.removeIf(biome -> {
                 final String biomeName = biome.getRegistryName().toString();
                 if (categoryString.toCharArray()[0] == '!') {
@@ -39,20 +45,20 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
                 }
             });
 
-    private static final IVoidPropertyApplier<BiomeList, String> NAME_APPLIER = (biomeList, nameString) ->
+    private static final VoidApplier<BiomeList, String> NAME_APPLIER = (biomeList, nameString) ->
             biomeList.removeIf(biome -> {
-                final String biomeName = biome.getRegistryName().toString();
+                final String biomeName = String.valueOf(biome.getRegistryName());
                 if (nameString.toCharArray()[0] == '!') {
                     return biomeName.matches(nameString.substring(1).toLowerCase());
                 } else {
                     return !biomeName.matches(nameString.toLowerCase());
                 }
             });
-    private static final IVoidPropertyApplier<BiomeList, JsonArray> NAMES_OR_APPLIER = (biomeList, arrayList) ->{
+    private static final VoidApplier<BiomeList, JsonArray> NAMES_OR_APPLIER = (biomeList, arrayList) ->{
         BiomeList whiteList = new BiomeList();
         BiomeList blackList = new BiomeList();
         BiomeList.getAll().forEach((biome -> {
-            final String biomeName = biome.getRegistryName().toString();
+            final String biomeName = String.valueOf(biome.getRegistryName());
             arrayList.forEach((jsonElement)->{
                 String nameString = jsonElement.getAsString();
                 if (nameString.toCharArray()[0] == '!') {
@@ -66,7 +72,7 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
         biomeList.removeIf((biome)-> !whiteList.contains(biome));
     };
 
-    private final IVoidPropertyApplier<BiomeList, JsonArray> OR_OPERATOR = (biomes, jsonArray) -> {
+    private final VoidApplier<BiomeList, JsonArray> OR_OPERATOR = (biomes, jsonArray) -> {
         BiomeList biomesList = new BiomeList();
         for (JsonElement elem : jsonArray){
             if (elem instanceof JsonObject){
@@ -78,7 +84,7 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
         biomes.removeIf(biome -> !biomesList.contains(biome));
     };
 
-    private final JsonPropertyApplierList<BiomeList> appliers = new JsonPropertyApplierList<>(BiomeList.class);
+    private final JsonPropertyAppliers<BiomeList> appliers = new JsonPropertyAppliers<>(BiomeList.class);
 
     public BiomeListGetter() {
         this.appliers.register("type", String.class, TYPE_APPLIER)
@@ -91,23 +97,23 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
                 .register("OR", JsonArray.class, OR_OPERATOR);
     }
 
-    private void applyAllAppliers(JsonObject obj, BiomeList biomes){
-        appliers.applyAll(obj, biomes);
+    private void applyAllAppliers(JsonObject json, BiomeList biomes){
+        appliers.applyAll(new JsonMapWrapper(json), biomes);
     }
 
     @Override
-    public ObjectFetchResult<BiomeList> get(final JsonElement jsonElement) {
+    public Result<BiomeList, JsonElement> deserialise(final JsonElement json) {
         final BiomeList biomes;
 
-        final ObjectFetchResult<Biome> biomeFetchResult = JsonObjectGetters.BIOME.get(jsonElement);
+        final Result<Biome, JsonElement> result = JsonDeserialisers.BIOME.deserialise(json);
 
-        if (biomeFetchResult.wasSuccessful()) {
-            biomes = new BiomeList(Collections.singletonList(biomeFetchResult.getValue()));
+        if (result.success()) {
+            biomes = new BiomeList(Collections.singletonList(result.get()));
         } else {
-            if (!jsonElement.isJsonObject()) {
-                return ObjectFetchResult.failureFromOther(biomeFetchResult);
+            if (!json.isJsonObject()) {
+                return result.map(biome -> new BiomeList(Collections.singletonList(biome)));
             }
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonObject jsonObject = json.getAsJsonObject();
 
             // Start with a list of all biomes.
             biomes = BiomeList.getAll();
@@ -116,7 +122,7 @@ public final class BiomeListGetter implements IJsonObjectGetter<BiomeList> {
             applyAllAppliers(jsonObject, biomes);
         }
 
-        return ObjectFetchResult.success(biomes);
+        return JsonResult.success(json, biomes);
     }
 
 }

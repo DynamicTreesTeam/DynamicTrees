@@ -119,7 +119,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
      * @return the BlockState of the rooty soil.
      */
     public BlockState getSoilState (BlockState primitiveSoilState, int fertility, boolean requireTileEntity){
-        return dynamicSoilBlock.defaultBlockState().setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, requireTileEntity);
+        return block.defaultBlockState().setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, requireTileEntity);
     }
 
     /**
@@ -157,12 +157,12 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     }
 
     public Optional<RootyBlock> getSoilBlock() {
-        return Optional.ofNullable(this.dynamicSoilBlock == Blocks.AIR ? null : this.dynamicSoilBlock);
+        return Optional.ofNullable(this.block == Blocks.AIR ? null : this.block);
     }
 
-    public void generateDynamicSoil(AbstractBlock.Properties blockProperties) {
-            setBlockRegistryNameIfNull();
-            this.dynamicSoilBlock = RegistryHandler.addBlock(this.blockRegistryName, this.createDynamicSoil(blockProperties));
+    public void generateBlock(AbstractBlock.Properties blockProperties) {
+        setBlockRegistryNameIfNull();
+        this.block = RegistryHandler.addBlock(this.blockRegistryName, this.createBlock(blockProperties));
     }
 
     protected RootyBlock createBlock(AbstractBlock.Properties blockProperties) {

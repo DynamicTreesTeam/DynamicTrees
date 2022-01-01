@@ -25,7 +25,7 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
     @Override
     public void registerAppliers() {
         this.loadAppliers.register("substitute_soil", String.class, (soilProperties, substitute) ->
-                soilProperties.setSubstitute(true)
+                soilProperties.setHasSubstitute(true)
         );
 
         // Primitive soil is needed before gathering data.

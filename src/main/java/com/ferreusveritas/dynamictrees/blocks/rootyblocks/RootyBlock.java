@@ -135,8 +135,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
-        return getPrimitiveSoilBlock().getShape(getDecayBlockState(state, reader, pos), reader, pos, context);
+    public VoxelShape getShape(BlockState p_220053_1_, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_) {
+        return getPrimitiveSoilBlock().getShape(getPrimitiveSoilBlock().defaultBlockState(), p_220053_2_, p_220053_3_, p_220053_4_);
     }
 
     @Override
@@ -255,8 +255,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
      * @param pos    The position of the {@link RootyBlock}
      * @return
      */
-    public BlockState getDecayBlockState(BlockState state, IBlockReader access, BlockPos pos) {
-        return properties.getPrimitiveSoilState(state);
+    public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
+        return getPrimitiveSoilBlock().defaultBlockState();
     }
 
     /**
@@ -281,9 +281,19 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
             return;
         }
 
-        final BlockState primitiveDirt = getDecayBlockState(rootyState, world, rootPos);
+//		final Biome biome = world.getBiome(rootPos);
+        final BlockState primitiveDirt = this.getPrimitiveSoilBlock().defaultBlockState();
 
+//		final BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
+//		final BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnderMaterial();
+
+        //if (primitiveDirt == topBlock || primitiveDirt == fillerBlock) {
         world.setBlock(rootPos, primitiveDirt, Constants.BlockFlags.DEFAULT);
+//		} else if (topBlock.getMaterial() == newState.getMaterial()) {
+//			world.setBlock(rootPos, topBlock, Constants.BlockFlags.DEFAULT);
+//		} else if (fillerBlock.getMaterial() == newState.getMaterial()) {
+//			world.setBlock(rootPos, fillerBlock, Constants.BlockFlags.DEFAULT);
+//		}
     }
 
     @Override
@@ -433,13 +443,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
 
     @Nullable
     private SpeciesTileEntity getTileEntitySpecies(IWorld world, BlockPos pos) {
-<<<<<<< HEAD
         final TileEntity blockEntity = world.getBlockEntity(pos);
         return blockEntity instanceof SpeciesTileEntity ? (SpeciesTileEntity) blockEntity : null;
-=======
-        final TileEntity tileEntity = world.getBlockEntity(pos);
-        return tileEntity instanceof SpeciesTileEntity ? (SpeciesTileEntity) tileEntity : null;
->>>>>>> develop/1.16.5
     }
 
     /**
