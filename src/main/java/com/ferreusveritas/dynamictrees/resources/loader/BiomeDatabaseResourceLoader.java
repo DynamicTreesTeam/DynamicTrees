@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.resources.loader;
 
+import com.ferreusveritas.dynamictrees.api.event.Hooks;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
@@ -163,7 +164,7 @@ public final class BiomeDatabaseResourceLoader
             return;
         }
 
-        BiomeDatabases.fireAddFeatureCancellersEvent();
+        Hooks.onAddFeatureCancellers();
         this.readCancellers(
                 resourceAccessor.filtered(this::isDefaultPopulator).map(this::toLinkedList)
         );
@@ -311,7 +312,6 @@ public final class BiomeDatabaseResourceLoader
         this.readDimensionalPopulators(
                 resourceAccessor.filtered(resource -> !this.isDefaultPopulator(resource)).map(this::toLinkedList)
         );
-        BiomeDatabases.populateBlacklistFromConfig();
     }
 
     private boolean isWorldGenDisabled() {
@@ -319,7 +319,7 @@ public final class BiomeDatabaseResourceLoader
     }
 
     private void readPopulators(ResourceAccessor<Deque<JsonElement>> resourceAccessor) {
-        BiomeDatabases.firePopulateDefaultDatabaseEvent();
+        Hooks.onPopulateDefaultDatabase();
         this.readModPopulators(BiomeDatabases.getDefault(), resourceAccessor);
         this.readTreePackPopulators(BiomeDatabases.getDefault(), resourceAccessor);
     }
@@ -338,7 +338,7 @@ public final class BiomeDatabaseResourceLoader
     }
 
     private void readDimensionalPopulators(ResourceAccessor<Deque<JsonElement>> resourceAccessor) {
-        BiomeDatabases.fireDimensionalPopulationEvent();
+        Hooks.onPopulateDimensionalDatabases();
         this.readDimensionalModPopulators(resourceAccessor);
         this.readDimensionalTreePackPopulators(resourceAccessor);
     }

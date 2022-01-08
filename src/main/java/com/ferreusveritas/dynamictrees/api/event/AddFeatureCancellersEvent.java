@@ -6,19 +6,21 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 
 /**
  * An {@link Event} for adding {@link FeatureCanceller} objects to biomes via {@link
  * #registerFeatureCancellations(RegistryKey, FeatureCanceller...)} and namespaces to of features to cancel via {@link
  * #registerNamespaces(RegistryKey, String...)}.
- *
- * <p>Fired on the {@link MinecraftForge#EVENT_BUS}.</p>
+ * <p>
+ * Fired on the mod bus.
  *
  * @author Harley O'Connor
+ * @deprecated feature cancellations will be solely defined in the biome database Json in the future
  */
-public final class AddFeatureCancellersEvent extends Event {
+@Deprecated
+public final class AddFeatureCancellersEvent extends Event implements IModBusEvent {
 
     private final BiomeDatabase defaultDatabase;
 

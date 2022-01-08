@@ -14,7 +14,9 @@ import java.util.Map;
  * <p>Fired on the {@link MinecraftForge#EVENT_BUS}.</p>
  *
  * @author Harley O'Connor
+ * @deprecated biome database population will happen solely from Json in the future
  */
+@Deprecated
 public final class PopulateDimensionalDatabaseEvent extends Event {
 
     private final Map<ResourceLocation, BiomeDatabase> dimensionalMap;

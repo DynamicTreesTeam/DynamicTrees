@@ -1,14 +1,10 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.api.event.AddFeatureCancellersEvent;
-import com.ferreusveritas.dynamictrees.api.event.PopulateDefaultDatabaseEvent;
-import com.ferreusveritas.dynamictrees.api.event.PopulateDimensionalDatabaseEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
-import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.Map;
@@ -30,12 +26,6 @@ public final class BiomeDatabases {
         return DEFAULT_DATABASE;
     }
 
-    public static void reset() {
-        DEFAULT_DATABASE.reset();
-        DIMENSIONAL_DATABASES.clear();
-        BLACKLIST.clear();
-    }
-
     public static BiomeDatabase getDimensionalOrDefault(ResourceLocation dimensionLocation) {
         return Optional.ofNullable(DIMENSIONAL_DATABASES.get(dimensionLocation))
                 .orElse(DEFAULT_DATABASE);
@@ -45,16 +35,8 @@ public final class BiomeDatabases {
         return DIMENSIONAL_DATABASES.computeIfAbsent(dimensionLocation, k -> BiomeDatabase.copyOf(DEFAULT_DATABASE));
     }
 
-    public static void fireAddFeatureCancellersEvent() {
-        MinecraftForge.EVENT_BUS.post(new AddFeatureCancellersEvent(DEFAULT_DATABASE));
-    }
-
-    public static void firePopulateDefaultDatabaseEvent() {
-        MinecraftForge.EVENT_BUS.post(new PopulateDefaultDatabaseEvent(DEFAULT_DATABASE));
-    }
-
-    public static void fireDimensionalPopulationEvent() {
-        MinecraftForge.EVENT_BUS.post(new PopulateDimensionalDatabaseEvent(DIMENSIONAL_DATABASES, DEFAULT_DATABASE));
+    public static Map<ResourceLocation, BiomeDatabase> getDimensionalDatabases() {
+        return DIMENSIONAL_DATABASES;
     }
 
     public static boolean isBlacklisted(ResourceLocation dimensionLocation) {
@@ -71,6 +53,12 @@ public final class BiomeDatabases {
         } catch (ResourceLocationException e) {
             LogManager.getLogger().error("Couldn't get location for dimension blacklist in config.", e);
         }
+    }
+
+    public static void reset() {
+        DEFAULT_DATABASE.reset();
+        DIMENSIONAL_DATABASES.clear();
+        BLACKLIST.clear();
     }
 
 }

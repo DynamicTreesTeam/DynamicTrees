@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -205,13 +206,15 @@ public class DTConfigs {
     @SubscribeEvent
     public static void onLoad(final ModConfig.Loading event) {
         EventHandlers.configReload();
-    CompatHandler.reloadSeasonManager();
+        CompatHandler.reloadSeasonManager();
+        BiomeDatabases.populateBlacklistFromConfig();
     }
 
     @SubscribeEvent
     public static void onReload(final ModConfig.Reloading event) {
         EventHandlers.configReload();
         CompatHandler.reloadSeasonManager();
+        BiomeDatabases.populateBlacklistFromConfig();
     }
 
 }

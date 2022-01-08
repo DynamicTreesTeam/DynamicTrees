@@ -11,7 +11,9 @@ import net.minecraftforge.eventbus.api.Event;
  * <p>Fired on the {@link MinecraftForge#EVENT_BUS}.</p>
  *
  * @author Harley O'Connor
+ * @deprecated biome database population will happen solely from Json in the future
  */
+@Deprecated
 public final class PopulateDefaultDatabaseEvent extends Event {
 
     private final BiomeDatabase defaultDatabase;
