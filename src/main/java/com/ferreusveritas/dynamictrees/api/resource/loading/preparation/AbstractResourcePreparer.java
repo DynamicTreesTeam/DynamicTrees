@@ -30,7 +30,9 @@ public abstract class AbstractResourcePreparer<R> implements ResourcePreparer<R>
     @Override
     public ResourceAccessor<R> prepare(IResourceManager resourceManager) {
         this.readAndPutResources(this.collectResources(resourceManager), resourceManager);
-        return this.resourceCollector.createAccessor();
+        ResourceAccessor<R> accessor = this.resourceCollector.createAccessor();
+        this.resourceCollector.clear(); // Refresh collector for future use.
+        return accessor;
     }
 
     protected Collection<ResourceLocation> collectResources(IResourceManager resourceManager) {

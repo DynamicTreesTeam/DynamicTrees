@@ -16,6 +16,8 @@ public interface ResourceCollector<R> {
 
     ResourceAccessor<R> createAccessor();
 
+    void clear();
+
     static <R> ResourceCollector<R> unordered() {
         return new SimpleResourceCollector<>(Maps::newHashMap);
     }

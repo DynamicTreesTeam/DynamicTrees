@@ -12,7 +12,7 @@ final class SimpleResourceCollector<R> implements ResourceCollector<R> {
 
     @SuppressWarnings("rawtypes")
     private final Supplier<Map> mapSupplier;
-    public final Map<ResourceLocation, Resource<R>> resources;
+    public Map<ResourceLocation, Resource<R>> resources;
 
     @SuppressWarnings("unchecked")
     public SimpleResourceCollector(@SuppressWarnings("rawtypes") Supplier<Map> mapSupplier) {
@@ -33,6 +33,12 @@ final class SimpleResourceCollector<R> implements ResourceCollector<R> {
     @Override
     public ResourceAccessor<R> createAccessor() {
         return new SimpleResourceAccessor<>(this.resources, this::newMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void clear() {
+        this.resources = (Map<ResourceLocation, Resource<R>>) mapSupplier.get();
     }
 
     @SuppressWarnings("unchecked")
