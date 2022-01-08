@@ -138,7 +138,7 @@ dependencies {
     compileOnly(fg.deobf("curse.maven:BetterWeatherAPI-400714:3403615"))
 
 //    useSereneSeasons(this)
-    useBetterWeather(this)
+//    useBetterWeather(this)
 
     // At runtime, use suggestion provider fix mod.
     runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:$mcVersion-${property("suggestionProviderFixVersion")}"))
@@ -146,12 +146,12 @@ dependencies {
 
 fun useSereneSeasons(depHandler: DependencyHandlerScope) {
     // At runtime, use full Serene Seasons mod.
-    depHandler.runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))
+    depHandler.runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:3510900"))
 }
 
 fun useBetterWeather(depHandler: DependencyHandlerScope) {
     // At runtime, use the full Better Weather mod.
-    depHandler.runtimeOnly(fg.deobf("curse.maven:BetterWeather-400714:3403614"))
+    depHandler.runtimeOnly(fg.deobf("curse.maven:BetterWeather-400714:3420517"))
 }
 
 translationSheet {
