@@ -19,7 +19,7 @@ import com.ferreusveritas.dynamictrees.data.provider.BranchLoaderBuilder;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
-import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
+import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
@@ -48,7 +48,6 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -71,7 +70,7 @@ import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.suffix;
  *
  * @author ferreusveritas
  */
-public class Family extends RegistryEntry<Family> implements IResettable<Family> {
+public class Family extends RegistryEntry<Family> implements Resettable<Family> {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(Family::new);
 
@@ -310,24 +309,25 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
 
     public boolean canStripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
         BranchBlock branchBlock = TreeHelper.getBranch(state);
-        if (branchBlock == null) {
-            return false;
-        }
+		if (branchBlock == null) {
+			return false;
+		}
         return branchBlock.canBeStripped(state, world, pos, player, heldItem);
     }
 
     public boolean stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
-        if (getStrippedBranch() != null) {
-            this.getBranch().stripBranch(state, world, pos, player, heldItem);
-
-            if (world.isClientSide) {
-                world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
-                WailaOther.invalidateWailaPosition();
-            }
-            return true;
-        } else {
-            return false;
-        }
+        if (this.hasStrippedBranch()) {
+            this.getBranch().ifPresent(branch -> {
+                branch.stripBranch(state, world, pos, player, heldItem);
+                if (world.isClientSide) {
+                    world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    WailaOther.invalidateWailaPosition();
+                }
+            });
+			return this.getBranch().isPresent();
+		} else {
+			return false;
+		}
     }
 
 
@@ -367,9 +367,9 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
      */
     protected BranchBlock createBranchBlock() {
         final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(this.getProperties()) : new BasicBranchBlock(this.getProperties());
-        if (this.isFireProof()) {
-            branch.setFireSpreadSpeed(0).setFlammability(0);
-        }
+		if (this.isFireProof()) {
+			branch.setFireSpreadSpeed(0).setFlammability(0);
+		}
         return branch;
     }
 
@@ -416,30 +416,16 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
         return this;
     }
 
-    @Nonnull
-    public BranchBlock getBranch() {
-        if (branch == null) {
-            throw new UnsupportedOperationException("getBranch() for Family " + getRegistryName() + " was called too early!");
-        }
-        return branch;
+    public Optional<BranchBlock> getBranch() {
+        return Optionals.ofBlock(branch);
     }
 
-    public Optional<BranchBlock> getBranchOptional() {
-        return Optional.ofNullable(this.branch);
+    public Optional<BranchBlock> getStrippedBranch() {
+        return Optionals.ofBlock(strippedBranch);
     }
 
-    @Nullable
-    public BranchBlock getStrippedBranch() {
-        return strippedBranch;
-    }
-
-    public Optional<BranchBlock> getStrippedBranchOptional() {
-        return Optional.ofNullable(strippedBranch);
-    }
-
-    @Nullable
-    public Item getBranchItem() {
-        return branchItem;
+    public Optional<Item> getBranchItem() {
+        return Optionals.ofItem(branchItem);
     }
 
     public boolean isThick() {
@@ -469,7 +455,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
      * @param item An itemstack of the stick
      * @return {@link Family} for chaining calls
      */
-    protected Family setStick(Item item) {
+    public Family setStick(Item item) {
         stick = item;
         return this;
     }
@@ -496,22 +482,22 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
      * @param primitiveLog An itemStack of the log item
      * @return {@link Family} for chaining calls
      */
-    protected Family setPrimitiveLog(Block primitiveLog) {
+    public Family setPrimitiveLog(Block primitiveLog) {
         this.primitiveLog = primitiveLog;
 
-        if (this.branch != null) {
-            this.branch.setPrimitiveLogDrops(new ItemStack(primitiveLog));
-        }
+		if (this.branch != null) {
+			this.branch.setPrimitiveLogDrops(new ItemStack(primitiveLog));
+		}
 
         return this;
     }
 
-    protected Family setPrimitiveStrippedLog(Block primitiveStrippedLog) {
+    public Family setPrimitiveStrippedLog(Block primitiveStrippedLog) {
         this.primitiveStrippedLog = primitiveStrippedLog;
 
-        if (this.strippedBranch != null) {
-            this.strippedBranch.setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
-        }
+		if (this.strippedBranch != null) {
+			this.strippedBranch.setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
+		}
 
         return this;
     }
@@ -522,19 +508,11 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
      *
      * @return Block of the primitive log.
      */
-    public Block getPrimitiveLog() {
-        return primitiveLog;
+    public Optional<Block> getPrimitiveLog() {
+        return Optionals.ofBlock(primitiveLog);
     }
 
-    public Optional<Block> getPrimitiveLogOptional() {
-        return Optionals.ofBlock(this.primitiveLog);
-    }
-
-    public Block getPrimitiveStrippedLog() {
-        return primitiveStrippedLog;
-    }
-
-    public Optional<Block> getPrimitiveStrippedLogOptional() {
+    public Optional<Block> getPrimitiveStrippedLog() {
         return Optionals.ofBlock(primitiveStrippedLog);
     }
 
@@ -712,11 +690,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
         return RegistryHandler.addBlock(suffix(this.getRegistryName(), "_root"), new SurfaceRootBlock(this));
     }
 
-    public SurfaceRootBlock getSurfaceRoot() {
-        return this.surfaceRoot;
-    }
-
-    public Optional<SurfaceRootBlock> getSurfaceRootOptional() {
+    public Optional<SurfaceRootBlock> getSurfaceRoot() {
         return Optionals.ofBlock(this.surfaceRoot);
     }
 
@@ -729,7 +703,7 @@ public class Family extends RegistryEntry<Family> implements IResettable<Family>
     // FALL ANIMATION HANDLING
     ///////////////////////////////////////////
 
-    public IAnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
+    public AnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
         return fallingEntity.defaultAnimationHandler();
     }
 

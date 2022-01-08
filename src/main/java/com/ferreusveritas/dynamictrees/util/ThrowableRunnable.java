@@ -6,6 +6,7 @@ package com.ferreusveritas.dynamictrees.util;
  * @param <T> The {@link Throwable} type.
  * @author Harley O'Connor
  */
+@FunctionalInterface
 public interface ThrowableRunnable<T extends Throwable> {
 
     /**

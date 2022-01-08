@@ -27,23 +27,23 @@ public class FruitDropCreator extends DropCreator {
     }
 
     @Override
-    protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
+    protected DropCreatorConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(FRUIT, new ItemStack(Items.APPLE))
                 .with(RARITY, 1f);
     }
 
     @Override
-    public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendHarvestDrops(DropCreatorConfiguration configuration, DropContext context) {
         this.appendFruit(context.drops(), configuration, context);
     }
 
     @Override
-    public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendLeavesDrops(DropCreatorConfiguration configuration, DropContext context) {
         this.appendFruit(context.drops(), configuration, context);
     }
 
-    private void appendFruit(List<ItemStack> dropList, ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    private void appendFruit(List<ItemStack> dropList, DropCreatorConfiguration configuration, DropContext context) {
         // More fortune contrivances here.  Vanilla compatible returns.
         int chance = 200; // 1 in 200 chance of returning an "apple"
         if (context.fortune() > 0) {

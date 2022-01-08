@@ -8,7 +8,13 @@
     "soil_longevity": 12,
     "max_branch_radius": 24,
     "world_gen_leaf_map_height": 40,
-    "growth_logic_kit": "jungle",
+    "growth_logic_kit": {
+        "name": "jungle",
+        "properties": {
+            "canopy_height": 25,
+            "branch_out_chance": 3
+        }
+    },
     "leaves_properties": "jungle",
     "environment_factors" : {
         "cold": 0.15,

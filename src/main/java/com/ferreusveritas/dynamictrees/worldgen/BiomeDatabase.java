@@ -1,7 +1,13 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.*;
+import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.google.common.collect.Maps;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -17,28 +23,28 @@ public class BiomeDatabase {
 
     public static final Entry BAD_ENTRY = new Entry() {
         @Override
-        public void setChanceSelector(IChanceSelector chanceSelector) {
+        public void setChanceSelector(ChanceSelector chanceSelector) {
         }
 
         @Override
-        public void setDensitySelector(IDensitySelector densitySelector) {
+        public void setDensitySelector(DensitySelector densitySelector) {
         }
 
         @Override
-        public void setSpeciesSelector(ISpeciesSelector speciesSelector) {
+        public void setSpeciesSelector(SpeciesSelector speciesSelector) {
         }
 
         @Override
-        public void setSubterraneanBiome(boolean is) {
+        public void setSubterranean(boolean is) {
         }
     };
 
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
 
     public Entry getEntry(@Nullable Biome biome) {
-        if (biome == null) {
-            return BAD_ENTRY;
-        }
+		if (biome == null) {
+			return BAD_ENTRY;
+		}
 
         return this.entries.computeIfAbsent(biome.getRegistryName(), k -> new Entry(this, biome));
     }
@@ -49,6 +55,15 @@ public class BiomeDatabase {
 
     public Collection<Entry> getAllEntries() {
         return this.entries.values();
+    }
+
+    /**
+     * Resets all entries in the database.
+     *
+     * @implNote does not reset cancellers, since they are only applied once on initial load
+     */
+    public void reset() {
+        this.entries.values().forEach(Entry::reset);
     }
 
     public void clear() {
@@ -75,15 +90,16 @@ public class BiomeDatabase {
     public static class Entry {
         private final BiomeDatabase database;
         private final Biome biome;
-        private IChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
-        private IDensitySelector densitySelector = (rnd, nd) -> -1;
-        private ISpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
+        private ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
+        private DensitySelector densitySelector = (rnd, nd) -> -1;
+        private SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
         private final FeatureCancellations featureCancellations = new FeatureCancellations();
         private boolean blacklisted = false;
-        private boolean isSubterranean = false;
+        private boolean subterranean = false;
         private float forestness = 0.0f;
         private final static Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
         private Function<Integer, Integer> multipass = defaultMultipass;
+        private GroundFinder groundFinder = GroundFinder.OVERWORLD;
 
         public Entry() {
             this.database = null;
@@ -103,27 +119,27 @@ public class BiomeDatabase {
             return biome;
         }
 
-        public IChanceSelector getChanceSelector() {
+        public ChanceSelector getChanceSelector() {
             return chanceSelector;
         }
 
-        public IDensitySelector getDensitySelector() {
+        public DensitySelector getDensitySelector() {
             return densitySelector;
         }
 
-        public ISpeciesSelector getSpeciesSelector() {
+        public SpeciesSelector getSpeciesSelector() {
             return speciesSelector;
         }
 
-        public void setChanceSelector(IChanceSelector chanceSelector) {
+        public void setChanceSelector(ChanceSelector chanceSelector) {
             this.chanceSelector = chanceSelector;
         }
 
-        public void setDensitySelector(IDensitySelector densitySelector) {
+        public void setDensitySelector(DensitySelector densitySelector) {
             this.densitySelector = densitySelector;
         }
 
-        public void setSpeciesSelector(ISpeciesSelector speciesSelector) {
+        public void setSpeciesSelector(SpeciesSelector speciesSelector) {
             this.speciesSelector = speciesSelector;
         }
 
@@ -135,16 +151,17 @@ public class BiomeDatabase {
             this.blacklisted = blacklisted;
         }
 
-        public void setSubterraneanBiome(boolean is) {
-            this.isSubterranean = is;
+        public void setSubterranean(boolean is) {
+            this.subterranean = is;
+            this.groundFinder = is ? GroundFinder.SUBTERRANEAN : GroundFinder.OVERWORLD;
         }
 
         public boolean isBlacklisted() {
             return blacklisted;
         }
 
-        public boolean isSubterraneanBiome() {
-            return isSubterranean;
+        public boolean isSubterranean() {
+            return subterranean;
         }
 
         public void setForestness(float forestness) {
@@ -163,17 +180,76 @@ public class BiomeDatabase {
             return multipass;
         }
 
+        public GroundFinder getGroundFinder() {
+            return groundFinder;
+        }
+
+        public void setGroundFinder(GroundFinder groundFinder) {
+            this.groundFinder = groundFinder;
+        }
+
+        public void enableDefaultMultipass() {
+            this.multipass = pass -> {
+                switch (pass) {
+                    case 0:
+                        return 0; // Zero means to run as normal.
+                    case 1:
+                        return 5; // Return only radius 5 on pass 1.
+                    case 2:
+                        return 3; // Return only radius 3 on pass 2.
+                    default:
+                        return -1; // A negative number means to terminate.
+                }
+            };
+        }
+
+        public void setCustomMultipass(JsonObject json) {
+            final Map<Integer, Integer> passMap = this.deserialiseCustomMultipass(json);
+            this.multipass = pass -> passMap.getOrDefault(pass, -1);
+        }
+
+        private Map<Integer, Integer> deserialiseCustomMultipass(JsonObject json) {
+            final Map<Integer, Integer> passMap = Maps.newHashMap();
+
+            for (final Map.Entry<String, JsonElement> passEntry : json.entrySet()) {
+                try {
+                    final int pass = Integer.parseInt(passEntry.getKey());
+                    final int radius = JsonDeserialisers.INTEGER.deserialise(passEntry.getValue())
+                            .orElse(-1);
+
+                    // Terminate when radius is -1.
+                    if (radius == -1) {
+                        break;
+                    }
+
+                    passMap.put(pass, radius);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            return passMap;
+        }
+
+        public void reset() {
+            this.speciesSelector = (pos, dirt, rnd) -> new BiomePropertySelectors.SpeciesSelection();
+            this.densitySelector = (rnd, nd) -> -1;
+            this.chanceSelector = (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
+            this.forestness = 0.0F;
+            this.blacklisted = false;
+            this.subterranean = false;
+            this.multipass = defaultMultipass;
+        }
+
     }
 
-    public ISpeciesSelector getSpecies(Biome biome) {
+    public SpeciesSelector getSpecies(Biome biome) {
         return getEntry(biome).speciesSelector;
     }
 
-    public IChanceSelector getChance(Biome biome) {
+    public ChanceSelector getChance(Biome biome) {
         return getEntry(biome).chanceSelector;
     }
 
-    public IDensitySelector getDensitySelector(Biome biome) {
+    public DensitySelector getDensitySelector(Biome biome) {
         return getEntry(biome).densitySelector;
     }
 
@@ -185,13 +261,13 @@ public class BiomeDatabase {
         return getEntry(biome).getMultipass();
     }
 
-    public BiomeDatabase setSpeciesSelector(final Biome biome, @Nullable final ISpeciesSelector selector, final Operation op) {
-        if (selector == null) {
-            return this;
-        }
+    public BiomeDatabase setSpeciesSelector(final Biome biome, @Nullable final SpeciesSelector selector, final Operation op) {
+		if (selector == null) {
+			return this;
+		}
 
         final Entry entry = getEntry(biome);
-        final ISpeciesSelector existing = entry.getSpeciesSelector();
+        final SpeciesSelector existing = entry.getSpeciesSelector();
 
         switch (op) {
             case REPLACE:
@@ -214,13 +290,13 @@ public class BiomeDatabase {
         return this;
     }
 
-    public BiomeDatabase setChanceSelector(final Biome biome, @Nullable final IChanceSelector selector, final Operation op) {
-        if (selector == null) {
-            return this;
-        }
+    public BiomeDatabase setChanceSelector(final Biome biome, @Nullable final ChanceSelector selector, final Operation op) {
+		if (selector == null) {
+			return this;
+		}
 
         final Entry entry = getEntry(biome);
-        final IChanceSelector existing = entry.getChanceSelector();
+        final ChanceSelector existing = entry.getChanceSelector();
 
         switch (op) {
             case REPLACE:
@@ -243,13 +319,13 @@ public class BiomeDatabase {
         return this;
     }
 
-    public BiomeDatabase setDensitySelector(final Biome biome, @Nullable final IDensitySelector selector, final Operation op) {
-        if (selector == null) {
-            return this;
-        }
+    public BiomeDatabase setDensitySelector(final Biome biome, @Nullable final DensitySelector selector, final Operation op) {
+		if (selector == null) {
+			return this;
+		}
 
         final Entry entry = getEntry(biome);
-        final IDensitySelector existing = entry.getDensitySelector();
+        final DensitySelector existing = entry.getDensitySelector();
 
         switch (op) {
             case REPLACE:
@@ -273,7 +349,7 @@ public class BiomeDatabase {
     }
 
     public BiomeDatabase setIsSubterranean(Biome biome, boolean is) {
-        getEntry(biome).setSubterraneanBiome(is);
+        getEntry(biome).setSubterranean(is);
         return this;
     }
 

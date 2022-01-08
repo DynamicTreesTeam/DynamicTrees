@@ -1,14 +1,12 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
@@ -21,7 +19,7 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Random;
 
-public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
+public class PodzolGenFeature extends GenFeature {
 
     public PodzolGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -32,45 +30,52 @@ public class PodzolGenFeature extends GenFeature implements IPostGrowFeature {
     }
 
     @Override
-    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-        if (DTConfigs.PODZOL_GEN.get()) {
-            FindEndsNode endFinder = new FindEndsNode();
-            TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
-            List<BlockPos> endPoints = endFinder.getEnds();
-            if (!endPoints.isEmpty()) {
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
+        if (!DTConfigs.PODZOL_GEN.get()) {
+            return false;
+        }
 
-                Random random = world.random;
-                BlockPos pos = endPoints.get(random.nextInt(endPoints.size()));
+        final World world = context.world();
+        final FindEndsNode endFinder = new FindEndsNode();
+        TreeHelper.startAnalysisFromRoot(world, context.pos(), new MapSignal(endFinder));
+        final List<BlockPos> endPoints = endFinder.getEnds();
 
-                int x = pos.getX() + random.nextInt(5) - 2;
-                int z = pos.getZ() + random.nextInt(5) - 2;
+        if (endPoints.isEmpty()) {
+            return false;
+        }
 
-                final int darkThreshold = 4;
+        final Random random = context.random();
+        final BlockPos pos = endPoints.get(random.nextInt(endPoints.size()));
 
-                for (int i = 0; i < 32; i++) {
+        final int x = pos.getX() + random.nextInt(5) - 2;
+        final int z = pos.getZ() + random.nextInt(5) - 2;
 
-                    BlockPos offPos = new BlockPos(x, pos.getY() - 1 - i, z);
+        final int darkThreshold = 4;
 
-                    if (!world.isEmptyBlock(offPos)) {
-                        Block block = world.getBlockState(offPos).getBlock();
+        for (int i = 0; i < 32; i++) {
+            final BlockPos offPos = new BlockPos(x, pos.getY() - 1 - i, z);
 
-                        if (block instanceof BranchBlock || block instanceof MushroomBlock || block instanceof LeavesBlock) { //Skip past Mushrooms and branches on the way down
-                            continue;
-                        } else if (block instanceof FlowerBlock || block instanceof TallGrassBlock || block instanceof DoublePlantBlock) {//Kill Plants
-                            if (world.getBrightness(LightType.SKY, offPos) <= darkThreshold) {
-                                world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                            }
-                            continue;
-                        } else if (block == Blocks.DIRT || block == Blocks.GRASS) {//Convert grass or dirt to podzol
-                            if (world.getBrightness(LightType.SKY, offPos.above()) <= darkThreshold) {
-                                world.setBlockAndUpdate(offPos, BlockStates.PODZOL);
-                            } else {
-                                spreadPodzol(world, pos);
-                            }
-                        }
-                        break;
+            if (!world.isEmptyBlock(offPos)) {
+                final Block block = world.getBlockState(offPos).getBlock();
+
+                // Skip past Mushrooms and branches on the way down.
+                if (block instanceof BranchBlock || block instanceof MushroomBlock || block instanceof LeavesBlock) {
+                    continue;
+                } else if (block instanceof FlowerBlock || block instanceof TallGrassBlock || block instanceof DoublePlantBlock) {
+                    // Kill plants.
+                    if (world.getBrightness(LightType.SKY, offPos) <= darkThreshold) {
+                        world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                    }
+                    continue;
+                } else if (block == Blocks.DIRT || block == Blocks.GRASS) {
+                    // Convert grass or dirt to podzol.
+                    if (world.getBrightness(LightType.SKY, offPos.above()) <= darkThreshold) {
+                        world.setBlockAndUpdate(offPos, BlockStates.PODZOL);
+                    } else {
+                        spreadPodzol(world, pos);
                     }
                 }
+                break;
             }
         }
         return true;

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.cells;
 
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.api.cells.Cell;
 import net.minecraft.util.Direction;
 
 /**
@@ -8,7 +8,7 @@ import net.minecraft.util.Direction;
  *
  * @author ferreusveritas
  */
-public class NormalCell implements ICell {
+public class NormalCell implements Cell {
 
     private final int value;
 

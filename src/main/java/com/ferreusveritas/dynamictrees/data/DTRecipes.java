@@ -32,15 +32,18 @@ public final class DTRecipes {
             final ResourceLocation registryName = species.getRegistryName();
 
             species.getPrimitiveSaplingRecipes().forEach(saplingRecipe -> {
-                assert saplingRecipe.isValid() && saplingRecipe.getSaplingItem().getRegistryName() != null;
+                assert saplingRecipe.isValid();
+                @SuppressWarnings("OptionalGetWithoutIsPresent")
+                final Item saplingItem = saplingRecipe.getSaplingItem().get();
+                assert saplingItem.getRegistryName() != null;
 
                 if (saplingRecipe.canCraftSaplingToSeed()) {
                     final ResourceLocation saplingToSeed = new ResourceLocation(registryName.getNamespace(),
-                            separate(saplingRecipe.getSaplingItem().getRegistryName()) + "_to_" + registryName.getPath() + "_seed");
+                            separate(saplingItem.getRegistryName()) + "_to_" + registryName.getPath() + "_seed");
 
                     List<Item> ingredients = saplingRecipe.getIngredientsForSaplingToSeed();
                     ingredients.add(DTRegistries.DIRT_BUCKET);
-                    ingredients.add(saplingRecipe.getSaplingItem());
+                    ingredients.add(saplingItem);
                     craftingRecipes.putIfAbsent(saplingToSeed, createShapeless(saplingToSeed,
                             species.getSeedStack(1), //result
                             ingredients(ingredients))); //ingredients
@@ -48,13 +51,13 @@ public final class DTRecipes {
 
                 if (saplingRecipe.canCraftSeedToSapling()) {
                     final ResourceLocation seedToSapling = new ResourceLocation(registryName.getNamespace(),
-                            registryName.getPath() + "_seed_to_" + separate(saplingRecipe.getSaplingItem().getRegistryName()));
+                            registryName.getPath() + "_seed_to_" + separate(saplingItem.getRegistryName()));
 
                     List<Item> ingredients = saplingRecipe.getIngredientsForSeedToSapling();
                     ingredients.add(DTRegistries.DIRT_BUCKET);
                     ingredients.add(species.getSeed().map(Item.class::cast).orElse(Items.AIR));
                     craftingRecipes.putIfAbsent(seedToSapling, createShapeless(seedToSapling,
-                            new ItemStack(saplingRecipe.getSaplingItem()), //result
+                            new ItemStack(saplingItem), //result
                             ingredients(ingredients))); //ingredients
                 }
 
@@ -73,6 +76,7 @@ public final class DTRecipes {
     private static Ingredient[] ingredients(Collection<Item> items) {
         return ingredients(items.toArray(new Item[]{}));
     }
+
     private static Ingredient[] ingredients(final Item... items) {
         if (items.length == 0) return new Ingredient[]{Ingredient.EMPTY};
         return Arrays.stream(items).map(item->Ingredient.of(new ItemStack(item))).collect(Collectors.toSet()).toArray(new Ingredient[]{});

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author ferreusveritas
  */
-public class DestroyerNode implements INodeInspector {
+public class DestroyerNode implements NodeInspector {
 
     Species species;//Destroy any node that's made of the same kind of wood
     private final List<BlockPos> endPoints;//We always need to track endpoints during destruction
@@ -74,5 +74,4 @@ public class DestroyerNode implements INodeInspector {
     public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
         return false;
     }
-
 }

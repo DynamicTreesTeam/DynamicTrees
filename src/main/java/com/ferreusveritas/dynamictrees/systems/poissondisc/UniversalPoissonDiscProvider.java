@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
-import com.ferreusveritas.dynamictrees.api.worldgen.IPoissonDiscProvider;
+import com.ferreusveritas.dynamictrees.api.worldgen.PoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.event.PoissonDiscProviderCreateEvent;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeRadiusCoordinator;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
@@ -16,23 +16,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UniversalPoissonDiscProvider {
 
-    private final Map<ResourceLocation, IPoissonDiscProvider> providerMap = new ConcurrentHashMap<>();
+    private final Map<ResourceLocation, PoissonDiscProvider> providerMap = new ConcurrentHashMap<>();
 
-    protected IPoissonDiscProvider createCircleProvider(ServerWorld world, IWorld iWorld) {
+    protected PoissonDiscProvider createCircleProvider(ServerWorld world, IWorld iWorld) {
         final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(TreeGenerator.getTreeGenerator(),
                 world.dimension().location(), iWorld);
         final PoissonDiscProviderCreateEvent poissonDiscProviderCreateEvent = new PoissonDiscProviderCreateEvent(world,
-                new PoissonDiscProvider(radiusCoordinator).setSeed(world.getSeed()));
+                new LevelPoissonDiscProvider(radiusCoordinator).setSeed(world.getSeed()));
         MinecraftForge.EVENT_BUS.post(poissonDiscProviderCreateEvent);
         return poissonDiscProviderCreateEvent.getPoissonDiscProvider();
     }
 
-    public IPoissonDiscProvider getProvider(ServerWorld world, IWorld iWorld) {
+    public PoissonDiscProvider getProvider(ServerWorld world, IWorld iWorld) {
         return this.providerMap.computeIfAbsent(world.dimension().location(), k -> createCircleProvider(world, iWorld));
     }
 
     public List<PoissonDisc> getPoissonDiscs(ServerWorld world, IWorld iWorld, ChunkPos chunkPos) {
-        final IPoissonDiscProvider provider = getProvider(world, iWorld);
+        final PoissonDiscProvider provider = getProvider(world, iWorld);
         return provider.getPoissonDiscs(chunkPos.x, 0, chunkPos.z);
     }
 

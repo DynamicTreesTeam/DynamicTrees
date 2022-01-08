@@ -1,14 +1,14 @@
 package com.ferreusveritas.dynamictrees.systems.substances;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class GrowthSubstance implements ISubstanceEffect {
+public class GrowthSubstance implements SubstanceEffect {
 
     private final int pulses;
     private final int ticksPerPulse;
@@ -26,7 +26,7 @@ public class GrowthSubstance implements ISubstanceEffect {
     public GrowthSubstance(int pulses, int ticksPerPulse, boolean fillFertility) {
         this.pulses = pulses;
         this.ticksPerPulse = ticksPerPulse;
-        this.fillFertility = fillFertility;
+     	this.fillFertility = fillFertility;
     }
 
     @Override
@@ -35,9 +35,9 @@ public class GrowthSubstance implements ISubstanceEffect {
         if (LingeringEffectorEntity.treeHasEffectorForEffect(world, rootPos, this)) {
             return false;
         }
-        if (fillFertility) {
-            new FertilizeSubstance().setAmount(15).setDisplayParticles(false).apply(world, rootPos);
-        }
+		if (fillFertility) {
+        	new FertilizeSubstance().setAmount(15).setDisplayParticles(false).apply(world, rootPos);
+		}
 
         TreeHelper.treeParticles(world, rootPos, ParticleTypes.EFFECT, 8);
         return true;

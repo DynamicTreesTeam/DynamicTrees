@@ -1,8 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -15,11 +14,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
 
-import java.util.List;
-
-public class UndergrowthGenFeature extends GenFeature implements IPostGenFeature {
+public class UndergrowthGenFeature extends GenFeature {
 
     public UndergrowthGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -30,12 +26,18 @@ public class UndergrowthGenFeature extends GenFeature implements IPostGenFeature
     }
 
     @Override
-    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-        final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
+        final boolean worldGen = context.isWorldGen();
+        final int radius = context.radius();
 
         if (!worldGen || radius <= 2) {
             return false;
         }
+
+        final IWorld world = context.world();
+        final BlockPos rootPos = context.pos();
+        final SafeChunkBounds bounds = context.bounds();
+        final Species species = context.species();
 
         final Vector3d vTree = new Vector3d(rootPos.getX(), rootPos.getY(), rootPos.getZ()).add(0.5, 0.5, 0.5);
 
@@ -45,7 +47,7 @@ public class UndergrowthGenFeature extends GenFeature implements IPostGenFeature
             Vector3d v = vTree.add(new Vector3d(1, 0, 0).scale(rad).yRot((float) (world.getRandom().nextFloat() * Math.PI * 2)));
             BlockPos vPos = new BlockPos(v);
 
-            if (!safeBounds.inBounds(vPos, true)) {
+            if (!bounds.inBounds(vPos, true)) {
                 continue;
             }
 
@@ -65,7 +67,7 @@ public class UndergrowthGenFeature extends GenFeature implements IPostGenFeature
                 for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
                     leafPos.set(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ());
 
-                    if (safeBounds.inBounds(leafPos, true) && (CoordUtils.coordHashCode(leafPos, 0) % 5) != 0 &&
+                    if (bounds.inBounds(leafPos, true) && (CoordUtils.coordHashCode(leafPos, 0) % 5) != 0 &&
                             (world.getBlockState(leafPos).canBeReplacedByLeaves(world, leafPos) ||
                                     world.getBlockState(leafPos).is(DTBlockTags.FOLIAGE))) {
                         world.setBlock(leafPos, leavesState, 2);

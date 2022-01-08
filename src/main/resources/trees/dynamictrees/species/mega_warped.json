@@ -8,7 +8,12 @@
     "growth_rate": 0.9,
     "soil_longevity": 8,
     "max_branch_radius": 20,
-    "growth_logic_kit": "nether_fungus",
+    "growth_logic_kit": {
+        "name": "nether_fungus",
+        "properties": {
+            "min_cap_height": 6
+        }
+    },
     "leaves_properties": "warped",
     "environment_factors" : {
         "cold": 0.25,
@@ -17,6 +22,15 @@
     "perfect_biomes": { "name": "minecraft:warped_forest" },
     "acceptable_soils": ["nether_soil_like", "fungus_like", "dirt_like"],
     "acceptable_growth_blocks": ["warped_nylium"],
+    "drop_creators": [
+        "log",
+        {
+            "name": "wart_block",
+            "properties": {
+                "block": "warped_wart_block"
+            }
+        }
+    ],
     "features": [
         {
             "name": "mound",
@@ -27,29 +41,5 @@
         "clear_volume",
         "shroomlight",
         "bottom_flare"
-    ],
-    "drop_creators": [
-        "log",
-        {
-            "name": "normal",
-            "properties": {
-                "drops": {
-                    "leaves": {
-                        "id": "stack",
-                        "properties": {
-                            "items": [ { "id": "warped_wart_block", "Count": 1 } ],
-                            "chance": 1
-                        }
-                    },
-                    "harvest": {
-                        "id": "stack",
-                        "properties": {
-                            "items": [ { "id": "warped_wart_block", "Count": 1 } ],
-                            "chance": 10
-                        }
-                    }
-                }
-            }
-        }
     ]
 }

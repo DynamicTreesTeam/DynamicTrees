@@ -5,7 +5,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class VoidAnimationHandler implements IAnimationHandler {
+public class VoidAnimationHandler implements AnimationHandler {
 
     @Override
     public String getName() {

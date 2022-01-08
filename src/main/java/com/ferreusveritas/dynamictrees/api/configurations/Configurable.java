@@ -16,9 +16,8 @@ public interface Configurable {
      */
     boolean isPropertyRegistered(ConfigurationProperty<?> property);
 
-
     Set<ConfigurationProperty<?>> getRegisteredProperties();
 
-    Configured<?, ?> getDefaultConfiguration();
+    Configuration<?, ?> getDefaultConfiguration();
 
 }

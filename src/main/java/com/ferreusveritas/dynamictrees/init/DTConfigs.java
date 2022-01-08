@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -180,10 +181,11 @@ public class DTConfigs {
                 .define("preferredSeasonMod", CompatHandler.ANY);
         ENABLE_SEASONAL_SEED_DROP_FACTOR = COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalSeedDropFactor", true);
-        ENABLE_SEASONAL_GROWTH_FACTOR = COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
+		ENABLE_SEASONAL_GROWTH_FACTOR = COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalGrowthFactor", true);
         ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR = COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalFruitProductionFactor", true);
+
         COMMON_BUILDER.pop();
 
 //		CLIENT_BUILDER.comment("Visual Settings").push("visuals");
@@ -205,12 +207,14 @@ public class DTConfigs {
     public static void onLoad(final ModConfig.Loading event) {
         EventHandlers.configReload();
         CompatHandler.reloadSeasonManager();
+        BiomeDatabases.populateBlacklistFromConfig();
     }
 
     @SubscribeEvent
     public static void onReload(final ModConfig.Reloading event) {
         EventHandlers.configReload();
         CompatHandler.reloadSeasonManager();
+        BiomeDatabases.populateBlacklistFromConfig();
     }
 
 }

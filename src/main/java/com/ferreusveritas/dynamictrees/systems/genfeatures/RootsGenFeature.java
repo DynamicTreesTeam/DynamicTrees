@@ -1,19 +1,17 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import com.ferreusveritas.dynamictrees.util.TetraFunction;
+import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
@@ -22,11 +20,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
-import java.util.List;
-
-public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPostGenFeature {
+public class RootsGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Integer> MIN_TRUNK_RADIUS = ConfigurationProperty.integer("min_trunk_radius");
     public static final ConfigurationProperty<Integer> LEVEL_LIMIT = ConfigurationProperty.integer("level_limit");
@@ -51,7 +46,7 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
     }
 
     @Override
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MIN_TRUNK_RADIUS, 13)
                 .with(LEVEL_LIMIT, 2)
@@ -79,39 +74,37 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
     }
 
     @Override
-    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-
-        BlockPos treePos = rootPos.above();
-        int trunkRadius = TreeHelper.getRadius(world, treePos);
-
-        if (trunkRadius >= configuredGenFeature.get(MIN_TRUNK_RADIUS)) {
-            return this.startRoots(configuredGenFeature, world, treePos, species, trunkRadius);
-        }
-        return false;
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
+        final BlockPos treePos = context.pos().above();
+        final int trunkRadius = TreeHelper.getRadius(context.world(), treePos);
+        return trunkRadius >= configuration.get(MIN_TRUNK_RADIUS) &&
+                this.startRoots(configuration, context.world(), treePos, context.species(), trunkRadius);
     }
 
     @Override
-    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-        int trunkRadius = TreeHelper.getRadius(world, treePos);
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
+        final World world = context.world();
+        final BlockPos treePos = context.treePos();
+        final int trunkRadius = TreeHelper.getRadius(world, treePos);
 
-        if (fertility > 0 && trunkRadius >= configuredGenFeature.get(MIN_TRUNK_RADIUS)) {
-            Surround surr = Surround.values()[world.random.nextInt(8)];
-            BlockPos dPos = treePos.offset(surr.getOffset());
+        if (context.fertility() > 0 && trunkRadius >= configuration.get(MIN_TRUNK_RADIUS)) {
+            final Surround surr = Surround.values()[world.random.nextInt(8)];
+            final BlockPos dPos = treePos.offset(surr.getOffset());
             if (world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
                 world.setBlockAndUpdate(dPos, DTRegistries.TRUNK_SHELL.defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
             }
 
-            this.startRoots(configuredGenFeature, world, treePos, species, trunkRadius);
+            this.startRoots(configuration, world, treePos, context.species(), trunkRadius);
         }
 
         return true;
     }
 
-    public boolean startRoots(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos treePos, Species species, int trunkRadius) {
+    public boolean startRoots(GenFeatureConfiguration configuration, IWorld world, BlockPos treePos, Species species, int trunkRadius) {
         int hash = CoordUtils.coordHashCode(treePos, 2);
         SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
-        this.nextRoot(world, rootMap, treePos, species, trunkRadius, configuredGenFeature.get(MIN_TRUNK_RADIUS), configuredGenFeature.get(SCALE_FACTOR), BlockPos.ZERO, 0,
-                -1, null, 0, configuredGenFeature.get(LEVEL_LIMIT));
+        this.nextRoot(world, rootMap, treePos, species, trunkRadius, configuration.get(MIN_TRUNK_RADIUS), configuration.get(SCALE_FACTOR), BlockPos.ZERO, 0,
+                -1, null, 0, configuration.get(LEVEL_LIMIT));
         return true;
     }
 
@@ -126,7 +119,9 @@ public class RootsGenFeature extends GenFeature implements IPostGrowFeature, IPo
 
             if (pos == BlockPos.ZERO || isReplaceableWithRoots(world, placeState, currPos) && (depth == 1 || onNormalCube)) {
                 if (radius > 0) {
-                    species.getFamily().getSurfaceRoot().setRadius(world, currPos, radius, 3);
+                    species.getFamily().getSurfaceRoot().ifPresent(root ->
+                            root.setRadius(world, currPos, radius, 3)
+                    );
                 }
                 if (onNormalCube) {
                     for (Direction dir : CoordUtils.HORIZONTALS) {

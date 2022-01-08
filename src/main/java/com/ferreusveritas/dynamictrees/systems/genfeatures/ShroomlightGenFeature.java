@@ -1,24 +1,18 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.util.TetraFunction;
+import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nullable;
 import java.util.LinkedList;
@@ -31,7 +25,7 @@ import java.util.List;
  *
  * @author Max Hyper
  */
-public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
+public class ShroomlightGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Block> SHROOMLIGHT_BLOCK = ConfigurationProperty.block("shroomlight");
 
@@ -48,7 +42,7 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
     }
 
     @Override
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(SHROOMLIGHT_BLOCK, Blocks.SHROOMLIGHT)
                 .with(MAX_HEIGHT, 32)
@@ -59,24 +53,21 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
     }
 
     @Override
-    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-        return placeShroomlightsInValidPlace(configuredGenFeature, world, rootPos, true);
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
+        return this.placeShroomlightsInValidPlace(configuration, context.world(), context.pos(), true);
     }
 
     @Override
-    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-        if (!natural || !configuredGenFeature.get(CAN_GROW_PREDICATE).test(world, rootPos.above()) || fertility == 0) {
-            return false;
-        }
-
-        return placeShroomlightsInValidPlace(configuredGenFeature, world, rootPos, false);
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
+        return context.natural() && configuration.get(CAN_GROW_PREDICATE).test(context.world(), context.pos().above())
+                && context.fertility() != 0 && this.placeShroomlightsInValidPlace(configuration, context.world(), context.pos(), false);
     }
 
-    private boolean placeShroomlightsInValidPlace(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, boolean worldGen) {
-        int treeHeight = getTreeHeight(world, rootPos, configuredGenFeature.get(MAX_HEIGHT));
-        Block shroomlightBlock = configuredGenFeature.get(SHROOMLIGHT_BLOCK);
+    private boolean placeShroomlightsInValidPlace(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, boolean worldGen) {
+        int treeHeight = getTreeHeight(world, rootPos, configuration.get(MAX_HEIGHT));
+        Block shroomlightBlock = configuration.get(SHROOMLIGHT_BLOCK);
 
-        List<BlockPos> validSpaces = findBranchPits(configuredGenFeature, world, rootPos, treeHeight);
+        List<BlockPos> validSpaces = findBranchPits(configuration, world, rootPos, treeHeight);
         if (validSpaces == null) {
             return false;
         }
@@ -84,10 +75,10 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
             if (worldGen) {
                 int placed = 0;
                 for (BlockPos chosenSpace : validSpaces) {
-                    if (world.getRandom().nextFloat() <= configuredGenFeature.get(PLACE_CHANCE)) {
+                    if (world.getRandom().nextFloat() <= configuration.get(PLACE_CHANCE)) {
                         world.setBlock(chosenSpace, shroomlightBlock.defaultBlockState(), 2);
                         placed++;
-                        if (placed > configuredGenFeature.get(MAX_COUNT)) {
+                        if (placed > configuration.get(MAX_COUNT)) {
                             break;
                         }
                     }
@@ -112,7 +103,7 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
 
     //Like the BeeNestGenFeature, the valid places are empty blocks under branches next to the trunk.
     @Nullable
-    private List<BlockPos> findBranchPits(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, int maxHeight) {
+    private List<BlockPos> findBranchPits(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, int maxHeight) {
         int existingBlocks = 0;
         List<BlockPos> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++) {
@@ -121,9 +112,9 @@ public class ShroomlightGenFeature extends GenFeature implements IPostGenFeature
                 BlockPos sidePos = trunkPos.relative(dir);
                 if ((world.isEmptyBlock(sidePos) || world.getBlockState(sidePos).getBlock() instanceof DynamicLeavesBlock) && TreeHelper.isBranch(world.getBlockState(sidePos.above()))) {
                     validSpaces.add(sidePos);
-                } else if (world.getBlockState(sidePos).getBlock() == configuredGenFeature.get(SHROOMLIGHT_BLOCK)) {
+                } else if (world.getBlockState(sidePos).getBlock() == configuration.get(SHROOMLIGHT_BLOCK)) {
                     existingBlocks++;
-                    if (existingBlocks > configuredGenFeature.get(MAX_COUNT)) {
+                    if (existingBlocks > configuration.get(MAX_COUNT)) {
                         return null;
                     }
                 }

@@ -31,8 +31,8 @@ public class SurfaceRootStateGenerator implements Generator<DTBlockStateProvider
     @Override
     public Dependencies gatherDependencies(Family input) {
         return new Dependencies()
-                .append(SURFACE_ROOT, input.getSurfaceRootOptional())
-                .append(PRIMITIVE_LOG, input.getPrimitiveLogOptional());
+                .append(SURFACE_ROOT, input.getSurfaceRoot())
+                .append(PRIMITIVE_LOG, input.getPrimitiveLog());
     }
 
 }

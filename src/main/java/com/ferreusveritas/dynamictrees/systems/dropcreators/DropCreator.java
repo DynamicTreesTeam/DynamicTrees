@@ -1,14 +1,14 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistry;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistryEntry;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import com.ferreusveritas.dynamictrees.api.registry.ConfigurableRegistryEntry;
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
-import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
+import com.ferreusveritas.dynamictrees.api.registry.*;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
-import com.ferreusveritas.dynamictrees.trees.IResettable;
+import com.ferreusveritas.dynamictrees.trees.Resettable;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.util.TriConsumer;
 
@@ -18,77 +18,83 @@ import org.apache.logging.log4j.util.TriConsumer;
  *
  * @author ferreusveritas
  */
-public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator, ConfiguredDropCreator<DropCreator>> implements IResettable<DropCreator> {
+public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator, DropCreatorConfiguration>
+        implements Resettable<DropCreator> {
 
     public static final ConfigurationProperty<Float> RARITY = ConfigurationProperty.floatProperty("rarity");
-
-    public static final class DropType<C extends DropContext> extends RegistryEntry<DropType<C>> {
-        public static final DropType<DropContext> NULL = new DropType<>(DTTrees.NULL, (dropCreator, configured, context) -> {
-        });
-
-        @SuppressWarnings("unchecked")
-        public static final Class<DropType<DropContext>> TYPE = (Class<DropType<DropContext>>) NULL.getClass();
-        public static final Registry<DropType<DropContext>> REGISTRY = new Registry<>(TYPE, NULL);
-
-        public static final DropType<DropContext> HARVEST = register(new DropType<>(DynamicTrees.resLoc("harvest"), DropCreator::appendHarvestDrops));
-        public static final DropType<DropContext> VOLUNTARY = register(new DropType<>(DynamicTrees.resLoc("voluntary"), DropCreator::appendVoluntaryDrops));
-        public static final DropType<DropContext> LEAVES = register(new DropType<>(DynamicTrees.resLoc("leaves"), DropCreator::appendLeavesDrops));
-        public static final DropType<LogDropContext> LOGS = register(new DropType<>(DynamicTrees.resLoc("logs"), DropCreator::appendLogDrops));
-
-        @SuppressWarnings("unchecked")
-        private static <C extends DropContext> DropType<C> register(DropType<C> dropType) {
-            REGISTRY.register((DropType<DropContext>) dropType);
-            return dropType;
-        }
-
-        private final TriConsumer<DropCreator, ConfiguredDropCreator<DropCreator>, C> appendDropConsumer;
-
-        public DropType(ResourceLocation registryName, TriConsumer<DropCreator, ConfiguredDropCreator<DropCreator>, C> appendDropConsumer) {
-            super(registryName);
-            this.appendDropConsumer = appendDropConsumer;
-        }
-
-        public void appendDrops(ConfiguredDropCreator<DropCreator> configuration, C context) {
-            this.appendDropConsumer.accept(configuration.getConfigurable(), configuration, context);
-        }
-
-        @SuppressWarnings("unchecked")
-        public static Class<DropType<DropContext>> getGenericClass() {
-            return (Class<DropType<DropContext>>) NULL.getClass();
-        }
-    }
-
-    public static final DropCreator NULL_DROP_CREATOR = new DropCreator(DTTrees.NULL) {
+    public static final DropCreator NULL = new DropCreator(DTTrees.NULL) {
         @Override
         protected void registerProperties() {
         }
     };
 
-    public static final Registry<DropCreator> REGISTRY = new Registry<>(DropCreator.class, NULL_DROP_CREATOR);
+    public static final ConfigurableRegistry<DropCreator, DropCreatorConfiguration> REGISTRY =
+            new ConfigurableRegistry<>(DropCreator.class, NULL, DropCreatorConfiguration.TEMPLATES);
 
     public DropCreator(final ResourceLocation registryName) {
         super(registryName);
     }
 
     @Override
-    protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
-        return new ConfiguredDropCreator<>(this);
+    protected DropCreatorConfiguration createDefaultConfiguration() {
+        return new DropCreatorConfiguration(this);
     }
 
-    public <C extends DropContext> void appendDrops(final ConfiguredDropCreator<DropCreator> configuration, final DropType<C> dropType, final C context) {
-        dropType.appendDrops(configuration, context);
+    public <C extends DropContext> void appendDrops(final DropCreatorConfiguration configuration, final Type<C> type,
+                                                    final C context) {
+        type.appendDrops(configuration, context);
     }
 
-    public void appendHarvestDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    protected void appendHarvestDrops(final DropCreatorConfiguration configuration, DropContext context) {
     }
 
-    public void appendVoluntaryDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    protected void appendVoluntaryDrops(final DropCreatorConfiguration configuration, DropContext context) {
     }
 
-    public void appendLeavesDrops(final ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    protected void appendLeavesDrops(final DropCreatorConfiguration configuration, DropContext context) {
     }
 
-    public void appendLogDrops(final ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) {
+    protected void appendLogDrops(final DropCreatorConfiguration configuration, LogDropContext context) {
+    }
+
+    public static final class Type<C extends DropContext> extends RegistryEntry<Type<C>> {
+        public static final Type<DropContext> NULL = new Type<>(DTTrees.NULL, (dropCreator, configured, context) -> {
+        });
+
+        @SuppressWarnings("unchecked")
+        public static final Class<Type<DropContext>> TYPE = (Class<Type<DropContext>>) NULL.getClass();
+        public static final SimpleRegistry<Type<DropContext>> REGISTRY = new SimpleRegistry<>(TYPE, NULL);
+
+        public static final Type<DropContext> HARVEST = register(new Type<>(DynamicTrees.resLoc("harvest"),
+                DropCreator::appendHarvestDrops));
+        public static final Type<DropContext> VOLUNTARY = register(new Type<>(DynamicTrees.resLoc("voluntary"),
+                DropCreator::appendVoluntaryDrops));
+        public static final Type<DropContext> LEAVES = register(new Type<>(DynamicTrees.resLoc("leaves"),
+                DropCreator::appendLeavesDrops));
+        public static final Type<LogDropContext> LOGS = register(new Type<>(DynamicTrees.resLoc("logs"),
+                DropCreator::appendLogDrops));
+        private final TriConsumer<DropCreator, DropCreatorConfiguration, C> appendDropConsumer;
+
+        public Type(ResourceLocation registryName,
+                    TriConsumer<DropCreator, DropCreatorConfiguration, C> appendDropConsumer) {
+            super(registryName);
+            this.appendDropConsumer = appendDropConsumer;
+        }
+
+        @SuppressWarnings("unchecked")
+        private static <C extends DropContext> Type<C> register(Type<C> type) {
+            REGISTRY.register((Type<DropContext>) type);
+            return type;
+        }
+
+        @SuppressWarnings("unchecked")
+        public static Class<Type<DropContext>> getGenericClass() {
+            return (Class<Type<DropContext>>) NULL.getClass();
+        }
+
+        public void appendDrops(DropCreatorConfiguration configuration, C context) {
+            this.appendDropConsumer.accept(configuration.getConfigurable(), configuration, context);
+        }
     }
 
 }

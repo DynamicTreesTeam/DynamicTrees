@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -22,13 +22,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 /**
- * An extension of {@link Registry} that allows for custom {@link EntryType}.
+ * An extension of {@link SimpleRegistry} that allows for custom {@link EntryType}.
  *
  * @param <V> The {@link RegistryEntry} type that will be registered.
  * @author Harley O'Connor
  */
 // TODO: Update Javadoc
-public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
+public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V> {
 
     /**
      * A {@link Map} of {@link EntryType} objects and their registry names. These handle construction of the {@link
@@ -58,7 +58,7 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
     /**
      * Constructs a new {@link TypedRegistry}.
      *
-     * @param name        The {@link #name} for this {@link Registry}.
+     * @param name        The {@link #name} for this {@link SimpleRegistry}.
      * @param type        The {@link Class} of the {@link RegistryEntry}.
      * @param nullValue   A null entry. See {@link #nullValue} for more details.
      * @param defaultType The default {@link EntryType<V>}.
@@ -93,10 +93,13 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
         final JsonElement typeElement = jsonObject.get("type");
 
         if (typeElement != null) {
-            JsonObjectGetters.RESOURCE_LOCATION.get(typeElement)
-                    .map(resourceLocation -> this.getType(TreeRegistry.processResLoc(resourceLocation)), "Could not find type for '{previous_value}' (will use default).")
-                    .ifSuccessful(type::set)
-                    .otherwise(error -> LogManager.getLogger().error("Error constructing " + this.name + " '" + registryName + "': " + error));
+            JsonDeserialisers.RESOURCE_LOCATION.deserialise(typeElement)
+                    .map(resourceLocation -> this.getType(TreeRegistry.processResLoc(resourceLocation)), "Could not find type for '{}' (will use default).")
+                    .ifSuccessOrElse(
+                            type::set,
+                            error -> LogManager.getLogger().error("Error constructing " + this.name + " '" + registryName + "': " + error),
+                            warning -> LogManager.getLogger().warn("Warning whilst constructing " + this.name + " '" + registryName + "': " + warning)
+                    );
         }
 
         return type.get();
@@ -157,13 +160,13 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends Registry<V> {
     }
 
     public static JsonObject putJsonRegistryName(final JsonObject jsonObject, final ResourceLocation registryName) {
-        jsonObject.add(DTResourceRegistries.RESOURCE_LOCATION.toString(), new JsonPrimitive(registryName.toString()));
+        jsonObject.add(Resources.RESOURCE_LOCATION.toString(), new JsonPrimitive(registryName.toString()));
         return jsonObject;
     }
 
     public static <V extends RegistryEntry<V>> Codec<V> createDefaultCodec(final Function<ResourceLocation, V> constructor) {
         return RecordCodecBuilder.create(instance -> instance
-                .group(ResourceLocation.CODEC.fieldOf(DTResourceRegistries.RESOURCE_LOCATION.toString()).forGetter(RegistryEntry::getRegistryName))
+                .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString()).forGetter(RegistryEntry::getRegistryName))
                 .apply(instance, constructor));
     }
 

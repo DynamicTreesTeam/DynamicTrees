@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.cells;
 
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.api.cells.Cell;
 import net.minecraft.util.Direction;
 
-public class MatrixCell implements ICell {
+public class MatrixCell implements Cell {
 
     private final int value;
     private final byte[] valMap;

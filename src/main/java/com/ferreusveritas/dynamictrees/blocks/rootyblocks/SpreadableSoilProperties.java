@@ -17,11 +17,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author Max Hyper
@@ -47,7 +43,7 @@ public class SpreadableSoilProperties extends SoilProperties {
     }
 
     @Override
-    protected RootyBlock createDynamicSoil(AbstractBlock.Properties blockProperties) {
+    protected RootyBlock createBlock(AbstractBlock.Properties blockProperties) {
         return new SpreadableRootyBlock(this, blockProperties);
     }
 
@@ -75,9 +71,8 @@ public class SpreadableSoilProperties extends SoilProperties {
             return (SpreadableSoilProperties) super.getSoilProperties();
         }
 
-        @Nullable
-        private RootyBlock getRootyBlock(Block block) {
-            return SoilHelper.getProperties(block).getDynamicSoilBlock();
+        private Optional<RootyBlock> getRootyBlock(Block block) {
+            return SoilHelper.getProperties(block).getBlock();
         }
 
         @Override
@@ -97,10 +92,9 @@ public class SpreadableSoilProperties extends SoilProperties {
                     if (foundBlocks.size() > 0) {
                         if (!worldIn.isClientSide()) {
                             int blockInt = worldIn.random.nextInt(foundBlocks.size());
-                            RootyBlock rootyBlock = getRootyBlock(foundBlocks.get(blockInt));
-                            if (rootyBlock != null) {
-                                worldIn.setBlock(pos, rootyBlock.defaultBlockState(), 3);
-                            }
+                            this.getRootyBlock(foundBlocks.get(blockInt)).ifPresent(rootyBlock ->
+                                    worldIn.setBlock(pos, rootyBlock.defaultBlockState(), 3)
+                            );
                         }
                         if (!player.isCreative()) {
                             handStack.shrink(1);
@@ -134,7 +128,7 @@ public class SpreadableSoilProperties extends SoilProperties {
                         BlockState thatState = world.getBlockState(thatPos);
 
                         for (SoilProperties spreadable : properties.spreadable_soils) {
-                            RootyBlock block = spreadable.getDynamicSoilBlock();
+                            RootyBlock block = spreadable.getBlock().orElse(null);
                             if (block != null && (thatState.getBlock() == spreadable.getPrimitiveSoilBlock() || thatState.getBlock() == block) && world.getMaxLocalRawBrightness(pos.above()) >= properties.required_light && thatStateUp.getLightBlock(world, thatPos.above()) <= 2) {
                                 if (state.hasProperty(FERTILITY)) {
                                     world.setBlockAndUpdate(pos, block.defaultBlockState().setValue(FERTILITY, state.getValue(FERTILITY)));

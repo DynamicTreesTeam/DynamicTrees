@@ -1,29 +1,28 @@
 package com.ferreusveritas.dynamictrees.api.treepacks;
 
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
+import com.google.common.collect.Lists;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Stores an error message in the event of a property applier failure.
+ * Stores an error and warning messages resulting from {@link Applier#apply(Object, Object)}.
  *
  * @author Harley O'Connor
  */
 public final class PropertyApplierResult {
 
     /**
-     * Stores the error message, or null to signify there was none.
+     * The error message, or null to signify that there was none.
      */
     private String errorMessage;
 
-    /**
-     * Stores any warnings.
-     */
     private final List<String> warnings;
 
     private PropertyApplierResult(final String errorMessage) {
-        this(errorMessage, Collections.emptyList());
+        this(errorMessage, Lists.newLinkedList());
     }
 
     private PropertyApplierResult(final String errorMessage, final List<String> warnings) {
@@ -35,8 +34,8 @@ public final class PropertyApplierResult {
         return this.errorMessage == null;
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public Optional<String> getError() {
+        return Optional.ofNullable(errorMessage);
     }
 
     public PropertyApplierResult addErrorPrefix(final String prefix) {
@@ -48,8 +47,12 @@ public final class PropertyApplierResult {
         return warnings;
     }
 
+    public void addWarnings(List<String> warning) {
+        this.warnings.addAll(warning);
+    }
+
     public PropertyApplierResult addWarningsPrefix(final String prefix) {
-        this.warnings.forEach(warning -> warning = prefix + warning);
+        this.warnings.replaceAll(warning -> warning = prefix + warning);
         return this;
     }
 
@@ -61,10 +64,6 @@ public final class PropertyApplierResult {
         return new PropertyApplierResult(null, warnings);
     }
 
-    public static PropertyApplierResult failure(final ObjectFetchResult<?> fetchResult) {
-        return new PropertyApplierResult(fetchResult.getErrorMessage(), fetchResult.getWarnings());
-    }
-
     public static PropertyApplierResult failure(final String errorMessage) {
         return new PropertyApplierResult(errorMessage);
     }
@@ -73,8 +72,8 @@ public final class PropertyApplierResult {
         return new PropertyApplierResult(errorMessage, warnings);
     }
 
-    public static PropertyApplierResult from(final ObjectFetchResult<?> fetchResult) {
-        return fetchResult.wasSuccessful() ? success() : failure(fetchResult.getErrorMessage());
+    public static PropertyApplierResult from(final Result<?, ?> result) {
+        return result.success() ? success(result.getWarnings()) : failure(result.getError(), result.getWarnings());
     }
 
 }

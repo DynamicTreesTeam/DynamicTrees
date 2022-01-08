@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
@@ -17,7 +17,6 @@ import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.RenderType;
@@ -86,11 +85,11 @@ public class DTClient {
             family.woodRingColor = 0xFFF1AE;
             family.woodBarkColor = 0xB3A979;
             if (family != Family.NULL_FAMILY) {
-                BlockState state = family.getPrimitiveLog().defaultBlockState();
-                if (state.getBlock() != Blocks.AIR) {
+                family.getPrimitiveLog().ifPresent(branch -> {
+                    BlockState state = branch.defaultBlockState();
                     family.woodRingColor = getFaceColor(state, Direction.DOWN, bakedTextureGetter);
                     family.woodBarkColor = getFaceColor(state, Direction.NORTH, bakedTextureGetter);
-                }
+                });
             }
         }
     }
@@ -240,7 +239,7 @@ public class DTClient {
     public static void crushLeavesBlock(World world, BlockPos pos, BlockState blockState, Entity entity) {
         if (world.isClientSide) {
             Random random = world.random;
-            ITreePart treePart = TreeHelper.getTreePart(blockState);
+            TreePart treePart = TreeHelper.getTreePart(blockState);
             if (treePart instanceof DynamicLeavesBlock) {
                 DynamicLeavesBlock leaves = (DynamicLeavesBlock) treePart;
                 LeavesProperties leavesProperties = leaves.getProperties(blockState);

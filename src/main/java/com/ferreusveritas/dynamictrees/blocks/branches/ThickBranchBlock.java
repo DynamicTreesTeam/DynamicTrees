@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class ThickBranchBlock extends BasicBranchBlock implements IMusable {
+public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     public static final int MAX_RADIUS_TICK = 24;
 

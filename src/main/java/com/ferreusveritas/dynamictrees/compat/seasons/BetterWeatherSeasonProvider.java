@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 /**
  * @author Harley O'Connor
  */
-public class BetterWeatherSeasonProvider implements ISeasonProvider {
+public class BetterWeatherSeasonProvider implements SeasonProvider {
 
     private Float seasonValue = 1.0f;
 

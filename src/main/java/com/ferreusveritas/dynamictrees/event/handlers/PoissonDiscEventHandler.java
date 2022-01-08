@@ -36,9 +36,9 @@ public class PoissonDiscEventHandler {
     public void onChunkDataLoad(ChunkDataEvent.Load event) {
         final IWorld world = event.getWorld();
 
-        if (world == null || world.isClientSide()) {
-            return;
-        }
+		if (world == null || world.isClientSide()) {
+			return;
+		}
 
         final byte[] circleData = event.getData().getByteArray(CIRCLE_DATA_ID);
         final UniversalPoissonDiscProvider discProvider = TreeGenerator.getTreeGenerator().getCircleProvider();
@@ -57,9 +57,9 @@ public class PoissonDiscEventHandler {
         final byte[] circleData = discProvider.getChunkPoissonData(world, chunkPos);
         event.getData().putByteArray(CIRCLE_DATA_ID, circleData); // Set circle data.
 
-        if (chunk instanceof Chunk && !((Chunk) chunk).loaded) {
-            discProvider.unloadChunkPoissonData(world, chunkPos);
-        }
+		if (chunk instanceof Chunk && !((Chunk) chunk).loaded) {
+			discProvider.unloadChunkPoissonData(world, chunkPos);
+		}
     }
 
 }

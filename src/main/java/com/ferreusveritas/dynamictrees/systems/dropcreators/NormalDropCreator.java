@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.MapDeserialiser;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
-import com.ferreusveritas.dynamictrees.util.json.MapGetter;
 import com.google.common.collect.Maps;
 import net.minecraft.util.ResourceLocation;
 
@@ -18,13 +18,13 @@ import java.util.Map;
 public final class NormalDropCreator extends DropCreator {
 
     @SuppressWarnings("all")
-    public static final ConfigurationProperty<Map<DropType<DropContext>, Drops>> DROP_MAP = ConfigurationProperty.property("drops",
-            MapGetter.getMapClass(DropType.getGenericClass(), Drops.class, HashMap::new));
+    public static final ConfigurationProperty<Map<Type<DropContext>, Drops>> DROP_MAP = ConfigurationProperty.property("drops",
+            MapDeserialiser.getMapClass(Type.getGenericClass(), Drops.class, HashMap::new));
 
     static {
-        JsonObjectGetters.register(
-                MapGetter.getMapClass(DropType.getGenericClass(), Drops.class),
-                new MapGetter<>(JsonObjectGetters.DROP_TYPE, JsonObjectGetters.DROPS)
+        JsonDeserialisers.register(
+                MapDeserialiser.getMapClass(Type.getGenericClass(), Drops.class),
+                new MapDeserialiser<>(JsonDeserialisers.DROP_TYPE, JsonDeserialisers.DROPS)
         );
     }
 
@@ -38,32 +38,32 @@ public final class NormalDropCreator extends DropCreator {
     }
 
     @Override
-    protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
+    protected DropCreatorConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(DROP_MAP, Maps.newHashMap());
     }
 
     @Override
-    public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-        configuration.get(DROP_MAP).getOrDefault(DropType.HARVEST, Drops.NONE)
+    public void appendHarvestDrops(DropCreatorConfiguration configuration, DropContext context) {
+        configuration.get(DROP_MAP).getOrDefault(Type.HARVEST, Drops.NONE)
                 .appendDrops(context.drops(), context.random(), context.fortune());
     }
 
     @Override
-    public void appendVoluntaryDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-        configuration.get(DROP_MAP).getOrDefault(DropType.VOLUNTARY, Drops.NONE)
+    public void appendVoluntaryDrops(DropCreatorConfiguration configuration, DropContext context) {
+        configuration.get(DROP_MAP).getOrDefault(Type.VOLUNTARY, Drops.NONE)
                 .appendDrops(context.drops(), context.random(), 0);
     }
 
     @Override
-    public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
-        configuration.get(DROP_MAP).getOrDefault(DropType.LEAVES, Drops.NONE)
+    public void appendLeavesDrops(DropCreatorConfiguration configuration, DropContext context) {
+        configuration.get(DROP_MAP).getOrDefault(Type.LEAVES, Drops.NONE)
                 .appendDrops(context.drops(), context.random(), context.fortune());
     }
 
     @Override
-    public void appendLogDrops(ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) {
-        configuration.get(DROP_MAP).getOrDefault(DropType.LOGS, Drops.NONE)
+    public void appendLogDrops(DropCreatorConfiguration configuration, LogDropContext context) {
+        configuration.get(DROP_MAP).getOrDefault(Type.LOGS, Drops.NONE)
                 .appendDrops(context.drops(), context.random(), 0);
     }
 

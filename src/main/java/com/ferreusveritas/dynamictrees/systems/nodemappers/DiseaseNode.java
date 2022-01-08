@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.block.BlockState;
@@ -14,7 +14,7 @@ import net.minecraft.world.IWorld;
  *
  * @author ferreusveritas
  */
-public class DiseaseNode implements INodeInspector {
+public class DiseaseNode implements NodeInspector {
 
     Species species;//Destroy any thin branches made of the same kind of wood.
 

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.nodemappers;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -11,7 +11,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
-public class TransformNode implements INodeInspector {
+public class TransformNode implements NodeInspector {
 
     private final Species fromSpecies;
     private final Species toSpecies;
@@ -28,11 +28,11 @@ public class TransformNode implements INodeInspector {
         if (branch != null && fromSpecies.getFamily() == branch.getFamily()) {
             int radius = branch.getRadius(blockState);
             if (radius > 0) {
-                BranchBlock newBranchBlock = toSpecies.getFamily().getBranch();
+                BranchBlock newBranchBlock = toSpecies.getFamily().getBranch().orElse(null);
 
                 // If the branch is stripped, make the replacement branch stripped.
-                if (fromSpecies.getFamily().getStrippedBranch().equals(branch)) {
-                    newBranchBlock = toSpecies.getFamily().getStrippedBranch();
+                if (fromSpecies.getFamily().getStrippedBranch().orElse(null) == branch) {
+                    newBranchBlock = toSpecies.getFamily().getStrippedBranch().get();
                 }
 
                 newBranchBlock.setRadius(world, pos, radius, null);

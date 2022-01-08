@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.registry.IRegistry;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -49,7 +49,7 @@ public final class GenFeatures {
         return new ResourceLocation(DynamicTrees.MOD_ID, name);
     }
 
-    public static void register(final IRegistry<GenFeature> registry) {
+    public static void register(final Registry<GenFeature> registry) {
         registry.registerAll(FRUIT, COCOA, VINES, BEE_NEST, SHROOMLIGHT, CONIFER_TOPPER, MOUND,
                 ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH, PODZOL, BUSH, HUGE_MUSHROOM,
                 HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE, RANDOM_PREDICATE, ALTERNATIVE_LEAVES);

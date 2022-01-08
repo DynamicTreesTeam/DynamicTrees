@@ -76,9 +76,9 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
     @Override
     public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		if (this.getSpecies().canSaplingGrowNaturally(worldIn, pos)) {
-			this.performBonemeal(worldIn, rand, pos, state);
-		}
+        if (this.getSpecies().canSaplingGrowNaturally(worldIn, pos)) {
+            this.performBonemeal(worldIn, rand, pos, state);
+        }
     }
 
     public static boolean canSaplingStay(IWorldReader world, Species species, BlockPos pos) {
@@ -144,9 +144,9 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
     @Override
     public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
         // If a loot table has been added load those drops instead (until drop creators).
-		if (builder.getLevel().getServer().getLootTables().getIds().contains(this.getLootTable())) {
-			return super.getDrops(state, builder);
-		}
+        if (builder.getLevel().getServer().getLootTables().getIds().contains(this.getLootTable())) {
+            return super.getDrops(state, builder);
+        }
 
         return DTConfigs.DYNAMIC_SAPLING_DROPS.get() ?
                 Collections.singletonList(this.getSpecies().getSeedStack(1)) :

@@ -7,7 +7,7 @@ import net.minecraft.util.Direction;
  *
  * @author ferreusveritas
  */
-public class CellNull implements ICell {
+public class CellNull implements Cell {
 
     public static final CellNull NULL_CELL = new CellNull();
 

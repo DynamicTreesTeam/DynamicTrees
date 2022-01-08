@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.cells;
 
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
+import com.ferreusveritas.dynamictrees.api.cells.Cell;
 import net.minecraft.util.Direction;
 
-public class ConiferBranchCell implements ICell {
+public class ConiferBranchCell implements Cell {
 
     @Override
     public int getValue() {

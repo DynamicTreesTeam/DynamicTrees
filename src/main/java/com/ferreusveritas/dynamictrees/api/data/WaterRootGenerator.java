@@ -21,7 +21,7 @@ public final class WaterRootGenerator extends SoilStateGenerator {
     @Override
     public Dependencies gatherDependencies(SoilProperties input) {
         return new Dependencies()
-                .append(SOIL, input.getSoilBlock());
+                .append(SOIL, input.getBlock());
     }
 
 }

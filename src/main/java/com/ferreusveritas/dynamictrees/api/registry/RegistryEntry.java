@@ -14,7 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.function.Consumer;
 
 /**
- * Holds an entry for a {@link Registry}.
+ * Holds an entry for a {@link SimpleRegistry}.
  *
  * @author Harley O'Connor
  */

@@ -1,5 +1,10 @@
 package com.ferreusveritas.dynamictrees.resources;
 
+import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
+import com.ferreusveritas.dynamictrees.api.resource.ResourceManager;
+import com.ferreusveritas.dynamictrees.api.resource.TreeResourcePack;
+import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
+import com.ferreusveritas.dynamictrees.api.resource.loading.ResourceLoader;
 import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.google.common.collect.Lists;
 import net.minecraft.resources.IResource;
@@ -24,71 +29,82 @@ import java.util.stream.Stream;
 /**
  * @author Harley O'Connor
  */
-public class TreesResourceManager implements IResourceManager {
+public final class TreesResourceManager implements IResourceManager, ResourceManager {
 
     private final List<TreeResourcePack> resourcePacks = Lists.newArrayList();
-    private final List<ReloadListener<?>> reloadListeners = Lists.newArrayList();
+    private final List<ResourceLoader<?>> resourceLoaders = Lists.newArrayList();
 
-    public void addReloadListeners(final ReloadListener<?>... reloadListener) {
-        this.reloadListeners.addAll(Arrays.asList(reloadListener));
+    @Override
+    public void addLoader(ResourceLoader<?> loader) {
+        this.resourceLoaders.add(loader);
     }
 
-    public void addReloadListener(final int position, final ReloadListener<?> reloadListener) {
-        this.reloadListeners.add(position, reloadListener);
+    @Override
+    public void addLoaders(ResourceLoader<?>... loaders) {
+        this.resourceLoaders.addAll(Arrays.asList(loaders));
     }
 
-    /**
-     * Gets the {@link #reloadListeners} for this {@link TreesResourceManager} object.
-     *
-     * @return The {@link #reloadListeners} for this {@link TreesResourceManager} object.
-     */
-    public List<ReloadListener<?>> getReloadListeners() {
-        return this.reloadListeners;
+    @Override
+    public void addLoaderBefore(ResourceLoader<?> loader, ResourceLoader<?> existing) {
+        this.resourceLoaders.add(this.resourceLoaders.indexOf(existing), loader);
     }
 
-    public void registerJsonAppliers() {
-        this.reloadListeners.stream()
-                .filter(JsonApplierReloadListener.class::isInstance)
-                .map(JsonApplierReloadListener.class::cast)
-                .forEach(JsonApplierReloadListener::registerAppliers);
+    @Override
+    public void addLoaderAfter(ResourceLoader<?> loader, ResourceLoader<?> existing) {
+        this.resourceLoaders.add(this.resourceLoaders.indexOf(existing) + 1, loader);
     }
 
+    @Override
+    public void registerAppliers() {
+        this.resourceLoaders.stream()
+                .filter(ApplierResourceLoader.class::isInstance)
+                .map(ApplierResourceLoader.class::cast)
+                .forEach(ApplierResourceLoader::registerAppliers);
+    }
+
+    @Override
     public void load() {
-        this.reloadListeners.forEach(reloadListener -> reloadListener.load(this).join());
+        this.resourceLoaders.forEach(loader -> loader.load(this).join());
     }
 
-    public void setup() {
-        this.reloadListeners.forEach(reloadListener -> reloadListener.setup(this).join());
-    }
-
+    @Override
     public void gatherData() {
-        this.reloadListeners.forEach(reloadListener ->  reloadListener.gatherData(this).join());
+        this.resourceLoaders.forEach(loader -> loader.gatherData(this).join());
     }
 
-    public CompletableFuture<?>[] prepareReload(final Executor backgroundExecutor, final Executor gameExecutor) {
-        return this.reloadListeners.stream()
-                .map(reloadListener -> reloadListener.prepareReload(this, backgroundExecutor)).toArray(CompletableFuture<?>[]::new);
+    @Override
+    public void setup() {
+        this.resourceLoaders.forEach(loader -> loader.setup(this).join());
+    }
+
+    @Override
+    public CompletableFuture<?>[] prepareReload(final Executor gameExecutor, final Executor backgroundExecutor) {
+        return this.resourceLoaders.stream()
+                .map(loader -> loader.prepareReload(this))
+                .toArray(CompletableFuture<?>[]::new);
     }
 
     /**
      * Reloads the given {@link CompletableFuture}s. These <b>must</b> be given in the same order as returned from
      * {@link #prepareReload(Executor, Executor)}.
      *
-     * @param futures The {@link CompletableFuture} returned from {@link #prepareReload(Executor, Executor)}.
+     * @param futures the futures returned from {@link #prepareReload(Executor, Executor)}
      */
+    @Override
     public void reload(final CompletableFuture<?>[] futures) {
         for (int i = 0; i < futures.length; i++) {
-            this.reload(this.reloadListeners.get(i), futures[i]);
+            this.reload(this.resourceLoaders.get(i), futures[i]);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void reload(final ReloadListener<T> reloadListener, final CompletableFuture<?> future) {
-        reloadListener.reload((CompletableFuture<T>) future, this);
+    private <R> void reload(final ResourceLoader<R> loader, final CompletableFuture<?> future) {
+        loader.reload((CompletableFuture<ResourceAccessor<R>>) future, this);
     }
 
-    public void addResourcePack(final TreeResourcePack treeResourcePack) {
-        this.resourcePacks.add(treeResourcePack);
+    @Override
+    public void addPack(TreeResourcePack pack) {
+        this.resourcePacks.add(pack);
     }
 
     @Override
@@ -100,11 +116,11 @@ public class TreesResourceManager implements IResourceManager {
     }
 
     @Override
-    public IResource getResource(final ResourceLocation resourceLocationIn) throws IOException {
-        final List<IResource> resources = this.getResources(resourceLocationIn);
+    public IResource getResource(final ResourceLocation location) throws IOException {
+        final List<IResource> resources = this.getResources(location);
 
         if (resources.isEmpty()) {
-            throw new FileNotFoundException("Could not find path '" + resourceLocationIn + "' in any tree packs.");
+            throw new FileNotFoundException("Could not find path '" + location + "' in any tree packs.");
         }
 
         return resources.get(resources.size() - 1);
@@ -119,29 +135,35 @@ public class TreesResourceManager implements IResourceManager {
         }
     }
 
-    private static final IResource NULL_RESOURCE = new SimpleResource(null, null, null, null);
+    private static final IResource NULL_RESOURCE =
+            new SimpleResource(null, null, null, null);
 
     @Override
     public List<IResource> getResources(ResourceLocation path) throws IOException {
-        return this.resourcePacks.stream().map(resourcePack -> {
-                    final InputStream stream;
-
-                    try {
-                        stream = resourcePack.getResource(null, path);
-                    } catch (final IOException e) {
-                        return NULL_RESOURCE; // This resource pack did not have this resource.
-                    }
-
-                    return new SimpleResource(resourcePack.getName(), path, stream, null);
-                }).filter(resourcePack -> resourcePack != NULL_RESOURCE) // Filter out non-existent resources.
+        return this.resourcePacks.stream()
+                .map(resourcePack -> getResource(path, resourcePack))
+                .filter(resourcePack -> resourcePack != NULL_RESOURCE)
                 .collect(Collectors.toList());
     }
 
-    protected Stream<ResourceLocation> resourceLocationStream(String path, Predicate<String> filter) {
+    private IResource getResource(ResourceLocation path, TreeResourcePack resourcePack) {
+        final InputStream stream;
+
+        try {
+            stream = resourcePack.getResource(path);
+        } catch (final IOException e) {
+            return NULL_RESOURCE;
+        }
+
+        return new SimpleResource(resourcePack.getName(), path, stream, null);
+    }
+
+    private Stream<ResourceLocation> resourceLocationStream(String path, Predicate<String> filter) {
         return this.resourcePacks.stream()
                 .map(
-                        resourcePack -> resourcePack.getResourceNamespaces().stream()
-                                .map(namespace -> resourcePack.getResources(null, namespace, path, Integer.MAX_VALUE, filter))
+                        resourcePack -> resourcePack.getNamespaces().stream()
+                                .map(namespace -> resourcePack.getResources(namespace, path,
+                                        Integer.MAX_VALUE, filter))
                                 .flatMap(Collection::stream)
                                 .collect(CommonCollectors.toLinkedSet())
                 ).flatMap(Collection::stream);
@@ -150,10 +172,6 @@ public class TreesResourceManager implements IResourceManager {
     @Override
     public Collection<ResourceLocation> listResources(String path, Predicate<String> filter) {
         return this.resourceLocationStream(path, filter).collect(CommonCollectors.toAlternateLinkedSet());
-    }
-
-    public Collection<ResourceLocation> resourcesAsRegularSet(String path, Predicate<String> filter) {
-        return this.resourceLocationStream(path, filter).collect(CommonCollectors.toLinkedSet());
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * An implementation for {@link AbstractRegistry} using a {@link ConcurrentHashMap} to store its entries.
  *
  * @author Harley O'Connor
- * @see Registry
+ * @see SimpleRegistry
  */
 public final class ConcurrentRegistry<V extends RegistryEntry<V>> extends AbstractRegistry<V> {
 
@@ -69,7 +69,7 @@ public final class ConcurrentRegistry<V extends RegistryEntry<V>> extends Abstra
     /**
      * Registers the given {@link RegistryEntry} to this {@link ConcurrentRegistry}.
      *
-     * <p>Note that this will throw a runtime exception if this {@link Registry} is locked, or if
+     * <p>Note that this will throw a runtime exception if this {@link SimpleRegistry} is locked, or if
      * the {@link ResourceLocation} already has a value registered, therefore {@link #isLocked()} or/and {@link
      * #has(ResourceLocation)} should be checked before calling if either conditions are uncertain.</p>
      *
@@ -77,10 +77,10 @@ public final class ConcurrentRegistry<V extends RegistryEntry<V>> extends Abstra
      * {@link RegistryEvent}, in which case you don't have to worry about locking.</p>
      *
      * @param value The {@link RegistryEntry} to register.
-     * @return This {@link Registry} object for chaining.
+     * @return This {@link SimpleRegistry} object for chaining.
      */
     @Override
-    public IRegistry<V> register(V value) {
+    public Registry<V> register(V value) {
         this.assertValid(value);
 
         this.entries.put(value.getRegistryName(), value);

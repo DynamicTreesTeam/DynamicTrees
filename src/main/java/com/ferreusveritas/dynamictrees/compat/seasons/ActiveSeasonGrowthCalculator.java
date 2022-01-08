@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import com.ferreusveritas.dynamictrees.api.seasons.ClimateZoneType;
-import com.ferreusveritas.dynamictrees.api.seasons.ISeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.api.seasons.SeasonGrowthCalculator;
 import net.minecraft.util.math.MathHelper;
 
-public class ActiveSeasonGrowthCalculator implements ISeasonGrowthCalculator {
+public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
 
     protected float clippedsineWave(float seasonValue, float qPhase, float amplitude, float bias) {
         return MathHelper.clamp((((float) Math.sin((seasonValue / 2 * Math.PI) + (Math.PI * 0.25 * qPhase))) * amplitude) + bias, 0.0f, 1.0f);

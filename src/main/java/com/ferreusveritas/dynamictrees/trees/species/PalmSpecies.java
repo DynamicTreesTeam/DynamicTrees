@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.leaves.PalmLeavesProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -66,7 +67,10 @@ public class PalmSpecies extends Species {
         //Ensure planting conditions are right
         Family family = getFamily();
         if (world.isEmptyBlock(pos.above()) && isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()))) {
-            family.getBranch().setRadius(world, pos, family.getPrimaryThickness(), null);//set to a single branch with 1 radius
+            family.getBranch().ifPresent(branch ->
+                    // Set to a single branch with 1 radius.
+                    branch.setRadius(world, pos, family.getPrimaryThickness(), null)
+            );
             world.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 4));//Place 2 leaf blocks on top
             world.setBlockAndUpdate(pos.above(2), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 3));
             placeRootyDirtBlock(world, pos.below(), 15);//Set to fully fertilized rooty dirt underneath
@@ -76,25 +80,25 @@ public class PalmSpecies extends Species {
     }
 
     @Override
-    public void postGeneration(World worldObj, IWorld world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
-        if (!endPoints.isEmpty()) {
-            for (BlockPos endPoint : endPoints) {
-                BlockPos tip = endPoint.above(2);
-                if (safeBounds.inBounds(tip, true)) {
-                    if (world.getBlockState(tip).getBlock() instanceof DynamicLeavesBlock) {
-                        for (CoordUtils.Surround surr : CoordUtils.Surround.values()) {
-                            BlockPos leafPos = tip.offset(surr.getOffset());
-                            BlockState leafState = world.getBlockState(leafPos);
-                            if (leafState.getBlock() instanceof DynamicLeavesBlock) {
-                                DynamicLeavesBlock block = (DynamicLeavesBlock) leafState.getBlock();
-                                world.setBlock(leafPos, block.getLeavesBlockStateForPlacement(world, leafPos, leafState, leafState.getValue(LeavesBlock.DISTANCE), true), 2);
-                            }
+    public void postGeneration(PostGenerationContext context) {
+        final IWorld world = context.world();
+
+        if (!context.endPoints().isEmpty()) {
+            BlockPos tip = context.endPoints().get(0).above(2);
+            if (context.bounds().inBounds(tip, true)) {
+                if (world.getBlockState(tip).getBlock() instanceof DynamicLeavesBlock) {
+                    for (CoordUtils.Surround surr : CoordUtils.Surround.values()) {
+                        BlockPos leafPos = tip.offset(surr.getOffset());
+                        BlockState leafState = world.getBlockState(leafPos);
+                        if (leafState.getBlock() instanceof DynamicLeavesBlock) {
+                            DynamicLeavesBlock block = (DynamicLeavesBlock) leafState.getBlock();
+                            world.setBlock(leafPos, block.getLeavesBlockStateForPlacement(world, leafPos, leafState, leafState.getValue(LeavesBlock.DISTANCE), true), 2);
                         }
                     }
                 }
             }
         }
-        super.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+        super.postGeneration(context);
     }
 
     @Nullable
@@ -120,8 +124,8 @@ public class PalmSpecies extends Species {
             }
 
             if (existingLeaves.contains(relPos)) {
-                leaves.put(relPos, leavesProperties.getDynamicLeavesState(4));//The barky overlapping part of the palm frond cluster
-            }
+                    leaves.put(relPos, leavesProperties.getDynamicLeavesState(4));//The barky overlapping part of the palm frond cluster
+                }
             if (existingLeaves.contains(relPos.above())) {
                 leaves.put(relPos.above(), leavesProperties.getDynamicLeavesState(3));//The leafy top of the palm frond cluster
             }

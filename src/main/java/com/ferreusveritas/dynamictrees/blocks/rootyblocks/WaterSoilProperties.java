@@ -26,7 +26,6 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 /**
@@ -43,7 +42,7 @@ public class WaterSoilProperties extends SoilProperties {
     }
 
     @Override
-    protected RootyBlock createDynamicSoil(AbstractBlock.Properties blockProperties) {
+    protected RootyBlock createBlock(AbstractBlock.Properties blockProperties) {
         return new RootyWaterBlock(this, blockProperties);
     }
 
@@ -81,7 +80,9 @@ public class WaterSoilProperties extends SoilProperties {
         public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
             BlockState upState = world.getBlockState(pos.above());
             if (TreeHelper.isBranch(upState)) {
-                return new ItemStack(TreeHelper.getBranch(upState).getFamily().getBranchItem());
+                return TreeHelper.getBranch(upState).getFamily().getBranchItem()
+                        .map(ItemStack::new)
+                        .orElse(ItemStack.EMPTY);
             }
             return ItemStack.EMPTY;
         }
@@ -120,7 +121,7 @@ public class WaterSoilProperties extends SoilProperties {
         }
 
         @Override
-        public BlockState getDecayBlockState(BlockState state, IBlockReader access, BlockPos pos) {
+        public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
             if (state.hasProperty(WATERLOGGED) && !state.getValue(WATERLOGGED)) {
                 return Blocks.AIR.defaultBlockState();
             }

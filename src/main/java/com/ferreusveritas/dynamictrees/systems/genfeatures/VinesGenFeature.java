@@ -1,13 +1,12 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -21,12 +20,11 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPostGrowFeature {
+public class VinesGenFeature extends GenFeature {
 
     /**
      * Vine Type - this tells the generator which side the vines generate on - ceiling for vines that grow from the
@@ -56,7 +54,7 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
     }
 
     @Override
-    public ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(QUANTITY, 4)
                 .with(MAX_LENGTH, 8)
@@ -69,24 +67,24 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
     }
 
     @Override
-    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-        if (safeBounds == SafeChunkBounds.ANY || endPoints.isEmpty()) {
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
+        if (!context.isWorldGen() || context.endPoints().isEmpty()) {
             return false;
         }
 
-        final VineType vineType = configuredGenFeature.get(VINE_TYPE);
-        final int quantity = configuredGenFeature.get(QUANTITY);
+        final VineType vineType = configuration.get(VINE_TYPE);
+        final int quantity = configuration.get(QUANTITY);
 
         for (int i = 0; i < quantity; i++) {
-            final BlockPos endPoint = endPoints.get(world.getRandom().nextInt(endPoints.size()));
+            final BlockPos endPoint = context.endPoints().get(context.random().nextInt(context.endPoints().size()));
 
             switch (vineType) {
                 case SIDE:
-                    this.addSideVines(configuredGenFeature, world, species, rootPos, endPoint, safeBounds, true);
+                    this.addSideVines(configuration, context.world(), context.species(), context.pos(), endPoint, context.bounds(), true);
                     break;
                 case CEILING:
                 case FLOOR:
-                    this.addVerticalVines(configuredGenFeature, world, species, rootPos, endPoint, safeBounds, true);
+                    this.addVerticalVines(configuration, context.world(), context.species(), context.pos(), endPoint, context.bounds(), true);
                     break;
             }
         }
@@ -95,27 +93,33 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
     }
 
     @Override
-    public boolean postGrow(ConfiguredGenFeature<?> configuredGenFeature, World world, BlockPos rootPos, BlockPos treePos, Species species, int fertility, boolean natural) {
-        int fruitingRadius = configuredGenFeature.get(FRUITING_RADIUS);
-        if (fruitingRadius < 0 || fertility < 1) {
+    protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
+        final World world = context.world();
+        final BlockPos rootPos = context.pos();
+        final Species species = context.species();
+        final int fruitingRadius = configuration.get(FRUITING_RADIUS);
+
+        if (fruitingRadius < 0 || context.fertility() < 1) {
             return false;
         }
-        BlockState blockState = world.getBlockState(treePos);
-        BranchBlock branch = TreeHelper.getBranch(blockState);
 
-        if (branch != null && branch.getRadius(blockState) >= fruitingRadius && natural) {
+        final BlockState blockState = world.getBlockState(context.treePos());
+        final BranchBlock branch = TreeHelper.getBranch(blockState);
+
+        if (branch != null && branch.getRadius(blockState) >= fruitingRadius && context.natural()) {
             if (species.seasonalFruitProductionFactor(world, rootPos) > world.random.nextFloat()) {
-                FindEndsNode endFinder = new FindEndsNode();
+                final FindEndsNode endFinder = new FindEndsNode();
                 TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
-                List<BlockPos> endPoints = endFinder.getEnds();
-                int qty = configuredGenFeature.get(QUANTITY);
+                final List<BlockPos> endPoints = endFinder.getEnds();
+                final int qty = configuration.get(QUANTITY);
+
                 if (!endPoints.isEmpty()) {
                     for (int i = 0; i < qty; i++) {
                         BlockPos endPoint = endPoints.get(world.getRandom().nextInt(endPoints.size()));
-                        if (configuredGenFeature.get(VINE_TYPE) == VineType.SIDE) {
-                            this.addSideVines(configuredGenFeature, world, species, rootPos, endPoint, SafeChunkBounds.ANY, false);
+                        if (configuration.get(VINE_TYPE) == VineType.SIDE) {
+                            this.addSideVines(configuration, world, species, rootPos, endPoint, SafeChunkBounds.ANY, false);
                         } else {
-                            this.addVerticalVines(configuredGenFeature, world, species, rootPos, endPoint, SafeChunkBounds.ANY, false);
+                            this.addVerticalVines(configuration, world, species, rootPos, endPoint, SafeChunkBounds.ANY, false);
                         }
                     }
                     return true;
@@ -126,10 +130,9 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
         return true;
     }
 
-
-    protected void addSideVines(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds, boolean worldgen) {
+    protected void addSideVines(GenFeatureConfiguration configuration, IWorld world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds, boolean worldgen) {
         // Uses branch ray tracing to find a place on the side of the tree to begin generating vines.
-        final BlockRayTraceResult result = CoordUtils.branchRayTrace(world, species, rootPos, branchPos, 90, configuredGenFeature.get(VERTICAL_SPREAD), configuredGenFeature.get(RAY_DISTANCE), safeBounds);
+        final BlockRayTraceResult result = CoordUtils.branchRayTrace(world, species, rootPos, branchPos, 90, configuration.get(VERTICAL_SPREAD), configuration.get(RAY_DISTANCE), safeBounds);
 
         if (result == null) {
             return;
@@ -145,11 +148,11 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
             return;
         }
 
-        final BlockState vineState = configuredGenFeature.get(BLOCK).defaultBlockState().setValue(vineSide, true);
-        this.placeVines(world, vinePos, vineState, configuredGenFeature.get(MAX_LENGTH), null, configuredGenFeature.get(VINE_TYPE), worldgen);
+        final BlockState vineState = configuration.get(BLOCK).defaultBlockState().setValue(vineSide, true);
+        this.placeVines(world, vinePos, vineState, configuration.get(MAX_LENGTH), null, configuration.get(VINE_TYPE), worldgen);
     }
 
-    protected void addVerticalVines(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds, boolean worldgen) {
+    protected void addVerticalVines(GenFeatureConfiguration configuration, IWorld world, Species species, BlockPos rootPos, BlockPos branchPos, SafeChunkBounds safeBounds, boolean worldgen) {
         // Uses fruit ray trace method to grab a position under the tree's leaves.
         BlockPos vinePos = CoordUtils.getRayTraceFruitPos(world, species, rootPos, branchPos, safeBounds);
 
@@ -157,7 +160,7 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
             return;
         }
 
-        if (configuredGenFeature.get(VINE_TYPE) == VineType.FLOOR) {
+        if (configuration.get(VINE_TYPE) == VineType.FLOOR) {
             vinePos = this.findGround(world, vinePos);
         }
 
@@ -165,12 +168,12 @@ public class VinesGenFeature extends GenFeature implements IPostGenFeature, IPos
             return;
         }
 
-        this.placeVines(world, vinePos, configuredGenFeature.get(BLOCK).defaultBlockState(),
-                configuredGenFeature.get(MAX_LENGTH),
-                configuredGenFeature.getAsOptional(TIP_BLOCK)
+        this.placeVines(world, vinePos, configuration.get(BLOCK).defaultBlockState(),
+                configuration.get(MAX_LENGTH),
+                configuration.getAsOptional(TIP_BLOCK)
                         .map(block -> block.defaultBlockState().setValue(AbstractTopPlantBlock.AGE, worldgen ? 25 : 0))
                         .orElse(null),
-                configuredGenFeature.get(VINE_TYPE), worldgen);
+                configuration.get(VINE_TYPE), worldgen);
     }
 
     // This is WIP (and isn't needed in the base mod anyway, as well as the fact that there's almost certainly a better way of doing this).

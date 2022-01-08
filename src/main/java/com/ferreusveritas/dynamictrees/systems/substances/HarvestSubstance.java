@@ -1,12 +1,14 @@
 package com.ferreusveritas.dynamictrees.systems.substances;
 
-import com.ferreusveritas.dynamictrees.api.IFruitGenFeature;
+import com.ferreusveritas.dynamictrees.api.GeneratesFruit;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTClient;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.Sets;
@@ -22,7 +24,7 @@ import java.util.Set;
 /**
  * @author Harley O'Connor
  */
-public class HarvestSubstance implements ISubstanceEffect {
+public class HarvestSubstance implements SubstanceEffect {
 
     private Species species = Species.NULL_SPECIES;
     private final int duration;
@@ -135,10 +137,21 @@ public class HarvestSubstance implements ISubstanceEffect {
 
             // Force a growth attempt of all fruit gen features.
             if (spawnAttempt) {
-                this.species.getGenFeatures().stream().filter(configuredGenFeature -> configuredGenFeature.getGenFeature() instanceof IFruitGenFeature)
-                        .forEach(configuredGenFeature ->
-                                ((IFruitGenFeature) configuredGenFeature.getGenFeature()).postGrow(configuredGenFeature, world, rootPos, rootPos.relative(rootyBlock.getTrunkDirection(world, rootPos)), this.species, fertility, true)
-                        );
+                this.species.getGenFeatures().stream()
+                        .filter(configuration ->
+                                configuration.getGenFeature().getClass().isAnnotationPresent(GeneratesFruit.class)
+                        )
+                        .forEach(configuration -> configuration.generate(
+                                GenFeature.Type.POST_GROW,
+                                new PostGrowContext(
+                                        world,
+                                        rootPos,
+                                        species,
+                                        rootPos.relative(rootyBlock.getTrunkDirection(world, rootPos)),
+                                        fertility,
+                                        true
+                                )
+                        ));
             }
         }
 

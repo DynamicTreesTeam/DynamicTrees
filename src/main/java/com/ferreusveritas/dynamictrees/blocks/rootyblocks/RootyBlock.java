@@ -1,12 +1,12 @@
 package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.ICustomRootDecay;
+import com.ferreusveritas.dynamictrees.api.RootyBlockDecayer;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.cells.Cell;
 import com.ferreusveritas.dynamictrees.api.cells.CellNull;
-import com.ferreusveritas.dynamictrees.api.cells.ICell;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
@@ -66,9 +66,9 @@ import java.util.Random;
  * @author ferreusveritas
  */
 @SuppressWarnings("deprecation")
-public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
+public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
 
-    public static ICustomRootDecay customRootDecay = null;
+    public static RootyBlockDecayer rootyBlockDecayer = null;
 
     public static final IntegerProperty FERTILITY = IntegerProperty.create("fertility", 0, 15);
     public static final BooleanProperty IS_VARIANT = BooleanProperty.create("is_variant");
@@ -135,8 +135,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
-        return getPrimitiveSoilBlock().getShape(getDecayBlockState(state, reader, pos), reader, pos, context);
+    public VoxelShape getShape(BlockState p_220053_1_, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_) {
+        return getPrimitiveSoilBlock().getShape(getPrimitiveSoilBlock().defaultBlockState(), p_220053_2_, p_220053_3_, p_220053_4_);
     }
 
     @Override
@@ -223,9 +223,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
         return Direction.UP;
     }
 
-    /**
-     * //	 * //	 * @param world //	 * @param rootPos //	 * @param random //	 * @param natural //
-     */
     public void updateTree(BlockState rootyState, World world, BlockPos rootPos, Random random, boolean natural) {
 
         if (CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
@@ -236,7 +233,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 
             if (species.isValid()) {
                 BlockPos treePos = rootPos.relative(getTrunkDirection(world, rootPos));
-                ITreePart treeBase = TreeHelper.getTreePart(world.getBlockState(treePos));
+                TreePart treeBase = TreeHelper.getTreePart(world.getBlockState(treePos));
                 if (treeBase != TreeHelper.NULL_TREE_PART) {
                     viable = species.update(world, this, rootPos, getFertility(rootyState, world, rootPos), treeBase, treePos, random, natural);
                 }
@@ -258,13 +255,13 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
      * @param pos    The position of the {@link RootyBlock}
      * @return
      */
-    public BlockState getDecayBlockState(BlockState state, IBlockReader access, BlockPos pos) {
-        return properties.getPrimitiveSoilState(state);
+    public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
+        return getPrimitiveSoilBlock().defaultBlockState();
     }
 
     /**
      * Forces the {@link RootyBlock} to decay if it's there, turning it back to its primitive soil block. Custom decay
-     * logic is also supported, see {@link ICustomRootDecay} for details.
+     * logic is also supported, see {@link RootyBlockDecayer} for details.
      *
      * @param world      The {@link World} instance.
      * @param rootPos    The {@link BlockPos} of the {@link RootyBlock}.
@@ -280,13 +277,23 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
         final BlockState newState = world.getBlockState(rootPos);
 
         // Make sure we're not still a rooty block and return if custom decay returns true.
-        if (TreeHelper.isRooty(newState) || (customRootDecay != null && customRootDecay.doDecay(world, rootPos, rootyState, species))) {
+        if (TreeHelper.isRooty(newState) || (rootyBlockDecayer != null && rootyBlockDecayer.decay(world, rootPos, rootyState, species))) {
             return;
         }
 
-        final BlockState primitiveDirt = getDecayBlockState(rootyState, world, rootPos);
+//		final Biome biome = world.getBiome(rootPos);
+        final BlockState primitiveDirt = this.getPrimitiveSoilBlock().defaultBlockState();
 
+//		final BlockState topBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
+//		final BlockState fillerBlock = biome.getGenerationSettings().getSurfaceBuilderConfig().getUnderMaterial();
+
+        //if (primitiveDirt == topBlock || primitiveDirt == fillerBlock) {
         world.setBlock(rootPos, primitiveDirt, Constants.BlockFlags.DEFAULT);
+//		} else if (topBlock.getMaterial() == newState.getMaterial()) {
+//			world.setBlock(rootPos, topBlock, Constants.BlockFlags.DEFAULT);
+//		} else if (fillerBlock.getMaterial() == newState.getMaterial()) {
+//			world.setBlock(rootPos, fillerBlock, Constants.BlockFlags.DEFAULT);
+//		}
     }
 
     @Override
@@ -359,7 +366,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
     }
 
     @Override
-    public ICell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
+    public Cell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
         return CellNull.NULL_CELL;
     }
 
@@ -436,8 +443,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements ITreePart {
 
     @Nullable
     private SpeciesTileEntity getTileEntitySpecies(IWorld world, BlockPos pos) {
-        final TileEntity tileEntity = world.getBlockEntity(pos);
-        return tileEntity instanceof SpeciesTileEntity ? (SpeciesTileEntity) tileEntity : null;
+        final TileEntity blockEntity = world.getBlockEntity(pos);
+        return blockEntity instanceof SpeciesTileEntity ? (SpeciesTileEntity) blockEntity : null;
     }
 
     /**

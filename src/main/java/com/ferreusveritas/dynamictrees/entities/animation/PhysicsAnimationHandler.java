@@ -22,7 +22,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Random;
 
-public class PhysicsAnimationHandler implements IAnimationHandler {
+public class PhysicsAnimationHandler implements AnimationHandler {
     @Override
     public String getName() {
         return "physics";

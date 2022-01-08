@@ -16,11 +16,11 @@ public class PoissonDisc extends Vec2i {
         int[] circledata = {0x48, 0x488, 0x36D1, 0x248D1, 0x16D919, 0xDB5B19, 0x7FF6B19};//Packed circle data.  3 bits per slice length. 1 element per circle.
         for (int r = 2; r <= 8; r++) {//Circles with radius 2 - 8
             SimpleBitmap whole = circleBitmapGen(r, circledata[r - 2]);//Unpack circle bitmaps
-            SimpleBitmap inside = new SimpleBitmap(whole.getW(), whole.getH());//Make a bitmap the same size that will serve as the inner circle pixels(non-edge)
+            SimpleBitmap inside = new SimpleBitmap(whole.getWidth(), whole.getHeight());//Make a bitmap the same size that will serve as the inner circle pixels(non-edge)
 
             //Generate interior circle bitmap
-            for (int z = 0; z < inside.getH(); z++) {
-                for (int x = 0; x < inside.getW(); x++) {
+            for (int z = 0; z < inside.getHeight(); z++) {
+                for (int x = 0; x < inside.getWidth(); x++) {
                     //A pixel is considered interior(non-edge) if it is both ON and surrounded on all four sides by ON pixels;
                     boolean in = whole.isPixelOn(x, z) && whole.isPixelOn(x + 1, z) && whole.isPixelOn(x - 1, z) && whole.isPixelOn(x, z + 1) && whole.isPixelOn(x, z - 1);
                     inside.setPixel(x, z, in ? 1 : 0);
@@ -167,7 +167,7 @@ public class PoissonDisc extends Vec2i {
         int dx = other.x - this.x;
         int dz = other.z - this.z;
 
-        return thisbm.isColliding(((thisbm.getW() - otherbm.getW()) / 2) + dx, ((thisbm.getH() - otherbm.getH()) / 2) + dz, otherbm);
+        return thisbm.isColliding(((thisbm.getWidth() - otherbm.getWidth()) / 2) + dx, ((thisbm.getHeight() - otherbm.getHeight()) / 2) + dz, otherbm);
     }
 
     /**
@@ -184,7 +184,7 @@ public class PoissonDisc extends Vec2i {
         int dx = other.x - this.x;
         int dz = other.z - this.z;
 
-        return thisbm.isColliding(((thisbm.getW() - otherbm.getW()) / 2) + dx, ((thisbm.getH() - otherbm.getH()) / 2) + dz, otherbm);
+        return thisbm.isColliding(((thisbm.getWidth() - otherbm.getWidth()) / 2) + dx, ((thisbm.getHeight() - otherbm.getHeight()) / 2) + dz, otherbm);
     }
 
     /**

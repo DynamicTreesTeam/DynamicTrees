@@ -5,14 +5,14 @@ import net.minecraftforge.eventbus.api.GenericEvent;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 
 /**
- * Allows for registering {@link TypedRegistry.EntryType} objects to {@link Registry} objects. Subscribers should use
+ * Allows for registering {@link TypedRegistry.EntryType} objects to {@link SimpleRegistry} objects. Subscribers should use
  * {@link #registerType(ResourceLocation, TypedRegistry.EntryType)} to register their {@link TypedRegistry.EntryType}
- * objects, as full access to the {@link Registry} is not given to prevent misuse of this event, for full access to
+ * objects, as full access to the {@link SimpleRegistry} is not given to prevent misuse of this event, for full access to
  * register {@link RegistryEntry} objects, use {@link RegistryEvent}.
  *
  * <p>This is an implementation of {@link IModBusEvent}, therefore firing on the mod bus.</p>
  *
- * @param <V> The {@link RegistryEntry} sub-class of the relevant {@link Registry}.
+ * @param <V> The {@link RegistryEntry} sub-class of the relevant {@link SimpleRegistry}.
  * @author Harley O'Connor
  */
 public final class TypeRegistryEvent<V extends RegistryEntry<V>> extends GenericEvent<V> implements IModBusEvent {

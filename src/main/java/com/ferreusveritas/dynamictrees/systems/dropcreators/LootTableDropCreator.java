@@ -31,7 +31,7 @@ public final class LootTableDropCreator extends DropCreator {
     }
 
     @Override
-    protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
+    protected DropCreatorConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(HARVEST_TABLE, LootTable.EMPTY.getLootTableId())
                 .with(VOLUNTARY_TABLE, LootTable.EMPTY.getLootTableId())
@@ -40,7 +40,7 @@ public final class LootTableDropCreator extends DropCreator {
     }
 
     @Override
-    public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendHarvestDrops(DropCreatorConfiguration configuration, DropContext context) {
         context.drops().addAll(((ServerWorld) context.world()).getServer().getLootTables().get(configuration.get(HARVEST_TABLE))
                 .getRandomItems(new LootContext.Builder((ServerWorld) context.world())
                         .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
@@ -53,7 +53,7 @@ public final class LootTableDropCreator extends DropCreator {
     }
 
     @Override
-    public void appendVoluntaryDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendVoluntaryDrops(DropCreatorConfiguration configuration, DropContext context) {
         context.drops().addAll(((ServerWorld) context.world()).getServer().getLootTables().get(configuration.get(VOLUNTARY_TABLE))
                 .getRandomItems(new LootContext.Builder((ServerWorld) context.world())
                         .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
@@ -65,7 +65,7 @@ public final class LootTableDropCreator extends DropCreator {
     }
 
     @Override
-    public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendLeavesDrops(DropCreatorConfiguration configuration, DropContext context) {
         context.drops().addAll(((ServerWorld) context.world()).getServer().getLootTables().get(configuration.get(LEAVES_TABLE))
                 .getRandomItems(new LootContext.Builder((ServerWorld) context.world())
                         .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
@@ -78,7 +78,7 @@ public final class LootTableDropCreator extends DropCreator {
     }
 
     @Override
-    public void appendLogDrops(ConfiguredDropCreator<DropCreator> configuration, LogDropContext context) {
+    public void appendLogDrops(DropCreatorConfiguration configuration, LogDropContext context) {
         context.drops().addAll(((ServerWorld) context.world()).getServer().getLootTables().get(configuration.get(LOGS_TABLE))
                 .getRandomItems(new LootContext.Builder((ServerWorld) context.world())
                         .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))

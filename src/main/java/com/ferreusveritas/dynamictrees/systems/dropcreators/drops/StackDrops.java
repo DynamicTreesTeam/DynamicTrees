@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators.drops;
 
+import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.item.ItemStack;
@@ -61,7 +62,7 @@ public final class StackDrops implements Drops {
 
     @Override
     public void appendDrops(List<ItemStack> drops, Random random, int fortune) {
-        final int chance = this.getChance(fortune, this.baseChance);
+        final int chance = Drops.getChance(fortune, this.baseChance);
 
         if (this.rarity > 0) {
             this.items.forEach(stack -> {
@@ -70,6 +71,10 @@ public final class StackDrops implements Drops {
                 }
             });
         }
+    }
+
+    public static Drops create(float rarity, int baseChance, ItemStack... stacks) {
+        return new StackDrops(Lists.newLinkedList(Lists.newArrayList(stacks)), rarity, baseChance);
     }
 
 }

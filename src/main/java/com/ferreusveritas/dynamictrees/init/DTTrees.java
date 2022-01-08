@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.Registries;
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
@@ -13,7 +13,8 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableSoilProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.WaterSoilProperties;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Mushroom;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -21,7 +22,6 @@ import com.ferreusveritas.dynamictrees.trees.families.NetherFungusFamily;
 import com.ferreusveritas.dynamictrees.trees.species.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.PalmSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.SwampOakSpecies;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -91,25 +91,25 @@ public class DTTrees {
 
     @SubscribeEvent
     public static void newRegistry(RegistryEvent.NewRegistry event) {
-        final List<Registry<?>> registries = Registries.REGISTRIES.stream()
-                .filter(registry -> registry instanceof Registry)
-                .map(registry -> (Registry<?>) registry)
+        final List<SimpleRegistry<?>> registries = Registries.REGISTRIES.stream()
+                .filter(registry -> registry instanceof SimpleRegistry)
+                .map(registry -> (SimpleRegistry<?>) registry)
                 .collect(Collectors.toList());
 
         // Post registry events.
-        registries.forEach(Registry::postRegistryEvent);
+        registries.forEach(SimpleRegistry::postRegistryEvent);
 
-        DTResourceRegistries.setupTreesResourceManager();
+        Resources.setupTreesResourceManager();
 
         // Register Forge registry entry getters and add-on Json object getters.
-        JsonObjectGetters.registerForgeEntryGetters();
-        JsonObjectGetters.postRegistryEvent();
+        JsonDeserialisers.registerForgeEntryGetters();
+        JsonDeserialisers.postRegistryEvent();
 
         // Register any registry entries from Json files.
-        DTResourceRegistries.TREES_RESOURCE_MANAGER.load();
+        Resources.MANAGER.load();
 
         // Lock all the registries.
-        registries.forEach(Registry::lock);
+        registries.forEach(SimpleRegistry::lock);
 
         // Register feature cancellers.
         FeatureCanceller.REGISTRY.postRegistryEvent();
@@ -127,12 +127,12 @@ public class DTTrees {
 
     private static void replaceFeatureConfigs(WeightedBlockStateProvider featureConfig, Block crimsonSapling, Block warpedSapling) {
         for (final WeightedList.Entry<BlockState> entry : featureConfig.weightedList.entries) {
-            if (entry.data.getBlock() == Blocks.CRIMSON_FUNGUS) {
+			if (entry.data.getBlock() == Blocks.CRIMSON_FUNGUS) {
                 entry.data = crimsonSapling.defaultBlockState();
             }
-            if (entry.data.getBlock() == Blocks.WARPED_FUNGUS) {
-                entry.data = warpedSapling.defaultBlockState();
-            }
+			if (entry.data.getBlock() == Blocks.WARPED_FUNGUS) {
+				entry.data = warpedSapling.defaultBlockState();
+			}
         }
     }
 

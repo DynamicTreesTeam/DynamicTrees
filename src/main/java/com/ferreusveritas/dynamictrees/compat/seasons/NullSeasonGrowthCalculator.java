@@ -1,14 +1,14 @@
 package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import com.ferreusveritas.dynamictrees.api.seasons.ClimateZoneType;
-import com.ferreusveritas.dynamictrees.api.seasons.ISeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.api.seasons.SeasonGrowthCalculator;
 
 /**
- * {@link ISeasonGrowthCalculator} that returns {@code 1.0f} for all values so there's no seasonal change.
+ * {@link SeasonGrowthCalculator} that returns {@code 1.0f} for all values so there's no seasonal change.
  *
  * @author ferreusveritas
  */
-public class NullSeasonGrowthCalculator implements ISeasonGrowthCalculator {
+public class NullSeasonGrowthCalculator implements SeasonGrowthCalculator {
 
     @Override
     public float calcGrowthRate(Float seasonValue, ClimateZoneType type) {

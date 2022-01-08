@@ -2,14 +2,16 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.LeafClusters;
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CoderNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
@@ -196,7 +198,7 @@ public class JoCode {
 
         final LeavesProperties leavesProperties = species.getLeavesProperties();
         final SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
-        final INodeInspector inflator = species.getNodeInflator(leafMap); // This is responsible for thickening the branches.
+        final NodeInspector inflator = species.getNodeInflator(leafMap); // This is responsible for thickening the branches.
         final FindEndsNode endFinder = new FindEndsNode(); // This is responsible for gathering a list of branch end points.
         final MapSignal signal = new MapSignal(inflator, endFinder); // The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
         signal.destroyLoopedNodes = this.careful;
@@ -243,7 +245,9 @@ public class JoCode {
         }
 
         // Allow for special decorations by the tree itself.
-        species.postGeneration(worldObj, world, rootPos, biome, radius, endPoints, safeBounds, initialDirtState);
+        species.postGeneration(new PostGenerationContext(world, rootPos, species, biome, radius, endPoints,
+                safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos),
+                species.seasonalFruitProductionFactor(worldObj, rootPos)));
         MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
 
         // Add snow to parts of the tree in chunks where snow was already placed.
@@ -381,8 +385,9 @@ public class JoCode {
                 world.getBlockState(pos).getBlock().is(DTBlockTags.FOLIAGE) ||
                 world.getBlockState(pos).getBlock().is(BlockTags.FLOWERS)) &&
                 (!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-            Objects.requireNonNull(species.getFamily().getBranch())
-                    .setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2);
+            species.getFamily().getBranch().ifPresent(branch ->
+                    branch.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)
+            );
             return false;
         }
         return true;

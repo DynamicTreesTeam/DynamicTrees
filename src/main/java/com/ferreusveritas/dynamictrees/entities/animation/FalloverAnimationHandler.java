@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FalloverAnimationHandler implements IAnimationHandler {
+public class FalloverAnimationHandler implements AnimationHandler {
 
     @Override
     public String getName() {

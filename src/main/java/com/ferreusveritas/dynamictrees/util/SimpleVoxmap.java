@@ -116,11 +116,12 @@ public class SimpleVoxmap {
         return new BlockBounds(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public interface IBlitOp {
+    @FunctionalInterface
+    public interface BlitOp {
         byte getOp(byte srcValue, byte dstValue);
     }
 
-    public SimpleVoxmap blitOp(BlockPos pos, SimpleVoxmap src, IBlitOp op) {
+    public SimpleVoxmap blitOp(BlockPos pos, SimpleVoxmap src, BlitOp op) {
         for (int iy = 0; iy < src.getLenY(); iy++) {
             int srcY = iy - src.center.getY();
             int dstY = pos.getY() + srcY;
@@ -158,11 +159,12 @@ public class SimpleVoxmap {
         });
     }
 
-    public interface IFilterOp {
+    @FunctionalInterface
+    public interface FilterOp {
         byte getOp(byte data);
     }
 
-    public SimpleVoxmap filter(IFilterOp op) {
+    public SimpleVoxmap filter(FilterOp op) {
         for (int i = 0; i < data.length; i++) {
             data[i] = op.getOp(data[i]);
         }
@@ -183,7 +185,7 @@ public class SimpleVoxmap {
         return this;
     }
 
-    public SimpleVoxmap filter(BlockPos from, BlockPos to, IFilterOp op) {
+    public SimpleVoxmap filter(BlockPos from, BlockPos to, FilterOp op) {
         for (BlockPos pos : BlockPos.betweenClosed(from, to)) {
             setVoxel(pos, op.getOp(getVoxel(pos)));
         }

@@ -1,28 +1,22 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.config.ConfiguredGenFeature;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.GenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PreGenerationContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
-import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 
-import java.util.List;
-
-public class MoundGenFeature extends GenFeature implements IPreGenFeature, IPostGenFeature {
+public class MoundGenFeature extends GenFeature {
 
     private static final SimpleVoxmap moundMap = new SimpleVoxmap(5, 4, 5, new byte[]{
             0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 2, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0,
@@ -43,7 +37,7 @@ public class MoundGenFeature extends GenFeature implements IPreGenFeature, IPost
     }
 
     @Override
-    protected ConfiguredGenFeature<GenFeature> createDefaultConfiguration() {
+    protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(MOUND_CUTOFF_RADIUS, 5);
     }
@@ -52,27 +46,34 @@ public class MoundGenFeature extends GenFeature implements IPreGenFeature, IPost
      * Used to create a 5x4x5 rounded mound that is one block higher than the ground surface. This is meant to replicate
      * the appearance of a root hill and gives generated surface roots a better appearance.
      *
-     * @param configuredGenFeature
-     * @param world                The world
-     * @param rootPos              The position of the rooty dirt
-     * @param safeBounds           A safebounds structure for preventing runaway cascading generation
-     * @return The modified position of the rooty dirt that is one block higher
+     * @param configuration                The {@link GenFeatureConfiguration} instance.
+     * @param context       The {@link GenerationContext}.
+     * @return The modified {@link BlockPos} of the rooty dirt that is one block higher.
      */
     @Override
-    public BlockPos preGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
-        if (radius >= configuredGenFeature.get(MOUND_CUTOFF_RADIUS) && safeBounds != SafeChunkBounds.ANY) {//worldgen test
+    protected BlockPos preGenerate(GenFeatureConfiguration configuration, PreGenerationContext context) {
+        final IWorld world = context.world();
+        BlockPos rootPos = context.pos();
+
+        if (context.radius() >= configuration.get(MOUND_CUTOFF_RADIUS) && context.isWorldGen()) {
             BlockState initialDirtState = world.getBlockState(rootPos);
             BlockState initialUnderState = world.getBlockState(rootPos.below());
 
-            if (initialUnderState.getMaterial() == Material.AIR || (initialUnderState.getMaterial() != Material.DIRT && initialUnderState.getMaterial() != Material.STONE)) {
-                Biome biome = world.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2);
+            if (initialUnderState.getMaterial() == Material.AIR ||
+                    (initialUnderState.getMaterial() != Material.DIRT && initialUnderState.getMaterial() != Material.STONE)
+            ) {
+                final Biome biome = world.getUncachedNoiseBiome(
+                        rootPos.getX() >> 2,
+                        rootPos.getY() >> 2,
+                        rootPos.getZ() >> 2
+                );
                 initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
             }
 
             rootPos = rootPos.above();
 
             for (Cell cell : moundMap.getAllNonZeroCells()) {
-                BlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;
+                final BlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;
                 world.setBlock(rootPos.offset(cell.getPos()), placeState, 3);
             }
         }
@@ -86,24 +87,28 @@ public class MoundGenFeature extends GenFeature implements IPreGenFeature, IPost
      * the radius is greater than 8.
      */
     @Override
-    public boolean postGeneration(ConfiguredGenFeature<?> configuredGenFeature, IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState, Float seasonValue, Float seasonFruitProductionFactor) {
-        if (radius < configuredGenFeature.get(MOUND_CUTOFF_RADIUS) && safeBounds != SafeChunkBounds.ANY) {//A mound was already generated in preGen and worldgen test
-            BlockPos treePos = rootPos.above();
-            BlockState belowState = world.getBlockState(rootPos.below());
+    protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
+        // A mound was already generated in preGen and worldgen test
+        if (context.radius() >= configuration.get(MOUND_CUTOFF_RADIUS) || !context.isWorldGen()) {
+            return false;
+        }
 
-            //Place dirt blocks around rooty dirt block if tree has a > 8 radius
-            BlockState branchState = world.getBlockState(treePos);
-            if (TreeHelper.getTreePart(branchState).getRadius(branchState) > BranchBlock.MAX_RADIUS) {
-                for (Surround dir : Surround.values()) {
-                    BlockPos dPos = rootPos.offset(dir.getOffset());
-                    world.setBlock(dPos, initialDirtState, 3);
-                    world.setBlock(dPos.below(), belowState, 3);
-                }
-                return true;
+        final IWorld world = context.world();
+        final BlockPos rootPos = context.pos();
+        final BlockPos treePos = rootPos.above();
+        final BlockState belowState = world.getBlockState(rootPos.below());
+
+        // Place dirt blocks around rooty dirt block if tree has a > 8 radius.
+        final BlockState branchState = world.getBlockState(treePos);
+        if (TreeHelper.getTreePart(branchState).getRadius(branchState) > BranchBlock.MAX_RADIUS) {
+            for (Surround dir : Surround.values()) {
+                BlockPos dPos = rootPos.offset(dir.getOffset());
+                world.setBlock(dPos, context.initialDirtState(), 3);
+                world.setBlock(dPos.below(), belowState, 3);
             }
+            return true;
         }
 
         return false;
     }
-
 }

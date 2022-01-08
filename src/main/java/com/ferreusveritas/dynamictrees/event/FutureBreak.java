@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.event;
 
-import com.ferreusveritas.dynamictrees.api.IFutureBreakable;
+import com.ferreusveritas.dynamictrees.api.FutureBreakable;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
@@ -43,7 +43,7 @@ public class FutureBreak {
                 continue;
             }
 
-            if (!(futureBreak.state.getBlock() instanceof IFutureBreakable)) {
+            if (!(futureBreak.state.getBlock() instanceof FutureBreakable)) {
                 FUTURE_BREAKS.remove(futureBreak);
                 continue;
             }
@@ -52,7 +52,7 @@ public class FutureBreak {
                 continue;
             }
 
-            final IFutureBreakable futureBreakable = (IFutureBreakable) futureBreak.state.getBlock();
+            final FutureBreakable futureBreakable = (FutureBreakable) futureBreak.state.getBlock();
             futureBreakable.futureBreak(futureBreak.state, world, futureBreak.pos, futureBreak.entity);
             FUTURE_BREAKS.remove(futureBreak);
         }

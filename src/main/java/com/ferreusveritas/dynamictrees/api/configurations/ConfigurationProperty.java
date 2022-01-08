@@ -1,35 +1,40 @@
 package com.ferreusveritas.dynamictrees.api.configurations;
 
-import com.ferreusveritas.dynamictrees.util.json.IJsonObjectGetter;
-import com.ferreusveritas.dynamictrees.util.json.JsonObjectGetters;
-import com.ferreusveritas.dynamictrees.util.json.ObjectFetchResult;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialiser;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Class for custom configuration properties that can be deserialised from a {@link JsonObject} using {@link
  * #deserialise(JsonObject)}. Stores a property's identifier and class type, handling getting properties of type {@link
- * T} using {@link JsonObjectGetters}s.
+ * T} using {@link JsonDeserialiser}s.
  *
  * @param <T> The type of the property being held.
  * @author Harley O'Connor
  */
 public class ConfigurationProperty<T> {
 
-    protected final String identifier;
-    protected final Class<T> type;
+    public static final ConfigurationProperty<Object> NULL =
+            new ConfigurationProperty<>("null", Object.class);
 
-    protected ConfigurationProperty(String identifier, Class<T> type) {
-        this.identifier = identifier;
+    private final String key;
+    private final Class<T> type;
+
+    protected ConfigurationProperty(String key, Class<T> type) {
+        this.key = key;
         this.type = type;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getKey() {
+        return key;
     }
 
     public Class<T> getType() {
@@ -37,28 +42,23 @@ public class ConfigurationProperty<T> {
     }
 
     /**
-     * Gets an {@link ObjectFetchResult} for the property's value from the given {@link JsonObject}, or null if it was
-     * not found.
+     * Gets a {@link Result} for the property's value from the given {@link JsonObject}, or null if it
+     * was not found.
      *
      * @param jsonObject The {@link JsonObject} to fetch from.
-     * @return The an {@link ObjectFetchResult} for the property value, or null if it wasn't found.
+     * @return The an {@link Result} for the property value, or null if it wasn't found.
      */
-    @Nullable
-    public ObjectFetchResult<T> deserialise(JsonObject jsonObject) {
-        final JsonElement jsonElement = jsonObject.get(this.identifier);
+    public Optional<Result<T, JsonElement>> deserialise(JsonObject jsonObject) {
+        final JsonElement jsonElement = jsonObject.get(this.key);
 
         if (jsonElement == null) {
-            return null;
+            return Optional.empty();
         }
 
-        final IJsonObjectGetter<T> getter = JsonObjectGetters.getObjectGetter(this.type);
-
-        if (!getter.isValid()) {
-            return ObjectFetchResult.failure("Tried to get class '" + (this.type == null ? "null" : this.type.getSimpleName()) +
-                    "' for gen feature property '" + this.identifier + "', but object getter was not registered.");
-        }
-
-        return getter.get(jsonElement);
+        final JsonDeserialiser<T> getter = JsonDeserialisers.getOrThrow(this.type, "Tried to get class " +
+                "\"" + this.type.getName() + "\" for gen feature property \"" + this.key + "\", but " +
+                "deserialiser was not registered.");
+        return Optional.ofNullable(getter.deserialise(jsonElement));
     }
 
     /**
@@ -69,7 +69,8 @@ public class ConfigurationProperty<T> {
      * @param <T>        The value the property will store.
      * @return The new {@link ConfigurationProperty} object.
      */
-    public static <T> ConfigurationProperty<T> property(String identifier, Class<T> type) {
+    public static <T> ConfigurationProperty<T> property(String identifier, @Nonnull Class<T> type) {
+        Objects.requireNonNull(type);
         return new ConfigurationProperty<>(identifier, type);
     }
 
@@ -105,11 +106,27 @@ public class ConfigurationProperty<T> {
         return property(identifier, Item.class);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ConfigurationProperty<?> that = (ConfigurationProperty<?>) o;
+        return Objects.equals(key, that.key) && Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key, type);
+    }
 
     @Override
     public String toString() {
         return "ConfigurationProperty{" +
-                "identifier='" + identifier + '\'' +
+                "identifier='" + key + '\'' +
                 ", type=" + type +
                 '}';
     }

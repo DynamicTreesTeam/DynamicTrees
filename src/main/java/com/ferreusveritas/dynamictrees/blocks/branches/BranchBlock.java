@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.IFutureBreakable;
+import com.ferreusveritas.dynamictrees.api.FutureBreakable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
@@ -53,7 +53,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
-public abstract class BranchBlock extends BlockWithDynamicHardness implements ITreePart, IFutureBreakable {
+public abstract class BranchBlock extends BlockWithDynamicHardness implements TreePart, FutureBreakable {
 
     public static final int MAX_RADIUS = 8;
     public static DynamicTrees.DestroyMode destroyMode = DynamicTrees.DestroyMode.SLOPPY;
@@ -95,7 +95,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
         return getFamily();
     }
 
-    public boolean isSameTree(ITreePart treepart) {
+    public boolean isSameTree(TreePart treepart) {
         return isSameTree(TreeHelper.getBranch(treepart));
     }
 
@@ -114,12 +114,12 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
         return branch != null && this.getFamily() == branch.getFamily();
     }
 
-    public Block getPrimitiveLog() {
+    public Optional<Block> getPrimitiveLog() {
         return this.isStrippedBranch() ? this.family.getPrimitiveStrippedLog() : this.family.getPrimitiveLog();
     }
 
     public boolean isStrippedBranch() {
-        return this.getFamily().hasStrippedBranch() && this.getFamily().getStrippedBranch() == this;
+        return this.getFamily().getStrippedBranch().map(other -> other == this).orElse(false);
     }
 
     @Override
@@ -203,13 +203,19 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
     }
 
     public void stripBranch(BlockState state, IWorld world, BlockPos pos, int radius) {
-        assert this.getFamily().getStrippedBranch() != null;
-        this.getFamily().getStrippedBranch().setRadius(world, pos, Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get() ? 1 : 0)), null);
+        this.getFamily().getStrippedBranch().ifPresent(strippedBranch ->
+                strippedBranch.setRadius(
+                        world,
+                        pos,
+                        Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get() ? 1 : 0)),
+                        null
+                )
+        );
     }
 
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        return new ItemStack(getFamily().getBranchItem());
+        return this.getFamily().getBranchItem().map(ItemStack::new).orElse(ItemStack.EMPTY);
     }
 
     /**
@@ -393,7 +399,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
         }
 
         final Family family = species.getFamily();
-        final BranchBlock familyBranch = family.getBranch();
+        final BranchBlock familyBranch = family.getBranch().get();
         final int primaryThickness = family.getPrimaryThickness();
 
         // Expand the volume yet again in all directions and search for other non-destroyed endpoints.
@@ -416,7 +422,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
             if (family.isCompatibleGenericLeaves(species, blockState, world, pos)) {
                 dropList.clear();
                 species.getDrops(
-                        DropCreator.DropType.HARVEST,
+                        DropCreator.Type.HARVEST,
                         new DropContext(world, pos, species, dropList)
                 );
                 final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
@@ -443,7 +449,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements IT
     public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NetVolumeNode.Volume volume, ItemStack handStack) {
         volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
         return species.getDrops(
-                DropCreator.DropType.LOGS,
+                DropCreator.Type.LOGS,
                 new LogDropContext(world, pos, species, new ArrayList<>(), volume, handStack)
         );
     }

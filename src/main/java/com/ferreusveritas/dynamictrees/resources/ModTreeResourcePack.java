@@ -8,12 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Sub-class of {@link TreeResourcePack} for {@link IModFile} so tree resources are automatically loaded from other
- * mods.
+ * A {@link FlatTreeResourcePack} for loading resources packaged with mods. This
+ * will load resources from the {@code trees} folder under their resources, given that it exists.
  *
  * @author Harley O'Connor
  */
-public final class ModTreeResourcePack extends TreeResourcePack {
+public final class ModTreeResourcePack extends FlatTreeResourcePack {
 
     private final IModFile modFile;
 
@@ -25,8 +25,10 @@ public final class ModTreeResourcePack extends TreeResourcePack {
     @Override
     protected Path getPath(String... paths) {
         final List<String> pathsList = new ArrayList<>(Arrays.asList(paths));
-        pathsList.add(0, DTResourceRegistries.TREES);
-        return this.modFile.getLocator().findPath(this.modFile, pathsList.toArray(new String[0])).toAbsolutePath();
+        pathsList.add(0, Resources.TREES);
+        return this.modFile.getLocator()
+                .findPath(this.modFile, pathsList.toArray(new String[0]))
+                .toAbsolutePath();
     }
 
 }

@@ -5,11 +5,11 @@ import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
 import com.ferreusveritas.dynamictrees.entities.animation.DataAnimationHandler;
-import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
+import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModelTrackerCache;
-import com.ferreusveritas.dynamictrees.models.IModelTracker;
+import com.ferreusveritas.dynamictrees.models.ModelTracker;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
@@ -50,7 +50,7 @@ import java.util.Objects;
 /**
  * @author ferreusveritas
  */
-public class FallingTreeEntity extends Entity implements IModelTracker {
+public class FallingTreeEntity extends Entity implements ModelTracker {
 
     public static final DataParameter<CompoundNBT> voxelDataParameter = EntityDataManager.defineId(FallingTreeEntity.class, DataSerializers.COMPOUND_TAG);
 
@@ -70,13 +70,13 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
     public boolean onFire = false;
     protected AxisAlignedBB cullingBB;
 
-    public static IAnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
-    public static IAnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
-    public static IAnimationHandler AnimHandlerBurn = AnimationHandlers.defaultAnimationHandler;
-    public static IAnimationHandler AnimHandlerFling = AnimationHandlers.defaultAnimationHandler;
-    public static IAnimationHandler AnimHandlerBlast = AnimationHandlers.blastAnimationHandler;
+    public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
+    public static AnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
+    public static AnimationHandler AnimHandlerBurn = AnimationHandlers.defaultAnimationHandler;
+    public static AnimationHandler AnimHandlerFling = AnimationHandlers.defaultAnimationHandler;
+    public static AnimationHandler AnimHandlerBlast = AnimationHandlers.blastAnimationHandler;
 
-    public IAnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
+    public AnimationHandler currentAnimationHandler = AnimationHandlers.voidAnimationHandler;
     public DataAnimationHandler dataAnimationHandler = null;
 
     //Stores color for tinted quads that aren't the leaves
@@ -331,11 +331,11 @@ public class FallingTreeEntity extends Entity implements IModelTracker {
         toUpdate.forEach(pos -> level.neighborChanged(pos, Blocks.AIR, pos));
     }
 
-    protected IAnimationHandler selectAnimationHandler() {
+    protected AnimationHandler selectAnimationHandler() {
         return DTConfigs.ENABLE_FALLING_TREES.get() ? destroyData.species.selectAnimationHandler(this) : AnimationHandlers.voidAnimationHandler;
     }
 
-    public IAnimationHandler defaultAnimationHandler() {
+    public AnimationHandler defaultAnimationHandler() {
         if (destroyType == DestroyType.VOID || destroyType == DestroyType.ROOT) {
             return AnimationHandlers.voidAnimationHandler;
         }

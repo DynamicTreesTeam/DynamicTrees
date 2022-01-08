@@ -39,7 +39,7 @@ public class SaplingStateGenerator implements Generator<DTBlockStateProvider, Sp
     public Dependencies gatherDependencies(Species input) {
         return new Dependencies()
                 .append(SAPLING, input.getSapling())
-                .append(PRIMITIVE_LOG, input.getFamily().getPrimitiveLogOptional())
+                .append(PRIMITIVE_LOG, input.getFamily().getPrimitiveLog())
                 .append(PRIMITIVE_LEAVES, input.getPrimitiveLeaves());
     }
 

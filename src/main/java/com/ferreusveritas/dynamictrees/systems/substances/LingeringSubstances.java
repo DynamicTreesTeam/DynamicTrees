@@ -1,13 +1,13 @@
 package com.ferreusveritas.dynamictrees.systems.substances;
 
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
 
 /**
- * Holds lingering {@link ISubstanceEffect} classes and a {@link Supplier} to instantiate them with. Stored in a {@link
+ * Holds lingering {@link SubstanceEffect} classes and a {@link Supplier} to instantiate them with. Stored in a {@link
  * LinkedHashMap} so that {@link com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity} can send the relevant
  * substance as an index in a packet.
  *
@@ -16,17 +16,17 @@ import java.util.function.Supplier;
 @SuppressWarnings("unchecked")
 public final class LingeringSubstances {
 
-    public static final LinkedHashMap<Class<ISubstanceEffect>, Supplier<ISubstanceEffect>> LINGERING_SUBSTANCES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<SubstanceEffect>, Supplier<SubstanceEffect>> LINGERING_SUBSTANCES = new LinkedHashMap<>();
 
-    public static <S extends ISubstanceEffect> void registerLingeringSubstance(final Class<S> substanceClass, Supplier<S> substanceSupplier) {
-        LINGERING_SUBSTANCES.put((Class<ISubstanceEffect>) substanceClass, (Supplier<ISubstanceEffect>) substanceSupplier);
+    public static <S extends SubstanceEffect> void registerLingeringSubstance(final Class<S> substanceClass, Supplier<S> substanceSupplier) {
+        LINGERING_SUBSTANCES.put((Class<SubstanceEffect>) substanceClass, (Supplier<SubstanceEffect>) substanceSupplier);
     }
 
-    public static <S extends ISubstanceEffect> int indexOf(final Class<S> substanceClass) {
+    public static <S extends SubstanceEffect> int indexOf(final Class<S> substanceClass) {
         return new ArrayList<>(LINGERING_SUBSTANCES.keySet()).indexOf(substanceClass);
     }
 
-    public static <S extends ISubstanceEffect> Supplier<S> fromIndex(final int index) {
+    public static <S extends SubstanceEffect> Supplier<S> fromIndex(final int index) {
         return (Supplier<S>) new ArrayList<>(LINGERING_SUBSTANCES.values()).get(index);
     }
 

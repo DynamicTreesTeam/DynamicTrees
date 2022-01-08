@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class MapSignal {
 
-    protected ArrayList<INodeInspector> nodeInspectors;
+    protected ArrayList<NodeInspector> nodeInspectors;
 
     public BlockPos root;
     public int depth;
@@ -31,33 +31,33 @@ public class MapSignal {
         nodeInspectors = new ArrayList<>();
     }
 
-    public MapSignal(INodeInspector... nis) {
+    public MapSignal(NodeInspector... nis) {
         this();
 
         nodeInspectors.addAll(Arrays.asList(nis));
     }
 
     public boolean run(BlockState blockState, IWorld world, BlockPos pos, @Nullable Direction fromDir) {
-        for (INodeInspector inspector : nodeInspectors) {
+        for (NodeInspector inspector : nodeInspectors) {
             inspector.run(blockState, world, pos, fromDir);
         }
         return false;
     }
 
     public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
-        for (INodeInspector inspector : nodeInspectors) {
+        for (NodeInspector inspector : nodeInspectors) {
             inspector.returnRun(blockState, world, pos, fromDir);
         }
         return false;
     }
 
-    public ArrayList<INodeInspector> getInspectors() {
+    public ArrayList<NodeInspector> getInspectors() {
         return nodeInspectors;
     }
 
     public boolean doTrackingVisited(BlockPos pos) {
         if (nodeInspectors.size() > 0) {
-            final INodeInspector inspector = nodeInspectors.get(0);
+            final NodeInspector inspector = nodeInspectors.get(0);
 
             if (inspector instanceof CollectorNode) {
                 return ((CollectorNode) inspector).contains(pos);

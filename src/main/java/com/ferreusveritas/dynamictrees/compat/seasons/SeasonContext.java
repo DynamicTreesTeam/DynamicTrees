@@ -1,13 +1,13 @@
 package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import com.ferreusveritas.dynamictrees.api.seasons.ClimateZoneType;
-import com.ferreusveritas.dynamictrees.api.seasons.ISeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.api.seasons.SeasonGrowthCalculator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SeasonContext {
-    private final ISeasonProvider provider;
-    private final ISeasonGrowthCalculator calculator;
+    private final SeasonProvider provider;
+    private final SeasonGrowthCalculator calculator;
     private float temperateGrowthFactor;
     private float tropicalGrowthFactor;
     private float temperateSeedDropFactor;
@@ -18,7 +18,7 @@ public class SeasonContext {
 
     private long methodTicks = 0;
 
-    public SeasonContext(ISeasonProvider provider, ISeasonGrowthCalculator calculator) {
+    public SeasonContext(SeasonProvider provider, SeasonGrowthCalculator calculator) {
         this.provider = provider;
         this.calculator = calculator;
     }
@@ -39,11 +39,11 @@ public class SeasonContext {
         methodTicks++;
     }
 
-    public ISeasonProvider getSeasonProvider() {
+    public SeasonProvider getSeasonProvider() {
         return provider;
     }
 
-    public ISeasonGrowthCalculator getCalculator() {
+    public SeasonGrowthCalculator getCalculator() {
         return calculator;
     }
 

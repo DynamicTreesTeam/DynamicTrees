@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.substances;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.api.substances.ISubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.TransformNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -11,7 +11,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class TransformSubstance implements ISubstanceEffect {
+public class TransformSubstance implements SubstanceEffect {
 
     private final Species toSpecies;
 

@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.resources.DTResourceRegistries;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -27,18 +26,17 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
     @Override
     public boolean place(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
 //        final long startTime = System.nanoTime();
-        final BiomeDatabaseManager biomeDatabaseManager = DTResourceRegistries.BIOME_DATABASE_MANAGER;
         final TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
         final ServerWorld serverWorld = world.getLevel();
-        final ResourceLocation dimensionRegistryName = serverWorld.dimension().location();
+        final ResourceLocation dimensinLocation = serverWorld.dimension().location();
 
         // Do not generate if the current dimension is blacklisted.
-        if (biomeDatabaseManager.isDimensionBlacklisted(dimensionRegistryName)) {
+        if (BiomeDatabases.isBlacklisted(dimensinLocation)) {
             return false;
         }
 
         // Grab biome data base for dimension.
-        final BiomeDatabase biomeDatabase = biomeDatabaseManager.getDimensionDatabase(dimensionRegistryName);
+        final BiomeDatabase biomeDatabase = BiomeDatabases.getDimensionalOrDefault(dimensinLocation);
 
         // Get chunk pos and create safe bounds, which ensure we do not try to generate in an unloaded chunk.
         final ChunkPos chunkPos = world.getChunk(pos).getPos();
@@ -46,7 +44,7 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
         // Generate trees.
         treeGenerator.getCircleProvider().getPoissonDiscs(serverWorld, world, chunkPos)
-                .forEach(c -> treeGenerator.makeTrees(world, biomeDatabase, c, new GroundFinder(), chunkBounds));
+                .forEach(c -> treeGenerator.makeTrees(world, biomeDatabase, c, chunkBounds));
 
 //		final long endTime = System.nanoTime();
 //		final long duration = (endTime - startTime) / 1000000;

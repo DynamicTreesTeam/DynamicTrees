@@ -119,7 +119,7 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     /**
      * Instantiates a new {@link RegistryHandler} object for the given mod ID. This should be registered using {@link
-     * Registry#register(RegistryEntry)} on {@link #REGISTRY}. It will also need to be registered to the mod event bus,
+     * SimpleRegistry#register(RegistryEntry)} on {@link #REGISTRY}. It will also need to be registered to the mod event bus,
      * which can be grabbed from {@link FMLJavaModLoadingContext#getModEventBus()}, so the registry events are fired.
      *
      * @param modId The mod ID for the relevant mod.

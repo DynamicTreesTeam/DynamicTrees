@@ -29,7 +29,7 @@ public class StickDropCreator extends DropCreator {
     }
 
     @Override
-    protected ConfiguredDropCreator<DropCreator> createDefaultConfiguration() {
+    protected DropCreatorConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(STICK, STICK_STACK)
                 .with(RARITY, 1f)
@@ -37,16 +37,16 @@ public class StickDropCreator extends DropCreator {
     }
 
     @Override
-    public void appendLeavesDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendLeavesDrops(DropCreatorConfiguration configuration, DropContext context) {
         this.appendSticks(configuration, context);
     }
 
     @Override
-    public void appendHarvestDrops(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    public void appendHarvestDrops(DropCreatorConfiguration configuration, DropContext context) {
         this.appendSticks(configuration, context);
     }
 
-    private void appendSticks(ConfiguredDropCreator<DropCreator> configuration, DropContext context) {
+    private void appendSticks(DropCreatorConfiguration configuration, DropContext context) {
         int chance = 50;
         if (context.fortune() > 0) {
             chance -= 2 << context.fortune();

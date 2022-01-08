@@ -79,7 +79,7 @@ public class SurfaceRootBlock extends Block implements IWaterLoggable {
 
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        return new ItemStack(this.family.getBranchItem());
+        return this.family.getBranchItem().map(ItemStack::new).orElse(ItemStack.EMPTY);
     }
 
     ///////////////////////////////////////////

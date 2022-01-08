@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -111,7 +111,11 @@ public class SoilHelper {
     }
 
     public static Set<RootyBlock> getRootyBlocksList() {
-        return dirtMap.values().stream().map(SoilProperties::getDynamicSoilBlock).filter(Objects::nonNull).collect(Collectors.toSet());
+        return dirtMap.values().stream()
+                .map(SoilProperties::getBlock)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
     }
 
     public static int getSoilFlags(String... types) {
