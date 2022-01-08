@@ -57,6 +57,15 @@ public class BiomeDatabase {
         return this.entries.values();
     }
 
+    /**
+     * Resets all entries in the database.
+     *
+     * @implNote does not reset cancellers, since they are only applied once on initial load
+     */
+    public void reset() {
+        this.entries.values().forEach(Entry::reset);
+    }
+
     public void clear() {
         this.entries.clear();
     }
@@ -225,8 +234,9 @@ public class BiomeDatabase {
             this.densitySelector = (rnd, nd) -> -1;
             this.chanceSelector = (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
             this.forestness = 0.0F;
+            this.blacklisted = false;
             this.subterranean = false;
-            this.multipass = pass -> (pass == 0 ? 0 : -1);
+            this.multipass = defaultMultipass;
         }
 
     }

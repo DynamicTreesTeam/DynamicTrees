@@ -20,41 +20,41 @@ import java.util.Set;
  */
 public final class BiomeDatabases {
 
-    private static BiomeDatabase defaultDatabase = new BiomeDatabase();
+    private static final BiomeDatabase DEFAULT_DATABASE = new BiomeDatabase();
     /** Dimension names to their respective {@link com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase}. */
     private static final Map<ResourceLocation, BiomeDatabase> DIMENSIONAL_DATABASES = Maps.newHashMap();
     /** Dimension names for dimensions that are blacklisted. */
     private static final Set<ResourceLocation> BLACKLIST = Sets.newHashSet();
 
     public static BiomeDatabase getDefault() {
-        return defaultDatabase;
+        return DEFAULT_DATABASE;
     }
 
     public static void reset() {
-        defaultDatabase = new BiomeDatabase();
+        DEFAULT_DATABASE.reset();
         DIMENSIONAL_DATABASES.clear();
         BLACKLIST.clear();
     }
 
     public static BiomeDatabase getDimensionalOrDefault(ResourceLocation dimensionLocation) {
         return Optional.ofNullable(DIMENSIONAL_DATABASES.get(dimensionLocation))
-                .orElse(defaultDatabase);
+                .orElse(DEFAULT_DATABASE);
     }
 
     public static BiomeDatabase getOrCreateDimensional(ResourceLocation dimensionLocation) {
-        return DIMENSIONAL_DATABASES.computeIfAbsent(dimensionLocation, k -> BiomeDatabase.copyOf(defaultDatabase));
+        return DIMENSIONAL_DATABASES.computeIfAbsent(dimensionLocation, k -> BiomeDatabase.copyOf(DEFAULT_DATABASE));
     }
 
     public static void fireAddFeatureCancellersEvent() {
-        MinecraftForge.EVENT_BUS.post(new AddFeatureCancellersEvent(defaultDatabase));
+        MinecraftForge.EVENT_BUS.post(new AddFeatureCancellersEvent(DEFAULT_DATABASE));
     }
 
     public static void firePopulateDefaultDatabaseEvent() {
-        MinecraftForge.EVENT_BUS.post(new PopulateDefaultDatabaseEvent(defaultDatabase));
+        MinecraftForge.EVENT_BUS.post(new PopulateDefaultDatabaseEvent(DEFAULT_DATABASE));
     }
 
     public static void fireDimensionalPopulationEvent() {
-        MinecraftForge.EVENT_BUS.post(new PopulateDimensionalDatabaseEvent(DIMENSIONAL_DATABASES, defaultDatabase));
+        MinecraftForge.EVENT_BUS.post(new PopulateDimensionalDatabaseEvent(DIMENSIONAL_DATABASES, DEFAULT_DATABASE));
     }
 
     public static boolean isBlacklisted(ResourceLocation dimensionLocation) {
