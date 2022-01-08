@@ -75,10 +75,10 @@ final class SimpleResourceAccessor<R> implements ResourceAccessor<R> {
         return (Map<ResourceLocation, Resource<N>>) this.mapSupplier.get();
     }
 
-    private void filterMap(Predicate<ResourceLocation> resourceFilter, Map<ResourceLocation, Resource<R>> resources) {
+    private void filterMap(Predicate<ResourceLocation> resourceFilter, Map<ResourceLocation, Resource<R>> newMap) {
         for (ResourceLocation location : resources.keySet()) {
             if (!resourceFilter.test(location)) {
-                resources.remove(location);
+                newMap.remove(location);
             }
         }
     }
