@@ -125,7 +125,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
         if (rand.nextInt(DTConfigs.TREE_GROWTH_FOLDING.get()) != 0) {
             return;
         }
@@ -133,7 +133,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         double attempts = DTConfigs.TREE_GROWTH_FOLDING.get() * DTConfigs.TREE_GROWTH_MULTIPLIER.get();
 
         if (attempts >= 1.0f || rand.nextFloat() < attempts) {
-            doTick(worldIn, pos, state, rand);
+            doTick(world, pos, state, rand);
         }
 
         int start = rand.nextInt(26);
@@ -143,10 +143,10 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
                 int r = (start++ % 26) + 14; // 14 - 39
                 r = r > 26 ? r - 13 : r - 14; // 0 - 26 but Skip 13
                 final BlockPos dPos = pos.offset((r % 3) - 1, ((r / 3) % 3) - 1, ((r / 9) % 3) - 1);// (-1, -1, -1) to (1, 1, 1) skipping (0, 0, 0)
-                final BlockState dState = worldIn.getBlockState(dPos);
+                final BlockState dState = world.getBlockState(dPos);
 
                 if (dState.getBlock() instanceof DynamicLeavesBlock) {
-                    ((DynamicLeavesBlock) dState.getBlock()).doTick(worldIn, dPos, dState, rand);
+                    ((DynamicLeavesBlock) dState.getBlock()).doTick(world, dPos, dState, rand);
                 }
             }
         }
@@ -156,12 +156,20 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
     }
 
-    protected void doTick(World worldIn, BlockPos pos, BlockState state, Random rand) {
-        if ((pos.getX() != 0 && pos.getX() != 15 & pos.getZ() != 0 & pos.getZ() != 15) || worldIn.isAreaLoaded(pos, 1)) {
-            if (getProperties(state).updateTick(worldIn, pos, state, rand)) {
-                age(worldIn, pos, state, rand, SafeChunkBounds.ANY);
-            }
+    protected void doTick(World world, BlockPos pos, BlockState state, Random rand) {
+        if (canTickAt(world, pos) && getProperties(state).updateTick(world, pos, state, rand)) {
+            age(world, pos, state, rand, SafeChunkBounds.ANY);
         }
+    }
+
+    protected boolean canTickAt(World world, BlockPos pos) {
+        // Check 2 blocks away for loaded chunks
+        int xm = pos.getX() - ((pos.getX() >> 4) << 4);
+        int zm = pos.getZ() - ((pos.getZ() >> 4) << 4);
+        if (xm > 1 && xm < 14 && zm > 1 && zm < 14) {
+            return world.isLoaded(pos);
+        }
+        return world.isAreaLoaded(pos, 2);
     }
 
     public boolean appearanceChangesWithHydro(int oldHydro, int newHydro) {
