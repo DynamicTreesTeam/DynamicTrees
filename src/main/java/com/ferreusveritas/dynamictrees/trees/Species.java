@@ -200,7 +200,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * Logic kit for standardized extended growth behavior
      */
-    protected GrowthLogicKitConfiguration logicKit = GrowthLogicKitConfiguration.NULL;
+    protected GrowthLogicKitConfiguration logicKit = GrowthLogicKitConfiguration.getDefault();
 
     /**
      * How quickly the branch thickens on it's own without branch merges [default = 0.3]

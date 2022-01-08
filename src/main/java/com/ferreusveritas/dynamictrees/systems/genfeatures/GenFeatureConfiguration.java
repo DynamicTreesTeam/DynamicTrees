@@ -1,9 +1,8 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.configurations.Configuration;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.configurations.TemplateRegistry;
-import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.GenerationContext;
 import com.ferreusveritas.dynamictrees.trees.Species;
 
@@ -14,12 +13,6 @@ import com.ferreusveritas.dynamictrees.trees.Species;
  * @author Harley O'Connor
  */
 public class GenFeatureConfiguration extends Configuration<GenFeatureConfiguration, GenFeature> {
-
-    /**
-     * A null configured gen feature. Mainly used for getting the class with the {@link GenFeature} parameter for {@link
-     * JsonDeserialisers#CONFIGURED_GEN_FEATURE}.
-     */
-    public static final GenFeatureConfiguration NULL = new GenFeatureConfiguration(GenFeature.NULL);
 
     public static final TemplateRegistry<GenFeatureConfiguration> TEMPLATES = new TemplateRegistry<>();
 
@@ -66,6 +59,10 @@ public class GenFeatureConfiguration extends Configuration<GenFeatureConfigurati
      */
     public boolean shouldApply(Species species) {
         return this.configurable.shouldApply(species, this);
+    }
+
+    public static GenFeatureConfiguration getNull() {
+        return GenFeature.NULL.getDefaultConfiguration();
     }
 
 }

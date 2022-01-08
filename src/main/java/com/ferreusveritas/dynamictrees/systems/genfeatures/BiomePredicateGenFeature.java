@@ -23,7 +23,7 @@ public class BiomePredicateGenFeature extends GenFeature {
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(BIOME_PREDICATE, i -> true)
-                .with(GEN_FEATURE, GenFeatureConfiguration.NULL)
+                .with(GEN_FEATURE, GenFeatureConfiguration.getNull())
                 .with(ONLY_WORLD_GEN, false);
     }
 

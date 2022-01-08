@@ -1,13 +1,17 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistry;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistryEntry;
-import com.ferreusveritas.dynamictrees.api.registry.Registry;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.GenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostRotContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PreGenerationContext;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
@@ -67,6 +71,11 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     public static final GenFeature NULL = new GenFeature(DTTrees.NULL) {
         @Override
         protected void registerProperties() {
+        }
+
+        @Override
+        public GenFeatureConfiguration getDefaultConfiguration() {
+            return this.defaultConfiguration;
         }
     };
 

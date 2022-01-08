@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.RadiusCoordinator;
-import com.ferreusveritas.dynamictrees.resources.Resources;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.MathHelper;

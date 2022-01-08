@@ -9,8 +9,6 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
  */
 public final class DropCreatorConfiguration extends Configuration<DropCreatorConfiguration, DropCreator> {
 
-    public static final DropCreatorConfiguration NULL = new DropCreatorConfiguration(DropCreator.NULL);
-
     public static final TemplateRegistry<DropCreatorConfiguration> TEMPLATES = new TemplateRegistry<>();
 
     public DropCreatorConfiguration(DropCreator dropCreator) {
@@ -31,6 +29,10 @@ public final class DropCreatorConfiguration extends Configuration<DropCreatorCon
 
     public <C extends DropContext> void appendDrops(DropCreator.Type<C> type, C context) {
         this.configurable.appendDrops(this, type, context);
+    }
+
+    public static DropCreatorConfiguration getNull() {
+        return DropCreator.NULL.getDefaultConfiguration();
     }
 
 }

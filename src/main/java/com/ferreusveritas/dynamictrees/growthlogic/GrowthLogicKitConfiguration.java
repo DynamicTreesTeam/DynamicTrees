@@ -12,9 +12,6 @@ import net.minecraft.util.Direction;
  */
 public final class GrowthLogicKitConfiguration extends Configuration<GrowthLogicKitConfiguration, GrowthLogicKit> {
 
-    public static final GrowthLogicKitConfiguration NULL =
-            new GrowthLogicKitConfiguration(GrowthLogicKit.NULL);
-
     public static final TemplateRegistry<GrowthLogicKitConfiguration> TEMPLATES = new TemplateRegistry<>();
 
     public GrowthLogicKitConfiguration(GrowthLogicKit configurable) {
@@ -74,6 +71,10 @@ public final class GrowthLogicKitConfiguration extends Configuration<GrowthLogic
      */
     public int getLowestBranchHeight(PositionalSpeciesContext context) {
         return this.configurable.getLowestBranchHeight(this, context);
+    }
+
+    public static GrowthLogicKitConfiguration getDefault() {
+        return GrowthLogicKit.DEFAULT.getDefaultConfiguration();
     }
 
 }

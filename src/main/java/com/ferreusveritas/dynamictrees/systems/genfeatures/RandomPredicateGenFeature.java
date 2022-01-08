@@ -24,7 +24,7 @@ public class RandomPredicateGenFeature extends GenFeature {
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
                 .with(PLACE_CHANCE, 0.5f)
-                .with(GEN_FEATURE, GenFeatureConfiguration.NULL)
+                .with(GEN_FEATURE, GenFeatureConfiguration.getNull())
                 .with(ONLY_WORLD_GEN, false);
     }
 

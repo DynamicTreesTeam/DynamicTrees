@@ -31,14 +31,18 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
     public static final ConfigurationProperty<Integer> HEIGHT_VARIATION =
             ConfigurationProperty.integer("height_variation");
 
-    public static final GrowthLogicKit NULL = new GrowthLogicKit(DTTrees.NULL) {
+    public static final GrowthLogicKit DEFAULT = new GrowthLogicKit(DTTrees.NULL) {
+        @Override
+        public GrowthLogicKitConfiguration getDefaultConfiguration() {
+            return this.defaultConfiguration;
+        }
     };
 
     /**
      * Central registry for all {@link GrowthLogicKit} objects.
      */
     public static final ConfigurableRegistry<GrowthLogicKit, GrowthLogicKitConfiguration> REGISTRY =
-            new ConfigurableRegistry<>(GrowthLogicKit.class, NULL, GrowthLogicKitConfiguration.TEMPLATES);
+            new ConfigurableRegistry<>(GrowthLogicKit.class, DEFAULT, GrowthLogicKitConfiguration.TEMPLATES);
 
     public GrowthLogicKit(final ResourceLocation registryName) {
         super(registryName);
