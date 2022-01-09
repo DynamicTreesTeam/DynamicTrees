@@ -192,6 +192,10 @@ public class SurfaceRootBlock extends Block implements IWaterLoggable {
         return shape;
     }
 
+    private boolean isAirOrWater (BlockState state){
+        return state.getBlock() == Blocks.AIR || state.getBlock() == Blocks.WATER;
+    }
+
     @Nullable
     protected RootConnection getSideConnectionRadius(IBlockReader blockReader, BlockPos pos, Direction side) {
         if (!side.getAxis().isHorizontal()) {
@@ -202,8 +206,8 @@ public class SurfaceRootBlock extends Block implements IWaterLoggable {
         BlockState state = CoordUtils.getStateSafe(blockReader, dPos);
         final BlockState upState = CoordUtils.getStateSafe(blockReader, pos.above());
 
-        final RootConnections.ConnectionLevel level = (upState != null && upState.getBlock() == Blocks.AIR && state != null && state.isRedstoneConductor(blockReader, dPos)) ?
-                RootConnections.ConnectionLevel.HIGH : (state != null && state.getBlock() == Blocks.AIR ? RootConnections.ConnectionLevel.LOW : RootConnections.ConnectionLevel.MID);
+        final RootConnections.ConnectionLevel level = (upState != null && isAirOrWater(upState) && state != null && state.isRedstoneConductor(blockReader, dPos)) ?
+                RootConnections.ConnectionLevel.HIGH : (state != null && isAirOrWater(state) ? RootConnections.ConnectionLevel.LOW : RootConnections.ConnectionLevel.MID);
 
         if (level != RootConnections.ConnectionLevel.MID) {
             dPos = dPos.above(level.getYOffset());
