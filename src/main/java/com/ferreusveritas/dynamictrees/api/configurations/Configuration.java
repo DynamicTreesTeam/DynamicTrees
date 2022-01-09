@@ -1,9 +1,11 @@
 package com.ferreusveritas.dynamictrees.api.configurations;
 
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
+import com.ferreusveritas.dynamictrees.util.Null;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.ReportedException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -65,34 +67,60 @@ public abstract class Configuration<T extends Configuration<T, C>, C extends Con
 
     /**
      * Gets the value for the given {@link ConfigurationProperty}. This
-     * method expects that the feature will be set, so call {@link #has(ConfigurationProperty)} first if it is
+     * method expects that the feature will be set, so call {@link #getAsOptional(ConfigurationProperty)} instead if it is
      * optional.
      *
      * @param property The {@link ConfigurationProperty} to get.
      * @param <V>      The type of the property's value.
      * @return The property's value.
-     * @throws ReportedException If the property did not exist. If a property is optional. {@link
-     *                           #has(ConfigurationProperty)} should be checked before calling this.
+     * @throws ReportedException If the property is null. If a property is optional. {@link
+     *                           #getAsOptional(ConfigurationProperty)} should be called instead.
      */
-    @Nullable
+    @Nonnull
     public <V> V get(ConfigurationProperty<V> property) {
-        if (!this.has(property)) {
-            final CrashReport crashReport = CrashReport.forThrowable(new IllegalStateException(), "Tried to obtain " +
-                    "property '" + property.getKey() + "' from '" + this.configurable + "' " + "that did not exist.");
+        Optional<V> optionalProperty = getAsOptional(property);
+
+        if (optionalProperty.isPresent())
+            return optionalProperty.get();
+         else {
+            final CrashReport crashReport = CrashReport.forThrowable(new IllegalStateException(),
+                    "Property '" + property.getKey() + "' from '" + this.configurable + "' is Null.");
             crashReport.addCategory("Getting property from a configuration");
             throw new ReportedException(crashReport);
         }
 
-        return this.properties.get(property);
     }
 
+    /**
+     *
+     * @param property The {@link ConfigurationProperty} to get.
+     * @param <V>      The type of the property's value.
+     * @return An Optional with the property's value.
+     * @throws ReportedException If the property did not exist.
+     */
     public <V> Optional<V> getAsOptional(ConfigurationProperty<V> property) {
-        return Optional.ofNullable(this.get(property));
+        if (!this.has(property)) {
+            final CrashReport crashReport = CrashReport.forThrowable(new IllegalStateException(), "Tried to obtain " +
+                    "property '" + property.getKey() + "' from '" + this.configurable + "' that did not exist.");
+            crashReport.addCategory("Getting property from a configuration");
+            throw new ReportedException(crashReport);
+        }
+
+        return Optional.ofNullable(this.properties.get(property));
     }
 
+    /**
+     * If property is null, invalidResult will be returned instead
+     *
+     * @param property The {@link ConfigurationProperty} to get.
+     * @param validator A predicate that can be used to validate the value of the Property. If the
+     *                  predicate fails, the invalidDefault will be returned instead
+     * @param invalidDefault The value that will be returned if the validator fails
+     * @param <V>      The type of the property's value.
+     * @return  The property's value or the invalidDefault if the validator failed.
+     */
     public <V> V getOrInvalidDefault(ConfigurationProperty<V> property, Predicate<V> validator, V invalidDefault) {
-        final V setProperty = this.get(property);
-        return validator.test(setProperty) ? setProperty : invalidDefault;
+        return this.getAsOptional(property).filter(validator).orElse(invalidDefault);
     }
 
     /**
