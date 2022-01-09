@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.resources.IResourceManager;
 import org.apache.logging.log4j.LogManager;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,8 +37,9 @@ public class ConfigurationTemplateResourceLoader<C extends Configuration<C, E>, 
             try {
                 this.register(resource.map(JsonElement::getAsJsonObject));
             } catch (DeserialisationException | IllegalStateException e) {
-                LogManager.getLogger().error("Error deserialising drop creator configuration \"{}\": {}",
-                        resource.getLocation(), e.getMessage());
+                LogManager.getLogger()
+                        .error("Error deserialising " + configurableRegistry.getType().getSimpleName() + " \"{}\": {}",
+                                resource.getLocation(), e.getMessage());
             }
         });
     }
@@ -77,15 +79,14 @@ public class ConfigurationTemplateResourceLoader<C extends Configuration<C, E>, 
                 .orElseThrow();
     }
 
-    private List<PropertyDefinition<?>> deserialisePropertyDefinitions(JsonObject json)
-            throws DeserialisationException {
+    private List<PropertyDefinition<?>> deserialisePropertyDefinitions(JsonObject json) {
         return JsonResult.success(json, json)
                 .mapIfContains("property_definitions", JsonArray.class, (array, warningAppender) ->
                         JsonResult.forInput(array)
                                 .mapToListOfType(PropertyDefinition.captureClass())
                                 .forEachWarning(warningAppender)
                                 .orElseThrow())
-                .orElseThrow();
+                .orElse(Collections.emptyList());
     }
 
     private void assertNameNotReserved(Resource<?> resource) throws DeserialisationException {
