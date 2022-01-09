@@ -11,6 +11,8 @@ import java.util.Optional;
  */
 public final class Properties implements PropertiesAccessor {
 
+    public static final Properties NONE = new Properties();
+
     private final Map<ConfigurationProperty<?>, Object> map = Maps.newHashMap();
 
     public <V> void put(ConfigurationProperty<V> property, V value) {

@@ -7,6 +7,13 @@ import net.minecraft.util.ResourceLocation;
  */
 public final class ResourceLocationUtils {
 
+    public static ResourceLocation parse(String string, final String defaultNamespace) {
+        if (!string.contains(":")) {
+            string = defaultNamespace + ":" + string;
+        }
+        return new ResourceLocation(string);
+    }
+
     public static ResourceLocation namespace(final ResourceLocation resourceLocation, final String namespace) {
         return new ResourceLocation(namespace, resourceLocation.getPath());
     }

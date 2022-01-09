@@ -1,12 +1,21 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
-import com.ferreusveritas.dynamictrees.api.configurations.*;
+import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.api.configurations.Configurable;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistryEntry;
+import com.ferreusveritas.dynamictrees.api.configurations.Configuration;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationTemplate;
+import com.ferreusveritas.dynamictrees.api.configurations.Properties;
+import com.ferreusveritas.dynamictrees.api.configurations.TemplateRegistry;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nullable;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
@@ -17,13 +26,12 @@ public final class ConfiguredDeserialiser<T extends Configuration<T, C>, C exten
 
     private final String configurableName;
     private final Class<C> configurableClass;
-    private final C nullValue;
     private final TemplateRegistry<T> templates;
 
-    public ConfiguredDeserialiser(String configurableName, Class<C> configurableClass, C nullValue, TemplateRegistry<T> templates) {
+    public ConfiguredDeserialiser(String configurableName, Class<C> configurableClass,
+                                  TemplateRegistry<T> templates) {
         this.configurableName = configurableName;
         this.configurableClass = configurableClass;
-        this.nullValue = nullValue;
         this.templates = templates;
     }
 
@@ -31,9 +39,15 @@ public final class ConfiguredDeserialiser<T extends Configuration<T, C>, C exten
     @Override
     public Result<T, JsonElement> deserialise(final JsonElement jsonElement) {
         return JsonResult.forInput(jsonElement)
-                .mapIfType(this.configurableClass, configurable -> (T) configurable.getDefaultConfiguration())
+                .mapIfType(String.class, (name, warningConsumer) -> {
+                    final ConfigurationTemplate<T> template = getTemplate(
+                            ResourceLocationUtils.parse(name, DynamicTrees.MOD_ID)
+                    );
+                    return template.apply(Properties.NONE).orElseThrow();
+                })
+                .elseMapIfType(this.configurableClass, configurable -> (T) configurable.getDefaultConfiguration())
                 .elseMapIfType(JsonObject.class, (object, warningConsumer) -> {
-                    final ConfigurationTemplate<T> template = getTemplate(object);
+                    final ConfigurationTemplate<T> template = getTemplate(this.getTemplateName(object));
                     final JsonObject propertiesJson = JsonHelper.getOrDefault(object, "properties",
                             JsonObject.class, new JsonObject());
                     final Properties properties = new Properties();
@@ -45,14 +59,17 @@ public final class ConfiguredDeserialiser<T extends Configuration<T, C>, C exten
 
                     return template.apply(properties).orElseThrow();
                 }).elseError(
-                        config -> config != null && (config.getConfigurable() instanceof ConfigurableRegistryEntry &&
-                                ((ConfigurableRegistryEntry<?, ?>) config.getConfigurable()).isValid()),
+                        this::isConfigurationValid,
                         this.configurableName + " couldn't be found from input \"{}\"."
                 );
     }
 
-    private ConfigurationTemplate<T> getTemplate(JsonObject json) throws DeserialisationException {
-        final ResourceLocation templateName = this.getTemplateName(json);
+    private boolean isConfigurationValid(@Nullable T config) {
+        return config != null && (config.getConfigurable() instanceof ConfigurableRegistryEntry &&
+                ((ConfigurableRegistryEntry<?, ?>) config.getConfigurable()).isValid());
+    }
+
+    private ConfigurationTemplate<T> getTemplate(ResourceLocation templateName) throws DeserialisationException {
         return this.templates.get(templateName)
                 .orElseThrow(() -> new DeserialisationException("No such template \"" + templateName + "\" for \"" + configurableName + "\"."));
     }

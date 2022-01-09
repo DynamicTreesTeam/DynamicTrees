@@ -246,13 +246,13 @@ public final class JsonDeserialisers {
 
     public static final JsonDeserialiser<GenFeatureConfiguration> CONFIGURED_GEN_FEATURE =
             register(GenFeatureConfiguration.class,
-                    new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class, GenFeature.NULL, GenFeatureConfiguration.TEMPLATES));
+                    new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class, GenFeatureConfiguration.TEMPLATES));
     public static final JsonDeserialiser<DropCreatorConfiguration> CONFIGURED_DROP_CREATOR =
             register(DropCreatorConfiguration.class,
-                    new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class, DropCreator.NULL, DropCreatorConfiguration.TEMPLATES));
+                    new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class, DropCreatorConfiguration.TEMPLATES));
     public static final JsonDeserialiser<GrowthLogicKitConfiguration> CONFIGURED_GROWTH_LOGIC_KIT =
             register(GrowthLogicKitConfiguration.class,
-                    new ConfiguredDeserialiser<>("Growth Logic Kit", GrowthLogicKit.class, GrowthLogicKit.DEFAULT, GrowthLogicKitConfiguration.TEMPLATES));
+                    new ConfiguredDeserialiser<>("Growth Logic Kit", GrowthLogicKit.class, GrowthLogicKitConfiguration.TEMPLATES));
 
     public static final JsonDeserialiser<Drops> DROPS = register(Drops.class, new DropsDeserialiser());
 
