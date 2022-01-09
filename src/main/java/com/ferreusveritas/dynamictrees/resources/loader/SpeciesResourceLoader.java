@@ -153,8 +153,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
 
     @Override
     protected void postLoadOnLoad(LoadData loadData, JsonObject json) {
-        loadData.getResource().generateSeed().generateSapling();
         super.postLoadOnLoad(loadData, json);
+        loadData.getResource().generateSeed().generateSapling();
     }
 
     @Override

@@ -94,8 +94,8 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
 
     @Override
     protected void postLoadOnLoad(LoadData loadData, JsonObject json) {
-        loadData.getResource().setupBlocks();
         super.postLoadOnLoad(loadData, json);
+        loadData.getResource().setupBlocks();
     }
 
 }
