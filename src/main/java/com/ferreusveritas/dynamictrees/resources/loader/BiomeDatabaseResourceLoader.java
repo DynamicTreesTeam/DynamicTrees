@@ -237,7 +237,7 @@ public final class BiomeDatabaseResourceLoader
                 .mapIfContains(SELECT, BiomeList.class, list -> list)
                 .mapIfValid(
                         biomeList -> biomeList != null && biomeList.size() > 0,
-                        "Couldn't get any biomes from entry:\n{}",
+                        "Couldn't get any biomes from selector:\n" + json,
                         list -> list
                 )
                 .forEachWarning(warningConsumer)
