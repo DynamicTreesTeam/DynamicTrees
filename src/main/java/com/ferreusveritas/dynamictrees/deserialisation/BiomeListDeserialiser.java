@@ -12,8 +12,11 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -21,86 +24,162 @@ import java.util.Set;
  */
 public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> {
 
-    private static final VoidApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeString) ->
-            biomeList.removeIf(biome -> {
-                        final Set<BiomeDictionary.Type> biomeTypes = BiomeDictionary.getTypes(
-                                RegistryKey.create(ForgeRegistries.Keys.BIOMES, biome.getRegistryName()));
-                        if (typeString.toCharArray()[0] == '!') {
-                            return biomeTypes.stream().anyMatch(
-                                    type -> type.toString().toLowerCase().matches(typeString.substring(1).toLowerCase()));
-                        } else {
-                            return biomeTypes.stream()
-                                    .noneMatch(type -> type.toString().toLowerCase().matches(typeString.toLowerCase()));
-                        }
-                    }
-            );
-
-    private static final VoidApplier<BiomeList, String> CATEGORY_APPLIER = (biomeList, categoryString) ->
-            biomeList.removeIf(biome -> {
-                final String biomeName = biome.getRegistryName().toString();
-                if (categoryString.toCharArray()[0] == '!') {
-                    return biomeName.toLowerCase().matches(categoryString.substring(1).toLowerCase());
-                } else {
-                    return !biomeName.toLowerCase().matches(categoryString.toLowerCase());
-                }
-            });
-
-    private static final VoidApplier<BiomeList, String> NAME_APPLIER = (biomeList, nameString) ->
-            biomeList.removeIf(biome -> {
-                final String biomeName = String.valueOf(biome.getRegistryName());
-                if (nameString.toCharArray()[0] == '!') {
-                    return biomeName.matches(nameString.substring(1).toLowerCase());
-                } else {
-                    return !biomeName.matches(nameString.toLowerCase());
-                }
-            });
-
-    private static final VoidApplier<BiomeList, JsonArray> NAMES_OR_APPLIER = (biomeList, arrayList) -> {
-        BiomeList whitelist = new BiomeList();
-        BiomeList blacklist = new BiomeList();
-        BiomeList.getAll().forEach((biome -> {
-            final String biomeName = String.valueOf(biome.getRegistryName());
-            arrayList.forEach((jsonElement) -> {
-                String nameString = jsonElement.getAsString();
-                if (nameString.toCharArray()[0] == '!') {
-                    if (biomeName.matches(nameString.substring(1).toLowerCase())) {
-                        blacklist.add(biome);
-                    }
-                } else {
-                    if (biomeName.matches(nameString.toLowerCase())) {
-                        whitelist.add(biome);
-                    }
-                }
-            });
-        }));
-        whitelist.removeIf(blacklist::contains);
-        biomeList.removeIf((biome) -> !whitelist.contains(biome));
+    private static final VoidApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeRegex) -> {
+        final boolean notOperator = usingNotOperator(typeRegex);
+        typeRegex = typeRegex.toLowerCase();
+        if (notOperator) {
+            typeRegex = typeRegex.substring(1);
+            removeBiomesWithMatchingType(biomeList, typeRegex);
+        } else {
+            removeBiomesWithoutMatchingType(biomeList, typeRegex);
+        }
     };
 
-    private final VoidApplier<BiomeList, JsonArray> orOperator = (biomes, jsonArray) -> {
-        BiomeList biomesList = new BiomeList();
-        for (JsonElement elem : jsonArray) {
-            if (elem instanceof JsonObject) {
-                BiomeList thisBiomesList = BiomeList.getAll();
-                applyAllAppliers(elem.getAsJsonObject(), thisBiomesList);
-                biomesList.addAll(thisBiomesList);
-            }
+    private static void removeBiomesWithMatchingType(BiomeList biomeList, String typeRegex) {
+        biomeList.removeIf(biome -> getBiomeTypes(biome).stream()
+                .anyMatch(type -> typeMatches(typeRegex, type)));
+    }
+
+    private static void removeBiomesWithoutMatchingType(BiomeList biomeList, String typeRegex) {
+        biomeList.removeIf(biome -> getBiomeTypes(biome).stream()
+                .noneMatch(type -> typeMatches(typeRegex, type)));
+    }
+
+    private static boolean typeMatches(String typeRegex, BiomeDictionary.Type type) {
+        return type.toString().toLowerCase().matches(typeRegex);
+    }
+
+    private static Set<BiomeDictionary.Type> getBiomeTypes(Biome biome) {
+        return BiomeDictionary.getTypes(
+                RegistryKey.create(ForgeRegistries.Keys.BIOMES, Objects.requireNonNull(biome.getRegistryName()))
+        );
+    }
+
+
+    private static final VoidApplier<BiomeList, String> CATEGORY_APPLIER = (biomeList, categoryRegex) -> {
+        final boolean notOperator = usingNotOperator(categoryRegex);
+        if (notOperator) {
+            categoryRegex = categoryRegex.substring(1);
+            removeBiomesWithMatchingCategory(biomeList, categoryRegex);
+        } else {
+            removeBiomesWithoutMatchingCategory(biomeList, categoryRegex);
         }
-        biomes.removeIf(biome -> !biomesList.contains(biome));
+    };
+
+    private static void removeBiomesWithMatchingCategory(BiomeList biomeList, String categoryRegex) {
+        biomeList.removeIf(biome -> biomeCategoryMatches(categoryRegex, biome));
+    }
+
+    private static void removeBiomesWithoutMatchingCategory(BiomeList biomeList, String categoryRegex) {
+        biomeList.removeIf(biome -> !biomeCategoryMatches(categoryRegex, biome));
+    }
+
+    private static boolean biomeCategoryMatches(String categoryRegex, Biome biome) {
+        return biome.getBiomeCategory().toString().toLowerCase().matches(categoryRegex);
+    }
+
+
+    private static final VoidApplier<BiomeList, String> NAME_APPLIER = (biomeList, nameRegex) -> {
+        final boolean notOperator = usingNotOperator(nameRegex);
+        nameRegex = nameRegex.toLowerCase();
+        if (notOperator) {
+            nameRegex = nameRegex.substring(1);
+            removeBiomesWithMatchingName(biomeList, nameRegex);
+        } else {
+            removeBiomesWithoutMatchingName(biomeList, nameRegex);
+        }
+    };
+
+    private static boolean usingNotOperator(String categoryString) {
+        return categoryString.toCharArray()[0] == '!';
+    }
+
+    private static void removeBiomesWithMatchingName(BiomeList biomeList, String nameRegex) {
+        biomeList.removeIf(biome -> biomeNameMatches(nameRegex, biome));
+    }
+
+    private static void removeBiomesWithoutMatchingName(BiomeList biomeList, String nameRegex) {
+        biomeList.removeIf(biome -> !biomeNameMatches(nameRegex, biome));
+    }
+
+    private static boolean biomeNameMatches(String nameRegex, Biome biome) {
+        return String.valueOf(biome.getRegistryName()).matches(nameRegex);
+    }
+
+
+    private static final VoidApplier<BiomeList, JsonArray> NAMES_OR_APPLIER = (biomeList, json) -> {
+        final List<String> nameRegexes = JsonResult.forInput(json)
+                .mapEachIfArray(String.class, nameRegex -> nameRegex.toLowerCase())
+                .orElse(Collections.emptyList(), LogManager.getLogger()::error, LogManager.getLogger()::warn);
+        final BiomeList whitelist = new BiomeList();
+        final BiomeList blacklist = new BiomeList();
+        nameRegexes.forEach(nameRegex -> {
+            populateListsForName(whitelist, blacklist, nameRegex);
+        });
+        biomeList.removeIf(biome -> !whitelist.contains(biome));
+        biomeList.removeAll(blacklist);
+    };
+
+    private static void populateListsForName(BiomeList whitelist, BiomeList blacklist, String nameRegex) {
+        if (usingNotOperator(nameRegex)) {
+            nameRegex = nameRegex.substring(1);
+            populateWhitelistForName(whitelist, nameRegex);
+        } else {
+            populateBlacklistForName(blacklist, nameRegex);
+        }
+    }
+
+    private static void populateWhitelistForName(BiomeList whitelist, String nameRegex) {
+        ForgeRegistries.BIOMES.getValues().stream()
+                .filter(biome -> biomeNameMatches(nameRegex, biome))
+                .forEach(whitelist::add);
+    }
+
+    private static void populateBlacklistForName(BiomeList blacklist, String nameRegex) {
+        ForgeRegistries.BIOMES.getValues().stream()
+                .filter(biome -> !biomeNameMatches(nameRegex, biome))
+                .forEach(blacklist::add);
+    }
+
+    private final VoidApplier<BiomeList, JsonObject> andOperator =
+            (biomes, jsonObject) -> applyAllAppliers(jsonObject, biomes);
+
+    private final VoidApplier<BiomeList, JsonArray> orOperator = (biomeList, json) -> {
+        BiomeList biomesList = new BiomeList();
+        JsonResult.forInput(json)
+                .mapEachIfArray(JsonObject.class, object -> {
+                    BiomeList subList = BiomeList.getAll();
+                    applyAllAppliers(object, subList);
+                    biomesList.addAll(subList);
+                    return object;
+                })
+                .orElse(null, LogManager.getLogger()::error, LogManager.getLogger()::warn);
+        biomeList.removeIf(biome -> !biomesList.contains(biome));
+    };
+
+    private final VoidApplier<BiomeList, JsonObject> notOperator = (biomeList, jsonObject) -> {
+        final BiomeList notBiomeList = BiomeList.getAll();
+        applyAllAppliers(jsonObject, notBiomeList);
+        notBiomeList.forEach(biomeList::remove);
     };
 
     private final JsonPropertyAppliers<BiomeList> appliers = new JsonPropertyAppliers<>(BiomeList.class);
 
     public BiomeListDeserialiser() {
-        this.appliers.register("type", String.class, TYPE_APPLIER)
+        registerAppliers();
+    }
+
+    private void registerAppliers() {
+        this.appliers
+                .register("type", String.class, TYPE_APPLIER)
                 .registerArrayApplier("types", String.class, TYPE_APPLIER)
                 .register("category", String.class, CATEGORY_APPLIER)
                 .register("name", String.class, NAME_APPLIER)
                 .registerArrayApplier("names", String.class, NAME_APPLIER)
                 .register("names_or", JsonArray.class, NAMES_OR_APPLIER)
-                .registerArrayApplier("AND", JsonObject.class,
-                        (biomes, jsonObject) -> applyAllAppliers(jsonObject, biomes))
-                .register("OR", JsonArray.class, orOperator);
+                .registerArrayApplier("AND", JsonObject.class, andOperator)
+                .register("OR", JsonArray.class, orOperator)
+                .register("NOT", JsonObject.class, notOperator);
     }
 
     private void applyAllAppliers(JsonObject json, BiomeList biomes) {

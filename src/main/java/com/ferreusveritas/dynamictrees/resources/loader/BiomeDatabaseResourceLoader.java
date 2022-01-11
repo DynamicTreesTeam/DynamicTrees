@@ -194,7 +194,7 @@ public final class BiomeDatabaseResourceLoader
 
         try {
             JsonResult.forInput(json)
-                    .mapEachIfArray(JsonObject.class, PropertyApplierResult.class, object -> {
+                    .mapEachIfArray(JsonObject.class, object -> {
                         try {
                             this.readCancellersInSection(location, object);
                         } catch (IgnoreThrowable ignored) {
@@ -367,7 +367,7 @@ public final class BiomeDatabaseResourceLoader
 
         try {
             JsonResult.forInput(json)
-                    .mapEachIfArray(JsonObject.class, PropertyApplierResult.class, object -> {
+                    .mapEachIfArray(JsonObject.class, object -> {
                         this.readPopulatorSection(database, location, object);
                         return PropertyApplierResult.success();
                     }).forEachWarning(warning ->

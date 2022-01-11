@@ -58,8 +58,8 @@ public interface Result<T, I> {
      * executes the specified {@code errorConsumer} with the result's error. Then executes the specified {@code
      * warningConsumer} for each warning regardless of this being a successful or unsuccessful result.
      *
-     * @param consumer the deserialised value consumer. Only consumed if this is a successful result.
-     * @param errorConsumer the error consumer. Only consumed if this is an unsuccessful result.
+     * @param consumer        the deserialised value consumer. Only consumed if this is a successful result.
+     * @param errorConsumer   the error consumer. Only consumed if this is an unsuccessful result.
      * @param warningConsumer the warning consumer. Consumed for each warning.
      * @return this result for chaining
      */
@@ -79,7 +79,7 @@ public interface Result<T, I> {
      * throws a {@link DeserialisationException} with the result's error as the detail message. Then executes the
      * specified {@code warningConsumer} for each warning (if successful).
      *
-     * @param consumer the deserialised value consumer. Only consumed if this is a successful result.
+     * @param consumer        the deserialised value consumer. Only consumed if this is a successful result.
      * @param warningConsumer the warning consumer. Consumed for each warning.
      * @return this result for chaining
      */
@@ -105,12 +105,11 @@ public interface Result<T, I> {
     /**
      * Returns the deserialised value if this is a successful result, or the specified other value if not.
      * <p>
-     * If this result is unsuccessful, the specified {@code errorConsumer} is also accepted with the result's error.
-     * The specified {@code warningConsumer} is then executed for each warning, regardless of the result being
-     * successful.
+     * If this result is unsuccessful, the specified {@code errorConsumer} is also accepted with the result's error. The
+     * specified {@code warningConsumer} is then executed for each warning, regardless of the result being successful.
      *
-     * @param other the value to return if this is an unsuccessful result
-     * @param errorConsumer the error consumer. Only consumed if this is an unsuccessful result.
+     * @param other           the value to return if this is an unsuccessful result
+     * @param errorConsumer   the error consumer. Only consumed if this is an unsuccessful result.
      * @param warningConsumer the warning consumer. Consumed for each warning.
      * @return the deserialised value, or {@code other} if this is an unsuccessful result
      */
@@ -127,7 +126,7 @@ public interface Result<T, I> {
      * {@code function} with the error otherwise. If no error is set the specified {@code other} value is used.
      *
      * @param function the function to apply if this is unsuccessful
-     * @param other the value to use if this is unsuccessful and an error is not set
+     * @param other    the value to use if this is unsuccessful and an error is not set
      * @return the deserialised value, or the value from applying the specified {@code function} if this is
      * unsuccessful. Otherwise {@code other} if no error was set.
      */
@@ -144,9 +143,9 @@ public interface Result<T, I> {
      * Returns the deserialised value if this is a successful result, or returns the result of applying the specified
      * {@code function} with the error otherwise. If no error is set the specified {@code other} value is used.
      *
-     * @param function the function to apply if this is unsuccessful
+     * @param function        the function to apply if this is unsuccessful
      * @param warningAppender a function to apply the returned value and warnings to
-     * @param other the value to use if this is unsuccessful and an error is not set
+     * @param other           the value to use if this is unsuccessful and an error is not set
      * @return the deserialised value, or the value from applying the specified {@code function} if this is
      * unsuccessful. Otherwise {@code other} if no error was set.
      */
@@ -204,22 +203,22 @@ public interface Result<T, I> {
     boolean success();
 
     /**
-     * Removes the error from this result. This is a very niche method usually used for customising the error message
-     * in {@link #orElseApply(Function, Object)} when mapping the deserialised value to its own result.
+     * Removes the error from this result. This is a very niche method usually used for customising the error message in
+     * {@link #orElseApply(Function, Object)} when mapping the deserialised value to its own result.
      *
      * @return this result for chaining
      */
     Result<T, I> removeError();
 
     /**
-     * Applies the specified {@code mapper} to the deserialised value, if this is a successful result, returning
-     * the resulting {@link MappedResult}.
+     * Applies the specified {@code mapper} to the deserialised value, if this is a successful result, returning the
+     * resulting {@link MappedResult}.
      * <p>
      * Otherwise, if this result was not successful in the first place, the error and warnings are carried to a new
      * mapped result.
      *
      * @param mapper a simple mapper that maps the deserialised value to a new value
-     * @param <V> the type to map to
+     * @param <V>    the type to map to
      * @return the mapped result
      */
     default <V> MappedResult<V, I> map(SimpleMapper<T, V> mapper) {
@@ -227,14 +226,14 @@ public interface Result<T, I> {
     }
 
     /**
-     * Applies the specified {@code mapper} to the deserialised value, if this is a successful result, returning
-     * the resulting {@link MappedResult}.
+     * Applies the specified {@code mapper} to the deserialised value, if this is a successful result, returning the
+     * resulting {@link MappedResult}.
      * <p>
      * Otherwise, if this result was not successful in the first place, the error and warnings are carried to a new
      * mapped result.
      *
      * @param mapper a mapper that maps the deserialised value to a new value
-     * @param <V> the type to map to
+     * @param <V>    the type to map to
      * @return the mapped result
      */
     <V> MappedResult<V, I> map(Mapper<T, V> mapper);
@@ -247,9 +246,9 @@ public interface Result<T, I> {
      * Otherwise, if this result was not successful in the first place, the error and warnings are carried to a new
      * mapped result.
      *
-     * @param mapper a mapper that maps the deserialised value to a new value
+     * @param mapper    a mapper that maps the deserialised value to a new value
      * @param nullError the error message to use if the mapped deserialised value is {@code null}
-     * @param <V> the type to map to
+     * @param <V>       the type to map to
      * @return the mapped result
      */
     default <V> MappedResult<V, I> map(SimpleMapper<T, V> mapper, String nullError) {
@@ -264,9 +263,9 @@ public interface Result<T, I> {
      * Otherwise, if this result was not successful in the first place, the error and warnings are carried to a new
      * mapped result.
      *
-     * @param mapper a mapper that maps the deserialised value to a new value
+     * @param mapper    a mapper that maps the deserialised value to a new value
      * @param nullError the error message to use if the mapped deserialised value is {@code null}
-     * @param <V> the type to map to
+     * @param <V>       the type to map to
      * @return the mapped result
      */
     default <V> MappedResult<V, I> map(Mapper<T, V> mapper, String nullError) {
@@ -282,10 +281,11 @@ public interface Result<T, I> {
      * Otherwise, if this result was not successful in the first place, the error and warnings are carried to a new
      * mapped result.
      *
-     * @param mapper a mapper that maps the deserialised value to a new value
-     * @param validator the predicate by which to test the mapped value
-     * @param invalidError the error message to use if the mapped deserialised value does not pass the {@code validator}
-     * @param <V> the type to map to
+     * @param mapper       a mapper that maps the deserialised value to a new value
+     * @param validator    the predicate by which to test the mapped value
+     * @param invalidError the error message to use if the mapped deserialised value does not pass the {@code
+     *                     validator}
+     * @param <V>          the type to map to
      * @return the mapped result
      */
     default <V> MappedResult<V, I> map(SimpleMapper<T, V> mapper, Predicate<V> validator, String invalidError) {
@@ -301,10 +301,11 @@ public interface Result<T, I> {
      * Otherwise, if this result was not successful in the first place, the error and warnings are carried to a new
      * mapped result.
      *
-     * @param mapper a mapper that maps the deserialised value to a new value
-     * @param validator the predicate by which to test the mapped value
-     * @param invalidError the error message to use if the mapped deserialised value does not pass the {@code validator}
-     * @param <V> the type to map to
+     * @param mapper       a mapper that maps the deserialised value to a new value
+     * @param validator    the predicate by which to test the mapped value
+     * @param invalidError the error message to use if the mapped deserialised value does not pass the {@code
+     *                     validator}
+     * @param <V>          the type to map to
      * @return the mapped result
      */
     <V> MappedResult<V, I> map(Mapper<T, V> mapper, Predicate<V> validator, String invalidError);
@@ -318,10 +319,10 @@ public interface Result<T, I> {
      * Otherwise, if this result was not successful in the first place, the error and warnings are carried to a new
      * mapped result.
      *
-     * @param validator the predicate by which to test the deserialised value
+     * @param validator    the predicate by which to test the deserialised value
      * @param invalidError the error message to use if this value does not pass the {@code validator}
-     * @param mapper a mapper that maps the deserialised value to a new value
-     * @param <V> the type to map to
+     * @param mapper       a mapper that maps the deserialised value to a new value
+     * @param <V>          the type to map to
      * @return the mapped result
      */
     default <V> MappedResult<V, I> mapIfValid(Predicate<T> validator, final String invalidError,
@@ -338,10 +339,10 @@ public interface Result<T, I> {
      * Otherwise, if this result was not successful in the first place, the error and warnings are carried to a new
      * mapped result.
      *
-     * @param validator the predicate by which to test the deserialised value
+     * @param validator    the predicate by which to test the deserialised value
      * @param invalidError the error message to use if this value does not pass the {@code validator}
-     * @param mapper a mapper that maps the deserialised value to a new value
-     * @param <V> the type to map to
+     * @param mapper       a mapper that maps the deserialised value to a new value
+     * @param <V>          the type to map to
      * @return the mapped result
      */
     <V> MappedResult<V, I> mapIfValid(Predicate<T> validator, final String invalidError, Mapper<T, V> mapper);
@@ -350,10 +351,10 @@ public interface Result<T, I> {
      * Attempts to deserialise the original input value as the specified {@code type}, mapping it using the specified
      * {@code mapper} if successful and returning the resulting {@link MappedResult}.
      *
-     * @param type the type to attempt to deserialise
+     * @param type   the type to attempt to deserialise
      * @param mapper a mapper that maps the deserialised value to a new value
-     * @param <V> the type to attempt to deserialise
-     * @param <N> the type to map to
+     * @param <V>    the type to attempt to deserialise
+     * @param <N>    the type to map to
      * @return the mapped result
      * @throws NoSuchDeserialiserException if {@code type} did not have a registered deserialiser
      */
@@ -365,10 +366,10 @@ public interface Result<T, I> {
      * Attempts to deserialise the original input value as the specified {@code type}, mapping it using the specified
      * {@code mapper} if successful and returning the resulting {@link MappedResult}.
      *
-     * @param type the type to attempt to deserialise
+     * @param type   the type to attempt to deserialise
      * @param mapper a mapper that maps the deserialised value to a new value
-     * @param <V> the type to attempt to deserialise
-     * @param <N> the type to map to
+     * @param <V>    the type to attempt to deserialise
+     * @param <N>    the type to map to
      * @return the mapped result
      * @throws NoSuchDeserialiserException if the specified {@code type} did not have a registered deserialiser
      */
@@ -378,52 +379,50 @@ public interface Result<T, I> {
      * Attempts to map the original input value to a list of the specified {@code elementType}.
      *
      * @param elementType the type of element to map to a list of
-     * @param <E> the type of the element of the list to map to
+     * @param <E>         the type of the element of the list to map to
      * @return the mapped result
      * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
      */
     <E> MappedResult<List<E>, I> mapToListOfType(Class<E> elementType);
 
     /**
-     * Attempts to map the original input value to a list of the specified {@code elementType}, then mappings each
-     * entry to the specified {@code mappedType} using the specified {@code mapper}.
+     * Attempts to map the original input value to a list of the specified {@code elementType}, then mappings each entry
+     * to the specified {@code mappedType} using the specified {@code mapper}.
      *
      * @param elementType the initial type of element to map to a list of
-     * @param mappedType the type to map each element to
-     * @param mapper a mapper that maps each deserialised value to the {@code mappedType}
-     * @param <V> the initial type of element to map to a list of
-     * @param <E> the type to map each element to
+     * @param mapper      a mapper that maps each deserialised value to the {@code mappedType}
+     * @param <V>         the initial type of element to map to a list of
+     * @param <E>         the type to map each element to
      * @return the mapper result
      * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
      */
-    default <V, E> MappedResult<List<E>, I> mapEachIfArray(Class<V> elementType, Class<E> mappedType,
+    default <V, E> MappedResult<List<E>, I> mapEachIfArray(Class<V> elementType,
                                                            SimpleMapper<V, E> mapper) {
-        return this.mapEachIfArray(elementType, mappedType, mapper.fullMapper());
+        return this.mapEachIfArray(elementType, mapper.fullMapper());
     }
 
     /**
-     * Attempts to map the original input value to a list of the specified {@code elementType}, then mappings each
-     * entry to the specified {@code mappedType} using the specified {@code mapper}.
+     * Attempts to map the original input value to a list of the specified {@code elementType}, then mappings each entry
+     * to the specified {@code mappedType} using the specified {@code mapper}.
      *
+     * @param <V>         the initial type of element to map to a list of
+     * @param <E>         the type to map each element to
      * @param elementType the initial type of element to map to a list of
-     * @param mappedType the type to map each element to
-     * @param mapper a mapper that maps each deserialised value to the {@code mappedType}
-     * @param <V> the initial type of element to map to a list of
-     * @param <E> the type to map each element to
+     * @param mapper      a mapper that maps each deserialised value to the {@code mappedType}
      * @return the mapper result
      * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
      */
-    <V, E> MappedResult<List<E>, I> mapEachIfArray(Class<V> elementType, Class<E> mappedType, Mapper<V, E> mapper);
+    <V, E> MappedResult<List<E>, I> mapEachIfArray(Class<V> elementType, Mapper<V, E> mapper);
 
     /**
      * Gets the value for the specified {@code key} if the input is a map-like structure, attempting to map it to the
      * specified {@code type} and then to type {@link V} using the specified {@code mapper}.
      *
-     * @param key the key for the value to map
-     * @param type the required type to be mapped
+     * @param key    the key for the value to map
+     * @param type   the required type to be mapped
      * @param mapper a mapper that maps the deserialised value to type {@link V}
-     * @param <E> the type to attempt to deserialise the key's corresponding value to
-     * @param <V> the type to map the deserialised value to
+     * @param <E>    the type to attempt to deserialise the key's corresponding value to
+     * @param <V>    the type to map the deserialised value to
      * @return the mapped result
      */
     default <E, V> MappedResult<V, I> mapIfContains(String key, Class<E> type, SimpleMapper<E, V> mapper) {
@@ -434,11 +433,11 @@ public interface Result<T, I> {
      * Gets the value for the specified {@code key} if the input is a map-like structure, attempting to map it to the
      * specified {@code type} and then to type {@link V} using the specified {@code mapper}.
      *
-     * @param key the key for the value to map
-     * @param type the required type to be mapped
+     * @param key    the key for the value to map
+     * @param type   the required type to be mapped
      * @param mapper a mapper that maps the deserialised value to type {@link V}
-     * @param <E> the type to attempt to deserialise the key's corresponding value to
-     * @param <V> the type to map the deserialised value to
+     * @param <E>    the type to attempt to deserialise the key's corresponding value to
+     * @param <V>    the type to map the deserialised value to
      * @return the mapped result
      */
     <E, V> MappedResult<V, I> mapIfContains(String key, Class<E> type, Mapper<E, V> mapper);
@@ -447,12 +446,12 @@ public interface Result<T, I> {
      * Gets the value for the specified {@code key} if the input is a map-like structure, attempting to map it to the
      * specified {@code type} and then to type {@link V} using the specified {@code mapper}.
      *
-     * @param key the key for the value to map
-     * @param type the required type to be mapped
-     * @param mapper a mapper that maps the deserialised value to type {@link V}
+     * @param key          the key for the value to map
+     * @param type         the required type to be mapped
+     * @param mapper       a mapper that maps the deserialised value to type {@link V}
      * @param defaultValue the value to use if the map-like structure doesn't contain the {@code key}
-     * @param <E> the type to attempt to deserialise the key's corresponding value to
-     * @param <V> the type to map the deserialised value to
+     * @param <E>          the type to attempt to deserialise the key's corresponding value to
+     * @param <V>          the type to map the deserialised value to
      * @return the mapped result
      */
     default <E, V> MappedResult<V, I> mapIfContains(String key, Class<E> type, SimpleMapper<E, V> mapper,
@@ -464,12 +463,12 @@ public interface Result<T, I> {
      * Gets the value for the specified {@code key} if the input is a map-like structure, attempting to map it to the
      * specified {@code type} and then to type {@link V} using the specified {@code mapper}.
      *
-     * @param key the key for the value to map
-     * @param type the required type to be mapped
-     * @param mapper a mapper that maps the deserialised value to type {@link V}
+     * @param key          the key for the value to map
+     * @param type         the required type to be mapped
+     * @param mapper       a mapper that maps the deserialised value to type {@link V}
      * @param defaultValue the value to use if the map-like structure doesn't contain the {@code key}
-     * @param <E> the type to attempt to deserialise the key's corresponding value to
-     * @param <V> the type to map the deserialised value to
+     * @param <E>          the type to attempt to deserialise the key's corresponding value to
+     * @param <V>          the type to map the deserialised value to
      * @return the mapped result
      */
     <E, V> MappedResult<V, I> mapIfContains(String key, Class<E> type, Mapper<E, V> mapper, V defaultValue);
@@ -496,9 +495,9 @@ public interface Result<T, I> {
     }
 
     /**
-     * A {@link ThrowableBiFunction} that handles mapping a deserialised value to another value. The first input is
-     * the deserialised value being mapped, the second a consumer for warnings, with the return being the mapped value.
-     * The application can also throw a {@link DeserialisationException}, whose message should be used as the mapped
+     * A {@link ThrowableBiFunction} that handles mapping a deserialised value to another value. The first input is the
+     * deserialised value being mapped, the second a consumer for warnings, with the return being the mapped value. The
+     * application can also throw a {@link DeserialisationException}, whose message should be used as the mapped
      * result's error if thrown.
      *
      * @param <T> the type of the original deserialised value

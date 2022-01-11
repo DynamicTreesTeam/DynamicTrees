@@ -44,7 +44,7 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
      * {@inheritDoc}
      *
      * @param mapper a mapper that maps the deserialised value to a new value
-     * @param <V> the type to map to
+     * @param <V>    the type to map to
      * @return the mapped result
      */
     @Override
@@ -60,10 +60,11 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     /**
      * {@inheritDoc}
      *
-     * @param mapper a mapper that maps the deserialised value to a new value
-     * @param validator the predicate by which to test the mapped value
-     * @param invalidError the error message to use if the mapped deserialised value does not pass the {@code validator}
-     * @param <V> the type to map to
+     * @param mapper       a mapper that maps the deserialised value to a new value
+     * @param validator    the predicate by which to test the mapped value
+     * @param invalidError the error message to use if the mapped deserialised value does not pass the {@code
+     *                     validator}
+     * @param <V>          the type to map to
      * @return the mapped result
      */
     @Override
@@ -87,14 +88,15 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     /**
      * {@inheritDoc}
      *
-     * @param validator the predicate by which to test the deserialised value
+     * @param validator    the predicate by which to test the deserialised value
      * @param invalidError the error message to use if this value does not pass the {@code validator}
-     * @param mapper a mapper that maps the deserialised value to a new value
-     * @param <V> the type to map to
+     * @param mapper       a mapper that maps the deserialised value to a new value
+     * @param <V>          the type to map to
      * @return the mapped result
      */
     @Override
-    public <V> MappedResult<V, JsonElement> mapIfValid(Predicate<T> validator, String invalidError, Mapper<T, V> mapper) {
+    public <V> MappedResult<V, JsonElement> mapIfValid(Predicate<T> validator, String invalidError,
+                                                       Mapper<T, V> mapper) {
         return this.value == null ? MappedJsonResult.mapErrorneous(this) :
                 validator.test(this.value) ?
                         this.map(mapper, "Unexpected error occurred. This should not be possible.") :
@@ -107,10 +109,10 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     /**
      * {@inheritDoc}
      *
-     * @param type the type to attempt to deserialise
+     * @param type   the type to attempt to deserialise
      * @param mapper a mapper that maps the deserialised value to a new value
-     * @param <V> the type to attempt to deserialise
-     * @param <N> the type to map to
+     * @param <V>    the type to attempt to deserialise
+     * @param <N>    the type to map to
      * @return the mapped result
      * @throws NoSuchDeserialiserException if the specified {@code type} did not have a registered deserialiser
      */
@@ -123,7 +125,7 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
      * {@inheritDoc}
      *
      * @param elementType the type of element to map to a list of
-     * @param <E> the type of the element of the list to map to
+     * @param <E>         the type of the element of the list to map to
      * @return the mapped result
      * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
      */
@@ -144,16 +146,16 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     /**
      * {@inheritDoc}
      *
+     * @param <V>         the initial type of element to map to a list of
+     * @param <E>         the type to map each element to
      * @param elementType the initial type of element to map to a list of
-     * @param mappedType the type to map each element to
-     * @param mapper a mapper that maps each deserialised value to the {@code mappedType}
-     * @param <V> the initial type of element to map to a list of
-     * @param <E> the type to map each element to
+     * @param mapper      a mapper that maps each deserialised value to the {@code mappedType}
      * @return the mapper result
      * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
      */
     @Override
-    public <V, E> MappedResult<List<E>, JsonElement> mapEachIfArray(Class<V> elementType, Class<E> mappedType, Mapper<V, E> mapper) {
+    public <V, E> MappedResult<List<E>, JsonElement> mapEachIfArray(Class<V> elementType,
+                                                                    Mapper<V, E> mapper) {
         return JsonDeserialisers.JSON_ARRAY.deserialise(this.input).map(array -> {
             final JsonDeserialiser<V> deserialiser = JsonDeserialisers.getOrThrow(elementType);
             final List<E> list = new LinkedList<>();
@@ -169,11 +171,11 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     /**
      * {@inheritDoc}
      *
-     * @param key the key for the value to map
-     * @param type the required type to be mapped
+     * @param key    the key for the value to map
+     * @param type   the required type to be mapped
      * @param mapper a mapper that maps the deserialised value to type {@link V}
-     * @param <E> the type to attempt to deserialise the key's corresponding value to
-     * @param <V> the type to map the deserialised value to
+     * @param <E>    the type to attempt to deserialise the key's corresponding value to
+     * @param <V>    the type to map the deserialised value to
      * @return the mapped result
      */
     @Override
@@ -193,7 +195,8 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     }
 
     @Override
-    public <E, V> MappedResult<V, JsonElement> mapIfContains(String key, Class<E> type, Mapper<E, V> mapper, V defaultValue) {
+    public <E, V> MappedResult<V, JsonElement> mapIfContains(String key, Class<E> type, Mapper<E, V> mapper,
+                                                             V defaultValue) {
         return JsonDeserialisers.JSON_OBJECT.deserialise(this.input).map(object -> {
             final JsonElement element = object.get(key);
 
@@ -222,9 +225,9 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     /**
      * Creates a successful json result for the specified {@code json} input and {@code value}.
      *
-     * @param json the original json input
+     * @param json  the original json input
      * @param value the deserialised value
-     * @param <T> the type of the deserialised value
+     * @param <T>   the type of the deserialised value
      * @return the successful json result
      */
     public static <T> JsonResult<T> success(JsonElement json, T value) {
@@ -234,9 +237,9 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     /**
      * Creates a failure json result for the specified {@code json} input and {@code error}.
      *
-     * @param json the original json input
+     * @param json  the original json input
      * @param error the error message
-     * @param <T> the type of the deserialised value
+     * @param <T>   the type of the deserialised value
      * @return the failure json result
      */
     public static <T> JsonResult<T> failure(JsonElement json, String error) {
@@ -246,10 +249,10 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     /**
      * Creates a failure json result for the specified {@code json} input, {@code error}, and {@code warnings}.
      *
-     * @param json the original json input
-     * @param error the error message
+     * @param json     the original json input
+     * @param error    the error message
      * @param warnings the warnings
-     * @param <T> the type of the deserialised value
+     * @param <T>      the type of the deserialised value
      * @return the failure json result
      */
     public static <T> JsonResult<T> failure(JsonElement json, String error, List<String> warnings) {
