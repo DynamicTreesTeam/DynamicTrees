@@ -221,7 +221,7 @@ public final class BiomeDatabaseResourceLoader
         throwIfShouldNotLoad(json);
 
         final BiomeList biomes = this.collectBiomes(json, warningConsumer);
-8
+
         if (biomes.isEmpty()) {
             warnNoBiomesSelected(json);
             return;
