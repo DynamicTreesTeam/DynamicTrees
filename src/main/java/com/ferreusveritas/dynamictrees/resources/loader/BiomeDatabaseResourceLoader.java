@@ -221,6 +221,11 @@ public final class BiomeDatabaseResourceLoader
         throwIfShouldNotLoad(json);
 
         final BiomeList biomes = this.collectBiomes(json, warningConsumer);
+8
+        if (biomes.isEmpty()) {
+            warnNoBiomesSelected(json);
+            return;
+        }
 
         JsonResult.forInput(json)
                 .mapIfContains(CANCELLERS, JsonObject.class, cancellerObject ->
@@ -235,11 +240,6 @@ public final class BiomeDatabaseResourceLoader
     private BiomeList collectBiomes(JsonObject json, Consumer<String> warningConsumer) throws DeserialisationException {
         return JsonResult.forInput(json)
                 .mapIfContains(SELECT, BiomeList.class, list -> list)
-                .mapIfValid(
-                        biomeList -> biomeList != null && biomeList.size() > 0,
-                        "Couldn't get any biomes from selector:\n" + json,
-                        list -> list
-                )
                 .forEachWarning(warningConsumer)
                 .orElseThrow();
     }
@@ -384,9 +384,15 @@ public final class BiomeDatabaseResourceLoader
         final BiomeList biomes = this.collectBiomes(json, warning ->
                 LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning));
 
+        if (biomes.isEmpty()) {
+            warnNoBiomesSelected(json);
+            return;
+        }
+
         JsonResult.forInput(json)
                 .mapIfContains(APPLY, JsonObject.class, applyObject -> {
-                    biomes.forEach(biome -> this.entryAppliers.applyAll(new JsonMapWrapper(applyObject), database.getEntry(biome)));
+                    biomes.forEach(biome -> this.entryAppliers.applyAll(new JsonMapWrapper(applyObject),
+                            database.getEntry(biome)));
                     return PropertyApplierResult.success();
                 }, PropertyApplierResult.success())
                 .elseMapIfContains(WHITE, String.class, type -> {
@@ -396,6 +402,18 @@ public final class BiomeDatabaseResourceLoader
                 .forEachWarning(warning ->
                         LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning))
                 .orElseThrow();
+    }
+
+    private void warnNoBiomesSelected(JsonObject json) {
+        if (noBiomesSelectedWarningNotSuppressed(json)) {
+            LogManager.getLogger().warn("Could not get any biomes from selector:\n" + json.get(SELECT));
+        }
+    }
+
+    private boolean noBiomesSelectedWarningNotSuppressed(JsonObject json) {
+        final JsonElement suppress = json.get("suppress_none_selected");
+        return suppress == null || !suppress.isJsonPrimitive() || !suppress.getAsJsonPrimitive().isBoolean() ||
+                !suppress.getAsJsonPrimitive().getAsBoolean();
     }
 
     private void applyWhite(BiomeDatabase database, ResourceLocation location, BiomeList biomes, String type)
