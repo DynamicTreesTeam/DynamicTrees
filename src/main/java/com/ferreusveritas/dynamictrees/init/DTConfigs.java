@@ -59,6 +59,7 @@ public class DTConfigs {
 
     public static final ForgeConfigSpec.BooleanValue REPLACE_VANILLA_SAPLING;
     public static final ForgeConfigSpec.BooleanValue REPLACE_NYLIUM_FUNGI;
+    public static final ForgeConfigSpec.BooleanValue CANCEL_VANILLA_VILLAGE_TREES;
 
     public static final ForgeConfigSpec.BooleanValue PODZOL_GEN;
 
@@ -157,6 +158,8 @@ public class DTConfigs {
                 define("replaceVanillaSapling", false);
         REPLACE_NYLIUM_FUNGI = COMMON_BUILDER.comment("Crimson Fungus and Warped Fungus that sprout from nylium will be dynamic instead.").
                 define("replaceNyliumFungi", true);
+        CANCEL_VANILLA_VILLAGE_TREES = COMMON_BUILDER.comment("If enabled, cancels the non-dynamic trees that spawn with vanilla villages.").
+                define("cancelVanillaVillageTrees", true);
         COMMON_BUILDER.pop();
 
         SERVER_BUILDER.comment("World Generation Settings").push("world");
