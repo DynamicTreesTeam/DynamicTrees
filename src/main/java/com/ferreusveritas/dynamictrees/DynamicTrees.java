@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
+import com.ferreusveritas.dynamictrees.worldgen.VillageTreeCanceller;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -107,6 +108,9 @@ public final class DynamicTrees {
 
         if (DTConfigs.REPLACE_NYLIUM_FUNGI.get()) {
             DTTrees.replaceNyliumFungiFeatures();
+        }
+        if (DTConfigs.CANCEL_VANILLA_VILLAGE_TREES.get()) {
+            VillageTreeCanceller.removeTreesFromVanillaVillages();
         }
 
         event.enqueueWork(DTRegistries::registerConfiguredFeatures);
