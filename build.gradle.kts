@@ -8,6 +8,7 @@ import java.time.Instant
 import java.time.format.DateTimeFormatter
 
 fun property(key: String) = project.findProperty(key).toString()
+fun optionalProperty(key: String) = project.findProperty(key)?.toString()
 
 plugins {
     id("java")
@@ -95,7 +96,15 @@ minecraft {
             property("mixin.env.remapRefMap", "true")
             property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
 
-            args("--mod", modId, "--all", "--output", file("src/generated/resources/"), "--existing", file("src/main/resources"))
+            args(
+                "--mod",
+                modId,
+                "--all",
+                "--output",
+                file("src/generated/resources/"),
+                "--existing",
+                file("src/main/resources")
+            )
 
             mods {
                 create(modId) {
@@ -187,7 +196,10 @@ java {
 }
 
 fun readChangelog(): String? {
-    val versionInfoFile = file("version_info.json")
+    val versionInfoFile = file(
+        (optionalProperty("dynamictrees.version_info_repo.directory") ?: return null)
+                + File.separatorChar + "DynamicTrees.json"
+    )
     val jsonObject = Gson().fromJson(InputStreamReader(versionInfoFile.inputStream()), JsonObject::class.java)
     return jsonObject
         .get(mcVersion)?.asJsonObject
@@ -218,7 +230,10 @@ curseforge {
             }
         }
     } else {
-        project.logger.log(LogLevel.WARN, "API Key and file type for CurseForge not detected; uploading will be disabled.")
+        project.logger.log(
+            LogLevel.WARN,
+            "API Key and file type for CurseForge not detected; uploading will be disabled."
+        )
     }
 }
 
