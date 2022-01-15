@@ -29,15 +29,14 @@ public final class SeedSaplingRecipeDeserialiser implements JsonDeserialiser<See
         return JsonResult.forInput(input)
                 .mapIfType(Block.class, block -> new SeedSaplingRecipe(block, block.asItem()))
                 .elseMapIfType(Item.class, (Result.SimpleMapper<Item, SeedSaplingRecipe>) SeedSaplingRecipe::new)
-                .elseMapIfType(JsonObject.class, (object, warningConsumer) -> {
-                    return JsonResult.from(SeedSaplingRecipe.CODEC.decode(JsonOps.INSTANCE, input), input)
-                            .map(recipe -> {
-                                this.appliers.applyAll(new JsonMapWrapper(object), recipe)
-                                        .forEachErrorWarning(warningConsumer, warningConsumer);
-                                return recipe;
-                            })
-                            .orElseThrow();
-                });
+                .elseMapIfType(JsonObject.class, (object, warningConsumer) ->
+                        JsonResult.from(SeedSaplingRecipe.CODEC.decode(JsonOps.INSTANCE, input), input)
+                        .map(recipe -> {
+                            this.appliers.applyAll(new JsonMapWrapper(object), recipe)
+                                    .forEachErrorWarning(warningConsumer, warningConsumer);
+                            return recipe;
+                        })
+                        .orElseThrow());
     }
 
 }

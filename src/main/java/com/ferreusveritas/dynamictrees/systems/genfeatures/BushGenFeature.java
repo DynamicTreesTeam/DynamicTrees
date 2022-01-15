@@ -107,18 +107,26 @@ public class BushGenFeature extends GenFeature {
                 for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
                     leafPos.set(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ());
                     if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getMaterial().isReplaceable()) {
-                        Block leaf = ((configuration.get(SECONDARY_LEAVES) == null ||
-                                random.nextInt(configuration.get(SECONDARY_LEAVES_CHANCE)) != 0) ?
-                                configuration.get(LEAVES) : configuration.get(SECONDARY_LEAVES));
-                        BlockState leafState = leaf.defaultBlockState();
-                        if (leaf instanceof LeavesBlock) {
-                            leafState = leafState.setValue(LeavesBlock.PERSISTENT, true);
-                        }
-                        world.setBlock(leafPos, leafState, 3);
+                        configuration.getAsOptional(SECONDARY_LEAVES).ifPresent(secondaryLeavesBlock -> placeLeavesBlock(
+                                world, leafPos, selectLeavesBlock(random, configuration.get(SECONDARY_LEAVES_CHANCE),
+                                        configuration.get(LEAVES), secondaryLeavesBlock)
+                        ));
                     }
                 }
             }
         }
+    }
+
+    private Block selectLeavesBlock(Random random, int secondaryLeavesChance, Block leavesBlock, Block secondaryLeavesBlock) {
+        return random.nextInt(secondaryLeavesChance) != 0 ? leavesBlock : secondaryLeavesBlock;
+    }
+
+    private void placeLeavesBlock(IWorld world, BlockPos.Mutable leafPos, Block leavesBlock) {
+        BlockState leafState = leavesBlock.defaultBlockState();
+        if (leavesBlock instanceof LeavesBlock) {
+            leafState = leafState.setValue(LeavesBlock.PERSISTENT, true);
+        }
+        world.setBlock(leafPos, leafState, 3);
     }
 
     public static int coordHashCode(BlockPos pos) {

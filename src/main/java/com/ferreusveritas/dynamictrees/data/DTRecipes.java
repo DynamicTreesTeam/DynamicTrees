@@ -32,10 +32,11 @@ public final class DTRecipes {
             final ResourceLocation registryName = species.getRegistryName();
 
             species.getPrimitiveSaplingRecipes().forEach(saplingRecipe -> {
-                assert saplingRecipe.isValid();
-                @SuppressWarnings("OptionalGetWithoutIsPresent")
-                final Item saplingItem = saplingRecipe.getSaplingItem().get();
-                assert saplingItem.getRegistryName() != null;
+                final Item saplingItem = saplingRecipe.getSaplingItem().orElse(null);
+                if (saplingItem == null || saplingItem.getRegistryName() == null){
+                    System.err.println("Error creating seed-sapling recipe for species "+species.getRegistryName()+" as sapling item does not exist.");
+                    return;
+                }
 
                 if (saplingRecipe.canCraftSaplingToSeed()) {
                     final ResourceLocation saplingToSeed = new ResourceLocation(registryName.getNamespace(),
