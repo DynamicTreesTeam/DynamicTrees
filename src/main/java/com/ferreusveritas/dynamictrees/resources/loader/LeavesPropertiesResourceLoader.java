@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
@@ -15,6 +16,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author Harley O'Connor
@@ -53,10 +55,31 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 .register("fire_spread", Integer.class, LeavesProperties::setFireSpreadSpeed)
                 .register("flammability", Integer.class, LeavesProperties::setFlammability)
                 .register("connect_any_radius", Boolean.class, LeavesProperties::setConnectAnyRadius)
-                .register("does_age", String.class, LeavesProperties::setDoesAge)
+                .register("does_age", String.class, (leavesProperties, configurationName) -> {
+                    return readDoesAge(leavesProperties, configurationName);
+                })
+                .register("ageing_configuration", LeavesProperties.AgeingConfiguration.class, LeavesProperties::setAgeingConfiguration)
                 .register("can_grow_on_ground", Boolean.class, LeavesProperties::setCanGrowOnGround);
 
         super.registerAppliers();
+    }
+
+    private PropertyApplierResult readDoesAge(LeavesProperties leavesProperties, String configurationName) {
+        LogManager.getLogger().warn("Deprecated use of leaves properties `does_age` property by \"" +
+                leavesProperties.getRegistryName() + "\". This has been renamed to `ageing_configuration`.");
+        // Account for refactors: YES -> ALWAYS, NO -> NEVER
+        if (configurationName.equalsIgnoreCase("yes")) {
+            leavesProperties.setAgeingConfiguration(LeavesProperties.AgeingConfiguration.ALWAYS);
+        } else if (configurationName.equalsIgnoreCase("no")) {
+            leavesProperties.setAgeingConfiguration(LeavesProperties.AgeingConfiguration.NEVER);
+        } else {
+            try {
+                leavesProperties.setDoesAge(configurationName);
+            } catch (IllegalArgumentException e) {
+                return PropertyApplierResult.failure("Unsupported ageing configuration: \"" + configurationName + "\".");
+            }
+        }
+        return PropertyApplierResult.success();
     }
 
     @Override

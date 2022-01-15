@@ -10,6 +10,7 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapelessRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,8 +34,8 @@ public final class DTRecipes {
 
             species.getPrimitiveSaplingRecipes().forEach(saplingRecipe -> {
                 final Item saplingItem = saplingRecipe.getSaplingItem().orElse(null);
-                if (saplingItem == null || saplingItem.getRegistryName() == null){
-                    System.err.println("Error creating seed-sapling recipe for species "+species.getRegistryName()+" as sapling item does not exist.");
+                if (saplingItem == null || saplingItem.getRegistryName() == null) {
+                    LogManager.getLogger().error("Error creating seed-sapling recipe for species \"" + species.getRegistryName() + "\" as sapling item does not exist.");
                     return;
                 }
 
@@ -80,7 +81,7 @@ public final class DTRecipes {
 
     private static Ingredient[] ingredients(final Item... items) {
         if (items.length == 0) return new Ingredient[]{Ingredient.EMPTY};
-        return Arrays.stream(items).map(item->Ingredient.of(new ItemStack(item))).collect(Collectors.toSet()).toArray(new Ingredient[]{});
+        return Arrays.stream(items).map(item -> Ingredient.of(new ItemStack(item))).collect(Collectors.toSet()).toArray(new Ingredient[]{});
     }
 
 }

@@ -183,7 +183,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
         final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
-        if (!getProperties(state).getDoesAge(worldGen, state)) {
+        if (!getProperties(state).shouldAge(worldGen, state)) {
             return oldHydro;
         }
 

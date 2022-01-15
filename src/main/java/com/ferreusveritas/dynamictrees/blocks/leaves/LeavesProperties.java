@@ -44,8 +44,10 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.Collections;
 import java.util.List;
-import java.util.*;
+import java.util.Optional;
+import java.util.Random;
 
 /**
  * This class provides a means of holding individual properties for leaves.  This is necessary since leaves can contain
@@ -151,7 +153,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     protected int smotherLeavesMax = 4;
     protected int lightRequirement = 13;
-    protected leafAges doesAge = leafAges.YES;
+    protected AgeingConfiguration ageingConfiguration = AgeingConfiguration.ALWAYS;
     protected boolean connectAnyRadius = false;
 
     /**
@@ -354,44 +356,59 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.lightRequirement = lightRequirement;
     }
 
-    protected enum leafAges {
-        YES(true, true),
+    public enum AgeingConfiguration {
+        ALWAYS(true, true),
         WORLDGEN_ONLY(true, false),
         GROWTH_ONLY(false, true),
-        NO(false, false);
+        NEVER(false, false);
 
-        boolean ageWorldgen, ageGrowth;
+        private final boolean ageDuringWorldGen, ageDuringGrowth;
 
-        leafAges(boolean ageWorgen, boolean ageGrowth) {
-            this.ageWorldgen = ageWorgen;
-            this.ageGrowth = ageGrowth;
+        AgeingConfiguration(boolean ageDuringWorldGen, boolean ageDuringGrowth) {
+            this.ageDuringWorldGen = ageDuringWorldGen;
+            this.ageDuringGrowth = ageDuringGrowth;
         }
 
-        public boolean getDoesAge(boolean worldgen) {
-            if (worldgen) {
-                return ageWorldgen;
+        public boolean shouldAge(boolean worldGen) {
+            if (worldGen) {
+                return ageDuringWorldGen;
             } else {
-                return ageGrowth;
+                return ageDuringGrowth;
             }
         }
     }
 
     /**
-     * If the leaves block should tick and age. Set to false for leaves for dead trees [default = true]
-     *
-     * @param worldgen if its trying to age during worldgen.
-     * @return the multiplier for the block tick rate
+     * @deprecated use {@link #shouldAge(boolean, BlockState)}
      */
-    public boolean getDoesAge(boolean worldgen, BlockState state) {
-        return this.doesAge.getDoesAge(worldgen);
+    public boolean getDoesAge(boolean worldGen, BlockState state) {
+        return shouldAge(worldGen, state);
     }
 
+    /**
+     * If the leaves block should tick and age. May return {@code false} to allow for dead leaves.
+     *
+     * @param worldGen {@code true} if called during world gen
+     * @return {@code true} if the leaves block should tick and age
+     */
+    public boolean shouldAge(boolean worldGen, BlockState state) {
+        return this.ageingConfiguration.shouldAge(worldGen);
+    }
+
+    /**
+     * @deprecated use {@link #setAgeingConfiguration(AgeingConfiguration)}
+     */
+    @Deprecated
     public void setDoesAge(String doesAge) {
         try {
-            this.doesAge = leafAges.valueOf(doesAge.toUpperCase());
+            this.ageingConfiguration = AgeingConfiguration.valueOf(doesAge.toUpperCase());
         } catch (IllegalArgumentException e) {
-            System.err.println("does_age value for leaves " + this + " is not valid. Options are: " + Arrays.toString(leafAges.values()));
+            throw new IllegalArgumentException("Invalid ageing configuration \"" + doesAge + "\".");
         }
+    }
+
+    public void setAgeingConfiguration(AgeingConfiguration doesAge) {
+        this.ageingConfiguration = doesAge;
     }
 
     private boolean canGrowOnGround = false;
