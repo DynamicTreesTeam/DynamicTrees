@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Locale;
+
 /**
  * An {@link JsonDeserialiser} for {@link ResourceLocation}s, but if no namespace is defined it defaults to the
  * specified {@link #defaultNamespace} given in {@link #ResourceLocationDeserialiser(String)}.
@@ -25,6 +27,7 @@ public final class ResourceLocationDeserialiser implements JsonDeserialiser<Reso
     @Override
     public Result<ResourceLocation, JsonElement> deserialise(JsonElement jsonElement) {
         return JsonDeserialisers.STRING.deserialise(jsonElement)
+                .map(string -> string.toLowerCase(Locale.ROOT))
                 .mapIfValid(ResourceLocationDeserialiser::isValidResourceLocation,
                         "Invalid resource location '{value}'. Namespace Constraints: [a-z0-9_.-] Path Constraints: [a-z0-9/._-]",
                         this::decode);

@@ -10,9 +10,10 @@ import java.util.stream.Stream;
 /**
  * Gets an {@link Object} of type {@link T} from the name of the {@code public static} {@link java.lang.reflect.Field}
  * given from the {@link JsonElement}.
- *
- * <p>Note that {@code field}s are case-sensitive and so the name must be checked by
- * {@link String#equals(Object)}, not {@link String#equalsIgnoreCase(String)}.</p>
+ * <p>
+ * Note that {@code field}s are case-sensitive and so the name must be checked by
+ * {@link String#equals(Object)}, not {@link String#equalsIgnoreCase(String)}. Also note that this should not be used
+ * on Minecraft classes because they are normally obfuscated in production environments.
  *
  * @author Harley O'Connor
  */

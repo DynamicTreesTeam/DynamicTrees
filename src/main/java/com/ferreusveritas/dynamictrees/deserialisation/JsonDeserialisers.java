@@ -249,10 +249,12 @@ public final class JsonDeserialisers {
                     new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class, GenFeatureConfiguration.TEMPLATES));
     public static final JsonDeserialiser<DropCreatorConfiguration> CONFIGURED_DROP_CREATOR =
             register(DropCreatorConfiguration.class,
-                    new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class, DropCreatorConfiguration.TEMPLATES));
+                    new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class,
+                            DropCreatorConfiguration.TEMPLATES));
     public static final JsonDeserialiser<GrowthLogicKitConfiguration> CONFIGURED_GROWTH_LOGIC_KIT =
             register(GrowthLogicKitConfiguration.class,
-                    new ConfiguredDeserialiser<>("Growth Logic Kit", GrowthLogicKit.class, GrowthLogicKitConfiguration.TEMPLATES));
+                    new ConfiguredDeserialiser<>("Growth Logic Kit", GrowthLogicKit.class,
+                            GrowthLogicKitConfiguration.TEMPLATES));
 
     public static final JsonDeserialiser<Drops> DROPS = register(Drops.class, new DropsDeserialiser());
 
@@ -296,11 +298,11 @@ public final class JsonDeserialisers {
     );
 
     public static final JsonDeserialiser<Material> MATERIAL =
-            register(Material.class, new StaticFieldDeserialiser<>(Material.class));
+            register(Material.class, new MaterialDeserialiser());
     public static final JsonDeserialiser<MaterialColor> MATERIAL_COLOR =
-            register(MaterialColor.class, new StaticFieldDeserialiser<>(MaterialColor.class));
+            register(MaterialColor.class, new MaterialColorDeserialiser());
     public static final JsonDeserialiser<SoundType> SOUND_TYPE =
-            register(SoundType.class, new StaticFieldDeserialiser<>(SoundType.class));
+            register(SoundType.class, new SoundTypeDeserialiser());
 
     private static final Map<String, ToolType> TOOL_TYPES =
             ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");
