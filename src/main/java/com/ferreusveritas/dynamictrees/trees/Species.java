@@ -1091,7 +1091,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return getLeavesProperties().foliageColorMultiplier(state, access, pos);
     }
 
-    private SoundType saplingSound;
+    private SoundType saplingSound = SoundType.GRASS;
 
     public SoundType getSaplingSound() {
         return this.saplingSound;

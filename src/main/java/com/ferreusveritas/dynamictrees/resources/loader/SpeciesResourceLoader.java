@@ -72,12 +72,18 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("sapling_name", String.class, Species::setSaplingName)
                 .register("seed_name", String.class, Species::setSeedName);
 
+        // Needed in common so sound and shape is known to clients joining servers.
+        // TODO: Consider marking certain reload appliers as being needed client-side and loaded when joining a server.
+        this.commonAppliers
+                .register("always_show_on_waila", Boolean.class, Species::setAlwaysShowOnWaila)
+                .register("sapling_sound", SoundType.class, Species::setSaplingSound)
+                .register("sapling_shape", VoxelShape.class, Species::setSaplingShape);
+
         // We need the sapling shape to know which parent smartmodel the sapling model should use.
         this.gatherDataAppliers
                 .register("sapling_shape", VoxelShape.class, Species::setSaplingShape);
 
         this.reloadAppliers
-                .register("always_show_on_waila", Boolean.class, Species::setAlwaysShowOnWaila)
                 .register("tapering", Float.class, Species::setTapering)
                 .register("up_probability", Integer.class, Species::setUpProbability)
                 .register("lowest_branch_height", Integer.class, Species::setLowestBranchHeight)
@@ -96,8 +102,6 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("seed", Seed.class, Species::setSeed)
                 .register("seed_composter_chance", Float.class, this.composterChanceCache::put)
                 .register("sapling_grows_naturally", Boolean.class, Species::setCanSaplingGrowNaturally)
-                .register("sapling_sound", SoundType.class, Species::setSaplingSound)
-                .register("sapling_shape", VoxelShape.class, Species::setSaplingShape)
                 .register("primitive_sapling", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .registerArrayApplier("primitive_saplings", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .register("common_override", Species.CommonOverride.class, Species::setCommonOverride)
