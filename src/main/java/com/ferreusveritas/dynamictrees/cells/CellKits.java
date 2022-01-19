@@ -167,7 +167,7 @@ public class CellKits {
     public static final CellKit DARK_OAK = new CellKit(DynamicTrees.resLoc("dark_oak")) {
 
         /** Typical branch with hydration 5 */
-        private final Cell branchCell = new NormalCell(5);
+        private final Cell branchCell = new NormalCell(8);
 
         private final Cell[] darkOakLeafCells = {
                 CellNull.NULL_CELL,
@@ -180,7 +180,7 @@ public class CellKits {
                 new DarkOakLeafCell(7)
         };
 
-        private final BasicSolver darkOakSolver = new BasicSolver(new short[]{0x0514, 0x0423, 0x0412, 0x0312, 0x0211});
+        private final BasicSolver darkOakSolver = new BasicSolver(new short[]{0x0817, 0x0726, 0x0715, 0x0615, 0x0514, 0x0413, 0x0322, 0x0221});
 
         @Override
         public Cell getCellForLeaves(int hydro) {
@@ -204,7 +204,7 @@ public class CellKits {
 
         @Override
         public int getDefaultHydration() {
-            return 4;
+            return 7;
         }
 
     };
