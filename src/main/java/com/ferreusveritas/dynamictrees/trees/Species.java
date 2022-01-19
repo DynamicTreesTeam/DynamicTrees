@@ -46,6 +46,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -103,7 +104,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 
 		@Override
-		public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+		public boolean generate(World world, BlockPos pos, Biome biome, Random random, int radius,
+								SafeChunkBounds safeBounds) {
 			return false;
 		}
 
@@ -133,7 +135,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		}
 
 		@Override
-		public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
+		public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase,
+							  BlockPos treePos, Random random, boolean rapid) {
 			return false;
 		}
 
@@ -314,7 +317,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return "species." + this.unlocalizedName;
 	}
 
-	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
+	public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight,
+											 float growthRate) {
 		this.tapering = tapering;
 		this.signalEnergy = energy;
 		this.upProbability = upProbability;
@@ -405,7 +409,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public void addValidLeavesBlocks(ILeavesProperties... leaves) {
 		this.validLeaves.addAll(Arrays.asList(leaves));
 	}
-	
+
 	public boolean isCompatibleLeaves(World world, BlockPos pos, IBlockState state) {
 		if (!this.treeFamily.isCompatibleGenericLeaves(state, world, pos)) {
 			return false;
@@ -417,7 +421,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		final ILeavesProperties properties = leaves.getProperties(state);
 		return this.leavesProperties == properties || this.isValidLeaves(properties);
 	}
-	
+
 	public boolean isValidLeaves(ILeavesProperties leaves) {
 		return this.validLeaves.contains(leaves);
 	}
@@ -464,7 +468,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		return this.getValidLeavesProperties(index).getDynamicLeavesState();
 	}
 
-	public int colorTreeQuads(int defaultColor, ModelEntityFallingTree.TreeQuadData treeQuad, @Nullable EntityFallingTree entity) {
+	public int colorTreeQuads(int defaultColor, ModelEntityFallingTree.TreeQuadData treeQuad,
+							  @Nullable EntityFallingTree entity) {
 		return defaultColor;
 	}
 
@@ -571,7 +576,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return
 	 */
 	public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, BlockPos treePos, int soilLife) {
-		List<ItemStack> dropList = TreeRegistry.globalDropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.rand, null, soilLife);
+		List<ItemStack> dropList =
+			TreeRegistry.globalDropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.rand, null, soilLife);
 		return dropCreatorStorage.getVoluntaryDrop(world, this, rootPos, world.rand, dropList, soilLife);
 	}
 
@@ -585,9 +591,11 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param fortune
 	 * @return
 	 */
-	public List<ItemStack> getLeavesDrops(IBlockAccess access, BlockPos breakPos, List<ItemStack> dropList, int fortune) {
+	public List<ItemStack> getLeavesDrops(IBlockAccess access, BlockPos breakPos, List<ItemStack> dropList,
+										  int fortune) {
 		Random random = access instanceof World ? ((World) access).rand : new Random();
-		dropList = TreeRegistry.globalDropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
+		dropList =
+			TreeRegistry.globalDropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
 		return dropCreatorStorage.getLeavesDrop(access, this, breakPos, random, dropList, fortune);
 	}
 
@@ -603,7 +611,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return
 	 */
 	public List<ItemStack> getLogsDrops(World world, BlockPos breakPos, List<ItemStack> dropList, float volume) {
-		dropList = TreeRegistry.globalDropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
+		dropList =
+			TreeRegistry.globalDropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 		return dropCreatorStorage.getLogsDrop(world, this, breakPos, world.rand, dropList, volume);
 	}
 
@@ -621,7 +630,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 
 	public LogsAndSticks getLogsAndSticks(float volume) {
 		int logs = (int) volume; // Drop vanilla logs or whatever
-		int sticks = (int) ((volume - logs) * 8);// A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
+		int sticks = (int) ((volume - logs) *
+			8);// A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
 		return new LogsAndSticks(logs, sticks);
 	}
 
@@ -633,7 +643,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param soilLife
 	 * @return true if seed was dropped
 	 */
-	public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int soilLife) {
+	public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos,
+										int soilLife) {
 		int tickSpeed = world.getGameRules().getInt("randomTickSpeed");
 		if (tickSpeed > 0) {
 			double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
@@ -643,15 +654,21 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 				if (!drops.isEmpty() && !endPoints.isEmpty()) {
 					for (ItemStack drop : drops) {
 						BlockPos branchPos = endPoints.get(world.rand.nextInt(endPoints.size()));
-						branchPos = branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
-						BlockPos itemPos = CoordUtils.getRayTraceFruitPos(world, this, treePos, branchPos, SafeChunkBounds.ANY);
+						branchPos =
+							branchPos.up();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
+						BlockPos itemPos =
+							CoordUtils.getRayTraceFruitPos(world, this, treePos, branchPos, SafeChunkBounds.ANY);
 
 						if (itemPos != BlockPos.ORIGIN) {
-							EntityItem itemEntity = new EntityItem(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
+							EntityItem itemEntity =
+								new EntityItem(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5,
+									drop);
 							Vec3d motion = new Vec3d(itemPos).subtract(new Vec3d(treePos));
 							float distAngle = 15;//The spread angle(center to edge)
 							float launchSpeed = 4;//Blocks(meters) per second
-							motion = new Vec3d(motion.x, 0, motion.y).normalize().rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed / 20f);
+							motion = new Vec3d(motion.x, 0, motion.y).normalize()
+								.rotateYaw((world.rand.nextFloat() * distAngle * 2) - distAngle)
+								.scale(launchSpeed / 20f);
 							itemEntity.motionX = motion.x;
 							itemEntity.motionY = motion.y;
 							itemEntity.motionZ = motion.z;
@@ -676,7 +693,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return true if the planting was successful
 	 */
 	public boolean plantSapling(World world, BlockPos pos) {
-		if (world.getBlockState(pos).getBlock().isReplaceable(world, pos) && BlockDynamicSapling.canSaplingStay(world, this, pos)) {
+		if (world.getBlockState(pos).getBlock().isReplaceable(world, pos) &&
+			BlockDynamicSapling.canSaplingStay(world, this, pos)) {
 			ModBlocks.blockDynamicSapling.setSpecies(world, pos, this);
 			return true;
 		}
@@ -706,8 +724,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		//Ensure planting conditions are right
 		TreeFamily family = getFamily();
 		if (world.isAirBlock(pos.up()) && isAcceptableSoil(world, pos.down(), world.getBlockState(pos.down()))) {
-			family.getDynamicBranch().setRadius(world, pos, (int) family.getPrimaryThickness(), null);//set to a single branch with 1 radius
-			world.setBlockState(pos.up(), getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
+			family.getDynamicBranch()
+				.setRadius(world, pos, (int) family.getPrimaryThickness(), null);//set to a single branch with 1 radius
+			world.setBlockState(pos.up(),
+				getLeavesProperties().getDynamicLeavesState());//Place a single leaf block on top
 			placeRootyDirtBlock(world, pos.down(), 15);//Set to fully fertilized rooty dirt underneath
 			return true;
 		}
@@ -741,7 +761,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 
 	public boolean placeRootyDirtBlock(World world, BlockPos rootPos, int life) {
-		world.setBlockState(rootPos, getRootyBlock(world, rootPos).getDefaultState().withProperty(BlockRooty.LIFE, life));
+		world.setBlockState(rootPos,
+			getRootyBlock(world, rootPos).getDefaultState().withProperty(BlockRooty.LIFE, life));
 
 		TileEntity tileEntity = world.getTileEntity(rootPos);
 		if (tileEntity instanceof TileEntitySpecies) {
@@ -777,7 +798,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	@Deprecated
 	public Species addAcceptableSoil(Block... soilBlocks) {
-		Deprecatron.Complain("addAcceptableSoil", "The Block version of addAcceptableSoil is DEPRECATED. Species: " + this.getRegistryName());
+		Deprecatron.Complain("addAcceptableSoil",
+			"The Block version of addAcceptableSoil is DEPRECATED. Species: " + this.getRegistryName());
 		return this;
 	}
 
@@ -859,7 +881,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree
 	 * is on)
 	 */
-	public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+	public boolean update(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase,
+						  BlockPos treePos, Random random, boolean natural) {
 
 		//Analyze structure to gather all of the endpoints.  They will be useful for this entire update
 		List<BlockPos> ends = getEnds(world, treePos, treeBase);
@@ -907,7 +930,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param safeBounds The defined boundaries where it is safe to make block changes
 	 * @return true if last piece of tree rotted away.
 	 */
-	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife, SafeChunkBounds safeBounds) {
+	public boolean handleRot(World world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int soilLife,
+							 SafeChunkBounds safeBounds) {
 
 		Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
 		SimpleVoxmap leafMap = getLeavesProperties().getCellKit().getLeafCluster();
@@ -919,19 +943,23 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			if (branch != null) {
 				int radius = branch.getRadius(branchState);
 				float rotChance = rotChance(world, endPos, world.rand, radius);
-				if (branch.checkForRot(world, endPos, this, radius, world.rand, rotChance, safeBounds != SafeChunkBounds.ANY) || radius != 1) {
+				if (branch.checkForRot(world, endPos, this, radius, world.rand, rotChance,
+					safeBounds != SafeChunkBounds.ANY) || radius != 1) {
 					if (safeBounds != SafeChunkBounds.ANY) { //worldgen
-						TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2, safeBounds);
+						TreeHelper.ageVolume(world, endPos.down((leafMap.getLenZ() - 1) / 2),
+							(leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2, safeBounds);
 					}
 					iter.remove();//Prune out the rotted end points so we don't spawn fruit from them.
 				}
 			}
 		}
 
-		return ends.isEmpty() && !TreeHelper.isBranch(world.getBlockState(treePos));//There are no endpoints and the trunk is missing
+		return ends.isEmpty() &&
+			!TreeHelper.isBranch(world.getBlockState(treePos));//There are no endpoints and the trunk is missing
 	}
 
-	static private final EnumFacing[] upFirst = {EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
+	static private final EnumFacing[] upFirst =
+		{EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST};
 
 	/**
 	 * Handle rotting branches
@@ -995,25 +1023,30 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @return true if network is viable.  false if network is not viable(will destroy the {@link BlockRooty} this tree
 	 * is on)
 	 */
-	public boolean grow(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+	public boolean grow(World world, BlockRooty rootyDirt, BlockPos rootPos, int soilLife, ITreePart treeBase,
+						BlockPos treePos, Random random, boolean natural) {
 
-		float growthRate = getGrowthRate(world, rootPos) * ModConfigs.treeGrowthMultiplier * ModConfigs.treeGrowthFolding;
+		float growthRate =
+			getGrowthRate(world, rootPos) * ModConfigs.treeGrowthMultiplier * ModConfigs.treeGrowthFolding;
 		do {
 			if (soilLife > 0) {
 				if (growthRate > random.nextFloat()) {
 					GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(world, rootPos));
 					boolean success = treeBase.growSignal(world, treePos, signal).success;
 
-					int soilLongevity = getSoilLongevity(world, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
+					int soilLongevity = getSoilLongevity(world, rootPos) *
+						(success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
 
-					if (soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
+					if (soilLongevity <= 0 ||
+						random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
 						rootyDirt.setSoilLife(world, rootPos, soilLife - 1);//decrement soil life
 					}
 
 					if (signal.choked) {
 						soilLife = 0;
 						rootyDirt.setSoilLife(world, rootPos, soilLife);
-						TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new NodeShrinker(signal.getSpecies())));
+						TreeHelper.startAnalysisFromRoot(world, rootPos,
+							new MapSignal(new NodeShrinker(signal.getSpecies())));
 					}
 				}
 			}
@@ -1070,7 +1103,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 				//Check probability for surrounding blocks
 				//Typically Air:1, Leaves:2, Branches: 2+r
 				IBlockState deltaBlockState = world.getBlockState(deltaPos);
-				probMap[dir.getIndex()] += TreeHelper.getTreePart(deltaBlockState).probabilityForBlock(deltaBlockState, world, deltaPos, branch);
+				probMap[dir.getIndex()] += TreeHelper.getTreePart(deltaBlockState)
+					.probabilityForBlock(deltaBlockState, world, deltaPos, branch);
 			}
 		}
 
@@ -1078,14 +1112,17 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		probMap = customDirectionManipulation(world, pos, branch.getRadius(world.getBlockState(pos)), signal, probMap);
 
 		//Select a direction from the probability map
-		int choice = com.ferreusveritas.dynamictrees.util.MathHelper.selectRandomFromDistribution(signal.rand, probMap);//Select a direction from the probability map
-		return newDirectionSelected(EnumFacing.getFront(choice != -1 ? choice : 1), signal);//Default to up if things are screwy
+		int choice = com.ferreusveritas.dynamictrees.util.MathHelper.selectRandomFromDistribution(signal.rand,
+			probMap);//Select a direction from the probability map
+		return newDirectionSelected(EnumFacing.getFront(choice != -1 ? choice : 1),
+			signal);//Default to up if things are screwy
 	}
 
 	/**
 	 * Species can override the probability map here
 	 **/
-	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal, int[] probMap) {
+	protected int[] customDirectionManipulation(World world, BlockPos pos, int radius, GrowSignal signal,
+												int[] probMap) {
 		return getGrowthLogicKit().directionManipulation(world, pos, this, radius, signal, probMap);
 	}
 
@@ -1128,7 +1165,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public boolean handleDisease(World world, ITreePart baseTreePart, BlockPos treePos, Random random, int soilLife) {
 		if (soilLife == 0 && ModConfigs.diseaseChance > random.nextFloat()) {
-			baseTreePart.analyse(world.getBlockState(treePos), world, treePos, EnumFacing.DOWN, new MapSignal(new NodeDisease(this)));
+			baseTreePart.analyse(world.getBlockState(treePos), world, treePos, EnumFacing.DOWN,
+				new MapSignal(new NodeDisease(this)));
 			return true;
 		}
 
@@ -1237,7 +1275,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	}
 
 	public float seasonalFruitProductionFactor(World world, BlockPos pos) {
-		return ModConfigs.enableSeasonalFruitProductionFactor ? SeasonHelper.globalSeasonalFruitProductionFactor(world, pos) : 1.0f;
+		return ModConfigs.enableSeasonalFruitProductionFactor ?
+			SeasonHelper.globalSeasonalFruitProductionFactor(world, pos) : 1.0f;
 	}
 
 	/**
@@ -1251,8 +1290,10 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 		if (BlockFruit.getFruitBlockForSpecies(this) != null) {
 			int seasonFlags = 0;
 			for (int i = 0; i < 4; i++) {
-				float prod1 = seasonalFruitProductionFactor(null, new BlockPos(dimension, (int) ((i + seasonStart) * 64.0f), 0));
-				float prod2 = seasonalFruitProductionFactor(null, new BlockPos(dimension, (int) ((i + seasonEnd) * 64.0f), 0));
+				float prod1 =
+					seasonalFruitProductionFactor(null, new BlockPos(dimension, (int) ((i + seasonStart) * 64.0f), 0));
+				float prod2 =
+					seasonalFruitProductionFactor(null, new BlockPos(dimension, (int) ((i + seasonEnd) * 64.0f), 0));
 				if (Math.min(prod1, prod2) >= threshold) {
 					seasonFlags |= 1 << i;
 				}
@@ -1312,7 +1353,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param itemStack The itemstack to be used.
 	 * @return true if item was used, false otherwise
 	 */
-	public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, EntityPlayer player, EnumHand hand, ItemStack itemStack) {
+	public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, EntityPlayer player, EnumHand hand,
+								  ItemStack itemStack) {
 
 		ISubstanceEffect effect = getSubstanceEffect(itemStack);
 
@@ -1320,7 +1362,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 			ISubstanceEffect.Result result = effect.apply(world, rootPos, hitPos);
 			if (!result.success() && world.isRemote && !result.getErrorKey().isEmpty()) {
 				Minecraft.getMinecraft().ingameGUI.setOverlayMessage(
-					new TextComponentTranslation(result.getErrorKey(), result.getArgs()).setStyle(Styles.ERROR), 
+					new TextComponentTranslation(result.getErrorKey(), result.getArgs()).setStyle(Styles.ERROR),
 					false
 				);
 				return false;
@@ -1352,7 +1394,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param hitZ     Z axis of hit with hitPos
 	 * @return True if action was handled, false otherwise.
 	 */
-	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, IBlockState state,
+								   EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX,
+								   float hitY, float hitZ) {
 
 		if (heldItem != null) {//Something in the hand
 			if (applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
@@ -1373,14 +1417,31 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 */
 	public static void consumePlayerItem(EntityPlayer player, EnumHand hand, ItemStack heldItem) {
 		if (!player.capabilities.isCreativeMode) {
-			if (heldItem.getItem() instanceof IEmptiable) {//A substance deployed from a refillable container
-				IEmptiable emptiable = (IEmptiable) heldItem.getItem();
-				player.setHeldItem(hand, emptiable.getEmptyContainer());
-			} else if (heldItem.getItem() == Items.POTIONITEM) {//An actual potion
-				player.setHeldItem(hand, new ItemStack(Items.GLASS_BOTTLE));
-			} else {
-				heldItem.shrink(1);//Just a regular item like bonemeal
+			ItemStack emptyBottleStack = getEmptyBottleStack(heldItem);
+			heldItem.shrink(1);
+			// If the item is a bottle, give player an empty bottle. 
+			if (emptyBottleStack != null) {
+				givePlayerEmptyBottle(player, hand, heldItem, emptyBottleStack);
 			}
+		}
+	}
+
+	private static ItemStack getEmptyBottleStack(ItemStack heldItem) {
+		final Item item = heldItem.getItem();
+		if (item instanceof IEmptiable) {
+			return ((IEmptiable) item).getEmptyContainer();
+		} else if (item instanceof ItemPotion) {
+			return new ItemStack(Items.GLASS_BOTTLE);
+		}
+		return null;
+	}
+
+	private static void givePlayerEmptyBottle(EntityPlayer player, EnumHand hand, ItemStack heldItem,
+											  ItemStack emptyBottleStack) {
+		if (heldItem.isEmpty()) {
+			player.setHeldItem(hand, emptyBottleStack);
+		} else {
+			player.inventory.addItemStackToInventory(emptyBottleStack);
 		}
 	}
 
@@ -1466,7 +1527,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param radius  The radius of the tree generation boundary
 	 * @return true if tree was generated. false otherwise.
 	 */
-	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+	public boolean generate(World world, BlockPos rootPos, Biome biome, Random random, int radius,
+							SafeChunkBounds safeBounds) {
 
 		if (genFeatureOverride != null) {
 			return genFeatureOverride.generate(world, rootPos, this, biome, random, radius, safeBounds);
@@ -1500,7 +1562,9 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * A {@link JoCode} defines the block model of the {@link TreeFamily}
 	 */
 	public void addJoCodes() {
-		joCodeStore.addCodesFromFile(this, "assets/" + getRegistryName().getResourceDomain() + "/trees/" + getRegistryName().getResourcePath() + ".txt");
+		joCodeStore.addCodesFromFile(this,
+			"assets/" + getRegistryName().getResourceDomain() + "/trees/" + getRegistryName().getResourcePath() +
+				".txt");
 	}
 
 	public Species addGenFeature(IGenFeature module) {
@@ -1553,7 +1617,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param joCode     The joCode that will be used to grow the tree
 	 * @return new blockposition of root block.  BlockPos.ORIGIN to cancel generation
 	 */
-	public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing, SafeChunkBounds safeBounds, JoCode joCode) {
+	public BlockPos preGeneration(World world, BlockPos rootPos, int radius, EnumFacing facing,
+								  SafeChunkBounds safeBounds, JoCode joCode) {
 		if (preGenFeatures != null) {
 			for (IPreGenFeature feature : preGenFeatures) {
 				rootPos = feature.preGeneration(world, rootPos, this, radius, facing, safeBounds, joCode);
@@ -1574,7 +1639,8 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	 * @param safeBounds       An object that helps prevent accessing blocks in unloaded chunks
 	 * @param initialDirtState The blockstate of the dirt that became rooty.  Useful for matching terrain.
 	 */
-	public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints, SafeChunkBounds safeBounds, IBlockState initialDirtState) {
+	public void postGeneration(World world, BlockPos rootPos, Biome biome, int radius, List<BlockPos> endPoints,
+							   SafeChunkBounds safeBounds, IBlockState initialDirtState) {
 		if (postGenFeatures != null) {
 			for (IPostGenFeature feature : postGenFeatures) {
 				feature.postGeneration(world, rootPos, this, biome, radius, endPoints, safeBounds, initialDirtState);
