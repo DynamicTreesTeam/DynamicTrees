@@ -26,8 +26,9 @@ repositories {
 val buildProperties = Properties()
 buildProperties.load(FileInputStream(file("build.properties")))
 
-fun property(key: String) =
-    buildProperties.getProperty(key)
+fun property(key: String) = buildProperties.getProperty(key)
+
+fun optionalProjectProperty(key: String) = project.findProperty(key)?.toString()
 
 val modName = property("modName")
 val modId = property("modId")
@@ -152,7 +153,10 @@ tasks.build {
 }
 
 fun readChangelog(): String? {
-    val versionInfoFile = file("version_info.json")
+    val versionInfoFile = file(
+        (optionalProjectProperty("dynamictrees.version_info_repo.directory") ?: return null)
+                + File.separatorChar + "DynamicTrees.json"
+    )
     val jsonObject = Gson().fromJson(InputStreamReader(versionInfoFile.inputStream()), JsonObject::class.java)
     return jsonObject
         .get(mcVersion)?.asJsonObject
