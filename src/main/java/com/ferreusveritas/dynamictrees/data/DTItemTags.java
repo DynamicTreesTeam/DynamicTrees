@@ -17,6 +17,16 @@ public final class DTItemTags {
     public static final ITag.INamedTag<Item> SEEDS = bind("seeds");
     public static final ITag.INamedTag<Item> FUNGUS_CAPS = bind("fungus_caps");
 
+    /**
+     * Items that apply a growth pulse to trees. By default, includes bone meal.
+     */
+    public static final ITag.INamedTag<Item> FERTILIZER = bind("fertilizer");
+    /**
+     * Items that apply the {@link com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance growth substance}
+     * to trees.
+     */
+    public static final ITag.INamedTag<Item> ENHANCED_FERTILIZER = bind("enhanced_fertilizer");
+
     private static ITag.INamedTag<Item> bind(String identifier) {
         return ItemTags.bind(DynamicTrees.MOD_ID + ":" + identifier);
     }

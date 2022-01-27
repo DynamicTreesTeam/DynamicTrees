@@ -23,8 +23,8 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
-import com.ferreusveritas.dynamictrees.compat.seasons.NormalSeasonManager;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
+import com.ferreusveritas.dynamictrees.compat.seasons.NormalSeasonManager;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
@@ -34,8 +34,8 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
 import com.ferreusveritas.dynamictrees.event.BiomeSuitabilityEvent;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
@@ -45,20 +45,36 @@ import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.GlobalDropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostRotContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PreGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.DiseaseNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.InflatorNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.ShrinkerNode;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
-import com.ferreusveritas.dynamictrees.util.*;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
+import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
+import com.ferreusveritas.dynamictrees.util.Optionals;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
@@ -89,7 +105,12 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.*;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
@@ -98,7 +119,20 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -1754,20 +1788,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     @Nullable
     public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 
-        // Bonemeal fertilizes the soil and causes a single growth pulse
-        if (canBoneMealTree() && itemStack.getItem() == Items.BONE_MEAL) {
+        // Bonemeal fertilizes the soil and causes a single growth pulse.
+        if (canBoneMealTree() && itemStack.getItem().is(DTItemTags.FERTILIZER)) {
             return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(DTConfigs.BONE_MEAL_GROWTH_PULSES::get);
         }
 
-        // Use substance provider interface if it's available
+        // Use substance provider interface if it's available.
         if (itemStack.getItem() instanceof SubstanceEffectProvider) {
             SubstanceEffectProvider provider = (SubstanceEffectProvider) itemStack.getItem();
             return provider.getSubstanceEffect(itemStack);
         }
 
-        //Tree fertilizer from the Create mod should do a bit more than bonemeal since its quite expensive to obtain.
-        //So it just does the Burgeoning potion effect
-        if (itemStack.getItem().getRegistryName().equals(new ResourceLocation("create", "tree_fertilizer"))) {
+        // Enhanced fertilizer applies the Burgeoning potion effect.
+        if (itemStack.getItem().is(DTItemTags.ENHANCED_FERTILIZER)) {
             return new GrowthSubstance();
         }
 
