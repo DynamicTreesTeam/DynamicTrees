@@ -18,6 +18,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 public class BushGenFeature extends GenFeature {
@@ -41,7 +42,8 @@ public class BushGenFeature extends GenFeature {
      * The chance for the {@link #SECONDARY_LEAVES} (if set) to generate in place of {@link #LEAVES}. Defaults to {@code
      * 4}, giving them a 1 in 4 chance of spawning.
      */
-    public static final ConfigurationProperty<Integer> SECONDARY_LEAVES_CHANCE = ConfigurationProperty.integer("secondary_leaves_chance");
+    public static final ConfigurationProperty<Integer> SECONDARY_LEAVES_CHANCE =
+            ConfigurationProperty.integer("secondary_leaves_chance");
 
     public BushGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -64,20 +66,23 @@ public class BushGenFeature extends GenFeature {
 
     @Override
     protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
-        this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(), context.radius(), context.bounds());
+        this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(),
+                context.radius(), context.bounds());
         return true;
     }
 
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (context.bounds() != SafeChunkBounds.ANY && configuration.get(BIOME_PREDICATE).test(context.biome())) {
-            this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(), context.radius(), context.bounds());
+            this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(),
+                    context.radius(), context.bounds());
             return true;
         }
         return false;
     }
 
-    protected void commonGen(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, Species species, Random random, int radius, SafeChunkBounds safeBounds) {
+    protected void commonGen(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, Species species,
+                             Random random, int radius, SafeChunkBounds safeBounds) {
         if (radius <= 2) {
             return;
         }
@@ -99,29 +104,37 @@ public class BushGenFeature extends GenFeature {
             final BlockState soilBlockState = world.getBlockState(groundPos);
 
             final BlockPos pos = groundPos.above();
-            if (!world.getBlockState(groundPos).getMaterial().isLiquid() && species.isAcceptableSoil(world, groundPos, soilBlockState)) {
+            if (!world.getBlockState(groundPos).getMaterial().isLiquid() &&
+                    species.isAcceptableSoil(world, groundPos, soilBlockState)) {
                 world.setBlock(pos, configuration.get(LOG).defaultBlockState(), 3);
 
                 SimpleVoxmap leafMap = LeafClusters.BUSH;
                 BlockPos.Mutable leafPos = new BlockPos.Mutable();
                 for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
                     leafPos.set(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ());
-                    if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 && world.getBlockState(leafPos).getMaterial().isReplaceable()) {
-                        configuration.getAsOptional(SECONDARY_LEAVES).ifPresent(secondaryLeavesBlock -> placeLeavesBlock(
-                                world, leafPos, selectLeavesBlock(random, configuration.get(SECONDARY_LEAVES_CHANCE),
-                                        configuration.get(LEAVES), secondaryLeavesBlock)
-                        ));
+                    if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 &&
+                            world.getBlockState(leafPos).getMaterial().isReplaceable()) {
+                        placeLeaves(configuration, world, random, leafPos);
                     }
                 }
             }
         }
     }
 
-    private Block selectLeavesBlock(Random random, int secondaryLeavesChance, Block leavesBlock, Block secondaryLeavesBlock) {
-        return random.nextInt(secondaryLeavesChance) != 0 ? leavesBlock : secondaryLeavesBlock;
+    private void placeLeaves(GenFeatureConfiguration configuration, IWorld world, Random random,
+                             BlockPos leafPos) {
+        final Block leavesBlock = selectLeavesBlock(random, configuration.get(SECONDARY_LEAVES_CHANCE),
+                configuration.get(LEAVES), configuration.getAsOptional(SECONDARY_LEAVES).orElse(null));
+        placeLeavesBlock(world, leafPos, leavesBlock);
     }
 
-    private void placeLeavesBlock(IWorld world, BlockPos.Mutable leafPos, Block leavesBlock) {
+    private Block selectLeavesBlock(Random random, int secondaryLeavesChance, Block leavesBlock,
+                                    @Nullable Block secondaryLeavesBlock) {
+        return secondaryLeavesBlock == null || random.nextInt(secondaryLeavesChance) != 0 ? leavesBlock :
+                secondaryLeavesBlock;
+    }
+
+    private void placeLeavesBlock(IWorld world, BlockPos leafPos, Block leavesBlock) {
         BlockState leafState = leavesBlock.defaultBlockState();
         if (leavesBlock instanceof LeavesBlock) {
             leafState = leafState.setValue(LeavesBlock.PERSISTENT, true);
