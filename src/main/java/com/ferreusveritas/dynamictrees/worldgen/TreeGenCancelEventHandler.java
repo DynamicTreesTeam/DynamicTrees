@@ -19,6 +19,7 @@ public class TreeGenCancelEventHandler {
 		int dimensionId = event.getWorld().provider.getDimension();
 		BiomeDataBase dbase = TreeGenerator.getTreeGenerator().getBiomeDataBase(dimensionId);
 		if (dbase != TreeGenerator.DIMENSIONBLACKLISTED && !ModConfigs.dimensionBlacklist.contains(dimensionId)) {
+			@SuppressWarnings("deprecation")
 			Biome biome = event.getWorld().getBiome(event.getPos());
 			switch (event.getType()) {
 				case CACTUS:

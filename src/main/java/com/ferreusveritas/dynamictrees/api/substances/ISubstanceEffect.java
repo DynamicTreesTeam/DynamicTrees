@@ -1,13 +1,13 @@
 package com.ferreusveritas.dynamictrees.api.substances;
 
+import javax.annotation.Nullable;
+
 import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
+
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-
-import javax.annotation.Nullable;
 
 /**
  * Represents a type of effect, somewhat like a potion effect, but for trees.

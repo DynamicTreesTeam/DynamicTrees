@@ -300,6 +300,7 @@ public class BakedModelBlockSurfaceRoot implements IBakedModel {
 		return barkParticles;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public ItemCameraTransforms getItemCameraTransforms() {
 		return sleeves[0][0].getItemCameraTransforms();

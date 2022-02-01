@@ -66,9 +66,12 @@ commands.dynamictrees.soillife.usage=/dt soillife <x> <y> <z> [life]
 commands.dynamictrees.createstaff.usage=/dt createstaff <x> <y> <z> [species] [joCode] [color] [readonly] [maxUses]
 commands.dynamictrees.growpulse.usage=/dt growpulse <x> <y> <z>
 commands.dynamictrees.killtree.usage=/dt killtree <x> <y> <z>
+commands.dynamictrees.clearorphaned.usage=/dt clearOrphaned <xChunk> <yChunk> <radiusChunks>
+commands.dynamictrees.purgetrees.usage=/dt purgeTrees <xChunk> <yChunk> <radiusChunks>
 commands.dynamictrees.rotatejocode.usage=/dt rotatejocode <joCode> <turns>
 commands.dynamictrees.transform.usage=/dt transform <x> <y> <z> <species>
 commands.dynamictrees.createtransformpotion.usage=/dt createtransformpotion <x> <y> <z> <species>
+commands.dynamictrees.unhandled.usage=Command Undocumented
 
 # Command errors
 commands.dynamictrees.setree.specieserror=Couldn't find species %s!

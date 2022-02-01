@@ -16,7 +16,7 @@ public class SimpleVoxmap {
 
 	private final byte[] data;
 	private final boolean[] touched;
-
+	
 	private final int lenX;
 	private final int lenY;
 	private final int lenZ;
@@ -55,6 +55,7 @@ public class SimpleVoxmap {
 		setMapAndCenter(bounds.getMin(), new BlockPos(0, 0, 0));
 	}
 
+	
 	/**
 	 * Convenience function to take the guessing and remembering out of how to convert local to world coordinates.
 	 *
@@ -118,9 +119,7 @@ public class SimpleVoxmap {
 	}
 
 	public interface IBlitOp {
-
 		byte getOp(byte srcValue, byte dstValue);
-
 	}
 
 	public SimpleVoxmap blitOp(BlockPos pos, SimpleVoxmap src, IBlitOp op) {
@@ -162,12 +161,13 @@ public class SimpleVoxmap {
 	}
 
 	public interface IFilterOp {
-
 		byte getOp(byte data);
-
 	}
 
 	public SimpleVoxmap filter(IFilterOp op) {
+		for (int i = 0; i < touched.length; i++) {
+			touched[i] = true;
+		}
 		for (int i = 0; i < data.length; i++) {
 			data[i] = op.getOp(data[i]);
 		}
@@ -214,7 +214,11 @@ public class SimpleVoxmap {
 	public void setVoxel(BlockPos pos, byte value) {
 		setVoxel(pos.getX(), pos.getY(), pos.getZ(), value);
 	}
-
+	
+	public void setVoxelOr(BlockPos pos, byte value) {
+		setVoxelOr(pos.getX(), pos.getY(), pos.getZ(), value);
+	}
+	
 	public void setVoxel(int x, int y, int z, byte value) {
 		x += center.getX();
 		y += center.getY();
@@ -226,7 +230,19 @@ public class SimpleVoxmap {
 			data[calcPos(x, y, z)] = value;
 		}
 	}
-
+	
+	public void setVoxelOr(int x, int y, int z, byte value) {
+		x += center.getX();
+		y += center.getY();
+		z += center.getZ();
+		if (testBounds(x, y, z)) {
+			if (value != 0) {
+				setYTouched(y - center.getY());
+			}
+			data[calcPos(x, y, z)] |= value;
+		}
+	}
+	
 	/**
 	 * Get voxel data relative to world coords
 	 *
@@ -488,6 +504,7 @@ public class SimpleVoxmap {
 
 		String buffer;
 		for (int y = 0; y < lenY; y++) {
+			System.out.println("Touched: " + touched[y]);
 			for (int z = 0; z < lenZ; z++) {
 				buffer = "";
 				for (int x = 0; x < lenX; x++) {

@@ -220,6 +220,7 @@ public class BlockBreakAnimationClientHandler implements ISelectiveResourceReloa
 	}
 
 
+	@SuppressWarnings("deprecation")
 	private IBakedModel getDamageModel(IBakedModel baseModel, TextureAtlasSprite texture, IBlockState state, IBlockAccess world, BlockPos pos) {
 		state = state.getBlock().getExtendedState(state, world, pos);
 

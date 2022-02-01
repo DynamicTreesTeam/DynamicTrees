@@ -14,6 +14,11 @@ public class CommandPurgeTrees extends CommandChunkBased {
 	}
 
 	@Override
+	public String messageToThrow() {
+		return "commands.dynamictrees.purgetrees.usage";
+	}
+	
+	@Override
 	void processChunk(World world, ChunkPos cPos, int radius) {
 		ChunkTreeHelper.removeAllBranchesFromChunk(world, cPos, radius);
 	}

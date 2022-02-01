@@ -32,7 +32,7 @@ public class CommandKillTree extends SubCommand {
 
 		return super.getTabCompletions(server, sender, args, targetPos);
 	}
-
+	
 	@Override
 	public void execute(World world, ICommandSender sender, String[] args) throws CommandException {
 

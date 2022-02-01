@@ -111,6 +111,7 @@ public class BlockTrunkShell extends Block {
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
 		// barretone fix, not calling the log's actual block and copying the value
@@ -207,10 +208,12 @@ public class BlockTrunkShell extends Block {
 
 	@Override
 	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+		@SuppressWarnings("deprecation")
 		AxisAlignedBB aabb = super.getCollisionBoundingBox(blockState, worldIn, pos);
 		return aabb == FULL_BLOCK_AABB ? NULL_AABB : aabb;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean isActualState) {
 		if (entityIn instanceof EntityFallingTree) {

@@ -4,7 +4,7 @@ public class ModConstants {
 
 	public static final String MODID = "dynamictrees";
 	public static final String NAME = "Dynamic Trees";
-	public static final String VERSION = "@VERSION@"; // Assigned from gradle during compile, do not change!
+	public static final String VERSION = "1.12.2-9999.9999.9999z"; // Assigned from gradle during compile, do not change!
 
 	public static final String OPTAFTER = "after:";
 	public static final String OPTBEFORE = "before:";
@@ -39,7 +39,9 @@ public class ModConstants {
 
 	//Forge
 	private static final String FORGE = "forge";
-	public static final String FORGE_VER = FORGE + AT + "14.23.5.2860" + ORGREATER;
+	public static final String FORGE_VER_NUM = "14.23.5.2768";
+	//public static final String FORGE_VER_NUM = "14.23.5.2860";
+	public static final String FORGE_VER = FORGE + AT + FORGE_VER_NUM + ORGREATER;
 
 	public static final String DEPENDENCIES
 		= REQAFTER + FORGE_VER

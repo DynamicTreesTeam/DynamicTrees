@@ -52,6 +52,7 @@ public class BlockBonsaiPot extends BlockContainer {
 		this(name);
 	}
 
+	@SuppressWarnings("deprecation")
 	public BlockBonsaiPot(String name) {
 		super(Blocks.FLOWER_POT.getMaterial(Blocks.FLOWER_POT.getDefaultState()));
 		setRegistryName(name);
@@ -166,6 +167,7 @@ public class BlockBonsaiPot extends BlockContainer {
 
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+		@SuppressWarnings("deprecation")
 		java.util.List<ItemStack> ret = super.getDrops(world, pos, state, fortune);//Return the pot itself
 		ret.add(getSpecies(world, pos).getSeedStack(1));//Add the seed in the pot
 		return ret;

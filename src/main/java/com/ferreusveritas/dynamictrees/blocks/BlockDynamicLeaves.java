@@ -155,11 +155,9 @@ public class BlockDynamicLeaves extends BlockLeaves implements ITreePart, IAgeab
 
 	protected boolean canTickAt(World worldIn, BlockPos pos) {
 		//Must check 2 blocks away for loaded chunks
-		int xm = pos.getX() - ((pos.getX() >> 4) << 4);
-		int zm = pos.getZ() - ((pos.getZ() >> 4) << 4);
-		if (xm > 1 && xm < 14 && zm > 1 && zm < 14)
-			return worldIn.isBlockLoaded(pos);
-		return worldIn.isAreaLoaded(pos, 2);
+		int xm = pos.getX() & 15;
+		int zm = pos.getZ() & 15;
+		return ((xm > 1 && xm < 14 && zm > 1 && zm < 14) && worldIn.isBlockLoaded(pos)) || worldIn.isAreaLoaded(pos, 2);
 	}
 
 	@Override

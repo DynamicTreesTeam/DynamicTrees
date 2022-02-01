@@ -17,7 +17,8 @@ public class ModConfigs {
 	public static int seedTimeToLive;
 	public static boolean seedOnlyForest;
 	public static float seedMinForestness;
-
+	public static boolean compatRecipeForSaplings;
+	
 	public static float treeGrowthMultiplier;
 	public static float treeHarvestMultiplier;
 	public static float maxTreeHardness;
@@ -55,7 +56,7 @@ public class ModConfigs {
 	public static boolean enableSeasonalSeedDropFactor;
 	public static boolean enableSeasonalGrowthFactor;
 	public static boolean enableSeasonalFruitProductionFactor;
-
+	
 	public static void preInit(FMLPreInitializationEvent event) {
 
 		configDirectory = event.getModConfigurationDirectory();
@@ -69,7 +70,8 @@ public class ModConfigs {
 		seedTimeToLive = config.getInt("timeToLive", "seeds", 1200, 0, 6000, "Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute");
 		seedOnlyForest = config.getBoolean("onlyForest", "seeds", true, "If enabled then seeds will only voluntarily plant themselves in forest-like biomes");
 		seedMinForestness = config.getFloat("minForestness", "seeds", 0, 0, 1, "The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional");
-
+		compatRecipeForSaplings = config.getBoolean("compatRecipeForSaplings", "seeds", true, "Add recipes that allow dynamic seeds to be converted to vanilla style saplings");
+		
 		//Trees
 		treeGrowthMultiplier = config.getFloat("growthMultiplier", "trees", 0.5f, 0, 16f, "Factor that multiplies the rate at which trees grow. Use at own risk");
 		treeHarvestMultiplier = config.getFloat("harvestMultiplier", "trees", 1f, 0f, 128f, "Factor that multiplies the wood returned from harvesting a tree.  You cheat.");

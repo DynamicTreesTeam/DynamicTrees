@@ -1,0 +1,62 @@
+buildscript {
+	repositories {
+		jcenter()
+		maven { url = "http://files.minecraftforge.net/maven" }
+	}
+	dependencies {
+		classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+	}
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+
+
+version = "${mc_version}-${mod_version}"
+group = package_group
+archivesBaseName = mod_name
+
+sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+compileJava {
+	sourceCompatibility = targetCompatibility = '1.8'
+}
+
+minecraft {
+	version = "${mc_version}-${forge_version}"
+	runDir = "run"
+	
+	replace "1.12.2-9999.9999.9999z", project.version
+	replaceIn "ModConstants.java"
+	
+	//makeObfSourceJar = false
+	
+	if (project.hasProperty('mappings_version'))
+		mappings = project.mappings_version
+}
+
+dependencies {
+
+}
+
+processResources {
+	inputs.property "version", project.version
+	inputs.property "mcversion", project.minecraft.version
+	
+	from(sourceSets.main.resources.srcDirs) {
+		include 'mcmod.info'
+		
+		expand 'version':project.version, 'mcversion':project.minecraft.version
+	}
+	
+	from(sourceSets.main.resources.srcDirs) {
+		exclude 'mcmod.info'
+	}
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
+}
+
+tasks.build.dependsOn deobfJar
