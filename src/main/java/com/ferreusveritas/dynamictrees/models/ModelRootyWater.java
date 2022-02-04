@@ -13,6 +13,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.common.Loader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +26,9 @@ public class ModelRootyWater implements IBakedModel {
 
 	public ModelRootyWater(IBakedModel rootsModel) {
 		this.rootsModel = rootsModel;
-		this.stillWaterTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/water_still");
-		this.flowWaterTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/water_flow");
+		String textureProvider = Loader.isModLoaded("aquaacrobatics") ? "aquaacrobatics" : "minecraft";
+		this.stillWaterTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(textureProvider + ":blocks/water_still");
+		this.flowWaterTexture = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(textureProvider + ":blocks/water_flow");
 	}
 
 	@Override
