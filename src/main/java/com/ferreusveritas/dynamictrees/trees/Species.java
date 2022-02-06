@@ -632,7 +632,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public LeavesProperties getValidLeavesProperties(int index) {
-        return this.validLeaves.get(index);
+        if (index < validLeaves.size())
+            return this.validLeaves.get(index);
+        else {
+            LogManager.getLogger().warn("Attempted to get leaves properties of index {} but {} only has {} valid leaves.", index, this, validLeaves.size());
+            return this.validLeaves.get(0);
+        }
     }
 
     public DynamicLeavesBlock getValidLeafBlock(int index) {
