@@ -109,23 +109,28 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
 
     private static final VoidApplier<BiomeList, JsonArray> NAMES_OR_APPLIER = (biomeList, json) -> {
         final List<String> nameRegexes = JsonResult.forInput(json)
-                .mapEachIfArray(String.class, nameRegex -> nameRegex.toLowerCase())
+                .mapEachIfArray(String.class, (Result.SimpleMapper<String, String>) String::toLowerCase)
                 .orElse(Collections.emptyList(), LogManager.getLogger()::error, LogManager.getLogger()::warn);
-        final BiomeList whitelist = new BiomeList();
-        final BiomeList blacklist = new BiomeList();
+
+        final BiomeList validBiomes = new BiomeList();
         nameRegexes.forEach(nameRegex -> {
-            populateListsForName(whitelist, blacklist, nameRegex);
+            if (usingNotOperator(nameRegex)) {
+                nameRegex = nameRegex.substring(1);
+                populateBlacklistForName(validBiomes, nameRegex);
+            } else {
+                populateWhitelistForName(validBiomes, nameRegex);
+            }
         });
-        biomeList.removeIf(biome -> !whitelist.contains(biome));
-        biomeList.removeAll(blacklist);
+
+        biomeList.removeIf(biome -> !validBiomes.contains(biome));
     };
 
     private static void populateListsForName(BiomeList whitelist, BiomeList blacklist, String nameRegex) {
         if (usingNotOperator(nameRegex)) {
             nameRegex = nameRegex.substring(1);
-            populateWhitelistForName(whitelist, nameRegex);
+            populateBlacklistForName(whitelist, nameRegex);
         } else {
-            populateBlacklistForName(blacklist, nameRegex);
+            populateWhitelistForName(blacklist, nameRegex);
         }
     }
 
