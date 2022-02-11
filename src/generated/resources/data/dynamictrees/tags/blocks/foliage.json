@@ -3,6 +3,9 @@
   "values": [
     "minecraft:grass",
     "minecraft:tall_grass",
-    "minecraft:fern"
+    "minecraft:fern",
+    "minecraft:crimson_roots",
+    "minecraft:warped_roots",
+    "minecraft:nether_sprouts"
   ]
 }
