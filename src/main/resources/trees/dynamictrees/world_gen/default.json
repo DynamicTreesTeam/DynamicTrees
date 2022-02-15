@@ -159,7 +159,7 @@
     "apply": {
       "species" : {
         "random" : {
-          "oak": 1,
+          "oak": 24,
           "apple_oak": 1
         }
       },
