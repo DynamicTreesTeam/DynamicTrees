@@ -2,7 +2,11 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.data.*;
+import com.ferreusveritas.dynamictrees.api.data.BranchItemModelGenerator;
+import com.ferreusveritas.dynamictrees.api.data.BranchStateGenerator;
+import com.ferreusveritas.dynamictrees.api.data.Generator;
+import com.ferreusveritas.dynamictrees.api.data.StrippedBranchStateGenerator;
+import com.ferreusveritas.dynamictrees.api.data.SurfaceRootStateGenerator;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
@@ -15,6 +19,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cells.MetadataCell;
 import com.ferreusveritas.dynamictrees.compat.waila.WailaOther;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.data.provider.BranchLoaderBuilder;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
@@ -25,14 +30,28 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
 import com.ferreusveritas.dynamictrees.util.Optionals;
-import net.minecraft.block.*;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.HorizontalBlock;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.Items;
 import net.minecraft.tags.ITag;
-import net.minecraft.util.*;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -49,7 +68,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -743,6 +768,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public List<ITag.INamedTag<Block>> defaultBranchTags() {
         return this.isFireProof ? Collections.singletonList(DTBlockTags.BRANCHES) :
                 Collections.singletonList(DTBlockTags.BRANCHES_THAT_BURN);
+    }
+
+    public List<ITag.INamedTag<Item>> defaultBranchItemTags() {
+        return this.isFireProof ? Collections.singletonList(DTItemTags.BRANCHES) :
+                Collections.singletonList(DTItemTags.BRANCHES_THAT_BURN);
     }
 
     public List<ITag.INamedTag<Block>> defaultStrippedBranchTags() {
