@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.compat.seasons.FlowerPeriod;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
-import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.items.Seed;
@@ -20,6 +19,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
@@ -47,6 +47,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
@@ -307,6 +308,10 @@ public final class JsonDeserialisers {
 
     private static final Map<String, ToolType> TOOL_TYPES =
             ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");
+
+    public static final JsonDeserialiser<IBooleanFunction> BOOLEAN_FUNCTION = register(
+            IBooleanFunction.class, new BooleanFunctionDeserialiser()
+    );
 
     public static final JsonDeserialiser<ToolType> TOOL_TYPE = register(ToolType.class, jsonElement ->
             STRING.deserialise(jsonElement).map(TOOL_TYPES::get, "Could not get tool type from \"{}\"."));
