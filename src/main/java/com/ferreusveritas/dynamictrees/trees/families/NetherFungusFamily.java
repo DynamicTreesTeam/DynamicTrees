@@ -2,11 +2,13 @@ package com.ferreusveritas.dynamictrees.trees.families;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.DTItemTags;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.item.Item;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -57,6 +59,11 @@ public class NetherFungusFamily extends Family {
     @Override
     public List<ITag.INamedTag<Block>> defaultBranchTags() {
         return Collections.singletonList(DTBlockTags.FUNGUS_BRANCHES);
+    }
+
+    @Override
+    public List<ITag.INamedTag<Item>> defaultBranchItemTags() {
+        return Collections.singletonList(DTItemTags.FUNGUS_BRANCHES);
     }
 
     @Override
