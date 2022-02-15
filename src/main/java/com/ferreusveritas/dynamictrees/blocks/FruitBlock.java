@@ -157,12 +157,12 @@ public class FruitBlock extends Block implements IGrowable {
 
     @Override
     public boolean isValidBonemealTarget(IBlockReader world, BlockPos pos, BlockState state, boolean isClient) {
-        return getAge(state) < fruit.getMaxAge();
+        return fruit.canBoneMeal() && getAge(state) < fruit.getMaxAge();
     }
 
     @Override
     public boolean isBonemealSuccess(World world, Random random, BlockPos pos, BlockState state) {
-        return fruit.canBoneMeal();
+        return true;
     }
 
     @Override

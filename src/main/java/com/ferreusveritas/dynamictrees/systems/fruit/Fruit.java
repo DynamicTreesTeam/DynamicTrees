@@ -32,7 +32,6 @@ import javax.annotation.Nullable;
 
 import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.HALF_SEASON;
 import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.SPRING;
-import static com.ferreusveritas.dynamictrees.util.ShapeUtils.createFruitShape;
 
 /**
  * Stores properties and implements functionality of fruits which grow from the leaves of a tree.
@@ -68,10 +67,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     private IntegerProperty ageProperty = BlockStateProperties.AGE_3;
 
     private VoxelShape[] blockShapes = {
-            VoxelShapes.create(createFruitShape(1, 1, 0, 16)),
-            VoxelShapes.create(createFruitShape(1, 2, 0, 16)),
-            VoxelShapes.create(createFruitShape(2.5f, 5, 0)),
-            VoxelShapes.create(createFruitShape(2.5f, 5, 1.25f))
+            VoxelShapes.block(), VoxelShapes.block(), VoxelShapes.block(), VoxelShapes.block()
     };
 
     /**

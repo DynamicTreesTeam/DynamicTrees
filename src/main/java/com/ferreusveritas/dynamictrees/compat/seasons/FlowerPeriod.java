@@ -10,12 +10,10 @@ import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.isSeas
  */
 public class FlowerPeriod {
 
-    public static final Codec<FlowerPeriod> CODEC = RecordCodecBuilder.create(instance ->
-            instance.group(
-                    Codec.FLOAT.fieldOf("start").forGetter(FlowerPeriod::getStart),
-                    Codec.FLOAT.fieldOf("end").forGetter(FlowerPeriod::getEnd)
-            ).apply(instance, FlowerPeriod::new)
-    );
+    public static final Codec<FlowerPeriod> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.FLOAT.fieldOf("start").forGetter(FlowerPeriod::getStart),
+            Codec.FLOAT.fieldOf("end").forGetter(FlowerPeriod::getEnd)
+    ).apply(instance, FlowerPeriod::new));
 
     /**
      * The minimum season value at which the fruit can flower.
