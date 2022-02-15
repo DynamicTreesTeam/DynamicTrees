@@ -40,9 +40,22 @@ import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.SPRING
  */
 public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
 
+    /**
+     * Defines what should happen when the fruit matures. A mature fruit is one that has reached its maximum age.
+     */
     public enum MatureAction {
+        /**
+         * Performs the default mature action (defined by the implementation of {@link
+         * FruitBlock#performMatureAction(World, BlockPos, BlockState)}) for the set block.
+         */
         DEFAULT,
+        /**
+         * Drops the fruit on the ground.
+         */
         DROP,
+        /**
+         * Rots the fruit by destroying it without dropping anything.
+         */
         ROT
     }
 
