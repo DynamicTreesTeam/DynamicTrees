@@ -166,7 +166,11 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V>
 
     public static <V extends RegistryEntry<V>> Codec<V> createDefaultCodec(final Function<ResourceLocation, V> constructor) {
         return RecordCodecBuilder.create(instance -> instance
-                .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString()).forGetter(RegistryEntry::getRegistryName))
+                .group(
+                        ResourceLocation.CODEC
+                                .fieldOf(Resources.RESOURCE_LOCATION.toString())
+                                .forGetter(RegistryEntry::getRegistryName)
+                )
                 .apply(instance, constructor));
     }
 

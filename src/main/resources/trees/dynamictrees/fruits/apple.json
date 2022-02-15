@@ -1,0 +1,11 @@
+{
+  "_todo": "Remove block registry name in 1.18 so it is called `dynamictrees:apple`.",
+  "block_registry_name": "apple_fruit",
+  "item_stack": "apple",
+  "block_shapes": [
+    [0.4375, 1.0, 0.4375, 0.5625, 0.9375, 0.5625],
+    [0.4375, 1.0, 0.4375, 0.5625, 0.875, 0.5625],
+    [0.375, 1.0, 0.375, 0.625, 0.75, 0.625],
+    [0.4375, 0.9375, 0.4375, 0.625, 0.6875, 0.625]
+  ]
+}

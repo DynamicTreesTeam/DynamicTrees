@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import com.ferreusveritas.dynamictrees.api.seasons.SeasonManager;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -15,6 +16,9 @@ public class SeasonHelper {
     public static final float SUMMER = 1.0f;
     public static final float AUTUMN = 2.0f;
     public static final float WINTER = 3.0f;
+
+    public static final float FULL_SEASON = 1.0F;
+    public static final float HALF_SEASON = 1.0F;
 
     // Tropical convenience values.
     public static final float DRY = SUMMER;
@@ -46,7 +50,8 @@ public class SeasonHelper {
     }
 
     static public float globalSeasonalGrowthFactor(World world, BlockPos rootPos, float offset) {
-        return seasonManager.getGrowthFactor(world, rootPos, offset);
+        return DTConfigs.ENABLE_SEASONAL_GROWTH_FACTOR.get() ?
+                seasonManager.getGrowthFactor(world, rootPos, offset) : 1.0F;
     }
 
     static public float globalSeasonalSeedDropFactor(World world, BlockPos pos) {
@@ -54,15 +59,17 @@ public class SeasonHelper {
     }
 
     static public float globalSeasonalSeedDropFactor(World world, BlockPos pos, float offset) {
-        return seasonManager.getSeedDropFactor(world, pos, offset);
+        return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() ?
+                seasonManager.getSeedDropFactor(world, pos, offset) : 1.0F;
     }
 
     static public float globalSeasonalFruitProductionFactor(World world, BlockPos pos, boolean getAsScan) {
-        return globalSeasonalFruitProductionFactor(world, pos, 0, getAsScan);
+        return globalSeasonalFruitProductionFactor(world, pos, 0F, getAsScan);
     }
 
     static public float globalSeasonalFruitProductionFactor(World world, BlockPos pos, float offset, boolean getAsScan) {
-        return seasonManager.getFruitProductionFactor(world, pos, offset, getAsScan);
+        return DTConfigs.ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR.get() ?
+                seasonManager.getFruitProductionFactor(world, pos, offset, getAsScan) : 1.0F;
     }
 
     /**

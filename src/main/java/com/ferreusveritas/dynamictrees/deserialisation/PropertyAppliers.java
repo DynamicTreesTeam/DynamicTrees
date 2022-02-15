@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.treepacks.VoidApplier;
 import com.google.gson.JsonElement;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -15,6 +16,7 @@ import java.util.function.Consumer;
  * @author Harley O'Connor
  */
 public interface PropertyAppliers<O, I> {
+
     ResultList applyAll(Map<String, JsonElement> inputs, O object);
 
     PropertyApplierResult apply(O object, String key, I input);
@@ -29,22 +31,32 @@ public interface PropertyAppliers<O, I> {
 
     <V> PropertyAppliers<O, I> registerArrayApplier(String key, Class<V> valueClass, VoidApplier<O, V> applier);
 
+    <V> PropertyAppliers<O, I> registerListApplier(String key, Class<V> valueClass, Applier<O, List<V>> applier);
+
+    <V> PropertyAppliers<O, I> registerListApplier(String key, Class<V> valueClass, VoidApplier<O, List<V>> applier);
+
     PropertyAppliers<O, I> registerIfTrueApplier(String key, IfTrueApplier<O> applier);
 
     <E extends O, V> PropertyAppliers<O, I> register(String key, Class<E> subClass, Class<V> valueClass,
-                                                         Applier<E, V> applier);
+                                                     Applier<E, V> applier);
 
     <E extends O, V> PropertyAppliers<O, I> register(String key, Class<E> subClass, Class<V> valueClass,
-                                                         VoidApplier<E, V> applier);
+                                                     VoidApplier<E, V> applier);
 
     <E extends O> PropertyAppliers<O, I> registerIfTrueApplier(String key, Class<E> subClass,
-                                                                   IfTrueApplier<E> applier);
+                                                               IfTrueApplier<E> applier);
 
     <E extends O, V> PropertyAppliers<O, I> registerArrayApplier(String key, Class<E> subClass, Class<V> valueClass,
-                                                                     Applier<E, V> applier);
+                                                                 Applier<E, V> applier);
 
     <E extends O, V> PropertyAppliers<O, I> registerArrayApplier(String key, Class<E> subClass, Class<V> valueClass,
-                                                                     VoidApplier<E, V> applier);
+                                                                 VoidApplier<E, V> applier);
+
+    <E extends O, V> PropertyAppliers<O, I> registerListApplier(String key, Class<E> subClass, Class<V> valueClass,
+                                                                 Applier<E, List<V>> applier);
+
+    <E extends O, V> PropertyAppliers<O, I> registerListApplier(String key, Class<E> subClass, Class<V> valueClass,
+                                                                VoidApplier<E, List<V>> applier);
 
     Class<O> getObjectType();
 
@@ -68,4 +80,5 @@ public interface PropertyAppliers<O, I> {
         }
 
     }
+
 }

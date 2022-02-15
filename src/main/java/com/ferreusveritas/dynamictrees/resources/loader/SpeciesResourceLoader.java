@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
@@ -111,7 +112,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .registerArrayApplier("acceptable_soils", String.class, (Applier<Species, String>) this::addAcceptableSoil)
                 .registerArrayApplier("features", GenFeatureConfiguration.class, Species::addGenFeature)
                 .registerArrayApplier("drop_creators", DropCreatorConfiguration.class, Species::addDropCreators)
-                .register("does_rot", Boolean.class, Species::setDoesRot);
+                .register("does_rot", Boolean.class, Species::setDoesRot)
+                .registerListApplier("fruits", Fruit.class, Species::setFruits);
 
         super.registerAppliers();
     }

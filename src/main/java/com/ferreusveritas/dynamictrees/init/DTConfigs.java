@@ -54,7 +54,7 @@ public class DTConfigs {
     public static final ForgeConfigSpec.BooleanValue SLOPPY_BREAK_DROPS;
     public static final ForgeConfigSpec.IntValue MIN_RADIUS_FOR_STRIP;
     public static final ForgeConfigSpec.BooleanValue ENABLE_STRIP_RADIUS_REDUCTION;
-    public static final ForgeConfigSpec.BooleanValue CAN_BONE_MEAL_APPLE;
+    public static final ForgeConfigSpec.BooleanValue CAN_BONE_MEAL_FRUIT;
     public static final ForgeConfigSpec.BooleanValue DYNAMIC_SAPLING_DROPS;
 
     public static final ForgeConfigSpec.BooleanValue REPLACE_VANILLA_SAPLING;
@@ -146,7 +146,7 @@ public class DTConfigs {
                 defineInRange("minRadiusForStrip", 6, 0, 24);
         ENABLE_STRIP_RADIUS_REDUCTION = SERVER_BUILDER.comment("If enabled, stripping a branch will decrease its radius by one").
                 define("enableStripRadiusReduction", true);
-        CAN_BONE_MEAL_APPLE = SERVER_BUILDER.comment("If enabled, an apple fruit can be bone mealed.").
+        CAN_BONE_MEAL_FRUIT = SERVER_BUILDER.comment("Sets the default for whether or not fruit growing from dynamic trees can be bone-mealed. Note that this is a default; it can be overridden by the individual fruit.").
                 define("canBoneMealApple", false);
         DYNAMIC_SAPLING_DROPS = SERVER_BUILDER.comment("If enabled, dynamic sapling blocks will drop their seed when broken.").
                 define("dynamicSaplingDrops", true);

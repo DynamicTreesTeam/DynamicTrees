@@ -7,7 +7,6 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.DynamicCocoaBlock;
-import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
@@ -28,32 +27,33 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.FungusFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.MushroomFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.TreeFeatureCanceller;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.gen.feature.*;
+import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
+import net.minecraft.world.gen.feature.BigMushroomFeatureConfig;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.HugeFungusConfig;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -73,12 +73,6 @@ public class DTRegistries {
     ///////////////////////////////////////////
     // BLOCKS
     ///////////////////////////////////////////
-
-    /**
-     * An apple fruit block.
-     */
-    public static final FruitBlock APPLE_FRUIT = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE))
-            .setCanBoneMeal(DTConfigs.CAN_BONE_MEAL_APPLE::get);
 
     /**
      * A modified cocoa fruit block (for dynamic trees).
@@ -102,7 +96,6 @@ public class DTRegistries {
     }
 
     private static void setupBlocks() {
-        RegistryHandler.addBlock(DynamicTrees.resLoc("apple_fruit"), APPLE_FRUIT);
         RegistryHandler.addBlock(DynamicTrees.resLoc("cocoa"), COCOA_FRUIT);
         RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, POTTED_SAPLING);
         RegistryHandler.addBlock(DynamicTrees.resLoc("trunk_shell"), TRUNK_SHELL);
@@ -128,15 +121,6 @@ public class DTRegistries {
             }
             return 0;
         });
-    }
-
-    @SubscribeEvent
-    public static void onBlocksRegistry(final RegistryEvent.Register<Block> event) {
-        final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
-
-        if (appleOak.isValid()) {
-            APPLE_FRUIT.setSpecies(appleOak);
-        }
     }
 
     ///////////////////////////////////////////

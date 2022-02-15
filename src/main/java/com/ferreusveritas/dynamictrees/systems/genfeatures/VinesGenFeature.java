@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
@@ -107,7 +108,8 @@ public class VinesGenFeature extends GenFeature {
         final BranchBlock branch = TreeHelper.getBranch(blockState);
 
         if (branch != null && branch.getRadius(blockState) >= fruitingRadius && context.natural()) {
-            if (species.seasonalFruitProductionFactor(world, rootPos) > world.random.nextFloat()) {
+            if (SeasonHelper.globalSeasonalFruitProductionFactor(world, rootPos, false)
+                    > world.random.nextFloat()) {
                 final FindEndsNode endFinder = new FindEndsNode();
                 TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
                 final List<BlockPos> endPoints = endFinder.getEnds();

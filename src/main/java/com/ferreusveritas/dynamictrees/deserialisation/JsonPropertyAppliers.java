@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
 import com.ferreusveritas.dynamictrees.api.treepacks.Applier;
+import com.ferreusveritas.dynamictrees.api.treepacks.ArrayIteratorPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.ArrayPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.IfTrueApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
@@ -9,7 +10,6 @@ import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.api.treepacks.VoidApplier;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,6 +106,18 @@ public final class JsonPropertyAppliers<O> implements PropertyAppliers<O, JsonEl
     }
 
     @Override
+    public <V> PropertyAppliers<O, JsonElement> registerListApplier(String key, Class<V> valueClass,
+                                                                    Applier<O, List<V>> applier) {
+        return this.registerListApplier(key, this.objectType, valueClass, applier);
+    }
+
+    @Override
+    public <V> PropertyAppliers<O, JsonElement> registerListApplier(String key, Class<V> valueClass,
+                                                                    VoidApplier<O, List<V>> applier) {
+        return this.registerListApplier(key, this.objectType, valueClass, applier);
+    }
+
+    @Override
     public JsonPropertyAppliers<O> registerIfTrueApplier(final String key, final IfTrueApplier<O> applier) {
         return this.registerIfTrueApplier(key, this.objectType, applier);
     }
@@ -137,7 +149,7 @@ public final class JsonPropertyAppliers<O> implements PropertyAppliers<O, JsonEl
     public <E extends O, V> JsonPropertyAppliers<O> registerArrayApplier(final String key, final Class<E> subClass,
                                                                          final Class<V> valueClass,
                                                                          final Applier<E, V> applier) {
-        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass,
+        return this.register(ArrayIteratorPropertyApplier.json(key, subClass, valueClass,
                 new JsonPropertyApplier<>("", subClass, valueClass, applier)));
     }
 
@@ -145,8 +157,22 @@ public final class JsonPropertyAppliers<O> implements PropertyAppliers<O, JsonEl
     public <E extends O, V> JsonPropertyAppliers<O> registerArrayApplier(final String key, final Class<E> subClass,
                                                                          final Class<V> valueClass,
                                                                          final VoidApplier<E, V> applier) {
-        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass,
+        return this.register(ArrayIteratorPropertyApplier.json(key, subClass, valueClass,
                 new JsonPropertyApplier<>("", subClass, valueClass, applier)));
+    }
+
+    @Override
+    public <E extends O, V> PropertyAppliers<O, JsonElement> registerListApplier(String key, Class<E> subClass,
+                                                                                 Class<V> valueClass,
+                                                                                 Applier<E, List<V>> applier) {
+        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass, applier));
+    }
+
+    @Override
+    public <E extends O, V> PropertyAppliers<O, JsonElement> registerListApplier(String key, Class<E> subClass,
+                                                                                 Class<V> valueClass,
+                                                                                 VoidApplier<E, List<V>> applier) {
+        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass, applier));
     }
 
     @Override

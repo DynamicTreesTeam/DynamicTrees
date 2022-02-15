@@ -16,7 +16,6 @@ import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
-import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
@@ -51,6 +50,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.GlobalDropCreators;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
@@ -318,6 +318,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected CommonOverride commonOverride;
 
     private String unlocalizedName = "";
+
+    private Set<Fruit> fruits = new HashSet<>();
 
     /**
      * Blank constructor for {@link #NULL_SPECIES}.
@@ -914,28 +916,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         saplingBlock = sapling;
         return this;
     }
-
-//    private boolean canCraftSeedToSapling = true;
-//
-//    public Species setCanCraftSeedToSapling(boolean truth) {
-//        this.canCraftSeedToSapling = truth;
-//        return this;
-//    }
-//
-//    public boolean canCraftSeedToSapling() {
-//        return canCraftSeedToSapling;
-//    }
-//
-//    private boolean canCraftSaplingToSeed = true;
-//
-//    public Species setCanCraftSaplingToSeed(boolean truth) {
-//        this.canCraftSaplingToSeed = truth;
-//        return this;
-//    }
-//
-//    public boolean canCraftSaplingToSeed() {
-//        return canCraftSaplingToSeed;
-//    }
 
     /**
      * Holds whether or not a {@link Seed} should be generated. Stored as a {@code non-primitive} so its default value
@@ -1716,20 +1696,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return Factor from 0.0 (no growth) to 1.0 (full growth).
      */
     public float seasonalGrowthFactor(World world, BlockPos rootPos) {
-        return DTConfigs.ENABLE_SEASONAL_GROWTH_FACTOR.get() && seasonalGrowthOffset != null ?
+        return seasonalGrowthOffset != null ?
                 SeasonHelper.globalSeasonalGrowthFactor(world, rootPos, -seasonalGrowthOffset) : 1.0f;
     }
 
     public float seasonalSeedDropFactor(World world, BlockPos pos) {
-        return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() && seasonalSeedDropOffset != null ?
+        return seasonalSeedDropOffset != null ?
                 SeasonHelper.globalSeasonalSeedDropFactor(world, pos, -seasonalSeedDropOffset) : 1.0f;
     }
 
     public float seasonalFruitProductionFactor(World world, BlockPos pos) {
-        return DTConfigs.ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR.get() && seasonalFruitingOffset != null ?
-                SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, -seasonalFruitingOffset, false) : 1.0f;
+        return seasonalFruitingOffset != null ?
+                SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, -seasonalFruitingOffset, false)
+                : 1.0F;
     }
 
+    // TODO: Update for data-driven fruit
     /**
      * 1 = Spring 2 = Summer 4 = Autumn 8 = Winter Values are OR'ed together for the return
      */
@@ -1738,7 +1720,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         final float seasonEnd = 1 - 1f / 6;
         final float threshold = 0.75f;
 
-        if (!FruitBlock.getFruitBlocksForSpecies(this).isEmpty()) {
+        if (this.hasFruits()) {
             int seasonFlags = 0;
             for (int i = 0; i < 4; i++) {
                 boolean isValidSeason = false;
@@ -2038,6 +2020,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public Species addGenFeature(GenFeatureConfiguration configuration) {
         if (configuration.shouldApply(this)) {
             this.genFeatures.add(configuration);
+        } else {
+            LogManager.getLogger().warn("Gen Feature \"{}\" refused to be applied to Species \"{}\".",
+                    configuration.getGenFeature().getRegistryName(), getRegistryName());
         }
         return this;
     }
@@ -2123,6 +2108,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public int coordHashCode(BlockPos pos) {
         return CoordUtils.coordHashCode(pos, 2);
+    }
+
+    public boolean hasFruit(Fruit fruit) {
+        return fruits.contains(fruit);
+    }
+
+    public boolean hasFruits() {
+        return !fruits.isEmpty();
+    }
+
+    public void setFruits(Collection<Fruit> fruits) {
+        this.fruits.addAll(fruits);
+    }
+
+    public Set<Fruit> getFruits() {
+        return Collections.unmodifiableSet(fruits);
     }
 
     public List<ITag.INamedTag<Block>> defaultSaplingTags() {
