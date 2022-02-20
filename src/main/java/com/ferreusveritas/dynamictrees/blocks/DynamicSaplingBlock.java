@@ -37,7 +37,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
     protected Species species;
 
     public DynamicSaplingBlock(Species species) {
-        super(Properties.of(Material.PLANT).sound(SoundType.GRASS).randomTicks());
+        super(Properties.of(Material.PLANT).sound(SoundType.GRASS).randomTicks().noOcclusion());
         this.species = species;
     }
 
