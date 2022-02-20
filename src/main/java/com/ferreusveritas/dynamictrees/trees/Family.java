@@ -380,7 +380,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @param prefix The prefix.
      * @return The {@link ResourceLocation} registry name for the branch.
      */
-    private ResourceLocation getBranchRegName(final String prefix) {
+    protected ResourceLocation getBranchRegName(final String prefix) {
         return suffix(prefix(this.getRegistryName(), prefix), "_branch");
     }
 
@@ -676,7 +676,17 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     @Nullable
     public BranchBlock getValidBranchBlock(int index) {
-        return this.validBranches.get(index);
+        if (index < validBranches.size())
+            return this.validBranches.get(index);
+        else {
+            LogManager.getLogger().warn("Attempted to get branch block of index {} but {} only has {} valid branches.", index, this, validBranches.size());
+            return this.validBranches.get(0);
+        }
+    }
+
+    //Useful for addons
+    public boolean isValidBranchBlock (BranchBlock block){
+        return this.validBranches.contains(block);
     }
 
     private boolean branchIsLadder = true;
