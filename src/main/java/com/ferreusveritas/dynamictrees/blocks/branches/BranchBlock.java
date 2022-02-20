@@ -468,8 +468,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return volumeIn - numLogs;
     }
 
-    public void setPrimitiveLogDrops(ItemStack... drops) {
+    public BranchBlock setPrimitiveLogDrops(ItemStack... drops) {
         primitiveLogDrops = drops;
+        return this;
     }
 
     @Override
