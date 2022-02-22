@@ -41,7 +41,7 @@ public abstract class BlockWithDynamicHardness extends Block {
      * @param pos   The {@link BlockPos}.
      * @return The hardness value.
      */
-    public float getHardness(final IBlockReader world, final BlockPos pos) {
+    public float getHardness(BlockState state, final IBlockReader world, final BlockPos pos) {
         return 2.0f;
     }
 
@@ -56,7 +56,7 @@ public abstract class BlockWithDynamicHardness extends Block {
 
         @Override
         public float getDestroySpeed(IBlockReader worldIn, BlockPos pos) {
-            return getHardness(worldIn, pos);
+            return getHardness(this, worldIn, pos);
         }
 
     }

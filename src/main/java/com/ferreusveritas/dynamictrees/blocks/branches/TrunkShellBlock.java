@@ -108,8 +108,8 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements IWaterL
     }
 
     @Override
-    public float getHardness(IBlockReader world, BlockPos pos) {
-        return Null.applyIfNonnull(this.getMuse(world, pos), muse -> ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(world, muse.pos), super.getHardness(world, pos));
+    public float getHardness(BlockState state, IBlockReader world, BlockPos pos) {
+        return Null.applyIfNonnull(this.getMuse(world, pos), muse -> ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(state, world, muse.pos), super.getHardness(state, world, pos));
     }
 
     @Override

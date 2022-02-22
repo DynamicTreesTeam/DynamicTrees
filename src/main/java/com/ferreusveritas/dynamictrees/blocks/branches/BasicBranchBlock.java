@@ -207,7 +207,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     ///////////////////////////////////////////
 
     @Override
-    public float getHardness(IBlockReader worldIn, BlockPos pos) {
+    public float getHardness(BlockState state, IBlockReader worldIn, BlockPos pos) {
         final int radius = this.getRadius(worldIn.getBlockState(pos));
         final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
                 .getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
