@@ -93,6 +93,9 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     public Block getPrimitiveSoilBlock() {
         return properties.getPrimitiveSoilBlock();
     }
+    public BlockState getPrimitiveSoilState(BlockState currentSoilState) {
+        return properties.getPrimitiveSoilState(currentSoilState);
+    }
 
     ///////////////////////////////////////////
     // BLOCK PROPERTIES
@@ -121,12 +124,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     @Nullable
     @Override
     public ToolType getHarvestTool(BlockState state) {
-        return getPrimitiveSoilBlock().getHarvestTool(getDecayBlockState(state));
+        return getPrimitiveSoilBlock().getHarvestTool(getPrimitiveSoilState(state));
     }
 
     @Override
     public int getHarvestLevel(BlockState state) {
-        return getPrimitiveSoilBlock().getHarvestLevel(getDecayBlockState(state));
+        return getPrimitiveSoilBlock().getHarvestLevel(getPrimitiveSoilState(state));
     }
 
     @Override
@@ -172,7 +175,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     @Nonnull
     @Override
     public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
-        return getDecayBlockState(state).getDrops(builder);
+        return getPrimitiveSoilState(state).getDrops(builder);
     }
 
     @Override
@@ -251,17 +254,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     /**
      * This is the state the rooty dirt returns to once it no longer supports a tree structure.
      *
-     * Use the world-pos version when possible.
-     *
      * @param world
      * @param pos    The position of the {@link RootyBlock}
      * @return
      */
     public BlockState getDecayBlockState(BlockState state, IBlockReader world, BlockPos pos) {
-        return getDecayBlockState(state);
-    }
-    public BlockState getDecayBlockState(BlockState state) {
-        return getPrimitiveSoilBlock().defaultBlockState();
+        return getPrimitiveSoilState(state);
     }
 
     /**
