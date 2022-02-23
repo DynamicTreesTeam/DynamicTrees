@@ -284,7 +284,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
             return;
         }
 
-        final BlockState primitiveDirt = this.getPrimitiveSoilBlock().defaultBlockState();
+        final BlockState primitiveDirt = this.getDecayBlockState(rootyState, world, rootPos);
 
         world.setBlock(rootPos, primitiveDirt, Constants.BlockFlags.DEFAULT);
     }
@@ -485,7 +485,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
         final int white = 0xFFFFFFFF;
         switch (tintIndex) {
             case 0:
-                return blockColors.getColor(getPrimitiveSoilBlock().defaultBlockState(), world, pos, tintIndex);
+                return blockColors.getColor(getPrimitiveSoilState(state), world, pos, tintIndex);
             case 1:
                 return state.getBlock() instanceof RootyBlock ? rootColor(state, world, pos) : white;
             default:
