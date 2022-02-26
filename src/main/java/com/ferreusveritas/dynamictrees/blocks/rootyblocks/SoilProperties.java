@@ -108,7 +108,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     }
 
     /**
-     * Allows to veto a soil block based on the blockstate.
+     * Allows to veto a soil block based on the BlockState.
      */
     public boolean isValidState(BlockState primitiveSoilState){
         return true;

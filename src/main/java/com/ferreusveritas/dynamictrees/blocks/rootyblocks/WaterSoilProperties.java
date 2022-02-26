@@ -26,6 +26,7 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 /**
@@ -88,12 +89,12 @@ public class WaterSoilProperties extends SoilProperties {
         }
 
         @Override
-        public float getHardness(IBlockReader worldIn, BlockPos pos) {
+        public float getHardness(BlockState state, IBlockReader worldIn, BlockPos pos) {
             return (float) (0.5 * DTConfigs.ROOTY_BLOCK_HARDNESS_MULTIPLIER.get());
         }
 
         @Override
-        public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
+        public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
             return VoxelShapes.create(WATER_ROOTS_AABB);
         }
 
@@ -121,7 +122,7 @@ public class WaterSoilProperties extends SoilProperties {
         }
 
         @Override
-        public BlockState getDecayBlockState(BlockState state, IWorld access, BlockPos pos) {
+        public BlockState getDecayBlockState(BlockState state, IBlockReader access, BlockPos pos) {
             if (state.hasProperty(WATERLOGGED) && !state.getValue(WATERLOGGED)) {
                 return Blocks.AIR.defaultBlockState();
             }

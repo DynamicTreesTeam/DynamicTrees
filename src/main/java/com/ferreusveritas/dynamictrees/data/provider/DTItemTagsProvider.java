@@ -1,7 +1,9 @@
 package com.ferreusveritas.dynamictrees.data.provider;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
+import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.data.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
@@ -29,6 +31,10 @@ public class DTItemTagsProvider extends ItemTagsProvider {
     }
 
     private void addDTOnlyTags() {
+        this.tag(DTItemTags.BRANCHES)
+                .addTag(DTItemTags.BRANCHES_THAT_BURN)
+                .addTag(DTItemTags.FUNGUS_BRANCHES);
+
         this.tag(DTItemTags.SEEDS)
                 .addTag(DTItemTags.FUNGUS_CAPS);
 
@@ -37,12 +43,17 @@ public class DTItemTagsProvider extends ItemTagsProvider {
     }
 
     protected void addDTTags() {
+        Family.REGISTRY.dataGenerationStream(this.modId).forEach(family -> {
+            family.getBranchItem().ifPresent(item ->
+                    family.defaultBranchItemTags().forEach(tag -> this.tag(tag).add(item))
+            );
+        });
+
         Species.REGISTRY.dataGenerationStream(this.modId).forEach(species -> {
             // Some species return the common seed, so only return if the species has its own seed.
             if (!species.hasSeed()) {
                 return;
             }
-
             // Create seed item tag.
             species.getSeed().ifPresent(seed ->
                     species.defaultSeedTags().forEach(tag ->
