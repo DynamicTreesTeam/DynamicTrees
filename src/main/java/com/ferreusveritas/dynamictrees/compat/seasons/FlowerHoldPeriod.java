@@ -6,25 +6,25 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.isSeasonBetween;
 
 /**
- * Stores the period in which a fruit or pod can flower.
+ * Stores the period in which a fruit or pod will not grow past its flower age (usually zero).
  */
-public class FlowerPeriod {
+public class FlowerHoldPeriod {
 
-    public static final Codec<FlowerPeriod> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.FLOAT.fieldOf("start").forGetter(FlowerPeriod::getStart),
-            Codec.FLOAT.fieldOf("end").forGetter(FlowerPeriod::getEnd)
-    ).apply(instance, FlowerPeriod::new));
+    public static final Codec<FlowerHoldPeriod> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.FLOAT.fieldOf("start").forGetter(FlowerHoldPeriod::getStart),
+            Codec.FLOAT.fieldOf("end").forGetter(FlowerHoldPeriod::getEnd)
+    ).apply(instance, FlowerHoldPeriod::new));
 
     /**
-     * The minimum season value at which the fruit can flower.
+     * The minimum season value at which the fruit or pod will not grow past its flower age.
      */
     private final float start;
     /**
-     * The maximum season value at which the fruit can flower.
+     * The maximum season value at which the fruit or pod will not grow past its flower age.
      */
     private final float end;
 
-    public FlowerPeriod(float start, float end) {
+    public FlowerHoldPeriod(float start, float end) {
         this.start = start;
         this.end = end;
     }

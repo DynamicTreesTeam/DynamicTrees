@@ -4,7 +4,8 @@ import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
-import com.ferreusveritas.dynamictrees.compat.seasons.FlowerPeriod;
+import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
+import com.ferreusveritas.dynamictrees.compat.seasons.FlowerHoldPeriod;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
@@ -40,33 +41,14 @@ import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.SPRING
  */
 public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
 
-    /**
-     * Defines what should happen when the fruit matures. A mature fruit is one that has reached its maximum age.
-     */
-    public enum MatureAction {
-        /**
-         * Performs the default mature action (defined by the implementation of {@link
-         * FruitBlock#performMatureAction(World, BlockPos, BlockState)}) for the set block.
-         */
-        DEFAULT,
-        /**
-         * Drops the fruit on the ground.
-         */
-        DROP,
-        /**
-         * Rots the fruit by destroying it without dropping anything.
-         */
-        ROT
-    }
-
     public static final TypedRegistry.EntryType<Fruit> TYPE = TypedRegistry.newType(Fruit::new);
 
-    public static final Fruit NULL_FRUIT = new Fruit(DTTrees.NULL);
+    public static final Fruit NULL = new Fruit(DTTrees.NULL);
 
     /**
      * Central registry for all {@link Fruit} objects.
      */
-    public static final TypedRegistry<Fruit> REGISTRY = new TypedRegistry<>(Fruit.class, NULL_FRUIT, TYPE);
+    public static final TypedRegistry<Fruit> REGISTRY = new TypedRegistry<>(Fruit.class, NULL, TYPE);
 
     private FruitBlock block;
 
@@ -96,14 +78,14 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
 
     private float growthChance = 0.2F;
 
-    private FlowerPeriod flowerPeriod = new FlowerPeriod(SPRING, SPRING + HALF_SEASON);
+    private FlowerHoldPeriod flowerHoldPeriod = new FlowerHoldPeriod(SPRING, SPRING + HALF_SEASON);
 
     @Nullable
     private Float seasonOffset = 0f;
 
     private float minProductionFactor = 0.3F;
 
-    private MatureAction matureAction = MatureAction.DEFAULT;
+    private GrowableBlock.MatureAction matureAction = GrowableBlock.MatureAction.DEFAULT;
 
     public Fruit(ResourceLocation registryName) {
         super(registryName);
@@ -210,11 +192,11 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     }
 
     public final boolean isInFlowerPeriod(Float seasonValue) {
-        return flowerPeriod.isIn(seasonValue, seasonOffset);
+        return flowerHoldPeriod.isIn(seasonValue, seasonOffset);
     }
 
-    public void setFlowerPeriod(FlowerPeriod flowerPeriod) {
-        this.flowerPeriod = flowerPeriod;
+    public void setFlowerPeriod(FlowerHoldPeriod flowerHoldPeriod) {
+        this.flowerHoldPeriod = flowerHoldPeriod;
     }
 
     @Nullable
@@ -283,11 +265,15 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
         return Math.min(world.getRandom().nextInt(maxAge * 2), maxAge);
     }
 
-    public MatureAction getMatureAction() {
+    public void performMatureAction(GrowableBlock.Info blockInfo) {
+        matureAction.perform(block, blockInfo);
+    }
+
+    public GrowableBlock.MatureAction getMatureAction() {
         return matureAction;
     }
 
-    public void setMatureAction(MatureAction matureAction) {
+    public void setMatureAction(GrowableBlock.MatureAction matureAction) {
         this.matureAction = matureAction;
     }
 
@@ -295,10 +281,10 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     @Override
     public Fruit reset() {
         canBoneMeal = DTConfigs.CAN_BONE_MEAL_FRUIT.get();
-        flowerPeriod = new FlowerPeriod(SPRING, SPRING + HALF_SEASON);
+        flowerHoldPeriod = new FlowerHoldPeriod(SPRING, SPRING + HALF_SEASON);
         seasonOffset = 0.0F;
         minProductionFactor = 0.3F;
-        matureAction = MatureAction.DEFAULT;
+        matureAction = GrowableBlock.MatureAction.DEFAULT;
         return this;
     }
 

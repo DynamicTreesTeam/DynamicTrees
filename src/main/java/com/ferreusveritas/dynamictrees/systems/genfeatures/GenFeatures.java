@@ -14,7 +14,7 @@ import net.minecraft.util.ResourceLocation;
 public final class GenFeatures {
 
     public static final GenFeature FRUIT = new FruitGenFeature(regName("fruit"));
-    public static final GenFeature COCOA = new CocoaGenFeature(regName("cocoa"));
+    public static final GenFeature POD = new PodGenFeature(regName("pod"));
 
     public static final GenFeature VINES = new VinesGenFeature(regName("vines"));
 
@@ -50,7 +50,7 @@ public final class GenFeatures {
     }
 
     public static void register(final Registry<GenFeature> registry) {
-        registry.registerAll(FRUIT, COCOA, VINES, BEE_NEST, SHROOMLIGHT, CONIFER_TOPPER, MOUND,
+        registry.registerAll(FRUIT, POD, VINES, BEE_NEST, SHROOMLIGHT, CONIFER_TOPPER, MOUND,
                 ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH, PODZOL, BUSH, HUGE_MUSHROOM,
                 HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE, RANDOM_PREDICATE, ALTERNATIVE_LEAVES);
     }

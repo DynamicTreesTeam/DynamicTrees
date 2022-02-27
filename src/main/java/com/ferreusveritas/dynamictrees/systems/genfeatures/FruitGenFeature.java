@@ -36,7 +36,7 @@ public class FruitGenFeature extends GenFeature {
     @Override
     public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
-                .with(FRUIT, Fruit.NULL_FRUIT)
+                .with(FRUIT, Fruit.NULL)
                 .with(VERTICAL_SPREAD, 30f)
                 .with(QUANTITY, 4)
                 .with(FRUITING_RADIUS, 8)

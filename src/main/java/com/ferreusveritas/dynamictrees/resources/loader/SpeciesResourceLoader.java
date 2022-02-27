@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
@@ -113,7 +114,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .registerArrayApplier("features", GenFeatureConfiguration.class, Species::addGenFeature)
                 .registerArrayApplier("drop_creators", DropCreatorConfiguration.class, Species::addDropCreators)
                 .register("does_rot", Boolean.class, Species::setDoesRot)
-                .registerListApplier("fruits", Fruit.class, Species::setFruits);
+                .registerListApplier("fruits", Fruit.class, Species::addFruits)
+                .registerListApplier("pods", Pod.class, Species::addPods);
 
         super.registerAppliers();
     }

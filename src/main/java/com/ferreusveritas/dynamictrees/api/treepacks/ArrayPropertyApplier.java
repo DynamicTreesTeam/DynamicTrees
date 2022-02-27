@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.LazyValue;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class ArrayPropertyApplier<T, V, I> extends PropertyApplier<T, List<V>, I
         final List<V> values = new ArrayList<>();
         final Iterator<I> iterator = iteratorResult.get();
         while (iterator.hasNext()) {
-            valueDeserialiser.get().deserialise(iterator.next()).ifSuccess(values::add);
+            valueDeserialiser.get().deserialise(iterator.next()).ifSuccessOrElse(values::add, error -> LogManager.getLogger().error(error), warning -> LogManager.getLogger().warn(warning));
         }
         return applier.apply(object, values);
     }

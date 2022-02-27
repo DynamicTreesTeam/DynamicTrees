@@ -2,19 +2,21 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
-import com.ferreusveritas.dynamictrees.util.BlockStates;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
@@ -25,7 +27,7 @@ import java.util.Random;
 /**
  * @author Harley O'Connor
  */
-public class FruitBlock extends Block implements IGrowable {
+public class FruitBlock extends Block implements IGrowable, GrowableBlock {
 
     private final Fruit fruit;
 
@@ -86,7 +88,7 @@ public class FruitBlock extends Block implements IGrowable {
     }
 
     private void outOfSeason(World world, BlockPos pos) {
-        world.setBlockAndUpdate(pos, BlockStates.AIR);
+        world.destroyBlock(pos, false);
     }
 
     private void tryGrow(BlockState state, World world, BlockPos pos, Random random, int age,
@@ -105,24 +107,14 @@ public class FruitBlock extends Block implements IGrowable {
     }
 
     public void tickMature(World world, BlockPos pos, BlockState state) {
-        switch (fruit.getMatureAction()) {
-            case DEFAULT:
-                performMatureAction(world, pos, state);
-                break;
-            case DROP:
-                drop(world, pos, state);
-                break;
-            case ROT:
-                world.setBlockAndUpdate(pos, BlockStates.AIR);
-                break;
-        }
+        fruit.performMatureAction(new Info(world, pos, state));
     }
 
     /**
-     * Performs the default mature action for this fruit block. This will be called on tick if the fruit is mature and
-     * {@linkplain Fruit#getMatureAction() its mature action} is set to {@linkplain Fruit.MatureAction#DEFAULT default}.
+     * {@inheritDoc}
      */
-    protected void performMatureAction(World world, BlockPos pos, BlockState state) {
+    @Override
+    public void performMatureAction(IWorld world, BlockPos pos, BlockState state) {
     }
 
     @SuppressWarnings("deprecation")
@@ -135,6 +127,12 @@ public class FruitBlock extends Block implements IGrowable {
         super.neighborChanged(state, world, pos, block, fromPos, isMoving);
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
+        return isSupported(world, pos, state);
+    }
+
     /**
      * Checks if the block is supported. An unsupported fruit block should drop.
      * <p>
@@ -142,6 +140,7 @@ public class FruitBlock extends Block implements IGrowable {
      *
      * @return {@code true} if this block is supported
      */
+    @Override
     public boolean isSupported(IBlockReader world, BlockPos pos, BlockState state) {
         return world.getBlockState(pos.above()).getBlock() instanceof LeavesBlock;
     }
@@ -180,6 +179,12 @@ public class FruitBlock extends Block implements IGrowable {
 
     private void setAge(World world, BlockPos pos, BlockState state, int newAge) {
         world.setBlock(pos, state.setValue(fruit.getAgeProperty(), newAge), 2);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean isPathfindable(BlockState pState, IBlockReader pLevel, BlockPos pPos, PathType pType) {
+        return false;
     }
 
 }

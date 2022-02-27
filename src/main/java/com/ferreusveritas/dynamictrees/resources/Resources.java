@@ -20,6 +20,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
+import com.ferreusveritas.dynamictrees.systems.pod.PodResourceLoader;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
@@ -84,6 +85,7 @@ public final class Resources {
     );
 
     public static final FruitResourceLoader FRUIT_LOADER = new FruitResourceLoader();
+    public static final PodResourceLoader POD_LOADER = new PodResourceLoader();
     public static final SpeciesResourceLoader SPECIES_LOADER = new SpeciesResourceLoader();
 
 
@@ -112,6 +114,7 @@ public final class Resources {
                 GEN_FEATURE_TEMPLATE_LOADER,
                 GROWTH_LOGIC_KIT_TEMPLATE_LOADER,
                 FRUIT_LOADER,
+                POD_LOADER,
                 SPECIES_LOADER,
                 JO_CODE_LOADER,
                 BIOME_DATABASE_LOADER,

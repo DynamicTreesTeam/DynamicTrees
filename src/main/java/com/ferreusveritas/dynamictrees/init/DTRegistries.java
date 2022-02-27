@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.blocks.DynamicCocoaBlock;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
@@ -75,11 +74,6 @@ public class DTRegistries {
     ///////////////////////////////////////////
 
     /**
-     * A modified cocoa fruit block (for dynamic trees).
-     */
-    public static final DynamicCocoaBlock COCOA_FRUIT = new DynamicCocoaBlock();
-
-    /**
      * A potted sapling block, which is a normal pot but for dynamic saplings.
      */
     public static final PottedSaplingBlock POTTED_SAPLING = new PottedSaplingBlock();
@@ -96,7 +90,6 @@ public class DTRegistries {
     }
 
     private static void setupBlocks() {
-        RegistryHandler.addBlock(DynamicTrees.resLoc("cocoa"), COCOA_FRUIT);
         RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, POTTED_SAPLING);
         RegistryHandler.addBlock(DynamicTrees.resLoc("trunk_shell"), TRUNK_SHELL);
     }

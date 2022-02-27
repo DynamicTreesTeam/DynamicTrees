@@ -24,8 +24,8 @@ public final class VoxelShapeDeserialiser implements JsonDeserialiser<VoxelShape
                         CommonVoxelShapes.SHAPES.getOrDefault(name.toLowerCase(), VoxelShapes.block())
                 ).elseMapIfType(AxisAlignedBB.class, VoxelShapes::create)
                 .elseMapIfType(JsonArray.class, this::deserialiseArray)
-                .elseMapIfType(JsonObject.class, this::deserialiseObject
-                ).elseTypeError();
+                .elseMapIfType(JsonObject.class, this::deserialiseObject)
+                .elseTypeError();
     }
 
     private VoxelShape deserialiseArray(JsonArray array) throws DeserialisationException {
@@ -45,8 +45,7 @@ public final class VoxelShapeDeserialiser implements JsonDeserialiser<VoxelShape
                 .mapIfContains("function", String.class, functionId -> ShapeFunctions.calculateShape(
                         functionId,
                         getParametersJson(json)
-                ).getOrThrow(true, s -> {
-                }))
+                ).getOrThrow(true, s -> {}))
                 .elseMapIfContains("shapes", JsonArray.class, shapes -> {
                     final IBooleanFunction operator = JsonHelper.getOrDefault(json, "operator",
                             IBooleanFunction.class, IBooleanFunction.OR);

@@ -2,7 +2,8 @@ package com.ferreusveritas.dynamictrees.systems.fruit;
 
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.compat.seasons.FlowerPeriod;
+import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
+import com.ferreusveritas.dynamictrees.compat.seasons.FlowerHoldPeriod;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
@@ -38,10 +39,10 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
                 .register("can_bone_meal", Boolean.class, Fruit::setCanBoneMeal)
                 .register("item_stack", ItemStack.class, Fruit::setItemStack)
                 .register("growth_chance", Float.class, Fruit::setGrowthChance)
-                .register("flower_period", FlowerPeriod.class, Fruit::setFlowerPeriod)
+                .register("flower_period", FlowerHoldPeriod.class, Fruit::setFlowerPeriod)
                 .register("season_offset", Float.class, Fruit::setSeasonOffset)
                 .register("min_production_factor", Float.class, Fruit::setMinProductionFactor)
-                .register("mature_action", Fruit.MatureAction.class, Fruit::setMatureAction);
+                .register("mature_action", GrowableBlock.MatureAction.class, Fruit::setMatureAction);
     }
 
     @Override

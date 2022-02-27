@@ -5,10 +5,11 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.configurations.PropertyDefinition;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
+import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
-import com.ferreusveritas.dynamictrees.compat.seasons.FlowerPeriod;
+import com.ferreusveritas.dynamictrees.compat.seasons.FlowerHoldPeriod;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
@@ -23,6 +24,7 @@ import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
@@ -238,6 +240,8 @@ public final class JsonDeserialisers {
             register(DropCreator.class, new RegistryEntryDeserialiser<>(DropCreator.REGISTRY));
     public static final JsonDeserialiser<Fruit> FRUIT =
             register(Fruit.class, new RegistryEntryDeserialiser<>(Fruit.REGISTRY));
+    public static final JsonDeserialiser<Pod> POD =
+            register(Pod.class, new RegistryEntryDeserialiser<>(Pod.REGISTRY));
     public static final JsonDeserialiser<Species> SPECIES =
             register(Species.class, new RegistryEntryDeserialiser<>(Species.REGISTRY));
     public static final JsonDeserialiser<FeatureCanceller> FEATURE_CANCELLER =
@@ -276,8 +280,8 @@ public final class JsonDeserialisers {
             register(BiomeDatabase.Operation.class, new EnumDeserialiser<>(BiomeDatabase.Operation.class));
     public static final JsonDeserialiser<GenerationStage.Decoration> DECORATION_STAGE =
             register(GenerationStage.Decoration.class, new EnumDeserialiser<>(GenerationStage.Decoration.class));
-    public static final JsonDeserialiser<Fruit.MatureAction> MATURE_ACTION =
-            register(Fruit.MatureAction.class, new EnumDeserialiser<>(Fruit.MatureAction.class));
+    public static final JsonDeserialiser<GrowableBlock.MatureAction> MATURE_ACTION =
+            register(GrowableBlock.MatureAction.class, new EnumDeserialiser<>(GrowableBlock.MatureAction.class));
 
     public static final JsonDeserialiser<BiomeList> BIOME_LIST = register(BiomeList.class, new BiomeListDeserialiser());
     public static final JsonDeserialiser<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
@@ -321,8 +325,8 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<PropertyDefinition<?>> VARIABLE_DEFINITION =
             register(PropertyDefinition.captureClass(), new PropertyDefinitionDeserialiser());
 
-    public static final JsonDeserialiser<FlowerPeriod> FLOWER_PERIOD = register(
-            FlowerPeriod.class, new CodecDeserialiserWrapper<>(FlowerPeriod.CODEC)
+    public static final JsonDeserialiser<FlowerHoldPeriod> FLOWER_PERIOD = register(
+            FlowerHoldPeriod.class, new CodecDeserialiserWrapper<>(FlowerHoldPeriod.CODEC)
     );
 
     /**
