@@ -12,7 +12,7 @@ import net.minecraft.world.IWorld;
 /**
  * @author Harley O'Connor
  */
-public class PreGenerationContext extends GenerationContext<IWorld> {
+public class PreGenerationContext extends GenerationContext {
 
     private final int radius;
     private final Direction facing;

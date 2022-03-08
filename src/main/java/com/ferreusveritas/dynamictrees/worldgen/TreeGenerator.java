@@ -9,12 +9,12 @@ import com.ferreusveritas.dynamictrees.systems.poissondisc.UniversalPoissonDiscP
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase.Entry;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.DyeColor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -94,19 +94,19 @@ public class TreeGenerator {
         }
     }
 
-    public void makeTrees(ISeedReader world, BiomeDatabase biomeDataBase, PoissonDisc circle, SafeChunkBounds safeBounds) {
+    public void makeTrees(WorldContext worldContext, BiomeDatabase biomeDataBase, PoissonDisc circle, SafeChunkBounds safeBounds) {
         circle.add(8, 8); // Move the circle into the "stage".
         BlockPos pos = new BlockPos(circle.x, 0, circle.z);
-        final Entry entry = biomeDataBase.getEntry(world.getBiome(pos));
-        for (BlockPos groundPos : entry.getGroundFinder().findGround(world, pos)) {
-            makeTree(world, entry, circle, groundPos, safeBounds);
+        final Entry entry = biomeDataBase.getEntry(worldContext.access().getBiome(pos));
+        for (BlockPos groundPos : entry.getGroundFinder().findGround(worldContext.access(), pos)) {
+            makeTree(worldContext, entry, circle, groundPos, safeBounds);
         }
         circle.sub(8, 8); // Move the circle back to normal coords.
     }
 
-    public GeneratorResult makeTree(ISeedReader world, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {
+    public GeneratorResult makeTree(WorldContext worldContext, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {
 
-        final Biome biome = world.getBiome(groundPos);
+        final Biome biome = worldContext.access().getBiome(groundPos);
 
         if (biomeEntry.isBlacklisted()) {
             return GeneratorResult.UNHANDLED_BIOME;
@@ -118,7 +118,7 @@ public class TreeGenerator {
 
         random.setXOR(groundPos);
 
-        final BlockState dirtState = world.getBlockState(groundPos);
+        final BlockState dirtState = worldContext.access().getBlockState(groundPos);
 
         GeneratorResult result = GeneratorResult.GENERATED;
 
@@ -128,9 +128,9 @@ public class TreeGenerator {
         if (speciesSelection.isHandled()) {
             final Species species = speciesSelection.getSpecies();
             if (species.isValid()) {
-                if (species.isAcceptableSoilForWorldgen(world, groundPos, dirtState)) {
+                if (species.isAcceptableSoilForWorldgen(worldContext.access(), groundPos, dirtState)) {
                     if (biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == Chance.OK) {
-                        if (!species.generate(world.getLevel(), world, groundPos, biome, random, circle.radius, safeBounds)) {
+                        if (!species.generate(worldContext, groundPos, biome, random, circle.radius, safeBounds)) {
                             result = GeneratorResult.FAIL_GENERATION;
                         }
                     } else {
@@ -148,7 +148,7 @@ public class TreeGenerator {
 
         // Display concrete circles for testing the circle growing algorithm.
         if (DTConfigs.WORLD_GEN_DEBUG.get()) {
-            this.makeConcreteCircle(world, circle, groundPos.getY(), result, safeBounds);
+            this.makeConcreteCircle(worldContext.access(), circle, groundPos.getY(), result, safeBounds);
         }
 
         return result;

@@ -20,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 
 public class RootsGenFeature extends GenFeature {
 
@@ -83,15 +84,16 @@ public class RootsGenFeature extends GenFeature {
 
     @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
-        final World world = context.world();
+        final IWorld world = context.world();
         final BlockPos treePos = context.treePos();
         final int trunkRadius = TreeHelper.getRadius(world, treePos);
 
         if (context.fertility() > 0 && trunkRadius >= configuration.get(MIN_TRUNK_RADIUS)) {
-            final Surround surr = Surround.values()[world.random.nextInt(8)];
+            final Surround surr = Surround.values()[world.getRandom().nextInt(8)];
             final BlockPos dPos = treePos.offset(surr.getOffset());
             if (world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
-                world.setBlockAndUpdate(dPos, DTRegistries.TRUNK_SHELL.defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
+                world.setBlock(dPos, DTRegistries.TRUNK_SHELL.defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()),
+                        Constants.BlockFlags.DEFAULT);
             }
 
             this.startRoots(configuration, world, treePos, context.species(), trunkRadius);

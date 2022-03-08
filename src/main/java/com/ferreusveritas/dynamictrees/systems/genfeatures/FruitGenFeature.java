@@ -16,7 +16,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
 import java.util.List;
 
@@ -65,25 +64,25 @@ public class FruitGenFeature extends GenFeature {
 
     @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
-        final World world = context.world();
+        final IWorld world = context.world();
         final BlockState blockState = world.getBlockState(context.treePos());
         final BranchBlock branch = TreeHelper.getBranch(blockState);
         final Fruit fruit = configuration.get(FRUIT);
 
         if (branch != null && branch.getRadius(blockState) >= configuration.get(FRUITING_RADIUS) && context.natural()) {
             final BlockPos rootPos = context.pos();
-            final float fruitingFactor = fruit.seasonalFruitProductionFactor(world, rootPos);
+            final float fruitingFactor = fruit.seasonalFruitProductionFactor(context.worldContext(), rootPos);
 
-            if (fruitingFactor > fruit.getMinProductionFactor() && fruitingFactor > world.random.nextFloat()) {
+            if (fruitingFactor > fruit.getMinProductionFactor() && fruitingFactor > world.getRandom().nextFloat()) {
                 final FindEndsNode endFinder = new FindEndsNode();
                 TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
                 final List<BlockPos> endPoints = endFinder.getEnds();
                 int qty = configuration.get(QUANTITY);
                 if (!endPoints.isEmpty()) {
                     for (int i = 0; i < qty; i++) {
-                        final BlockPos endPoint = endPoints.get(world.random.nextInt(endPoints.size()));
+                        final BlockPos endPoint = endPoints.get(world.getRandom().nextInt(endPoints.size()));
                         this.place(configuration, context.species(), world, rootPos.above(), endPoint,
-                                SeasonHelper.getSeasonValue(world, rootPos));
+                                SeasonHelper.getSeasonValue(context.worldContext(), rootPos));
                     }
                 }
             }

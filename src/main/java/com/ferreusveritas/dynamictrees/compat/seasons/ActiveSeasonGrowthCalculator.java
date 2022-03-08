@@ -61,4 +61,16 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
         }
     }
 
+    @Override
+    public Float getPeakFruitProductionSeasonValue(ClimateZoneType type) {
+        switch (type) {
+            case TEMPERATE:
+                return 1.5F;
+            case TROPICAL:
+                return 0.5F;
+            default:
+                return null;
+        }
+    }
+
 }

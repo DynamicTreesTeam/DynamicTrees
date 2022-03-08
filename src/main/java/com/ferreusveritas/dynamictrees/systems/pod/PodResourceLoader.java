@@ -42,8 +42,8 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
                 .register("can_bone_meal", Boolean.class, Pod::setCanBoneMeal)
                 .register("item_stack", ItemStack.class, Pod::setItemStack)
                 .register("growth_chance", Float.class, Pod::setGrowthChance)
-                .register("flower_period", FlowerHoldPeriod.class, Pod::setFlowerPeriod)
                 .register("season_offset", Float.class, Pod::setSeasonOffset)
+                .register("flower_hold_period_length", Float.class, Pod::setFlowerHoldPeriodLength)
                 .register("min_production_factor", Float.class, Pod::setMinProductionFactor)
                 .register("mature_action", GrowableBlock.MatureAction.class, Pod::setMatureAction);
     }

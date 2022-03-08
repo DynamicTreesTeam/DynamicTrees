@@ -76,6 +76,7 @@ import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
@@ -165,7 +166,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius,
+        public boolean generate(WorldContext worldContext, BlockPos pos,
+                                Biome biome, Random random, int radius,
                                 SafeChunkBounds safeBounds) {
             return false;
         }
@@ -527,7 +529,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public float getGrowthRate(World world, BlockPos rootPos) {
-        return this.growthRate * this.seasonalGrowthFactor(world, rootPos);
+        return this.growthRate * this.seasonalGrowthFactor(WorldContext.create(world), rootPos);
     }
 
     /**
@@ -1734,23 +1736,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Pulls data from the {@link NormalSeasonManager} to determine the rate of
      * tree growth for the current season.
      *
-     * @param world   The {@link World} object.
      * @param rootPos the {@link BlockPos} of the {@link RootyBlock}.
      * @return Factor from 0.0 (no growth) to 1.0 (full growth).
      */
-    public float seasonalGrowthFactor(World world, BlockPos rootPos) {
+    public float seasonalGrowthFactor(WorldContext worldContext, BlockPos rootPos) {
         return seasonalGrowthOffset != null ?
-                SeasonHelper.globalSeasonalGrowthFactor(world, rootPos, -seasonalGrowthOffset) : 1.0f;
+                SeasonHelper.globalSeasonalGrowthFactor(worldContext, rootPos, -seasonalGrowthOffset) : 1.0f;
     }
 
-    public float seasonalSeedDropFactor(World world, BlockPos pos) {
+    public float seasonalSeedDropFactor(WorldContext worldContext, BlockPos pos) {
         return seasonalSeedDropOffset != null ?
-                SeasonHelper.globalSeasonalSeedDropFactor(world, pos, -seasonalSeedDropOffset) : 1.0f;
+                SeasonHelper.globalSeasonalSeedDropFactor(worldContext, pos, -seasonalSeedDropOffset) : 1.0f;
     }
 
-    public float seasonalFruitProductionFactor(World world, BlockPos pos) {
+    public float seasonalFruitProductionFactor(WorldContext worldContext, BlockPos pos) {
         return seasonalFruitingOffset != null ?
-                SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, -seasonalFruitingOffset, false)
+                SeasonHelper.globalSeasonalFruitProductionFactor(worldContext, pos, -seasonalFruitingOffset, false)
                 : 1.0F;
     }
 
@@ -1769,9 +1770,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             for (int i = 0; i < 4; i++) {
                 boolean isValidSeason = false;
                 if (seasonalFruitingOffset != null) {
-                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(world,
+                    final WorldContext worldContext = WorldContext.create(world);
+                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(worldContext,
                             new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
-                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(world,
+                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(worldContext,
                             new BlockPos(0, (int) ((i + seasonEnd - seasonalFruitingOffset) * 64.0f), 0), true);
                     if (Math.min(prod1, prod2) > threshold) {
                         isValidSeason = true;
@@ -1997,17 +1999,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Default worldgen spawn mechanism. This method uses JoCodes to generate tree models. Override to use other
      * methods.
      *
-     * @param world   The world
      * @param rootPos The position of {@link RootyBlock} this tree is planted in
      * @param biome   The biome this tree is generating in
      * @param radius  The radius of the tree generation boundary
      * @return true if tree was generated. false otherwise.
      */
-    public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius,
+    public boolean generate(WorldContext worldContext, BlockPos rootPos, Biome biome, Random random, int radius,
                             SafeChunkBounds safeBounds) {
         final AtomicBoolean fullGen = new AtomicBoolean(false);
         final FullGenerationContext context =
-                new FullGenerationContext(world, rootPos, this, biome, radius, safeBounds);
+                new FullGenerationContext(worldContext.access(), rootPos, this, biome, radius, safeBounds);
 
         this.genFeatures.forEach(configuration ->
                 fullGen.set(fullGen.get() || configuration.generate(GenFeature.Type.FULL, context))
@@ -2021,7 +2022,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         if (!JoCodeRegistry.getCodes(this.getRegistryName()).isEmpty()) {
             final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), radius, random);
             if (code != null) {
-                code.generate(worldObj, world, this, rootPos, biome, facing, radius, safeBounds, false);
+                code.generate(worldContext, this, rootPos, biome, facing, radius, safeBounds, false);
                 return true;
             }
         }

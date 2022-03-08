@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.compat.seasons.FlowerHoldPeriod;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.util.Null;
 import com.google.gson.JsonObject;
 import net.minecraft.block.AbstractBlock;
@@ -39,7 +40,7 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
                 .register("can_bone_meal", Boolean.class, Fruit::setCanBoneMeal)
                 .register("item_stack", ItemStack.class, Fruit::setItemStack)
                 .register("growth_chance", Float.class, Fruit::setGrowthChance)
-                .register("flower_period", FlowerHoldPeriod.class, Fruit::setFlowerPeriod)
+                .register("flower_hold_period_length", Float.class, Fruit::setFlowerHoldPeriodLength)
                 .register("season_offset", Float.class, Fruit::setSeasonOffset)
                 .register("min_production_factor", Float.class, Fruit::setMinProductionFactor)
                 .register("mature_action", GrowableBlock.MatureAction.class, Fruit::setMatureAction);

@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.block.Block;
@@ -89,7 +90,7 @@ public class Seed extends Item implements IPlantable {
             String joCode = getCode(seedStack);
             if (!joCode.isEmpty()) {
                 world.removeBlock(pos, false); // Remove the newly created dynamic sapling
-                species.getJoCode(joCode).setCareful(true).generate(world, world, species, pos.below(), world.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY, false);
+                species.getJoCode(joCode).setCareful(true).generate(WorldContext.create(world), species, pos.below(), world.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY, false);
             }
             return true;
         }

@@ -5,12 +5,12 @@ import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
-import com.ferreusveritas.dynamictrees.compat.seasons.FlowerHoldPeriod;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
 import com.ferreusveritas.dynamictrees.util.AgeProperties;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -31,8 +31,7 @@ import net.minecraftforge.common.util.Constants;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.HALF_SEASON;
-import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.SPRING;
+import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.isSeasonBetween;
 
 /**
  * Stores properties and implements functionality of fruits which grow from the leaves of a tree.
@@ -78,10 +77,10 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
 
     private float growthChance = 0.2F;
 
-    private FlowerHoldPeriod flowerHoldPeriod = new FlowerHoldPeriod(SPRING, SPRING + HALF_SEASON);
-
     @Nullable
     private Float seasonOffset = 0f;
+
+    private float flowerHoldPeriodLength = 0.5F;
 
     private float minProductionFactor = 0.3F;
 
@@ -96,7 +95,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      */
     public final FruitBlock getBlock() {
         if (block == null) {
-            throw new IllegalStateException("Fruit#getBlock called too early (before the block was created).");
+            throw new IllegalStateException("Invoked too early (before the block was created).");
         }
         return block;
     }
@@ -158,8 +157,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      */
     public void setBlockShapes(VoxelShape[] blockShapes) {
         if (blockShapes.length < maxAge) {
-            throw new IllegalArgumentException("Fruit#setBlockShapes called with insufficient blockShapes array " +
-                    "for the maximum age set.");
+            throw new IllegalArgumentException("Insufficient number of block shapes provided for the maximum age set.");
         }
         this.blockShapes = blockShapes;
     }
@@ -191,12 +189,18 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
         this.growthChance = growthChance;
     }
 
-    public final boolean isInFlowerPeriod(Float seasonValue) {
-        return flowerHoldPeriod.isIn(seasonValue, seasonOffset);
-    }
-
-    public void setFlowerPeriod(FlowerHoldPeriod flowerHoldPeriod) {
-        this.flowerHoldPeriod = flowerHoldPeriod;
+    public final boolean isInFlowerHoldPeriod(IWorld world, BlockPos rootPos, Float seasonValue) {
+        if (seasonOffset == null) {
+            return false;
+        }
+        final Float peakSeasonValue = SeasonHelper.getSeasonManager()
+                .getPeakFruitProductionSeasonValue(WorldContext.create(world).level(), rootPos, seasonOffset);
+        if (peakSeasonValue == null || flowerHoldPeriodLength == 0.0F) {
+            return false;
+        }
+        final float min = peakSeasonValue - 1.5F;
+        final float max = min + flowerHoldPeriodLength;
+        return isSeasonBetween(seasonValue, min, max);
     }
 
     @Nullable
@@ -215,10 +219,18 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
         seasonOffset = offset;
     }
 
-    public float seasonalFruitProductionFactor(World world, BlockPos pos) {
+    public float seasonalFruitProductionFactor(WorldContext worldContext, BlockPos pos) {
         return seasonOffset != null ?
-                SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, -seasonOffset, false)
+                SeasonHelper.globalSeasonalFruitProductionFactor(worldContext, pos, -seasonOffset, false)
                 : 1.0F;
+    }
+
+    public float getFlowerHoldPeriodLength() {
+        return flowerHoldPeriodLength;
+    }
+
+    public void setFlowerHoldPeriodLength(float flowerHoldPeriodLength) {
+        this.flowerHoldPeriodLength = flowerHoldPeriodLength;
     }
 
     public final float getMinProductionFactor() {
@@ -230,7 +242,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     }
 
     public boolean isOutOfSeason(World world, BlockPos pos) {
-        return seasonalFruitProductionFactor(world, pos) < minProductionFactor;
+        return seasonalFruitProductionFactor(WorldContext.create(world), pos) < minProductionFactor;
     }
 
     public void place(IWorld world, BlockPos pos, @Nullable Float seasonValue) {
@@ -258,7 +270,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
 
     protected int getAgeForWorldGen(IWorld world, BlockPos pos, @Nullable Float seasonValue) {
         // If seasons are enabled and in flower period, set to flower age (0).
-        if (seasonValue != null && this.isInFlowerPeriod(seasonValue)) {
+        if (seasonValue != null && this.isInFlowerHoldPeriod(world, pos, seasonValue)) {
             return 0;
         }
         // Half the time the fruit should be fully mature.
@@ -281,8 +293,8 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     @Override
     public Fruit reset() {
         canBoneMeal = DTConfigs.CAN_BONE_MEAL_FRUIT.get();
-        flowerHoldPeriod = new FlowerHoldPeriod(SPRING, SPRING + HALF_SEASON);
         seasonOffset = 0.0F;
+        flowerHoldPeriodLength = 0.5F;
         minProductionFactor = 0.3F;
         matureAction = GrowableBlock.MatureAction.DEFAULT;
         return this;

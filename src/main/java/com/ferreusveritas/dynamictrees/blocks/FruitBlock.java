@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IGrowable;
@@ -68,14 +69,14 @@ public class FruitBlock extends Block implements IGrowable, GrowableBlock {
         }
 
         final int age = getAge(state);
-        final Float season = SeasonHelper.getSeasonValue(world, pos);
+        final Float season = SeasonHelper.getSeasonValue(WorldContext.create(world), pos);
 
         if (season != null) { // Non-Null means we are season capable.
             if (fruit.isOutOfSeason(world, pos)) {
                 this.outOfSeason(world, pos); // Destroy the block or similar action.
                 return;
             }
-            if (age == 0 && fruit.isInFlowerPeriod(season)) {
+            if (age == 0 && fruit.isInFlowerHoldPeriod(world, pos, season)) {
                 return;
             }
         }

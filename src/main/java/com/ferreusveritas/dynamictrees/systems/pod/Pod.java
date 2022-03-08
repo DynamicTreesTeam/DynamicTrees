@@ -5,12 +5,12 @@ import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
 import com.ferreusveritas.dynamictrees.blocks.PodBlock;
-import com.ferreusveritas.dynamictrees.compat.seasons.FlowerHoldPeriod;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
 import com.ferreusveritas.dynamictrees.util.AgeProperties;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.google.common.collect.Maps;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -29,15 +29,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.HALF_SEASON;
-import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.SPRING;
+import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.isSeasonBetween;
 
 /**
  * Stores properties and implements functionality of pods which grow from the branches of a tree.
@@ -68,8 +66,8 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
         public void setShapesFor(Direction facing, VoxelShape[] shapes) {
             if (shapes.length < maxAge) {
-                throw new IllegalArgumentException("Pod$BlockShapeData#setShapesFor called with insufficient blockShapes array " +
-                        "for the maximum age set.");
+                throw new IllegalArgumentException("Insufficient number of block shapes provided for the maximum " +
+                        "age set.");
             }
             facingShapes.put(facing, shapes);
         }
@@ -110,10 +108,10 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
     private float growthChance = 0.2F;
 
-    private FlowerHoldPeriod flowerHoldPeriod = new FlowerHoldPeriod(SPRING, SPRING + HALF_SEASON);
-
     @Nullable
     private Float seasonOffset = 0f;
+
+    private float flowerHoldPeriodLength = 0.5F;
 
     private float minProductionFactor = 0.3F;
 
@@ -128,7 +126,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
      */
     public final PodBlock getBlock() {
         if (block == null) {
-            throw new IllegalStateException("Pod#getBlock called too early (before the block was created).");
+            throw new IllegalStateException("Invoked too early (before the block was created).");
         }
         return block;
     }
@@ -206,8 +204,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
      */
     public final ItemStack getItemStack() {
         if (itemStack == null) {
-            throw new IllegalStateException("Pod#getItemStack called too early or item was not set on \"" +
-                    getRegistryName() + "\".");
+            throw new IllegalStateException("Invoked too early or item was not set on \"" + getRegistryName() + "\".");
         }
         return itemStack.copy();
     }
@@ -231,12 +228,18 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         this.growthChance = growthChance;
     }
 
-    public final boolean isInFlowerPeriod(Float seasonValue) {
-        return flowerHoldPeriod.isIn(seasonValue, seasonOffset);
-    }
-
-    public void setFlowerPeriod(FlowerHoldPeriod flowerHoldPeriod) {
-        this.flowerHoldPeriod = flowerHoldPeriod;
+    public boolean isInFlowerHoldPeriod(IWorld world, BlockPos rootPos, Float seasonValue) {
+        if (seasonOffset == null) {
+            return false;
+        }
+        final Float peakSeasonValue = SeasonHelper.getSeasonManager()
+                .getPeakFruitProductionSeasonValue(WorldContext.create(world).level(), rootPos, seasonOffset);
+        if (peakSeasonValue == null || flowerHoldPeriodLength == 0.0F) {
+            return false;
+        }
+        final float min = peakSeasonValue - 1.5F;
+        final float max = min + flowerHoldPeriodLength;
+        return isSeasonBetween(seasonValue, min, max);
     }
 
     @Nullable
@@ -255,10 +258,18 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         seasonOffset = offset;
     }
 
-    public float seasonalProductionFactor(World world, BlockPos pos) {
+    public float seasonalProductionFactor(WorldContext worldContext, BlockPos pos) {
         return seasonOffset != null ?
-                SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, -seasonOffset, false)
+                SeasonHelper.globalSeasonalFruitProductionFactor(worldContext, pos, -seasonOffset, false)
                 : 1.0F;
+    }
+
+    public float getFlowerHoldPeriodLength() {
+        return flowerHoldPeriodLength;
+    }
+
+    public void setFlowerHoldPeriodLength(float flowerHoldPeriodLength) {
+        this.flowerHoldPeriodLength = flowerHoldPeriodLength;
     }
 
     public final float getMinProductionFactor() {
@@ -269,8 +280,8 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         this.minProductionFactor = minProductionFactor;
     }
 
-    public boolean isOutOfSeason(World world, BlockPos pos) {
-        return seasonalProductionFactor(world, pos) < minProductionFactor;
+    public boolean isOutOfSeason(WorldContext worldContext, BlockPos pos) {
+        return seasonalProductionFactor(worldContext, pos) < minProductionFactor;
     }
 
     public void place(IWorld world, BlockPos pos, @Nullable Float seasonValue, Direction facing) {
@@ -298,7 +309,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
     protected int getAgeForWorldGen(IWorld world, BlockPos pos, @Nullable Float seasonValue) {
         // If seasons are enabled and in flower period, set to flower age (0).
-        if (seasonValue != null && this.isInFlowerPeriod(seasonValue)) {
+        if (seasonValue != null && this.isInFlowerHoldPeriod(world, pos, seasonValue)) {
             return 0;
         }
         // Half the time the pod should be fully mature.
@@ -317,8 +328,8 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     @Override
     public Pod reset() {
         canBoneMeal = DTConfigs.CAN_BONE_MEAL_PODS.get();
-        flowerHoldPeriod = new FlowerHoldPeriod(SPRING, SPRING + HALF_SEASON);
         seasonOffset = 0.0F;
+        flowerHoldPeriodLength = 0.5F;
         minProductionFactor = 0.3F;
         matureAction = GrowableBlock.MatureAction.DEFAULT;
         return this;

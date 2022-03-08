@@ -9,10 +9,10 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowConte
 import com.ferreusveritas.dynamictrees.systems.nodemappers.PodGenerationNode;
 import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -40,8 +40,8 @@ public class PodGenFeature extends GenFeature {
     @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         if (context.fertility() == 0) {
-            final World world = context.world();
-            if (shouldGrow(configuration, context.species(), context.world(), context.treePos(), context.random())) {
+            final IWorld world = context.world();
+            if (shouldGrow(configuration, context.species(), context.worldContext(), context.treePos(), context.random())) {
                 this.place(configuration.get(POD)::place, world, context.pos(),
                         SeasonHelper.getSeasonValue(world, context.pos()));
             }
@@ -49,9 +49,9 @@ public class PodGenFeature extends GenFeature {
         return false;
     }
 
-    private boolean shouldGrow(GenFeatureConfiguration configuration, Species species, World world, BlockPos treePos,
+    private boolean shouldGrow(GenFeatureConfiguration configuration, Species species, WorldContext worldContext, BlockPos treePos,
                                Random random) {
-        return species.seasonalFruitProductionFactor(world, treePos) >
+        return species.seasonalFruitProductionFactor(worldContext, treePos) >
                 random.nextFloat() && random.nextFloat() <= configuration.get(PLACE_CHANCE);
     }
 

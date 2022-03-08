@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.systems.pod.Pod;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -77,11 +78,11 @@ public class PodBlock extends HorizontalBlock implements GrowableBlock, IGrowabl
         final Float season = SeasonHelper.getSeasonValue(world, pos);
 
         if (season != null) { // Non-Null means we are season capable.
-            if (pod.isOutOfSeason(world, pos)) {
+            if (pod.isOutOfSeason(WorldContext.create(world), pos)) {
                 this.outOfSeason(world, pos); // Destroy the block or similar action.
                 return;
             }
-            if (age == 0 && pod.isInFlowerPeriod(season)) {
+            if (age == 0 && pod.isInFlowerHoldPeriod(world, pos, season)) {
                 return;
             }
         }
