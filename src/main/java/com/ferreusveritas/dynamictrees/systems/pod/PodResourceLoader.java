@@ -64,6 +64,7 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
 
     @Override
     protected void applyLoadAppliers(JsonRegistryResourceLoader<Pod>.LoadData loadData, JsonObject json) {
+        super.applyLoadAppliers(loadData, json);
         final JsonObject propertiesJson = getBlockPropertiesJson(json);
         if (propertiesJson == null) {
             this.createBlock(loadData.getResource(), json);
