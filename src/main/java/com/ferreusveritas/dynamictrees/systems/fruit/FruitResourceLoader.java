@@ -3,11 +3,9 @@ package com.ferreusveritas.dynamictrees.systems.fruit;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
-import com.ferreusveritas.dynamictrees.compat.seasons.FlowerHoldPeriod;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
-import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.util.Null;
 import com.google.gson.JsonObject;
 import net.minecraft.block.AbstractBlock;
@@ -48,6 +46,7 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
 
     @Override
     protected void applyLoadAppliers(JsonRegistryResourceLoader<Fruit>.LoadData loadData, JsonObject json) {
+        super.applyLoadAppliers(loadData, json);
         final JsonObject propertiesJson = getBlockPropertiesJson(json);
         if (propertiesJson == null) {
             this.createBlock(loadData.getResource(), json);
