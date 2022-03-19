@@ -156,8 +156,8 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      * @throws IllegalArgumentException if the specified {@code blockShapes} array does not contain a shape for each age
      */
     public void setBlockShapes(VoxelShape[] blockShapes) {
-        if (blockShapes.length < maxAge) {
-            throw new IllegalArgumentException("Insufficient number of block shapes provided for the maximum age set.");
+        if (blockShapes.length <= maxAge) {
+            throw new IllegalArgumentException("Insufficient number of block shapes provided for the maximum age "+maxAge+" on fruit "+this);
         }
         this.blockShapes = blockShapes;
     }

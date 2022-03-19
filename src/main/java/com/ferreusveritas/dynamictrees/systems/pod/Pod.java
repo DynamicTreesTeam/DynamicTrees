@@ -65,9 +65,8 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         }
 
         public void setShapesFor(Direction facing, VoxelShape[] shapes) {
-            if (shapes.length < maxAge) {
-                throw new IllegalArgumentException("Insufficient number of block shapes provided for the maximum " +
-                        "age set.");
+            if (shapes.length <= maxAge) {
+                throw new IllegalArgumentException("Insufficient number of block shapes provided for the maximum age "+maxAge+" on pod "+this);
             }
             facingShapes.put(facing, shapes);
         }
