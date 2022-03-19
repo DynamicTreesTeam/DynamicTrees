@@ -2,24 +2,24 @@
   "item_stack": "cocoa_beans",
   "block_shapes": {
     "east": [
-      [ 0.6875, 0.4375, 0.375, 0.9375, 0.75, 0.625 ],
-      [ 0.5625, 0.3125, 0.3125, 0.9375, 0.75, 0.6825 ],
-      [ 0.4375, 0.1875, 0.25, 0.9375, 0.75, 0.75 ]
+      { "function": "pod", "parameters": { "radius": 2, "height": 5, "stem_length": 4, "side_offset": 5, "side": "east" } },
+      { "function": "pod", "parameters": { "radius": 3, "height": 7, "stem_length": 4, "side_offset": 4, "side": "east" } },
+      { "function": "pod", "parameters": { "radius": 4, "height": 9, "stem_length": 4, "side_offset": 3, "side": "east" } }
     ],
     "west": [
-      [ 0.0625, 0.4375, 0.375, 0.3125, 0.75, 0.625 ],
-      [ 0.0625, 0.3125, 0.3125, 0.4375, 0.75, 0.6825 ],
-      [ 0.0625, 0.1875, 0.25, 0.5625, 0.75, 0.75 ]
+      { "function": "pod", "parameters": { "radius": 2, "height": 5, "stem_length": 4, "side_offset": 5, "side": "west" } },
+      { "function": "pod", "parameters": { "radius": 3, "height": 7, "stem_length": 4, "side_offset": 4, "side": "west" } },
+      { "function": "pod", "parameters": { "radius": 4, "height": 9, "stem_length": 4, "side_offset": 3, "side": "west" } }
     ],
     "north": [
-      [ 0.375, 0.4375, 0.0625, 0.625, 0.75, 0.3125 ],
-      [ 0.3125, 0.3125, 0.0625, 0.6875, 0.75, 0.4375 ],
-      [ 0.25, 0.1875, 0.0625, 0.75, 0.75, 0.5625 ]
+      { "function": "pod", "parameters": { "radius": 2, "height": 5, "stem_length": 4, "side_offset": 5, "side": "north" } },
+      { "function": "pod", "parameters": { "radius": 3, "height": 7, "stem_length": 4, "side_offset": 4, "side": "north" } },
+      { "function": "pod", "parameters": { "radius": 4, "height": 9, "stem_length": 4, "side_offset": 3, "side": "north" } }
     ],
     "south": [
-      [ 0.375, 0.4375, 0.6875, 0.625, 0.75, 0.9375 ],
-      [ 0.3125, 0.3125, 0.5625, 0.6875, 0.75, 0.9375 ],
-      [ 0.25, 0.1875, 0.4375, 0.75, 0.75, 0.9375 ]
+      { "function": "pod", "parameters": { "radius": 2, "height": 5, "stem_length": 4, "side_offset": 5, "side": "south" } },
+      { "function": "pod", "parameters": { "radius": 3, "height": 7, "stem_length": 4, "side_offset": 4, "side": "south" } },
+      { "function": "pod", "parameters": { "radius": 4, "height": 9, "stem_length": 4, "side_offset": 3, "side": "south" } }
     ]
   },
   "flower_hold_period_length": 0
