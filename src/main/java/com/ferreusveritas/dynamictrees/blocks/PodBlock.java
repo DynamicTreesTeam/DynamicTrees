@@ -13,13 +13,13 @@ import net.minecraft.block.IGrowable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootTables;
+import net.minecraft.loot.*;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
@@ -164,11 +164,19 @@ public class PodBlock extends HorizontalBlock implements GrowableBlock, IGrowabl
     @SuppressWarnings("deprecation")
     @Override
     public List<ItemStack> getDrops(BlockState pState, LootContext.Builder pBuilder) {
-        //If no loot table is set up, the default behaviour is to drop the fruit item if the age is max.
-        if (getLootTable() == LootTables.EMPTY &&
-                pState.hasProperty(pod.getAgeProperty()) && pState.getValue(pod.getAgeProperty()) == pod.getMaxAge())
-            return Collections.singletonList(pod.getItemStack());
-        return super.getDrops(pState, pBuilder);
+        ResourceLocation resourcelocation = this.getLootTable();
+        if (resourcelocation == LootTables.EMPTY) return Collections.emptyList();
+        else {
+            LootContext lootcontext = pBuilder.withParameter(LootParameters.BLOCK_STATE, pState).create(LootParameterSets.BLOCK);
+            LootTable loottable = lootcontext.getLevel().getServer().getLootTables().get(resourcelocation);
+
+            //If no loot table is set up, the default behaviour is to drop the pod item if the age is max.
+            if (loottable == LootTable.EMPTY &&
+                    pState.hasProperty(pod.getAgeProperty()) && pState.getValue(pod.getAgeProperty()) == pod.getMaxAge())
+                return Collections.singletonList(pod.getItemStack());
+
+            return loottable.getRandomItems(lootcontext);
+        }
     }
 
     @Override
