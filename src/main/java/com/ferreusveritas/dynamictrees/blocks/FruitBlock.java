@@ -3,12 +3,15 @@ package com.ferreusveritas.dynamictrees.blocks;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.util.WorldContext;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootTables;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.ActionResultType;
@@ -26,6 +29,9 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -151,6 +157,16 @@ public class FruitBlock extends Block implements IGrowable, GrowableBlock {
 
     protected void drop(World world, BlockPos pos, BlockState state) {
         world.destroyBlock(pos, true);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public List<ItemStack> getDrops(BlockState pState, LootContext.Builder pBuilder) {
+        //If no loot table is set up, the default behaviour is to drop the fruit item if the age is max.
+        if (getLootTable() == LootTables.EMPTY &&
+                pState.hasProperty(fruit.getAgeProperty()) && pState.getValue(fruit.getAgeProperty()) == fruit.getMaxAge())
+            return Collections.singletonList(fruit.getItemStack());
+        return super.getDrops(pState, pBuilder);
     }
 
     @Override

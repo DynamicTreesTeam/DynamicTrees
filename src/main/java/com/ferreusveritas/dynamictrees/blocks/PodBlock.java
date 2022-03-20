@@ -13,6 +13,8 @@ import net.minecraft.block.IGrowable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootTables;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.ActionResultType;
@@ -31,6 +33,8 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -155,6 +159,16 @@ public class PodBlock extends HorizontalBlock implements GrowableBlock, IGrowabl
         final BlockState branchState = world.getBlockState(pos.relative(state.getValue(FACING)));
         final BranchBlock branch = TreeHelper.getBranch(branchState);
         return branch != null && branch.getRadius(branchState) == 8;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public List<ItemStack> getDrops(BlockState pState, LootContext.Builder pBuilder) {
+        //If no loot table is set up, the default behaviour is to drop the fruit item if the age is max.
+        if (getLootTable() == LootTables.EMPTY &&
+                pState.hasProperty(pod.getAgeProperty()) && pState.getValue(pod.getAgeProperty()) == pod.getMaxAge())
+            return Collections.singletonList(pod.getItemStack());
+        return super.getDrops(pState, pBuilder);
     }
 
     @Override
