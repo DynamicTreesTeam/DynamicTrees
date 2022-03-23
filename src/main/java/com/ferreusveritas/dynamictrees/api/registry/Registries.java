@@ -31,10 +31,10 @@ public final class Registries {
                     Family.REGISTRY,
                     GenFeature.REGISTRY,
                     DropCreator.REGISTRY,
-                    Species.REGISTRY,
-                    SoilProperties.REGISTRY,
                     Fruit.REGISTRY,
-                    Pod.REGISTRY
+                    Pod.REGISTRY,
+                    Species.REGISTRY,
+                    SoilProperties.REGISTRY
             )
     );
 
