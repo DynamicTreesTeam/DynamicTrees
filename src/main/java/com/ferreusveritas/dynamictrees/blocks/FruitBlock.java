@@ -213,8 +213,12 @@ public class FruitBlock extends Block implements IGrowable, GrowableBlock {
         }
     }
 
-    private int getAge(BlockState state) {
+    public int getAge(BlockState state) {
         return state.getValue(fruit.getAgeProperty());
+    }
+
+    public int getMaxAge() {
+        return fruit.getMaxAge();
     }
 
     private void setAge(World world, BlockPos pos, BlockState state, int newAge) {
@@ -226,5 +230,4 @@ public class FruitBlock extends Block implements IGrowable, GrowableBlock {
     public boolean isPathfindable(BlockState pState, IBlockReader pLevel, BlockPos pPos, PathType pType) {
         return false;
     }
-
 }

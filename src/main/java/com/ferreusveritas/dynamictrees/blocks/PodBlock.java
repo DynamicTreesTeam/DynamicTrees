@@ -223,6 +223,8 @@ public class PodBlock extends HorizontalBlock implements GrowableBlock, IGrowabl
         return state.getValue(pod.getAgeProperty());
     }
 
+    public int getMaxAge() { return pod.getMaxAge(); }
+
     private void setAge(World world, BlockPos pos, BlockState state, int newAge) {
         world.setBlock(pos, state.setValue(pod.getAgeProperty(), newAge), 2);
     }
