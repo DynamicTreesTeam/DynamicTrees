@@ -385,7 +385,7 @@ public class JoCode {
                 world.getBlockState(pos).getBlock().is(DTBlockTags.FOLIAGE) ||
                 world.getBlockState(pos).getBlock().is(BlockTags.FLOWERS)) &&
                 (!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-            species.getFamily().getBranch().ifPresent(branch ->
+            species.getFamily().getBranchForPlacement(world, species, pos).ifPresent(branch ->
                     branch.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)
             );
             return false;
