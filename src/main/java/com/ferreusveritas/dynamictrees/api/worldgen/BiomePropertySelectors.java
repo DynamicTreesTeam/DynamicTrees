@@ -3,10 +3,10 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.Sets;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.GenerationStep;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class BiomePropertySelectors {
     public static final class FeatureCancellations {
         private final Collection<String> namespaces = Sets.newHashSet();
         private final Collection<FeatureCanceller> featureCancellers = Sets.newHashSet();
-        private final Collection<GenerationStage.Decoration> stages = Sets.newHashSet();
+        private final Collection<GenerationStep.Decoration> stages = Sets.newHashSet();
 
         public void putNamespace(final String namespace) {
             this.namespaces.add(namespace);
@@ -53,13 +53,13 @@ public class BiomePropertySelectors {
             this.featureCancellers.add(featureCanceller);
         }
 
-        public void putStage(final GenerationStage.Decoration stage) {
+        public void putStage(final GenerationStep.Decoration stage) {
             this.stages.add(stage);
         }
 
         public void putDefaultStagesIfEmpty() {
             if (this.stages.size() < 1) {
-                this.stages.add(GenerationStage.Decoration.VEGETAL_DECORATION);
+                this.stages.add(GenerationStep.Decoration.VEGETAL_DECORATION);
             }
         }
 
@@ -79,7 +79,7 @@ public class BiomePropertySelectors {
             return this.featureCancellers;
         }
 
-        public Collection<GenerationStage.Decoration> getStages() {
+        public Collection<GenerationStep.Decoration> getStages() {
             return this.stages;
         }
 

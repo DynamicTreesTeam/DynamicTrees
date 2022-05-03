@@ -1,13 +1,12 @@
 package com.ferreusveritas.dynamictrees.api.resource.loading.preparation;
 
-import com.ferreusveritas.dynamictrees.api.resource.ResourceCollector;
 import com.ferreusveritas.dynamictrees.api.resource.Resource;
+import com.ferreusveritas.dynamictrees.api.resource.ResourceCollector;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import net.minecraft.resources.IResource;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -37,14 +36,14 @@ public final class MultiJsonResourcePreparer extends
 
     @Override
     protected void readAndPutResources(Collection<ResourceLocation> resourceLocations,
-                                       IResourceManager resourceManager) {
+                                       ResourceManager resourceManager) {
         resourceLocations.forEach(location -> {
             final ResourceLocation resourceName = this.getResourceName(location);
             this.tryReadAndPutResource(resourceManager, location, resourceName);
         });
     }
 
-    private void tryReadAndPutResource(IResourceManager resourceManager, ResourceLocation location,
+    private void tryReadAndPutResource(ResourceManager resourceManager, ResourceLocation location,
                                        ResourceLocation resourceName) {
         try {
             this.readAndPutResource(resourceManager, location, resourceName);
@@ -54,12 +53,12 @@ public final class MultiJsonResourcePreparer extends
     }
 
     @Override
-    protected void readAndPutResource(IResource resource, ResourceLocation resourceName)
+    protected void readAndPutResource(Resource resource, ResourceLocation resourceName)
             throws PreparationException, IOException {
 
     }
 
-    private void readAndPutResource(IResourceManager resourceManager, ResourceLocation location,
+    private void readAndPutResource(ResourceManager resourceManager, ResourceLocation location,
                                     ResourceLocation resourceName) throws PreparationException, IOException {
         this.computeResourceListIfAbsent(resourceName)
                 .addAll(this.collectResources(resourceManager, location));
@@ -72,10 +71,10 @@ public final class MultiJsonResourcePreparer extends
                         ).getResource();
     }
 
-    private List<JsonElement> collectResources(IResourceManager resourceManager, ResourceLocation location)
+    private List<JsonElement> collectResources(ResourceManager resourceManager, ResourceLocation location)
             throws IOException, PreparationException {
         final List<JsonElement> resources = new LinkedList<>();
-        for (IResource resource : resourceManager.getResources(location)) {
+        for (Resource resource : resourceManager.getResources(location)) {
             resources.add(JsonResourcePreparer.readResource(resource));
         }
         return resources;

@@ -7,13 +7,13 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -72,7 +72,7 @@ public class BranchDestructionData {
         this.trunkHeight = trunkHeight;
     }
 
-    public BranchDestructionData(CompoundNBT nbt) {
+    public BranchDestructionData(CompoundTag nbt) {
         this.species = TreeRegistry.findSpecies(new ResourceLocation(nbt.getString("species")));
         this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos");
         this.destroyedBranchesConnections = nbt.getIntArray("branchcon");
@@ -83,12 +83,12 @@ public class BranchDestructionData {
         this.endPoints = nbt.getIntArray("ends");
         this.woodVolume = new NetVolumeNode.Volume(nbt.getIntArray("volume"));
         this.cutPos = new BlockPos(nbt.getInt("cutx"), nbt.getInt("cuty"), nbt.getInt("cutz"));
-        this.cutDir = Direction.values()[MathHelper.clamp(nbt.getInt("cutdir"), 0, Direction.values().length - 1)];
-        this.toolDir = Direction.values()[MathHelper.clamp(nbt.getInt("tooldir"), 0, Direction.values().length - 1)];
+        this.cutDir = Direction.values()[Mth.clamp(nbt.getInt("cutdir"), 0, Direction.values().length - 1)];
+        this.toolDir = Direction.values()[Mth.clamp(nbt.getInt("tooldir"), 0, Direction.values().length - 1)];
         this.trunkHeight = nbt.getInt("trunkheight");
     }
 
-    public CompoundNBT writeToNBT(CompoundNBT tag) {
+    public CompoundTag writeToNBT(CompoundTag tag) {
         tag.putString("species", species.getRegistryName().toString());
         tag.putIntArray("branchpos", destroyedBranchesRadiusPosition);
         tag.putIntArray("branchcon", destroyedBranchesConnections);

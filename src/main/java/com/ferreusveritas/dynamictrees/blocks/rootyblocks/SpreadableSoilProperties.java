@@ -2,20 +2,20 @@ package com.ferreusveritas.dynamictrees.blocks.rootyblocks;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.init.DTClient;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.*;
 
@@ -43,7 +43,7 @@ public class SpreadableSoilProperties extends SoilProperties {
     }
 
     @Override
-    protected RootyBlock createBlock(AbstractBlock.Properties blockProperties) {
+    protected RootyBlock createBlock(BlockBehaviour.Properties blockProperties) {
         return new SpreadableRootyBlock(this, blockProperties);
     }
 
@@ -76,7 +76,7 @@ public class SpreadableSoilProperties extends SoilProperties {
         }
 
         @Override
-        public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
             SpreadableSoilProperties properties = getSoilProperties();
             if (properties.spread_item != null) {
                 ItemStack handStack = player.getItemInHand(handIn);
@@ -100,7 +100,7 @@ public class SpreadableSoilProperties extends SoilProperties {
                             handStack.shrink(1);
                         }
                         DTClient.spawnParticles(worldIn, ParticleTypes.HAPPY_VILLAGER, pos.above(), 2 + worldIn.random.nextInt(5), worldIn.random);
-                        return ActionResultType.SUCCESS;
+                        return InteractionResult.SUCCESS;
                     }
                 }
             }
@@ -108,7 +108,7 @@ public class SpreadableSoilProperties extends SoilProperties {
         }
 
         @Override
-        public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
             super.randomTick(state, world, pos, random);
             SpreadableSoilProperties properties = getSoilProperties();
             //this is a similar behaviour to vanilla grass spreading but inverted to be handled by the dirt block

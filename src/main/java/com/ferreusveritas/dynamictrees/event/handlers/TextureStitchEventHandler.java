@@ -3,9 +3,9 @@ package com.ferreusveritas.dynamictrees.event.handlers;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.resources.SimpleReloadableResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,7 +22,7 @@ public class TextureStitchEventHandler {
     @SubscribeEvent
     public static void onTextureStitchEventPre(TextureStitchEvent.Pre event) {
         ResourceLocation eventAtlasLocation = event.getMap().location();
-        if (eventAtlasLocation.equals(AtlasTexture.LOCATION_BLOCKS)) {
+        if (eventAtlasLocation.equals(TextureAtlas.LOCATION_BLOCKS)) {
             SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager) Minecraft.getInstance().getResourceManager();
 
             List<ResourceLocation> ringLocationsToGenerate = new LinkedList<>();

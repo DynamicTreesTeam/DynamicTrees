@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
 
 /**
  * Extension of regular {@link Connections} data, modified for surface roots. This is needed because roots only have
@@ -59,7 +59,7 @@ public class RootConnections extends Connections {
      *     <li>A <tt>HIGH</tt> connection describes one where there is a surface root up one block in the y-direction and offset by one block in the given {@link Direction}.</li>
      * </ul>
      */
-    public enum ConnectionLevel implements IStringSerializable {
+    public enum ConnectionLevel implements StringRepresentable {
         MID(0),
         LOW(-1),
         HIGH(1);

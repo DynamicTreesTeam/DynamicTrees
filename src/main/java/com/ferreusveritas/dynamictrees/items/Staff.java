@@ -11,23 +11,23 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -74,7 +74,7 @@ public class Staff extends Item {
     }
 
     @Override
-    public boolean mineBlock(ItemStack stack, World worldIn, BlockState state, BlockPos pos, LivingEntity entityLiving) {
+    public boolean mineBlock(ItemStack stack, Level worldIn, BlockState state, BlockPos pos, LivingEntity entityLiving) {
         if (state.getBlock() instanceof BranchBlock || state.getBlock() instanceof TrunkShellBlock) {
             if (decUses(stack)) {
                 stack.shrink(1);
@@ -85,8 +85,8 @@ public class Staff extends Item {
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
-        World world = context.getLevel();
+    public InteractionResult useOn(UseOnContext context) {
+        Level world = context.getLevel();
         ItemStack heldStack = context.getPlayer().getItemInHand(context.getHand());
 
         BlockPos pos = context.getClickedPos();
@@ -107,7 +107,7 @@ public class Staff extends Item {
                     }
                 }
                 setSpecies(heldStack, species);
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
 
@@ -122,10 +122,10 @@ public class Staff extends Item {
             } else {
                 heldStack.shrink(1);//If the player is in creative this will have no effect.
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return ActionResultType.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override
@@ -167,7 +167,7 @@ public class Staff extends Item {
     }
 
     public Species getSpecies(ItemStack itemStack) {
-        CompoundNBT nbt = itemStack.getOrCreateTag();
+        CompoundTag nbt = itemStack.getOrCreateTag();
 
         if (nbt.contains(TREE)) {
             return TreeRegistry.findSpecies(nbt.getString(TREE));
@@ -179,7 +179,7 @@ public class Staff extends Item {
     }
 
     public int getUses(ItemStack itemStack) {
-        CompoundNBT nbt = itemStack.getOrCreateTag();
+        CompoundTag nbt = itemStack.getOrCreateTag();
 
         if (nbt.contains(USES)) {
             return nbt.getInt(USES);
@@ -197,7 +197,7 @@ public class Staff extends Item {
     }
 
     public int getMaxUses(ItemStack itemStack) {
-        CompoundNBT nbt = itemStack.getOrCreateTag();
+        CompoundTag nbt = itemStack.getOrCreateTag();
 
         if (nbt.contains(MAX_USES)) {
             return nbt.getInt(MAX_USES);
@@ -222,7 +222,7 @@ public class Staff extends Item {
     }
 
     public int getColor(ItemStack itemStack, int tint) {
-        final CompoundNBT tag = itemStack.getOrCreateTag();
+        final CompoundTag tag = itemStack.getOrCreateTag();
 
         if (tint == 0) {
             int color = 0x005b472f; // Original brown wood color
@@ -266,7 +266,7 @@ public class Staff extends Item {
      * @deprecated This will no longer be necessary in 1.17.
      */
     @Deprecated
-    private void tryConvertLegacyTag(final CompoundNBT tag) {
+    private void tryConvertLegacyTag(final CompoundTag tag) {
         final String color = tag.getString(COLOR);
         tag.remove(COLOR);
 
@@ -295,9 +295,9 @@ public class Staff extends Item {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
-        tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+        tooltip.add(new TranslatableComponent("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
+        tooltip.add(new TranslatableComponent("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
     }
 
     /**
@@ -305,8 +305,8 @@ public class Staff extends Item {
      */
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
-        return slot == EquipmentSlotType.MAINHAND ? this.attributeModifiers : super.getAttributeModifiers(slot, stack);
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+        return slot == EquipmentSlot.MAINHAND ? this.attributeModifiers : super.getAttributeModifiers(slot, stack);
     }
 
 }

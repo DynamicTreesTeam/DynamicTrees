@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.blocks.branches;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.Cell;
+import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
@@ -16,28 +16,34 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nonnull;
@@ -45,7 +51,7 @@ import javax.annotation.Nullable;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
+public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBlock {
 
     protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, MAX_RADIUS);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -62,7 +68,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     private final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
 
     public BasicBranchBlock(Material material) {
-        this(AbstractBlock.Properties.of(material).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
+        this(BlockBehaviour.Properties.of(material).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
     }
 
     public BasicBranchBlock(Properties properties) {
@@ -70,7 +76,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     }
 
     // Useful for more unique subclasses
-    public BasicBranchBlock(AbstractBlock.Properties properties, final IntegerProperty radiusProperty, final int maxRadius) {
+    public BasicBranchBlock(BlockBehaviour.Properties properties, final IntegerProperty radiusProperty, final int maxRadius) {
         super(properties);
 
         // Create branch state cache.
@@ -100,7 +106,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     }
 
     @Override
-    public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
+    public SoundType getSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
         return getFamily().getBranchSoundType(state, world, pos, entity);
     }
 
@@ -119,7 +125,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     // BLOCKSTATES
     ///////////////////////////////////////////
 
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(RADIUS).add(WATERLOGGED);
     }
 
@@ -128,7 +134,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     ///////////////////////////////////////////
 
     @Override
-    public int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+    public int branchSupport(BlockState state, BlockGetter reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
         return isSameTree(branch) ? BasicBranchBlock.setSupport(1, 1) : 0;// Other branches of the same type are always valid support.
     }
 
@@ -143,7 +149,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     ///////////////////////////////////////////
 
     @Override
-    public boolean checkForRot(IWorld world, BlockPos pos, Species species, int fertility, int radius, Random rand, float chance, boolean rapid) {
+    public boolean checkForRot(LevelAccessor world, BlockPos pos, Species species, int fertility, int radius, Random rand, float chance, boolean rapid) {
 
         if (!rapid && (chance == 0.0f || rand.nextFloat() > chance)) {
             return false;//Bail out if not in rapid mode and the postRot chance fails
@@ -187,7 +193,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     }
 
     @Override
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
         if (stateIn.getValue(WATERLOGGED)) {
             worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
         }
@@ -195,11 +201,11 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     }
 
     @Override
-    public boolean canPlaceLiquid(IBlockReader world, BlockPos pos, BlockState state, Fluid fluid) {
+    public boolean canPlaceLiquid(BlockGetter world, BlockPos pos, BlockState state, Fluid fluid) {
         if (getRadius(state) > maxRadiusForWaterLogging) {
             return false;
         }
-        return IWaterLoggable.super.canPlaceLiquid(world, pos, state, fluid);
+        return SimpleWaterloggedBlock.super.canPlaceLiquid(world, pos, state, fluid);
     }
 
     ///////////////////////////////////////////
@@ -207,7 +213,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     ///////////////////////////////////////////
 
     @Override
-    public float getHardness(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public float getHardness(BlockState state, BlockGetter worldIn, BlockPos pos) {
         final int radius = this.getRadius(worldIn.getBlockState(pos));
         final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
                 .getDestroySpeed(worldIn, pos) * (radius * radius) / 64.0f * 8.0f;
@@ -215,13 +221,13 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     }
 
     @Override
-    public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+    public int getFireSpreadSpeed(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         int radius = getRadius(world.getBlockState(pos));
         return (fireSpreadSpeed * radius) / 8;
     }
 
     @Override
-    public int getFlammability(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+    public int getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return flammability;
     }
 
@@ -240,7 +246,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     ///////////////////////////////////////////
 
     @Override
-    public Cell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
+    public Cell getHydrationCell(BlockGetter reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
         final Family thisTree = getFamily();
 
         // The requesting leaves must match the tree for hydration to occur, and the branch must not be stripped.
@@ -260,7 +266,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     }
 
     @Override
-    public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
+    public int setRadius(LevelAccessor world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
         destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
         boolean replacingWater = world.getBlockState(pos).getFluidState() == Fluids.WATER.getSource(false);
         boolean setWaterlogged = replacingWater && radius <= maxRadiusForWaterLogging;
@@ -271,16 +277,16 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
 
     @Override
     public BlockState getStateForRadius(int radius) {
-        return branchStates[MathHelper.clamp(radius, 1, getMaxRadius())];
+        return branchStates[Mth.clamp(radius, 1, getMaxRadius())];
     }
 
     // Directionless probability grabber
     @Override
-    public int probabilityForBlock(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from) {
+    public int probabilityForBlock(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from) {
         return isSameTree(from) ? getRadius(state) + 2 : 0;
     }
 
-    public GrowSignal growIntoAir(World world, BlockPos pos, GrowSignal signal, int fromRadius) {
+    public GrowSignal growIntoAir(Level world, BlockPos pos, GrowSignal signal, int fromRadius) {
         final Species species = signal.getSpecies();
 
         final DynamicLeavesBlock leaves = species.getLeavesBlock().orElse(null);
@@ -304,7 +310,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     }
 
     @Override
-    public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
+    public GrowSignal growSignal(Level world, BlockPos pos, GrowSignal signal) {
         // This is always placed at the beginning of every growSignal function
         if (!signal.step()) {
             return signal;
@@ -360,7 +366,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
 
             // The new branch should be the square root of all of the sums of the areas of the branches coming into it.
             // But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-            signal.radius = MathHelper.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
+            signal.radius = Mth.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
             int targetRadius = (int) Math.floor(signal.radius);
             int setRad = setRadius(world, pos, targetRadius, originDir);
             if (setRad < targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
@@ -380,28 +386,28 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     // The result is that only thin branches and trunks can be climbed.
     // We do not check if the radius is over 3 since some mods can modify this, and allow you to climb on contact.
     @Override
-    public boolean isLadder(BlockState state, IWorldReader world, BlockPos pos, LivingEntity entity) {
+    public boolean isLadder(BlockState state, LevelReader world, BlockPos pos, LivingEntity entity) {
         return DTConfigs.ENABLE_BRANCH_CLIMBING.get() &&
-                entity instanceof PlayerEntity &&
+                entity instanceof Player &&
                 getFamily().branchIsLadder() &&
                 (!state.hasProperty(WATERLOGGED) || !state.getValue(WATERLOGGED));
     }
 
     @Nonnull
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         int thisRadiusInt = getRadius(state);
         double radius = thisRadiusInt / 16.0;
-        VoxelShape core = VoxelShapes.box(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
+        VoxelShape core = Shapes.box(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
 
         for (Direction dir : Direction.values()) {
             int sideRadiusInt = Math.min(getSideConnectionRadius(worldIn, pos, thisRadiusInt, dir), thisRadiusInt);
             double sideRadius = sideRadiusInt / 16.0f;
             if (sideRadius > 0.0f) {
                 double gap = 0.5f - sideRadius;
-                AxisAlignedBB aabb = new AxisAlignedBB(0.5 - sideRadius, 0.5 - sideRadius, 0.5 - sideRadius, 0.5 + sideRadius, 0.5 + sideRadius, 0.5 + sideRadius);
+                AABB aabb = new AABB(0.5 - sideRadius, 0.5 - sideRadius, 0.5 - sideRadius, 0.5 + sideRadius, 0.5 + sideRadius, 0.5 + sideRadius);
                 aabb = aabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
-                core = VoxelShapes.or(core, VoxelShapes.create(aabb));
+                core = Shapes.or(core, Shapes.create(aabb));
             }
         }
 
@@ -409,11 +415,11 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
     }
 
     @Override
-    public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+    public int getRadiusForConnection(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         return getRadius(state);
     }
 
-    protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
+    protected int getSideConnectionRadius(BlockGetter blockAccess, BlockPos pos, int radius, Direction side) {
         final BlockPos deltaPos = pos.relative(side);
         final BlockState blockState = CoordUtils.getStateSafe(blockAccess, deltaPos);
 
@@ -448,7 +454,7 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
      * for practically non-existent gains. Java does a pretty good job of managing the stack on its own.
      */
     @Override
-    public MapSignal analyse(BlockState blockState, IWorld world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal) {
+    public MapSignal analyse(BlockState blockState, LevelAccessor world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal) {
         // Note: fromDir will be null in the origin node
 
         if (signal.overflow || (signal.trackVisited && signal.doTrackingVisited(pos))) {

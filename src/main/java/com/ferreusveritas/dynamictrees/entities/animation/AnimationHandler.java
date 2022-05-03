@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.entities.animation;
 
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -17,7 +17,7 @@ public interface AnimationHandler {
     boolean shouldDie(FallingTreeEntity entity);
 
     @OnlyIn(Dist.CLIENT)
-    void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack);
+    void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, PoseStack matrixStack);
 
     @OnlyIn(Dist.CLIENT)
     boolean shouldRender(FallingTreeEntity entity);

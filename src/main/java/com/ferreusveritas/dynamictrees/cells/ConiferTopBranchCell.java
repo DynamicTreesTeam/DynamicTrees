@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.cells;
 
 import com.ferreusveritas.dynamictrees.api.cells.Cell;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 
 public class ConiferTopBranchCell implements Cell {
 

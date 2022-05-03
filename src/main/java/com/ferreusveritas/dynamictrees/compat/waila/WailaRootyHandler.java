@@ -4,17 +4,17 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import mcp.mobius.waila.api.IComponentProvider;
 import mcp.mobius.waila.api.IDataAccessor;
 import mcp.mobius.waila.api.IPluginConfig;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
 public class WailaRootyHandler implements IComponentProvider {
 
     @Override
-    public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
+    public void appendBody(List<Component> tooltip, IDataAccessor accessor, IPluginConfig config) {
         final BlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
 
         if (!(state.getBlock() instanceof RootyBlock)) {
@@ -23,7 +23,7 @@ public class WailaRootyHandler implements IComponentProvider {
 
         final RootyBlock rooty = (RootyBlock) state.getBlock();
         final int fertility = rooty.getFertility(state, accessor.getWorld(), accessor.getPosition());
-        tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.fertility",
-                MathHelper.floor(fertility * 100 / 15f) + "%"));
+        tooltip.add(new TranslatableComponent("tooltip.dynamictrees.fertility",
+                Mth.floor(fertility * 100 / 15f) + "%"));
     }
 }

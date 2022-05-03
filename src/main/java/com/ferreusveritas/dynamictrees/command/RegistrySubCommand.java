@@ -4,10 +4,10 @@ import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
 
 import static com.ferreusveritas.dynamictrees.command.CommandConstants.RAW;
 
@@ -33,7 +33,7 @@ public final class RegistrySubCommand<V extends RegistryEntry<V>> extends SubCom
     }
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArgument() {
+    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return Commands.literal("list")
                 .executes(context -> executesSuccess(() -> this.listEntries(context.getSource(), false)))
                 .then(booleanArgument(RAW)
@@ -41,14 +41,14 @@ public final class RegistrySubCommand<V extends RegistryEntry<V>> extends SubCom
                 );
     }
 
-    private void listEntries(final CommandSource source, final boolean raw) {
+    private void listEntries(final CommandSourceStack source, final boolean raw) {
         if (raw) {
-            this.registry.getAll().forEach(entry -> source.sendSuccess(new StringTextComponent(entry.getRegistryName().toString()), false));
+            this.registry.getAll().forEach(entry -> source.sendSuccess(new TextComponent(entry.getRegistryName().toString()), false));
             return;
         }
 
-        this.registry.getAll().forEach(entry -> source.sendSuccess(new StringTextComponent("- ")
-                .append(entry.getTextComponent()).withStyle(TextFormatting.GREEN), false));
+        this.registry.getAll().forEach(entry -> source.sendSuccess(new TextComponent("- ")
+                .append(entry.getTextComponent()).withStyle(ChatFormatting.GREEN), false));
     }
 
 }

@@ -9,12 +9,12 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PreGeneration
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 
 public class MoundGenFeature extends GenFeature {
 
@@ -52,7 +52,7 @@ public class MoundGenFeature extends GenFeature {
      */
     @Override
     protected BlockPos preGenerate(GenFeatureConfiguration configuration, PreGenerationContext context) {
-        final IWorld world = context.world();
+        final LevelAccessor world = context.world();
         BlockPos rootPos = context.pos();
 
         if (context.radius() >= configuration.get(MOUND_CUTOFF_RADIUS) && context.isWorldGen()) {
@@ -93,7 +93,7 @@ public class MoundGenFeature extends GenFeature {
             return false;
         }
 
-        final IWorld world = context.world();
+        final LevelAccessor world = context.world();
         final BlockPos rootPos = context.pos();
         final BlockPos treePos = rootPos.above();
         final BlockState belowState = world.getBlockState(rootPos.below());

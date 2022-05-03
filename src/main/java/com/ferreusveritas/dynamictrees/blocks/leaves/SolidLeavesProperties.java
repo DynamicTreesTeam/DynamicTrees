@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 /**
  * An extension of {@link LeavesProperties} which provides {@link SolidDynamicLeavesBlock} for a solid version of {@link
@@ -20,7 +20,7 @@ public class SolidLeavesProperties extends LeavesProperties {
     }
 
     @Override
-    protected DynamicLeavesBlock createDynamicLeaves(AbstractBlock.Properties properties) {
+    protected DynamicLeavesBlock createDynamicLeaves(BlockBehaviour.Properties properties) {
         return new SolidDynamicLeavesBlock(this, properties);
     }
 

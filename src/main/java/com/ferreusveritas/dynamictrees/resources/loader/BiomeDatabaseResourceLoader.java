@@ -23,10 +23,10 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -89,9 +89,9 @@ public final class BiomeDatabaseResourceLoader
                 .register("type", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller)
                 .registerArrayApplier("types", FeatureCanceller.class,
                         BiomePropertySelectors.FeatureCancellations::putCanceller)
-                .register("stage", GenerationStage.Decoration.class,
+                .register("stage", GenerationStep.Decoration.class,
                         BiomePropertySelectors.FeatureCancellations::putStage)
-                .registerArrayApplier("stages", GenerationStage.Decoration.class,
+                .registerArrayApplier("stages", GenerationStep.Decoration.class,
                         BiomePropertySelectors.FeatureCancellations::putStage);
 
         postApplierEvent(new EntryApplierRegistryEvent<>(this.entryAppliers, ENTRY_APPLIERS));
@@ -158,7 +158,7 @@ public final class BiomeDatabaseResourceLoader
 
     @Override
     public void applyOnSetup(ResourceAccessor<Iterable<JsonElement>> resourceAccessor,
-                             IResourceManager resourceManager) {
+                             ResourceManager resourceManager) {
         BiomeDatabases.reset();
         if (this.isWorldGenDisabled()) {
             return;
@@ -300,7 +300,7 @@ public final class BiomeDatabaseResourceLoader
 
     @Override
     public void applyOnReload(ResourceAccessor<Iterable<JsonElement>> resourceAccessor,
-                              IResourceManager resourceManager) {
+                              ResourceManager resourceManager) {
         BiomeDatabases.reset();
         if (this.isWorldGenDisabled()) {
             return;

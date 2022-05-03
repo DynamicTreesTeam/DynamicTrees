@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.data;
 
 import com.ferreusveritas.dynamictrees.data.provider.DTDataProvider;
-import net.minecraft.data.IDataProvider;
+import net.minecraft.data.DataProvider;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Optional;
  * @param <I> the type of the input to get the dependencies from
  * @author Harley O'Connor
  */
-public interface Generator<P extends IDataProvider & DTDataProvider, I> {
+public interface Generator<P extends DataProvider & DTDataProvider, I> {
 
     /**
      * Gathers dependencies from the specified {@code input}, then generating the relevant files if dependencies and

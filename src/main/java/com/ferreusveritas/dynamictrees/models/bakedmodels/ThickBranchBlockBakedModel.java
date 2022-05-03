@@ -8,17 +8,20 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Maps;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.model.*;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.SimpleBakedModel;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
@@ -32,10 +35,10 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
     protected final ResourceLocation thickRingsResLoc;
 
-    private final IBakedModel[] trunksBark = new IBakedModel[16]; // The trunk will always feature bark on its sides.
-    private final IBakedModel[] trunksTopBark = new IBakedModel[16]; // The trunk will feature bark on its top when there's a branch on top of it.
-    private final IBakedModel[] trunksTopRings = new IBakedModel[16]; // The trunk will feature rings on its top when there's no branches on top of it.
-    private final IBakedModel[] trunksBotRings = new IBakedModel[16]; // The trunk will always feature rings on its bottom surface if nothing is below it.
+    private final BakedModel[] trunksBark = new BakedModel[16]; // The trunk will always feature bark on its sides.
+    private final BakedModel[] trunksTopBark = new BakedModel[16]; // The trunk will feature bark on its top when there's a branch on top of it.
+    private final BakedModel[] trunksTopRings = new BakedModel[16]; // The trunk will feature rings on its top when there's no branches on top of it.
+    private final BakedModel[] trunksBotRings = new BakedModel[16]; // The trunk will always feature rings on its bottom surface if nothing is below it.
 
     public ThickBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc, ResourceLocation thickRingsResLoc) {
         super(modelResLoc, barkResLoc, ringsResLoc);
@@ -70,36 +73,36 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
         }
     }
 
-    public IBakedModel bakeTrunkBark(int radius, TextureAtlasSprite bark, boolean side) {
+    public BakedModel bakeTrunkBark(int radius, TextureAtlasSprite bark, boolean side) {
 
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrideList.EMPTY).particle(bark);
-        AxisAlignedBB wholeVolume = new AxisAlignedBB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrides.EMPTY).particle(bark);
+        AABB wholeVolume = new AABB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
 
         final Direction[] run = side ? CoordUtils.HORIZONTALS : new Direction[]{Direction.UP, Direction.DOWN};
-        ArrayList<Vector3i> offsets = new ArrayList<>();
+        ArrayList<Vec3i> offsets = new ArrayList<>();
 
         for (Surround dir : Surround.values()) {
             offsets.add(dir.getOffset()); // 8 surrounding component pieces
         }
-        offsets.add(new Vector3i(0, 0, 0));//Center
+        offsets.add(new Vec3i(0, 0, 0));//Center
 
         for (Direction face : run) {
-            final Vector3i dirVector = face.getNormal();
+            final Vec3i dirVector = face.getNormal();
 
-            for (Vector3i offset : offsets) {
-                if (face.getAxis() == Axis.Y || new Vector3d(dirVector.getX(), dirVector.getY(), dirVector.getZ()).add(new Vector3d(offset.getX(), offset.getY(), offset.getZ())).lengthSqr() > 2.25) { //This means that the dir and face share a common direction
-                    Vector3d scaledOffset = new Vector3d(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);//Scale the dimensions to match standard minecraft texels
-                    AxisAlignedBB partBoundary = new AxisAlignedBB(0, 0, 0, 16, 16, 16).move(scaledOffset).intersect(wholeVolume);
+            for (Vec3i offset : offsets) {
+                if (face.getAxis() == Axis.Y || new Vec3(dirVector.getX(), dirVector.getY(), dirVector.getZ()).add(new Vec3(offset.getX(), offset.getY(), offset.getZ())).lengthSqr() > 2.25) { //This means that the dir and face share a common direction
+                    Vec3 scaledOffset = new Vec3(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);//Scale the dimensions to match standard minecraft texels
+                    AABB partBoundary = new AABB(0, 0, 0, 16, 16, 16).move(scaledOffset).intersect(wholeVolume);
 
                     Vector3f[] limits = ModelUtils.AABBLimits(partBoundary);
 
-                    Map<Direction, BlockPartFace> mapFacesIn = Maps.newEnumMap(Direction.class);
+                    Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 
                     BlockFaceUV uvface = new BlockFaceUV(ModelUtils.modUV(ModelUtils.getUVs(partBoundary, face)), getFaceAngle(Axis.Y, face));
-                    mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
+                    mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
 
-                    BlockPart part = new BlockPart(limits[0], limits[1], mapFacesIn, null, true);
-                    builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), bark, face, ModelRotation.X0_Y0, this.modelResLoc));
+                    BlockElement part = new BlockElement(limits[0], limits[1], mapFacesIn, null, true);
+                    builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), bark, face, BlockModelRotation.X0_Y0, this.modelResLoc));
                 }
 
             }
@@ -108,26 +111,26 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
         return builder.build();
     }
 
-    public IBakedModel bakeTrunkRings(int radius, TextureAtlasSprite ring, Direction face) {
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrideList.EMPTY).particle(ring);
-        AxisAlignedBB wholeVolume = new AxisAlignedBB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
+    public BakedModel bakeTrunkRings(int radius, TextureAtlasSprite ring, Direction face) {
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrides.EMPTY).particle(ring);
+        AABB wholeVolume = new AABB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
         int wholeVolumeWidth = 48;
 
-        ArrayList<Vector3i> offsets = new ArrayList<>();
+        ArrayList<Vec3i> offsets = new ArrayList<>();
 
         for (Surround dir : Surround.values()) {
             offsets.add(dir.getOffset()); // 8 surrounding component pieces
         }
-        offsets.add(new Vector3i(0, 0, 0)); // Center
+        offsets.add(new Vec3i(0, 0, 0)); // Center
 
-        for (Vector3i offset : offsets) {
-            Vector3d scaledOffset = new Vector3d(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16); // Scale the dimensions to match standard minecraft texels
-            AxisAlignedBB partBoundary = new AxisAlignedBB(0, 0, 0, 16, 16, 16).move(scaledOffset).intersect(wholeVolume);
+        for (Vec3i offset : offsets) {
+            Vec3 scaledOffset = new Vec3(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16); // Scale the dimensions to match standard minecraft texels
+            AABB partBoundary = new AABB(0, 0, 0, 16, 16, 16).move(scaledOffset).intersect(wholeVolume);
 
             Vector3f posFrom = new Vector3f((float) partBoundary.minX, (float) partBoundary.minY, (float) partBoundary.minZ);
             Vector3f posTo = new Vector3f((float) partBoundary.maxX, (float) partBoundary.maxY, (float) partBoundary.maxZ);
 
-            Map<Direction, BlockPartFace> mapFacesIn = Maps.newEnumMap(Direction.class);
+            Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
             float textureOffsetX = -16f;
             float textureOffsetZ = -16f;
 
@@ -144,10 +147,10 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
             float[] uvs = new float[]{minX, minZ, maxX, maxZ};
 
             BlockFaceUV uvface = new BlockFaceUV(uvs, getFaceAngle(Axis.Y, face));
-            mapFacesIn.put(face, new BlockPartFace(null, -1, null, uvface));
+            mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
 
-            BlockPart part = new BlockPart(posFrom, posTo, mapFacesIn, null, true);
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), ring, face, ModelRotation.X0_Y0, this.modelResLoc));
+            BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
+            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), ring, face, BlockModelRotation.X0_Y0, this.modelResLoc));
         }
 
         return builder.build();
@@ -166,7 +169,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
             return super.getQuads(state, null, rand, extraData);
         }
 
-        coreRadius = MathHelper.clamp(coreRadius, 9, 24);
+        coreRadius = Mth.clamp(coreRadius, 9, 24);
 
         List<BakedQuad> quads = new ArrayList<>(30);
 

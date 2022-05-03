@@ -4,20 +4,20 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.world.World;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -69,18 +69,18 @@ public class FalloverAnimationHandler implements AnimationHandler {
         entity.setPos(entity.getX(), entity.getY() + entity.getDeltaMovement().y, entity.getZ());
 
         {//Handle entire entity falling and collisions with it's base and the ground
-            World world = entity.level;
+            Level world = entity.level;
             int radius = 8;
             BlockState state = entity.getDestroyData().getBranchBlockState(0);
             if (TreeHelper.isBranch(state)) {
                 radius = ((BranchBlock) state.getBlock()).getRadius(state);
             }
-            AxisAlignedBB fallBox = new AxisAlignedBB(entity.getX() - radius, entity.getY(), entity.getZ() - radius, entity.getX() + radius, entity.getY() + 1.0, entity.getZ() + radius);
+            AABB fallBox = new AABB(entity.getX() - radius, entity.getY(), entity.getZ() - radius, entity.getX() + radius, entity.getY() + 1.0, entity.getZ() + radius);
             BlockPos pos = new BlockPos(entity.getX(), entity.getY(), entity.getZ());
             BlockState collState = world.getBlockState(pos);
 
             VoxelShape shape = collState.getBlockSupportShape(world, pos);
-            AxisAlignedBB collBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+            AABB collBox = new AABB(0, 0, 0, 0, 0, 0);
             if (!shape.isEmpty()) {
                 collBox = collState.getBlockSupportShape(world, pos).bounds();
             }
@@ -102,7 +102,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
         }
 
         //Crush living things with clumsy dead trees
-        World world = entity.level;
+        Level world = entity.level;
         if (DTConfigs.ENABLE_FALLING_TREE_DAMAGE.get() && !world.isClientSide) {
             List<LivingEntity> elist = testEntityCollision(entity);
             for (LivingEntity living : elist) {
@@ -141,8 +141,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
         int offsetX = toolDir.getStepX();
         int offsetZ = toolDir.getStepZ();
-        float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
-        float v = MathHelper.cos((float) Math.toRadians(actingAngle));
+        float h = Mth.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
+        float v = Mth.cos((float) Math.toRadians(actingAngle));
         float xbase = (float) (entity.getX() + offsetX * (-(0.5f) + (v * 0.5f) + (h * 0.5f)));
         float ybase = (float) (entity.getY() - (h * 0.5f) + (v * 0.5f));
         float zbase = (float) (entity.getZ() + offsetZ * (-(0.5f) + (v * 0.5f) + (h * 0.5f)));
@@ -157,8 +157,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
             float segY = ybase + v * segment;
             float segZ = zbase + h * segment * offsetZ;
             float tex = 0.0625f;
-            float half = MathHelper.clamp(tex * (segment + 1) * 2, tex, maxRadius);
-            AxisAlignedBB testBB = new AxisAlignedBB(segX - half, segY - half, segZ - half, segX + half, segY + half, segZ + half);
+            float half = Mth.clamp(tex * (segment + 1) * 2, tex, maxRadius);
+            AABB testBB = new AABB(segX - half, segY - half, segZ - half, segX + half, segY + half, segZ + half);
 
             if (!entity.level.noCollision(entity, testBB)) {
                 return true;
@@ -188,13 +188,13 @@ public class FalloverAnimationHandler implements AnimationHandler {
                 break;
         }
 
-        entity.xRot = MathHelper.wrapDegrees(entity.xRot);
-        entity.yRot = MathHelper.wrapDegrees(entity.yRot);
+        entity.xRot = Mth.wrapDegrees(entity.xRot);
+        entity.yRot = Mth.wrapDegrees(entity.yRot);
     }
 
     public List<LivingEntity> testEntityCollision(FallingTreeEntity entity) {
 
-        World world = entity.level;
+        Level world = entity.level;
 
         Direction toolDir = entity.getDestroyData().toolDir;
 
@@ -202,8 +202,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
         int offsetX = toolDir.getStepX();
         int offsetZ = toolDir.getStepZ();
-        float h = MathHelper.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
-        float v = MathHelper.cos((float) Math.toRadians(actingAngle));
+        float h = Mth.sin((float) Math.toRadians(actingAngle)) * (offsetX | offsetZ);
+        float v = Mth.cos((float) Math.toRadians(actingAngle));
         float xbase = (float) (entity.getX() + offsetX * (-(0.5f) + (v * 0.5f) + (h * 0.5f)));
         float ybase = (float) (entity.getY() - (h * 0.5f) + (v * 0.5f));
         float zbase = (float) (entity.getZ() + offsetZ * (-(0.5f) + (v * 0.5f) + (h * 0.5f)));
@@ -214,13 +214,13 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
         float maxRadius = entity.getDestroyData().getBranchRadius(0) / 16.0f;
 
-        Vector3d vec3d1 = new Vector3d(xbase, ybase, zbase);
-        Vector3d vec3d2 = new Vector3d(segX, segY, segZ);
+        Vec3 vec3d1 = new Vec3(xbase, ybase, zbase);
+        Vec3 vec3d2 = new Vec3(segX, segY, segZ);
 
-        return world.getEntities(entity, new AxisAlignedBB(vec3d1.x, vec3d1.y, vec3d1.z, vec3d2.x, vec3d2.y, vec3d2.z),
+        return world.getEntities(entity, new AABB(vec3d1.x, vec3d1.y, vec3d1.z, vec3d2.x, vec3d2.y, vec3d2.z),
                 entity1 -> {
                     if (entity1 instanceof LivingEntity && entity1.isPickable()) {
-                        AxisAlignedBB axisalignedbb = entity1.getBoundingBox().inflate(maxRadius);
+                        AABB axisalignedbb = entity1.getBoundingBox().inflate(maxRadius);
                         return axisalignedbb.contains(vec3d1) || intersects(axisalignedbb, vec3d1, vec3d2);
                     }
                     return false;
@@ -232,13 +232,13 @@ public class FalloverAnimationHandler implements AnimationHandler {
     /**
      * A client side version of {@link AxisAlignedBB#intersects(Vector3d, Vector3d)}.
      */
-    public static boolean intersects(AxisAlignedBB axisAlignedBB, Vector3d vec3d, Vector3d otherVec3d) {
+    public static boolean intersects(AABB axisAlignedBB, Vec3 vec3d, Vec3 otherVec3d) {
         return axisAlignedBB.intersects(Math.min(vec3d.x, otherVec3d.x), Math.min(vec3d.y, otherVec3d.y), Math.min(vec3d.z, otherVec3d.z), Math.max(vec3d.x, otherVec3d.x), Math.max(vec3d.y, otherVec3d.y), Math.max(vec3d.z, otherVec3d.z));
     }
 
     @Override
     public void dropPayload(FallingTreeEntity entity) {
-        World world = entity.level;
+        Level world = entity.level;
         BlockPos cutPos = entity.getDestroyData().cutPos;
         entity.getPayload().forEach(i -> Block.popResource(world, cutPos, i));
     }
@@ -262,17 +262,17 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack) {
+    public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, PoseStack matrixStack) {
 
-        float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.yRotO, entity.yRot, partialTicks));
-        float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.xRotO, entity.xRot, partialTicks));
+        float yaw = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.yRotO, entity.yRot, partialTicks));
+        float pit = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.xRotO, entity.xRot, partialTicks));
 
         //Vec3d mc = entity.getMassCenter();
 
         int radius = entity.getDestroyData().getBranchRadius(0);
 
         Direction toolDir = entity.getDestroyData().toolDir;
-        Vector3d toolVec = new Vector3d(toolDir.getStepX(), toolDir.getStepY(), toolDir.getStepZ()).scale(radius / 16.0f);
+        Vec3 toolVec = new Vec3(toolDir.getStepX(), toolDir.getStepY(), toolDir.getStepZ()).scale(radius / 16.0f);
 
         matrixStack.translate(-toolVec.x, -toolVec.y, -toolVec.z);
         matrixStack.mulPose(new Quaternion(new Vector3f(0, 0, 1), -yaw, true));

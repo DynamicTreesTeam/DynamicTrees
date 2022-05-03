@@ -2,20 +2,20 @@ package com.ferreusveritas.dynamictrees.data;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.loot.LootParameter;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 
 /**
  * @author Harley O'Connor
  */
 public final class DTLootParameters {
 
-    public static final LootParameter<Species> SPECIES = create("species");
-    public static final LootParameter<Integer> FERTILITY = create("fertility");
-    public static final LootParameter<Integer> FORTUNE = create("fortune");
-    public static final LootParameter<Species.LogsAndSticks> LOGS_AND_STICKS = create("logs_and_sticks");
+    public static final LootContextParam<Species> SPECIES = create("species");
+    public static final LootContextParam<Integer> FERTILITY = create("fertility");
+    public static final LootContextParam<Integer> FORTUNE = create("fortune");
+    public static final LootContextParam<Species.LogsAndSticks> LOGS_AND_STICKS = create("logs_and_sticks");
 
-    private static <T> LootParameter<T> create(String path) {
-        return new LootParameter<>(DynamicTrees.resLoc(path));
+    private static <T> LootContextParam<T> create(String path) {
+        return new LootContextParam<>(DynamicTrees.resLoc(path));
     }
 
 }

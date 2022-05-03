@@ -6,15 +6,15 @@ import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FreezerNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.block.BlockState;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FreezeSubstance implements SubstanceEffect {
 
     @Override
-    public boolean apply(World world, BlockPos rootPos) {
+    public boolean apply(Level world, BlockPos rootPos) {
         final BlockState rootyState = world.getBlockState(rootPos);
         final RootyBlock dirt = TreeHelper.getRooty(rootyState);
         final Species species = dirt.getSpecies(rootyState, world, rootPos);

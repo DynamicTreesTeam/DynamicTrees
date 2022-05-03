@@ -6,25 +6,25 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGeneratio
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
-import net.minecraft.block.BeehiveBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.passive.BeeEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tileentity.BeehiveTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Bee;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.BeehiveBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.BiomeDictionary;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -67,7 +67,7 @@ public class BeeNestGenFeature extends GenFeature {
                 return false;
             }
             // Default flower check predicate, straight from the sapling class
-            for (BlockPos blockpos : BlockPos.Mutable.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
+            for (BlockPos blockpos : BlockPos.MutableBlockPos.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
                 if (world.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
                     return true;
                 }
@@ -75,7 +75,7 @@ public class BeeNestGenFeature extends GenFeature {
             return false;
         }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
             // Default biome check chance function. Uses vanilla chances
-            RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).getRegistryName()));
+            ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).getRegistryName()));
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS)) {
                 return PLAINS_CHANCE;
             }
@@ -91,7 +91,7 @@ public class BeeNestGenFeature extends GenFeature {
 
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
-        final IWorld world = context.world();
+        final LevelAccessor world = context.world();
         final BlockPos rootPos = context.pos();
         return !(world.getRandom().nextFloat() > configuration.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos)) &&
                 this.placeBeeNestInValidPlace(configuration, world, rootPos, true);
@@ -107,7 +107,7 @@ public class BeeNestGenFeature extends GenFeature {
         return this.placeBeeNestInValidPlace(configuration, context.world(), context.pos(), false);
     }
 
-    private boolean placeBeeNestInValidPlace(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, boolean worldGen) {
+    private boolean placeBeeNestInValidPlace(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, boolean worldGen) {
         Block nestBlock = configuration.get(NEST_BLOCK);
 
         int treeHeight = getTreeHeight(world, rootPos, configuration.get(MAX_HEIGHT));
@@ -132,7 +132,7 @@ public class BeeNestGenFeature extends GenFeature {
         return false;
     }
 
-    private boolean placeBeeNestWithBees(IWorld world, Block nestBlock, BlockPos pos, Direction faceDir, boolean worldGen) {
+    private boolean placeBeeNestWithBees(LevelAccessor world, Block nestBlock, BlockPos pos, Direction faceDir, boolean worldGen) {
         int honeyLevel = worldGen ? world.getRandom().nextInt(6) : 0;
         BlockState nestState = nestBlock.defaultBlockState();
         if (nestState.hasProperty(BeehiveBlock.FACING)) {
@@ -143,17 +143,17 @@ public class BeeNestGenFeature extends GenFeature {
         }
         // Sets the nest block, but the bees still need to be added.
         world.setBlock(pos, nestState, 2);
-        TileEntity blockEntity = world.getBlockEntity(pos);
+        BlockEntity blockEntity = world.getBlockEntity(pos);
         // Populates the bee nest with 3 bees if the nest was generated, or with 2-3 bees if it was grown.
-        if (blockEntity instanceof BeehiveTileEntity) {
-            BeehiveTileEntity beehivetileentity = (BeehiveTileEntity) blockEntity;
-            World thisWorld = worldFromIWorld(world);
+        if (blockEntity instanceof BeehiveBlockEntity) {
+            BeehiveBlockEntity beehivetileentity = (BeehiveBlockEntity) blockEntity;
+            Level thisWorld = worldFromIWorld(world);
             if (thisWorld == null) {
                 return false;
             }
             int beeCount = worldGen ? 3 : 2 + world.getRandom().nextInt(2);
             for (int i = 0; i < beeCount; ++i) {
-                BeeEntity beeEntity = new BeeEntity(EntityType.BEE, thisWorld);
+                Bee beeEntity = new Bee(EntityType.BEE, thisWorld);
                 beehivetileentity.addOccupantWithPresetTicks(beeEntity, false, world.getRandom().nextInt(599));
             }
             return true;
@@ -163,16 +163,16 @@ public class BeeNestGenFeature extends GenFeature {
 
     //This just fetches a World instance from an IWorld instance, since IWorld cannot be used to create bees.
     @Nullable
-    private World worldFromIWorld(IWorld iWorld) {
+    private Level worldFromIWorld(LevelAccessor iWorld) {
         if (iWorld instanceof WorldGenRegion) {
             return ((WorldGenRegion) iWorld).getLevel();
-        } else if (iWorld instanceof World) {
-            return (World) iWorld;
+        } else if (iWorld instanceof Level) {
+            return (Level) iWorld;
         }
         return null;
     }
 
-    private boolean nestAlreadyPresent(IWorld world, Block nestBlock, BlockPos rootPos, int maxHeight) {
+    private boolean nestAlreadyPresent(LevelAccessor world, Block nestBlock, BlockPos rootPos, int maxHeight) {
         for (int y = 2; y < maxHeight; y++) {
             BlockPos trunkPos = rootPos.above(y);
             for (Direction dir : CoordUtils.HORIZONTALS) {
@@ -184,7 +184,7 @@ public class BeeNestGenFeature extends GenFeature {
         return false;
     }
 
-    private int getTreeHeight(IWorld world, BlockPos rootPos, int maxHeight) {
+    private int getTreeHeight(LevelAccessor world, BlockPos rootPos, int maxHeight) {
         for (int i = 1; i < maxHeight; i++) {
             if (!TreeHelper.isBranch(world.getBlockState(rootPos.above(i)))) {
                 return i - 1;
@@ -195,7 +195,7 @@ public class BeeNestGenFeature extends GenFeature {
 
     //The valid places this genFeature looks for are empty blocks under branches next to the trunk, similar to armpits lol
     @Nullable
-    private List<Pair<BlockPos, List<Direction>>> findBranchPits(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, int maxHeight) {
+    private List<Pair<BlockPos, List<Direction>>> findBranchPits(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, int maxHeight) {
         int existingBlocks = 0;
         List<Pair<BlockPos, List<Direction>>> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++) {
@@ -224,7 +224,7 @@ public class BeeNestGenFeature extends GenFeature {
         return validSpaces;
     }
 
-    public interface WorldGenChanceFunction extends BiFunction<IWorld, BlockPos, Double> {
+    public interface WorldGenChanceFunction extends BiFunction<LevelAccessor, BlockPos, Double> {
     }
 
 }

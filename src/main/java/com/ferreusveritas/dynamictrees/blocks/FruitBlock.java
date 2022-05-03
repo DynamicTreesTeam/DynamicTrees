@@ -3,27 +3,35 @@ package com.ferreusveritas.dynamictrees.blocks;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.ForgeHooks;
 
 import javax.annotation.Nonnull;
@@ -34,7 +42,7 @@ import java.util.function.Supplier;
 import static com.ferreusveritas.dynamictrees.util.ShapeUtils.createFruitShape;
 
 @SuppressWarnings({"deprecation", "unused"})
-public class FruitBlock extends Block implements IGrowable {
+public class FruitBlock extends Block implements BonemealableBlock {
 
     enum MatureFruitAction {
         NOTHING,
@@ -46,7 +54,7 @@ public class FruitBlock extends Block implements IGrowable {
     /**
      * Default shapes for the apple fruit, each element is the shape for each growth stage.
      */
-    protected AxisAlignedBB[] FRUIT_AABB = new AxisAlignedBB[]{
+    protected AABB[] FRUIT_AABB = new AABB[]{
             createFruitShape(1, 1, 0, 16),
             createFruitShape(1, 2, 0, 16),
             createFruitShape(2.5f, 5, 0),
@@ -64,7 +72,7 @@ public class FruitBlock extends Block implements IGrowable {
 
     protected ItemStack droppedFruit = ItemStack.EMPTY;
     protected Supplier<Boolean> canBoneMeal = () -> false; // Q: Does dusting an apple with bone dust make it grow faster? A: Not by default.
-    protected Vector3d itemSpawnOffset = new Vector3d(0.5, 0.6, 0.5);
+    protected Vec3 itemSpawnOffset = new Vec3(0.5, 0.6, 0.5);
     private Species species;
 
     public FruitBlock() {
@@ -83,7 +91,7 @@ public class FruitBlock extends Block implements IGrowable {
     }
 
     public void setItemSpawnOffset(float x, float y, float z) {
-        this.itemSpawnOffset = new Vector3d(Math.min(Math.max(x, 0), 1), Math.min(Math.max(y, 0), 1), Math.min(Math.max(z, 0), 1));
+        this.itemSpawnOffset = new Vec3(Math.min(Math.max(x, 0), 1), Math.min(Math.max(y, 0), 1), Math.min(Math.max(z, 0), 1));
     }
 
     public void setSpecies(Species species) {
@@ -106,11 +114,11 @@ public class FruitBlock extends Block implements IGrowable {
     }
 
     @Override
-    public void tick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, Random rand) {
         this.doTick(state, world, pos, rand);
     }
 
-    public void doTick(BlockState state, World world, BlockPos pos, Random rand) {
+    public void doTick(BlockState state, Level world, BlockPos pos, Random rand) {
         if (this.shouldBlockDrop(world, pos, state)) {
             this.dropBlock(world, state, pos);
             return;
@@ -154,7 +162,7 @@ public class FruitBlock extends Block implements IGrowable {
         }
     }
 
-    protected float getGrowthChance(World world, BlockPos blockPos) {
+    protected float getGrowthChance(Level world, BlockPos blockPos) {
         return 0.2f;
     }
 
@@ -167,37 +175,37 @@ public class FruitBlock extends Block implements IGrowable {
      * @param rand  A random number generator
      * @return MatureFruitAction action to take
      */
-    protected MatureFruitAction matureAction(World world, BlockPos pos, BlockState state, Random rand) {
+    protected MatureFruitAction matureAction(Level world, BlockPos pos, BlockState state, Random rand) {
         return MatureFruitAction.NOTHING;
     }
 
-    protected void outOfSeasonAction(World world, BlockPos pos) {
+    protected void outOfSeasonAction(Level world, BlockPos pos) {
         world.setBlockAndUpdate(pos, BlockStates.AIR);
     }
 
     @Override
-    public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos neighbor, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos neighbor, boolean isMoving) {
         this.onNeighborChange(state, world, pos, neighbor);
     }
 
     @Override
-    public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
+    public void onNeighborChange(BlockState state, LevelReader world, BlockPos pos, BlockPos neighbor) {
         if (this.shouldBlockDrop(world, pos, state)) {
-            this.dropBlock((World) world, state, pos);
+            this.dropBlock((Level) world, state, pos);
         }
     }
 
     @Override
-    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (state.getValue(AGE) >= 3) {
             this.dropBlock(worldIn, state, pos);
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return ActionResultType.FAIL;
+        return InteractionResult.FAIL;
     }
 
-    protected void dropBlock(World worldIn, BlockState state, BlockPos pos) {
+    protected void dropBlock(Level worldIn, BlockState state, BlockPos pos) {
         worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
         if (state.getValue(AGE) >= 3) {
             worldIn.addFreshEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, this.getFruitDrop(fruitDropCount(state, worldIn, pos))));
@@ -205,7 +213,7 @@ public class FruitBlock extends Block implements IGrowable {
     }
 
     @Override
-    public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
         return this.getFruitDrop(1);
     }
 
@@ -217,7 +225,7 @@ public class FruitBlock extends Block implements IGrowable {
      * @param state
      * @return True if it should drop (leaves are not above).
      */
-    public boolean shouldBlockDrop(IBlockReader world, BlockPos pos, BlockState state) {
+    public boolean shouldBlockDrop(BlockGetter world, BlockPos pos, BlockState state) {
         return !(world.getBlockState(pos.above()).getBlock() instanceof LeavesBlock);
     }
 
@@ -227,19 +235,19 @@ public class FruitBlock extends Block implements IGrowable {
     ///////////////////////////////////////////
 
     @Override
-    public boolean isValidBonemealTarget(IBlockReader worldIn, BlockPos pos, BlockState state, boolean isClient) {
+    public boolean isValidBonemealTarget(BlockGetter worldIn, BlockPos pos, BlockState state, boolean isClient) {
         return state.getValue(AGE) < 3;
     }
 
     @Override
-    public boolean isBonemealSuccess(World world, Random rand, BlockPos pos, BlockState state) {
+    public boolean isBonemealSuccess(Level world, Random rand, BlockPos pos, BlockState state) {
         return this.canBoneMeal.get();
     }
 
     @Override
-    public void performBonemeal(ServerWorld world, Random rand, BlockPos pos, BlockState state) {
+    public void performBonemeal(ServerLevel world, Random rand, BlockPos pos, BlockState state) {
         final int age = state.getValue(AGE);
-        final int newAge = MathHelper.clamp(age + 1, 0, 3);
+        final int newAge = Mth.clamp(age + 1, 0, 3);
         if (newAge != age) {
             world.setBlock(pos, state.setValue(AGE, newAge), 2);
         }
@@ -283,7 +291,7 @@ public class FruitBlock extends Block implements IGrowable {
     }
 
     //pos could be BlockPos.ZERO
-    protected int fruitDropCount(BlockState state, World world, BlockPos pos) {
+    protected int fruitDropCount(BlockState state, Level world, BlockPos pos) {
         return 1;
     }
 
@@ -291,19 +299,19 @@ public class FruitBlock extends Block implements IGrowable {
     // BOUNDARIES
     ///////////////////////////////////////////
 
-    public FruitBlock setShape(int stage, AxisAlignedBB boundingBox) {
+    public FruitBlock setShape(int stage, AABB boundingBox) {
         FRUIT_AABB[stage] = boundingBox;
         return this;
     }
 
-    public FruitBlock setShape(AxisAlignedBB[] boundingBox) {
+    public FruitBlock setShape(AABB[] boundingBox) {
         FRUIT_AABB = boundingBox;
         return this;
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return VoxelShapes.create(FRUIT_AABB[state.getValue(AGE)]);
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+        return Shapes.create(FRUIT_AABB[state.getValue(AGE)]);
     }
 
     ///////////////////////////////////////////
@@ -311,7 +319,7 @@ public class FruitBlock extends Block implements IGrowable {
     ///////////////////////////////////////////
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(AGE);
     }
 
@@ -319,7 +327,7 @@ public class FruitBlock extends Block implements IGrowable {
         return this.defaultBlockState().setValue(AGE, age);
     }
 
-    public int getAgeForSeasonalWorldGen(IWorld world, BlockPos pos, @Nullable Float seasonValue) {
+    public int getAgeForSeasonalWorldGen(LevelAccessor world, BlockPos pos, @Nullable Float seasonValue) {
         if (seasonValue == null) {
             return 3;
         }

@@ -2,9 +2,9 @@ package com.ferreusveritas.dynamictrees.api.resource.loading.preparation;
 
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceCollector;
-import net.minecraft.resources.IResource;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
@@ -28,25 +28,25 @@ public abstract class AbstractResourcePreparer<R> implements ResourcePreparer<R>
     }
 
     @Override
-    public ResourceAccessor<R> prepare(IResourceManager resourceManager) {
+    public ResourceAccessor<R> prepare(ResourceManager resourceManager) {
         this.readAndPutResources(this.collectResources(resourceManager), resourceManager);
         ResourceAccessor<R> accessor = this.resourceCollector.createAccessor();
         this.resourceCollector.clear(); // Refresh collector for future use.
         return accessor;
     }
 
-    protected Collection<ResourceLocation> collectResources(IResourceManager resourceManager) {
+    protected Collection<ResourceLocation> collectResources(ResourceManager resourceManager) {
         return resourceManager.listResources(this.folderName, (fileName) -> fileName.endsWith(this.extension));
     }
 
-    protected void readAndPutResources(Collection<ResourceLocation> resourceLocations, IResourceManager resourceManager) {
+    protected void readAndPutResources(Collection<ResourceLocation> resourceLocations, ResourceManager resourceManager) {
         resourceLocations.forEach(location -> {
             final ResourceLocation resourceName = this.getResourceName(location);
             this.tryReadAndPutResource(resourceManager, location, resourceName);
         });
     }
 
-    private void tryReadAndPutResource(IResourceManager resourceManager, ResourceLocation location,
+    private void tryReadAndPutResource(ResourceManager resourceManager, ResourceLocation location,
                                        ResourceLocation resourceName) {
         try {
             this.readAndPutResource(resourceManager.getResource(location), resourceName);
@@ -55,7 +55,7 @@ public abstract class AbstractResourcePreparer<R> implements ResourcePreparer<R>
         }
     }
 
-    protected abstract void readAndPutResource(IResource resource, ResourceLocation resourceName)
+    protected abstract void readAndPutResource(Resource resource, ResourceLocation resourceName)
             throws PreparationException, IOException;
 
     protected void logError(ResourceLocation location, Exception e) {

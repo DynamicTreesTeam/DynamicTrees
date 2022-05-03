@@ -2,13 +2,13 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostRotContext;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.LightType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.IPlantable;
 
 /**
@@ -43,13 +43,13 @@ public class MushroomRotGenFeature extends GenFeature {
 
     @Override
     protected boolean postRot(GenFeatureConfiguration configuration, PostRotContext context) {
-        final IWorld world = context.world();
+        final LevelAccessor world = context.world();
         final BlockPos pos = context.pos();
         final Block mushroom = configuration.get(ALTERNATE_MUSHROOM_CHANCE) > context.random().nextFloat() ?
                 configuration.get(MUSHROOM) : configuration.get(ALTERNATE_MUSHROOM);
 
         if (context.radius() <= 4 || !this.canSustainMushroom(world, pos, mushroom) ||
-                world.getBrightness(LightType.SKY, pos) >= 4) {
+                world.getBrightness(LightLayer.SKY, pos) >= 4) {
             return false;
         }
 
@@ -57,7 +57,7 @@ public class MushroomRotGenFeature extends GenFeature {
         return true;
     }
 
-    private boolean canSustainMushroom(final IWorld world, final BlockPos pos, final Block block) {
+    private boolean canSustainMushroom(final LevelAccessor world, final BlockPos pos, final Block block) {
         return block instanceof IPlantable && world.getBlockState(pos).canSustainPlant(world, pos, Direction.UP, (IPlantable) block);
     }
 

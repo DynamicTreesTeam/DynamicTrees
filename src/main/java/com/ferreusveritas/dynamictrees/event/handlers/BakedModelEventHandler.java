@@ -7,9 +7,9 @@ import com.ferreusveritas.dynamictrees.models.bakedmodels.BranchBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.loaders.BranchBlockModelLoader;
 import com.ferreusveritas.dynamictrees.models.loaders.RootBlockModelLoader;
 import com.ferreusveritas.dynamictrees.models.loaders.ThickBranchBlockModelLoader;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -42,7 +42,7 @@ public final class BakedModelEventHandler {
         BranchBlockBakedModel.INSTANCES.clear();
 
         // Put bonsai pot baked model into its model location.
-        IBakedModel flowerPotModel = event.getModelRegistry().get(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""));
+        BakedModel flowerPotModel = event.getModelRegistry().get(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""));
         event.getModelRegistry().put(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""),
                 new BakedModelBlockBonsaiPot(flowerPotModel));
 

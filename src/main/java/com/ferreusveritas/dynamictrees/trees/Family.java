@@ -2,11 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.data.BranchItemModelGenerator;
-import com.ferreusveritas.dynamictrees.api.data.BranchStateGenerator;
-import com.ferreusveritas.dynamictrees.api.data.Generator;
-import com.ferreusveritas.dynamictrees.api.data.StrippedBranchStateGenerator;
-import com.ferreusveritas.dynamictrees.api.data.SurfaceRootStateGenerator;
+import com.ferreusveritas.dynamictrees.api.data.*;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
@@ -30,51 +26,44 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
 import com.ferreusveritas.dynamictrees.util.Optionals;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.Items;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.Tag;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -110,7 +99,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         }
 
         @Override
-        public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
+        public boolean onTreeActivated(Level world, BlockPos hitPos, BlockState state, Player player, InteractionHand hand, ItemStack heldItem, BlockHitResult hit) {
             return false;
         }
 
@@ -125,7 +114,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         }
 
         @Override
-        public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
+        public Species getSpeciesForLocation(LevelAccessor world, BlockPos trunkPos) {
             return Species.NULL_SPECIES;
         }
     };
@@ -259,27 +248,13 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // SPECIES LOCATION OVERRIDES
     ///////////////////////////////////////////
 
-    /**
-     * This is only used by Rooty Dirt to get the appropriate species for this tree. For instance Oak may use this to
-     * select a Swamp Oak species if the coordinates are in a swamp.
-     *
-     * @param world    The {@link IWorld} object.
-     * @param trunkPos The {@link BlockPos} of the trunk.
-     * @return The {@link Species} for the specified position.
-     */
-    public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
+//
+    public Species getSpeciesForLocation(LevelAccessor world, BlockPos trunkPos) {
         return this.getSpeciesForLocation(world, trunkPos, this.commonSpecies);
     }
 
-    /**
-     * This is only used by Rooty Dirt to get the appropriate species for this tree. For instance Oak may use this to
-     * select a Swamp Oak species if the coordinates are in a swamp.
-     *
-     * @param world    The {@link IWorld} object.
-     * @param trunkPos The {@link BlockPos} of the trunk.
-     * @return The {@link Species} for the specified position.
-     */
-    public Species getSpeciesForLocation(IBlockReader world, BlockPos trunkPos, Species defaultSpecies) {
+
+    public Species getSpeciesForLocation(BlockGetter world, BlockPos trunkPos, Species defaultSpecies) {
         for (final Species species : this.species) {
             if (species.shouldOverrideCommon(world, trunkPos)) {
                 return species;
@@ -293,7 +268,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // INTERACTION
     ///////////////////////////////////////////
 
-    public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, @Nullable ItemStack heldItem, BlockRayTraceResult hit) {
+    public boolean onTreeActivated(Level world, BlockPos hitPos, BlockState state, Player player, InteractionHand hand, @Nullable ItemStack heldItem, BlockHitResult hit) {
 
         if (this.canSupportCocoa) {
             BlockPos pos = hit.getBlockPos();
@@ -305,10 +280,10 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
                             pos = pos.relative(hit.getDirection());
                         }
                         if (world.isEmptyBlock(pos)) {
-                            BlockState cocoaState = DTRegistries.COCOA_FRUIT.getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, hand, hit)));
+                            BlockState cocoaState = DTRegistries.COCOA_FRUIT.getStateForPlacement(new BlockPlaceContext(new UseOnContext(player, hand, hit)));
                             assert cocoaState != null;
-                            Direction facing = cocoaState.getValue(HorizontalBlock.FACING);
-                            world.setBlock(pos, DTRegistries.COCOA_FRUIT.defaultBlockState().setValue(HorizontalBlock.FACING, facing), 2);
+                            Direction facing = cocoaState.getValue(HorizontalDirectionalBlock.FACING);
+                            world.setBlock(pos, DTRegistries.COCOA_FRUIT.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing), 2);
                             if (!player.isCreative()) {
                                 heldItem.shrink(1);
                             }
@@ -332,7 +307,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return false;
     }
 
-    public boolean canStripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
+    public boolean canStripBranch(BlockState state, Level world, BlockPos pos, Player player, ItemStack heldItem) {
         BranchBlock branchBlock = TreeHelper.getBranch(state);
 		if (branchBlock == null) {
 			return false;
@@ -340,12 +315,12 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return branchBlock.canBeStripped(state, world, pos, player, heldItem);
     }
 
-    public boolean stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
+    public boolean stripBranch(BlockState state, Level world, BlockPos pos, Player player, ItemStack heldItem) {
         if (this.hasStrippedBranch()) {
             this.getBranch().ifPresent(branch -> {
                 branch.stripBranch(state, world, pos, player, heldItem);
                 if (world.isClientSide) {
-                    world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
                     WailaOther.invalidateWailaPosition();
                 }
             });
@@ -492,7 +467,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @return an {@link ItemStack} of sticky things
      */
     public ItemStack getStick(int qty) {
-        return this.stick == Items.AIR ? ItemStack.EMPTY : new ItemStack(this.stick, MathHelper.clamp(qty, 0, 64));
+        return this.stick == Items.AIR ? ItemStack.EMPTY : new ItemStack(this.stick, Mth.clamp(qty, 0, 64));
     }
 
     public void setCanSupportCocoa(boolean canSupportCocoa) {
@@ -560,13 +535,13 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.isFireProof = isFireProof;
     }
 
-    public SoundType getBranchSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
+    public SoundType getBranchSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
         return this.getDefaultBranchSoundType();
     }
 
-    public ToolType getBranchHarvestTool(BlockState state) {
-        return ToolType.AXE;
-    }
+//    public ToolType getBranchHarvestTool(BlockState state) {
+//        return ToolType.AXE;
+//    }
 
     public int getBranchHarvestLevel(BlockState state) {
         return 0;
@@ -580,34 +555,29 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return SoundType.WOOD;
     }
 
-    public ToolType getDefaultBranchTool() {
-        return ToolType.AXE;
+//    public ToolType getDefaultBranchTool() {
+//        return ToolType.AXE;
+//    }
+
+    public BlockBehaviour.Properties getDefaultBranchProperties(final Material material, final MaterialColor materialColor) {
+        return BlockBehaviour.Properties.of(material, materialColor).sound(this.getDefaultBranchSoundType())
+                .noDrops()/*.harvestLevel(0).harvestTool(this.getDefaultBranchTool())*/;
     }
 
-    public AbstractBlock.Properties getDefaultBranchProperties(final Material material, final MaterialColor materialColor) {
-        return AbstractBlock.Properties.of(material, materialColor).sound(this.getDefaultBranchSoundType())
-                .noDrops().harvestLevel(0).harvestTool(this.getDefaultBranchTool());
-    }
-
-    private AbstractBlock.Properties properties;
+    private BlockBehaviour.Properties properties;
 
     /**
      * Gets the {@link #properties} for this {@link Family} object.
      *
      * @return The {@link #properties} for this {@link Family} object.
      */
-    public AbstractBlock.Properties getProperties() {
+    public BlockBehaviour.Properties getProperties() {
         return this.properties == null ? this.getDefaultBranchProperties(this.getDefaultBranchMaterial(),
                 this.getDefaultBranchMaterial().getColor()) : this.properties;
     }
 
-    /**
-     * Sets the {@link #properties} for this {@link Family} object to the given {@code properties}.
-     *
-     * @param properties The new {@link AbstractBlock.Properties} object to set.
-     * @return This {@link Family} object for chaining.
-     */
-    public Family setProperties(AbstractBlock.Properties properties) {
+
+    public Family setProperties(BlockBehaviour.Properties properties) {
         this.properties = properties;
         return this;
     }
@@ -616,7 +586,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     //BRANCHES
     ///////////////////////////////////////////
 
-    public int getRadiusForCellKit(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, BranchBlock branch) {
+    public int getRadiusForCellKit(BlockGetter blockAccess, BlockPos pos, BlockState blockState, Direction dir, BranchBlock branch) {
         int radius = branch.getRadius(blockState);
         int meta = MetadataCell.NONE;
         if (hasConiferVariants && radius == getPrimaryThickness()) {
@@ -756,13 +726,13 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return bounds.expand(3);
     }
 
-    public boolean isCompatibleDynamicLeaves(Species species, BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+    public boolean isCompatibleDynamicLeaves(Species species, BlockState blockState, BlockGetter blockAccess, BlockPos pos) {
         final DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);
         return (leaves != null) && (this == leaves.getFamily(blockState, blockAccess, pos)
                 || species.isValidLeafBlock(leaves));
     }
 
-    public boolean isCompatibleGenericLeaves(final Species species, BlockState blockState, IWorld blockAccess, BlockPos pos) {
+    public boolean isCompatibleGenericLeaves(final Species species, BlockState blockState, LevelAccessor blockAccess, BlockPos pos) {
         return this.isCompatibleDynamicLeaves(species, blockState, blockAccess, pos);
     }
 
@@ -775,17 +745,17 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         properties.setFamily(this);
     }
 
-    public List<ITag.INamedTag<Block>> defaultBranchTags() {
+    public List<Tag.Named<Block>> defaultBranchTags() {
         return this.isFireProof ? Collections.singletonList(DTBlockTags.BRANCHES) :
                 Collections.singletonList(DTBlockTags.BRANCHES_THAT_BURN);
     }
 
-    public List<ITag.INamedTag<Item>> defaultBranchItemTags() {
+    public List<Tag.Named<Item>> defaultBranchItemTags() {
         return this.isFireProof ? Collections.singletonList(DTItemTags.BRANCHES) :
                 Collections.singletonList(DTItemTags.BRANCHES_THAT_BURN);
     }
 
-    public List<ITag.INamedTag<Block>> defaultStrippedBranchTags() {
+    public List<Tag.Named<Block>> defaultStrippedBranchTags() {
         return this.isFireProof ? Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES) :
                 Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN);
     }

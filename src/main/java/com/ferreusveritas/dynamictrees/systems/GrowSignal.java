@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.systems;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 import java.util.Random;
 

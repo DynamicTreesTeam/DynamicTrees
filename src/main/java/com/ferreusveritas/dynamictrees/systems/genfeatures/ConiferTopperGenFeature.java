@@ -3,10 +3,10 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,10 +36,10 @@ public class ConiferTopperGenFeature extends GenFeature {
             return false;
         }
 
-        final IWorld world = context.world();
+        final LevelAccessor world = context.world();
 
         // Find the highest end point.
-        final BlockPos highest = Collections.max(context.endPoints(), Comparator.comparingInt(Vector3i::getY));
+        final BlockPos highest = Collections.max(context.endPoints(), Comparator.comparingInt(Vec3i::getY));
         // Fetch leaves properties property set or the default for the Species.
         final LeavesProperties leavesProperties = configuration.get(LEAVES_PROPERTIES)
                 .elseIfInvalid(context.species().getLeavesProperties());

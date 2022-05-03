@@ -22,13 +22,13 @@ import com.ferreusveritas.dynamictrees.trees.families.NetherFungusFamily;
 import com.ferreusveritas.dynamictrees.trees.species.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.PalmSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.SwampOakSpecies;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.WeightedList;
-import net.minecraft.world.gen.blockstateprovider.WeightedBlockStateProvider;
-import net.minecraft.world.gen.feature.Features;
+import net.minecraft.data.worldgen.Features;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.behavior.WeightedList;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -119,14 +119,14 @@ public class DTTrees {
     public static void replaceNyliumFungiFeatures() {
         TreeRegistry.findSpecies(CRIMSON).getSapling().ifPresent(crimsonSapling ->
                 TreeRegistry.findSpecies(WARPED).getSapling().ifPresent(warpedSapling -> {
-                    replaceFeatureConfigs(((WeightedBlockStateProvider) Features.Configs.CRIMSON_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
-                    replaceFeatureConfigs(((WeightedBlockStateProvider) Features.Configs.WARPED_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
+                    replaceFeatureConfigs(((WeightedStateProvider) Features.Configs.CRIMSON_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
+                    replaceFeatureConfigs(((WeightedStateProvider) Features.Configs.WARPED_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
                 })
         );
     }
 
-    private static void replaceFeatureConfigs(WeightedBlockStateProvider featureConfig, Block crimsonSapling, Block warpedSapling) {
-        for (final WeightedList.Entry<BlockState> entry : featureConfig.weightedList.entries) {
+    private static void replaceFeatureConfigs(WeightedStateProvider featureConfig, Block crimsonSapling, Block warpedSapling) {
+        for (final WeightedList.WeightedEntry<BlockState> entry : featureConfig.weightedList.entries) {
 			if (entry.data.getBlock() == Blocks.CRIMSON_FUNGUS) {
                 entry.data = crimsonSapling.defaultBlockState();
             }

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
-import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.Cell;
+import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
@@ -9,12 +9,12 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class NullTreePart implements TreePart {
 
@@ -22,17 +22,17 @@ public class NullTreePart implements TreePart {
     //Handles some vanilla blocks
 
     @Override
-    public Cell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
+    public Cell getHydrationCell(BlockGetter reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
         return CellNull.NULL_CELL;
     }
 
     @Override
-    public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
+    public GrowSignal growSignal(Level world, BlockPos pos, GrowSignal signal) {
         return signal;
     }
 
     @Override
-    public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+    public int getRadiusForConnection(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         // Connectable blocks such as bee nests and shroomlight will be handled here.
         if (BranchConnectables.isBlockConnectable(state.getBlock())) {
             int rad = BranchConnectables.getConnectionRadiusForBlock(state, reader, pos, side);
@@ -45,7 +45,7 @@ public class NullTreePart implements TreePart {
     }
 
     @Override
-    public int probabilityForBlock(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from) {
+    public int probabilityForBlock(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from) {
         return state.getBlock().isAir(state, reader, pos) ? 1 : 0;
     }
 
@@ -55,23 +55,23 @@ public class NullTreePart implements TreePart {
     }
 
     @Override
-    public boolean shouldAnalyse(BlockState state, IBlockReader reader, BlockPos pos) {
+    public boolean shouldAnalyse(BlockState state, BlockGetter reader, BlockPos pos) {
         return BranchConnectables.isBlockConnectable(state.getBlock());
     }
 
     @Override
-    public MapSignal analyse(BlockState state, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
+    public MapSignal analyse(BlockState state, LevelAccessor world, BlockPos pos, Direction fromDir, MapSignal signal) {
         signal.run(state, world, pos, fromDir);
         return signal;
     }
 
     @Override
-    public int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+    public int branchSupport(BlockState state, BlockGetter reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
         return 0;
     }
 
     @Override
-    public Family getFamily(BlockState state, IBlockReader reader, BlockPos pos) {
+    public Family getFamily(BlockState state, BlockGetter reader, BlockPos pos) {
         return Family.NULL_FAMILY;
     }
 

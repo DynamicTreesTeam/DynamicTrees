@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.compat.seasons;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public interface SeasonProvider {
 
@@ -13,7 +13,7 @@ public interface SeasonProvider {
      *
      * @return season value as a Float object or null if seasons are not enabled
      */
-    Float getSeasonValue(World world, BlockPos pos);
+    Float getSeasonValue(Level world, BlockPos pos);
 
     /**
      * A simple method for updating the handler every tick.
@@ -21,8 +21,8 @@ public interface SeasonProvider {
      * @param world
      * @param worldTicks
      */
-    void updateTick(World world, long worldTicks);
+    void updateTick(Level world, long worldTicks);
 
-    boolean shouldSnowMelt(World world, BlockPos pos);
+    boolean shouldSnowMelt(Level world, BlockPos pos);
 
 }

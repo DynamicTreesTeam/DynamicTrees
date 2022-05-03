@@ -6,10 +6,10 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CocoaFruitNode;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 
 @GeneratesFruit
 public class CocoaGenFeature extends GenFeature {
@@ -25,7 +25,7 @@ public class CocoaGenFeature extends GenFeature {
     @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         if (context.fertility() == 0 && context.random().nextInt() % 16 == 0) {
-            final World world = context.world();
+            final Level world = context.world();
             if (context.species().seasonalFruitProductionFactor(world, context.treePos()) > context.random().nextFloat()) {
                 this.addCocoa(world, context.pos(), false);
             }
@@ -42,7 +42,7 @@ public class CocoaGenFeature extends GenFeature {
         return false;
     }
 
-    private void addCocoa(IWorld world, BlockPos rootPos, boolean worldGen) {
+    private void addCocoa(LevelAccessor world, BlockPos rootPos, boolean worldGen) {
         TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(new CocoaFruitNode().setWorldGen(worldGen)));
     }
 

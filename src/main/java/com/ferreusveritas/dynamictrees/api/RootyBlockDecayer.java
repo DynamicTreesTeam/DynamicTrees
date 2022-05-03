@@ -2,9 +2,9 @@ package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Implementations of this {@code interface} allow for custom logic when decaying {@link RootyBlock}s after a tree has
@@ -27,6 +27,6 @@ public interface RootyBlockDecayer {
      * @param species    The {@link Species} of the tree that was removed.
      * @return {@code true} if handled; otherwise {@code false} to run the default decay algorithm.
      */
-    boolean decay(World world, BlockPos rootPos, BlockState rootyState, Species species);
+    boolean decay(Level world, BlockPos rootPos, BlockState rootyState, Species species);
 
 }

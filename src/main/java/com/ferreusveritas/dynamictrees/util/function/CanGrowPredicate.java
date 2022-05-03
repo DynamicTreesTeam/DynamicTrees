@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.util.function;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.function.BiPredicate;
 
@@ -13,5 +13,5 @@ import java.util.function.BiPredicate;
  * @author Harley O'Connor
  */
 @FunctionalInterface
-public interface CanGrowPredicate extends BiPredicate<IWorld, BlockPos> {
+public interface CanGrowPredicate extends BiPredicate<LevelAccessor, BlockPos> {
 }

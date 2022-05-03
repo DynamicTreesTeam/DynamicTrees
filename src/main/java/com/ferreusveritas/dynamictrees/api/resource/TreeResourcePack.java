@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.resource;
 
-import net.minecraft.resources.IResourcePack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +14,7 @@ import java.util.function.Predicate;
  *
  * @author Harley O'Connor
  */
-public interface TreeResourcePack extends IResourcePack {
+public interface TreeResourcePack extends PackResources {
 
     String FOLDER = "trees";
 

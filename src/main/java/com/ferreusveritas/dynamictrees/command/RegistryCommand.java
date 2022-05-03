@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.command;
 import com.ferreusveritas.dynamictrees.api.registry.Registries;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,13 +30,13 @@ public final class RegistryCommand extends SubCommand {
     }
 
     @Override
-    protected List<ArgumentBuilder<CommandSource, ?>> registerArguments() {
+    protected List<ArgumentBuilder<CommandSourceStack, ?>> registerArguments() {
         return this.subCommands.stream().map(SubCommand::register)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArgument() {
+    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return stringArgument("null");
     }
 

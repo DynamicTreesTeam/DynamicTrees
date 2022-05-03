@@ -5,10 +5,10 @@ import com.ferreusveritas.dynamictrees.compat.seasons.*;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
 import corgitaco.betterweather.api.season.Season;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
-import net.minecraft.util.registry.Registry;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import sereneseasons.config.BiomeConfig;
@@ -49,7 +49,7 @@ public final class CompatHandler {
             );
             seasonManager.setTropicalPredicate((world, pos) -> {
                 final ResourceLocation registryName = world.getBiome(pos).getRegistryName();
-                return registryName != null && BiomeConfig.usesTropicalSeasons(RegistryKey.create(Registry.BIOME_REGISTRY, registryName));
+                return registryName != null && BiomeConfig.usesTropicalSeasons(ResourceKey.create(Registry.BIOME_REGISTRY, registryName));
             });
             return seasonManager;
         });

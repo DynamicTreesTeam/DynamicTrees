@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.cells;
 
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 
 public interface Cell {
 

@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import com.ferreusveritas.dynamictrees.api.seasons.SeasonManager;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import java.util.function.Supplier;
 
@@ -37,31 +37,31 @@ public class SeasonHelper {
         seasonManager = manager;
     }
 
-    static public void updateTick(World world, long worldTicks) {
+    static public void updateTick(Level world, long worldTicks) {
         seasonManager.updateTick(world, worldTicks);
     }
 
-    static public float globalSeasonalGrowthFactor(World world, BlockPos rootPos) {
+    static public float globalSeasonalGrowthFactor(Level world, BlockPos rootPos) {
         return globalSeasonalGrowthFactor(world, rootPos, 0);
     }
 
-    static public float globalSeasonalGrowthFactor(World world, BlockPos rootPos, float offset) {
+    static public float globalSeasonalGrowthFactor(Level world, BlockPos rootPos, float offset) {
         return seasonManager.getGrowthFactor(world, rootPos, offset);
     }
 
-    static public float globalSeasonalSeedDropFactor(World world, BlockPos pos) {
+    static public float globalSeasonalSeedDropFactor(Level world, BlockPos pos) {
         return globalSeasonalSeedDropFactor(world, pos, 0);
     }
 
-    static public float globalSeasonalSeedDropFactor(World world, BlockPos pos, float offset) {
+    static public float globalSeasonalSeedDropFactor(Level world, BlockPos pos, float offset) {
         return seasonManager.getSeedDropFactor(world, pos, offset);
     }
 
-    static public float globalSeasonalFruitProductionFactor(World world, BlockPos pos, boolean getAsScan) {
+    static public float globalSeasonalFruitProductionFactor(Level world, BlockPos pos, boolean getAsScan) {
         return globalSeasonalFruitProductionFactor(world, pos, 0, getAsScan);
     }
 
-    static public float globalSeasonalFruitProductionFactor(World world, BlockPos pos, float offset, boolean getAsScan) {
+    static public float globalSeasonalFruitProductionFactor(Level world, BlockPos pos, float offset, boolean getAsScan) {
         return seasonManager.getFruitProductionFactor(world, pos, offset, getAsScan);
     }
 
@@ -70,7 +70,7 @@ public class SeasonHelper {
      * @return season value 0.0(Early Spring, Inclusive) -> 4.0(Later Winter, Exclusive) or null if there's no seasons
      * in the world.
      */
-    static public Float getSeasonValue(World world, BlockPos pos) {
+    static public Float getSeasonValue(Level world, BlockPos pos) {
         return seasonManager.getSeasonValue(world, pos);
     }
 
@@ -81,7 +81,7 @@ public class SeasonHelper {
      * @param pos
      * @return
      */
-    static public boolean isTropical(World world, BlockPos pos) {
+    static public boolean isTropical(Level world, BlockPos pos) {
         return seasonManager.isTropical(world, pos);
     }
 
@@ -108,7 +108,7 @@ public class SeasonHelper {
 
     }
 
-    static public boolean shouldSnowMelt(World world, BlockPos pos) {
+    static public boolean shouldSnowMelt(Level world, BlockPos pos) {
         return seasonManager.shouldSnowMelt(world, pos);
     }
 

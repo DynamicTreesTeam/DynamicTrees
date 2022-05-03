@@ -6,17 +6,17 @@ import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.google.common.collect.Iterables;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Random;
 
-import static net.minecraft.block.HugeMushroomBlock.*;
+import static net.minecraft.world.level.block.HugeMushroomBlock.*;
 
 /**
  * Generates a singular huge mushroom
@@ -177,13 +177,13 @@ public class HugeMushroomGenFeature extends GenFeature {
     }
 
     //Override this for custom mushroom heights
-    protected int getMushroomHeight(IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+    protected int getMushroomHeight(LevelAccessor world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
         return this.height > 0 ? this.height : random.nextInt(9) + 2;
     }
 
     @Override
     protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
-        final IWorld world = context.world();
+        final LevelAccessor world = context.world();
         final BlockPos rootPos = context.pos();
 
         final BlockPos genPos = rootPos.above();

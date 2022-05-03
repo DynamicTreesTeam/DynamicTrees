@@ -4,10 +4,10 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ResourceLocationException;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModelLoader;
@@ -35,7 +35,7 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
     private static final String RINGS = "rings";
 
     @Override
-    public void onResourceManagerReload(IResourceManager resourceManager) {
+    public void onResourceManagerReload(ResourceManager resourceManager) {
     }
 
     @Override
@@ -78,7 +78,7 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
         } catch (final RuntimeException e) {
             LOGGER.error("{} missing or did not have valid \"{}\" texture location element, using missing " +
                     "texture.", this.getModelTypeName(), textureElement);
-            return MissingTextureSprite.getLocation();
+            return MissingTextureAtlasSprite.getLocation();
         }
     }
 

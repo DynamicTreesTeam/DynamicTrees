@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.blocks.branches;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 @FunctionalInterface
 public interface Musable {
-    boolean isMusable(IBlockReader world, BlockState state, BlockPos pos);
+    boolean isMusable(BlockGetter world, BlockState state, BlockPos pos);
 }

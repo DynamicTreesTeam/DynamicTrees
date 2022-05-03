@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,15 +28,15 @@ public final class CommonVoxelShapes {
     public static final VoxelShape MUSHROOM_BRIM_S = Block.box(4D, 3D, 11D, 12D, 5D, 12D);
     public static final VoxelShape MUSHROOM_BRIM_N = Block.box(4D, 3D, 4D, 12D, 5D, 5D);
 
-    public static final VoxelShape SAPLING = VoxelShapes.or(SAPLING_TRUNK, SAPLING_LEAVES);
-    public static final VoxelShape SLIM_SAPLING = VoxelShapes.or(SAPLING_TRUNK, SLIM_SAPLING_LEAVES);
-    public static final VoxelShape FLAT_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_FLAT);
-    public static final VoxelShape ROUND_MUSHROOM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND);
-    public static final VoxelShape ROUND_MUSHROOM_RIM = VoxelShapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND, MUSHROOM_BRIM_E, MUSHROOM_BRIM_W, MUSHROOM_BRIM_S, MUSHROOM_BRIM_N);
+    public static final VoxelShape SAPLING = Shapes.or(SAPLING_TRUNK, SAPLING_LEAVES);
+    public static final VoxelShape SLIM_SAPLING = Shapes.or(SAPLING_TRUNK, SLIM_SAPLING_LEAVES);
+    public static final VoxelShape FLAT_MUSHROOM = Shapes.or(MUSHROOM_STEM, MUSHROOM_CAP_FLAT);
+    public static final VoxelShape ROUND_MUSHROOM = Shapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND);
+    public static final VoxelShape ROUND_MUSHROOM_RIM = Shapes.or(MUSHROOM_STEM, MUSHROOM_CAP_ROUND, MUSHROOM_BRIM_E, MUSHROOM_BRIM_W, MUSHROOM_BRIM_S, MUSHROOM_BRIM_N);
 
     static {
-        SHAPES.put("empty", VoxelShapes.empty());
-        SHAPES.put("block", VoxelShapes.block());
+        SHAPES.put("empty", Shapes.empty());
+        SHAPES.put("block", Shapes.block());
         SHAPES.put("sapling", SAPLING);
         SHAPES.put("slim_sapling", SLIM_SAPLING);
         SHAPES.put("flat_mushroom", FLAT_MUSHROOM);

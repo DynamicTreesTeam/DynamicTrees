@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.systems;
 
 import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -18,10 +18,10 @@ import java.util.Map;
  */
 public class BranchConnectables {
 
-    private static final Map<Block, TetraFunction<BlockState, IBlockReader, BlockPos, Direction, Integer>> connectablesMap = new HashMap<>();
+    private static final Map<Block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer>> connectablesMap = new HashMap<>();
 
     //Direction can be null
-    public static void makeBlockConnectable(Block block, TetraFunction<BlockState, IBlockReader, BlockPos, Direction, Integer> radiusFunction) {
+    public static void makeBlockConnectable(Block block, TetraFunction<BlockState, BlockGetter, BlockPos, Direction, Integer> radiusFunction) {
         connectablesMap.putIfAbsent(block, radiusFunction);
     }
 
@@ -29,7 +29,7 @@ public class BranchConnectables {
         return connectablesMap.containsKey(block);
     }
 
-    public static int getConnectionRadiusForBlock(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
+    public static int getConnectionRadiusForBlock(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side) {
         final Block block = state.getBlock();
         return isBlockConnectable(block) ? connectablesMap.get(block).apply(state, world, pos, side) : 0;
     }

@@ -8,8 +8,8 @@ import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
@@ -51,7 +51,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
 
     private static Set<BiomeDictionary.Type> getBiomeTypes(Biome biome) {
         return BiomeDictionary.getTypes(
-                RegistryKey.create(ForgeRegistries.Keys.BIOMES, Objects.requireNonNull(biome.getRegistryName()))
+                ResourceKey.create(ForgeRegistries.Keys.BIOMES, Objects.requireNonNull(biome.getRegistryName()))
         );
     }
 

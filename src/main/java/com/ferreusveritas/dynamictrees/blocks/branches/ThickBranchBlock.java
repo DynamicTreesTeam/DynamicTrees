@@ -5,23 +5,23 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BushBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BushBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,7 +45,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     }
 
     @Override
-    public void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(RADIUS_DOUBLE).add(WATERLOGGED);
     }
 
@@ -58,11 +58,11 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         if (!(state.getBlock() instanceof ThickBranchBlock)) {
             return super.getRadius(state);
         }
-        return isSameTree(state) ? MathHelper.clamp(state.getValue(RADIUS_DOUBLE), 1, getMaxRadius()) : 0;
+        return isSameTree(state) ? Mth.clamp(state.getValue(RADIUS_DOUBLE), 1, getMaxRadius()) : 0;
     }
 
     @Override
-    public int setRadius(IWorld world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
+    public int setRadius(LevelAccessor world, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
         if (this.updateTrunkShells(world, pos, radius, flags)) {
             return super.setRadius(world, pos, radius, originDir, flags);
         }
@@ -70,12 +70,12 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     }
 
     @Override
-    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
         updateTrunkShells(worldIn, pos, getRadius(state), 6);
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
     }
 
-    private boolean updateTrunkShells(IWorld world, BlockPos pos, int radius, int flags) {
+    private boolean updateTrunkShells(LevelAccessor world, BlockPos pos, int radius, int flags) {
         // If the radius is <= 8 then we can just set the block as normal and move on.
         if (radius <= MAX_RADIUS) {
             return true;
@@ -112,7 +112,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     }
 
     @Override
-    public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+    public int getRadiusForConnection(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         if (from instanceof ThickBranchBlock) {
             return getRadius(state);
         }
@@ -120,7 +120,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     }
 
     @Override
-    protected int getSideConnectionRadius(IBlockReader blockAccess, BlockPos pos, int radius, Direction side) {
+    protected int getSideConnectionRadius(BlockGetter blockAccess, BlockPos pos, int radius, Direction side) {
         final BlockPos deltaPos = pos.relative(side);
         final BlockState blockState = CoordUtils.getStateSafe(blockAccess, deltaPos);
 
@@ -141,7 +141,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         return Math.min(MAX_RADIUS, connectionRadius);
     }
 
-    public ReplaceableState getReplaceability(IWorld world, BlockPos pos, BlockPos corePos) {
+    public ReplaceableState getReplaceability(LevelAccessor world, BlockPos pos, BlockPos corePos) {
 
         final BlockState state = world.getBlockState(pos);
         final Block block = state.getBlock();
@@ -195,18 +195,18 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     @Nonnull
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader blockReader, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter blockReader, BlockPos pos, CollisionContext context) {
         final int thisRadius = getRadius(state);
         if (thisRadius <= MAX_RADIUS) {
             return super.getShape(state, blockReader, pos, context);
         }
 
         final double radius = thisRadius / 16.0;
-        return VoxelShapes.create(new AxisAlignedBB(0.5 - radius, 0.0, 0.5 - radius, 0.5 + radius, 1.0, 0.5 + radius));
+        return Shapes.create(new AABB(0.5 - radius, 0.0, 0.5 - radius, 0.5 + radius, 1.0, 0.5 + radius));
     }
 
     @Override
-    public boolean isMusable(IBlockReader world, BlockState state, BlockPos pos) {
+    public boolean isMusable(BlockGetter world, BlockState state, BlockPos pos) {
         return getRadius(state) > 8;
     }
 

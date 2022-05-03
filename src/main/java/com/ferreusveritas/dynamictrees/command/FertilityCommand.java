@@ -4,13 +4,13 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Objects;
 
@@ -32,7 +32,7 @@ public final class FertilityCommand extends SubCommand {
     private static final String FERTILITY = CommandConstants.FERTILITY;
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArgument() {
+    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument().executes(context -> executesSuccess(() -> this.getFertility(context.getSource(),
                         rootPosArgument(context), false)))
                 .then(booleanArgument(RAW).executes(context -> executesSuccess(() -> this.getFertility(context.getSource(),
@@ -43,27 +43,27 @@ public final class FertilityCommand extends SubCommand {
                                 intArgument(context, FERTILITY)))));
     }
 
-    private void getFertility(final CommandSource source, final BlockPos rootPos, final boolean raw) {
+    private void getFertility(final CommandSourceStack source, final BlockPos rootPos, final boolean raw) {
         final BlockState state = source.getLevel().getBlockState(rootPos);
         final int fertility = Objects.requireNonNull(TreeHelper.getRooty(state)).getFertility(state, source.getLevel(), rootPos);
 
         if (raw) {
-            sendSuccess(source, new StringTextComponent(String.valueOf(fertility)));
+            sendSuccess(source, new TextComponent(String.valueOf(fertility)));
             return;
         }
 
-        sendSuccess(source, new TranslationTextComponent("commands.dynamictrees.success.get_fertility",
-                CommandHelper.posComponent(rootPos, TextFormatting.AQUA),
-                CommandHelper.colour(String.valueOf(fertility), TextFormatting.AQUA)));
+        sendSuccess(source, new TranslatableComponent("commands.dynamictrees.success.get_fertility",
+                CommandHelper.posComponent(rootPos, ChatFormatting.AQUA),
+                CommandHelper.colour(String.valueOf(fertility), ChatFormatting.AQUA)));
     }
 
-    private void setFertility(final CommandSource source, final BlockPos rootPos, final int fertility) {
+    private void setFertility(final CommandSourceStack source, final BlockPos rootPos, final int fertility) {
         final BlockState state = source.getLevel().getBlockState(rootPos);
         Objects.requireNonNull(TreeHelper.getRooty(state)).setFertility(source.getLevel(), rootPos, fertility);
 
-        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.set_fertility",
-                CommandHelper.posComponent(rootPos, TextFormatting.AQUA),
-                CommandHelper.colour(String.valueOf(fertility), TextFormatting.AQUA)));
+        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.set_fertility",
+                CommandHelper.posComponent(rootPos, ChatFormatting.AQUA),
+                CommandHelper.colour(String.valueOf(fertility), ChatFormatting.AQUA)));
     }
 
 }

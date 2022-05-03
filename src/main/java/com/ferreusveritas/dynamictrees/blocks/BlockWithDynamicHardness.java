@@ -3,12 +3,12 @@ package com.ferreusveritas.dynamictrees.blocks;
 import com.ferreusveritas.dynamictrees.blocks.branches.BasicBranchBlock;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.Property;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.Property;
 
 /**
  * An abstract class to allow for Blocks with dynamic hardness.
@@ -23,7 +23,7 @@ public abstract class BlockWithDynamicHardness extends Block {
         super(properties);
 
         // Create and fill a new state container.
-        final StateContainer.Builder<Block, BlockState> builder = new StateContainer.Builder<>(this);
+        final StateDefinition.Builder<Block, BlockState> builder = new StateDefinition.Builder<>(this);
         this.createBlockStateDefinition(builder);
 
         // Set the state container to use our custom BlockState class.
@@ -41,7 +41,7 @@ public abstract class BlockWithDynamicHardness extends Block {
      * @param pos   The {@link BlockPos}.
      * @return The hardness value.
      */
-    public float getHardness(BlockState state, final IBlockReader world, final BlockPos pos) {
+    public float getHardness(BlockState state, final BlockGetter world, final BlockPos pos) {
         return 2.0f;
     }
 
@@ -55,7 +55,7 @@ public abstract class BlockWithDynamicHardness extends Block {
         }
 
         @Override
-        public float getDestroySpeed(IBlockReader worldIn, BlockPos pos) {
+        public float getDestroySpeed(BlockGetter worldIn, BlockPos pos) {
             return getHardness(this, worldIn, pos);
         }
 

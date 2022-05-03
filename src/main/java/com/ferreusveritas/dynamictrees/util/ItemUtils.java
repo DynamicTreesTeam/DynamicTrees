@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 /**
  * @author Harley O'Connor
@@ -17,7 +17,7 @@ public final class ItemUtils {
      * @param pos   The {@link BlockPos} object to spawn the item at.
      * @param stack The {@link ItemStack} to spawn.
      */
-    public static void spawnItemStack(World world, BlockPos pos, ItemStack stack) {
+    public static void spawnItemStack(Level world, BlockPos pos, ItemStack stack) {
         spawnItemStack(world, pos, stack, false);
     }
 
@@ -29,7 +29,7 @@ public final class ItemUtils {
      * @param stack        The {@link ItemStack} to spawn.
      * @param searchForAir If true, searches for air for the item to spawn in.
      */
-    public static void spawnItemStack(World world, BlockPos pos, ItemStack stack, boolean searchForAir) {
+    public static void spawnItemStack(Level world, BlockPos pos, ItemStack stack, boolean searchForAir) {
         if (searchForAir) {
             // Goes up one block at a time until an air block to spawn on is found.
             while (!world.isEmptyBlock(pos)) {

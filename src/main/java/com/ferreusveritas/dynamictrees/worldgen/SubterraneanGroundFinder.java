@@ -2,11 +2,11 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.gen.Heightmap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +20,7 @@ public class SubterraneanGroundFinder implements GroundFinder {
 
     private static final List<BlockPos> NO_LAYERS = Collections.singletonList(BlockPos.ZERO);
 
-    protected boolean isReplaceable(final IWorld world, final BlockPos pos) {
+    protected boolean isReplaceable(final LevelAccessor world, final BlockPos pos) {
         return (world.isEmptyBlock(pos) || !world.getBlockState(pos).getMaterial().blocksMotion() || world.getBlockState(pos).getBlock() instanceof DynamicSaplingBlock) && !world.getBlockState(pos).getMaterial().isLiquid();
     }
 
@@ -28,14 +28,14 @@ public class SubterraneanGroundFinder implements GroundFinder {
         return pos.getY() >= minY && pos.getY() <= maxY;
     }
 
-    protected int getTopY(final IWorld world, final BlockPos pos) {
-        return world.getChunk(pos).getHeight(Heightmap.Type.WORLD_SURFACE_WG, pos.getX(), pos.getZ());
+    protected int getTopY(final LevelAccessor world, final BlockPos pos) {
+        return world.getChunk(pos).getHeight(Heightmap.Types.WORLD_SURFACE_WG, pos.getX(), pos.getZ());
     }
 
-    protected ArrayList<Integer> findSubterraneanLayerHeights(final IWorld world, final BlockPos start) {
+    protected ArrayList<Integer> findSubterraneanLayerHeights(final LevelAccessor world, final BlockPos start) {
         final int maxY = this.getTopY(world, start);
 
-        final BlockPos.Mutable pos = new BlockPos.Mutable(start.getX(), 0, start.getZ());
+        final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(start.getX(), 0, start.getZ());
         final ArrayList<Integer> layers = new ArrayList<>();
 
         while (this.inRange(pos, 0, maxY)) {
@@ -63,7 +63,7 @@ public class SubterraneanGroundFinder implements GroundFinder {
     }
 
     @Override
-    public List<BlockPos> findGround(ISeedReader world, BlockPos start) {
+    public List<BlockPos> findGround(WorldGenLevel world, BlockPos start) {
         final ArrayList<Integer> layers = findSubterraneanLayerHeights(world, start);
         if (layers.size() < 1) {
             return NO_LAYERS;

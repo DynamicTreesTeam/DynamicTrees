@@ -4,11 +4,11 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,9 +47,9 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature {
             return false;
         }
 
-        final IWorld world = context.world();
+        final LevelAccessor world = context.world();
         final BlockPos rootPos = context.pos();
-        final BlockPos lowest = Collections.min(context.endPoints(), Comparator.comparingInt(Vector3i::getY));
+        final BlockPos lowest = Collections.min(context.endPoints(), Comparator.comparingInt(Vec3i::getY));
         final Random rand = context.random();
 
         int success = 0;
@@ -57,8 +57,8 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature {
         for (int tries = 0; tries < configuration.get(MAX_ATTEMPTS); tries++) {
 
             float angle = (float) (rand.nextFloat() * Math.PI * 2);
-            int xOff = (int) (MathHelper.sin(angle) * (context.radius() - 1));
-            int zOff = (int) (MathHelper.cos(angle) * (context.radius() - 1));
+            int xOff = (int) (Mth.sin(angle) * (context.radius() - 1));
+            int zOff = (int) (Mth.cos(angle) * (context.radius() - 1));
 
             BlockPos mushPos = rootPos.offset(xOff, 0, zOff);
 
@@ -67,7 +67,7 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature {
             if (context.bounds().inBounds(mushPos, true)) {
                 int maxHeight = lowest.getY() - mushPos.getY();
                 if (maxHeight >= 2) {
-                    int height = MathHelper.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
+                    int height = Mth.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
 
                     if (this.setHeight(height).generate(configuration, new FullGenerationContext(
                             context.world(),

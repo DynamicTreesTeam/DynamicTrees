@@ -4,19 +4,19 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.world.World;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -45,7 +45,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         final long seed = entity.level.random.nextLong();
         final Random random = new Random(seed ^ (((long) cutPos.getX()) << 32 | ((long) cutPos.getZ())));
         final float mass = entity.getDestroyData().woodVolume.getVolume();
-        final float inertialMass = MathHelper.clamp(mass, 1, 3);
+        final float inertialMass = Mth.clamp(mass, 1, 3);
         entity.setDeltaMovement(entity.getDeltaMovement().x / inertialMass,
                 entity.getDeltaMovement().y / inertialMass, entity.getDeltaMovement().z / inertialMass);
 
@@ -75,8 +75,8 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         // Apply motion.
         entity.setPos(entity.getX() + entity.getDeltaMovement().x, entity.getY() + entity.getDeltaMovement().y,
                 entity.getZ() + entity.getDeltaMovement().z);
-        entity.xRot = MathHelper.wrapDegrees(entity.xRot + getData(entity).rotPit);
-        entity.yRot = MathHelper.wrapDegrees(entity.yRot + getData(entity).rotYaw);
+        entity.xRot = Mth.wrapDegrees(entity.xRot + getData(entity).rotPit);
+        entity.yRot = Mth.wrapDegrees(entity.yRot + getData(entity).rotYaw);
 
         int radius = 8;
         if (entity.getDestroyData().getNumBranches() <= 0) {
@@ -87,13 +87,13 @@ public class PhysicsAnimationHandler implements AnimationHandler {
             radius = ((BranchBlock) state.getBlock()).getRadius(state);
         }
 
-        final World world = entity.level;
-        final AxisAlignedBB fallBox = new AxisAlignedBB(entity.getX() - radius, entity.getY(), entity.getZ() - radius, entity.getX() + radius, entity.getY() + 1.0, entity.getZ() + radius);
+        final Level world = entity.level;
+        final AABB fallBox = new AABB(entity.getX() - radius, entity.getY(), entity.getZ() - radius, entity.getX() + radius, entity.getY() + 1.0, entity.getZ() + radius);
         final BlockPos pos = new BlockPos(entity.getX(), entity.getY(), entity.getZ());
         final BlockState collState = world.getBlockState(pos);
 
         if (!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState) && !(collState.getBlock() instanceof TrunkShellBlock)) {
-            if (collState.getBlock() instanceof FlowingFluidBlock) {
+            if (collState.getBlock() instanceof LiquidBlock) {
                 // Undo the gravity.
                 entity.setDeltaMovement(entity.getDeltaMovement().add(0, AnimationConstants.TREE_GRAVITY, 0));
                 // Create drag in liquid.
@@ -105,7 +105,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
                 entity.onFire = false;
             } else {
                 final VoxelShape shape = collState.getBlockSupportShape(world, pos);
-                AxisAlignedBB collBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+                AABB collBox = new AABB(0, 0, 0, 0, 0, 0);
                 if (!shape.isEmpty()) {
                     collBox = collState.getBlockSupportShape(world, pos).bounds();
                 }
@@ -130,7 +130,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
 
     @Override
     public void dropPayload(FallingTreeEntity entity) {
-        final World world = entity.level;
+        final Level world = entity.level;
         entity.getPayload().forEach(i -> Block.popResource(world, new BlockPos(entity.getX(), entity.getY(), entity.getZ()), i));
         entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(world, entity.getDestroyData().cutPos.offset(bis.pos), bis.stack));
     }
@@ -147,11 +147,11 @@ public class PhysicsAnimationHandler implements AnimationHandler {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack) {
-        final float yaw = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.yRotO, entity.yRot, partialTicks));
-        final float pit = MathHelper.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.xRotO, entity.xRot, partialTicks));
+    public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, PoseStack matrixStack) {
+        final float yaw = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.yRotO, entity.yRot, partialTicks));
+        final float pit = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.xRotO, entity.xRot, partialTicks));
 
-        final Vector3d mc = entity.getMassCenter();
+        final Vec3 mc = entity.getMassCenter();
         matrixStack.translate(mc.x, mc.y, mc.z);
         matrixStack.mulPose(new Quaternion(new Vector3f(0, 1, 0), -yaw, true));
         matrixStack.mulPose(new Quaternion(new Vector3f(1, 0, 0), pit, true));

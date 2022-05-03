@@ -1,18 +1,22 @@
 package com.ferreusveritas.dynamictrees.client;
 
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.*;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockElement;
+import net.minecraft.client.renderer.block.model.BlockElementFace;
+import net.minecraft.client.renderer.block.model.FaceBakery;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.AABB;
 
 public class ModelUtils {
 
-    public static float[] getUVs(AxisAlignedBB box, Direction face) {
+    public static float[] getUVs(AABB box, Direction face) {
         switch (face) {
             default:
             case DOWN:
@@ -66,20 +70,20 @@ public class ModelUtils {
         return uvs;
     }
 
-    public static Vector3f[] AABBLimits(AxisAlignedBB aabb) {
+    public static Vector3f[] AABBLimits(AABB aabb) {
         return new Vector3f[]{
                 new Vector3f((float) aabb.minX, (float) aabb.minY, (float) aabb.minZ),
                 new Vector3f((float) aabb.maxX, (float) aabb.maxY, (float) aabb.maxZ),
         };
     }
 
-    public static BakedQuad makeBakedQuad(BlockPart blockPart, BlockPartFace partFace, TextureAtlasSprite atlasSprite, Direction dir, ModelRotation modelRotation, ResourceLocation modelResLoc) {
+    public static BakedQuad makeBakedQuad(BlockElement blockPart, BlockElementFace partFace, TextureAtlasSprite atlasSprite, Direction dir, BlockModelRotation modelRotation, ResourceLocation modelResLoc) {
         return new FaceBakery().bakeQuad(blockPart.from, blockPart.to, partFace, atlasSprite, dir, modelRotation, blockPart.rotation, true, modelResLoc);
     }
 
     @SuppressWarnings("deprecation")
     public static TextureAtlasSprite getTexture(ResourceLocation resLoc) {
-        return getTexture(resLoc, AtlasTexture.LOCATION_BLOCKS);
+        return getTexture(resLoc, TextureAtlas.LOCATION_BLOCKS);
     }
 
     public static TextureAtlasSprite getTexture(ResourceLocation resLoc, ResourceLocation atlasResLoc) {

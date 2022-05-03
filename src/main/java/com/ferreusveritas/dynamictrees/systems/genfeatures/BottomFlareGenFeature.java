@@ -6,10 +6,10 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGeneratio
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
 
 public class BottomFlareGenFeature extends GenFeature  {
 
@@ -52,7 +52,7 @@ public class BottomFlareGenFeature extends GenFeature  {
      * @param world   The world
      * @param rootPos The position of the rooty dirt block of the tree
      */
-    public void flareBottom(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, Species species) {
+    public void flareBottom(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, Species species) {
         Family family = species.getFamily();
 
         //Put a cute little flare on the bottom of the dark oaks

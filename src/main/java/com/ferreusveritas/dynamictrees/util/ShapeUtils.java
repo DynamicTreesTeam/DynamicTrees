@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.phys.AABB;
 
 /**
  * @author Max Hyper
@@ -17,15 +17,15 @@ public final class ShapeUtils {
      *                   parameters
      * @return an Axis Aligned Bounding Box of the fruit
      */
-    public static AxisAlignedBB createFruitShape(float radius, float height, float stemLength, float fraction) {
+    public static AABB createFruitShape(float radius, float height, float stemLength, float fraction) {
         float topHeight = fraction - stemLength;
         float bottomHeight = topHeight - height;
-        return new AxisAlignedBB(
+        return new AABB(
                 ((fraction / 2) - radius) / fraction, topHeight / fraction, ((fraction / 2) - radius) / fraction,
                 ((fraction / 2) + radius) / fraction, bottomHeight / fraction, ((fraction / 2) + radius) / fraction);
     }
 
-    public static AxisAlignedBB createFruitShape(float radius, float height, float stemLength) {
+    public static AABB createFruitShape(float radius, float height, float stemLength) {
         return createFruitShape(radius, height, stemLength, 20);
     }
 }

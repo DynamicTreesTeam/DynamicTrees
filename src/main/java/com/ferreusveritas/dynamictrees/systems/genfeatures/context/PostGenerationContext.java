@@ -5,18 +5,18 @@ import com.ferreusveritas.dynamictrees.compat.seasons.SeasonProvider;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
 /**
  * @author Harley O'Connor
  */
-public class PostGenerationContext extends GenerationContext<IWorld> {
+public class PostGenerationContext extends GenerationContext<LevelAccessor> {
 
     private final Biome biome;
     private final int radius;
@@ -41,7 +41,7 @@ public class PostGenerationContext extends GenerationContext<IWorld> {
      * @param fruitProductionFactor The current fruit production factor, as obtained from {@link
      *                              Species#seasonalFruitProductionFactor(World, BlockPos)}.
      */
-    public PostGenerationContext(IWorld world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints,
+    public PostGenerationContext(LevelAccessor world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints,
                                  SafeChunkBounds bounds, BlockState initialDirtState, Float seasonValue, Float fruitProductionFactor) {
         super(world, rootPos, species);
         this.biome = biome;

@@ -4,10 +4,10 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.ItemUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.SaplingGrowTreeEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -19,11 +19,11 @@ public class VanillaSaplingEventHandler {
     public void onPlayerPlaceBlock(BlockEvent.EntityPlaceEvent event) {
         final BlockState state = event.getPlacedBlock();
 
-        if (!(event.getWorld() instanceof World) || !TreeRegistry.SAPLING_REPLACERS.containsKey(state)) {
+        if (!(event.getWorld() instanceof Level) || !TreeRegistry.SAPLING_REPLACERS.containsKey(state)) {
             return;
         }
 
-        final World world = (World) event.getWorld();
+        final Level world = (Level) event.getWorld();
         final BlockPos pos = event.getPos();
         final Species targetSpecies = TreeRegistry.SAPLING_REPLACERS.get(state);
 
@@ -39,15 +39,15 @@ public class VanillaSaplingEventHandler {
 
     @SubscribeEvent
     public void onSaplingGrowTree(SaplingGrowTreeEvent event) {
-        final IWorld iWorld = event.getWorld();
+        final LevelAccessor iWorld = event.getWorld();
         final BlockPos pos = event.getPos();
         final BlockState blockState = iWorld.getBlockState(pos);
 
-        if (!(iWorld instanceof World) || !TreeRegistry.SAPLING_REPLACERS.containsKey(blockState)) {
+        if (!(iWorld instanceof Level) || !TreeRegistry.SAPLING_REPLACERS.containsKey(blockState)) {
             return;
         }
 
-        final World world = ((World) iWorld);
+        final Level world = ((Level) iWorld);
         final Species species = TreeRegistry.SAPLING_REPLACERS.get(blockState)
                 .selfOrLocationOverride(world, pos);
 

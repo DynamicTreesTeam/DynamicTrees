@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 
 import com.ferreusveritas.dynamictrees.worldgen.OverworldGroundFinder;
 import com.ferreusveritas.dynamictrees.worldgen.SubterraneanGroundFinder;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.WorldGenLevel;
 
 import java.util.List;
 
@@ -23,6 +23,6 @@ public interface GroundFinder {
      * @param start The {@link BlockPos} to start from.
      * @return The {@link BlockPos} of the first ground block.
      */
-    List<BlockPos> findGround(ISeedReader world, BlockPos start);
+    List<BlockPos> findGround(WorldGenLevel world, BlockPos start);
 
 }

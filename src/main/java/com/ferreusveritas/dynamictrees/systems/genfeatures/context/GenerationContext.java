@@ -1,15 +1,15 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.context;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.Random;
 
 /**
  * @author Harley O'Connor
  */
-public abstract class GenerationContext<W extends IWorld> {
+public abstract class GenerationContext<W extends LevelAccessor> {
 
     private final W world;
     private final BlockPos pos;

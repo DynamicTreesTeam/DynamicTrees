@@ -8,19 +8,19 @@ import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
     protected final Species species;
 
     public FallingTreeEntityModel(FallingTreeEntity entity) {
-        World world = entity.getCommandSenderWorld();
+        Level world = entity.getCommandSenderWorld();
         BranchDestructionData destructionData = entity.getDestroyData();
         Species species = destructionData.species;
 
@@ -57,12 +57,12 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 
     public static int getBrightness(FallingTreeEntity entity) {
         final BranchDestructionData destructionData = entity.getDestroyData();
-        final World world = entity.level;
+        final Level world = entity.level;
         return world.getBlockState(destructionData.cutPos).getLightValue(world, destructionData.cutPos);
     }
 
     public static List<TreeQuadData> generateTreeQuads(FallingTreeEntity entity) {
-        BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
+        BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
         BranchDestructionData destructionData = entity.getDestroyData();
         Direction cutDir = destructionData.cutDir;
 
@@ -83,22 +83,22 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                 if (TreeHelper.isRooty(bottomState)) {
                     RootyBlock rootyBlock = TreeHelper.getRooty(bottomState);
                     if (rootyBlock != null && rootyBlock.fallWithTree(bottomState, entity.level, bottomPos)) {
-                        IBakedModel rootyModel = dispatcher.getBlockModel(bottomState);
-                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, bottomState, new Vector3d(0, -1, 0), EmptyModelData.INSTANCE),
+                        BakedModel rootyModel = dispatcher.getBlockModel(bottomState);
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, bottomState, new Vec3(0, -1, 0), EmptyModelData.INSTANCE),
                                 destructionData.species.getFamily().getRootColor(bottomState, rootyBlock.getColorFromBark()),
                                 bottomState));
                         rootyBlockAdded = true;
                     }
                 }
 
-                IBakedModel branchModel = dispatcher.getBlockModel(exState);
+                BakedModel branchModel = dispatcher.getBlockModel(exState);
                 //Draw the ring texture cap on the cut block if the bottom connection is above 0
                 destructionData.getConnections(0, connectionArray);
                 boolean bottomRingsAdded = false;
                 if (!rootyBlockAdded && connectionArray[cutDir.get3DDataValue()] > 0) {
                     BlockPos offsetPos = BlockPos.ZERO.relative(cutDir);
                     float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.MAX_RADIUS)) / 16f;
-                    treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vector3d(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, new ModelConnections(cutDir).setFamily(TreeHelper.getBranch(exState))),
+                    treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, new ModelConnections(cutDir).setFamily(TreeHelper.getBranch(exState))),
                             exState));
                     bottomRingsAdded = true;
                 }
@@ -117,7 +117,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                     if (index == 0 && bottomRingsAdded) {
                         modelConnections.setForceRing(cutDir);
                     }
-                    treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), modelConnections),
+                    treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3(relPos.getX(), relPos.getY(), relPos.getZ()), modelConnections),
                             exState));
                 }
 
@@ -126,15 +126,15 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                 if (leavesClusters != null) {
                     for (Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
                         BlockState leafState = leafLoc.getValue();
-                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(dispatcher.getBlockModel(leafState), leafState, new Vector3d(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), EmptyModelData.INSTANCE),
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(dispatcher.getBlockModel(leafState), leafState, new Vec3(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), EmptyModelData.INSTANCE),
                                 species.leafColorMultiplier(entity.level, rootPos.offset(leafLoc.getKey())), leafState));
                     }
                 } else {
                     for (int index = 0; index < destructionData.getNumLeaves(); index++) {
                         BlockPos relPos = destructionData.getLeavesRelPos(index);
                         BlockState leafState = destructionData.getLeavesBlockState(index);
-                        IBakedModel leavesModel = dispatcher.getBlockModel(leafState);
-                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, leafState, new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE),
+                        BakedModel leavesModel = dispatcher.getBlockModel(leafState);
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, leafState, new Vec3(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE),
                                 destructionData.getLeavesProperties(index).treeFallColorMultiplier(leafState, entity.level, rootPos.offset(relPos)), leafState));
                     }
                 }
@@ -150,7 +150,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
     }
 
     @Override
-    public void renderToBuffer(MatrixStack matrixStack, IVertexBuilder buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+    public void renderToBuffer(PoseStack matrixStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         int color;
         float r, g, b;
         for (TreeQuadData treeQuad : getQuads()) {

@@ -8,12 +8,12 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 
@@ -29,7 +29,7 @@ public interface TreePart {
      * @param leavesProperties The {@link LeavesProperties} for the leaves the request came from.
      * @return The {@link Cell} for getting hydration levels.
      */
-    Cell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties);
+    Cell getHydrationCell(BlockGetter reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties);
 
     /**
      * The signal that is passed from the root of the tree to the tip of a branch to create growth.
@@ -39,7 +39,7 @@ public interface TreePart {
      * @param signal The {@link GrowSignal} that keeps track of the growth path.
      * @return The {@link GrowSignal} specified by the {@code signal} parameter for chaining.
      */
-    GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal);
+    GrowSignal growSignal(Level world, BlockPos pos, GrowSignal signal);
 
     /**
      * Returns the probability that the branch logic will follow into this block as part of it's path.
@@ -50,7 +50,7 @@ public interface TreePart {
      * @param from   The {@link BranchBlock} making the request.
      * @return The probability weight used to determine if the growth path will take this block as a path next.
      */
-    int probabilityForBlock(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from);
+    int probabilityForBlock(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from);
 
     /**
      * Returns the radius of the {@link TreePart} that a neighbor is expected to connect with.
@@ -63,7 +63,7 @@ public interface TreePart {
      * @param fromRadius The radius of the {@link BranchBlock} requesting connection data.
      * @return The radius of the connection point to this block from the branch.
      */
-    int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius);
+    int getRadiusForConnection(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius);
 
     /**
      * Returns the radius of a branch, or {@code 0} if this {@link TreePart} is not a {@link BranchBlock}.
@@ -82,7 +82,7 @@ public interface TreePart {
      * @param pos    The {@link BlockPos} of the block to be analysed.
      * @return {@code true} if this {@link TreePart} should be analysed; {@code false} otherwise.
      */
-    boolean shouldAnalyse(BlockState state, IBlockReader reader, BlockPos pos);
+    boolean shouldAnalyse(BlockState state, BlockGetter reader, BlockPos pos);
 
     /**
      * Configurable, general-purpose branch network scanner to gather data and/or perform operations on a dynamic tree.
@@ -94,7 +94,7 @@ public interface TreePart {
      * @param signal  The {@link MapSignal} object to gather data and/or perform operations.
      * @return The specified {@link MapSignal} parameter for chaining.
      */
-    MapSignal analyse(BlockState state, IWorld world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal);
+    MapSignal analyse(BlockState state, LevelAccessor world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal);
 
     /**
      * Returns the {@link Family} this block is used to build.
@@ -104,7 +104,7 @@ public interface TreePart {
      * @param pos    The {@link BlockPos} of this {@link TreePart}.
      * @return The {@link Family} this {@link TreePart} belongs to.
      */
-    Family getFamily(BlockState state, IBlockReader reader, BlockPos pos);
+    Family getFamily(BlockState state, BlockGetter reader, BlockPos pos);
 
     /**
      * A branch requires 2 or more adjacent supporting neighbors, at least one of which must be another branch. Valid
@@ -121,7 +121,7 @@ public interface TreePart {
      * @param radius The radius of the {@link BranchBlock} requesting support.
      * @return The neighbor values in Nybble pair ( (#branches & 0xF0) | (#treeparts & 0x0F) ).
      */
-    int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius);
+    int branchSupport(BlockState state, BlockGetter reader, BranchBlock branch, BlockPos pos, Direction dir, int radius);
 
     enum TreePartType {
         /**

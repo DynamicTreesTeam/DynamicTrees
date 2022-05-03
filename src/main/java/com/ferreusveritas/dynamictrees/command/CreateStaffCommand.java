@@ -8,13 +8,13 @@ import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,11 +43,11 @@ public final class CreateStaffCommand extends SubCommand {
     private static final int DEFAULT_MAX_USES = 64;
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArgument() {
+    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument()
                 .then(speciesArgument().executes(context -> this.spawnStaff(context.getSource(), blockPosArgument(context), speciesArgument(context),
                                 DEFAULT_JO_CODE, DEFAULT_COLOUR, DEFAULT_READ_ONLY, DEFAULT_MAX_USES))
-                        .then(stringArgument(JO_CODE).suggests(((context, builder) -> ISuggestionProvider.suggest(speciesArgument(context).getJoCodes()
+                        .then(stringArgument(JO_CODE).suggests(((context, builder) -> SharedSuggestionProvider.suggest(speciesArgument(context).getJoCodes()
                                         .stream().map(JoCode::toString).collect(Collectors.toList()), builder)))
                                 .executes(context -> this.spawnStaff(context.getSource(), blockPosArgument(context), speciesArgument(context),
                                         stringArgument(context, JO_CODE), DEFAULT_COLOUR, DEFAULT_READ_ONLY, DEFAULT_MAX_USES))
@@ -57,13 +57,13 @@ public final class CreateStaffCommand extends SubCommand {
                                         .then(Commands.argument(READ_ONLY, BoolArgumentType.bool()).executes(context -> this.spawnStaff(context.getSource(), blockPosArgument(context),
                                                         speciesArgument(context), stringArgument(context, JO_CODE), HexColorArgument.getHexCode(context, COLOR),
                                                         BoolArgumentType.getBool(context, READ_ONLY), DEFAULT_MAX_USES))
-                                                .then(intArgument(MAX_USES).suggests(((context, builder) -> ISuggestionProvider.suggest(Stream.of(1, 3, 32, 64, 128).map(String::valueOf).collect(Collectors.toList()), builder)))
+                                                .then(intArgument(MAX_USES).suggests(((context, builder) -> SharedSuggestionProvider.suggest(Stream.of(1, 3, 32, 64, 128).map(String::valueOf).collect(Collectors.toList()), builder)))
                                                         .executes(context -> this.spawnStaff(context.getSource(), blockPosArgument(context), speciesArgument(context),
                                                                 stringArgument(context, JO_CODE), HexColorArgument.getHexCode(context, COLOR), BoolArgumentType.getBool(context, READ_ONLY),
                                                                 intArgument(context, MAX_USES))))))));
     }
 
-    private int spawnStaff(final CommandSource source, final BlockPos pos, final Species species, final String code, final int colour, final boolean readOnly, final int maxUses) {
+    private int spawnStaff(final CommandSourceStack source, final BlockPos pos, final Species species, final String code, final int colour, final boolean readOnly, final int maxUses) {
         final Staff staff = DTRegistries.STAFF;
 
         final ItemStack wandStack = new ItemStack(staff, 1);
@@ -77,8 +77,8 @@ public final class CreateStaffCommand extends SubCommand {
 
         ItemUtils.spawnItemStack(source.getLevel(), pos, wandStack, true);
 
-        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.create_staff", species.getTextComponent(),
-                new JoCode(code).getTextComponent(), aqua(String.format("#%08X", colour)), aqua(readOnly), aqua(maxUses), CommandHelper.posComponent(pos, TextFormatting.AQUA)));
+        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.create_staff", species.getTextComponent(),
+                new JoCode(code).getTextComponent(), aqua(String.format("#%08X", colour)), aqua(readOnly), aqua(maxUses), CommandHelper.posComponent(pos, ChatFormatting.AQUA)));
 
         return 1;
     }

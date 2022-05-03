@@ -6,11 +6,11 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.LeavesBlock;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FreezerNode implements NodeInspector {
 
@@ -22,7 +22,7 @@ public class FreezerNode implements NodeInspector {
     }
 
     @Override
-    public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+    public boolean run(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir) {
         final BranchBlock branch = TreeHelper.getBranch(blockState);
         if (branch != null) {
             final int radius = branch.getRadius(blockState);
@@ -35,12 +35,12 @@ public class FreezerNode implements NodeInspector {
     }
 
     @Override
-    public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+    public boolean returnRun(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir) {
         return false;
     }
 
     // Clumsy hack to freeze leaves
-    public void freezeSurroundingLeaves(IWorld world, BranchBlock branch, BlockPos twigPos) {
+    public void freezeSurroundingLeaves(LevelAccessor world, BranchBlock branch, BlockPos twigPos) {
         if (world.isClientSide()) {
             return;
         }

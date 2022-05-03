@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.cells;
 
 import com.ferreusveritas.dynamictrees.api.cells.Cell;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 
 /**
  * Cell that simply returns it's value

@@ -8,15 +8,15 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.LeavesBlock;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -81,7 +81,7 @@ public class BushGenFeature extends GenFeature {
         return false;
     }
 
-    protected void commonGen(GenFeatureConfiguration configuration, IWorld world, BlockPos rootPos, Species species,
+    protected void commonGen(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, Species species,
                              Random random, int radius, SafeChunkBounds safeBounds) {
         if (radius <= 2) {
             return;
@@ -89,11 +89,11 @@ public class BushGenFeature extends GenFeature {
 
         final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
-        Vector3d vTree = new Vector3d(rootPos.getX(), rootPos.getY(), rootPos.getZ()).add(0.5, 0.5, 0.5);
+        Vec3 vTree = new Vec3(rootPos.getX(), rootPos.getY(), rootPos.getZ()).add(0.5, 0.5, 0.5);
 
         for (int i = 0; i < 2; i++) {
-            int rad = MathHelper.clamp(random.nextInt(radius - 2) + 2, 2, radius - 1);
-            Vector3d v = vTree.add(new Vector3d(1, 0, 0).scale(rad).yRot((float) (random.nextFloat() * Math.PI * 2)));
+            int rad = Mth.clamp(random.nextInt(radius - 2) + 2, 2, radius - 1);
+            Vec3 v = vTree.add(new Vec3(1, 0, 0).scale(rad).yRot((float) (random.nextFloat() * Math.PI * 2)));
             BlockPos vPos = new BlockPos(v);
 
             if (!safeBounds.inBounds(vPos, true)) {
@@ -109,8 +109,8 @@ public class BushGenFeature extends GenFeature {
                 world.setBlock(pos, configuration.get(LOG).defaultBlockState(), 3);
 
                 SimpleVoxmap leafMap = LeafClusters.BUSH;
-                BlockPos.Mutable leafPos = new BlockPos.Mutable();
-                for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
+                BlockPos.MutableBlockPos leafPos = new BlockPos.MutableBlockPos();
+                for (BlockPos.MutableBlockPos dPos : leafMap.getAllNonZero()) {
                     leafPos.set(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ());
                     if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 &&
                             world.getBlockState(leafPos).getMaterial().isReplaceable()) {
@@ -121,7 +121,7 @@ public class BushGenFeature extends GenFeature {
         }
     }
 
-    private void placeLeaves(GenFeatureConfiguration configuration, IWorld world, Random random,
+    private void placeLeaves(GenFeatureConfiguration configuration, LevelAccessor world, Random random,
                              BlockPos leafPos) {
         final Block leavesBlock = selectLeavesBlock(random, configuration.get(SECONDARY_LEAVES_CHANCE),
                 configuration.get(LEAVES), configuration.getAsOptional(SECONDARY_LEAVES).orElse(null));
@@ -134,7 +134,7 @@ public class BushGenFeature extends GenFeature {
                 secondaryLeavesBlock;
     }
 
-    private void placeLeavesBlock(IWorld world, BlockPos leafPos, Block leavesBlock) {
+    private void placeLeavesBlock(LevelAccessor world, BlockPos leafPos, Block leavesBlock) {
         BlockState leafState = leavesBlock.defaultBlockState();
         if (leavesBlock instanceof LeavesBlock) {
             leafState = leafState.setValue(LeavesBlock.PERSISTENT, true);

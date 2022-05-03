@@ -3,9 +3,9 @@ package com.ferreusveritas.dynamictrees.api.event;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
 
@@ -32,7 +32,7 @@ public final class AddFeatureCancellersEvent extends Event implements IModBusEve
         return this.defaultDatabase.getEntry(biomeResLoc).getFeatureCancellations();
     }
 
-    public void registerFeatureCancellations(final RegistryKey<Biome> biome, final FeatureCanceller... featureCancellers) {
+    public void registerFeatureCancellations(final ResourceKey<Biome> biome, final FeatureCanceller... featureCancellers) {
         final BiomePropertySelectors.FeatureCancellations featureCancellations = this.getCancellations(biome.location());
 
         for (final FeatureCanceller featureCanceller : featureCancellers) {
@@ -40,7 +40,7 @@ public final class AddFeatureCancellersEvent extends Event implements IModBusEve
         }
     }
 
-    public void registerNamespaces(final RegistryKey<Biome> biome, final String... namespaces) {
+    public void registerNamespaces(final ResourceKey<Biome> biome, final String... namespaces) {
         final BiomePropertySelectors.FeatureCancellations featureCancellations = this.getCancellations(biome.location());
 
         for (final String namespace : namespaces) {

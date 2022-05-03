@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.client;
 
-import net.minecraft.client.renderer.texture.NativeImage;
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import java.util.Arrays;

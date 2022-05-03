@@ -8,20 +8,16 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.substances.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.DendroBrewingRecipe;
-import net.minecraft.block.Block;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 
 import javax.annotation.Nullable;
@@ -86,10 +82,10 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
             return this.ingredient;
         }
 
-        public ITextComponent getDescription() {
-            return new TranslationTextComponent("potion." + this.name +
+        public Component getDescription() {
+            return new TranslatableComponent("potion." + this.name +
                     ".description" + (this == TRANSFORM ? ".empty" : ""))
-                    .withStyle(style -> style.withColor(TextFormatting.GRAY));
+                    .withStyle(style -> style.withColor(ChatFormatting.GRAY));
         }
 
         public DendroPotionType getBasePotionType() {
@@ -107,7 +103,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
     }
 
     @Override
-    public void fillItemCategory(final ItemGroup group, final NonNullList<ItemStack> items) {
+    public void fillItemCategory(final CreativeModeTab group, final NonNullList<ItemStack> items) {
         if (this.allowdedIn(group)) {
             for (final DendroPotionType potion : DendroPotionType.values()) {
                 if (potion.isActive()) {
@@ -148,7 +144,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
     }
 
     public Species getTargetSpecies(ItemStack itemStack) {
-        final CompoundNBT nbtTag = itemStack.getOrCreateTag();
+        final CompoundTag nbtTag = itemStack.getOrCreateTag();
 
         return nbtTag.contains(TREE_TAG_KEY) ?
                 TreeRegistry.findSpecies(nbtTag.getString(TREE_TAG_KEY)) :
@@ -213,7 +209,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         final DendroPotionType potionType = getPotionType(stack);
 
         if (potionType != DendroPotionType.TRANSFORM || !this.getTargetSpecies(stack).isValid()) {
@@ -222,8 +218,8 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
         }
 
         final Species species = this.getTargetSpecies(stack);
-        tooltip.add(new TranslationTextComponent("potion.transform.description", species.getTextComponent())
-                .withStyle(style -> style.withColor(TextFormatting.GRAY)));
+        tooltip.add(new TranslatableComponent("potion.transform.description", species.getTextComponent())
+                .withStyle(style -> style.withColor(ChatFormatting.GRAY)));
     }
 
     public int getColor(ItemStack stack, int tint) {

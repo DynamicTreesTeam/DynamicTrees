@@ -3,9 +3,9 @@ package com.ferreusveritas.dynamictrees.deserialisation;
 import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.*;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -123,9 +123,9 @@ public class JsonHelper {
                         .orElseThrow();
     }
 
-    public static AbstractBlock.Properties getBlockProperties(final JsonObject jsonObject, final Material defaultMaterial, final MaterialColor defaultMaterialColor, final BiFunction<Material, MaterialColor, AbstractBlock.Properties> defaultPropertiesGetter, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
+    public static BlockBehaviour.Properties getBlockProperties(final JsonObject jsonObject, final Material defaultMaterial, final MaterialColor defaultMaterialColor, final BiFunction<Material, MaterialColor, BlockBehaviour.Properties> defaultPropertiesGetter, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
         final Material material = JsonHelper.getOrDefault(jsonObject, "material", Material.class, defaultMaterial);
-        final AbstractBlock.Properties properties = defaultPropertiesGetter.apply(material,
+        final BlockBehaviour.Properties properties = defaultPropertiesGetter.apply(material,
                 JsonHelper.getOrDefault(jsonObject, "material_color", MaterialColor.class, defaultMaterialColor));
 
         JsonPropertyApplierLists.PROPERTIES.applyAll(new JsonMapWrapper(jsonObject), properties)

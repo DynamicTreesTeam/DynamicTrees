@@ -3,15 +3,15 @@ package com.ferreusveritas.dynamictrees.models.bakedmodels;
 import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemOverrideList;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
@@ -24,10 +24,10 @@ import java.util.*;
 @OnlyIn(Dist.CLIENT)
 public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
 
-    protected IBakedModel basePotModel;
+    protected BakedModel basePotModel;
     protected Map<Species, List<BakedQuad>> cachedSaplingQuads = new HashMap<>();
 
-    public BakedModelBlockBonsaiPot(IBakedModel basePotModel) {
+    public BakedModelBlockBonsaiPot(BakedModel basePotModel) {
         this.basePotModel = basePotModel;
     }
 
@@ -49,12 +49,12 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
 
         final BlockState saplingState = species.getSapling().get().defaultBlockState();
 
-        BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
-        IBakedModel potModel = dispatcher.getBlockModel(potState);
-        IBakedModel saplingModel = dispatcher.getBlockModel(saplingState);
+        BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
+        BakedModel potModel = dispatcher.getBlockModel(potState);
+        BakedModel saplingModel = dispatcher.getBlockModel(saplingState);
 
         quads.addAll(potModel.getQuads(potState, side, rand, extraData));
-        quads.addAll(cachedSaplingQuads.computeIfAbsent(species, s -> QuadManipulator.getQuads(saplingModel, saplingState, new Vector3d(0, 0.25, 0), rand, extraData)));
+        quads.addAll(cachedSaplingQuads.computeIfAbsent(species, s -> QuadManipulator.getQuads(saplingModel, saplingState, new Vec3(0, 0.25, 0), rand, extraData)));
 
         return quads;
     }
@@ -85,8 +85,8 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
     }
 
     @Override
-    public ItemOverrideList getOverrides() {
-        return ItemOverrideList.EMPTY;
+    public ItemOverrides getOverrides() {
+        return ItemOverrides.EMPTY;
     }
 
 }

@@ -3,9 +3,9 @@ package com.ferreusveritas.dynamictrees.entities;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandlers;
 import com.ferreusveritas.dynamictrees.entities.animation.DataAnimationHandler;
-import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModelTrackerCache;
@@ -15,31 +15,31 @@ import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Iterables;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -52,23 +52,23 @@ import java.util.Objects;
  */
 public class FallingTreeEntity extends Entity implements ModelTracker {
 
-    public static final DataParameter<CompoundNBT> voxelDataParameter = EntityDataManager.defineId(FallingTreeEntity.class, DataSerializers.COMPOUND_TAG);
+    public static final EntityDataAccessor<CompoundTag> voxelDataParameter = SynchedEntityData.defineId(FallingTreeEntity.class, EntityDataSerializers.COMPOUND_TAG);
 
     //Not needed in client
     protected List<ItemStack> payload = new ArrayList<>(0);
 
     //Needed in client and server
     protected BranchDestructionData destroyData = new BranchDestructionData();
-    protected Vector3d geomCenter = Vector3d.ZERO;
-    protected Vector3d massCenter = Vector3d.ZERO;
-    protected AxisAlignedBB normalBB = new AxisAlignedBB(BlockPos.ZERO);
-    protected AxisAlignedBB cullingNormalBB = new AxisAlignedBB(BlockPos.ZERO);
+    protected Vec3 geomCenter = Vec3.ZERO;
+    protected Vec3 massCenter = Vec3.ZERO;
+    protected AABB normalBB = new AABB(BlockPos.ZERO);
+    protected AABB cullingNormalBB = new AABB(BlockPos.ZERO);
     protected boolean clientBuilt = false;
     protected boolean firstUpdate = true;
     public boolean landed = false;
     public DestroyType destroyType = DestroyType.HARVEST;
     public boolean onFire = false;
-    protected AxisAlignedBB cullingBB;
+    protected AABB cullingBB;
 
     public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
     public static AnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
@@ -90,11 +90,11 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         ROOT
     }
 
-    public FallingTreeEntity(World world) {
+    public FallingTreeEntity(Level world) {
         super(DTRegistries.FALLING_TREE, world);
     }
 
-    public FallingTreeEntity(EntityType<? extends FallingTreeEntity> type, World world) {
+    public FallingTreeEntity(EntityType<? extends FallingTreeEntity> type, Level world) {
         super(type, world);
     }
 
@@ -124,7 +124,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         this.setPosRaw(cutPos.getX() + 0.5, cutPos.getY(), cutPos.getZ() + 0.5);
 
         int numBlocks = destroyData.getNumBranches();
-        geomCenter = new Vector3d(0, 0, 0);
+        geomCenter = new Vec3(0, 0, 0);
         double totalMass = 0;
 
         //Calculate center of geometry, center of mass and bounding box, remap to relative coordinates
@@ -135,7 +135,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
             float mass = (radius * radius * 64) / 4096f;//Assume full height cuboids for simplicity
             totalMass += mass;
 
-            Vector3d relVec = new Vector3d(relPos.getX(), relPos.getY(), relPos.getZ());
+            Vec3 relVec = new Vec3(relPos.getX(), relPos.getY(), relPos.getZ());
             geomCenter = geomCenter.add(relVec);
             massCenter = massCenter.add(relVec.scale(mass));
         }
@@ -148,8 +148,8 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         return this;
     }
 
-    public CompoundNBT buildVoxelData(BranchDestructionData destroyData) {
-        CompoundNBT tag = new CompoundNBT();
+    public CompoundTag buildVoxelData(BranchDestructionData destroyData) {
+        CompoundTag tag = new CompoundTag();
         destroyData.writeToNBT(tag);
 
         tag.putDouble("geomx", geomCenter.x);
@@ -164,14 +164,14 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         return tag;
     }
 
-    public void setupFromNBT(CompoundNBT tag) {
+    public void setupFromNBT(CompoundTag tag) {
         destroyData = new BranchDestructionData(tag);
         if (destroyData.getNumBranches() == 0) {
             kill();
         }
         destroyType = DestroyType.values()[tag.getInt("destroytype")];
-        geomCenter = new Vector3d(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
-        massCenter = new Vector3d(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
+        geomCenter = new Vec3(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
+        massCenter = new Vec3(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
 
         this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
         this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
@@ -192,7 +192,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     public void buildClient() {
 
-        CompoundNBT tag = getVoxelData();
+        CompoundTag tag = getVoxelData();
 
         if (tag.contains("species")) {
             setupFromNBT(tag);
@@ -231,17 +231,17 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         }
     }
 
-    public AxisAlignedBB buildAABBFromDestroyData(BranchDestructionData destroyData) {
+    public AABB buildAABBFromDestroyData(BranchDestructionData destroyData) {
 
-        normalBB = new AxisAlignedBB(BlockPos.ZERO);
+        normalBB = new AABB(BlockPos.ZERO);
 
         for (BlockPos relPos : destroyData.getPositions(BranchDestructionData.PosType.BRANCHES, false)) {
-            normalBB = normalBB.minmax(new AxisAlignedBB(relPos));
+            normalBB = normalBB.minmax(new AABB(relPos));
         }
 
         //Adjust the bounding box to account for the tree falling over
         double height = normalBB.maxY - normalBB.minY;
-        double width = MathHelper.absMax(normalBB.maxX - normalBB.minX, normalBB.maxZ - normalBB.minZ);
+        double width = Mth.absMax(normalBB.maxX - normalBB.minX, normalBB.maxZ - normalBB.minZ);
         double grow = Math.max(0, height - (width / 2)) + 2;
         cullingNormalBB = normalBB.inflate(grow + 4, 4, grow + 4);
 
@@ -249,7 +249,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     }
 
     @Override
-    public AxisAlignedBB getBoundingBoxForCulling() {
+    public AABB getBoundingBoxForCulling() {
         return this.cullingBB;
     }
 
@@ -261,11 +261,11 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         return payload;
     }
 
-    public Vector3d getGeomCenter() {
+    public Vec3 getGeomCenter() {
         return geomCenter;
     }
 
-    public Vector3d getMassCenter() {
+    public Vec3 getMassCenter() {
         return massCenter;
     }
 
@@ -274,8 +274,8 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         //This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
         this.setPosRaw(x, y, z);
         //This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
-        this.setBoundingBox(this.normalBB != null ? this.normalBB.move(x, y, z) : new AxisAlignedBB(BlockPos.ZERO));
-        this.cullingBB = cullingNormalBB != null ? cullingNormalBB.move(x, y, z) : new AxisAlignedBB(BlockPos.ZERO);
+        this.setBoundingBox(this.normalBB != null ? this.normalBB.move(x, y, z) : new AABB(BlockPos.ZERO));
+        this.cullingBB = cullingNormalBB != null ? cullingNormalBB.move(x, y, z) : new AABB(BlockPos.ZERO);
     }
 
     @Override
@@ -397,7 +397,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
      * @param entity The {@link FallingTreeEntity} object.
      */
     public static void standardDropLogsPayload(FallingTreeEntity entity) {
-        World world = entity.level;
+        Level world = entity.level;
         if (!world.isClientSide) {
             BlockPos cutPos = entity.getDestroyData().cutPos;
             entity.getPayload().forEach(i -> spawnItemAsEntity(world, cutPos, i));
@@ -405,7 +405,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     }
 
     public static void standardDropLeavesPayLoad(FallingTreeEntity entity) {
-        World world = entity.level;
+        Level world = entity.level;
         if (!world.isClientSide) {
             BlockPos cutPos = entity.getDestroyData().cutPos;
             entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(world, cutPos.offset(bis.pos), bis.stack));
@@ -416,7 +416,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
      * Same as Block.spawnAsEntity only this arrests the entityItem's random motion. Useful for CC turtles to pick up
      * the loot.
      */
-    public static void spawnItemAsEntity(World worldIn, BlockPos pos, ItemStack stack) {
+    public static void spawnItemAsEntity(Level worldIn, BlockPos pos, ItemStack stack) {
         if (!worldIn.isClientSide && !stack.isEmpty() && worldIn.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
             ItemEntity entityitem = new ItemEntity(worldIn, (double) pos.getX() + 0.5F, (double) pos.getY() + 0.5F, (double) pos.getZ() + 0.5F, stack);
             entityitem.setDeltaMovement(0, 0, 0);
@@ -427,7 +427,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     @Override
     protected void defineSynchedData() {
-        getEntityData().define(voxelDataParameter, new CompoundNBT());
+        getEntityData().define(voxelDataParameter, new CompoundTag());
     }
 
     public void cleanupRootyDirt() {
@@ -445,28 +445,28 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
 
     //This is shipped off to the clients
-    public void setVoxelData(CompoundNBT tag) {
+    public void setVoxelData(CompoundTag tag) {
         this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
         this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
         getEntityData().set(voxelDataParameter, tag);
     }
 
-    public CompoundNBT getVoxelData() {
+    public CompoundTag getVoxelData() {
         return getEntityData().get(voxelDataParameter);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundNBT compound) {
-        CompoundNBT vox = (CompoundNBT) compound.get("vox");
+    protected void readAdditionalSaveData(CompoundTag compound) {
+        CompoundTag vox = (CompoundTag) compound.get("vox");
         setupFromNBT(vox);
         setVoxelData(vox);
 
         if (compound.contains("payload")) {
-            final ListNBT nbtList = (ListNBT) compound.get("payload");
+            final ListTag nbtList = (ListTag) compound.get("payload");
 
-            for (INBT tag : Objects.requireNonNull(nbtList)) {
-                if (tag instanceof CompoundNBT) {
-                    CompoundNBT compTag = (CompoundNBT) tag;
+            for (Tag tag : Objects.requireNonNull(nbtList)) {
+                if (tag instanceof CompoundTag) {
+                    CompoundTag compTag = (CompoundTag) tag;
                     this.payload.add(ItemStack.of(compTag));
                 }
             }
@@ -475,11 +475,11 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundNBT compound) {
+    protected void addAdditionalSaveData(CompoundTag compound) {
         compound.put("vox", getVoxelData());
 
         if (!payload.isEmpty()) {
-            ListNBT list = new ListNBT();
+            ListTag list = new ListTag();
 
             for (ItemStack stack : payload) {
                 list.add(stack.serializeNBT());
@@ -491,11 +491,11 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     @Nonnull
     @Override
-    public IPacket<?> getAddEntityPacket() {
+    public Packet<?> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
-    public static FallingTreeEntity dropTree(World world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
+    public static FallingTreeEntity dropTree(Level world, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
         //Spawn the appropriate item entities into the world
         if (!world.isClientSide) {// Only spawn entities server side
             // Falling tree currently has severe rendering issues.

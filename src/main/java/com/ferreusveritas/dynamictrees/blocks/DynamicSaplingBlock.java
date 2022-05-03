@@ -4,25 +4,25 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.IGrowable;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.IPlantable;
 
 import javax.annotation.Nonnull;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable {
+public class DynamicSaplingBlock extends Block implements BonemealableBlock, IPlantable {
 
     protected Species species;
 
@@ -51,12 +51,12 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
     }
 
     @Override
-    public boolean isValidBonemealTarget(@Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
-        return this.getSpecies().canSaplingConsumeBoneMeal((World) world, pos);
+    public boolean isValidBonemealTarget(@Nonnull BlockGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
+        return this.getSpecies().canSaplingConsumeBoneMeal((Level) world, pos);
     }
 
     @Override
-    public boolean isBonemealSuccess(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+    public boolean isBonemealSuccess(@Nonnull Level world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
         return this.getSpecies().canSaplingGrowAfterBoneMeal(world, rand, pos);
     }
 
@@ -65,23 +65,23 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
     ///////////////////////////////////////////
 
     @Override
-    public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+    public int getFireSpreadSpeed(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return this.getSpecies().saplingFireSpread();
     }
 
     @Override
-    public int getFlammability(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+    public int getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return this.getSpecies().saplingFlammability();
     }
 
     @Override
-    public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
         if (this.getSpecies().canSaplingGrowNaturally(worldIn, pos)) {
             this.performBonemeal(worldIn, rand, pos, state);
         }
     }
 
-    public static boolean canSaplingStay(IWorldReader world, Species species, BlockPos pos) {
+    public static boolean canSaplingStay(LevelReader world, Species species, BlockPos pos) {
         //Ensure there are no adjacent branches or other saplings
         for (Direction dir : CoordUtils.HORIZONTALS) {
             BlockState blockState = world.getBlockState(pos.relative(dir));
@@ -96,12 +96,12 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
     }
 
     @Override
-    public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
         return canSaplingStay(world, this.getSpecies(), pos);
     }
 
     @Override
-    public void performBonemeal(@Nonnull ServerWorld world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+    public void performBonemeal(@Nonnull ServerLevel world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
         if (this.canSurvive(state, world, pos)) {
             final Species species = this.getSpecies();
             if (species.canSaplingGrow(world, pos)) {
@@ -113,7 +113,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
     }
 
     @Override
-    public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
+    public SoundType getSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
         return this.getSpecies().getSaplingSound();
     }
 
@@ -123,20 +123,20 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
 
     @Override
-    public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
         if (!this.canSurvive(state, world, pos)) {
             this.dropBlock(world, state, pos);
         }
     }
 
-    protected void dropBlock(World world, BlockState state, BlockPos pos) {
+    protected void dropBlock(Level world, BlockState state, BlockPos pos) {
         world.addFreshEntity(new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, getSpecies().getSeedStack(1)));
         world.removeBlock(pos, false);
     }
 
     @Nonnull
     @Override
-    public ItemStack getCloneItemStack(IBlockReader worldIn, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(BlockGetter worldIn, BlockPos pos, BlockState state) {
         return this.getSpecies().getSeedStack(1);
     }
 
@@ -154,7 +154,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
     }
 
     @Override
-    public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
         return this.getSpecies().getSeedStack(1);
     }
 
@@ -165,7 +165,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
 
     @Nonnull
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader access, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter access, BlockPos pos, CollisionContext context) {
         return this.getSpecies().getSaplingShape();
     }
 
@@ -174,7 +174,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
     ///////////////////////////////////////////
 
     @Override
-    public BlockState getPlant(IBlockReader world, BlockPos pos) {
+    public BlockState getPlant(BlockGetter world, BlockPos pos) {
         return this.defaultBlockState();
     }
 

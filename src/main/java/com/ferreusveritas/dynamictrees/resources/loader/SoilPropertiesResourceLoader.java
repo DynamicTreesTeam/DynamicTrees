@@ -10,8 +10,8 @@ import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeseriali
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 /**
  * @author Max Hyper and Harley O'Connor

@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,9 +21,9 @@ public final class DTCommand {
                 new CreateTransformPotionCommand(), new TransformCommand(), new ClearOrphanedCommand(), new PurgeTreesCommand());
     }
 
-    public void registerDTCommand(CommandDispatcher<CommandSource> dispatcher) {
+    public void registerDTCommand(CommandDispatcher<CommandSourceStack> dispatcher) {
         // Create DT command builder.
-        LiteralArgumentBuilder<CommandSource> dtCommandBuilder = LiteralArgumentBuilder.literal(CommandConstants.COMMAND);
+        LiteralArgumentBuilder<CommandSourceStack> dtCommandBuilder = LiteralArgumentBuilder.literal(CommandConstants.COMMAND);
 
         // Add sub-commands.
         for (SubCommand subCommand : this.subCommands) {
@@ -31,7 +31,7 @@ public final class DTCommand {
         }
 
         // Register command.
-        LiteralCommandNode<CommandSource> dtCommand = dispatcher.register(dtCommandBuilder);
+        LiteralCommandNode<CommandSourceStack> dtCommand = dispatcher.register(dtCommandBuilder);
 
         // Create 'dynamictrees' alias.
         dispatcher.register(Commands.literal(CommandConstants.COMMAND_ALIAS)

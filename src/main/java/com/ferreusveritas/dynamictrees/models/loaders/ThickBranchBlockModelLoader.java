@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.models.loaders;
 
 import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 

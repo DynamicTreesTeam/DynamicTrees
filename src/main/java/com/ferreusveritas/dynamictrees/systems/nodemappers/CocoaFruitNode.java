@@ -5,11 +5,11 @@ import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CocoaBlock;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.CocoaBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CocoaFruitNode implements NodeInspector {
 
@@ -22,7 +22,7 @@ public class CocoaFruitNode implements NodeInspector {
     }
 
     @Override
-    public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+    public boolean run(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir) {
 
         if (!finished) {
             int hashCode = CoordUtils.coordHashCode(pos, 1);
@@ -47,7 +47,7 @@ public class CocoaFruitNode implements NodeInspector {
     }
 
     @Override
-    public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+    public boolean returnRun(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir) {
         return false;
     }
 

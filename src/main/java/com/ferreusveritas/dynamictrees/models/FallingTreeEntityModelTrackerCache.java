@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.models;
 
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -19,12 +19,12 @@ public class FallingTreeEntityModelTrackerCache {
         return models.computeIfAbsent(entity.getId(), e -> new FallingTreeEntityModel(entity));
     }
 
-    public static void cleanupModels(World world, FallingTreeEntity entity) {
+    public static void cleanupModels(Level world, FallingTreeEntity entity) {
         models.remove(entity.getId());
         cleanupModels(world);
     }
 
-    public static void cleanupModels(World world) {
+    public static void cleanupModels(Level world) {
         models = models.entrySet().stream()
                 .filter(map -> world.getEntity(map.getKey()) != null)
                 .collect(Collectors.toConcurrentMap(Map.Entry::getKey, Map.Entry::getValue));

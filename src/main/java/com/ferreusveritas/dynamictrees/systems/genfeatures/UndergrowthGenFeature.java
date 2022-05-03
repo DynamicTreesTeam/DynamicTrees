@@ -6,14 +6,14 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.LeavesBlock;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class UndergrowthGenFeature extends GenFeature {
 
@@ -34,17 +34,17 @@ public class UndergrowthGenFeature extends GenFeature {
             return false;
         }
 
-        final IWorld world = context.world();
+        final LevelAccessor world = context.world();
         final BlockPos rootPos = context.pos();
         final SafeChunkBounds bounds = context.bounds();
         final Species species = context.species();
 
-        final Vector3d vTree = new Vector3d(rootPos.getX(), rootPos.getY(), rootPos.getZ()).add(0.5, 0.5, 0.5);
+        final Vec3 vTree = new Vec3(rootPos.getX(), rootPos.getY(), rootPos.getZ()).add(0.5, 0.5, 0.5);
 
         for (int i = 0; i < 2; i++) {
 
-            int rad = MathHelper.clamp(world.getRandom().nextInt(radius - 2) + 2, 2, radius - 1);
-            Vector3d v = vTree.add(new Vector3d(1, 0, 0).scale(rad).yRot((float) (world.getRandom().nextFloat() * Math.PI * 2)));
+            int rad = Mth.clamp(world.getRandom().nextInt(radius - 2) + 2, 2, radius - 1);
+            Vec3 v = vTree.add(new Vec3(1, 0, 0).scale(rad).yRot((float) (world.getRandom().nextFloat() * Math.PI * 2)));
             BlockPos vPos = new BlockPos(v);
 
             if (!bounds.inBounds(vPos, true)) {
@@ -63,8 +63,8 @@ public class UndergrowthGenFeature extends GenFeature {
                 final BlockState leavesState = (type == 0 ? Blocks.OAK_LEAVES : Blocks.JUNGLE_LEAVES).defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
 
                 final SimpleVoxmap leafMap = species.getLeavesProperties().getCellKit().getLeafCluster();
-                final BlockPos.Mutable leafPos = new BlockPos.Mutable();
-                for (BlockPos.Mutable dPos : leafMap.getAllNonZero()) {
+                final BlockPos.MutableBlockPos leafPos = new BlockPos.MutableBlockPos();
+                for (BlockPos.MutableBlockPos dPos : leafMap.getAllNonZero()) {
                     leafPos.set(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ());
 
                     if (bounds.inBounds(leafPos, true) && (CoordUtils.coordHashCode(leafPos, 0) % 5) != 0 &&

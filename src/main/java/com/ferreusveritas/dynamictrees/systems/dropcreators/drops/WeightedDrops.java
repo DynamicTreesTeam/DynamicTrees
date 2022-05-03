@@ -3,9 +3,9 @@ package com.ferreusveritas.dynamictrees.systems.dropcreators.drops;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.WeightedList;
+import net.minecraft.world.entity.ai.behavior.WeightedList;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Map;

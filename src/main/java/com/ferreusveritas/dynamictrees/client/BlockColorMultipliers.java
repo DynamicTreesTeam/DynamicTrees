@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.client;
 
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -11,21 +11,21 @@ import java.util.Map;
 @OnlyIn(Dist.CLIENT)
 public class BlockColorMultipliers {
 
-    private static Map<String, IBlockColor> colorBase = new HashMap<>();
+    private static Map<String, BlockColor> colorBase = new HashMap<>();
 
-    public static void register(String label, IBlockColor colorMultiplier) {
+    public static void register(String label, BlockColor colorMultiplier) {
         colorBase.put(label, colorMultiplier);
     }
 
-    public static void register(ResourceLocation label, IBlockColor colorMultiplier) {
+    public static void register(ResourceLocation label, BlockColor colorMultiplier) {
         colorBase.put(label.toString(), colorMultiplier);
     }
 
-    public static IBlockColor find(String label) {
+    public static BlockColor find(String label) {
         return colorBase.get(label);
     }
 
-    public static IBlockColor find(ResourceLocation label) {
+    public static BlockColor find(ResourceLocation label) {
         return colorBase.get(label.toString());
     }
 

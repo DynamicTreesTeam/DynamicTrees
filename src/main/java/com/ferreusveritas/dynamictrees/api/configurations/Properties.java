@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 
 import javax.annotation.Nullable;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Harley O'Connor
