@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
-import net.minecraftforge.common.ToolType;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +36,7 @@ public class WartProperties extends SolidLeavesProperties {
 
     @Override
     public BlockBehaviour.Properties getDefaultBlockProperties(Material material, MaterialColor materialColor) {
-        return BlockBehaviour.Properties.of(material, materialColor).strength(1.0F).sound(SoundType.WART_BLOCK).harvestTool(ToolType.HOE).randomTicks();
+        return BlockBehaviour.Properties.of(material, materialColor).strength(1.0F).sound(SoundType.WART_BLOCK)./*harvestTool(ToolType.HOE).*/randomTicks();
     }
 
     @Override

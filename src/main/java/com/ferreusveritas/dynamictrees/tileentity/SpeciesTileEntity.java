@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.tileentity;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -22,8 +23,8 @@ public class SpeciesTileEntity extends BlockEntity {
 
     private Species species = Species.NULL_SPECIES;
 
-    public SpeciesTileEntity() {
-        super(DTRegistries.speciesTE);
+    public SpeciesTileEntity(BlockPos pos, BlockState state) {
+        super(DTRegistries.speciesTE, pos, state);
     }
 
     public Species getSpecies() {
@@ -36,34 +37,35 @@ public class SpeciesTileEntity extends BlockEntity {
     }
 
     @Override
-    public void load(BlockState state, CompoundTag tag) {
+    public void load(CompoundTag tag) {
         if (tag.contains("species")) {
             ResourceLocation speciesName = new ResourceLocation(tag.getString("species"));
             species = TreeRegistry.findSpecies(speciesName);
         }
-        super.load(state, tag);
+        super.load( tag);
     }
 
     @Nonnull
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public void saveAdditional(CompoundTag tag) {
         tag.putString("species", species.getRegistryName().toString());
-        return super.save(tag);
     }
 
     @Nullable
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return new ClientboundBlockEntityDataPacket(this.worldPosition, 0, this.getUpdateTag());
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        load(getBlockState(), pkt.getTag());
+        load(pkt.getTag());
     }
 
     @Override
     public CompoundTag getUpdateTag() {
-        return save(new CompoundTag());
+        CompoundTag tag = super.getUpdateTag();
+        this.saveAdditional(tag);
+        return tag;
     }
 
 }

@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.resource.loading.preparation;
 
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import com.ferreusveritas.dynamictrees.api.resource.Resource;
+import com.ferreusveritas.dynamictrees.api.resource.DTResource;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplicationException;
 import com.ferreusveritas.dynamictrees.api.resource.loading.StagedApplierResourceLoader;
@@ -191,7 +191,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     // COMMON
     //////////////////////////////
 
-    private JsonObject prepareJson(Resource<JsonElement> resource)
+    private JsonObject prepareJson(DTResource<JsonElement> resource)
             throws ApplicationException, IgnoreThrowable {
         throwIfNotJsonObject(resource.getResource(),
                 () -> new ApplicationException("Root element is not a Json object."));

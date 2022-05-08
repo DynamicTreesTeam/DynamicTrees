@@ -9,6 +9,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -124,7 +125,9 @@ public class QuadManipulator {
             float closest = Float.POSITIVE_INFINITY;
             ResourceLocation closestTex = new ResourceLocation("missingno");
             if (model != null) {
-                for (ResourceLocation tex : model.getParticleIcon().getDependencies()) {
+                //todo: check if this is correct
+//                for (ResourceLocation tex : model.getParticleIcon().getName()) {
+                ResourceLocation tex = model.getParticleIcon().getName();
                     TextureAtlasSprite tas = bakedTextureGetter.apply(tex);
                     float u = tas.getU(8);
                     float v = tas.getV(8);
@@ -136,7 +139,7 @@ public class QuadManipulator {
                         closest = distSq;
                         closestTex = tex;
                     }
-                }
+//                }
             }
 
             return closestTex;

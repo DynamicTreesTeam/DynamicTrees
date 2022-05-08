@@ -2,11 +2,10 @@ package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import com.ferreusveritas.dynamictrees.event.handlers.BakedModelEventHandler;
 import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.ItemOverride;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public abstract class BranchBlockBakedModel implements IDynamicBakedModel {
     protected final ResourceLocation ringsResLoc;
 
     public BranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc) {
-        this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT, ItemTransforms.NO_TRANSFORMS, ItemOverrides.EMPTY.getOverrides());
+        this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT, ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
 
         this.modelResLoc = modelResLoc;
         this.barkResLoc = barkResLoc;
@@ -46,7 +45,6 @@ public abstract class BranchBlockBakedModel implements IDynamicBakedModel {
     }
 
     /**
-     * Sets up the {@link IBakedModel} objects for the model. This is called from {@link
      * BakedModelEventHandler#onModelBake(ModelBakeEvent)}, once the textures have been stitched and so can be baked
      * onto models.
      */

@@ -125,11 +125,6 @@ dependencies {
     // Not sure if we need this one, what is a "forge" anyway?
     minecraft("net.minecraftforge:forge:$mcVersion-${property("forgeVersion")}")
 
-    // Compile Hwyla API, but don"t include in runtime.
-    compileOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api"))
-    // At runtime, use the full Hwyla mod.
-    runtimeOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}"))
-
     // Compile JEI API, but don"t include in runtime.
     compileOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}:api"))
     // At runtime, use the full JEI mod.

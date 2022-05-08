@@ -11,13 +11,13 @@ import java.util.function.Predicate;
  */
 public interface ResourceAccessor<R> {
 
-    Resource<R> getResource(ResourceLocation key);
+    DTResource<R> getResource(ResourceLocation key);
 
-    Iterable<Resource<R>> getAllResources();
+    Iterable<DTResource<R>> getAllResources();
 
-    Iterable<Resource<R>> getAllResources(Predicate<ResourceLocation> resourceFilter);
+    Iterable<DTResource<R>> getAllResources(Predicate<ResourceLocation> resourceFilter);
 
-    void forEach(Consumer<Resource<R>> resourceConsumer);
+    void forEach(Consumer<DTResource<R>> resourceConsumer);
 
     ResourceAccessor<R> filtered(Predicate<ResourceLocation> resourceFilter);
 

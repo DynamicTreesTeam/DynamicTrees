@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.event;
 
-import com.ferreusveritas.dynamictrees.api.resource.ResourceManager;
+import com.ferreusveritas.dynamictrees.api.resource.TreeResourceManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoader;
 
@@ -12,7 +12,7 @@ import static com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases.getDimensi
  */
 public final class Hooks {
 
-    public static void onAddResourceLoaders(ResourceManager resourceManager) {
+    public static void onAddResourceLoaders(TreeResourceManager resourceManager) {
         ModLoader.get().postEvent(new AddResourceLoadersEvent(resourceManager));
     }
 

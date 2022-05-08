@@ -25,7 +25,6 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
-import com.ferreusveritas.dynamictrees.util.ReflectionHelper;
 import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.ChanceSelectorDeserialiser;
@@ -49,10 +48,9 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
-import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
+import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
@@ -304,11 +302,11 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<SoundType> SOUND_TYPE =
             register(SoundType.class, new SoundTypeDeserialiser());
 
-    private static final Map<String, ToolType> TOOL_TYPES =
-            ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");
-
-    public static final JsonDeserialiser<ToolType> TOOL_TYPE = register(ToolType.class, jsonElement ->
-            STRING.deserialise(jsonElement).map(TOOL_TYPES::get, "Could not get tool type from \"{}\"."));
+//    private static final Map<String, ToolType> TOOL_TYPES =
+//            ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");
+//
+//    public static final JsonDeserialiser<ToolType> TOOL_TYPE = register(ToolType.class, jsonElement ->
+//            STRING.deserialise(jsonElement).map(TOOL_TYPES::get, "Could not get tool type from \"{}\"."));
 
     public static final JsonDeserialiser<Class<?>> DESERIALISABLE_CLASS = new DeserialisableClassDeserialiser();
 

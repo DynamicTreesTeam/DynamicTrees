@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.tileentity;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -16,7 +17,6 @@ import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelProperty;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
@@ -38,8 +38,8 @@ public class PottedSaplingTileEntity extends BlockEntity {
     private BlockState potState = Blocks.FLOWER_POT.defaultBlockState();
     private Species species = Species.NULL_SPECIES;
 
-    public PottedSaplingTileEntity() {
-        super(DTRegistries.bonsaiTE);
+    public PottedSaplingTileEntity(BlockPos pos, BlockState state) {
+        super(DTRegistries.bonsaiTE,pos,state);
     }
 
     public Species getSpecies() {
@@ -49,7 +49,7 @@ public class PottedSaplingTileEntity extends BlockEntity {
     public void setSpecies(Species species) {
         this.species = species;
         this.setChanged();
-        level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+        level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
     }
 
     public BlockState getPot() {
@@ -63,35 +63,35 @@ public class PottedSaplingTileEntity extends BlockEntity {
             this.potState = Blocks.FLOWER_POT.defaultBlockState();
         }
         this.setChanged();
-        level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+        level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
     }
 
     @Override
     public CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
-        this.save(tag);
+        this.saveAdditional(tag);
         return tag;
     }
 
     @Nullable
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return new ClientboundBlockEntityDataPacket(worldPosition, 1, this.getUpdateTag());
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         BlockState oldPotState = potState;
-        this.handleUpdateTag(this.getBlockState(), pkt.getTag());
+        this.handleUpdateTag(pkt.getTag());
 
         if (!oldPotState.equals(potState)) {
             ModelDataManager.requestModelDataRefresh(this);
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
         }
     }
 
     @Override
-    public void load(BlockState state, CompoundTag tag) {
+    public void load(CompoundTag tag) {
         if (tag.contains(POT_MIMIC_TAG)) {
             Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(tag.getString(POT_MIMIC_TAG)));
             potState = block != Blocks.AIR ? block.defaultBlockState() : Blocks.FLOWER_POT.defaultBlockState();
@@ -99,14 +99,13 @@ public class PottedSaplingTileEntity extends BlockEntity {
         if (tag.contains(SPECIES_TAG)) {
             this.species = TreeRegistry.findSpecies(tag.getString(SPECIES_TAG));
         }
-        super.load(state, tag);
+        super.load(tag);
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    protected void saveAdditional(CompoundTag tag) {
         tag.putString(POT_MIMIC_TAG, potState.getBlock().getRegistryName().toString());
         tag.putString(SPECIES_TAG, this.species.getRegistryName().toString());
-        return super.save(tag);
     }
 
     @Nonnull

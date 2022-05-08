@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 /**
  * @author Harley O'Connor
  */
-public interface ResourceManager extends ResourceManager {
+public interface TreeResourceManager extends net.minecraft.server.packs.resources.ResourceManager {
 
     void addLoader(ResourceLoader<?> loader);
 

@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,17 +28,17 @@ public class PostGenerationContext extends GenerationContext<LevelAccessor> {
     /**
      * Instantiates a new {@link PostGenerationContext} object.
      *
-     * @param world                 The {@link IWorld} object.
+     * @param world                 The {@link LevelAccessor} object.
      * @param rootPos               The {@link BlockPos} of the {@link RootyBlock} the generated tree is planted on.
      * @param biome                 The {@link Biome} the tree has generated in.
      * @param radius                The radius of the {@link PoissonDisc} the tree generated in.
      * @param endPoints             A {@link List} of {@link BlockPos} in the world designating branch endpoints.
      * @param bounds                The {@link SafeChunkBounds} to generate in.
      * @param initialDirtState      The {@link BlockState} of the dirt that became rooty. Useful for matching terrain.
-     * @param seasonValue           The current season value, as obtained from {@link SeasonProvider#getSeasonValue(World,
+     * @param seasonValue           The current season value, as obtained from {@link SeasonProvider#getSeasonValue(net.minecraft.world.level.Level,
      *                              BlockPos)}.
      * @param fruitProductionFactor The current fruit production factor, as obtained from {@link
-     *                              Species#seasonalFruitProductionFactor(World, BlockPos)}.
+     *                              Species#seasonalFruitProductionFactor(net.minecraft.world.level.Level, BlockPos)}.
      */
     public PostGenerationContext(LevelAccessor world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints,
                                  SafeChunkBounds bounds, BlockState initialDirtState, Float seasonValue, Float fruitProductionFactor) {

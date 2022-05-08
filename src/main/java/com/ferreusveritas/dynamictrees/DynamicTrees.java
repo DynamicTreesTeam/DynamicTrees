@@ -74,7 +74,7 @@ public final class DynamicTrees {
         loadingContext.registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
         loadingContext.registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
 
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DTClient::clientStart);
+//        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DTClient::clientStart);
 
         TreeGenerator.setup();
 

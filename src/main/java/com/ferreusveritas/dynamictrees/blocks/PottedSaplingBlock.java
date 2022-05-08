@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import com.ferreusveritas.dynamictrees.util.Null;
-import net.minecraft.block.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -78,9 +77,10 @@ public class PottedSaplingBlock extends BaseEntityBlock {
         return tileEntity instanceof PottedSaplingTileEntity ? (PottedSaplingTileEntity) tileEntity : null;
     }
 
+    @org.jetbrains.annotations.Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockGetter worldIn) {
-        return new PottedSaplingTileEntity();
+    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+        return new PottedSaplingTileEntity(pPos,pState);
     }
 
 

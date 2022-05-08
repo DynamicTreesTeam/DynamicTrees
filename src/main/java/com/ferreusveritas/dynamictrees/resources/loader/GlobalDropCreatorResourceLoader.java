@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.resources.loader;
 
-import com.ferreusveritas.dynamictrees.api.resource.Resource;
+import com.ferreusveritas.dynamictrees.api.resource.DTResource;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplicationException;
@@ -32,7 +32,7 @@ public final class GlobalDropCreatorResourceLoader extends AbstractResourceLoade
         resourceAccessor.forEach(this::tryReadEntry);
     }
 
-    private void tryReadEntry(Resource<JsonElement> resource) {
+    private void tryReadEntry(DTResource<JsonElement> resource) {
         try {
             this.readEntry(resource);
         } catch (ApplicationException e) {
@@ -41,7 +41,7 @@ public final class GlobalDropCreatorResourceLoader extends AbstractResourceLoade
         }
     }
 
-    private void readEntry(Resource<JsonElement> resource) throws ApplicationException {
+    private void readEntry(DTResource<JsonElement> resource) throws ApplicationException {
         throwIfNotJsonObject(resource.getResource(), () -> new ApplicationException("Root element is not a Json object."));
         this.deserialiseAndPutEntry(resource.getLocation(), resource.getResource().getAsJsonObject());
     }

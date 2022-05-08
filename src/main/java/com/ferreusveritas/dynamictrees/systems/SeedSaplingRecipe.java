@@ -18,8 +18,8 @@ public class SeedSaplingRecipe {
     @SuppressWarnings("deprecation")
     public static final Codec<SeedSaplingRecipe> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Registry.BLOCK.optionalFieldOf("sapling_block").forGetter(SeedSaplingRecipe::getSaplingBlock),
-                    Registry.ITEM.optionalFieldOf("sapling_item").forGetter(SeedSaplingRecipe::getSaplingItem)
+                    Registry.BLOCK.byNameCodec().optionalFieldOf("sapling_block").forGetter(SeedSaplingRecipe::getSaplingBlock),
+                    Registry.ITEM.byNameCodec().optionalFieldOf("sapling_item").forGetter(SeedSaplingRecipe::getSaplingItem)
             ).apply(instance, (saplingBlock, saplingItem) -> new SeedSaplingRecipe(
                     saplingBlock.orElse(null),
                     saplingItem.orElseGet(() ->

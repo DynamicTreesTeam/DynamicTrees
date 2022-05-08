@@ -1,4 +1,6 @@
 @MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
 package com.ferreusveritas.dynamictrees.systems.genfeatures;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
+
 import javax.annotation.ParametersAreNonnullByDefault;

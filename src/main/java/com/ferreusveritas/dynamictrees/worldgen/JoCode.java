@@ -151,7 +151,7 @@ public class JoCode {
     /**
      * Generate a tree from this {@link JoCode} instruction list.
      *
-     * @param world             The {@link World} instance.
+     * @param world             The {@link Level} instance.
      * @param rootPosIn         The position of what will become the {@link com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock}.
      * @param biome             The {@link Biome} at {@code rootPosIn}.
      * @param facing            The {@link Direction} of the tree.
@@ -216,7 +216,7 @@ public class JoCode {
 
             if (safeBounds.inBounds(cellPos, false)) {
                 final BlockState testBlockState = world.getBlockState(cellPos);
-                if (testBlockState.canBeReplacedByLeaves(world, cellPos)) {
+                if (testBlockState.isSolidRender(world, cellPos)) {
                     world.setBlock(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2); // Flag 16 to prevent observers from causing cascading lag.
                 }
             } else {
@@ -376,10 +376,10 @@ public class JoCode {
     }
 
     protected boolean setBlockForGeneration(LevelAccessor world, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
-        if (((world.getBlockState(pos).canBeReplacedByLogs(world, pos)) ||
+        if (((world.getBlockState(pos).isSolidRender(world, pos)) ||
                 world.getBlockState(pos).getMaterial().isLiquid() ||
-                world.getBlockState(pos).getBlock().is(DTBlockTags.FOLIAGE) ||
-                world.getBlockState(pos).getBlock().is(BlockTags.FLOWERS)) &&
+                world.getBlockState(pos).is(DTBlockTags.FOLIAGE) ||
+                world.getBlockState(pos).is(BlockTags.FLOWERS)) &&
                 (!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
             species.getFamily().getBranch().ifPresent(branch ->
                     branch.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)

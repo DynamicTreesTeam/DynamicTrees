@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
@@ -15,7 +14,7 @@ import java.util.Random;
 
 /**
  * Provides the forest density for a given biome. Mods should implement this interface and register it via the {@link
- * TreeRegistry} to control how densely populated a {@link Biome} is.
+ * TreeRegistry} to control how densely populated a {@link net.minecraft.world.level.biome.Biome} is.
  *
  * @author ferreusveritas
  */

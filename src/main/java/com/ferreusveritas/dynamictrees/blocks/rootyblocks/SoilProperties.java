@@ -15,7 +15,6 @@ import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
 import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.block.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -106,7 +105,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     }
 
     public void setPrimitiveSoilBlock(final Block primitiveSoil) {
-        if (this.primitiveSoilBlock == null || primitiveSoil != this.primitiveSoilBlock.getBlock()) {
+        if (this.primitiveSoilBlock == null || primitiveSoil != this.primitiveSoilBlock) {
             this.primitiveSoilBlock = primitiveSoil;
         }
         SoilHelper.addSoilPropertiesToMap(this);

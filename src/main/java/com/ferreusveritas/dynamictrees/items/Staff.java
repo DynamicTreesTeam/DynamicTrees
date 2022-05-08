@@ -14,6 +14,7 @@ import com.google.common.collect.Multimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionResult;
@@ -35,7 +36,6 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.List;
 
-import static net.minecraftforge.common.util.Constants.NBT.TAG_STRING;
 
 /**
  * Try the following in a command block to demonstrate the extra tag functionality. {@code /give @p
@@ -129,13 +129,13 @@ public class Staff extends Item {
     }
 
     @Override
-    public boolean showDurabilityBar(ItemStack stack) {
-        return hasMaxUses(stack);
+    public boolean isBarVisible(ItemStack pStack) {
+        return hasMaxUses(pStack);
     }
 
     @Override
-    public double getDurabilityForDisplay(ItemStack stack) {
-        double damage = getUses(stack) / (double) getMaxUses(stack);
+    public int getBarWidth(ItemStack stack) {
+        int damage = getUses(stack) / getMaxUses(stack);
         return 1 - damage;
     }
 
@@ -245,7 +245,7 @@ public class Staff extends Item {
 
             if (tag.contains(COLOR)) {
                 // Convert legacy string tag to int tag if tag type is String.
-                if (tag.getTagType(COLOR) == TAG_STRING) {
+                if (tag.getTagType(COLOR) == Tag.TAG_STRING) {
                     this.tryConvertLegacyTag(tag);
                 }
                 color = tag.getInt(COLOR);
@@ -262,7 +262,7 @@ public class Staff extends Item {
      * The {@link #COLOR} tag used to store a Hex String, such as {@code #FFFFFF}, but was recently changed to store an
      * int instead. This attempts to convert the legacy tag to an int.
      *
-     * @param tag The {@link CompoundNBT} tag containing the {@link #COLOR} string.
+     * @param tag The {@link CompoundTag} tag containing the {@link #COLOR} string.
      * @deprecated This will no longer be necessary in 1.17.
      */
     @Deprecated

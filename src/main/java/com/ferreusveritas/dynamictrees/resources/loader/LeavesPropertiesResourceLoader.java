@@ -10,7 +10,6 @@ import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.util.ToolTypes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
@@ -120,9 +119,8 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 warning -> this.logWarning(leavesProperties.getRegistryName(), warning)
         );
 
-        if (blockProperties.getHarvestTool() == ToolTypes.SHEARS) {
-            leavesProperties.setRequiresShears(true);
-        }
+        leavesProperties.setRequiresShears(true);
+
 
         leavesProperties.generateDynamicLeaves(blockProperties);
     }

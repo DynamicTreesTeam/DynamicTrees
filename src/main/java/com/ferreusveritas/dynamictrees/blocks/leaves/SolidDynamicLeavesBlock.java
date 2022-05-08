@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockGetter;
@@ -32,8 +33,8 @@ public class SolidDynamicLeavesBlock extends DynamicLeavesBlock {
     }
 
     @Override
-    public void fallOn(Level world, BlockPos pos, Entity entity, float fallDistance) {
-        entity.causeFallDamage(fallDistance, 1.0F);
+    public void fallOn(Level world, BlockState blockstate, BlockPos pos, Entity entity, float fallDistance) {
+        entity.causeFallDamage(fallDistance, 1.0F, DamageSource.FALLING_BLOCK);
     }
 
     @Override

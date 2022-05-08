@@ -7,12 +7,11 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
+import net.minecraftforge.fml.event.IModBusEvent;
 
 /**
  * An {@link Event} for adding {@link FeatureCanceller} objects to biomes via {@link
- * #registerFeatureCancellations(RegistryKey, FeatureCanceller...)} and namespaces to of features to cancel via {@link
- * #registerNamespaces(RegistryKey, String...)}.
+
  * <p>
  * Fired on the mod bus.
  *

@@ -75,8 +75,8 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         // Apply motion.
         entity.setPos(entity.getX() + entity.getDeltaMovement().x, entity.getY() + entity.getDeltaMovement().y,
                 entity.getZ() + entity.getDeltaMovement().z);
-        entity.xRot = Mth.wrapDegrees(entity.xRot + getData(entity).rotPit);
-        entity.yRot = Mth.wrapDegrees(entity.yRot + getData(entity).rotYaw);
+        entity.setXRot(Mth.wrapDegrees(entity.getXRot() + getData(entity).rotPit));
+        entity.setYRot(Mth.wrapDegrees(entity.getYRot() + getData(entity).rotYaw));
 
         int radius = 8;
         if (entity.getDestroyData().getNumBranches() <= 0) {
@@ -148,8 +148,8 @@ public class PhysicsAnimationHandler implements AnimationHandler {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, PoseStack matrixStack) {
-        final float yaw = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.yRotO, entity.yRot, partialTicks));
-        final float pit = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.xRotO, entity.xRot, partialTicks));
+        final float yaw = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTicks));
+        final float pit = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTicks));
 
         final Vec3 mc = entity.getMassCenter();
         matrixStack.translate(mc.x, mc.y, mc.z);

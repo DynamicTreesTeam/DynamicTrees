@@ -1,3 +1,4 @@
+/*
 package com.ferreusveritas.dynamictrees.compat.waila;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -36,8 +37,10 @@ public class WailaBranchHandler implements IComponentProvider {
     private Species lastSpecies = Species.NULL_SPECIES;
     private NetVolumeNode.Volume lastVolume = new NetVolumeNode.Volume();
 
+
+
     @Override
-    public void appendBody(List<Component> tooltip, IDataAccessor accessor, IPluginConfig config) {
+    public void appendBody(List<TextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
         if (WailaOther.invalid) {
             lastPos = BlockPos.ZERO;
             lastSpecies = Species.NULL_SPECIES;
@@ -167,3 +170,4 @@ public class WailaBranchHandler implements IComponentProvider {
         }
     }
 }
+*/

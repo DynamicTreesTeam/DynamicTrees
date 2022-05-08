@@ -10,18 +10,18 @@ import java.util.function.Function;
  * @param <R> the type of the resource object
  * @author Harley O'Connor
  */
-public final class Resource<R> {
+public final class DTResource<R> {
 
     private final ResourceLocation location;
     private final R resource;
 
-    public Resource(ResourceLocation location, R resource) {
+    public DTResource(ResourceLocation location, R resource) {
         this.location = location;
         this.resource = resource;
     }
 
-    public <N> Resource<N> map(Function<R, N> mapper) {
-        return new Resource<>(this.location, mapper.apply(this.resource));
+    public <N> DTResource<N> map(Function<R, N> mapper) {
+        return new DTResource<>(this.location, mapper.apply(this.resource));
     }
 
     public ResourceLocation getLocation() {

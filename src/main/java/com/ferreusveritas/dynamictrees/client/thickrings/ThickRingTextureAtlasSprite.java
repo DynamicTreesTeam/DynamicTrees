@@ -37,10 +37,10 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
         }
     }
 
-    @Override
-    public boolean hasCustomLoader(ResourceManager manager, ResourceLocation location) {
-        return true;
-    }
+//    @Override
+//    public boolean hasCustomLoader(ResourceManager manager, ResourceLocation location) {
+//        return true;
+//    }
 
     /**
      * This compares the color of the sprite border with the color of the sprite middle and returns a the RGB delta
@@ -238,9 +238,9 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
         return antecedent;
     }
 
-    @Override
-    public Collection<ResourceLocation> getDependencies() {
-        return ImmutableList.of(baseRingResloc);
-    }
+//    @Override
+//    public Collection<ResourceLocation> getDependencies() {
+//        return ImmutableList.of(baseRingResloc);
+//    }
 
 }

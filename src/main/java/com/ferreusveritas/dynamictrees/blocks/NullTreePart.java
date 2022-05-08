@@ -46,7 +46,7 @@ public class NullTreePart implements TreePart {
 
     @Override
     public int probabilityForBlock(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from) {
-        return state.getBlock().isAir(state, reader, pos) ? 1 : 0;
+        return state.isAir() ? 1 : 0;
     }
 
     @Override

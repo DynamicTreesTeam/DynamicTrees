@@ -1,3 +1,4 @@
+/*
 package com.ferreusveritas.dynamictrees.compat.waila;
 
 import mcp.mobius.waila.api.IComponentProvider;
@@ -18,3 +19,4 @@ public class WailaRootyWaterHandler implements IComponentProvider {
     }
 
 }
+*/

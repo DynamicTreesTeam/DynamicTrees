@@ -173,7 +173,7 @@ public class Seed extends Item implements IPlantable {
 
             if (player != null) {
                 context.getPlayer().awardStat(Stats.POT_FLOWER);
-                if (!context.getPlayer().abilities.instabuild) {
+                if (!context.getPlayer().getAbilities().instabuild) {
                     context.getItemInHand().shrink(1);
                 }
             }

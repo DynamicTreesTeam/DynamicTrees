@@ -10,9 +10,9 @@ import java.util.function.Supplier;
  */
 public interface ResourceCollector<R> {
 
-    Resource<R> put(Resource<R> resource);
+    DTResource<R> put(DTResource<R> resource);
 
-    Resource<R> computeIfAbsent(ResourceLocation key, Supplier<Resource<R>> resourceSupplier);
+    DTResource<R> computeIfAbsent(ResourceLocation key, Supplier<DTResource<R>> resourceSupplier);
 
     ResourceAccessor<R> createAccessor();
 

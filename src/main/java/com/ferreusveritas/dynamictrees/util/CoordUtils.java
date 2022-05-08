@@ -7,9 +7,9 @@ import com.google.common.collect.AbstractIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.util.math.*;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -81,7 +81,7 @@ public final class CoordUtils {
     public static boolean isSurroundedByLoadedChunks(Level world, BlockPos pos) {
         for (Surround surr : CoordUtils.Surround.values()) {
             Vec3i dir = surr.getOffset();
-            if (!world.getChunkSource().isEntityTickingChunk(new ChunkPos((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()))) {
+            if (!((ServerLevel)world).isPositionEntityTicking(new ChunkPos((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()))) {
                 return false;
             }
         }
@@ -99,7 +99,7 @@ public final class CoordUtils {
             // Handles other instances where it should be safe.
             return (blockReader instanceof ChunkAccess ||
                     blockReader instanceof EmptyBlockGetter ||
-                    blockReader instanceof NoiseColumn ||
+//                    blockReader instanceof NoiseColumn ||
                     blockReader.getClass().getSimpleName().contains("ChunkRenderCache") || // Check for ChunkRenderCache (we can't call instanceof as this a client-side only class).
                     blockReader.getClass().getSimpleName().contains("ChunkCache")); // Checks for OptiFine's custom ChunkRenderCache.
         }
@@ -109,7 +109,7 @@ public final class CoordUtils {
      * Gets the {@link BlockState} object at the given position, or null if the block wasn't loaded. This is safer
      * because calling getBlockState on an unloaded block can cause a crash.
      *
-     * @param blockReader The {@link IBlockReader} object.
+     * @param blockReader The {@link BlockGetter} object.
      * @return The {@link BlockState} object, or null if it's not loaded.
      */
     @Nullable

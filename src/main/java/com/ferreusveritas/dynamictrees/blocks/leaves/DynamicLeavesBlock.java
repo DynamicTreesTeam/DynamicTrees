@@ -18,8 +18,6 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.RayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.util.ToolTypes;
-import net.minecraft.block.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -52,9 +50,11 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.ToolType;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nonnull;
@@ -272,9 +272,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return DTConfigs.IS_LEAVES_PASSABLE.get() || ModList.get().isLoaded(DynamicTrees.PASSABLE_FOLIAGE);
     }
 
-//    public boolean isEntityPassable(CollisionContext context) {
-//        return isEntityPassable(context.getEntity());
-//    }
+    public boolean isEntityPassable(CollisionContext context) {
+        if(context instanceof EntityCollisionContext entityCollisionContext) {
+            return isEntityPassable(entityCollisionContext.getEntity());
+        }
+        return false;
+    }
 
     public boolean isEntityPassable(@Nullable Entity entity) {
         if (entity instanceof Projectile) //Projectiles such as arrows fly through leaves
@@ -292,8 +295,10 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return false;
     }
 
+
+
     @Override
-    public void fallOn(Level world, BlockPos pos, Entity entity, float fallDistance) {
+    public void fallOn(Level world,BlockState blockState, BlockPos pos, Entity entity, float fallDistance) {
         // We are only interested in Living things crashing through the canopy.
         if (!DTConfigs.CANOPY_CRASH.get() || !(entity instanceof LivingEntity)) {
             return;
@@ -414,7 +419,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      * Checks that the {@link DynamicLeavesBlock} at the given {@link BlockPos} has enough light to exist.
      *
      * @param blockState       The {@link BlockState} of the {@link DynamicLeavesBlock} to check.
-     * @param world            The {@link IWorld} instance.
+     * @param world            The {@link LevelAccessor} instance.
      * @param leavesProperties The {@link LeavesProperties} instance.
      * @param pos              The {@link BlockPos} of the {@link DynamicLeavesBlock}.
      * @return {@code true} if the {@link Block} has adequate light; {@code false otherwise}.
@@ -474,7 +479,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     /**
      * Gathers hydration levels from neighbors before pushing the values into the solver.
      *
-     * @param world            The {@link IWorld} instance.
+     * @param world            The {@link LevelAccessor} instance.
      * @param pos              The {@link BlockPos} to get neighbors for.
      * @param leavesProperties The {@link LeavesProperties} instance.
      * @return The hydration from the solved cells.
@@ -616,11 +621,11 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
         // Since shears don't have a ToolType, requireShears acts as an override for shears not extending ShearsItem.
         if (this.getProperties(state).doRequireShears()) {
-            return item instanceof ShearsItem || item.getToolTypes(stack).contains(ToolTypes.SHEARS);
+            return item instanceof ShearsItem || stack.is(Tags.Items.SHEARS);
         }
 
-        final ToolType harvestTool = this.getHarvestTool(state);
-        return harvestTool != null && item.getToolTypes(stack).contains(harvestTool);
+//        final ToolType harvestTool = this.getHarvestTool(state);
+        return ForgeHooks.isCorrectToolForDrops(this.defaultBlockState(),player);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.api.registry;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.GenericEvent;
-import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
+import net.minecraftforge.fml.event.IModBusEvent;
 
 /**
  * Allows for registering {@link TypedRegistry.EntryType} objects to {@link SimpleRegistry} objects. Subscribers should use

@@ -67,7 +67,7 @@ public class DirtBucket extends Item {
                         return new InteractionResultHolder<>(InteractionResult.FAIL, itemStack);
                     } else if (this.tryPlaceContainedDirt(player, world, workingPos)) {
                         player.awardStat(Stats.ITEM_USED.get(this));
-                        return !player.abilities.instabuild ? new InteractionResultHolder<>(InteractionResult.SUCCESS, new ItemStack(Items.BUCKET)) : new InteractionResultHolder<>(InteractionResult.SUCCESS, itemStack);
+                        return !player.getAbilities().instabuild ? new InteractionResultHolder<>(InteractionResult.SUCCESS, new ItemStack(Items.BUCKET)) : new InteractionResultHolder<>(InteractionResult.SUCCESS, itemStack);
                     } else {
                         return new InteractionResultHolder<>(InteractionResult.FAIL, itemStack);
                     }

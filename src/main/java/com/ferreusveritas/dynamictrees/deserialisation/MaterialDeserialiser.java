@@ -55,7 +55,7 @@ public final class MaterialDeserialiser implements JsonDeserialiser<Material> {
         materials.put(new ResourceLocation("heavy_metal"), Material.HEAVY_METAL);
         materials.put(new ResourceLocation("barrier"), Material.BARRIER);
         materials.put(new ResourceLocation("piston"), Material.PISTON);
-        materials.put(new ResourceLocation("coral"), Material.CORAL);
+//        materials.put(new ResourceLocation("coral"), Material.CORAL);
         materials.put(new ResourceLocation("vegetable"), Material.VEGETABLE);
         materials.put(new ResourceLocation("egg"), Material.EGG);
         materials.put(new ResourceLocation("cake"), Material.CAKE);

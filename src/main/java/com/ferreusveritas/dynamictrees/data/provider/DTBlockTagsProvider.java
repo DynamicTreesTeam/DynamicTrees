@@ -50,7 +50,7 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
                 .addTag(DTBlockTags.FUNGUS_CAPS);
 
         this.tag(BlockTags.FLOWER_POTS)
-                .add(DTRegistries.POTTED_SAPLING.getBlock());
+                .add(DTRegistries.POTTED_SAPLING);
 
         Species.REGISTRY.get(DTTrees.WARPED).getSapling().ifPresent(sapling ->
                 this.tag(BlockTags.HOGLIN_REPELLENTS).add(sapling));

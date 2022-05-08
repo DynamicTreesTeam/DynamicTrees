@@ -1,4 +1,6 @@
 @MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
+
 import javax.annotation.ParametersAreNonnullByDefault;

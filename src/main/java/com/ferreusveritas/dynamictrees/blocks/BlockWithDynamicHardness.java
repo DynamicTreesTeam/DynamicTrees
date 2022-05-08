@@ -37,7 +37,7 @@ public abstract class BlockWithDynamicHardness extends Block {
      * Sub-classes can override this method to return a hardness value that could, for example, depend on the {@link
      * BlockState}.
      *
-     * @param world An {@link IBlockReader} instance.
+     * @param world An {@link BlockGetter} instance.
      * @param pos   The {@link BlockPos}.
      * @return The hardness value.
      */

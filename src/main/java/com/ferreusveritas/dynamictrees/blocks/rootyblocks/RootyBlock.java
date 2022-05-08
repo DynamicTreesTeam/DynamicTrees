@@ -30,6 +30,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,8 +46,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
-import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -66,7 +65,7 @@ import java.util.Random;
  * @author ferreusveritas
  */
 @SuppressWarnings("deprecation")
-public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
+public class RootyBlock extends BlockWithDynamicHardness implements TreePart, EntityBlock {
 
     public static RootyBlockDecayer rootyBlockDecayer = null;
 
@@ -107,8 +106,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public int getLightValue(BlockState state, BlockGetter world, BlockPos pos) {
-        return getPrimitiveSoilBlock().getLightValue(getDecayBlockState(state, world, pos), world, pos);
+    public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
+        return getPrimitiveSoilBlock().getLightEmission(getDecayBlockState(state, world, pos), world, pos);
     }
 
     @Override
@@ -121,16 +120,16 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
         return getPrimitiveSoilBlock().getLightBlock(getDecayBlockState(state, world, pos), world, pos);
     }
 
-    @Nullable
-    @Override
-    public ToolType getHarvestTool(BlockState state) {
-        return getPrimitiveSoilBlock().getHarvestTool(getPrimitiveSoilState(state));
-    }
-
-    @Override
-    public int getHarvestLevel(BlockState state) {
-        return getPrimitiveSoilBlock().getHarvestLevel(getPrimitiveSoilState(state));
-    }
+//    @Nullable
+//    @Override
+//    public ToolType getHarvestTool(BlockState state) {
+//        return getPrimitiveSoilBlock().getHarvestTool(getPrimitiveSoilState(state));
+//    }
+//
+//    @Override
+//    public int getHarvestLevel(BlockState state) {
+//        return getPrimitiveSoilBlock().getHarvestLevel(getPrimitiveSoilState(state));
+//    }
 
     @Override
     public MaterialColor defaultMaterialColor() {
@@ -201,19 +200,20 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     // INTERACTION
     ///////////////////////////////////////////
 
-    @Nullable
+
+    @org.jetbrains.annotations.Nullable
     @Override
-    public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
-        if (state.getValue(IS_VARIANT)) {
-            return new SpeciesTileEntity();
+    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+        if (pState.getValue(IS_VARIANT)) {
+            return new SpeciesTileEntity(pPos,pState);
         }
         return null;
     }
-
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return state.getValue(IS_VARIANT);
-    }
+//
+//    @Override
+//    public boolean hasTileEntity(BlockState state) {
+//        return state.getValue(IS_VARIANT);
+//    }
 
     @Override
     public void randomTick(BlockState state, ServerLevel worldIn, BlockPos pos, Random random) {
@@ -266,7 +266,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
      * Forces the {@link RootyBlock} to decay if it's there, turning it back to its primitive soil block. Custom decay
      * logic is also supported, see {@link RootyBlockDecayer} for details.
      *
-     * @param world      The {@link World} instance.
+     * @param world      The {@link Level} instance.
      * @param rootPos    The {@link BlockPos} of the {@link RootyBlock}.
      * @param rootyState The {@link BlockState} of the {@link RootyBlock}.
      * @param species    The {@link Species} of the tree that was removed.
@@ -286,7 +286,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
 
         final BlockState primitiveDirt = this.getDecayBlockState(rootyState, world, rootPos);
 
-        world.setBlock(rootPos, primitiveDirt, Constants.BlockFlags.DEFAULT);
+        world.setBlock(rootPos, primitiveDirt, Block.UPDATE_ALL);
     }
 
     @Override
@@ -442,7 +442,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
 
     /**
      * Rooty Dirt can report whatever {@link Family} species it wants to be. We'll use a stored value to determine the
-     * species for the {@link TileEntity} version. Otherwise we'll just make it report whatever {@link DynamicTrees} the
+     * species for the {@link BlockEntity} version. Otherwise we'll just make it report whatever {@link DynamicTrees} the
      * above {@link BranchBlock} says it is.
      */
     public Species getSpecies(BlockState state, LevelAccessor world, BlockPos rootPos) {

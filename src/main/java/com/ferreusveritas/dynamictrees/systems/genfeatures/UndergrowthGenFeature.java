@@ -68,7 +68,7 @@ public class UndergrowthGenFeature extends GenFeature {
                     leafPos.set(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ());
 
                     if (bounds.inBounds(leafPos, true) && (CoordUtils.coordHashCode(leafPos, 0) % 5) != 0 &&
-                            (world.getBlockState(leafPos).canBeReplacedByLeaves(world, leafPos) ||
+                            (world.getBlockState(leafPos).isSolidRender(world, leafPos) ||
                                     world.getBlockState(leafPos).is(DTBlockTags.FOLIAGE))) {
                         world.setBlock(leafPos, leavesState, 2);
                     }

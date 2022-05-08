@@ -376,7 +376,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Gets the default chance to use for the {@link #seed} for the {@link net.minecraft.block.ComposterBlock}.
      *
      * @return The default chance for the compostable {@link Seed} to be successfully composted.
      */
@@ -508,7 +507,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Works out if this {@link Species} will require a {@link SpeciesTileEntity} at the given position. It should
      * require one if it's not the common species and it's not in its common species override for the given position.
      *
-     * @param world The {@link IWorld} the tree is being planted in.
+     * @param world The {@link LevelAccessor} the tree is being planted in.
      * @param pos   The {@link BlockPos} at which the tree is being planted at.
      * @return True if it will require a {@link SpeciesTileEntity}.
      */
@@ -943,10 +942,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Returns the {@link Species} override for the specified {@link BlockPos} in the specified {@link World} if {@link
+     * Returns the {@link Species} override for the specified {@link BlockPos} in the specified {@link Level} if {@link
      * #shouldUseLocationOverride()}, or returns {@code this} {@link Species} otherwise.
      *
-     * @param world The {@link IWorld} to check for the override in.
+     * @param world The {@link LevelAccessor} to check for the override in.
      * @param pos   The {@link BlockPos} to check.
      * @return The relevant {@link Species} override or {@code this} {@link Species}.
      */
@@ -990,7 +989,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * Checks if the sapling can grow at the given position.
      *
-     * @param world The {@link World} object.
+     * @param world The {@link Level} object.
      * @param pos   The {@link BlockPos} the sapling is on.
      * @return True if it can grow.
      */
@@ -1009,7 +1008,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Determines whether or not the {@link #saplingBlock} should be able to grow without player intervention
      * (bone-mealing).
      *
-     * @param world The {@link World} instance.
+     * @param world The {@link Level} instance.
      * @param pos   The {@link BlockPos} of the {@link DynamicSaplingBlock}.
      * @return {@code true} if the sapling can and should grow naturally; {@code false} otherwise.
      */
@@ -1049,8 +1048,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             placeRootyDirtBlock(world, pos.below(), 15);
 
             if (doesRequireTileEntity(world, pos)) {
-                SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
-                world.setBlockEntity(pos.below(), speciesTE);
+                SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create(pos.below(),world.getBlockState(pos));
+                world.setBlockEntity(speciesTE);
                 if (speciesTE != null) {
                     speciesTE.setSpecies(this);
                 }
@@ -1391,7 +1390,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * @deprecated No longe in use due to extra parameter. Use/override {@link #rot(IWorld, BlockPos, int, int, int,
+     * @deprecated No longe in use due to extra parameter. Use/override {@link #rot(LevelAccessor, BlockPos, int, int, int,
      * Random, boolean, boolean)} instead.
      */
     @Deprecated
@@ -1543,7 +1542,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * @param world The {@link World} object.
+     * @param world The {@link Level} object.
      * @param pos
      * @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
      */
@@ -1673,7 +1672,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Pulls data from the {@link NormalSeasonManager} to determine the rate of
      * tree growth for the current season.
      *
-     * @param world   The {@link World} object.
+     * @param world   The {@link Level} object.
      * @param rootPos the {@link BlockPos} of the {@link RootyBlock}.
      * @return Factor from 0.0 (no growth) to 1.0 (full growth).
      */
@@ -1756,7 +1755,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 
         // Bonemeal fertilizes the soil and causes a single growth pulse.
-        if (canBoneMealTree() && itemStack.getItem().is(DTItemTags.FERTILIZER)) {
+        if (canBoneMealTree() && itemStack.is(DTItemTags.FERTILIZER)) {
             return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(DTConfigs.BONE_MEAL_GROWTH_PULSES::get);
         }
 
@@ -1767,7 +1766,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         // Enhanced fertilizer applies the Burgeoning potion effect.
-        if (itemStack.getItem().is(DTItemTags.ENHANCED_FERTILIZER)) {
+        if (itemStack.is(DTItemTags.ENHANCED_FERTILIZER)) {
             return new GrowthSubstance();
         }
 
@@ -1807,9 +1806,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param rootPos  The  {@link BlockPos} of the {@link RootyBlock}
      * @param hitPos   The {@link BlockPos} of the {@link Block} that was hit.
      * @param state    The {@link BlockState} of the hit {@link Block}.
-     * @param player   The {@link PlayerEntity} that hit the {@link Block}
+     * @param player   The {@link Player} that hit the {@link Block}
      * @param hand     Hand used to peform the action
-     * @param heldItem The {@link ItemStack} the {@link PlayerEntity} hit the {@link Block} with.
+     * @param heldItem The {@link ItemStack} the {@link Player} hit the {@link Block} with.
      * @param hit      The block ray trace of the clicking action
      * @return True if action was handled, false otherwise.
      */

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
-import com.ferreusveritas.dynamictrees.api.resource.ResourceManager;
+import com.ferreusveritas.dynamictrees.api.resource.TreeResourceManager;
 import com.ferreusveritas.dynamictrees.api.resource.TreeResourcePack;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ResourceLoader;
@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleResource;
 
 import java.io.FileNotFoundException;
@@ -28,7 +29,7 @@ import java.util.stream.Stream;
 /**
  * @author Harley O'Connor
  */
-public final class TreesResourceManager implements ResourceManager, ResourceManager {
+public final class TreesResourceManager implements ResourceManager, TreeResourceManager {
 
     private final List<TreeResourcePack> resourcePacks = Lists.newArrayList();
     private final List<ResourceLoader<?>> resourceLoaders = Lists.newArrayList();

@@ -22,12 +22,13 @@ import com.ferreusveritas.dynamictrees.trees.families.NetherFungusFamily;
 import com.ferreusveritas.dynamictrees.trees.species.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.PalmSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.SwampOakSpecies;
-import net.minecraft.data.worldgen.Features;
+import net.minecraft.data.worldgen.features.NetherFeatures;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.ai.behavior.WeightedList;
+import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.configurations.NetherForestVegetationConfig;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -119,15 +120,15 @@ public class DTTrees {
     public static void replaceNyliumFungiFeatures() {
         TreeRegistry.findSpecies(CRIMSON).getSapling().ifPresent(crimsonSapling ->
                 TreeRegistry.findSpecies(WARPED).getSapling().ifPresent(warpedSapling -> {
-                    replaceFeatureConfigs(((WeightedStateProvider) Features.Configs.CRIMSON_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
-                    replaceFeatureConfigs(((WeightedStateProvider) Features.Configs.WARPED_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
+                    replaceFeatureConfigs(((WeightedStateProvider) new NetherForestVegetationConfig(NetherFeatures.CRIMSON_VEGETATION_PROVIDER, 8, 4).stateProvider), crimsonSapling, warpedSapling);
+                    replaceFeatureConfigs(((WeightedStateProvider) new NetherForestVegetationConfig(NetherFeatures.WARPED_VEGETATION_PROVIDER, 8, 4).stateProvider), crimsonSapling, warpedSapling);
                 })
         );
     }
 
     private static void replaceFeatureConfigs(WeightedStateProvider featureConfig, Block crimsonSapling, Block warpedSapling) {
-        for (final WeightedList.WeightedEntry<BlockState> entry : featureConfig.weightedList.entries) {
-			if (entry.data.getBlock() == Blocks.CRIMSON_FUNGUS) {
+        for (final WeightedEntry.Wrapper<BlockState> entry : featureConfig.weightedList.items) {
+			if (entry.getData().getBlock() == Blocks.CRIMSON_FUNGUS) {
                 entry.data = crimsonSapling.defaultBlockState();
             }
 			if (entry.data.getBlock() == Blocks.WARPED_FUNGUS) {

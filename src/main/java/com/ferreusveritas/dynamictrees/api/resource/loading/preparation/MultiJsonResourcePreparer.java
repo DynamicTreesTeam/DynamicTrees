@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.resource.loading.preparation;
 
-import com.ferreusveritas.dynamictrees.api.resource.Resource;
+import com.ferreusveritas.dynamictrees.api.resource.DTResource;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceCollector;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -53,7 +53,7 @@ public final class MultiJsonResourcePreparer extends
     }
 
     @Override
-    protected void readAndPutResource(Resource resource, ResourceLocation resourceName)
+    protected void readAndPutResource(net.minecraft.server.packs.resources.Resource resource, ResourceLocation resourceName)
             throws PreparationException, IOException {
 
     }
@@ -67,14 +67,14 @@ public final class MultiJsonResourcePreparer extends
     private List<JsonElement> computeResourceListIfAbsent(ResourceLocation resourceName) {
         return (List<JsonElement>)
                 this.resourceCollector.computeIfAbsent(resourceName,
-                                () -> new Resource<>(resourceName, new LinkedList<>())
+                                () -> new DTResource<>(resourceName, new LinkedList<>())
                         ).getResource();
     }
 
     private List<JsonElement> collectResources(ResourceManager resourceManager, ResourceLocation location)
             throws IOException, PreparationException {
         final List<JsonElement> resources = new LinkedList<>();
-        for (Resource resource : resourceManager.getResources(location)) {
+        for (net.minecraft.server.packs.resources.Resource resource : resourceManager.getResources(location)) {
             resources.add(JsonResourcePreparer.readResource(resource));
         }
         return resources;

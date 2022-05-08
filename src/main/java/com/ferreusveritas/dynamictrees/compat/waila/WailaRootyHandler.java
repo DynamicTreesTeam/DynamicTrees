@@ -1,3 +1,4 @@
+/*
 package com.ferreusveritas.dynamictrees.compat.waila;
 
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
@@ -27,3 +28,4 @@ public class WailaRootyHandler implements IComponentProvider {
                 Mth.floor(fertility * 100 / 15f) + "%"));
     }
 }
+*/

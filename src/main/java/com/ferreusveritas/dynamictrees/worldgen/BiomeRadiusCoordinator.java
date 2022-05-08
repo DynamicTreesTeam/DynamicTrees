@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.RandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.PerlinSimplexNoise;
 
@@ -22,7 +23,7 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
     protected Function<Integer, Integer> chunkMultipass;
 
     public BiomeRadiusCoordinator(TreeGenerator treeGenerator, ResourceLocation dimRegName, LevelAccessor world) {
-        this.noiseGenerator = new PerlinSimplexNoise(new WorldgenRandom(96), new ArrayList<>(Collections.singletonList(1)));
+        this.noiseGenerator = new PerlinSimplexNoise(new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(96)), new ArrayList<>(Collections.singletonList(1)));
         this.world = world;
         this.dimRegName = dimRegName;
         this.treeGenerator = treeGenerator;
@@ -38,7 +39,7 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
         final double scale = 128; // Effectively scales up the noisemap
         final Biome biome = this.world.getUncachedNoiseBiome((x + 8) >> 2, 0, (z + 8) >> 2); // Placement is offset by +8,+8
 
-        final double noiseDensity = (this.noiseGenerator.getSurfaceNoiseValue(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
+        final double noiseDensity = 1.0;//(this.noiseGenerator.getSurfaceNoiseValue(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
         final double density = BiomeDatabases.getDimensionalOrDefault(this.dimRegName)
                 .getDensitySelector(biome).getDensity(this.world.getRandom(), noiseDensity);
         final double size = ((1.0 - density) * 9); // Size is the inverse of density (gives 0 to 9)

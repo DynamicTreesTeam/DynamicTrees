@@ -9,6 +9,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 import java.util.Random;
@@ -24,10 +25,10 @@ public final class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> 
     }
 
     @Override
-    public boolean place(WorldGenLevel world, ChunkGenerator generator, Random rand, BlockPos pos, NoneFeatureConfiguration config) {
+    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> pContext) {
 //        final long startTime = System.nanoTime();
         final TreeGenerator treeGenerator = TreeGenerator.getTreeGenerator();
-        final ServerLevel serverWorld = world.getLevel();
+        final ServerLevel serverWorld = pContext.level().getLevel();
         final ResourceLocation dimensinLocation = serverWorld.dimension().location();
 
         // Do not generate if the current dimension is blacklisted.
@@ -39,12 +40,12 @@ public final class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> 
         final BiomeDatabase biomeDatabase = BiomeDatabases.getDimensionalOrDefault(dimensinLocation);
 
         // Get chunk pos and create safe bounds, which ensure we do not try to generate in an unloaded chunk.
-        final ChunkPos chunkPos = world.getChunk(pos).getPos();
-        final SafeChunkBounds chunkBounds = new SafeChunkBounds(world, chunkPos);
+        final ChunkPos chunkPos = pContext.level().getChunk(pContext.origin()).getPos();
+        final SafeChunkBounds chunkBounds = new SafeChunkBounds(pContext.level(), chunkPos);
 
         // Generate trees.
-        treeGenerator.getCircleProvider().getPoissonDiscs(serverWorld, world, chunkPos)
-                .forEach(c -> treeGenerator.makeTrees(world, biomeDatabase, c, chunkBounds));
+        treeGenerator.getCircleProvider().getPoissonDiscs(serverWorld, pContext.level(), chunkPos)
+                .forEach(c -> treeGenerator.makeTrees(pContext.level(), biomeDatabase, c, chunkBounds));
 
 //		final long endTime = System.nanoTime();
 //		final long duration = (endTime - startTime) / 1000000;

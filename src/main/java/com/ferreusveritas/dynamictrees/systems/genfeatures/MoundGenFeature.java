@@ -67,7 +67,8 @@ public class MoundGenFeature extends GenFeature {
                         rootPos.getY() >> 2,
                         rootPos.getZ() >> 2
                 );
-                initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
+                //todo: figure out if needs replacement
+//                initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
             }
 
             rootPos = rootPos.above();

@@ -1,11 +1,12 @@
 package com.ferreusveritas.dynamictrees.api.resource.loading.preparation;
 
-import com.ferreusveritas.dynamictrees.api.resource.Resource;
+import com.ferreusveritas.dynamictrees.api.resource.DTResource;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceCollector;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.util.GsonHelper;
 
 import javax.annotation.Nonnull;
@@ -30,10 +31,12 @@ public final class JsonResourcePreparer extends AbstractResourcePreparer<JsonEle
         super(folderName, JSON_EXTENSION, resourceCollector);
     }
 
+
+
     @Override
     protected void readAndPutResource(Resource resource, ResourceLocation resourceName) throws PreparationException {
         final JsonElement jsonElement = readResource(resource);
-        this.resourceCollector.put(new Resource<>(resourceName, jsonElement));
+        this.resourceCollector.put(new DTResource<>(resourceName, jsonElement));
     }
 
     @Nonnull

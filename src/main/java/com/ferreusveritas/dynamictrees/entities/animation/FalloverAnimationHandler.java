@@ -9,7 +9,6 @@ import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -129,7 +128,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
     /**
      * This tests a bounding box cube for each block of the trunk. Processing is approximately equivalent to the same
-     * number of {@link ItemEntity}s in the world.
+     * number of {@link net.minecraft.world.entity.item.ItemEntity}s in the world.
      *
      * @param entity
      * @return true if collision is detected
@@ -137,7 +136,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     private boolean testCollision(FallingTreeEntity entity) {
         Direction toolDir = entity.getDestroyData().toolDir;
 
-        float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.yRot : entity.xRot;
+        float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.getYRot() : entity.getXRot();
 
         int offsetX = toolDir.getStepX();
         int offsetZ = toolDir.getStepZ();
@@ -173,23 +172,23 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
         switch (toolDir) {
             case NORTH:
-                entity.xRot += delta;
+                entity.setXRot(entity.getXRot() + delta);
                 break;
             case SOUTH:
-                entity.xRot -= delta;
+                entity.setXRot(entity.getXRot() - delta);
                 break;
             case WEST:
-                entity.yRot += delta;
+                entity.setYRot(entity.getYRot() + delta);
                 break;
             case EAST:
-                entity.yRot -= delta;
+                entity.setYRot(entity.getYRot() - delta);
                 break;
             default:
                 break;
         }
 
-        entity.xRot = Mth.wrapDegrees(entity.xRot);
-        entity.yRot = Mth.wrapDegrees(entity.yRot);
+        entity.setXRot(Mth.wrapDegrees(entity.getXRot()));
+        entity.setYRot(Mth.wrapDegrees(entity.getYRot()));
     }
 
     public List<LivingEntity> testEntityCollision(FallingTreeEntity entity) {
@@ -198,7 +197,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
         Direction toolDir = entity.getDestroyData().toolDir;
 
-        float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.yRot : entity.xRot;
+        float actingAngle = toolDir.getAxis() == Direction.Axis.X ? entity.getYRot() : entity.getXRot();
 
         int offsetX = toolDir.getStepX();
         int offsetZ = toolDir.getStepZ();
@@ -230,7 +229,6 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     /**
-     * A client side version of {@link AxisAlignedBB#intersects(Vector3d, Vector3d)}.
      */
     public static boolean intersects(AABB axisAlignedBB, Vec3 vec3d, Vec3 otherVec3d) {
         return axisAlignedBB.intersects(Math.min(vec3d.x, otherVec3d.x), Math.min(vec3d.y, otherVec3d.y), Math.min(vec3d.z, otherVec3d.z), Math.max(vec3d.x, otherVec3d.x), Math.max(vec3d.y, otherVec3d.y), Math.max(vec3d.z, otherVec3d.z));
@@ -247,8 +245,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
     public boolean shouldDie(FallingTreeEntity entity) {
 
         boolean dead =
-                Math.abs(entity.xRot) >= 160 ||
-                        Math.abs(entity.yRot) >= 160 ||
+                Math.abs(entity.getXRot()) >= 160 ||
+                        Math.abs(entity.getYRot()) >= 160 ||
                         entity.landed ||
                         entity.tickCount > 120 + (entity.getDestroyData().trunkHeight);
 
@@ -264,8 +262,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
     @OnlyIn(Dist.CLIENT)
     public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTicks, PoseStack matrixStack) {
 
-        float yaw = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.yRotO, entity.yRot, partialTicks));
-        float pit = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.xRotO, entity.xRot, partialTicks));
+        float yaw = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTicks));
+        float pit = Mth.wrapDegrees(com.ferreusveritas.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTicks));
 
         //Vec3d mc = entity.getMassCenter();
 

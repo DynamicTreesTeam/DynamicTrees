@@ -1,8 +1,9 @@
 package com.ferreusveritas.dynamictrees.api.resource.loading.preparation;
 
-import com.ferreusveritas.dynamictrees.api.resource.Resource;
+import com.ferreusveritas.dynamictrees.api.resource.DTResource;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceCollector;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,11 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Simple {@link com.ferreusveritas.dynamictrees.api.resource.loading.ResourcePreparer} implementation that maps text file resources into a list of their lines.
- *
- * @author Harley O'Connor
- */
+
 public class TextResourcePreparer extends AbstractResourcePreparer<List<String>> {
 
     private static final String EXTENSION = ".txt";
@@ -32,7 +29,7 @@ public class TextResourcePreparer extends AbstractResourcePreparer<List<String>>
     protected void readAndPutResource(Resource resource, ResourceLocation resourceName)
             throws IOException {
         final List<String> lines = this.readResource(resource);
-        this.resourceCollector.put(new Resource<>(resourceName, lines));
+        this.resourceCollector.put(new DTResource<>(resourceName, lines));
     }
 
     private List<String> readResource(Resource resource) throws IOException {

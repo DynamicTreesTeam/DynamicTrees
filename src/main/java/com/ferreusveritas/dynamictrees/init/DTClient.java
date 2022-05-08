@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.init;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
@@ -39,8 +40,10 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 
@@ -49,6 +52,7 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Mod.EventBusSubscriber(modid = DynamicTrees.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DTClient {
 
     //TODO: thick ring stitching
@@ -66,7 +70,7 @@ public class DTClient {
 
         registerRenderLayers();
         registerJsonColorMultipliers();
-        registerEntityRenderers();
+
 
         registerColorHandlers();
 //		MinecraftForge.EVENT_BUS.register(BlockBreakAnimationClientHandler.instance);
@@ -193,9 +197,10 @@ public class DTClient {
         //        MinecraftForge.EVENT_BUS.register(TextureGenerationHandler.class);
     }
 
-    private static void registerEntityRenderers() {
-        RenderingRegistry.registerEntityRenderingHandler(DTRegistries.FALLING_TREE, new FallingTreeRenderer.Factory());
-        RenderingRegistry.registerEntityRenderingHandler(DTRegistries.LINGERING_EFFECTOR, new LingeringEffectorRenderer.Factory());
+    @SubscribeEvent
+    public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(DTRegistries.FALLING_TREE, manager->new FallingTreeRenderer(manager));
+        event.registerEntityRenderer(DTRegistries.LINGERING_EFFECTOR, manager->new LingeringEffectorRenderer(manager));
     }
 
     private static int getFoliageColor(LeavesProperties leavesProperties, Level world, BlockState blockState, BlockPos pos) {

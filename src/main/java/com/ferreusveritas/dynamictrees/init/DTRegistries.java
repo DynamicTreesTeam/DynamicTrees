@@ -37,10 +37,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.features.FeatureUtils;
+import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -54,6 +56,8 @@ import net.minecraft.world.level.levelgen.feature.HugeFungusConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.HugeMushroomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -235,24 +239,19 @@ public class DTRegistries {
 
     public static final ConfiguredFeature<NoneFeatureConfiguration, ?> DYNAMIC_TREE_CONFIGURED_FEATURE = DYNAMIC_TREE_FEATURE.configured(NoneFeatureConfiguration.INSTANCE);
 
+    public static final PlacedFeature DYNAMIC_TREE_PLACED_FEATURE = PlacementUtils.register("dynamic_tree_placed_feature", DYNAMIC_TREE_CONFIGURED_FEATURE.placed(VegetationPlacements.TREE_THRESHOLD));
+
+
     public static void registerConfiguredFeatures() {
         Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, DynamicTrees.resLoc("dynamic_tree"), DYNAMIC_TREE_CONFIGURED_FEATURE);
     }
 
-    /**
-     * The vanilla tree canceller, which cancels any features whose config extends {@link BaseTreeFeatureConfig}.
-     */
+
     public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.resLoc("tree"), TreeConfiguration.class);
 
-    /**
-     * The vanilla fungus canceller, which cancels any features whose config extends {@link HugeFungusConfig}.
-     */
+
     public static final FeatureCanceller FUNGUS_CANCELLER = new FungusFeatureCanceller<>(DynamicTrees.resLoc("fungus"), HugeFungusConfiguration.class);
 
-    /**
-     * The vanilla mushroom canceller, which cancels any features whose config extends {@link
-     * BigMushroomFeatureConfig}.
-     */
     public static final FeatureCanceller MUSHROOM_CANCELLER = new MushroomFeatureCanceller<>(DynamicTrees.resLoc("mushroom"), HugeMushroomFeatureConfiguration.class);
 
     @SubscribeEvent

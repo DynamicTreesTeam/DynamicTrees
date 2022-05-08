@@ -21,7 +21,7 @@ public class TextureStitchEventHandler {
 
     @SubscribeEvent
     public static void onTextureStitchEventPre(TextureStitchEvent.Pre event) {
-        ResourceLocation eventAtlasLocation = event.getMap().location();
+        ResourceLocation eventAtlasLocation = event.getAtlas().location();
         if (eventAtlasLocation.equals(TextureAtlas.LOCATION_BLOCKS)) {
             SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager) Minecraft.getInstance().getResourceManager();
 

@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.compat.seasons.*;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
-import corgitaco.betterweather.api.season.Season;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -13,6 +12,7 @@ import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import sereneseasons.config.BiomeConfig;
 import sereneseasons.config.SeasonsConfig;
+import sereneseasons.config.ServerConfig;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -43,7 +43,7 @@ public final class CompatHandler {
     public static void registerBuiltInSeasonManagers() {
         registerSeasonManager(DynamicTrees.SERENE_SEASONS, () -> {
             NormalSeasonManager seasonManager = new NormalSeasonManager(
-                    world -> SeasonsConfig.isDimensionWhitelisted(world.dimension()) ?
+                    world -> ServerConfig.isDimensionWhitelisted(world.dimension()) ?
                             new Tuple<>(new SereneSeasonsSeasonProvider(), new ActiveSeasonGrowthCalculator()) :
                             new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator())
             );
@@ -53,12 +53,7 @@ public final class CompatHandler {
             });
             return seasonManager;
         });
-
-        registerSeasonManager(DynamicTrees.BETTER_WEATHER, () -> new NormalSeasonManager(
-                world -> Season.getSeason(world) == null ?
-                        new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator()) :
-                        new Tuple<>(new BetterWeatherSeasonProvider(), new ActiveSeasonGrowthCalculator())
-        ));
+        
     }
 
     public static final String DISABLED = "!";
