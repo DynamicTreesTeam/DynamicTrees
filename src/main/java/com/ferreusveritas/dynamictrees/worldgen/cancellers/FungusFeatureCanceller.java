@@ -38,7 +38,7 @@ public class FungusFeatureCanceller<T extends FeatureConfiguration> extends Feat
 //
 //        return this.fungusFeatureConfigClass.isInstance(nextConfiguredFeature.config) && featureRegistryName != null &&
 //                featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
-        return  configuredFeature.getFeatures().findFirst().get().feature instanceof HugeFungusFeature;
+        return  true;//configuredFeature.getFeatures().findFirst().get().feature instanceof HugeFungusFeature;
     }
 
 }

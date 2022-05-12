@@ -44,17 +44,15 @@ public final class WorldGenEventHandler {
         final BiomePropertySelectors.FeatureCancellations featureCancellations = BiomeDatabases.getDefault()
                 .getEntry(biomeName).getFeatureCancellations();
 
-        featureCancellations.getStages().forEach(stage -> {
-            event.getGeneration().getFeatures(stage).removeIf(configuredFeatureSupplier -> {
-                for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {
-                    if (featureCanceller.shouldCancel(configuredFeatureSupplier.get(), featureCancellations)) {
-                        return true;
-                    }
+        featureCancellations.getStages().forEach(stage -> event.getGeneration().getFeatures(stage).removeIf(configuredFeatureSupplier -> {
+            for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {
+                if (featureCanceller.shouldCancel(configuredFeatureSupplier.get(), featureCancellations)) {
+                    return true;
                 }
+            }
 
-                return false;
-            });
-        });
+            return false;
+        }));
     }
 
 }

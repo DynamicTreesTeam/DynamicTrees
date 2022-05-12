@@ -2,10 +2,12 @@ package com.ferreusveritas.dynamictrees.worldgen.cancellers;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
+import net.minecraft.world.level.levelgen.feature.WeightedPlacedFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
@@ -32,39 +34,44 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
             so these are currently removed from world gen too. The list is immutable so they can't be removed individually,
             but one (unclean) solution may be to add the non-tree features back to the generator. */
 
-//        if (featureConfig instanceof RandomFeatureConfiguration) {
-//            // Removes configuredFeature if it contains trees.
-//            return this.doesContainTrees((RandomFeatureConfiguration) featureConfig, featureCancellations);
-//        } else if (featureConfig instanceof TreeConfiguration) {
-//            final ConfiguredFeature<?, ?> nextConfiguredFeature = ((DecoratedFeatureConfiguration) featureConfig).feature.get();
-//            final FeatureConfiguration nextFeatureConfig = nextConfiguredFeature.config;
-//            final ResourceLocation featureRegistryName = nextConfiguredFeature.feature.getRegistryName();
-//
-//            if (this.treeFeatureConfigClass.isInstance(nextFeatureConfig) && featureRegistryName != null &&
-//                    featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace())) {
-//                return true; // Removes any individual trees.
-//            } else if (nextFeatureConfig instanceof RandomFeatureConfiguration) {
-//                // Removes configuredFeature if it contains trees.
-//                return this.doesContainTrees((RandomFeatureConfiguration) nextFeatureConfig, featureCancellations);
-//            }
-//        }
+        if (featureConfig instanceof RandomFeatureConfiguration) {
+            // Removes configuredFeature if it contains trees.
+            return this.doesContainTrees((RandomFeatureConfiguration) featureConfig, featureCancellations);
+        } else if (featureConfig instanceof TreeConfiguration) {
+            String nameSpace = "";
+            final ConfiguredFeature<?, ?> nextConfiguredFeature = configuredFeature.getFeatures().findFirst().get();
+            final FeatureConfiguration nextFeatureConfig = nextConfiguredFeature.config;
+            final ResourceLocation featureRegistryName = nextConfiguredFeature.feature.getRegistryName();
+            if(featureRegistryName != null) {
+                nameSpace = featureRegistryName.getNamespace();
+            }
+            if (this.treeFeatureConfigClass.isInstance(nextFeatureConfig) && !nameSpace.equals("") &&
+                    featureCancellations.shouldCancelNamespace(nameSpace)) {
+                return true; // Removes any individual trees.
+            } else if (nextFeatureConfig instanceof RandomFeatureConfiguration) {
+                // Removes configuredFeature if it contains trees.
+                return this.doesContainTrees((RandomFeatureConfiguration) nextFeatureConfig, featureCancellations);
+            }
+        }
+        if(configuredFeature == DTRegistries.DYNAMIC_TREE_PLACED_FEATURE){
+            return false;
+        }
 
         return configuredFeature.getFeatures().filter(abc -> abc.feature instanceof TreeFeature).count() > 0;
     }
 
 
     private boolean doesContainTrees(RandomFeatureConfiguration featureConfig, BiomePropertySelectors.FeatureCancellations featureCancellations) {
-//        for (WeightedPlacedFeature feature : featureConfig.features) {
-//            final PlacedFeature currentConfiguredFeature = feature.feature.get();
-//            final ResourceLocation featureRegistryName = currentConfiguredFeature.feature.getRegistryName();
-//
-//            if (this.treeFeatureConfigClass.isInstance(currentConfiguredFeature.config) && featureRegistryName != null &&
-//                    featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace())) {
-//                return true;
-//            }
-//        }
-//        return false;
-        return true;
+        for (WeightedPlacedFeature feature : featureConfig.features) {
+            final PlacedFeature currentConfiguredFeature = feature.feature.get();
+            final ResourceLocation featureRegistryName = currentConfiguredFeature.getFeatures().findFirst().get().feature.getRegistryName();
+
+            if (this.treeFeatureConfigClass.isInstance(currentConfiguredFeature.getPlacement()) && featureRegistryName != null &&
+                    featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

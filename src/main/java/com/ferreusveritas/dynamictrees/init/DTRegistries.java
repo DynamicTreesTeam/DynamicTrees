@@ -239,7 +239,7 @@ public class DTRegistries {
 
     public static final ConfiguredFeature<NoneFeatureConfiguration, ?> DYNAMIC_TREE_CONFIGURED_FEATURE = DYNAMIC_TREE_FEATURE.configured(NoneFeatureConfiguration.INSTANCE);
 
-    public static final PlacedFeature DYNAMIC_TREE_PLACED_FEATURE = PlacementUtils.register("dynamic_tree_placed_feature", DYNAMIC_TREE_CONFIGURED_FEATURE.placed(VegetationPlacements.TREE_THRESHOLD));
+    public static final PlacedFeature DYNAMIC_TREE_PLACED_FEATURE = PlacementUtils.register("dynamic_tree_placed_feature", DYNAMIC_TREE_CONFIGURED_FEATURE.placed(/*VegetationPlacements.treePlacement(PlacementUtils.countExtra(10, 0.1F, 1))*/));
 
 
     public static void registerConfiguredFeatures() {

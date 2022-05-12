@@ -204,10 +204,10 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     @org.jetbrains.annotations.Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        if (pState.getValue(IS_VARIANT)) {
+//        if (pState.getValue(IS_VARIANT)) {
             return new SpeciesTileEntity(pPos,pState);
-        }
-        return null;
+//        }
+//        return null;
     }
 //
 //    @Override
@@ -437,6 +437,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     @Nullable
     private SpeciesTileEntity getTileEntitySpecies(LevelAccessor world, BlockPos pos) {
         final BlockEntity blockEntity = world.getBlockEntity(pos);
+        if(blockEntity == null)
+            return null;
         return blockEntity instanceof SpeciesTileEntity ? (SpeciesTileEntity) blockEntity : null;
     }
 

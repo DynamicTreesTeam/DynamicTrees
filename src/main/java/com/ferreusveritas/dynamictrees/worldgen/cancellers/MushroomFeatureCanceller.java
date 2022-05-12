@@ -3,7 +3,9 @@ package com.ferreusveritas.dynamictrees.worldgen.cancellers;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.feature.AbstractHugeMushroomFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.HugeFungusFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomBooleanFeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -41,7 +43,7 @@ public class MushroomFeatureCanceller<T extends FeatureConfiguration> extends Fe
 //
 //        return getConfigs((RandomBooleanFeatureConfiguration) nextConfiguredFeature.config).stream().anyMatch(this.mushroomFeatureConfigClass::isInstance) &&
 //                featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
-        return false;
+        return true;//configuredFeature.getFeatures().findFirst().get().feature instanceof AbstractHugeMushroomFeature;
     }
 
 //    private List<FeatureConfiguration> getConfigs(final RandomBooleanFeatureConfiguration twoFeatureConfig) {
