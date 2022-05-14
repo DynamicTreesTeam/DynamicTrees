@@ -182,8 +182,8 @@
     }
   },
   {
-    "_comment": "Wooded Mountains are denser and spawn more trees.",
-    "select": "minecraft:wooded_mountains",
+    "_comment": "Windswept Forests are denser and spawn more trees.",
+    "select": "minecraft:windswept_forest",
     "apply": {
       "density": [ 0.7 ],
       "chance": 0.6
