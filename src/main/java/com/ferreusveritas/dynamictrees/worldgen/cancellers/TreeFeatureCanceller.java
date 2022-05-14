@@ -24,10 +24,8 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
     }
 //todo: figure out
     @Override
-    public boolean shouldCancel(PlacedFeature configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
-
-
-        final FeatureConfiguration featureConfig = ((FeatureConfiguration) configuredFeature.getFeatures().findFirst().get().config);//.feature.get().config;
+    public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
+        final FeatureConfiguration featureConfig = configuredFeature.config;
 
         /*  The following code removes vanilla trees from the biome's generator.
             There may be some problems as MultipleRandomFeatures can store other features too,
@@ -53,7 +51,7 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
                 return this.doesContainTrees((RandomFeatureConfiguration) nextFeatureConfig, featureCancellations);
             }
         }
-        if(configuredFeature == DTRegistries.DYNAMIC_TREE_PLACED_FEATURE){
+        if (configuredFeature == DTRegistries.DYNAMIC_TREE_CONFIGURED_FEATURE){
             return false;
         }
 

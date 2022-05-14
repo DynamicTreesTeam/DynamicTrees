@@ -28,7 +28,7 @@ public class FungusFeatureCanceller<T extends FeatureConfiguration> extends Feat
 
     //todo: add support for this
     @Override
-    public boolean shouldCancel(PlacedFeature configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
+    public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
 //        if (!(configuredFeature.placem instanceof FeatureConfiguration)) {
 //            return false;
 //        }
@@ -38,7 +38,7 @@ public class FungusFeatureCanceller<T extends FeatureConfiguration> extends Feat
 //
 //        return this.fungusFeatureConfigClass.isInstance(nextConfiguredFeature.config) && featureRegistryName != null &&
 //                featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
-        return  true;//configuredFeature.getFeatures().findFirst().get().feature instanceof HugeFungusFeature;
+        return false;//configuredFeature.getFeatures().findFirst().get().feature instanceof HugeFungusFeature;
     }
 
 }

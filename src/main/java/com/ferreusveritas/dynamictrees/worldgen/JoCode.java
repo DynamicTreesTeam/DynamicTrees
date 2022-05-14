@@ -376,10 +376,11 @@ public class JoCode {
     }
 
     protected boolean setBlockForGeneration(LevelAccessor world, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
-        if (((world.getBlockState(pos).isSolidRender(world, pos)) ||
-                world.getBlockState(pos).getMaterial().isLiquid() ||
-                world.getBlockState(pos).is(DTBlockTags.FOLIAGE) ||
-                world.getBlockState(pos).is(BlockTags.FLOWERS)) &&
+        BlockState blockState = world.getBlockState(pos);
+        if (((blockState.isSolidRender(world, pos)) ||
+                blockState.getMaterial().isLiquid() ||
+                blockState.is(DTBlockTags.FOLIAGE) ||
+                blockState.is(BlockTags.FLOWERS)) &&
                 (!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
             species.getFamily().getBranch().ifPresent(branch ->
                     branch.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)

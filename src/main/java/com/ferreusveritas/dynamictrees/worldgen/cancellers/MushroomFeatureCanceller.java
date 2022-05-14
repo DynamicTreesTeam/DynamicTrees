@@ -24,7 +24,7 @@ public class MushroomFeatureCanceller<T extends FeatureConfiguration> extends Fe
     }
 //todo: check if this is correct
     @Override
-    public boolean shouldCancel(final PlacedFeature configuredFeature, final BiomePropertySelectors.FeatureCancellations featureCancellations) {
+    public boolean shouldCancel(final ConfiguredFeature<?, ?> configuredFeature, final BiomePropertySelectors.FeatureCancellations featureCancellations) {
 //        if (!(configuredFeature.config instanceof DecoratedFeatureConfiguration)) {
 //            return false;
 //        }
@@ -43,7 +43,7 @@ public class MushroomFeatureCanceller<T extends FeatureConfiguration> extends Fe
 //
 //        return getConfigs((RandomBooleanFeatureConfiguration) nextConfiguredFeature.config).stream().anyMatch(this.mushroomFeatureConfigClass::isInstance) &&
 //                featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
-        return true;//configuredFeature.getFeatures().findFirst().get().feature instanceof AbstractHugeMushroomFeature;
+        return false;//configuredFeature.getFeatures().findFirst().get().feature instanceof AbstractHugeMushroomFeature;
     }
 
 //    private List<FeatureConfiguration> getConfigs(final RandomBooleanFeatureConfiguration twoFeatureConfig) {

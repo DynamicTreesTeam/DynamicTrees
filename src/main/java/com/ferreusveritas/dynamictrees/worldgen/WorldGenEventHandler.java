@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -44,14 +45,18 @@ public final class WorldGenEventHandler {
         final BiomePropertySelectors.FeatureCancellations featureCancellations = BiomeDatabases.getDefault()
                 .getEntry(biomeName).getFeatureCancellations();
 
-        featureCancellations.getStages().forEach(stage -> event.getGeneration().getFeatures(stage).removeIf(configuredFeatureSupplier -> {
-            for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {
-                if (featureCanceller.shouldCancel(configuredFeatureSupplier.get(), featureCancellations)) {
-                    return true;
-                }
-            }
+        featureCancellations.getStages().forEach(stage -> event.getGeneration().getFeatures(stage).removeIf(placedFeatureSupplier -> {
+            PlacedFeature placedFeature = placedFeatureSupplier.get();
 
-            return false;
+            return placedFeature.getFeatures().anyMatch(configuredFeature -> {
+                for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {
+                    if (featureCanceller.shouldCancel(configuredFeature, featureCancellations)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
         }));
     }
 
