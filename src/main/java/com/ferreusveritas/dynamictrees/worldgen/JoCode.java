@@ -32,6 +32,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
@@ -216,7 +217,7 @@ public class JoCode {
 
             if (safeBounds.inBounds(cellPos, false)) {
                 final BlockState testBlockState = world.getBlockState(cellPos);
-                if (testBlockState.isSolidRender(world, cellPos)) {
+                if (testBlockState.isAir() || testBlockState.is(BlockTags.LEAVES)) {
                     world.setBlock(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2); // Flag 16 to prevent observers from causing cascading lag.
                 }
             } else {
@@ -376,18 +377,21 @@ public class JoCode {
     }
 
     protected boolean setBlockForGeneration(LevelAccessor world, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
-        BlockState blockState = world.getBlockState(pos);
-        if (((blockState.isSolidRender(world, pos)) ||
-                blockState.getMaterial().isLiquid() ||
-                blockState.is(DTBlockTags.FOLIAGE) ||
-                blockState.is(BlockTags.FLOWERS)) &&
-                (!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
+        if (isFreeToSetBlock(world, pos) && (!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
             species.getFamily().getBranch().ifPresent(branch ->
                     branch.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)
             );
             return false;
         }
         return true;
+    }
+
+    protected boolean isFreeToSetBlock(LevelAccessor level, BlockPos pos) {
+        if (TreeFeature.isFree(level, pos))
+            return true;
+
+        BlockState blockState = level.getBlockState(pos);
+        return blockState.getMaterial().isLiquid() || blockState.is(DTBlockTags.FOLIAGE) || blockState.is(BlockTags.FLOWERS);
     }
 
     /**
