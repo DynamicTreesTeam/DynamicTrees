@@ -46,6 +46,7 @@ public class BeeNestGenFeature extends GenFeature {
     public static final ConfigurationProperty<Block> NEST_BLOCK = ConfigurationProperty.block("nest");
     public static final ConfigurationProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = ConfigurationProperty.property("world_gen_chance", WorldGenChanceFunction.class);
 
+    private static final double MEADOWS_CHANCE = 1.0D;
     private static final double PLAINS_CHANCE = 0.05f;
     private static final double FLOWER_FOREST_CHANCE = 0.02f;
     private static final double FOREST_CHANCE = 0.0005f;
@@ -76,6 +77,8 @@ public class BeeNestGenFeature extends GenFeature {
         }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
             // Default biome check chance function. Uses vanilla chances
             ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).getRegistryName()));
+            if (biomeKey == Biomes.MEADOW)
+                return MEADOWS_CHANCE;
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS)) {
                 return PLAINS_CHANCE;
             }

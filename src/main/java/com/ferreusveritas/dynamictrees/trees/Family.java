@@ -31,6 +31,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -40,6 +41,8 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
@@ -539,12 +542,20 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return this.getDefaultBranchSoundType();
     }
 
-//    public ToolType getBranchHarvestTool(BlockState state) {
-//        return ToolType.AXE;
-//    }
+    /**
+     * {@code null} = can harvest with hand
+     */
+    @Nullable
+    public Tier getDefaultBranchHarvestTier() {
+        return null;
+    }
 
-    public int getBranchHarvestLevel(BlockState state) {
-        return 0;
+    /**
+     * {@code null} = can harvest with hand
+     */
+    @Nullable
+    public Tier getDefaultStrippedBranchHarvestTier() {
+        return null;
     }
 
     public Material getDefaultBranchMaterial() {
@@ -555,13 +566,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return SoundType.WOOD;
     }
 
-//    public ToolType getDefaultBranchTool() {
-//        return ToolType.AXE;
-//    }
-
     public BlockBehaviour.Properties getDefaultBranchProperties(final Material material, final MaterialColor materialColor) {
         return BlockBehaviour.Properties.of(material, materialColor).sound(this.getDefaultBranchSoundType())
-                .noDrops()/*.harvestLevel(0).harvestTool(this.getDefaultBranchTool())*/;
+                .noDrops().requiresCorrectToolForDrops();
     }
 
     private BlockBehaviour.Properties properties;

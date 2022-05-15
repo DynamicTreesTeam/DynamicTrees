@@ -29,7 +29,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -46,6 +45,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.ToolActions;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -177,7 +177,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
 
     public boolean canBeStripped(BlockState state, Level world, BlockPos pos, Player player, ItemStack heldItem) {
         final int stripRadius = DTConfigs.MIN_RADIUS_FOR_STRIP.get();
-        return stripRadius != 0 && stripRadius <= this.getRadius(state) && this.canBeStripped && this.isAxe(heldItem);
+        return stripRadius != 0 && stripRadius <= this.getRadius(state) && this.canBeStripped && heldItem.canPerformAction(ToolActions.AXE_STRIP);
     }
 
 
@@ -536,7 +536,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
 
 
     public void damageAxe(final LivingEntity entity, @Nullable final ItemStack heldItem, final int radius, final NetVolumeNode.Volume woodVolume, final boolean forBlockBreak) {
-        if (heldItem == null || !this.isAxe(heldItem)) {
+        if (heldItem == null || !heldItem.canPerformAction(ToolActions.AXE_DIG)) {
             return;
         }
 
@@ -562,10 +562,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         if (damage > 0) {
             heldItem.hurtAndBreak(damage, entity, LivingEntity::tick);
         }
-    }
-
-    protected boolean isAxe(ItemStack stack) {
-        return stack.getItem() instanceof AxeItem ;//|| stack.getItem().getToo(stack).contains(ToolType.AXE);
     }
 
     @Override

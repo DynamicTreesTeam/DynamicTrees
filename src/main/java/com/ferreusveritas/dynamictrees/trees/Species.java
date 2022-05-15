@@ -69,6 +69,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -1189,6 +1190,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public boolean hasAcceptableSoil() {
         return this.soilTypeFlags != 0;
+    }
+
+    /**
+     * Moves ground position for world generation purposes to allow trees in snow-covered biomes, for example.
+     */
+    public BlockPos moveGroundPosWorldgen(LevelAccessor world, BlockPos pos, BlockState soilBlockState) {
+        if (!soilBlockState.is(BlockTags.SNOW))
+            return pos;
+
+        for (int steps = 8; steps > 0 && soilBlockState.is(BlockTags.SNOW); steps--) {
+            pos = pos.below();
+            soilBlockState = world.getBlockState(pos);
+        }
+
+        return pos;
     }
 
     /**

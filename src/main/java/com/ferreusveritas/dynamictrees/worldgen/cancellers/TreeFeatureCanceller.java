@@ -5,7 +5,6 @@ import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import net.minecraft.world.level.levelgen.feature.WeightedPlacedFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -22,7 +21,7 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
         super(registryName);
         this.treeFeatureConfigClass = treeFeatureConfigClass;
     }
-//todo: figure out
+
     @Override
     public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
         final FeatureConfiguration featureConfig = configuredFeature.config;
@@ -51,7 +50,7 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
                 return this.doesContainTrees((RandomFeatureConfiguration) nextFeatureConfig, featureCancellations);
             }
         }
-        if (configuredFeature == DTRegistries.DYNAMIC_TREE_CONFIGURED_FEATURE){
+        if (configuredFeature == DTRegistries.DYNAMIC_TREE_CONFIGURED_FEATURE) {
             return false;
         }
 

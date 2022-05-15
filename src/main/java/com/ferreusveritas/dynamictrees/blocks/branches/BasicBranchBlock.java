@@ -108,17 +108,6 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
         return getFamily().getBranchSoundType(state, world, pos, entity);
     }
 
-//    @Nullable
-//    @Override
-//    public ToolType getHarvestTool(BlockState state) {
-//        return getFamily().getBranchHarvestTool(state);
-//    }
-//
-//    @Override
-//    public int getHarvestLevel(BlockState state) {
-//        return getFamily().getBranchHarvestLevel(state);
-//    }
-
     ///////////////////////////////////////////
     // BLOCKSTATES
     ///////////////////////////////////////////

@@ -118,7 +118,7 @@ public class TreeGenerator {
 
         random.setXOR(groundPos);
 
-        final BlockState dirtState = world.getBlockState(groundPos);
+        BlockState dirtState = world.getBlockState(groundPos);
 
         GeneratorResult result = GeneratorResult.GENERATED;
 
@@ -128,6 +128,11 @@ public class TreeGenerator {
         if (speciesSelection.isHandled()) {
             final Species species = speciesSelection.getSpecies();
             if (species.isValid()) {
+                BlockPos newGroundPos = species.moveGroundPosWorldgen(world, groundPos, dirtState);
+                if (!newGroundPos.equals(groundPos)) {
+                    groundPos = newGroundPos;
+                    dirtState = world.getBlockState(newGroundPos);
+                }
                 if (species.isAcceptableSoilForWorldgen(world, groundPos, dirtState)) {
                     if (biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == Chance.OK) {
                         if (!species.generate(world.getLevel(), world, groundPos, biome, random, circle.radius, safeBounds)) {

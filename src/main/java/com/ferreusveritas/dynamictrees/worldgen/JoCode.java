@@ -391,7 +391,7 @@ public class JoCode {
             return true;
 
         BlockState blockState = level.getBlockState(pos);
-        return blockState.getMaterial().isLiquid() || blockState.is(DTBlockTags.FOLIAGE) || blockState.is(BlockTags.FLOWERS);
+        return blockState.getMaterial().isLiquid() || blockState.is(BlockTags.SNOW) || blockState.is(DTBlockTags.FOLIAGE) || blockState.is(BlockTags.FLOWERS);
     }
 
     /**
