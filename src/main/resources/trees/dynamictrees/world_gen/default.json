@@ -75,7 +75,7 @@
     }
   },
   {
-    "select": { "name": "minecraft:shattered_savanna.*" },
+    "select": { "name": "minecraft:windswept_savanna.*" },
     "apply": {
       "density": [ 0.2 ]
     }
@@ -94,7 +94,7 @@
     }
   },
   {
-    "select": { "name": "minecraft:.*jungle_edge" },
+    "select": { "name": "minecraft:.*sparse_jungle" },
     "apply": {
       "density": [ 0.2 ]
     }
@@ -148,7 +148,7 @@
   },
   {
     "__comment": "Any biome with 'tall_birch' in the name is 100% tall birch",
-    "select": { "name": "minecraft:.*tall_birch.*" },
+    "select": { "name": "minecraft:.*old_growth_birch_forest.*" },
     "apply": {
       "species" : "tall_birch"
     }
@@ -169,7 +169,20 @@
   },
   {
     "__comment": "All mountain biomes generate spruce 2/3 of the time and oak 1/3 of the time.",
-    "select": { "name": "minecraft:.*mountain.*" },
+    "select": { "name": "minecraft:.*grove.*" },
+    "apply": {
+      "species" : {
+        "random" : {
+          "spruce" : 2
+        }
+      },
+      "density": [ 0.7 ],
+      "chance": 0.6
+    }
+  },
+  {
+    "__comment": "All mountain biomes generate spruce 2/3 of the time and oak 1/3 of the time.",
+    "select": { "name": "minecraft:.*meadow.*" },
     "apply": {
       "species" : {
         "random" : {
@@ -191,14 +204,14 @@
   },
   {
     "__comment": "Mega taiga has giant spruce trees.",
-    "select": { "name": "minecraft:.*giant_spruce_taiga.*" },
+    "select": { "name": "minecraft:.*old_growth_spruce_taiga.*" },
     "apply": {
       "species" : "mega_spruce"
     }
   },
   {
     "__comment": "Giant tree taiga has giant spruce trees, but also is less leaf-dense than giant spruce taiga.",
-    "select": { "name": "minecraft:.*giant_tree_taiga.*" },
+    "select": { "name": "minecraft:.*old_growth_pine_taiga.*" },
     "apply": {
       "species" : {
         "random" : {
@@ -219,7 +232,7 @@
 
   {
     "__comment" : "Wooded Mesas have a chance of generating oak on the dirt patches.",
-    "select": { "name": "minecraft:.*wooded_badlands_plateau" },
+    "select": { "name": "minecraft:.*wooded_badlands" },
     "apply": {
       "species" : "oak",
       "density": [ 0.5 ],
