@@ -64,7 +64,7 @@ public final class CreateStaffCommand extends SubCommand {
     }
 
     private int spawnStaff(final CommandSourceStack source, final BlockPos pos, final Species species, final String code, final int colour, final boolean readOnly, final int maxUses) {
-        final Staff staff = DTRegistries.STAFF;
+        final Staff staff = DTRegistries.STAFF.get();
 
         final ItemStack wandStack = new ItemStack(staff, 1);
 

@@ -81,7 +81,7 @@ public final class CoordUtils {
     public static boolean isSurroundedByLoadedChunks(Level world, BlockPos pos) {
         for (Surround surr : CoordUtils.Surround.values()) {
             Vec3i dir = surr.getOffset();
-            if (!((ServerLevel)world).isPositionEntityTicking(new ChunkPos((pos.getX() >> 4) + dir.getX(), (pos.getZ() >> 4) + dir.getZ()))) {
+            if (!((ServerLevel)world).isPositionEntityTicking(pos.offset(dir))) {
                 return false;
             }
         }

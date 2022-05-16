@@ -33,14 +33,13 @@ import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.FungusFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.MushroomFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.TreeFeatureCanceller;
+import com.google.common.base.Suppliers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.data.worldgen.features.FeatureUtils;
-import net.minecraft.data.worldgen.placement.PlacementUtils;
-import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
@@ -57,13 +56,19 @@ import net.minecraft.world.level.levelgen.feature.configurations.HugeMushroomFea
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryObject;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
@@ -79,6 +84,10 @@ public class DTRegistries {
         }
     };
 
+    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITIES, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<ConfiguredFeature<?, ?>> CONFIGURED_FEATURES = DeferredRegister.create(Registry.CONFIGURED_FEATURE_REGISTRY, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<PlacedFeature> PLACED_FEATURES = DeferredRegister.create(Registry.PLACED_FEATURE_REGISTRY, DynamicTrees.MOD_ID);
+
     ///////////////////////////////////////////
     // BLOCKS
     ///////////////////////////////////////////
@@ -86,25 +95,30 @@ public class DTRegistries {
     /**
      * An apple fruit block.
      */
-    public static final FruitBlock APPLE_FRUIT = new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE))
-            .setCanBoneMeal(DTConfigs.CAN_BONE_MEAL_APPLE::get);
+    public static final Supplier<FruitBlock> APPLE_FRUIT = Suppliers.memoize(() -> new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE))
+            .setCanBoneMeal(DTConfigs.CAN_BONE_MEAL_APPLE::get));
 
     /**
      * A modified cocoa fruit block (for dynamic trees).
      */
-    public static final DynamicCocoaBlock COCOA_FRUIT = new DynamicCocoaBlock();
+    public static final Supplier<DynamicCocoaBlock> COCOA_FRUIT = Suppliers.memoize(DynamicCocoaBlock::new);
 
     /**
      * A potted sapling block, which is a normal pot but for dynamic saplings.
      */
-    public static final PottedSaplingBlock POTTED_SAPLING = new PottedSaplingBlock();
+    public static final Supplier<PottedSaplingBlock> POTTED_SAPLING = Suppliers.memoize(PottedSaplingBlock::new);
 
     /**
      * A trunk shell block, which is the outer block for thick branches.
      */
-    public static final TrunkShellBlock TRUNK_SHELL = new TrunkShellBlock();
+    public static final Supplier<TrunkShellBlock> TRUNK_SHELL = Suppliers.memoize(TrunkShellBlock::new);
 
     public static void setup() {
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        ENTITY_TYPES.register(modBus);
+        CONFIGURED_FEATURES.register(modBus);
+        PLACED_FEATURES.register(modBus);
+
         setupBlocks();
         setupConnectables();
         setupItems();
@@ -144,7 +158,7 @@ public class DTRegistries {
         final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
 
         if (appleOak.isValid()) {
-            APPLE_FRUIT.setSpecies(appleOak);
+            APPLE_FRUIT.get().setSpecies(appleOak);
         }
     }
 
@@ -155,17 +169,17 @@ public class DTRegistries {
     /**
      * A custom potion called the Dendro Potion, houses all tree potions.
      */
-    public static final DendroPotion DENDRO_POTION = new DendroPotion();
+    public static final Supplier<DendroPotion> DENDRO_POTION = Suppliers.memoize(DendroPotion::new);
 
     /**
      * A bucket of dirt item, for crafting saplings into seeds and vice versa.
      */
-    public static final DirtBucket DIRT_BUCKET = new DirtBucket();
+    public static final Supplier<DirtBucket> DIRT_BUCKET = Suppliers.memoize(DirtBucket::new);
 
     /**
      * A staff, a creative tool for copying and pasting tree shapes.
      */
-    public static final Staff STAFF = new Staff();
+    public static final Supplier<Staff> STAFF = Suppliers.memoize(Staff::new);
 
     private static void setupItems() {
         RegistryHandler.addItem(DynamicTrees.resLoc("staff"), STAFF);
@@ -177,26 +191,17 @@ public class DTRegistries {
     // ENTITIES
     ///////////////////////////////////////////
 
-    public final static String FALLING_TREE_ID = "falling_tree";
-    public final static String LINGERING_EFFECTOR_ID = "lingering_effector";
-
-    public static final EntityType<FallingTreeEntity> FALLING_TREE = EntityType.Builder.<FallingTreeEntity>of(FallingTreeEntity::new, MobCategory.MISC)
+    public static final Supplier<EntityType<FallingTreeEntity>> FALLING_TREE = registerEntity("falling_tree", () -> EntityType.Builder.<FallingTreeEntity>of(FallingTreeEntity::new, MobCategory.MISC)
             .setShouldReceiveVelocityUpdates(true)
             .setTrackingRange(512)
             .setUpdateInterval(Integer.MAX_VALUE)
-            .setCustomClientFactory((spawnEntity, world) -> new FallingTreeEntity(world))
-            .build(FALLING_TREE_ID);
-    public static final EntityType<LingeringEffectorEntity> LINGERING_EFFECTOR = EntityType.Builder.<LingeringEffectorEntity>of(LingeringEffectorEntity::new, MobCategory.MISC)
+            .setCustomClientFactory((spawnEntity, world) -> new FallingTreeEntity(world)));
+    public static final Supplier<EntityType<LingeringEffectorEntity>> LINGERING_EFFECTOR = registerEntity("lingering_effector", () -> EntityType.Builder.<LingeringEffectorEntity>of(LingeringEffectorEntity::new, MobCategory.MISC)
             .setCustomClientFactory((spawnEntity, world) ->
-                    new LingeringEffectorEntity(world, new BlockPos(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), null))
-            .build(LINGERING_EFFECTOR_ID);
+                    new LingeringEffectorEntity(world, new BlockPos(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), null)));
 
-    @SubscribeEvent
-    public static void onEntitiesRegistry(final RegistryEvent.Register<EntityType<?>> entityRegistryEvent) {
-        IForgeRegistry<EntityType<?>> registry = entityRegistryEvent.getRegistry();
-
-        registry.registerAll(FALLING_TREE.setRegistryName(DynamicTrees.resLoc(FALLING_TREE_ID)),
-                LINGERING_EFFECTOR.setRegistryName(DynamicTrees.resLoc(LINGERING_EFFECTOR_ID)));
+    private static <T extends Entity> Supplier<EntityType<T>> registerEntity(String name, Supplier<EntityType.Builder<T>> builderSupplier) {
+        return ENTITY_TYPES.register(name, () -> builderSupplier.get().build(name));
     }
 
     ///////////////////////////////////////////
@@ -215,7 +220,7 @@ public class DTRegistries {
                 .toArray(RootyBlock[]::new);
 
         speciesTE = BlockEntityType.Builder.of(SpeciesTileEntity::new, rootyBlocks).build(null);
-        bonsaiTE = BlockEntityType.Builder.of(PottedSaplingTileEntity::new, POTTED_SAPLING).build(null);
+        bonsaiTE = BlockEntityType.Builder.of(PottedSaplingTileEntity::new, POTTED_SAPLING.get()).build(null);
     }
 
     @SubscribeEvent
@@ -237,18 +242,13 @@ public class DTRegistries {
         event.getRegistry().register(DYNAMIC_TREE_FEATURE);
     }
 
-    public static final ConfiguredFeature<NoneFeatureConfiguration, ?> DYNAMIC_TREE_CONFIGURED_FEATURE = DYNAMIC_TREE_FEATURE.configured(NoneFeatureConfiguration.INSTANCE);
+    public static final RegistryObject<ConfiguredFeature<NoneFeatureConfiguration, ?>> DYNAMIC_TREE_CONFIGURED_FEATURE = CONFIGURED_FEATURES.register("dynamic_tree",
+            () -> new ConfiguredFeature<>(DYNAMIC_TREE_FEATURE, NoneFeatureConfiguration.INSTANCE));
 
-    public static final PlacedFeature DYNAMIC_TREE_PLACED_FEATURE = PlacementUtils.register("dynamic_tree_placed_feature", DYNAMIC_TREE_CONFIGURED_FEATURE.placed(/*VegetationPlacements.treePlacement(PlacementUtils.countExtra(10, 0.1F, 1))*/));
-
-
-    public static void registerConfiguredFeatures() {
-        Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, DynamicTrees.resLoc("dynamic_tree"), DYNAMIC_TREE_CONFIGURED_FEATURE);
-    }
-
+    public static final RegistryObject<PlacedFeature> DYNAMIC_TREE_PLACED_FEATURE = PLACED_FEATURES.register("dynamic_tree_placed_feature",
+            () -> new PlacedFeature(Holder.hackyErase(DYNAMIC_TREE_CONFIGURED_FEATURE.getHolder().get()), List.of()/*VegetationPlacements.treePlacement(PlacementUtils.countExtra(10, 0.1F, 1))*/));
 
     public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.resLoc("tree"), TreeConfiguration.class);
-
 
     public static final FeatureCanceller FUNGUS_CANCELLER = new FungusFeatureCanceller<>(DynamicTrees.resLoc("fungus"), HugeFungusConfiguration.class);
 

@@ -23,9 +23,9 @@ public class FungusFeatureCanceller<T extends FeatureConfiguration> extends Feat
 
     @Override
     public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.FeatureCancellations featureCancellations) {
-       final ResourceLocation featureRegistryName = configuredFeature.feature.getRegistryName();
+       final ResourceLocation featureRegistryName = configuredFeature.feature().getRegistryName();
 
-       return featureRegistryName != null && this.fungusFeatureConfigClass.isInstance(configuredFeature.config) &&
+       return featureRegistryName != null && this.fungusFeatureConfigClass.isInstance(configuredFeature.config()) &&
                featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
     }
 }

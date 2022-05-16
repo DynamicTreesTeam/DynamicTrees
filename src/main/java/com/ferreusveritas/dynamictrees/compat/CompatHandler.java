@@ -1,17 +1,18 @@
 package com.ferreusveritas.dynamictrees.compat;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.compat.seasons.*;
+import com.ferreusveritas.dynamictrees.compat.seasons.ActiveSeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.compat.seasons.NormalSeasonManager;
+import com.ferreusveritas.dynamictrees.compat.seasons.NullSeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.compat.seasons.NullSeasonProvider;
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
+import com.ferreusveritas.dynamictrees.compat.seasons.SereneSeasonsSeasonProvider;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import sereneseasons.config.BiomeConfig;
-import sereneseasons.config.SeasonsConfig;
 import sereneseasons.config.ServerConfig;
 
 import java.util.LinkedHashMap;
@@ -47,10 +48,7 @@ public final class CompatHandler {
                             new Tuple<>(new SereneSeasonsSeasonProvider(), new ActiveSeasonGrowthCalculator()) :
                             new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator())
             );
-            seasonManager.setTropicalPredicate((world, pos) -> {
-                final ResourceLocation registryName = world.getBiome(pos).getRegistryName();
-                return registryName != null && BiomeConfig.usesTropicalSeasons(ResourceKey.create(Registry.BIOME_REGISTRY, registryName));
-            });
+            seasonManager.setTropicalPredicate((world, pos) -> BiomeConfig.usesTropicalSeasons(world.getBiome(pos)));
             return seasonManager;
         });
         

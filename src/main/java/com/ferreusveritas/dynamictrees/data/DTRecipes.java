@@ -47,7 +47,7 @@ public final class DTRecipes {
                             separate(saplingItem.getRegistryName()) + "_to_" + registryName.getPath() + "_seed");
 
                     List<Item> ingredients = saplingRecipe.getIngredientsForSaplingToSeed();
-                    ingredients.add(DTRegistries.DIRT_BUCKET);
+                    ingredients.add(DTRegistries.DIRT_BUCKET.get());
                     ingredients.add(saplingItem);
                     craftingRecipes.putIfAbsent(saplingToSeed, createShapeless(saplingToSeed,
                             species.getSeedStack(1), //result
@@ -59,7 +59,7 @@ public final class DTRecipes {
                             registryName.getPath() + "_seed_to_" + separate(saplingItem.getRegistryName()));
 
                     List<Item> ingredients = saplingRecipe.getIngredientsForSeedToSapling();
-                    ingredients.add(DTRegistries.DIRT_BUCKET);
+                    ingredients.add(DTRegistries.DIRT_BUCKET.get());
                     ingredients.add(species.getSeed().map(Item.class::cast).orElse(Items.AIR));
                     craftingRecipes.putIfAbsent(seedToSapling, createShapeless(seedToSapling,
                             new ItemStack(saplingItem), //result

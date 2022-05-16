@@ -65,12 +65,13 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -100,6 +101,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator.RARITY;
@@ -143,7 +145,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public Species setSeed(Seed seed) {
+        public Species setSeed(Supplier<Seed> seedSup) {
             return this;
         }
 
@@ -256,12 +258,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * The seed used to reproduce this species.  Drops from the tree and can plant itself
      */
-    protected Seed seed;
+    protected Supplier<Seed> seed;
 
     /**
      * A blockState that will turn itself into this tree
      */
-    protected DynamicSaplingBlock saplingBlock;
+    protected Supplier<DynamicSaplingBlock> saplingBlock;
 
     protected List<DropCreatorConfiguration> dropCreators = new ArrayList<>();
 
@@ -634,7 +636,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return An {@link ItemStack} with the {@link Seed} inside.
      */
     public ItemStack getSeedStack(int qty) {
-        return !this.hasSeed() ? ItemStack.EMPTY : new ItemStack(this.seed, qty);
+        return !this.hasSeed() ? ItemStack.EMPTY : new ItemStack(this.seed.get(), qty);
     }
 
     public boolean hasSeed() {
@@ -642,7 +644,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public Optional<Seed> getSeed() {
-        return Optional.ofNullable(this.seed);
+        return Optional.ofNullable(this.seed == null ? null : this.seed.get());
     }
 
     /**
@@ -695,16 +697,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public Species generateSeed() {
         return !this.shouldGenerateSeed() || this.seed != null ? this :
-                this.setSeed(RegistryHandler.addItem(getSeedName(), new Seed(this)));
+                this.setSeed(RegistryHandler.addItem(getSeedName(), () -> new Seed(this)));
     }
 
     /**
-     * Sets the {@link Seed} object for this {@link Species}.
+     * Sets the {@link Seed} supplier for this {@link Species}.
      *
-     * @param seed The {@link Seed} to set.
+     * @param seedSup The supplier of the {@link Seed} to set.
      * @return This {@link Species} object for chaining.
      */
-    public Species setSeed(final Seed seed) {
+    public Species setSeed(final Supplier<Seed> seedSup) {
         this.seed = seed;
         return this;
     }
@@ -872,7 +874,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
-    public Species setSapling(DynamicSaplingBlock sapling) {
+    public Species setSapling(Supplier<DynamicSaplingBlock> sapling) {
         saplingBlock = sapling;
         return this;
     }
@@ -935,11 +937,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public Species generateSapling() {
         return !this.shouldGenerateSapling() || this.saplingBlock != null ? this :
-                this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), new DynamicSaplingBlock(this)));
+                this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), () -> new DynamicSaplingBlock(this)));
     }
 
     public Optional<DynamicSaplingBlock> getSapling() {
-        return Optional.ofNullable(saplingBlock);
+        return Optional.ofNullable(this.saplingBlock == null ? null : this.saplingBlock.get());
     }
 
     /**
@@ -972,7 +974,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if the planting was successful
      */
     public boolean plantSapling(LevelAccessor world, BlockPos pos, boolean locationOverride) {
-        final DynamicSaplingBlock sapling = this.getSapling().orElse(this.getCommonSpecies().saplingBlock);
+        final DynamicSaplingBlock sapling = this.getSapling().orElse(this.getCommonSpecies().saplingBlock.get());
 
         if (sapling == null || !world.getBlockState(pos).getMaterial().isReplaceable() ||
                 !DynamicSaplingBlock.canSaplingStay(world, this, pos)) {
@@ -1564,7 +1566,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public float biomeSuitability(Level world, BlockPos pos) {
 
-        Biome biome = world.getBiome(pos);
+        Holder<Biome> biomeHolder = world.getBiome(pos);
+        Biome biome = biomeHolder.value();
 
         //An override to allow other mods to change the behavior of the suitability for a world location. Such as Terrafirmacraft.
         BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(world, biome, this, pos);
@@ -1581,7 +1584,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         float suit = defaultSuitability();
 
-        for (BiomeDictionary.Type t : BiomeDictionary.getTypes(ResourceKey.create(net.minecraft.core.Registry.BIOME_REGISTRY, biome.getRegistryName()))) {
+        for (BiomeDictionary.Type t : BiomeDictionary.getTypes(biomeHolder.unwrapKey().orElseThrow())) {
             suit *= envFactors.getOrDefault(t, 1.0f);
         }
 
@@ -1615,14 +1618,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public List<Biome> getPerfectBiomes() {
         return perfectBiomes;
-    }
-
-    public static Biome getBiome(final ResourceKey<Biome> biomeKey) {
-        return Objects.requireNonNull(ForgeRegistries.BIOMES.getValue(biomeKey.getRegistryName()));
-    }
-
-    public static ResourceKey<Biome> getBiomeKey(final Biome biome) {
-        return ResourceKey.create(net.minecraft.core.Registry.BIOME_REGISTRY, Objects.requireNonNull(biome.getRegistryName()));
     }
 
     /**
@@ -1939,7 +1934,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return The {@link PottedSaplingBlock} for this {@link Species}.
      */
     public PottedSaplingBlock getPottedSapling() {
-        return DTRegistries.POTTED_SAPLING;
+        return DTRegistries.POTTED_SAPLING.get();
     }
 
 
@@ -2102,11 +2097,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return CoordUtils.coordHashCode(pos, 2);
     }
 
-    public List<Tag.Named<Block>> defaultSaplingTags() {
+    public List<TagKey<Block>> defaultSaplingTags() {
         return Collections.singletonList(DTBlockTags.SAPLINGS);
     }
 
-    public List<Tag.Named<Item>> defaultSeedTags() {
+    public List<TagKey<Item>> defaultSeedTags() {
         return Collections.singletonList(DTItemTags.SEEDS);
     }
 
@@ -2156,8 +2151,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     @Override
     public String toLoadDataString() {
         final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
-        return this.getString(Pair.of("seed", this.seed != null ? registryHandler.getRegName(this.seed) : null),
-                Pair.of("sapling", this.saplingBlock != null ? "Block{" + registryHandler.getRegName(this.saplingBlock) + "}" : null));
+        return this.getString(Pair.of("seed", this.seed != null ? registryHandler.getRegName(this.seed.get()) : null),
+                Pair.of("sapling", this.saplingBlock != null ? "Block{" + registryHandler.getRegName(this.saplingBlock.get()) + "}" : null));
     }
 
     @Override

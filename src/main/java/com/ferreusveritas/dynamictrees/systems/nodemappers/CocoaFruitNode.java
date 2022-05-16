@@ -36,7 +36,7 @@ public class CocoaFruitNode implements NodeInspector {
                         if (!dir.getAxis().isHorizontal()) {
                             dir = Direction.NORTH;
                         }
-                        world.setBlock(deltaPos, DTRegistries.COCOA_FRUIT.defaultBlockState().setValue(CocoaBlock.FACING, dir.getOpposite()).setValue(CocoaBlock.AGE, worldGen ? 2 : 0), 2);
+                        world.setBlock(deltaPos, DTRegistries.COCOA_FRUIT.get().defaultBlockState().setValue(CocoaBlock.FACING, dir.getOpposite()).setValue(CocoaBlock.AGE, worldGen ? 2 : 0), 2);
                     }
                 } else {
                     finished = true;

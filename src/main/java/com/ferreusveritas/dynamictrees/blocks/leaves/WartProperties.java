@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks.leaves;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -40,7 +40,7 @@ public class WartProperties extends SolidLeavesProperties {
     }
 
     @Override
-    public List<Tag.Named<Block>> defaultLeavesTags() {
+    public List<TagKey<Block>> defaultLeavesTags() {
         return Collections.singletonList(DTBlockTags.WART_BLOCKS);
     }
 

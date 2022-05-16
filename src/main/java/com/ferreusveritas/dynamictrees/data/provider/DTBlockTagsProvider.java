@@ -12,6 +12,7 @@ import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -55,7 +56,7 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
                 .addTag(DTBlockTags.FUNGUS_CAPS);
 
         this.tag(BlockTags.FLOWER_POTS)
-                .add(DTRegistries.POTTED_SAPLING);
+                .add(DTRegistries.POTTED_SAPLING.get());
 
         Species.REGISTRY.get(DTTrees.WARPED).getSapling().ifPresent(sapling ->
                 this.tag(BlockTags.HOGLIN_REPELLENTS).add(sapling));
@@ -114,11 +115,9 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
         if (tier == null)
             return Optional.empty();
 
-        Tag<Block> tag = tier.getTag();
-        if (tag == null)
-            return Optional.empty();
+        TagKey<Block> tag = tier.getTag();
 
-        return tag instanceof Tag.Named<Block> named ? Optional.of(this.tag(named)) : Optional.empty();
+        return tag == null ? Optional.empty() : Optional.of(this.tag(tag));
     }
 
     @Override

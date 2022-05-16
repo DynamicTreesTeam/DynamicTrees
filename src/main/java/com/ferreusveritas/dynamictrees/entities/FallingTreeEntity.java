@@ -91,7 +91,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     }
 
     public FallingTreeEntity(Level world) {
-        super(DTRegistries.FALLING_TREE, world);
+        super(DTRegistries.FALLING_TREE.get(), world);
     }
 
     public FallingTreeEntity(EntityType<? extends FallingTreeEntity> type, Level world) {

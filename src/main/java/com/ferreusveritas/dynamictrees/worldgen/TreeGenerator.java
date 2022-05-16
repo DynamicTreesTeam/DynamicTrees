@@ -97,7 +97,7 @@ public class TreeGenerator {
     public void makeTrees(WorldGenLevel world, BiomeDatabase biomeDataBase, PoissonDisc circle, SafeChunkBounds safeBounds) {
         circle.add(8, 8); // Move the circle into the "stage".
         BlockPos pos = new BlockPos(circle.x, 0, circle.z);
-        final Entry entry = biomeDataBase.getEntry(world.getBiome(pos));
+        final Entry entry = biomeDataBase.getEntry(world.getBiome(pos).value());
         for (BlockPos groundPos : entry.getGroundFinder().findGround(world, pos)) {
             makeTree(world, entry, circle, groundPos, safeBounds);
         }
@@ -106,7 +106,7 @@ public class TreeGenerator {
 
     public GeneratorResult makeTree(WorldGenLevel world, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {
 
-        final Biome biome = world.getBiome(groundPos);
+        final Biome biome = world.getBiome(groundPos).value();
 
         if (biomeEntry.isBlacklisted()) {
             return GeneratorResult.UNHANDLED_BIOME;

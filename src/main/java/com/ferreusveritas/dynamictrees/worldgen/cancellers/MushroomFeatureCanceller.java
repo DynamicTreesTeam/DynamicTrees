@@ -20,14 +20,14 @@ public class MushroomFeatureCanceller<T extends FeatureConfiguration> extends Fe
 
     @Override
     public boolean shouldCancel(final ConfiguredFeature<?, ?> configuredFeature, final BiomePropertySelectors.FeatureCancellations featureCancellations) {
-        final ResourceLocation featureRegistryName = configuredFeature.feature.getRegistryName();
+        final ResourceLocation featureRegistryName = configuredFeature.feature().getRegistryName();
 
         if (featureRegistryName == null) {
             return false;
         }
 
         // Mushrooms come in RandomBooleanFeatureConfiguration to select between brown and red.
-        if (!(configuredFeature.config instanceof RandomBooleanFeatureConfiguration randomBooleanFeatureConfiguration)) {
+        if (!(configuredFeature.config() instanceof RandomBooleanFeatureConfiguration randomBooleanFeatureConfiguration)) {
             return false;
         }
 

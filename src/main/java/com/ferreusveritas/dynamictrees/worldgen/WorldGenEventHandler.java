@@ -21,7 +21,7 @@ public final class WorldGenEventHandler {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void addDynamicTrees(final BiomeLoadingEvent event) {
         event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                DTRegistries.DYNAMIC_TREE_PLACED_FEATURE);
+                DTRegistries.DYNAMIC_TREE_PLACED_FEATURE.getHolder().get());
     }
 
     /**
@@ -45,8 +45,8 @@ public final class WorldGenEventHandler {
         final BiomePropertySelectors.FeatureCancellations featureCancellations = BiomeDatabases.getDefault()
                 .getEntry(biomeName).getFeatureCancellations();
 
-        featureCancellations.getStages().forEach(stage -> event.getGeneration().getFeatures(stage).removeIf(placedFeatureSupplier -> {
-            PlacedFeature placedFeature = placedFeatureSupplier.get();
+        featureCancellations.getStages().forEach(stage -> event.getGeneration().getFeatures(stage).removeIf(placedFeatureHolder -> {
+            PlacedFeature placedFeature = placedFeatureHolder.value();
 
             return placedFeature.getFeatures().anyMatch(configuredFeature -> {
                 for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {

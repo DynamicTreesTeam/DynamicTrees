@@ -39,7 +39,7 @@ public final class CreateTransformPotionCommand extends SubCommand {
             throw SPECIES_NOT_TRANSFORMABLE.create(species.getTextComponent());
         }
 
-        final DendroPotion dendroPotion = DTRegistries.DENDRO_POTION;
+        final DendroPotion dendroPotion = DTRegistries.DENDRO_POTION.get();
         final ItemStack dendroPotionStack = new ItemStack(dendroPotion);
 
         dendroPotion.applyIndexTag(dendroPotionStack, DendroPotion.DendroPotionType.TRANSFORM.getIndex()); // Make it a transform potion.

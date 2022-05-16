@@ -460,7 +460,7 @@ public class JoCode {
         }
 
         for (BlockPos.MutableBlockPos top : leafMap.getTops()) {
-            if (world.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).shouldSnow(world, rootPos)) {
+            if (world.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value().shouldSnow(world, rootPos)) {
                 final BlockPos.MutableBlockPos iPos = new BlockPos.MutableBlockPos(top.getX(), top.getY(), top.getZ());
                 int yOffset = 0;
 

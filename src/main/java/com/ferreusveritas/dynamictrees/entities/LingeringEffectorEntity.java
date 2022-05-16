@@ -29,11 +29,11 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
 
     @SuppressWarnings("unused")
     private LingeringEffectorEntity(Level world) {
-        super(DTRegistries.LINGERING_EFFECTOR, world);
+        super(DTRegistries.LINGERING_EFFECTOR.get(), world);
     }
 
     public LingeringEffectorEntity(Level world, BlockPos pos, SubstanceEffect effect) {
-        this(DTRegistries.LINGERING_EFFECTOR, world);
+        this(DTRegistries.LINGERING_EFFECTOR.get(), world);
         this.maxUpStep = 1f;
         this.noPhysics = true;
         this.setBlockPos(pos);

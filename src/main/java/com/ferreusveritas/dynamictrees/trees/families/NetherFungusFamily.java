@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -57,17 +57,17 @@ public class NetherFungusFamily extends Family {
     }
 
     @Override
-    public List<Tag.Named<Block>> defaultBranchTags() {
+    public List<TagKey<Block>> defaultBranchTags() {
         return Collections.singletonList(DTBlockTags.FUNGUS_BRANCHES);
     }
 
     @Override
-    public List<Tag.Named<Item>> defaultBranchItemTags() {
+    public List<TagKey<Item>> defaultBranchItemTags() {
         return Collections.singletonList(DTItemTags.FUNGUS_BRANCHES);
     }
 
     @Override
-    public List<Tag.Named<Block>> defaultStrippedBranchTags() {
+    public List<TagKey<Block>> defaultStrippedBranchTags() {
         return Collections.singletonList(DTBlockTags.STRIPPED_FUNGUS_BRANCHES);
     }
 

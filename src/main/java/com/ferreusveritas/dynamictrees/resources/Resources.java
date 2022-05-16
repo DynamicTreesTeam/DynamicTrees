@@ -15,7 +15,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.ServerResources;
+import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -152,7 +152,7 @@ public final class Resources {
 
     @SubscribeEvent
     public static void addReloadListeners(final AddReloadListenerEvent event) {
-        event.addListener(new ReloadListener(event.getDataPackRegistries()));
+        event.addListener(new ReloadListener(event.getServerResources()));
     }
 
     /**
@@ -160,9 +160,9 @@ public final class Resources {
      * recipes.
      */
     public static final class ReloadListener implements PreparableReloadListener {
-        private final ServerResources dataPackRegistries;
+        private final ReloadableServerResources dataPackRegistries;
 
-        public ReloadListener(ServerResources dataPackRegistries) {
+        public ReloadListener(ReloadableServerResources dataPackRegistries) {
             this.dataPackRegistries = dataPackRegistries;
         }
 

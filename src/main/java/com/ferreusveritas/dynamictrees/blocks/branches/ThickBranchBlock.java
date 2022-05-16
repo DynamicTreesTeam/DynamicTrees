@@ -41,7 +41,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     }
 
     public TrunkShellBlock getTrunkShell() {
-        return DTRegistries.TRUNK_SHELL;
+        return DTRegistries.TRUNK_SHELL.get();
     }
 
     @Override

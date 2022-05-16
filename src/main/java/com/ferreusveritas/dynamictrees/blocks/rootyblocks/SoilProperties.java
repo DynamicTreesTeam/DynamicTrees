@@ -26,6 +26,7 @@ import net.minecraft.world.level.material.MaterialColor;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
 
@@ -65,7 +66,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     public static final TypedRegistry<SoilProperties> REGISTRY = new TypedRegistry<>(SoilProperties.class, NULL_SOIL_PROPERTIES, new TypedRegistry.EntryType<>(CODEC));
 
     protected Block primitiveSoilBlock;
-    protected RootyBlock block;
+    protected Supplier<RootyBlock> block;
     protected Integer soilFlags = 0;
     private ResourceLocation blockRegistryName;
     protected boolean hasSubstitute;
@@ -123,7 +124,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
      * @return the BlockState of the rooty soil.
      */
     public BlockState getSoilState (BlockState primitiveSoilState, int fertility, boolean requireTileEntity){
-        return block.defaultBlockState().setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, requireTileEntity);
+        return block.get().defaultBlockState().setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, requireTileEntity);
     }
 
     /**
@@ -157,16 +158,16 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     }
 
     public Optional<RootyBlock> getBlock() {
-        return Optionals.ofBlock(block);
+        return Optionals.ofBlock(block.get());
     }
 
     public Optional<RootyBlock> getSoilBlock() {
-        return Optional.ofNullable(this.block == Blocks.AIR ? null : this.block);
+        return Optional.ofNullable(this.block == Blocks.AIR ? null : this.block.get());
     }
 
     public void generateBlock(BlockBehaviour.Properties blockProperties) {
         setBlockRegistryNameIfNull();
-        this.block = RegistryHandler.addBlock(this.blockRegistryName, this.createBlock(blockProperties));
+        this.block = RegistryHandler.addBlock(this.blockRegistryName, () -> this.createBlock(blockProperties));
     }
 
     protected RootyBlock createBlock(BlockBehaviour.Properties blockProperties) {
@@ -174,7 +175,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     }
 
     public void setBlock(RootyBlock rootyBlock) {
-        this.block = rootyBlock;
+        this.block = () -> rootyBlock;
     }
 
     public boolean hasSubstitute() {

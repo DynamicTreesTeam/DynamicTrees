@@ -23,7 +23,7 @@ import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -262,7 +262,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     public void generateDynamicLeaves(final BlockBehaviour.Properties properties) {
-        RegistryHandler.addBlock(this.blockRegistryName, this.createDynamicLeaves(properties));
+        RegistryHandler.addBlock(this.blockRegistryName, () -> this.createDynamicLeaves(properties));
     }
 
     public LeavesProperties setDynamicLeavesState(BlockState state) {
@@ -478,7 +478,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.requiresShears = requiresShears;
     }
 
-    public List<Tag.Named<Block>> defaultLeavesTags() {
+    public List<TagKey<Block>> defaultLeavesTags() {
         return Collections.singletonList(DTBlockTags.LEAVES);
     }
 
@@ -532,7 +532,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
             if (code.startsWith("@")) {
                 code = code.substring(1);
                 if ("biome".equals(code)) { // Built in code since we need access to super.
-                    this.colorMultiplier = (state, world, pos, t) -> ((LevelAccessor) world).getBiome(pos).getFoliageColor();
+                    this.colorMultiplier = (state, world, pos, t) -> ((LevelAccessor) world).getBiome(pos).value().getFoliageColor();
                     return;
                 }
 

@@ -131,7 +131,7 @@ public class DTClient {
     }
 
     private static void registerRenderLayers() {
-        ItemBlockRenderTypes.setRenderLayer(DTRegistries.POTTED_SAPLING, RenderType.cutoutMipped());
+        ItemBlockRenderTypes.setRenderLayer(DTRegistries.POTTED_SAPLING.get(), RenderType.cutoutMipped());
 
         ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block == DTRegistries.COCOA_FRUIT || block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof FruitBlock)
                 .forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped()));
@@ -154,16 +154,16 @@ public class DTClient {
         }
 
         // Register Bonsai Pot Colorizer
-        ModelHelper.regColorHandler(DTRegistries.POTTED_SAPLING, (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof PottedSaplingBlock)
-                ? DTRegistries.POTTED_SAPLING.getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
+        ModelHelper.regColorHandler(DTRegistries.POTTED_SAPLING.get(), (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof PottedSaplingBlock)
+                ? DTRegistries.POTTED_SAPLING.get().getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
 
         // ITEMS
 
         // Register Potion Colorizer
-        ModelHelper.regColorHandler(DTRegistries.DENDRO_POTION, DTRegistries.DENDRO_POTION::getColor);
+        ModelHelper.regColorHandler(DTRegistries.DENDRO_POTION.get(), DTRegistries.DENDRO_POTION.get()::getColor);
 
         // Register Woodland Staff Colorizer
-        ModelHelper.regColorHandler(DTRegistries.STAFF, DTRegistries.STAFF::getColor);
+        ModelHelper.regColorHandler(DTRegistries.STAFF.get(), DTRegistries.STAFF.get()::getColor);
 
         // TREE PARTS
 
@@ -199,8 +199,8 @@ public class DTClient {
 
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(DTRegistries.FALLING_TREE, manager->new FallingTreeRenderer(manager));
-        event.registerEntityRenderer(DTRegistries.LINGERING_EFFECTOR, manager->new LingeringEffectorRenderer(manager));
+        event.registerEntityRenderer(DTRegistries.FALLING_TREE.get(), FallingTreeRenderer::new);
+        event.registerEntityRenderer(DTRegistries.LINGERING_EFFECTOR.get(), LingeringEffectorRenderer::new);
     }
 
     private static int getFoliageColor(LeavesProperties leavesProperties, Level world, BlockState blockState, BlockPos pos) {

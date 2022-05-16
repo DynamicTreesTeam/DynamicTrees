@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.Registries;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
@@ -33,6 +34,7 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStatePr
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.NewRegistryEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,7 +93,7 @@ public class DTTrees {
     }
 
     @SubscribeEvent
-    public static void newRegistry(RegistryEvent.NewRegistry event) {
+    public static void newRegistry(NewRegistryEvent event) {
         final List<SimpleRegistry<?>> registries = Registries.REGISTRIES.stream()
                 .filter(registry -> registry instanceof SimpleRegistry)
                 .map(registry -> (SimpleRegistry<?>) registry)
@@ -106,15 +108,20 @@ public class DTTrees {
         JsonDeserialisers.registerForgeEntryGetters();
         JsonDeserialisers.postRegistryEvent();
 
+        // Register feature cancellers.
+        FeatureCanceller.REGISTRY.postRegistryEvent();
+        FeatureCanceller.REGISTRY.lock();
+    }
+
+    @SubscribeEvent
+    public static void onRegisterBlocks(RegistryEvent.Register<Block> event) {
         // Register any registry entries from Json files.
         Resources.MANAGER.load();
 
         // Lock all the registries.
-        registries.forEach(SimpleRegistry::lock);
-
-        // Register feature cancellers.
-        FeatureCanceller.REGISTRY.postRegistryEvent();
-        FeatureCanceller.REGISTRY.lock();
+        Registries.REGISTRIES.stream()
+                .filter(registry -> registry instanceof SimpleRegistry)
+                .forEach(Registry::lock);
     }
 
     public static void replaceNyliumFungiFeatures() {

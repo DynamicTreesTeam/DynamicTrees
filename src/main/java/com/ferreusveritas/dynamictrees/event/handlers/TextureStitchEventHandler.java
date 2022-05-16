@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.client.thickrings.ThickRingTextureManager
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.SimpleReloadableResourceManager;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -23,7 +23,7 @@ public class TextureStitchEventHandler {
     public static void onTextureStitchEventPre(TextureStitchEvent.Pre event) {
         ResourceLocation eventAtlasLocation = event.getAtlas().location();
         if (eventAtlasLocation.equals(TextureAtlas.LOCATION_BLOCKS)) {
-            SimpleReloadableResourceManager manager = (SimpleReloadableResourceManager) Minecraft.getInstance().getResourceManager();
+            ReloadableResourceManager manager = (ReloadableResourceManager) Minecraft.getInstance().getResourceManager();
 
             List<ResourceLocation> ringLocationsToGenerate = new LinkedList<>();
             boolean textureNotFound = true;

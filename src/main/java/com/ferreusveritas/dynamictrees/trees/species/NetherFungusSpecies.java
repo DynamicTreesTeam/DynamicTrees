@@ -13,7 +13,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -84,12 +84,12 @@ public class NetherFungusSpecies extends Species {
     }
 
     @Override
-    public List<Tag.Named<Block>> defaultSaplingTags() {
+    public List<TagKey<Block>> defaultSaplingTags() {
         return Collections.singletonList(DTBlockTags.FUNGUS_CAPS);
     }
 
     @Override
-    public List<Tag.Named<Item>> defaultSeedTags() {
+    public List<TagKey<Item>> defaultSeedTags() {
         return Collections.singletonList(DTItemTags.FUNGUS_CAPS);
     }
 

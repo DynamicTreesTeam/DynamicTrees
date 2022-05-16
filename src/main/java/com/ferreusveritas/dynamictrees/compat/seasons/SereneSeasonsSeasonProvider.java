@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -30,9 +31,9 @@ public class SereneSeasonsSeasonProvider implements SeasonProvider {
     @Override
     public boolean shouldSnowMelt(Level world, BlockPos pos) {
         if (SeasonsConfig.generateSnowAndIce.get() && seasonValue < com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.WINTER) {
-            final ResourceKey<Biome> biome = ResourceKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getBiome(pos).getRegistryName()));
-            return BiomeConfig.enablesSeasonalEffects(biome) &&
-                    SeasonHooks.getBiomeTemperature(world, biome, pos) >= 0.15f;
+            Holder<Biome> biomeHolder = world.getBiome(pos);
+            return BiomeConfig.enablesSeasonalEffects(biomeHolder) &&
+                    SeasonHooks.getBiomeTemperature(world, biomeHolder, pos) >= 0.15f;
         }
         return false;
     }

@@ -62,7 +62,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         JsonDeserialisers.register(Species.CommonOverride.class, input ->
                 JsonDeserialisers.BIOME_PREDICATE.deserialise(input)
                         .map(biomePredicate -> (world, pos) -> world instanceof LevelReader &&
-                                biomePredicate.test(((LevelReader) world).getBiome(pos)))
+                                biomePredicate.test(((LevelReader) world).getBiome(pos).value()))
         );
 
         this.loadAppliers
@@ -99,7 +99,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("seed_drop_rarity", Float.class, Species::setupStandardSeedDropping)
                 .register("stick_drop_rarity", Float.class, Species::setupStandardStickDropping)
                 .register("mega_species", ResourceLocation.class, this::setMegaSpecies)
-                .register("seed", Seed.class, Species::setSeed)
+                .register("seed", Seed.class, (species, seed) -> species.setSeed(() -> seed))
                 .register("seed_composter_chance", Float.class, this.composterChanceCache::put)
                 .register("sapling_grows_naturally", Boolean.class, Species::setCanSaplingGrowNaturally)
                 .register("primitive_sapling", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
@@ -123,7 +123,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         CommonSetup.runOnCommonSetup(event -> {
             final Item seed = ForgeRegistries.ITEMS.getValue(processedSeedName);
             if (seed instanceof Seed) {
-                species.setSeed((Seed) seed);
+                species.setSeed(() -> (Seed) seed);
             } else {
                 LOGGER.warn("Could not find valid seed item from registry name \"" + seedName + "\".");
             }

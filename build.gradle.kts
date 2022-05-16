@@ -135,10 +135,10 @@ dependencies {
 
     // At runtime use, CC for creating growth chambers.
     //runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
-    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3606346"))
+    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3770724"))
 
     // Compile Serene Seasons.
-    compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3599020"))
+    compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3693807"))
 
     // Compile Better Weather API.
 //    compileOnly(fg.deobf("curse.maven:BetterWeatherAPI-400714:3403615"))

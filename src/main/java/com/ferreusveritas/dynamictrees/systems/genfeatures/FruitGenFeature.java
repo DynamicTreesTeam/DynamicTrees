@@ -21,11 +21,13 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @GeneratesFruit
 public class FruitGenFeature extends GenFeature {
 
-    public static final ConfigurationProperty<FruitBlock> FRUIT_BLOCK = ConfigurationProperty.property("fruit_block", FruitBlock.class);
+    @SuppressWarnings("unchecked")
+    public static final ConfigurationProperty<Supplier<FruitBlock>> FRUIT_BLOCK = ConfigurationProperty.property("fruit_block", (Class<Supplier<FruitBlock>>) (Class) Supplier.class);
 
     public FruitGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -71,7 +73,7 @@ public class FruitGenFeature extends GenFeature {
             final BlockPos rootPos = context.pos();
             final float fruitingFactor = context.species().seasonalFruitProductionFactor(world, rootPos);
 
-            if (fruitingFactor > configuration.get(FRUIT_BLOCK).getMinimumSeasonalValue() && fruitingFactor > world.random.nextFloat()) {
+            if (fruitingFactor > configuration.get(FRUIT_BLOCK).get().getMinimumSeasonalValue() && fruitingFactor > world.random.nextFloat()) {
                 final FindEndsNode endFinder = new FindEndsNode();
                 TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
                 final List<BlockPos> endPoints = endFinder.getEnds();
@@ -94,7 +96,7 @@ public class FruitGenFeature extends GenFeature {
         if (fruitPos != BlockPos.ZERO &&
                 (!enableHash || ((CoordUtils.coordHashCode(fruitPos, 0) & 3) == 0)) &&
                 world.getRandom().nextFloat() <= configuration.get(PLACE_CHANCE)) {
-            FruitBlock fruitBlock = configuration.get(FRUIT_BLOCK);
+            FruitBlock fruitBlock = configuration.get(FRUIT_BLOCK).get();
             BlockState setState = fruitBlock.getStateForAge(worldGen ? fruitBlock.getAgeForSeasonalWorldGen(world, fruitPos, seasonValue) : 0);
             world.setBlock(fruitPos, setState, 3);
         }

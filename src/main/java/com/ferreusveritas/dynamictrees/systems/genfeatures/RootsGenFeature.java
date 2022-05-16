@@ -91,7 +91,7 @@ public class RootsGenFeature extends GenFeature {
             final Surround surr = Surround.values()[world.random.nextInt(8)];
             final BlockPos dPos = treePos.offset(surr.getOffset());
             if (world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
-                world.setBlockAndUpdate(dPos, DTRegistries.TRUNK_SHELL.defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
+                world.setBlockAndUpdate(dPos, DTRegistries.TRUNK_SHELL.get().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
             }
 
             this.startRoots(configuration, world, treePos, context.species(), trunkRadius);

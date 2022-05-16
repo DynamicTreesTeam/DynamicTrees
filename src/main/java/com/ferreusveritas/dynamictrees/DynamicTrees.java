@@ -99,15 +99,13 @@ public final class DynamicTrees {
         // Clears and locks registry handlers to free them from memory.
         RegistryHandler.REGISTRY.clear();
 
-        DTRegistries.DENDRO_POTION.registerRecipes();
+        DTRegistries.DENDRO_POTION.get().registerRecipes();
 
         Resources.MANAGER.setup();
 
         if (DTConfigs.REPLACE_NYLIUM_FUNGI.get()) {
             DTTrees.replaceNyliumFungiFeatures();
         }
-
-        event.enqueueWork(DTRegistries::registerConfiguredFeatures);
     }
 
     private void gatherData(final GatherDataEvent event) {

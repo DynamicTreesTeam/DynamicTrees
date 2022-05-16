@@ -50,7 +50,7 @@ public class NormalSeasonManager implements SeasonManager {
 
     static private final float TROPICAL_THRESHHOLD = 0.8f; //Same threshold used by Serene Seasons.  Seems smart enough
 
-    private BiPredicate<Level, BlockPos> isTropical = (world, rootPos) -> world.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).getBaseTemperature() > TROPICAL_THRESHHOLD;
+    private BiPredicate<Level, BlockPos> isTropical = (world, rootPos) -> world.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value().getBaseTemperature() > TROPICAL_THRESHHOLD;
 
     /**
      * Set the global predicate that determines if a world location is tropical. Predicate should return true if
