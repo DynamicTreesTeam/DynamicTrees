@@ -378,7 +378,7 @@ public class JoCode {
 
     protected boolean setBlockForGeneration(LevelAccessor world, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
         if (isFreeToSetBlock(world, pos) && (!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-            species.getFamily().getBranch().ifPresent(branch ->
+            species.getFamily().getBranchForPlacement(world,species,pos).ifPresent(branch ->
                     branch.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)
             );
             return false;
