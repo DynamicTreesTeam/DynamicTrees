@@ -422,7 +422,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * #family}; {@code false} otherwise.
      */
     public boolean isSeedCommon() {
-        return this.getCommonSpecies().getSeed().orElse(null) == this.seed;
+        return this.getCommonSpecies().getSeed().orElse(null) == this.seed.get();
     }
 
     public Species setUnlocalizedName(String name) {
