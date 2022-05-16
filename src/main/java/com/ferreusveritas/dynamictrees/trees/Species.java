@@ -707,7 +707,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return This {@link Species} object for chaining.
      */
     public Species setSeed(final Supplier<Seed> seedSup) {
-        this.seed = seed;
+        this.seed = seedSup;
         return this;
     }
 
