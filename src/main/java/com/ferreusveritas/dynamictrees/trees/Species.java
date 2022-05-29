@@ -1,29 +1,9 @@
 package com.ferreusveritas.dynamictrees.trees;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.function.Consumer;
-
-import javax.annotation.Nullable;
-
-import org.apache.logging.log4j.LogManager;
-
 import com.ferreusveritas.dynamictrees.ModBlocks;
 import com.ferreusveritas.dynamictrees.ModConfigs;
 import com.ferreusveritas.dynamictrees.ModConstants;
-import com.ferreusveritas.dynamictrees.api.IFullGenFeature;
-import com.ferreusveritas.dynamictrees.api.IGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGenFeature;
-import com.ferreusveritas.dynamictrees.api.IPostGrowFeature;
-import com.ferreusveritas.dynamictrees.api.IPreGenFeature;
-import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.*;
 import com.ferreusveritas.dynamictrees.api.network.INodeInspector;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.IEmptiable;
@@ -33,14 +13,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.IDropCreator;
 import com.ferreusveritas.dynamictrees.api.treedata.IDropCreatorStorage;
 import com.ferreusveritas.dynamictrees.api.treedata.ILeavesProperties;
 import com.ferreusveritas.dynamictrees.api.treedata.ITreePart;
-import com.ferreusveritas.dynamictrees.blocks.BlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranch;
-import com.ferreusveritas.dynamictrees.blocks.BlockBranchThick;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicLeaves;
-import com.ferreusveritas.dynamictrees.blocks.BlockDynamicSapling;
-import com.ferreusveritas.dynamictrees.blocks.BlockFruit;
-import com.ferreusveritas.dynamictrees.blocks.BlockRooty;
-import com.ferreusveritas.dynamictrees.blocks.LeavesProperties;
+import com.ferreusveritas.dynamictrees.blocks.*;
 import com.ferreusveritas.dynamictrees.entities.EntityFallingTree;
 import com.ferreusveritas.dynamictrees.entities.EntityLingeringEffector;
 import com.ferreusveritas.dynamictrees.entities.animation.IAnimationHandler;
@@ -61,14 +34,9 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeInflator;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NodeShrinker;
 import com.ferreusveritas.dynamictrees.systems.substances.SubstanceFertilize;
 import com.ferreusveritas.dynamictrees.tileentity.TileEntitySpecies;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.Deprecatron;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import com.ferreusveritas.dynamictrees.util.Styles;
+import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeStore;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
@@ -100,6 +68,11 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
+import org.apache.logging.log4j.LogManager;
+
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Consumer;
 
 @SuppressWarnings("deprecation")
 public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<Species> {
@@ -1353,12 +1326,17 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	// INTERACTIVE
 	//////////////////////////////
 
-	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
+	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack, World world, BlockPos pos) {
 
 		// Bonemeal fertilizes the soil and causes two growth pulses.
-		if (canBoneMeal() && itemStack.getItem() == Items.DYE && itemStack.getItemDamage() == 15) {
+		if (canBoneMeal() && BoneMealHelper.isBoneMeal(itemStack, world, pos, this)) {
 			return new SubstanceFertilize().setAmount(2).setGrow(true).setPulses(ModConfigs.boneMealGrowthPulses);
-		}
+		} 
+		else return getSubstanceEffect(itemStack);
+		
+	}
+	
+	public ISubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 
 		// Use substance provider interface if it's available.
 		if (itemStack.getItem() instanceof ISubstanceEffectProvider) {
@@ -1382,7 +1360,7 @@ public class Species extends net.minecraftforge.registries.IForgeRegistryEntry.I
 	public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, EntityPlayer player, EnumHand hand,
 								  ItemStack itemStack) {
 
-		ISubstanceEffect effect = getSubstanceEffect(itemStack);
+		ISubstanceEffect effect = getSubstanceEffect(itemStack, world, hitPos);
 
 		if (effect != null) {
 			ISubstanceEffect.Result result = effect.apply(world, rootPos, hitPos);

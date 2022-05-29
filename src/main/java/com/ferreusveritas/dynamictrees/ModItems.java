@@ -1,9 +1,12 @@
 package com.ferreusveritas.dynamictrees;
 
+import com.ferreusveritas.dynamictrees.api.BoneMealHelper;
 import com.ferreusveritas.dynamictrees.items.DendroPotion;
 import com.ferreusveritas.dynamictrees.items.DirtBucket;
 import com.ferreusveritas.dynamictrees.items.Staff;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -17,7 +20,7 @@ public class ModItems {
 	public static DendroPotion dendroPotion;
 	public static DirtBucket dirtBucket;
 	public static Staff treeStaff;
-
+	
 	public static void preInit() {
 		dendroPotion = new DendroPotion();//Potions
 		dirtBucket = new DirtBucket();//Dirt Bucket
@@ -34,6 +37,8 @@ public class ModItems {
 
 		registry.registerAll(dendroPotion, dirtBucket, treeStaff);
 		registry.registerAll(treeItems.toArray(new Item[0]));
+		
+		BoneMealHelper.addItem(Items.DYE, 15);
 	}
 
 }
