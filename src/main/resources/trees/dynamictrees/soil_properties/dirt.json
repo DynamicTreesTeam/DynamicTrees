@@ -1,8 +1,0 @@
-{
-  "type": "spreadable",
-  "primitive_soil": "dirt",
-  "acceptable_soils": [ "dirt_like" ],
-
-  "required_light": 9,
-  "spreadable_soils": [ "grass_block", "mycelium" ]
-}

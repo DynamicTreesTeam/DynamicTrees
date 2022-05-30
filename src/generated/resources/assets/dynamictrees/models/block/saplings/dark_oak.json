@@ -1,8 +1,0 @@
-{
-  "parent": "dynamictrees:block/smartmodel/sapling",
-  "textures": {
-    "particle": "minecraft:block/dark_oak_leaves",
-    "log": "minecraft:block/dark_oak_log",
-    "leaves": "minecraft:block/dark_oak_leaves"
-  }
-}

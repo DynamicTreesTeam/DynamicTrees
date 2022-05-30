@@ -1,8 +1,0 @@
-{
-    "type": "nether_fungus",
-    "common_leaves": "warped",
-    "common_species": "warped",
-    "primitive_log": "warped_stem",
-    "primitive_stripped_log": "stripped_warped_stem",
-    "max_branch_radius": 24
-}
