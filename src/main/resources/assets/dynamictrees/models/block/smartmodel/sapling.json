@@ -1,0 +1,41 @@
+{
+    "parent": "block/block",
+    "textures": {
+        "particle": "block/stone",
+        "log": "block/stone",
+        "leaves": "block/stone"
+    },
+    "display": {
+        "fixed": {
+            "rotation": [ 0, 90, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 0.5, 0.5, 0.5 ]
+        }
+    },
+    "elements": [
+        {   "__comment": "Leaves",
+            "from": [ 4, 4, 4 ],
+            "to": [ 12, 12, 12 ],
+            "faces": {
+                "down":  { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 },
+                "up":    { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 },
+                "north": { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 },
+                "south": { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 },
+                "west":  { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 },
+                "east":  { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 }
+            }
+        },
+        {   "__comment": "Trunk",
+            "from": [ 7, 0, 7 ],
+            "to": [ 9, 5, 9 ],
+            "faces": {
+                "down":  { "uv": [ 7, 7, 9, 9 ], "texture": "#log", "cullface": "down"},
+                "up":    { "uv": [ 7, 7, 9, 9 ], "texture": "#log"},
+                "north": { "uv": [ 7, 0, 9, 5 ], "texture": "#log"},
+                "south": { "uv": [ 7, 0, 9, 5 ], "texture": "#log"},
+                "west":  { "uv": [ 7, 0, 9, 5 ], "texture": "#log"},
+                "east":  { "uv": [ 7, 0, 9, 5 ], "texture": "#log"}
+            }
+        }
+    ]
+}

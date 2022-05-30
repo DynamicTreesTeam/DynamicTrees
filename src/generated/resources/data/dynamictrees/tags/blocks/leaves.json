@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "dynamictrees:oak_leaves",
+    "dynamictrees:jungle_leaves",
+    "dynamictrees:dark_oak_leaves",
+    "dynamictrees:spruce_leaves",
+    "dynamictrees:acacia_leaves",
+    "dynamictrees:birch_leaves"
+  ]
+}

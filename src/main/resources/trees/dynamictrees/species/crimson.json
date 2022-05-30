@@ -1,0 +1,51 @@
+{
+    "type": "nether_fungus",
+    "family": "crimson",
+    "tapering": 0,
+    "signal_energy": 18.0,
+    "up_probability": 6,
+    "lowest_branch_height": 3,
+    "growth_rate": 1,
+    "soil_longevity": 3,
+    "growth_logic_kit": "nether_fungus",
+    "leaves_properties": "crimson",
+    "environment_factors" : {
+        "cold": 0.25,
+        "wet": 0.75
+    },
+    "perfect_biomes": { "name": "minecraft:crimson_forest" },
+    "primitive_sapling": "crimson_fungus",
+    "acceptable_soils": ["nether_soil_like", "fungus_like", "dirt_like"],
+    "acceptable_growth_blocks": ["minecraft:crimson_nylium", "dynamictrees:rooty_crimson_nylium"],
+    "mega_species": "mega_crimson",
+    "sapling_shape": "round_mushroom_rim",
+    "drop_creators": [
+        "log",
+        {
+            "name": "wart_block",
+            "properties": {
+                "block": "nether_wart_block"
+            }
+        }
+    ],
+    "features": [
+        {
+            "name": "vines",
+            "properties": {
+                "vine_type": "ceiling",
+                "block": "weeping_vines_plant",
+                "tip_block": "weeping_vines",
+                "max_length": 5,
+                "quantity": 7
+            }
+        },
+        "clear_volume",
+        "shroomlight",
+        {
+            "name": "bottom_flare",
+            "properties": {
+                "min_radius": 7
+            }
+        }
+    ]
+}

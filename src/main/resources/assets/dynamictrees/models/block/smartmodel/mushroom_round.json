@@ -1,0 +1,81 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"cap": "block/stone",
+		"stem": "block/stone",
+		"particle": "block/stone"
+	},
+	"elements": [
+		{
+			"name": "Cap",
+			"from": [5, 3, 5],
+			"to": [11, 8, 11],
+			"faces": {
+				"north": {"uv": [1, 6, 7, 11], "texture": "#cap"},
+				"east": {"uv": [1, 11, 7, 16], "texture": "#cap"},
+				"south": {"uv": [1, 6, 7, 11], "texture": "#cap"},
+				"west": {"uv": [1, 11, 7, 16], "texture": "#cap"},
+				"up": {"uv": [1, 0, 7, 6], "texture": "#cap"},
+				"down": {"uv": [9, 0, 15, 6], "texture": "#cap"}
+			}
+		},
+		{
+			"name": "Stem",
+			"from": [7, 0, 7],
+			"to": [9, 5, 9],
+			"faces": {
+				"north": {"uv": [11, 11, 13, 16], "texture": "#stem"},
+				"east": {"uv": [11, 11, 13, 16], "texture": "#stem"},
+				"south": {"uv": [11, 11, 13, 16], "texture": "#stem"},
+				"west": {"uv": [11, 11, 13, 16], "texture": "#stem"},
+				"up": {"uv": [11, 11, 13, 13], "texture": "#stem"},
+				"down": {"uv": [11, 14, 13, 16], "texture": "#stem", "cullface": "down"}
+			}
+		},
+		{
+			"name": "Brim_E",
+			"from": [11, 3, 5],
+			"to": [12, 5, 11],
+			"faces": {
+				"east": {"uv": [9, 8, 15, 10], "texture": "#cap"},
+				"up": {"uv": [9, 8, 15, 9], "rotation": 90, "texture": "#cap"},
+				"down": {"uv": [9, 9, 15, 10], "rotation": 270, "texture": "#cap"}
+			}
+		},
+		{
+			"name": "Brim_W",
+			"from": [4, 3, 5],
+			"to": [5, 5, 11],
+			"faces": {
+				"west": {"uv": [9, 8, 15, 10], "texture": "#cap"},
+				"up": {"uv": [9, 8, 15, 9], "rotation": 270, "texture": "#cap"},
+				"down": {"uv": [9, 9, 15, 10], "rotation": 90, "texture": "#cap"}
+			}
+		},
+		{
+			"name": "Brim_S",
+			"from": [4, 3, 11],
+			"to": [12, 5, 12],
+			"faces": {
+				"east": {"uv": [8, 8, 9, 10], "texture": "#cap"},
+				"south": {"uv": [8, 8, 16, 10], "texture": "#cap"},
+				"west": {"uv": [15, 8, 16, 10], "texture": "#cap"},
+				"up": {"uv": [8, 8, 16, 9], "rotation": 180, "texture": "#cap"},
+				"down": {"uv": [8, 9, 16, 10], "rotation": 180, "texture": "#cap"}
+			}
+		},
+		{
+			"name": "Brim_N",
+			"from": [4, 3, 4],
+			"to": [12, 5, 5],
+			"faces": {
+				"north": {"uv": [8, 8, 16, 10], "texture": "#cap"},
+				"east": {"uv": [15, 8, 16, 10], "texture": "#cap"},
+				"west": {"uv": [8, 8, 9, 10], "texture": "#cap"},
+				"up": {"uv": [8, 8, 16, 9], "texture": "#cap"},
+				"down": {"uv": [8, 9, 16, 10], "texture": "#cap"}
+			}
+		}
+	]
+}

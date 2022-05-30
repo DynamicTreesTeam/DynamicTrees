@@ -1,0 +1,16 @@
+{
+    "family": "acacia",
+    "tapering": 0.15,
+    "signal_energy": 12.0,
+    "up_probability": 0,
+    "lowest_branch_height": 3,
+    "growth_rate": 0.7,
+    "leaves_properties": "acacia",
+    "environment_factors" : {
+        "cold": 0.25,
+        "nether": 0.75,
+        "wet": 0.75
+    },
+    "perfect_biomes": { "type": "savanna" },
+    "primitive_sapling": "acacia_sapling"
+}

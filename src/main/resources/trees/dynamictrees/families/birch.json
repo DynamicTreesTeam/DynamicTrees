@@ -1,0 +1,8 @@
+{
+    "common_leaves": "birch",
+    "common_species": "birch",
+    "primitive_log": "birch_log",
+    "primitive_stripped_log": "stripped_birch_log",
+    "max_branch_radius": 8,
+    "conifer_variants": true
+}

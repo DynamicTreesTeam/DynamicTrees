@@ -1,0 +1,261 @@
+[
+  {
+    "__comment" : "Start by making any vanilla minecraft biome default to oak",
+    "select": { "name": "minecraft:.*" },
+    "apply": {
+      "species" : "oak",
+      "density": 0,
+      "chance" : "standard"
+    }
+  },
+  {
+    "__comment": "Cancel standard tree features from the overworld.",
+    "select": { "name": "minecraft.*", "type": "overworld" },
+    "cancellers": {
+      "type": "tree",
+      "namespace": "minecraft"
+    }
+  },
+  {
+    "__comment" : "Rivers have no chance of having trees",
+    "select": { "type": "river" },
+    "apply": {
+      "chance": 0.0
+    }
+  },
+  {
+    "__comment" : "Default for a Forest which generates a Birch Tree 1/5 of the time.",
+    "select": { "type": "forest", "name": "minecraft:.*" },
+    "apply": {
+      "species" : {
+        "random" : {
+          "oak" : 4,
+          "birch" : 1
+        }
+      },
+      "density": [ 1 ],
+      "chance": 1.0,
+      "forestness" : 1.0
+    }
+  },
+  {
+    "select": "minecraft:flower_forest",
+    "apply": {
+      "density": [ 0.6 ]
+    }
+  },
+  {
+    "__comment" : "Anything cold will have spruce trees",
+    "select": { "type": "cold",	"name": "minecraft:.*" },
+    "apply": {
+      "species" : "spruce"
+    }
+  },
+  {
+    "__comment" : "Any wasteland will be treeless",
+    "select": { "type": "wasteland", "name": "minecraft:.*" },
+    "apply": {
+      "species" : "..."
+    }
+  },
+  {
+    "__comment" : "Generates an alternative oak style in swamps",
+    "select": { "type": "swamp", "name": "minecraft:.*" },
+    "apply": {
+      "species" : "swamp_oak",
+      "density": [ 0.2 ],
+      "chance": 0.75
+    }
+  },
+  {
+    "select": { "type": "savanna", "name": "minecraft:.*" },
+    "apply": {
+      "species" : "acacia",
+      "density": [ 0.1 ]
+    }
+  },
+  {
+    "select": { "name": "minecraft:shattered_savanna.*" },
+    "apply": {
+      "density": [ 0.2 ]
+    }
+  },
+  {
+    "select": { "type": "jungle", "name": "minecraft:.*" },
+    "apply": {
+      "species" : {
+        "random" : {
+          "jungle" : 5,
+          "mega_jungle" : 1
+        }
+      },
+      "density": [ 2 ],
+      "forestness" : 1.0
+    }
+  },
+  {
+    "select": { "name": "minecraft:.*jungle_edge" },
+    "apply": {
+      "density": [ 0.2 ]
+    }
+  },
+  {
+    "__comment" : "Mushroom Islands",
+    "select": { "type": "mushroom",	"name": "minecraft:.*" },
+    "apply": {
+      "species" : {
+        "random" : {
+          "red_mushroom" : 4,
+          "brown_mushroom" : 3
+        }
+      },
+      "chance": 0.66
+    },
+    "cancellers": {
+      "type": "mushroom",
+      "namespace": "minecraft"
+    }
+  },
+  {
+    "select": { "type": "coniferous", "name": "minecraft:.*" },
+    "apply": {
+      "species" : "spruce",
+      "density": [ 1 ],
+      "chance": 1
+    }
+  },
+  {
+    "__comment" : "Roofed forests are handled specially. Multipass tries to close canopy as much as possible",
+    "select": { "type": "spooky", "name": "minecraft:.*" },
+    "apply": {
+      "species" : "dark_oak",
+      "density" : { "math": { "div" : [ "noise", 3.0 ] } },
+      "multipass" : true
+    }
+  },
+  {
+    "select": { "name": "minecraft:.*beach.*" },
+    "apply": {
+      "chance": 0.0
+    }
+  },
+  {
+    "__comment": "Any biome with 'birch' in the name is 100% birch",
+    "select": { "name": "minecraft:.*birch.*" },
+    "apply": {
+      "species" : "birch"
+    }
+  },
+  {
+    "__comment": "Any biome with 'tall_birch' in the name is 100% tall birch",
+    "select": { "name": "minecraft:.*tall_birch.*" },
+    "apply": {
+      "species" : "tall_birch"
+    }
+  },
+  {
+    "__comment": "1/25 chance to spawn apple trees in any minecraft biome that ends in 'plains'",
+    "select": { "name": "minecraft:.*plains" },
+    "apply": {
+      "species" : {
+        "random" : {
+          "oak": 24,
+          "apple_oak": 1
+        }
+      },
+      "density": 0,
+      "chance": 0.05
+    }
+  },
+  {
+    "__comment": "All mountain biomes generate spruce 2/3 of the time and oak 1/3 of the time.",
+    "select": { "name": "minecraft:.*mountain.*" },
+    "apply": {
+      "species" : {
+        "random" : {
+          "spruce" : 2,
+          "oak" : 1
+        }
+      },
+      "density": [ 0.3 ],
+      "chance": 0.05
+    }
+  },
+  {
+    "_comment": "Wooded Mountains are denser and spawn more trees.",
+    "select": "minecraft:wooded_mountains",
+    "apply": {
+      "density": [ 0.7 ],
+      "chance": 0.6
+    }
+  },
+  {
+    "__comment": "Mega taiga has giant spruce trees.",
+    "select": { "name": "minecraft:.*giant_spruce_taiga.*" },
+    "apply": {
+      "species" : "mega_spruce"
+    }
+  },
+  {
+    "__comment": "Giant tree taiga has giant spruce trees, but also is less leaf-dense than giant spruce taiga.",
+    "select": { "name": "minecraft:.*giant_tree_taiga.*" },
+    "apply": {
+      "species" : {
+        "random" : {
+          "mega_spruce" : 2,
+          "spruce" : 1
+        }
+      }
+    }
+  },
+  {
+    "__comment": "Flag nether as being subterranean.",
+    "select": { "name": "minecraft:.*", "type": "nether" },
+    "apply": {
+      "subterranean": true,
+      "chance": 0.4
+    }
+  },
+
+  {
+    "__comment" : "Wooded Mesas have a chance of generating oak on the dirt patches.",
+    "select": { "name": "minecraft:.*wooded_badlands_plateau" },
+    "apply": {
+      "species" : "oak",
+      "density": [ 0.5 ],
+      "chance": 0.5
+    }
+  },
+  {
+    "__comment": "Cancel huge fungus features from namespace 'minecraft' in the nether forests.",
+    "select": { "name": "minecraft:.*forest", "type": "nether" },
+    "cancellers": {
+      "type": "fungus",
+      "namespace": "minecraft"
+    }
+  },
+  {
+    "select": { "name": "minecraft:crimson_forest" },
+    "apply": {
+      "species" : {
+        "random" : {
+          "crimson" : 4,
+          "mega_crimson" : 1
+        }
+      },
+      "density": [ 2.0, 0.3 ]
+    }
+  },
+  {
+    "select": { "name": "minecraft:warped_forest" },
+    "apply": {
+      "species" : {
+        "random" : {
+          "warped" : 4,
+          "mega_warped" : 1
+        }
+      },
+      "density": [ 2.0, 0.3 ]
+    }
+  }
+]

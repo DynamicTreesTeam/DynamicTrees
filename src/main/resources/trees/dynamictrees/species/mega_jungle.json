@@ -1,0 +1,50 @@
+{
+    "family": "jungle",
+    "tapering": 0.17,
+    "signal_energy": 35.0,
+    "up_probability": 10,
+    "lowest_branch_height": 8,
+    "growth_rate": 1.2,
+    "soil_longevity": 12,
+    "max_branch_radius": 24,
+    "world_gen_leaf_map_height": 40,
+    "growth_logic_kit": {
+        "name": "jungle",
+        "properties": {
+            "canopy_height": 25,
+            "branch_out_chance": 3
+        }
+    },
+    "leaves_properties": "jungle",
+    "environment_factors" : {
+        "cold": 0.15,
+        "dry": 0.2,
+        "hot": 1.1,
+        "wet": 1.1
+    },
+    "perfect_biomes": { "type": "jungle" },
+    "features" : [
+        {
+            "name": "vines",
+            "properties": {
+                "quantity": 16,
+                "max_length": 16
+            }
+        },
+        {
+            "name": "mound",
+            "properties": {
+                "mound_cutoff_radius": 999
+            }
+        },
+        {
+            "name": "roots",
+            "properties": {
+                "min_trunk_radius": 9,
+                "scale_factor": 20
+            }
+        },
+        "clear_volume",
+        "bottom_flare"
+    ]
+}

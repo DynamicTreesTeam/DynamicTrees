@@ -1,0 +1,8 @@
+{
+    "common_leaves": "spruce",
+    "common_species": "spruce",
+    "primitive_log": "spruce_log",
+    "primitive_stripped_log": "stripped_spruce_log",
+    "max_branch_radius": 24,
+    "conifer_variants": true
+}

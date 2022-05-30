@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "age=0": { "model": "dynamictrees:block/fruit/apple_age0" },
+        "age=1": { "model": "dynamictrees:block/fruit/apple_age1" },
+        "age=2": { "model": "dynamictrees:block/fruit/apple_age2" },
+        "age=3": { "model": "dynamictrees:block/fruit/apple_age3" }
+    }
+}

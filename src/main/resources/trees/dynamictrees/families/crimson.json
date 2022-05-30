@@ -1,0 +1,8 @@
+{
+    "type": "nether_fungus",
+    "common_leaves": "crimson",
+    "common_species": "crimson",
+    "primitive_log": "crimson_stem",
+    "primitive_stripped_log": "stripped_crimson_stem",
+    "max_branch_radius": 24
+}

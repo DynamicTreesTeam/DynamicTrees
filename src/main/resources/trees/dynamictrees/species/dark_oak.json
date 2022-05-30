@@ -1,0 +1,58 @@
+{
+    "family": "dark_oak",
+    "tapering": 0.3,
+    "signal_energy": 18.0,
+    "up_probability": 4,
+    "lowest_branch_height": 6,
+    "growth_rate": 0.8,
+    "soil_longevity": 14,
+    "max_branch_radius": 24,
+    "growth_logic_kit": "dark_oak",
+    "leaves_properties": "dark_oak",
+    "environment_factors" : {
+        "cold": 0.75,
+        "hot": 0.5,
+        "dry": 0.25,
+        "mushroom": 1.25
+    },
+    "perfect_biomes": { "type": "spooky", "name": "minecraft:.*" },
+    "primitive_sapling": "dark_oak_sapling",
+    "features" : [
+        {
+            "name": "clear_volume",
+            "properties": {
+                "height": 6
+            }
+        },
+        {
+            "name": "biome_predicate",
+            "properties": {
+                "only_world_gen": true,
+                "gen_feature": {
+                    "name": "huge_mushrooms",
+                    "properties": {
+                        "max_mushrooms": 1,
+                        "max_attempts": 3
+                    }
+                },
+                "biome_predicate": { "type": "spooky", "name": "minecraft:.*" }
+            }
+        },
+        {
+            "name": "rot_soil",
+            "properties": {
+                "rotten_soil": "podzol"
+            }
+        },
+        {
+            "name": "mushroom_rot",
+            "properties": {
+                "_comment": "An alternate mushroom chance of -1 means that a red mushroom will always be generated.",
+                "alternate_mushroom_chance": -1
+            }
+        },
+        "bottom_flare",
+        "mound",
+        "roots"
+    ]
+}

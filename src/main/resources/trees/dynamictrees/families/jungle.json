@@ -1,0 +1,10 @@
+{
+    "common_leaves": "jungle",
+    "common_species": "jungle",
+    "primitive_log": "jungle_log",
+    "primitive_stripped_log": "stripped_jungle_log",
+    "max_branch_radius": 24,
+    "generate_surface_root": true,
+    "can_support_cocoa": true,
+    "max_signal_depth": 64
+}
