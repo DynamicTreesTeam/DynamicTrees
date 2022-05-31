@@ -40,7 +40,7 @@ public class ModConstants {
 	//Forge
 	private static final String FORGE = "forge";
 	//public static final String FORGE_VER_NUM = "14.23.5.2768";
-	public static final String FORGE_VER_NUM = "14.23.5.2860";
+	public static final String FORGE_VER_NUM = "14.23.5.2859";
 	public static final String FORGE_VER = FORGE + AT + FORGE_VER_NUM + ORGREATER;
 
 	public static final String DEPENDENCIES
@@ -63,6 +63,6 @@ public class ModConstants {
 	public static final String CLIENT_PROXY = "com.ferreusveritas.dynamictrees.proxy.ClientProxy";
 	public static final String COMMON_PROXY = "com.ferreusveritas.dynamictrees.proxy.CommonProxy";
 
-	public static final String UPDATE_CHECKER = "https://github.com/ferreusveritas/DynamicTrees/blob/1.12.2/version_info.json?raw=true";
+	public static final String UPDATE_CHECKER = "https://github.com/DynamicTreesTeam/DynamicTreesVersionInfo/blob/master/DynamicTrees.json?raw=true";
 
 }

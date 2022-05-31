@@ -6,7 +6,7 @@
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "https://minecraft.curseforge.com/projects/dynamictrees",
-  "updateUrl": "https://github.com/DynamicTreesTeam/DynamicTreesVersionInfo/blob/master/DynamicTrees.json?raw=true",
+  "updateUrl": "https://github.com/DynamicTreesTeam/DynamicTreesVersionInfo/blob/master/DynamicTrees.json?raw=true?raw=true",
   "authorList": [ "FerreusVeritas" ],
   "credits": "",
   "logoFile": "assets/dynamictrees/logo.png",
