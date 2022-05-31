@@ -1,10 +1,11 @@
 package com.ferreusveritas.dynamictrees.compat.seasons;
 
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import sereneseasons.api.season.Season.SubSeason;
 import sereneseasons.api.season.SeasonHelper;
 import sereneseasons.config.BiomeConfig;
@@ -18,21 +19,21 @@ public class SereneSeasonsSeasonProvider implements SeasonProvider {
     private float seasonValue = 1.0f;
 
     @Override
-    public Float getSeasonValue(World world, BlockPos pos) {
+    public Float getSeasonValue(Level world, BlockPos pos) {
         return seasonValue;
     }
 
     @Override
-    public void updateTick(World world, long worldTicks) {
+    public void updateTick(Level world, long worldTicks) {
         seasonValue = ((SeasonHelper.getSeasonState(world).getSubSeason().ordinal() + 0.5f) / SubSeason.VALUES.length) * 4.0f;
     }
 
     @Override
-    public boolean shouldSnowMelt(World world, BlockPos pos) {
+    public boolean shouldSnowMelt(Level world, BlockPos pos) {
         if (SeasonsConfig.generateSnowAndIce.get() && seasonValue < com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.WINTER) {
-            final RegistryKey<Biome> biome = RegistryKey.create(Registry.BIOME_REGISTRY, Objects.requireNonNull(world.getBiome(pos).getRegistryName()));
-            return BiomeConfig.enablesSeasonalEffects(biome) &&
-                    SeasonHooks.getBiomeTemperature(world, biome, pos) >= 0.15f;
+            Holder<Biome> biomeHolder = world.getBiome(pos);
+            return BiomeConfig.enablesSeasonalEffects(biomeHolder) &&
+                    SeasonHooks.getBiomeTemperature(world, biomeHolder, pos) >= 0.15f;
         }
         return false;
     }

@@ -2,15 +2,9 @@ package com.ferreusveritas.dynamictrees.api.treepacks;
 
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
 import com.ferreusveritas.dynamictrees.deserialisation.PropertyAppliers;
-import net.minecraft.command.Commands;
-import net.minecraft.resources.DataPackRegistries;
 import net.minecraftforge.eventbus.api.GenericEvent;
+import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
-import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
-
-import java.util.List;
-import java.util.concurrent.Executor;
 
 /**
  * An event fired when a {@link JsonPropertyAppliers} is registered. This can be used for registering custom property
@@ -63,7 +57,7 @@ public class ApplierRegistryEvent<O, I> extends GenericEvent<O> implements IModB
 
     /**
      * An {@link ApplierRegistryEvent} that is fired when registering appliers that are invoked on gather data. This
-     * refers to when {@link GatherDataEvent} is fired.
+     * refers to when {@link net.minecraftforge.forge.event.lifecycle.GatherDataEvent} is fired.
      *
      * @param <O> the type of object the appliers being registered handle applying to
      * @see ApplierRegistryEvent
@@ -97,7 +91,6 @@ public class ApplierRegistryEvent<O, I> extends GenericEvent<O> implements IModB
 
     /**
      * An {@link ApplierRegistryEvent} that is fired when registering appliers that are invoked on every reload. This
-     * refers to any time {@link DataPackRegistries#loadResources(List, Commands.EnvironmentType, int, Executor,
      * Executor)} is invoked, including when launching a world and when executing the {@code /reload} command.
      *
      * @param <O> the type of object the appliers being registered handle applying to

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -172,7 +172,7 @@ public class SimpleVoxmap {
     }
 
     public SimpleVoxmap crop(BlockPos from, BlockPos to) {
-        for (BlockPos.Mutable pos : getAllNonZero()) {
+        for (BlockPos.MutableBlockPos pos : getAllNonZero()) {
             if (pos.getX() < from.getX() ||
                     pos.getY() < from.getY() ||
                     pos.getZ() < from.getZ() ||
@@ -272,10 +272,10 @@ public class SimpleVoxmap {
 
     public static class Cell {
         private byte value;
-        private final BlockPos.Mutable pos;
+        private final BlockPos.MutableBlockPos pos;
 
         public Cell() {
-            pos = new BlockPos.Mutable();
+            pos = new BlockPos.MutableBlockPos();
         }
 
         public Cell setValue(byte value) {
@@ -287,7 +287,7 @@ public class SimpleVoxmap {
             return value;
         }
 
-        public BlockPos.Mutable getPos() {
+        public BlockPos.MutableBlockPos getPos() {
             return pos;
         }
 
@@ -312,7 +312,7 @@ public class SimpleVoxmap {
                     private int z = 0;
                     private int dataPos = -1;
                     private final Cell workingCell = new Cell();
-                    private final BlockPos.Mutable dPos = workingCell.getPos();
+                    private final BlockPos.MutableBlockPos dPos = workingCell.getPos();
 
                     @Override
                     protected Cell computeNext() {
@@ -357,28 +357,28 @@ public class SimpleVoxmap {
     /**
      * Create an Iterable that returns all positions in the map whose value is non-zero
      */
-    public Iterable<BlockPos.Mutable> getAllNonZero() {
+    public Iterable<BlockPos.MutableBlockPos> getAllNonZero() {
         return getAllNonZero((byte) 0xFF);
     }
 
     /**
      * Create an Iterable that returns all positions in the map whose value is non-zero
      */
-    public Iterable<BlockPos.Mutable> getAllNonZero(final byte mask) {
+    public Iterable<BlockPos.MutableBlockPos> getAllNonZero(final byte mask) {
 
-        return new Iterable<BlockPos.Mutable>() {
+        return new Iterable<BlockPos.MutableBlockPos>() {
             @Override
-            public Iterator<BlockPos.Mutable> iterator() {
-                return new AbstractIterator<BlockPos.Mutable>() {
+            public Iterator<BlockPos.MutableBlockPos> iterator() {
+                return new AbstractIterator<BlockPos.MutableBlockPos>() {
                     private int x = -1;
                     private int y = 0;
                     private int z = 0;
                     private int dataPos = -1;
                     private boolean yclean;
-                    private final BlockPos.Mutable dPos = new BlockPos.Mutable();
+                    private final BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos();
 
                     @Override
-                    protected BlockPos.Mutable computeNext() {
+                    protected BlockPos.MutableBlockPos computeNext() {
 
                         main:
                         while (true) {
@@ -429,17 +429,17 @@ public class SimpleVoxmap {
     /**
      * Create an Iterable that returns all top(Y-axis) positions in the map whose value is non-zero
      */
-    public Iterable<BlockPos.Mutable> getTops() {
+    public Iterable<BlockPos.MutableBlockPos> getTops() {
 
-        return new Iterable<BlockPos.Mutable>() {
+        return new Iterable<BlockPos.MutableBlockPos>() {
             @Override
-            public Iterator<BlockPos.Mutable> iterator() {
-                return new AbstractIterator<BlockPos.Mutable>() {
+            public Iterator<BlockPos.MutableBlockPos> iterator() {
+                return new AbstractIterator<BlockPos.MutableBlockPos>() {
                     private int x = -1;
                     private int y = 0;
                     private int z = 0;
                     private final int yStart = getStartY();
-                    private final BlockPos.Mutable dPos = new BlockPos.Mutable();
+                    private final BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos();
 
                     protected int getStartY() {
                         int yi;
@@ -449,7 +449,7 @@ public class SimpleVoxmap {
                     }
 
                     @Override
-                    protected BlockPos.Mutable computeNext() {
+                    protected BlockPos.MutableBlockPos computeNext() {
 
                         while (true) {
                             if (x < lenX - 1) {

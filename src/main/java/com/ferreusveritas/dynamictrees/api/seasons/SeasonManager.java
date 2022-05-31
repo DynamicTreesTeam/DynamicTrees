@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.seasons;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 /**
  * Manages Seasonal output rates.
@@ -10,20 +10,20 @@ import net.minecraft.world.World;
  */
 public interface SeasonManager {
 
-    void updateTick(World world, long worldTicks);
+    void updateTick(Level world, long worldTicks);
 
     void flushMappings();
 
-    float getGrowthFactor(World world, BlockPos rootPos, float offset);
+    float getGrowthFactor(Level world, BlockPos rootPos, float offset);
 
-    float getSeedDropFactor(World world, BlockPos rootPos, float offset);
+    float getSeedDropFactor(Level world, BlockPos rootPos, float offset);
 
-    float getFruitProductionFactor(World world, BlockPos rootPos, float offset, boolean getAsScan);
+    float getFruitProductionFactor(Level world, BlockPos rootPos, float offset, boolean getAsScan);
 
-    Float getSeasonValue(World world, BlockPos rootPos);
+    Float getSeasonValue(Level world, BlockPos rootPos);
 
-    boolean isTropical(World world, BlockPos rootPos);
+    boolean isTropical(Level world, BlockPos rootPos);
 
-    boolean shouldSnowMelt(World world, BlockPos pos);
+    boolean shouldSnowMelt(Level world, BlockPos pos);
 
 }

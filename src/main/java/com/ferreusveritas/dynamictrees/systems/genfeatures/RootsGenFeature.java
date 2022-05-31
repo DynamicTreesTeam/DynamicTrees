@@ -12,14 +12,14 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 
 public class RootsGenFeature extends GenFeature {
 
@@ -28,7 +28,7 @@ public class RootsGenFeature extends GenFeature {
     public static final ConfigurationProperty<Float> SCALE_FACTOR = ConfigurationProperty.floatProperty("scale_factor");
 
     private TetraFunction<Integer, Integer, Integer, Float, Integer> scaler = (inRadius, trunkRadius, minTrunkRadius, scaleFactor) -> {
-        float scale = MathHelper.clamp(trunkRadius >= minTrunkRadius ? (trunkRadius / scaleFactor) : 0, 0, 1);
+        float scale = Mth.clamp(trunkRadius >= minTrunkRadius ? (trunkRadius / scaleFactor) : 0, 0, 1);
         return (int) (inRadius * scale);
     };
 
@@ -83,7 +83,7 @@ public class RootsGenFeature extends GenFeature {
 
     @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
-        final World world = context.world();
+        final Level world = context.world();
         final BlockPos treePos = context.treePos();
         final int trunkRadius = TreeHelper.getRadius(world, treePos);
 
@@ -91,7 +91,7 @@ public class RootsGenFeature extends GenFeature {
             final Surround surr = Surround.values()[world.random.nextInt(8)];
             final BlockPos dPos = treePos.offset(surr.getOffset());
             if (world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
-                world.setBlockAndUpdate(dPos, DTRegistries.TRUNK_SHELL.defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
+                world.setBlockAndUpdate(dPos, DTRegistries.TRUNK_SHELL.get().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
             }
 
             this.startRoots(configuration, world, treePos, context.species(), trunkRadius);
@@ -100,7 +100,7 @@ public class RootsGenFeature extends GenFeature {
         return true;
     }
 
-    public boolean startRoots(GenFeatureConfiguration configuration, IWorld world, BlockPos treePos, Species species, int trunkRadius) {
+    public boolean startRoots(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos treePos, Species species, int trunkRadius) {
         int hash = CoordUtils.coordHashCode(treePos, 2);
         SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
         this.nextRoot(world, rootMap, treePos, species, trunkRadius, configuration.get(MIN_TRUNK_RADIUS), configuration.get(SCALE_FACTOR), BlockPos.ZERO, 0,
@@ -108,7 +108,7 @@ public class RootsGenFeature extends GenFeature {
         return true;
     }
 
-    protected void nextRoot(IWorld world, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, int minTrunkRadius, float scaleFactor, BlockPos pos, int height, int levelCount, Direction fromDir, int radius, int levelLimit) {
+    protected void nextRoot(LevelAccessor world, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, int minTrunkRadius, float scaleFactor, BlockPos pos, int height, int levelCount, Direction fromDir, int radius, int levelLimit) {
 
         for (int depth = 0; depth < 2; depth++) {
             BlockPos currPos = trunkPos.offset(pos).above(height - depth);
@@ -144,7 +144,7 @@ public class RootsGenFeature extends GenFeature {
 
     }
 
-    protected boolean isReplaceableWithRoots(IWorld world, BlockState placeState, BlockPos pos) {
+    protected boolean isReplaceableWithRoots(LevelAccessor world, BlockState placeState, BlockPos pos) {
         if (world.isEmptyBlock(pos) || placeState.getBlock() instanceof TrunkShellBlock) {
             return true;
         }

@@ -1,6 +1,6 @@
 license="MIT"
 modLoader="javafml"
-loaderVersion="[36,37)"
+loaderVersion="[40,)"
 issueTrackerURL="https://github.com/DynamicTreesTeam/DynamicTrees/issues"
 
 [[mods]]
@@ -18,13 +18,13 @@ Progressively growing trees.. forests that spread'''
 [[dependencies.dynamictrees]]
     modId="forge"
     mandatory=true
-    versionRange="[36.2.20,37)"
+    versionRange="[40.1.0,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.dynamictrees]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.5,1.17)"
+    versionRange="[1.18.2,1.19)"
     ordering="NONE"
     side="BOTH"

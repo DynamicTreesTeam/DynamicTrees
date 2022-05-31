@@ -4,36 +4,36 @@ import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.substances.LingeringSubstances;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.entity.IEntityAdditionalSpawnData;
+import net.minecraftforge.network.NetworkHooks;
 
 public class LingeringEffectorEntity extends Entity implements IEntityAdditionalSpawnData {
 
     private BlockPos blockPos;
     private SubstanceEffect effect;
 
-    public LingeringEffectorEntity(EntityType<? extends LingeringEffectorEntity> entityTypeIn, World worldIn) {
+    public LingeringEffectorEntity(EntityType<? extends LingeringEffectorEntity> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
         this.blockPos = BlockPos.ZERO;
     }
 
     @SuppressWarnings("unused")
-    private LingeringEffectorEntity(World world) {
-        super(DTRegistries.LINGERING_EFFECTOR, world);
+    private LingeringEffectorEntity(Level world) {
+        super(DTRegistries.LINGERING_EFFECTOR.get(), world);
     }
 
-    public LingeringEffectorEntity(World world, BlockPos pos, SubstanceEffect effect) {
-        this(DTRegistries.LINGERING_EFFECTOR, world);
+    public LingeringEffectorEntity(Level world, BlockPos pos, SubstanceEffect effect) {
+        this(DTRegistries.LINGERING_EFFECTOR.get(), world);
         this.maxUpStep = 1f;
         this.noPhysics = true;
         this.setBlockPos(pos);
@@ -41,7 +41,7 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
 
         if (this.effect != null) {
             // Search for existing effectors with the same effect in the same place.
-            for (final LingeringEffectorEntity effector : world.getEntitiesOfClass(LingeringEffectorEntity.class, new AxisAlignedBB(pos))) {
+            for (final LingeringEffectorEntity effector : world.getEntitiesOfClass(LingeringEffectorEntity.class, new AABB(pos))) {
                 if (effector.getEffect() != null && effector.getEffect().getName().equals(effect.getName())) {
                     effector.kill(); // Kill old effector if it's the same.
                 }
@@ -49,8 +49,8 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
         }
     }
 
-    public static boolean treeHasEffectorForEffect(IWorld world, BlockPos pos, SubstanceEffect effect) {
-        for (final LingeringEffectorEntity effector : world.getEntitiesOfClass(LingeringEffectorEntity.class, new AxisAlignedBB(pos))) {
+    public static boolean treeHasEffectorForEffect(LevelAccessor world, BlockPos pos, SubstanceEffect effect) {
+        for (final LingeringEffectorEntity effector : world.getEntitiesOfClass(LingeringEffectorEntity.class, new AABB(pos))) {
             if (effector.getEffect() != null && effector.getEffect().getName().equals(effect.getName())) {
                 return true;
             }
@@ -76,11 +76,11 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundNBT compound) {
+    protected void readAdditionalSaveData(CompoundTag compound) {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundNBT compound) {
+    protected void addAdditionalSaveData(CompoundTag compound) {
     }
 
     private byte invalidTicks = 0;
@@ -109,18 +109,18 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
     }
 
     @Override
-    public IPacket<?> getAddEntityPacket() {
+    public Packet<?> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     @Override
-    public void writeSpawnData(PacketBuffer buffer) {
+    public void writeSpawnData(FriendlyByteBuf buffer) {
         // We'll assume there aren't more than 128 lingering substance effects, so send a byte.
         buffer.writeByte(this.effect == null ? -1 : LingeringSubstances.indexOf(this.effect.getClass()));
     }
 
     @Override
-    public void readSpawnData(PacketBuffer additionalData) {
+    public void readSpawnData(FriendlyByteBuf additionalData) {
         // We'll assume there aren't more than 128 lingering substance effects, so send a byte.
         final byte index = additionalData.readByte();
         this.effect = index < 0 ? null : LingeringSubstances.fromIndex(index).get();

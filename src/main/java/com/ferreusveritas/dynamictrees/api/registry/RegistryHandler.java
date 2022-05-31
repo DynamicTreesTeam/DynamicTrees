@@ -2,10 +2,12 @@ package com.ferreusveritas.dynamictrees.api.registry;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+import com.google.common.base.Suppliers;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Handles registries for the given mod ID in the constructor. Add-ons should instantiate one of these in their
@@ -88,14 +91,15 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
      * Forge from complaining - so it shouldn't have been called on the block already!
      *
      * @param registryName The {@link ResourceLocation} registry name to set for the block.
-     * @param block        The {@link Block} object to register.
+     * @param blockSup     The supplier of the {@link Block} object to register.
      * @param <T>          The {@link Class} of the {@link Block}.
-     * @return The {@link Block}, allowing for this to be called in-line.
+     * @return The supplier of the {@link Block}, allowing for this to be called in-line.
      */
-    public static <T extends Block> T addBlock(ResourceLocation registryName, final T block) {
+    public static <T extends Block> Supplier<T> addBlock(ResourceLocation registryName, Supplier<T> blockSup) {
         registryName = correctRegistryName(registryName);
-        get(registryName.getNamespace()).putBlock(registryName, block);
-        return block;
+        blockSup = Suppliers.memoize(blockSup::get);
+        get(registryName.getNamespace()).putBlock(registryName, blockSup);
+        return blockSup;
     }
 
     /**
@@ -104,18 +108,19 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
      * Forge from complaining - so it shouldn't have been called on the block already!
      *
      * @param registryName The {@link ResourceLocation} registry name to set for the block.
-     * @param item         The {@link Item} object to register.
+     * @param itemSup      The supplier of the {@link Item} object to register.
      * @param <T>          The {@link Class} of the {@link Item}.
-     * @return The {@link Item}, allowing for this to be called in-line.
+     * @return The supplier of the {@link Item}, allowing for this to be called in-line.
      */
-    public static <T extends Item> T addItem(ResourceLocation registryName, final T item) {
+    public static <T extends Item> Supplier<T> addItem(ResourceLocation registryName, Supplier<T> itemSup) {
         registryName = correctRegistryName(registryName);
-        get(registryName.getNamespace()).putItem(registryName, item);
-        return item;
+        itemSup = Suppliers.memoize(itemSup::get);
+        get(registryName.getNamespace()).putItem(registryName, itemSup);
+        return itemSup;
     }
 
-    protected final Map<ResourceLocation, Block> blocks = new LinkedHashMap<>();
-    protected final Map<ResourceLocation, Item> items = new LinkedHashMap<>();
+    protected final Map<ResourceLocation, Supplier<Block>> blocks = new LinkedHashMap<>();
+    protected final Map<ResourceLocation, Supplier<Item>> items = new LinkedHashMap<>();
 
     /**
      * Instantiates a new {@link RegistryHandler} object for the given mod ID. This should be registered using {@link
@@ -129,7 +134,7 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
     }
 
     @Nullable
-    public Block getBlock(final ResourceLocation registryName) {
+    public Supplier<Block> getBlock(final ResourceLocation registryName) {
         return this.blocks.get(registryName);
     }
 
@@ -139,7 +144,7 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
     }
 
     @Nullable
-    public Item getItem(final ResourceLocation registryName) {
+    public Supplier<Item> getItem(final ResourceLocation registryName) {
         return this.items.get(registryName);
     }
 
@@ -148,20 +153,22 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
         return this.items.entrySet().stream().filter(entry -> entry.getValue() == item).map(Map.Entry::getKey).findAny().orElse(null);
     }
 
-    public void putBlock(final ResourceLocation registryName, final Block block) {
+    @SuppressWarnings("unchecked")
+    public <T extends Block> void putBlock(final ResourceLocation registryName, final Supplier<T> blockSup) {
         if (this.warnIfInvalid("Block", registryName)) {
             return;
         }
 
-        this.blocks.put(registryName, block);
+        this.blocks.put(registryName, (Supplier<Block>) blockSup);
     }
 
-    public void putItem(final ResourceLocation registryName, final Item item) {
+    @SuppressWarnings("unchecked")
+    public <T extends Item> void putItem(final ResourceLocation registryName, final Supplier<T> itemSup) {
         if (this.warnIfInvalid("Item", registryName)) {
             return;
         }
 
-        this.items.put(registryName, item);
+        this.items.put(registryName, (Supplier<Item>) itemSup);
     }
 
     /**
@@ -178,14 +185,15 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
         return !this.isValid();
     }
 
-    @SubscribeEvent
+    // LOWEST allows DT to accumulate blocks & items from inside other listeners to this Register event if necessary
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onBlockRegistry(final RegistryEvent.Register<Block> event) {
-        this.blocks.forEach((resourceLocation, block) -> event.getRegistry().register(block.setRegistryName(resourceLocation)));
+        this.blocks.forEach((resourceLocation, block) -> event.getRegistry().register(block.get().setRegistryName(resourceLocation)));
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onItemRegistry(final RegistryEvent.Register<Item> event) {
-        this.items.forEach(((resourceLocation, item) -> event.getRegistry().register(item.setRegistryName(resourceLocation))));
+        this.items.forEach((resourceLocation, item) -> event.getRegistry().register(item.get().setRegistryName(resourceLocation)));
     }
 
 }

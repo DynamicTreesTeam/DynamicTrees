@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.substances;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * An interface for items that can have an effect on trees when right clicked.  Such as a tree potion.

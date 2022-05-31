@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.command;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 
 /**
  * An extension of {@link SubCommand} for simple commands (in this case, a command is considered "simple" if it does not
@@ -14,7 +14,7 @@ import net.minecraft.command.Commands;
 public abstract class SimpleSubCommand extends SubCommand {
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> register() {
+    public ArgumentBuilder<CommandSourceStack, ?> register() {
         return Commands.literal(this.getName()).requires(commandSource -> commandSource.hasPermission(this.getPermissionLevel()))
                 .executes(context -> executesSuccess(() -> this.execute(context)));
     }
@@ -24,7 +24,7 @@ public abstract class SimpleSubCommand extends SubCommand {
      *
      * @param context The {@link CommandContext<CommandSource>} for the executed command.
      */
-    protected abstract void execute(final CommandContext<CommandSource> context);
+    protected abstract void execute(final CommandContext<CommandSourceStack> context);
 
     /**
      * Default implementation returns {@code 0}, since commands which take no arguments are likely to be printing
@@ -39,7 +39,7 @@ public abstract class SimpleSubCommand extends SubCommand {
 
     @Override
     @SuppressWarnings("all") // This is never used so we just return null.
-    public ArgumentBuilder<CommandSource, ?> registerArgument() {
+    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return null;
     }
 

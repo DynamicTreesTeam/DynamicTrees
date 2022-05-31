@@ -4,13 +4,13 @@ import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.NativeImage;
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.Collection;
 
@@ -19,7 +19,7 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
     private final TextureAtlasSprite baseTexture;
     private final ResourceLocation baseRingResloc;
 
-    public ThickRingTextureAtlasSprite(AtlasTexture atlasTextureIn, TextureAtlasSprite.Info spriteInfoIn, int mipmapLevelsIn, int atlasWidth, int atlasHeight, int xIn, int yIn, TextureAtlasSprite baseRing, ResourceLocation baseRingResLoc) {
+    public ThickRingTextureAtlasSprite(TextureAtlas atlasTextureIn, TextureAtlasSprite.Info spriteInfoIn, int mipmapLevelsIn, int atlasWidth, int atlasHeight, int xIn, int yIn, TextureAtlasSprite baseRing, ResourceLocation baseRingResLoc) {
         super(atlasTextureIn, spriteInfoIn, mipmapLevelsIn, atlasWidth, atlasHeight, xIn, yIn, new NativeImage(atlasWidth, atlasHeight, false));
 
         this.baseTexture = baseRing;
@@ -37,10 +37,10 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
         }
     }
 
-    @Override
-    public boolean hasCustomLoader(IResourceManager manager, ResourceLocation location) {
-        return true;
-    }
+//    @Override
+//    public boolean hasCustomLoader(ResourceManager manager, ResourceLocation location) {
+//        return true;
+//    }
 
     /**
      * This compares the color of the sprite border with the color of the sprite middle and returns a the RGB delta
@@ -238,9 +238,9 @@ public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
         return antecedent;
     }
 
-    @Override
-    public Collection<ResourceLocation> getDependencies() {
-        return ImmutableList.of(baseRingResloc);
-    }
+//    @Override
+//    public Collection<ResourceLocation> getDependencies() {
+//        return ImmutableList.of(baseRingResloc);
+//    }
 
 }

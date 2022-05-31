@@ -9,6 +9,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
@@ -204,14 +205,14 @@ public class DTConfigs {
     }
 
     @SubscribeEvent
-    public static void onLoad(final ModConfig.Loading event) {
+    public static void onLoad(final ModConfigEvent.Loading event) {
         EventHandlers.configReload();
         CompatHandler.reloadSeasonManager();
         BiomeDatabases.populateBlacklistFromConfig();
     }
 
     @SubscribeEvent
-    public static void onReload(final ModConfig.Reloading event) {
+    public static void onReload(final ModConfigEvent.Reloading event) {
         EventHandlers.configReload();
         CompatHandler.reloadSeasonManager();
         BiomeDatabases.populateBlacklistFromConfig();

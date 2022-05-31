@@ -3,11 +3,11 @@ package com.ferreusveritas.dynamictrees.command;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 
 import java.util.Objects;
 
@@ -24,16 +24,16 @@ public final class KillTreeCommand extends SubCommand {
     }
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArgument() {
+    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument().executes(context -> executesSuccess(() -> this.killTree(context.getSource(), rootPosArgument(context))));
     }
 
-    private void killTree(final CommandSource source, final BlockPos rootPos) {
-        final World world = source.getLevel();
+    private void killTree(final CommandSourceStack source, final BlockPos rootPos) {
+        final Level world = source.getLevel();
 
         Objects.requireNonNull(TreeHelper.getRooty(world.getBlockState(rootPos))).destroyTree(world, rootPos);
-        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.kill_tree",
-                CommandHelper.posComponent(rootPos, TextFormatting.AQUA)));
+        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.kill_tree",
+                CommandHelper.posComponent(rootPos, ChatFormatting.AQUA)));
     }
 
 }

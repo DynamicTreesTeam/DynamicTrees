@@ -2,9 +2,13 @@ package com.ferreusveritas.dynamictrees.models.geometry;
 
 import com.ferreusveritas.dynamictrees.models.bakedmodels.RootBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.loaders.RootBlockModelLoader;
-import net.minecraft.client.renderer.model.*;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.IModelConfiguration;
 
 import java.util.function.Function;
@@ -21,7 +25,7 @@ public class RootBlockModelGeometry extends BranchBlockModelGeometry {
     }
 
     @Override
-    public IBakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<RenderMaterial, TextureAtlasSprite> spriteGetter, IModelTransform modelTransform, ItemOverrideList overrides, ResourceLocation modelLocation) {
+    public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
         return new RootBlockBakedModel(modelLocation, this.barkResLoc);
     }
 

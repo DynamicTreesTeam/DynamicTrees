@@ -2,19 +2,19 @@ package com.ferreusveritas.dynamictrees.api.resource.loading.preparation;
 
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
+import com.ferreusveritas.dynamictrees.api.resource.DTResource;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
+import com.ferreusveritas.dynamictrees.api.resource.loading.ApplicationException;
 import com.ferreusveritas.dynamictrees.api.resource.loading.StagedApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
-import com.ferreusveritas.dynamictrees.api.resource.loading.ApplicationException;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
 import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
-import com.ferreusveritas.dynamictrees.api.resource.Resource;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,7 +47,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     //////////////////////////////
 
     @Override
-    public void applyOnLoad(ResourceAccessor<JsonElement> resourceAccessor, IResourceManager resourceManager) {
+    public void applyOnLoad(ResourceAccessor<JsonElement> resourceAccessor, ResourceManager resourceManager) {
         resourceAccessor.forEach(resource -> {
             try {
                 final JsonObject object = this.prepareJson(resource);
@@ -83,7 +83,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
 
     @Override
     public void applyOnGatherData(ResourceAccessor<JsonElement> resourceAccessor,
-                                  IResourceManager resourceManager) {
+                                  ResourceManager resourceManager) {
         resourceAccessor.forEach(resource -> {
             try {
                 final JsonObject object = this.prepareJson(resource);
@@ -115,7 +115,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     //////////////////////////////
 
     @Override
-    public void applyOnSetup(ResourceAccessor<JsonElement> resourceAccessor, IResourceManager resourceManager) {
+    public void applyOnSetup(ResourceAccessor<JsonElement> resourceAccessor, ResourceManager resourceManager) {
         resourceAccessor.forEach(resource -> {
             try {
                 final JsonObject object = this.prepareJson(resource);
@@ -149,7 +149,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     //////////////////////////////
 
     @Override
-    public void applyOnReload(ResourceAccessor<JsonElement> resourceAccessor, IResourceManager resourceManager) {
+    public void applyOnReload(ResourceAccessor<JsonElement> resourceAccessor, ResourceManager resourceManager) {
         this.registry.unlock();
         resourceAccessor.forEach(resource -> {
             try {
@@ -191,7 +191,7 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     // COMMON
     //////////////////////////////
 
-    private JsonObject prepareJson(Resource<JsonElement> resource)
+    private JsonObject prepareJson(DTResource<JsonElement> resource)
             throws ApplicationException, IgnoreThrowable {
         throwIfNotJsonObject(resource.getResource(),
                 () -> new ApplicationException("Root element is not a Json object."));

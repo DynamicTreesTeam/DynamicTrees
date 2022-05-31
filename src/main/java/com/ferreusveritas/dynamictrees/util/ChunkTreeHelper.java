@@ -5,13 +5,13 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -22,12 +22,12 @@ import java.util.Optional;
  */
 public class ChunkTreeHelper {
 
-    public static int removeOrphanedBranchNodes(World world, @Nullable ChunkPos chunkPos, int radius) {
+    public static int removeOrphanedBranchNodes(Level world, @Nullable ChunkPos chunkPos, int radius) {
         if (chunkPos == null) {
             return 0;
         }
 
-        final Chunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
+        final LevelChunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
         final BlockBounds bounds = getBounds(world, chunk, radius);
         int orphansCleared = 0;
 
@@ -73,12 +73,12 @@ public class ChunkTreeHelper {
         return orphansCleared;
     }
 
-    public static int removeAllBranchesFromChunk(World world, @Nullable ChunkPos chunkPos, int radius) {
+    public static int removeAllBranchesFromChunk(Level world, @Nullable ChunkPos chunkPos, int radius) {
         if (chunkPos == null) {
             return 0;
         }
 
-        final Chunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
+        final LevelChunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
         final BlockBounds bounds = getBounds(world, chunk, radius);
 
         int treesCleared = 0;
@@ -96,7 +96,7 @@ public class ChunkTreeHelper {
         return treesCleared;
     }
 
-    private static BlockBounds getBounds(final World world, final Chunk chunk, int radius) {
+    private static BlockBounds getBounds(final Level world, final LevelChunk chunk, int radius) {
         final BlockBounds bounds = new BlockBounds(chunk.getPos());
 
         bounds.shrink(Direction.UP, world.getHeight() - 1 - (getTopFilledSegment(chunk) + 16));
@@ -107,17 +107,17 @@ public class ChunkTreeHelper {
         return bounds;
     }
 
-    private static int getTopFilledSegment(final Chunk chunk) {
-        final ChunkSection lastChunkSection = getLastSection(chunk);
+    private static int getTopFilledSegment(final LevelChunk chunk) {
+        final LevelChunkSection lastChunkSection = getLastSection(chunk);
         return lastChunkSection == null ? 0 : lastChunkSection.bottomBlockY();
     }
 
     @Nullable
-    private static ChunkSection getLastSection(final Chunk chunk) {
-        final ChunkSection[] sections = chunk.getSections();
+    private static LevelChunkSection getLastSection(final LevelChunk chunk) {
+        final LevelChunkSection[] sections = chunk.getSections();
 
         for (int i = sections.length - 1; i >= 0; i--) {
-            if (sections[i] != null && !sections[i].isEmpty()) {
+            if (sections[i] != null && !sections[i].hasOnlyAir()) {
                 return sections[i];
             }
         }

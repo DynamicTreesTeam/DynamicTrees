@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.configurations;
 
-import com.ferreusveritas.dynamictrees.api.resource.Resource;
+import com.ferreusveritas.dynamictrees.api.resource.DTResource;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonResourcePreparer;
@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.Collections;
@@ -32,7 +32,7 @@ public class ConfigurationTemplateResourceLoader<C extends Configuration<C, E>, 
     }
 
     @Override
-    public void applyOnReload(ResourceAccessor<JsonElement> resourceAccessor, IResourceManager resourceManager) {
+    public void applyOnReload(ResourceAccessor<JsonElement> resourceAccessor, ResourceManager resourceManager) {
         resourceAccessor.forEach(resource -> {
             try {
                 this.register(resource.map(JsonElement::getAsJsonObject));
@@ -44,7 +44,7 @@ public class ConfigurationTemplateResourceLoader<C extends Configuration<C, E>, 
         });
     }
 
-    protected void register(Resource<JsonObject> resource) throws DeserialisationException {
+    protected void register(DTResource<JsonObject> resource) throws DeserialisationException {
         this.assertNameNotReserved(resource);
 
         final List<PropertyDefinition<?>> propertyDefinitions =
@@ -56,7 +56,7 @@ public class ConfigurationTemplateResourceLoader<C extends Configuration<C, E>, 
     }
 
     @SuppressWarnings("unchecked")
-    private CustomConfigurationTemplate<C> createTemplate(Resource<JsonObject> resource,
+    private CustomConfigurationTemplate<C> createTemplate(DTResource<JsonObject> resource,
                                                           List<PropertyDefinition<?>> propertyDefinitions,
                                                           E configurable) {
         return new CustomConfigurationTemplate<>(
@@ -67,7 +67,7 @@ public class ConfigurationTemplateResourceLoader<C extends Configuration<C, E>, 
         );
     }
 
-    private E getConfigurable(Resource<JsonObject> resource) throws DeserialisationException {
+    private E getConfigurable(DTResource<JsonObject> resource) throws DeserialisationException {
         return this.configurableRegistry.get(
                 this.getConfigurableName(resource.getResource())
         );
@@ -89,7 +89,7 @@ public class ConfigurationTemplateResourceLoader<C extends Configuration<C, E>, 
                 .orElse(Collections.emptyList());
     }
 
-    private void assertNameNotReserved(Resource<?> resource) throws DeserialisationException {
+    private void assertNameNotReserved(DTResource<?> resource) throws DeserialisationException {
         if (this.configurableRegistry.has(resource.getLocation())) {
             throw new DeserialisationException("Cannot override default configuration of " +
                     this.configurableRegistry.getType().getSimpleName() + " with key \"" + resource.getLocation() +

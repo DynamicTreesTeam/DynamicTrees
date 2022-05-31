@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.blocks.leaves;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.Ageable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.cells.Cell;
+import com.ferreusveritas.dynamictrees.api.cells.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
@@ -18,41 +18,43 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.RayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.util.ToolTypes;
-import net.minecraft.block.*;
-import net.minecraft.block.material.PushReaction;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.passive.BeeEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ShearsItem;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Bee;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShearsItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nonnull;
@@ -81,7 +83,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(DISTANCE, PERSISTENT);
     }
 
@@ -94,38 +96,38 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public Family getFamily(BlockState state, IBlockReader reader, BlockPos pos) {
+    public Family getFamily(BlockState state, BlockGetter reader, BlockPos pos) {
         return getProperties(state).getFamily();
     }
 
     // Get Leaves-specific flammability
     @Override
-    public int getFlammability(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+    public int getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return this.getProperties(world.getBlockState(pos)).getFlammability();
     }
 
     // Get Leaves-specific fire spread speed
     @Override
-    public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+    public int getFireSpreadSpeed(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return this.getProperties(world.getBlockState(pos)).getFireSpreadSpeed();
     }
 
     @Override
-    public boolean isFlammable(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+    public boolean isFlammable(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return this.getFlammability(state, world, pos, face) > 0 || face == Direction.UP;
     }
 
     @Nonnull
-    public BlockState updateShape(@Nonnull BlockState stateIn, Direction facing, BlockState facingState, @Nonnull IWorld worldIn, @Nonnull BlockPos currentPos, BlockPos facingPos) {
+    public BlockState updateShape(@Nonnull BlockState stateIn, Direction facing, BlockState facingState, @Nonnull LevelAccessor worldIn, @Nonnull BlockPos currentPos, BlockPos facingPos) {
         return stateIn;
     }
 
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState();
     }
 
     @Override
-    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
+    public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random rand) {
         if (rand.nextInt(DTConfigs.TREE_GROWTH_FOLDING.get()) != 0) {
             return;
         }
@@ -153,16 +155,16 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
     }
 
-    protected void doTick(World world, BlockPos pos, BlockState state, Random rand) {
+    protected void doTick(Level world, BlockPos pos, BlockState state, Random rand) {
         if (canTickAt(world, pos) && getProperties(state).updateTick(world, pos, state, rand)) {
             age(world, pos, state, rand, SafeChunkBounds.ANY);
         }
     }
 
-    protected boolean canTickAt(World world, BlockPos pos) {
+    protected boolean canTickAt(Level world, BlockPos pos) {
         // Check 2 blocks away for loaded chunks
         int xm = pos.getX() - ((pos.getX() >> 4) << 4);
         int zm = pos.getZ() - ((pos.getZ() >> 4) << 4);
@@ -177,7 +179,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public int age(IWorld world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
+    public int age(LevelAccessor world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
         final LeavesProperties leavesProperties = getProperties(state);
         final int oldHydro = state.getValue(DynamicLeavesBlock.DISTANCE);
 
@@ -227,17 +229,17 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      * @param worldGen             true if this is happening during worldgen
      * @return A provider for adding more blockstate properties
      */
-    public BlockState getLeavesBlockStateForPlacement(IWorld world, BlockPos pos, BlockState leavesStateWithHydro, int oldHydro, boolean worldGen) {
+    public BlockState getLeavesBlockStateForPlacement(LevelAccessor world, BlockPos pos, BlockState leavesStateWithHydro, int oldHydro, boolean worldGen) {
         return leavesStateWithHydro; //by default just pass the blockstate along
     }
 
     @Override
-    public float getDestroyProgress(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+    public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
         return getProperties(state).getPrimitiveLeaves().getDestroyProgress(player, worldIn, pos);
     }
 
     @Override
-    public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
         return getProperties(state).getPrimitiveLeavesItemStack();
     }
 
@@ -246,23 +248,23 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      * crushBlock()
      */
     @Override
-    public boolean addLandingEffects(BlockState state1, ServerWorld world, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+    public boolean addLandingEffects(BlockState state1, ServerLevel world, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
         return true;
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         // This is for blocks that check the shape, for example snow.
-        if (context.getEntity() == null) {
-            return VoxelShapes.block();
-        }
+//        if (context.getEntity() == null) {
+//            return Shapes.block();
+//        }
 
         if (isLeavesPassable() || this.isEntityPassable(context)) {
-            return VoxelShapes.empty();
+            return Shapes.empty();
         } else if (DTConfigs.VANILLA_LEAVES_COLLISION.get()) {
-            return VoxelShapes.block();
+            return Shapes.block();
         } else {
-            return VoxelShapes.create(new AxisAlignedBB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
+            return Shapes.create(new AABB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
         }
     }
 
@@ -270,12 +272,15 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return DTConfigs.IS_LEAVES_PASSABLE.get() || ModList.get().isLoaded(DynamicTrees.PASSABLE_FOLIAGE);
     }
 
-    public boolean isEntityPassable(ISelectionContext context) {
-        return isEntityPassable(context.getEntity());
+    public boolean isEntityPassable(CollisionContext context) {
+        if(context instanceof EntityCollisionContext entityCollisionContext) {
+            return isEntityPassable(entityCollisionContext.getEntity());
+        }
+        return false;
     }
 
     public boolean isEntityPassable(@Nullable Entity entity) {
-        if (entity instanceof ProjectileEntity) //Projectiles such as arrows fly through leaves
+        if (entity instanceof Projectile) //Projectiles such as arrows fly through leaves
         {
             return true;
         }
@@ -285,13 +290,15 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         }
         if (entity instanceof LivingEntity) //Bees fly through leaves, otherwise they get stuck :(
         {
-            return entity instanceof BeeEntity;
+            return entity instanceof Bee;
         }
         return false;
     }
 
+
+
     @Override
-    public void fallOn(World world, BlockPos pos, Entity entity, float fallDistance) {
+    public void fallOn(Level world,BlockState blockState, BlockPos pos, Entity entity, float fallDistance) {
         // We are only interested in Living things crashing through the canopy.
         if (!DTConfigs.CANOPY_CRASH.get() || !(entity instanceof LivingEntity)) {
             return;
@@ -299,19 +306,19 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
         entity.fallDistance--;
 
-        final AxisAlignedBB aabb = entity.getBoundingBox();
+        final AABB aabb = entity.getBoundingBox();
 
-        final int minX = MathHelper.floor(aabb.minX + 0.001D);
-        final int minZ = MathHelper.floor(aabb.minZ + 0.001D);
-        final int maxX = MathHelper.floor(aabb.maxX - 0.001D);
-        final int maxZ = MathHelper.floor(aabb.maxZ - 0.001D);
+        final int minX = Mth.floor(aabb.minX + 0.001D);
+        final int minZ = Mth.floor(aabb.minZ + 0.001D);
+        final int maxX = Mth.floor(aabb.maxX - 0.001D);
+        final int maxZ = Mth.floor(aabb.maxZ - 0.001D);
 
         boolean crushing = true;
         boolean hasLeaves = true;
 
         final SoundType stepSound = this.getSoundType(world.getBlockState(pos), world, pos, entity);
-        final float volume = MathHelper.clamp(stepSound.getVolume() / 16.0f * fallDistance, 0, 3.0f);
-        world.playLocalSound(entity.getX(), entity.getY(), entity.getZ(), stepSound.getBreakSound(), SoundCategory.BLOCKS, volume, stepSound.getPitch(), false);
+        final float volume = Mth.clamp(stepSound.getVolume() / 16.0f * fallDistance, 0, 3.0f);
+        world.playLocalSound(entity.getX(), entity.getY(), entity.getZ(), stepSound.getBreakSound(), SoundSource.BLOCKS, volume, stepSound.getPitch(), false);
 
         for (int iy = 0; (entity.fallDistance > 3.0f) && crushing && ((pos.getY() - iy) > 0); iy++) {
             if (hasLeaves) { // This layer has leaves that can help break our fall
@@ -336,7 +343,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public void entityInside(BlockState state, World world, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
         if (isLeavesPassable() || isEntityPassable(entity)) {
             super.entityInside(state, world, pos, entity);
         } else {
@@ -361,7 +368,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      * @param hydro      The hydration value for the resulting cell
      * @return {@code true} if the location was suitable (and so leaves were placed); {@code false} otherwise.
      */
-    public boolean growLeavesIfLocationIsSuitable(IWorld world, LeavesProperties leavesProp, BlockPos pos, int hydro) {
+    public boolean growLeavesIfLocationIsSuitable(LevelAccessor world, LeavesProperties leavesProp, BlockPos pos, int hydro) {
         hydro = hydro == 0 ? leavesProp.getCellKit().getDefaultHydration() : hydro;
         if (isLocationSuitableForNewLeaves(world, leavesProp, pos)) {
             world.setBlock(pos, getLeavesBlockStateForPlacement(world, pos, leavesProp.getDynamicLeavesState(hydro), 0, false), 2); // Removed Notify Neighbors Flag for performance.
@@ -373,12 +380,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     /**
      * Checks the {@link Block} at the given {@link BlockPos} is suitable for growing new leaves.
      *
-     * @param world            The {@link World} instance.
+     * @param world            The {@link Level} instance.
      * @param leavesProperties The {@link LeavesProperties} instance.
      * @param pos              The {@link BlockPos} for the new leaves.
      * @return {@code true} if the {@link BlockPos} is suitable for new leaves; {@code false} otherwise.
      */
-    public boolean isLocationSuitableForNewLeaves(IWorld world, LeavesProperties leavesProperties, BlockPos pos) {
+    public boolean isLocationSuitableForNewLeaves(LevelAccessor world, LeavesProperties leavesProperties, BlockPos pos) {
         final BlockState blockState = world.getBlockState(pos);
         final Block block = blockState.getBlock();
 
@@ -389,7 +396,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         final BlockState belowBlockState = world.getBlockState(pos.below());
 
         // Prevent leaves from growing on the ground or above liquids.
-        if (!leavesProperties.canGrowOnGround() && ((belowBlockState.canOcclude() && !TreeHelper.isBranch(belowBlockState) && !(belowBlockState.getBlock() instanceof LeavesBlock)) || belowBlockState.getBlock() instanceof FlowingFluidBlock)) {
+        if (!leavesProperties.canGrowOnGround() && ((belowBlockState.canOcclude() && !TreeHelper.isBranch(belowBlockState) && !(belowBlockState.getBlock() instanceof LeavesBlock)) || belowBlockState.getBlock() instanceof LiquidBlock)) {
             return false;
         }
 
@@ -412,12 +419,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      * Checks that the {@link DynamicLeavesBlock} at the given {@link BlockPos} has enough light to exist.
      *
      * @param blockState       The {@link BlockState} of the {@link DynamicLeavesBlock} to check.
-     * @param world            The {@link IWorld} instance.
+     * @param world            The {@link LevelAccessor} instance.
      * @param leavesProperties The {@link LeavesProperties} instance.
      * @param pos              The {@link BlockPos} of the {@link DynamicLeavesBlock}.
      * @return {@code true} if the {@link Block} has adequate light; {@code false otherwise}.
      */
-    public boolean hasAdequateLight(BlockState blockState, IWorld world, LeavesProperties leavesProperties, BlockPos pos) {
+    public boolean hasAdequateLight(BlockState blockState, LevelAccessor world, LeavesProperties leavesProperties, BlockPos pos) {
 
         // If clear sky is above the block then we needn't go any further.
         if (world.canSeeSkyFromBelowWater(pos)) {
@@ -448,17 +455,17 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 		    If it's empty space then don't create leaves unless it's sufficiently bright.
 		    The range allows for adaptation to the hysteric effect that could cause blocks to rapidly appear and disappear. */
 
-        return world.getBrightness(LightType.SKY, pos) >= (TreeHelper.isLeaves(blockState) ? leavesProperties.getLightRequirement() - 2 : leavesProperties.getLightRequirement());
+        return world.getBrightness(LightLayer.SKY, pos) >= (TreeHelper.isLeaves(blockState) ? leavesProperties.getLightRequirement() - 2 : leavesProperties.getLightRequirement());
     }
 
     /**
      * Checks if the {@link DynamicLeavesBlock} at the given {@link BlockPos} is at the bottom of the stack.
      *
-     * @param world The {@link World} instance.
+     * @param world The {@link Level} instance.
      * @param pos   The {@link BlockPos} for the leaves {@link Block} to check.
      * @return {@code true} if the {@link Block} is at the bottom of the stack; {@code false} otherwise.
      */
-    public static boolean isBottom(IWorld world, BlockPos pos) {
+    public static boolean isBottom(LevelAccessor world, BlockPos pos) {
         final BlockState belowBlockState = world.getBlockState(pos.below());
         final TreePart belowTreepart = TreeHelper.getTreePart(belowBlockState);
 
@@ -472,12 +479,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     /**
      * Gathers hydration levels from neighbors before pushing the values into the solver.
      *
-     * @param world            The {@link IWorld} instance.
+     * @param world            The {@link LevelAccessor} instance.
      * @param pos              The {@link BlockPos} to get neighbors for.
      * @param leavesProperties The {@link LeavesProperties} instance.
      * @return The hydration from the solved cells.
      */
-    public int getHydrationLevelFromNeighbors(IWorld world, BlockPos pos, LeavesProperties leavesProperties) {
+    public int getHydrationLevelFromNeighbors(LevelAccessor world, BlockPos pos, LeavesProperties leavesProperties) {
         final Cell[] cells = new Cell[6];
 
         for (Direction dir : Direction.values()) {
@@ -492,12 +499,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public Cell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
+    public Cell getHydrationCell(BlockGetter reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesProperties) {
         return dir != null ? leavesProperties.getCellKit().getCellForLeaves(state.getValue(LeavesBlock.DISTANCE)) : CellNull.NULL_CELL;
     }
 
     @Override
-    public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
+    public GrowSignal growSignal(Level world, BlockPos pos, GrowSignal signal) {
         if (signal.step()) // This is always placed at the beginning of every growSignal function.
         {
             this.branchOut(world, pos, signal); // When a growth signal hits a leaf block it attempts to become a tree branch.}
@@ -509,12 +516,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      * Will place a leaves block if the position is air and it's possible to create one there. Otherwise it will check
      * to see if the block is already there.
      *
-     * @param world            The {@link World} instance.
+     * @param world            The {@link Level} instance.
      * @param pos              The {@link BlockPos} to check.
      * @param leavesProperties The {@link LeavesProperties} required.
      * @return {@code true} if the leaves are at the given {@link BlockPos}; {@code false} otherwise.
      */
-    public boolean needLeaves(World world, BlockPos pos, LeavesProperties leavesProperties, Species species) {
+    public boolean needLeaves(Level world, BlockPos pos, LeavesProperties leavesProperties, Species species) {
         if (world.isEmptyBlock(pos)) { // Place leaves if air.
             return this.growLeavesIfLocationIsSuitable(world, leavesProperties, pos, leavesProperties.getCellKit().getDefaultHydration());
         } else { // Otherwise check if there's already this type of leaves there.
@@ -525,7 +532,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         }
     }
 
-    public GrowSignal branchOut(World world, BlockPos pos, GrowSignal signal) {
+    public GrowSignal branchOut(Level world, BlockPos pos, GrowSignal signal) {
 
         Species species = signal.getSpecies();
         LeavesProperties leavesProperties = species.getLeavesProperties();
@@ -566,7 +573,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public int probabilityForBlock(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from) {
+    public int probabilityForBlock(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from) {
         return from.getFamily().isCompatibleDynamicLeaves(from.getFamily().getCommonSpecies(), state, reader, pos) ? 2 : 0;
     }
 
@@ -575,17 +582,17 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     //////////////////////////////
 
     @Override
-    public boolean canHarvestBlock(BlockState state, IBlockReader world, BlockPos pos, PlayerEntity player) {
+    public boolean canHarvestBlock(BlockState state, BlockGetter world, BlockPos pos, Player player) {
         return true; // We'll handle this in #getDrops as some leave drops may not require a tool.
     }
 
     @Override
-    public boolean isShearable(@Nonnull ItemStack item, World world, BlockPos pos) {
+    public boolean isShearable(@Nonnull ItemStack item, Level world, BlockPos pos) {
         return this.getProperties(world.getBlockState(pos)).doRequireShears();
     }
 
     @Override
-    public List<ItemStack> onSheared(@Nullable PlayerEntity player, ItemStack item, World world, BlockPos pos, int fortune) {
+    public List<ItemStack> onSheared(@Nullable Player player, ItemStack item, Level world, BlockPos pos, int fortune) {
         return this.getDrops(player, item, world, pos, fortune);
     }
 
@@ -593,18 +600,18 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      * Gets the drops for this {@link DynamicLeavesBlock}. Default implementation simply returns the primitive leaves
      * stack.
      *
-     * @param player  The {@link PlayerEntity} who destroyed the {@link DynamicLeavesBlock}.
+     * @param player  The {@link Player} who destroyed the {@link DynamicLeavesBlock}.
      * @param item    The {@link ItemStack} used to destroy the {@link DynamicLeavesBlock}.
-     * @param world   The {@link World} instance.
+     * @param world   The {@link Level} instance.
      * @param pos     The {@link BlockPos} of the {@link DynamicLeavesBlock}.
      * @param fortune The {@code fortune} on the tool used.
      * @return The {@link List} of {@link ItemStack}s to drop.
      */
-    public List<ItemStack> getDrops(@Nullable PlayerEntity player, ItemStack item, World world, BlockPos pos, int fortune) {
+    public List<ItemStack> getDrops(@Nullable Player player, ItemStack item, Level world, BlockPos pos, int fortune) {
         return new ArrayList<>(Collections.singletonList(this.getProperties(world.getBlockState(pos)).getPrimitiveLeavesItemStack()));
     }
 
-    public boolean shouldDrop(BlockState state, IBlockReader world, BlockPos pos, PlayerEntity player) {
+    public boolean shouldDrop(BlockState state, BlockGetter world, BlockPos pos, Player player) {
         final ItemStack stack = player.getMainHandItem();
         final Item item = stack.getItem();
 
@@ -615,11 +622,11 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
         // Since shears don't have a ToolType, requireShears acts as an override for shears not extending ShearsItem.
         if (this.getProperties(state).doRequireShears()) {
-            return item instanceof ShearsItem || item.getToolTypes(stack).contains(ToolTypes.SHEARS);
+            return item instanceof ShearsItem || stack.is(Tags.Items.SHEARS);
         }
 
-        final ToolType harvestTool = this.getHarvestTool(state);
-        return harvestTool != null && item.getToolTypes(stack).contains(harvestTool);
+//        final ToolType harvestTool = this.getHarvestTool(state);
+        return ForgeHooks.isCorrectToolForDrops(this.defaultBlockState(),player);
     }
 
     @Override
@@ -630,9 +637,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         }
 
         final List<ItemStack> ret = new ArrayList<>();
-        final Entity entity = builder.getOptionalParameter(LootParameters.THIS_ENTITY);
-        final PlayerEntity player = entity instanceof PlayerEntity ? (PlayerEntity) entity : null;
-        final Vector3d builderPos = builder.getOptionalParameter(LootParameters.ORIGIN);
+        final Entity entity = builder.getOptionalParameter(LootContextParams.THIS_ENTITY);
+        final Player player = entity instanceof Player ? (Player) entity : null;
+        final Vec3 builderPos = builder.getOptionalParameter(LootContextParams.ORIGIN);
         final BlockPos builderBlockPos = new BlockPos(builderPos.x(), builderPos.y(), builderPos.z());
 
         int fortuneLevel = 0;
@@ -646,7 +653,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return species.getDrops(
                 DropCreator.Type.LEAVES,
                 new DropContext(builder.getLevel(), builderBlockPos, species, ret,
-                        Optional.ofNullable(builder.getOptionalParameter(LootParameters.TOOL)).orElse(ItemStack.EMPTY),
+                        Optional.ofNullable(builder.getOptionalParameter(LootContextParams.TOOL)).orElse(ItemStack.EMPTY),
                         -1, fortuneLevel)
         );
     }
@@ -655,13 +662,13 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      * Gets the exact {@link Species} for these leaves (if able to find branches nearby). Warning! Resource intensive
      * algorithm. Use only for interactions like breaking blocks.
      *
-     * @param world            The {@link World} instance.
+     * @param world            The {@link Level} instance.
      * @param pos              The {@link BlockPos} of the {@link DynamicLeavesBlock}.
      * @param leavesProperties The {@link LeavesProperties} instance.
      * @return The {@link Species} for the given leaves; otherwise {@link Species#NULL_SPECIES} if branches could not be
      * found nearby.
      */
-    Species getExactSpecies(@Nullable final World world, final BlockPos pos, final LeavesProperties leavesProperties) {
+    Species getExactSpecies(@Nullable final Level world, final BlockPos pos, final LeavesProperties leavesProperties) {
         if (world == null) {
             return Species.NULL_SPECIES;
         }
@@ -709,7 +716,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     //////////////////////////////
 
     @Override
-    public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+    public int getRadiusForConnection(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         return getProperties(state).getRadiusForConnection(state, reader, pos, from, side, fromRadius);
     }
 
@@ -722,17 +729,17 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      * Generally Leaves blocks should not be analyzed
      */
     @Override
-    public boolean shouldAnalyse(BlockState state, IBlockReader reader, BlockPos pos) {
+    public boolean shouldAnalyse(BlockState state, BlockGetter reader, BlockPos pos) {
         return false;
     }
 
     @Override
-    public MapSignal analyse(BlockState state, IWorld world, BlockPos pos, Direction fromDir, MapSignal signal) {
+    public MapSignal analyse(BlockState state, LevelAccessor world, BlockPos pos, Direction fromDir, MapSignal signal) {
         return signal; // Shouldn't need to run analysis on leaf blocks.
     }
 
     @Override
-    public int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+    public int branchSupport(BlockState state, BlockGetter reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
         // Leaves are only support for "twigs".
         return radius == branch.getFamily().getPrimaryThickness() && branch.getFamily() == getFamily(state, reader, pos) ? BranchBlock.setSupport(0, 1) : 0;
     }
@@ -753,7 +760,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public float getShadeBrightness(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public float getShadeBrightness(BlockState state, BlockGetter worldIn, BlockPos pos) {
         return 0.2F;
     }
 

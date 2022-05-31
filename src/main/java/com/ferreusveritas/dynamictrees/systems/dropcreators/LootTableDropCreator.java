@@ -5,11 +5,11 @@ import com.ferreusveritas.dynamictrees.data.DTLootParameterSets;
 import com.ferreusveritas.dynamictrees.data.DTLootParameters;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.loot.LootTable;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 /**
  * @author Harley O'Connor
@@ -41,9 +41,9 @@ public final class LootTableDropCreator extends DropCreator {
 
     @Override
     public void appendHarvestDrops(DropCreatorConfiguration configuration, DropContext context) {
-        context.drops().addAll(((ServerWorld) context.world()).getServer().getLootTables().get(configuration.get(HARVEST_TABLE))
-                .getRandomItems(new LootContext.Builder((ServerWorld) context.world())
-                        .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
+        context.drops().addAll(((ServerLevel) context.world()).getServer().getLootTables().get(configuration.get(HARVEST_TABLE))
+                .getRandomItems(new LootContext.Builder((ServerLevel) context.world())
+                        .withParameter(LootContextParams.BLOCK_STATE, context.world().getBlockState(context.pos()))
                         .withParameter(DTLootParameters.SPECIES, context.species())
                         .withParameter(DTLootParameters.FERTILITY, context.fertility())
                         .withParameter(DTLootParameters.FORTUNE, context.fortune())
@@ -54,9 +54,9 @@ public final class LootTableDropCreator extends DropCreator {
 
     @Override
     public void appendVoluntaryDrops(DropCreatorConfiguration configuration, DropContext context) {
-        context.drops().addAll(((ServerWorld) context.world()).getServer().getLootTables().get(configuration.get(VOLUNTARY_TABLE))
-                .getRandomItems(new LootContext.Builder((ServerWorld) context.world())
-                        .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
+        context.drops().addAll(((ServerLevel) context.world()).getServer().getLootTables().get(configuration.get(VOLUNTARY_TABLE))
+                .getRandomItems(new LootContext.Builder((ServerLevel) context.world())
+                        .withParameter(LootContextParams.BLOCK_STATE, context.world().getBlockState(context.pos()))
                         .withParameter(DTLootParameters.SPECIES, context.species())
                         .withParameter(DTLootParameters.FERTILITY, context.fertility())
                         .create(DTLootParameterSets.VOLUNTARY)
@@ -66,10 +66,10 @@ public final class LootTableDropCreator extends DropCreator {
 
     @Override
     public void appendLeavesDrops(DropCreatorConfiguration configuration, DropContext context) {
-        context.drops().addAll(((ServerWorld) context.world()).getServer().getLootTables().get(configuration.get(LEAVES_TABLE))
-                .getRandomItems(new LootContext.Builder((ServerWorld) context.world())
-                        .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
-                        .withParameter(LootParameters.TOOL, context.tool())
+        context.drops().addAll(((ServerLevel) context.world()).getServer().getLootTables().get(configuration.get(LEAVES_TABLE))
+                .getRandomItems(new LootContext.Builder((ServerLevel) context.world())
+                        .withParameter(LootContextParams.BLOCK_STATE, context.world().getBlockState(context.pos()))
+                        .withParameter(LootContextParams.TOOL, context.tool())
                         .withParameter(DTLootParameters.SPECIES, context.species())
                         .withParameter(DTLootParameters.FORTUNE, context.fortune())
                         .create(DTLootParameterSets.LEAVES)
@@ -79,10 +79,10 @@ public final class LootTableDropCreator extends DropCreator {
 
     @Override
     public void appendLogDrops(DropCreatorConfiguration configuration, LogDropContext context) {
-        context.drops().addAll(((ServerWorld) context.world()).getServer().getLootTables().get(configuration.get(LOGS_TABLE))
-                .getRandomItems(new LootContext.Builder((ServerWorld) context.world())
-                        .withParameter(LootParameters.BLOCK_STATE, context.world().getBlockState(context.pos()))
-                        .withParameter(LootParameters.TOOL, context.tool())
+        context.drops().addAll(((ServerLevel) context.world()).getServer().getLootTables().get(configuration.get(LOGS_TABLE))
+                .getRandomItems(new LootContext.Builder((ServerLevel) context.world())
+                        .withParameter(LootContextParams.BLOCK_STATE, context.world().getBlockState(context.pos()))
+                        .withParameter(LootContextParams.TOOL, context.tool())
                         .withParameter(DTLootParameters.SPECIES, context.species())
                         .withParameter(DTLootParameters.LOGS_AND_STICKS, context.species().getLogsAndSticks(context.volume()))
                         .create(DTLootParameterSets.LOGS)

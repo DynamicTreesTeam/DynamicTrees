@@ -15,14 +15,13 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.LeavesBlock;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class PalmSpecies extends Species {
     }
 
     @Override
-    public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
+    public boolean postGrow(Level world, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
         BlockState trunkBlockState = world.getBlockState(treePos);
         BranchBlock branch = TreeHelper.getBranch(trunkBlockState);
         if (branch == null) {
@@ -63,7 +62,7 @@ public class PalmSpecies extends Species {
         return super.postGrow(world, rootPos, treePos, fertility, natural);
     }
 
-    public boolean transitionToTree(World world, BlockPos pos) {
+    public boolean transitionToTree(Level world, BlockPos pos) {
         //Ensure planting conditions are right
         Family family = getFamily();
         if (world.isEmptyBlock(pos.above()) && isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()))) {
@@ -81,7 +80,7 @@ public class PalmSpecies extends Species {
 
     @Override
     public void postGeneration(PostGenerationContext context) {
-        final IWorld world = context.world();
+        final LevelAccessor world = context.world();
 
         if (!context.endPoints().isEmpty()) {
             BlockPos tip = context.endPoints().get(0).above(2);

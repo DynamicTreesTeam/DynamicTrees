@@ -1,12 +1,13 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.RadiusCoordinator;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SharedSeedRandom;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.PerlinNoiseGenerator;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.RandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.synth.PerlinSimplexNoise;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,15 +15,15 @@ import java.util.function.Function;
 
 public class BiomeRadiusCoordinator implements RadiusCoordinator {
 
-    public PerlinNoiseGenerator noiseGenerator;
+    public PerlinSimplexNoise noiseGenerator;
     protected final TreeGenerator treeGenerator;
-    protected final IWorld world;
+    protected final LevelAccessor world;
     protected final ResourceLocation dimRegName;
     protected int pass;
     protected Function<Integer, Integer> chunkMultipass;
 
-    public BiomeRadiusCoordinator(TreeGenerator treeGenerator, ResourceLocation dimRegName, IWorld world) {
-        this.noiseGenerator = new PerlinNoiseGenerator(new SharedSeedRandom(96), new ArrayList<>(Collections.singletonList(1)));
+    public BiomeRadiusCoordinator(TreeGenerator treeGenerator, ResourceLocation dimRegName, LevelAccessor world) {
+        this.noiseGenerator = new PerlinSimplexNoise(new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(96)), new ArrayList<>(Collections.singletonList(1)));
         this.world = world;
         this.dimRegName = dimRegName;
         this.treeGenerator = treeGenerator;
@@ -36,9 +37,9 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
         }
 
         final double scale = 128; // Effectively scales up the noisemap
-        final Biome biome = this.world.getUncachedNoiseBiome((x + 8) >> 2, 0, (z + 8) >> 2); // Placement is offset by +8,+8
+        final Biome biome = this.world.getUncachedNoiseBiome((x + 8) >> 2, 0, (z + 8) >> 2).value(); // Placement is offset by +8,+8
 
-        final double noiseDensity = (this.noiseGenerator.getSurfaceNoiseValue(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
+        final double noiseDensity = 1.0;//(this.noiseGenerator.getSurfaceNoiseValue(x / scale, 0, z / scale, 1.0) + 1D) / 2.0D; // Gives 0.0 to 1.0
         final double density = BiomeDatabases.getDimensionalOrDefault(this.dimRegName)
                 .getDensitySelector(biome).getDensity(this.world.getRandom(), noiseDensity);
         final double size = ((1.0 - density) * 9); // Size is the inverse of density (gives 0 to 9)
@@ -49,7 +50,7 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
         int shakelow = (kindaRandom & 0x3) % 3; // Produces 0,0,1 or 2
         int shakehigh = (kindaRandom & 0xc) % 3; // Produces 0,0,1 or 2
 
-        return MathHelper.clamp((int) size, 2 + shakelow, 8 - shakehigh); // Clamp to tree volume radius range
+        return Mth.clamp((int) size, 2 + shakelow, 8 - shakehigh); // Clamp to tree volume radius range
     }
 
     @Override
@@ -57,7 +58,7 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
         this.pass = pass;
 
         if (pass == 0) {
-            final Biome biome = this.world.getUncachedNoiseBiome(((chunkX << 4) + 8) >> 2, 0, ((chunkZ << 4) + 8) >> 2); // Aim at center of chunk
+            final Biome biome = this.world.getUncachedNoiseBiome(((chunkX << 4) + 8) >> 2, 0, ((chunkZ << 4) + 8) >> 2).value(); // Aim at center of chunk
             this.chunkMultipass = BiomeDatabases.getDimensionalOrDefault(this.dimRegName).getMultipass(biome);
         }
 

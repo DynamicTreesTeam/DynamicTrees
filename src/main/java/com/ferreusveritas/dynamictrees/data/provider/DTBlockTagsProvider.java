@@ -7,13 +7,19 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.block.Blocks;
-import net.minecraft.data.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * @author Harley O'Connor
@@ -50,7 +56,7 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
                 .addTag(DTBlockTags.FUNGUS_CAPS);
 
         this.tag(BlockTags.FLOWER_POTS)
-                .add(DTRegistries.POTTED_SAPLING.getBlock());
+                .add(DTRegistries.POTTED_SAPLING.get());
 
         Species.REGISTRY.get(DTTrees.WARPED).getSapling().ifPresent(sapling ->
                 this.tag(BlockTags.HOGLIN_REPELLENTS).add(sapling));
@@ -82,17 +88,19 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
         });
 
         Family.REGISTRY.dataGenerationStream(this.modId).forEach(family -> {
-            // Create branch tag if a branch exists.
-            family.getBranch().ifPresent(branch ->
-                    family.defaultBranchTags().forEach(tag ->
-                            this.tag(tag).add(branch))
-            );
+            // Create branch tag and harvest tag if a branch exists.
+            family.getBranch().ifPresent(branch -> {
+                this.tierTag(family.getDefaultBranchHarvestTier()).ifPresent(tagBuilder -> tagBuilder.add(branch));
+                family.defaultBranchTags().forEach(tag ->
+                        this.tag(tag).add(branch));
+            });
 
-            // Create stripped branch tag if the family has a stripped branch.
-            family.getStrippedBranch().ifPresent(strippedBranch ->
-                    family.defaultStrippedBranchTags().forEach(tag ->
-                            this.tag(tag).add(strippedBranch))
-            );
+            // Create stripped branch tag and harvest tag if the family has a stripped branch.
+            family.getStrippedBranch().ifPresent(strippedBranch -> {
+                this.tierTag(family.getDefaultStrippedBranchHarvestTier()).ifPresent(tagBuilder -> tagBuilder.add(strippedBranch));
+                family.defaultStrippedBranchTags().forEach(tag ->
+                        this.tag(tag).add(strippedBranch));
+            });
         });
 
         Species.REGISTRY.dataGenerationStream(this.modId).forEach(species -> {
@@ -101,6 +109,15 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
                     species.defaultSaplingTags().forEach(tag ->
                             this.tag(tag).add(sapling)));
         });
+    }
+
+    protected Optional<TagsProvider.TagAppender<Block>> tierTag(@Nullable Tier tier) {
+        if (tier == null)
+            return Optional.empty();
+
+        TagKey<Block> tag = tier.getTag();
+
+        return tag == null ? Optional.empty() : Optional.of(this.tag(tag));
     }
 
     @Override

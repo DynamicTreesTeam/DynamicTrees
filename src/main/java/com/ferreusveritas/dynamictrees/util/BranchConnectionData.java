@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BranchConnectionData {
 

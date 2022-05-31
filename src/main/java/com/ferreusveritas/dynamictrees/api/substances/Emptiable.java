@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.substances;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * An emptiable is a container that contains a substance that when consumed leaves a reusable container.  Such as a

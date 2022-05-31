@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.entities.animation;
 
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 
 /**
  * This class hold different animation handlers for EntityFallingTree. The idea is that a unique animation could be used

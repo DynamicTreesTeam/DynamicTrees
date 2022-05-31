@@ -16,7 +16,7 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
@@ -25,8 +25,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 @Mod(DynamicTrees.MOD_ID)
 public final class DynamicTrees {
@@ -74,7 +74,7 @@ public final class DynamicTrees {
         loadingContext.registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
         loadingContext.registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
 
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DTClient::clientStart);
+//        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DTClient::clientStart);
 
         TreeGenerator.setup();
 
@@ -99,15 +99,13 @@ public final class DynamicTrees {
         // Clears and locks registry handlers to free them from memory.
         RegistryHandler.REGISTRY.clear();
 
-        DTRegistries.DENDRO_POTION.registerRecipes();
+        DTRegistries.DENDRO_POTION.get().registerRecipes();
 
         Resources.MANAGER.setup();
 
         if (DTConfigs.REPLACE_NYLIUM_FUNGI.get()) {
             DTTrees.replaceNyliumFungiFeatures();
         }
-
-        event.enqueueWork(DTRegistries::registerConfiguredFeatures);
     }
 
     private void gatherData(final GatherDataEvent event) {

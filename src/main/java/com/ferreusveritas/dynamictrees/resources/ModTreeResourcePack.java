@@ -26,8 +26,7 @@ public final class ModTreeResourcePack extends FlatTreeResourcePack {
     protected Path getPath(String... paths) {
         final List<String> pathsList = new ArrayList<>(Arrays.asList(paths));
         pathsList.add(0, Resources.TREES);
-        return this.modFile.getLocator()
-                .findPath(this.modFile, pathsList.toArray(new String[0]))
+        return this.modFile.findResource(pathsList.toArray(new String[0]))
                 .toAbsolutePath();
     }
 

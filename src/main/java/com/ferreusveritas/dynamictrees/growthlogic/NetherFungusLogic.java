@@ -6,10 +6,10 @@ import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulation
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 public class NetherFungusLogic extends GrowthLogicKit {
 
@@ -64,7 +64,7 @@ public class NetherFungusLogic extends GrowthLogicKit {
         return probMap;
     }
 
-    private float getHashedVariation(GrowthLogicKitConfiguration configuration, World world, BlockPos pos) {
+    private float getHashedVariation(GrowthLogicKitConfiguration configuration, Level world, BlockPos pos) {
         long day = world.getGameTime() / 24000L;
         int month = (int) day / 30;//Change the hashs every in-game month
         return (CoordUtils.coordHashCode(pos.above(month), 2) %

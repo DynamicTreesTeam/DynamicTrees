@@ -3,10 +3,10 @@ package com.ferreusveritas.dynamictrees.resources;
 import com.ferreusveritas.dynamictrees.api.resource.TreeResourcePack;
 import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.google.common.base.Joiner;
-import net.minecraft.resources.ResourcePack;
-import net.minecraft.resources.ResourcePackFileNotFoundException;
-import net.minecraft.resources.ResourcePackType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.AbstractPackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.ResourcePackFileNotFoundException;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -26,7 +26,7 @@ import java.util.function.Predicate;
  *
  * @author Harley O'Connor
  */
-public class FlatTreeResourcePack extends ResourcePack implements TreeResourcePack {
+public class FlatTreeResourcePack extends AbstractPackResources implements TreeResourcePack {
 
     protected final Path path;
 
@@ -36,7 +36,7 @@ public class FlatTreeResourcePack extends ResourcePack implements TreeResourcePa
     }
 
     @Override
-    public InputStream getResource(@Nullable ResourcePackType type, ResourceLocation location) throws IOException {
+    public InputStream getResource(@Nullable PackType type, ResourceLocation location) throws IOException {
         final Path path = this.getPath(location.getNamespace(), location.getPath());
         if (!Files.exists(path)) {
             throw new FileNotFoundException("Could not find tree resource for path '" + path + "'.");
@@ -57,7 +57,7 @@ public class FlatTreeResourcePack extends ResourcePack implements TreeResourcePa
     }
 
     @Override
-    public Collection<ResourceLocation> getResources(@Nullable ResourcePackType type, String namespace, String pathIn, int maxDepth, Predicate<String> filter) {
+    public Collection<ResourceLocation> getResources(@Nullable PackType type, String namespace, String pathIn, int maxDepth, Predicate<String> filter) {
         try {
             Path root = this.getPath(namespace);
             Path inputPath = root.getFileSystem().getPath(pathIn);
@@ -79,7 +79,7 @@ public class FlatTreeResourcePack extends ResourcePack implements TreeResourcePa
     }
 
     @Override
-    public Set<String> getNamespaces(@Nullable final ResourcePackType type) {
+    public Set<String> getNamespaces(@Nullable final PackType type) {
         try {
             Path root = this.getPath();
 

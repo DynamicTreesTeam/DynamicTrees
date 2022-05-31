@@ -11,15 +11,15 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
-import net.minecraft.item.Item;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.Collections;
@@ -71,7 +71,7 @@ public class NetherFungusSpecies extends Species {
     }
 
     @Override
-    public boolean isAcceptableSoilForWorldgen(IWorld world, BlockPos pos, BlockState soilBlockState) {
+    public boolean isAcceptableSoilForWorldgen(LevelAccessor world, BlockPos pos, BlockState soilBlockState) {
         if (soilBlockState.getBlock() == Blocks.NETHERRACK) {
             return true; //Soil exception for worldgen
         }
@@ -84,12 +84,12 @@ public class NetherFungusSpecies extends Species {
     }
 
     @Override
-    public List<ITag.INamedTag<Block>> defaultSaplingTags() {
+    public List<TagKey<Block>> defaultSaplingTags() {
         return Collections.singletonList(DTBlockTags.FUNGUS_CAPS);
     }
 
     @Override
-    public List<ITag.INamedTag<Item>> defaultSeedTags() {
+    public List<TagKey<Item>> defaultSeedTags() {
         return Collections.singletonList(DTItemTags.FUNGUS_CAPS);
     }
 

@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.util;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.models.bakedmodels.BasicBranchBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 
 /**
  * This holds connection data for branches.

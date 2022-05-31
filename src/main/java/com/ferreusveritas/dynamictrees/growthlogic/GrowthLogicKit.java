@@ -4,8 +4,6 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistry;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistryEntry;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
@@ -13,11 +11,10 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * A growth logic kit defines how/in what shape a tree should grow.
@@ -96,8 +93,6 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
      * <p>
      * The default implementation uses the {@linkplain Species#getUpProbability() species' up probability} for the up
      * direction, the {@linkplain Species#getProbabilityForCurrentDir() current direction probability reinforcer} to
-     * reinforce the current direction of travel, and adds the result of {@link TreePart#probabilityForBlock(BlockState,
-     * IBlockReader, BlockPos, BranchBlock)} for all directions, which depends on the block the tree part represents.
      *
      * @param configuration the configuration
      * @param context       the context

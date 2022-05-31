@@ -2,9 +2,9 @@ package com.ferreusveritas.dynamictrees.deserialisation;
 
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
-import net.minecraft.block.material.Material;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.material.Material;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +55,7 @@ public final class MaterialDeserialiser implements JsonDeserialiser<Material> {
         materials.put(new ResourceLocation("heavy_metal"), Material.HEAVY_METAL);
         materials.put(new ResourceLocation("barrier"), Material.BARRIER);
         materials.put(new ResourceLocation("piston"), Material.PISTON);
-        materials.put(new ResourceLocation("coral"), Material.CORAL);
+//        materials.put(new ResourceLocation("coral"), Material.CORAL);
         materials.put(new ResourceLocation("vegetable"), Material.VEGETABLE);
         materials.put(new ResourceLocation("egg"), Material.EGG);
         materials.put(new ResourceLocation("cake"), Material.CAKE);

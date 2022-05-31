@@ -7,11 +7,11 @@ import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.CommandSource;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * @author Harley O'Connor
@@ -29,25 +29,25 @@ public final class CreateTransformPotionCommand extends SubCommand {
     }
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArgument() {
+    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument().then(transformableSpeciesArgument().executes(context -> this.spawnTransformPotion(context.getSource(),
                 blockPosArgument(context), speciesArgument(context))));
     }
 
-    private int spawnTransformPotion(final CommandSource source, final BlockPos pos, final Species species) throws CommandSyntaxException {
+    private int spawnTransformPotion(final CommandSourceStack source, final BlockPos pos, final Species species) throws CommandSyntaxException {
         if (!species.isTransformable()) {
             throw SPECIES_NOT_TRANSFORMABLE.create(species.getTextComponent());
         }
 
-        final DendroPotion dendroPotion = DTRegistries.DENDRO_POTION;
+        final DendroPotion dendroPotion = DTRegistries.DENDRO_POTION.get();
         final ItemStack dendroPotionStack = new ItemStack(dendroPotion);
 
         dendroPotion.applyIndexTag(dendroPotionStack, DendroPotion.DendroPotionType.TRANSFORM.getIndex()); // Make it a transform potion.
         dendroPotion.setTargetSpecies(dendroPotionStack, species); // Tell it to set the target tree to the selected family.
 
         ItemUtils.spawnItemStack(source.getLevel(), pos, dendroPotionStack, true); // Spawn potion in the world.
-        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.create_transform_potion",
-                species.getTextComponent(), CommandHelper.posComponent(pos, TextFormatting.AQUA)));
+        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.create_transform_potion",
+                species.getTextComponent(), CommandHelper.posComponent(pos, ChatFormatting.AQUA)));
 
         return 1;
     }

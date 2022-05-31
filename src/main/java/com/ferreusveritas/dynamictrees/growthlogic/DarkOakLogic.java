@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.growthlogic;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 
 public class DarkOakLogic extends GrowthLogicKit {
 
@@ -33,7 +33,7 @@ public class DarkOakLogic extends GrowthLogicKit {
         }
 
         //Ensure that the branch gets out of the trunk at least two blocks so it won't interfere with new side branches at the same level
-        if (context.signal().numTurns == 1 && context.signal().delta.distSqr(0, context.signal().delta.getY(), 0, true) == 1.0) {
+        if (context.signal().numTurns == 1 && context.signal().delta.distToCenterSqr(0, context.signal().delta.getY(), 0) == 1.0) {
             for (Direction dir : CoordUtils.HORIZONTALS) {
                 if (context.signal().dir != dir) {
                     probMap[dir.ordinal()] = 0;

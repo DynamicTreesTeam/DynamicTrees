@@ -1,32 +1,31 @@
 package com.ferreusveritas.dynamictrees.api.resource.loading;
 
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 /**
  * @author Harley O'Connor
  */
 public interface ResourceLoader<R> {
 
-    CompletableFuture<Void> load(IResourceManager resourceManager);
+    CompletableFuture<Void> load(ResourceManager resourceManager);
 
-    CompletableFuture<Void> gatherData(IResourceManager resourceManager);
+    CompletableFuture<Void> gatherData(ResourceManager resourceManager);
 
-    CompletableFuture<Void> setup(IResourceManager resourceManager);
+    CompletableFuture<Void> setup(ResourceManager resourceManager);
 
-    CompletableFuture<ResourceAccessor<R>> prepareReload(IResourceManager resourceManager);
+    CompletableFuture<ResourceAccessor<R>> prepareReload(ResourceManager resourceManager);
 
-    void reload(CompletableFuture<ResourceAccessor<R>> future, IResourceManager resourceManager);
+    void reload(CompletableFuture<ResourceAccessor<R>> future, ResourceManager resourceManager);
 
-    void applyOnLoad(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager);
+    void applyOnLoad(ResourceAccessor<R> resourceAccessor, ResourceManager resourceManager);
 
-    void applyOnGatherData(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager);
+    void applyOnGatherData(ResourceAccessor<R> resourceAccessor, ResourceManager resourceManager);
 
-    void applyOnSetup(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager);
+    void applyOnSetup(ResourceAccessor<R> resourceAccessor, ResourceManager resourceManager);
 
-    void applyOnReload(ResourceAccessor<R> resourceAccessor, IResourceManager resourceManager);
+    void applyOnReload(ResourceAccessor<R> resourceAccessor, ResourceManager resourceManager);
 
 }

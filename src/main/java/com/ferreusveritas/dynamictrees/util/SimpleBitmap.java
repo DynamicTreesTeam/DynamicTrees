@@ -20,7 +20,7 @@ public class SimpleBitmap {
      * @param height Height
      */
     public SimpleBitmap(int width, int height) {
-        this.width = net.minecraft.util.math.MathHelper.clamp(width, 1, 32);
+        this.width = net.minecraft.util.Mth.clamp(width, 1, 32);
         this.height = Math.max(1, height);
         this.bits = new int[this.height];
         this.touched = false;

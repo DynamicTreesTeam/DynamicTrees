@@ -3,11 +3,11 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostRotContext;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 /**
  * A{@link GenFeature} handling post rot behaviour in which the soil below the base branch is turned to the {@link
@@ -35,7 +35,7 @@ public class RotSoilGenFeature extends GenFeature {
 
     @Override
     protected boolean postRot(GenFeatureConfiguration configuration, PostRotContext context) {
-        final IWorld world = context.world();
+        final LevelAccessor world = context.world();
         final BlockPos belowPos = context.pos().below();
 
         if (!TreeHelper.isRooty(world.getBlockState(belowPos))) {

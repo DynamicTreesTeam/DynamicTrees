@@ -18,35 +18,34 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.block.material.PushReaction;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.*;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
-import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -66,7 +65,7 @@ import java.util.Random;
  * @author ferreusveritas
  */
 @SuppressWarnings("deprecation")
-public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
+public class RootyBlock extends BlockWithDynamicHardness implements TreePart, EntityBlock {
 
     public static RootyBlockDecayer rootyBlockDecayer = null;
 
@@ -102,35 +101,35 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     ///////////////////////////////////////////
 
     @Override
-    public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
+    public SoundType getSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
         return getPrimitiveSoilBlock().getSoundType(getDecayBlockState(state, world, pos), world, pos, entity);
     }
 
     @Override
-    public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
-        return getPrimitiveSoilBlock().getLightValue(getDecayBlockState(state, world, pos), world, pos);
+    public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
+        return getPrimitiveSoilBlock().getLightEmission(getDecayBlockState(state, world, pos), world, pos);
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState state, IBlockReader world, BlockPos pos) {
+    public boolean propagatesSkylightDown(BlockState state, BlockGetter world, BlockPos pos) {
         return getPrimitiveSoilBlock().propagatesSkylightDown(getDecayBlockState(state, world, pos), world, pos);
     }
 
     @Override
-    public int getLightBlock(BlockState state, IBlockReader world, BlockPos pos) {
+    public int getLightBlock(BlockState state, BlockGetter world, BlockPos pos) {
         return getPrimitiveSoilBlock().getLightBlock(getDecayBlockState(state, world, pos), world, pos);
     }
 
-    @Nullable
-    @Override
-    public ToolType getHarvestTool(BlockState state) {
-        return getPrimitiveSoilBlock().getHarvestTool(getPrimitiveSoilState(state));
-    }
-
-    @Override
-    public int getHarvestLevel(BlockState state) {
-        return getPrimitiveSoilBlock().getHarvestLevel(getPrimitiveSoilState(state));
-    }
+//    @Nullable
+//    @Override
+//    public ToolType getHarvestTool(BlockState state) {
+//        return getPrimitiveSoilBlock().getHarvestTool(getPrimitiveSoilState(state));
+//    }
+//
+//    @Override
+//    public int getHarvestLevel(BlockState state) {
+//        return getPrimitiveSoilBlock().getHarvestLevel(getPrimitiveSoilState(state));
+//    }
 
     @Override
     public MaterialColor defaultMaterialColor() {
@@ -138,7 +137,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return getPrimitiveSoilBlock().getShape(getDecayBlockState(state, world, pos), world, pos, context);
     }
 
@@ -148,7 +147,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public float getExplosionResistance(BlockState state, IBlockReader world, BlockPos pos, Explosion explosion) {
+    public float getExplosionResistance(BlockState state, BlockGetter world, BlockPos pos, Explosion explosion) {
         return getPrimitiveSoilBlock().getExplosionResistance(getDecayBlockState(state, world, pos), world, pos, explosion);
     }
 
@@ -163,12 +162,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public int getFireSpreadSpeed(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+    public int getFireSpreadSpeed(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return getPrimitiveSoilBlock().getFireSpreadSpeed(getDecayBlockState(state, world, pos), world, pos, face);
     }
 
     @Override
-    public boolean isFireSource(BlockState state, IWorldReader world, BlockPos pos, Direction side) {
+    public boolean isFireSource(BlockState state, LevelReader world, BlockPos pos, Direction side) {
         return getPrimitiveSoilBlock().isFireSource(getDecayBlockState(state, world, pos), world, pos, side);
     }
 
@@ -179,12 +178,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        return getPrimitiveSoilBlock().getPickBlock(getDecayBlockState(state, world, pos), target, world, pos, player);
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
+        return getPrimitiveSoilBlock().getCloneItemStack(getDecayBlockState(state, world, pos), target, world, pos, player);
     }
 
     @Override
-    public float getHardness(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public float getHardness(BlockState state, BlockGetter worldIn, BlockPos pos) {
         return (float) (getDecayBlockState(state, worldIn, pos).getDestroySpeed(worldIn, pos) * DTConfigs.ROOTY_BLOCK_HARDNESS_MULTIPLIER.get());
     }
 
@@ -193,7 +192,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     ///////////////////////////////////////////
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FERTILITY).add(IS_VARIANT);
     }
 
@@ -201,32 +200,33 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     // INTERACTION
     ///////////////////////////////////////////
 
-    @Nullable
+
+    @org.jetbrains.annotations.Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        if (state.getValue(IS_VARIANT)) {
-            return new SpeciesTileEntity();
-        }
-        return null;
+    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+//        if (pState.getValue(IS_VARIANT)) {
+            return new SpeciesTileEntity(pPos,pState);
+//        }
+//        return null;
     }
+//
+//    @Override
+//    public boolean hasTileEntity(BlockState state) {
+//        return state.getValue(IS_VARIANT);
+//    }
 
     @Override
-    public boolean hasTileEntity(BlockState state) {
-        return state.getValue(IS_VARIANT);
-    }
-
-    @Override
-    public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
+    public void randomTick(BlockState state, ServerLevel worldIn, BlockPos pos, Random random) {
         if (random.nextInt(DTConfigs.TREE_GROWTH_FOLDING.get()) == 0) {
             updateTree(state, worldIn, pos, random, true);
         }
     }
 
-    public Direction getTrunkDirection(IBlockReader access, BlockPos rootPos) {
+    public Direction getTrunkDirection(BlockGetter access, BlockPos rootPos) {
         return Direction.UP;
     }
 
-    public void updateTree(BlockState rootyState, World world, BlockPos rootPos, Random random, boolean natural) {
+    public void updateTree(BlockState rootyState, Level world, BlockPos rootPos, Random random, boolean natural) {
 
         if (CoordUtils.isSurroundedByLoadedChunks(world, rootPos)) {
 
@@ -258,7 +258,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
      * @param pos    The position of the {@link RootyBlock}
      * @return
      */
-    public BlockState getDecayBlockState(BlockState state, IBlockReader world, BlockPos pos) {
+    public BlockState getDecayBlockState(BlockState state, BlockGetter world, BlockPos pos) {
         return getPrimitiveSoilState(state);
     }
 
@@ -266,12 +266,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
      * Forces the {@link RootyBlock} to decay if it's there, turning it back to its primitive soil block. Custom decay
      * logic is also supported, see {@link RootyBlockDecayer} for details.
      *
-     * @param world      The {@link World} instance.
+     * @param world      The {@link Level} instance.
      * @param rootPos    The {@link BlockPos} of the {@link RootyBlock}.
      * @param rootyState The {@link BlockState} of the {@link RootyBlock}.
      * @param species    The {@link Species} of the tree that was removed.
      */
-    public void doDecay(World world, BlockPos rootPos, BlockState rootyState, Species species) {
+    public void doDecay(Level world, BlockPos rootPos, BlockState rootyState, Species species) {
         if (world.isClientSide || !TreeHelper.isRooty(rootyState)) {
             return;
         }
@@ -286,7 +286,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
 
         final BlockState primitiveDirt = this.getDecayBlockState(rootyState, world, rootPos);
 
-        world.setBlock(rootPos, primitiveDirt, Constants.BlockFlags.DEFAULT);
+        world.setBlock(rootPos, primitiveDirt, Block.UPDATE_ALL);
     }
 
     @Override
@@ -295,16 +295,16 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState blockState, World world, BlockPos pos) {
+    public int getAnalogOutputSignal(BlockState blockState, Level world, BlockPos pos) {
         return getFertility(blockState, world, pos);
     }
 
     @Override
-    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getItemInHand(handIn), hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+        return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getItemInHand(handIn), hit) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
 
-    public void destroyTree(World world, BlockPos rootPos) {
+    public void destroyTree(Level world, BlockPos rootPos) {
         Optional<BranchBlock> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.above()));
 
         if (branch.isPresent()) {
@@ -314,13 +314,13 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public void playerWillDestroy(World world, @Nonnull BlockPos pos, BlockState state, @Nonnull PlayerEntity player) {
+    public void playerWillDestroy(Level world, @Nonnull BlockPos pos, BlockState state, @Nonnull Player player) {
         this.destroyTree(world, pos);
         super.playerWillDestroy(world, pos, state, player);
     }
 
     @Override
-    public void onBlockExploded(BlockState state, World world, BlockPos pos, Explosion explosion) {
+    public void onBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion) {
         destroyTree(world, pos);
         super.onBlockExploded(state, world, pos, explosion);
     }
@@ -336,20 +336,20 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     // TREE STUFF
     ///////////////////////////////////////////
 
-    public int getFertility(BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+    public int getFertility(BlockState blockState, BlockGetter blockAccess, BlockPos pos) {
         return blockState.getValue(FERTILITY);
     }
 
-    public void setFertility(World world, BlockPos rootPos, int fertility) {
+    public void setFertility(Level world, BlockPos rootPos, int fertility) {
         final BlockState currentState = world.getBlockState(rootPos);
         final Species species = this.getSpecies(currentState, world, rootPos);
 
-        world.setBlock(rootPos, currentState.setValue(FERTILITY, MathHelper.clamp(fertility, 0, 15)), 3);
+        world.setBlock(rootPos, currentState.setValue(FERTILITY, Mth.clamp(fertility, 0, 15)), 3);
         world.updateNeighborsAt(rootPos, this); // Notify all neighbors of NSEWUD neighbors (for comparator).
         this.setSpecies(world, rootPos, species);
     }
 
-    public boolean fertilize(World world, BlockPos pos, int amount) {
+    public boolean fertilize(Level world, BlockPos pos, int amount) {
         int fertility = this.getFertility(world.getBlockState(pos), world, pos);
         if ((fertility == 0 && amount < 0) || (fertility == 15 && amount > 0)) {
             return false;//Already maxed out
@@ -359,12 +359,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public Cell getHydrationCell(IBlockReader reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
+    public Cell getHydrationCell(BlockGetter reader, BlockPos pos, BlockState state, Direction dir, LeavesProperties leavesTree) {
         return CellNull.NULL_CELL;
     }
 
     @Override
-    public GrowSignal growSignal(World world, BlockPos pos, GrowSignal signal) {
+    public GrowSignal growSignal(Level world, BlockPos pos, GrowSignal signal) {
         return signal;
     }
 
@@ -374,12 +374,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+    public int getRadiusForConnection(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         return 8;
     }
 
     @Override
-    public int probabilityForBlock(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from) {
+    public int probabilityForBlock(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from) {
         return 0;
     }
 
@@ -392,7 +392,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
      * @param signal
      * @return
      */
-    public MapSignal startAnalysis(IWorld world, BlockPos rootPos, MapSignal signal) {
+    public MapSignal startAnalysis(LevelAccessor world, BlockPos rootPos, MapSignal signal) {
         Direction dir = getTrunkDirection(world, rootPos);
         BlockPos treePos = rootPos.relative(dir);
         BlockState treeState = world.getBlockState(treePos);
@@ -403,12 +403,12 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public boolean shouldAnalyse(BlockState state, IBlockReader reader, BlockPos pos) {
+    public boolean shouldAnalyse(BlockState state, BlockGetter reader, BlockPos pos) {
         return true;
     }
 
     @Override
-    public MapSignal analyse(BlockState state, IWorld world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal) {
+    public MapSignal analyse(BlockState state, LevelAccessor world, BlockPos pos, @Nullable Direction fromDir, MapSignal signal) {
         signal.run(state, world, pos, fromDir);//Run inspector of choice
 
         if (signal.root == null) {
@@ -423,29 +423,31 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+    public int branchSupport(BlockState state, BlockGetter reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
         return dir == Direction.DOWN ? BranchBlock.setSupport(1, 1) : 0;
     }
 
     @Override
-    public Family getFamily(BlockState state, IBlockReader reader, BlockPos rootPos) {
+    public Family getFamily(BlockState state, BlockGetter reader, BlockPos rootPos) {
         BlockPos treePos = rootPos.relative(getTrunkDirection(reader, rootPos));
         BlockState treeState = reader.getBlockState(treePos);
         return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, reader, treePos) : Family.NULL_FAMILY;
     }
 
     @Nullable
-    private SpeciesTileEntity getTileEntitySpecies(IWorld world, BlockPos pos) {
-        final TileEntity blockEntity = world.getBlockEntity(pos);
+    private SpeciesTileEntity getTileEntitySpecies(LevelAccessor world, BlockPos pos) {
+        final BlockEntity blockEntity = world.getBlockEntity(pos);
+        if(blockEntity == null)
+            return null;
         return blockEntity instanceof SpeciesTileEntity ? (SpeciesTileEntity) blockEntity : null;
     }
 
     /**
      * Rooty Dirt can report whatever {@link Family} species it wants to be. We'll use a stored value to determine the
-     * species for the {@link TileEntity} version. Otherwise we'll just make it report whatever {@link DynamicTrees} the
+     * species for the {@link BlockEntity} version. Otherwise we'll just make it report whatever {@link DynamicTrees} the
      * above {@link BranchBlock} says it is.
      */
-    public Species getSpecies(BlockState state, IWorld world, BlockPos rootPos) {
+    public Species getSpecies(BlockState state, LevelAccessor world, BlockPos rootPos) {
 
         Family tree = getFamily(state, world, rootPos);
 
@@ -461,7 +463,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
         return tree.getSpeciesForLocation(world, rootPos.relative(getTrunkDirection(world, rootPos)));
     }
 
-    public void setSpecies(World world, BlockPos rootPos, Species species) {
+    public void setSpecies(Level world, BlockPos rootPos, Species species) {
         SpeciesTileEntity rootyDirtTE = getTileEntitySpecies(world, rootPos);
         if (rootyDirtTE != null) {
             rootyDirtTE.setSpecies(species);
@@ -481,7 +483,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     // RENDERING
     ///////////////////////////////////////////
 
-    public int colorMultiplier(BlockColors blockColors, BlockState state, @Nullable IBlockDisplayReader world, @Nullable BlockPos pos, int tintIndex) {
+    public int colorMultiplier(BlockColors blockColors, BlockState state, @Nullable BlockAndTintGetter world, @Nullable BlockPos pos, int tintIndex) {
         final int white = 0xFFFFFFFF;
         switch (tintIndex) {
             case 0:
@@ -498,11 +500,11 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public int rootColor(BlockState state, IBlockReader blockAccess, BlockPos pos) {
+    public int rootColor(BlockState state, BlockGetter blockAccess, BlockPos pos) {
         return getFamily(state, blockAccess, pos).getRootColor(state, getColorFromBark());
     }
 
-    public boolean fallWithTree(BlockState state, World world, BlockPos pos) {
+    public boolean fallWithTree(BlockState state, Level world, BlockPos pos) {
         return false;
     }
 

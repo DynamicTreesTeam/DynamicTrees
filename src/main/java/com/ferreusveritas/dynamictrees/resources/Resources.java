@@ -3,35 +3,30 @@ package com.ferreusveritas.dynamictrees.resources;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationTemplateResourceLoader;
 import com.ferreusveritas.dynamictrees.api.event.Hooks;
-import com.ferreusveritas.dynamictrees.api.resource.ResourceManager;
+import com.ferreusveritas.dynamictrees.api.resource.TreeResourceManager;
 import com.ferreusveritas.dynamictrees.data.DTRecipes;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.resources.loader.BiomeDatabaseResourceLoader;
-import com.ferreusveritas.dynamictrees.resources.loader.FamilyResourceLoader;
-import com.ferreusveritas.dynamictrees.resources.loader.GlobalDropCreatorResourceLoader;
-import com.ferreusveritas.dynamictrees.resources.loader.JoCodeResourceLoader;
-import com.ferreusveritas.dynamictrees.resources.loader.LeavesPropertiesResourceLoader;
-import com.ferreusveritas.dynamictrees.resources.loader.SoilPropertiesResourceLoader;
-import com.ferreusveritas.dynamictrees.resources.loader.SpeciesResourceLoader;
+import com.ferreusveritas.dynamictrees.resources.loader.*;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.DataPackRegistries;
-import net.minecraft.resources.IFutureReloadListener;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.ReloadableServerResources;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
+import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
 import org.apache.logging.log4j.LogManager;
 
@@ -44,7 +39,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 /**
- * Holds and registers data pack entries ({@link IFutureReloadListener} objects).
  *
  * @author Harley O'Connor
  */
@@ -55,7 +49,7 @@ public final class Resources {
 
     public static final String TREES = "trees";
 
-    public static final ResourceManager MANAGER = new TreesResourceManager();
+    public static final TreeResourceManager MANAGER = new TreesResourceManager();
 
     public static final LeavesPropertiesResourceLoader LEAVES_PROPERTIES_LOADER = new LeavesPropertiesResourceLoader();
     public static final SoilPropertiesResourceLoader SOIL_PROPERTIES_LOADER = new SoilPropertiesResourceLoader();
@@ -122,7 +116,10 @@ public final class Resources {
         ModList.get().getMods().forEach(Resources::addModResourcePack);
     }
 
-    private static void addModResourcePack(ModInfo modInfo) {
+
+
+
+    private static void addModResourcePack(IModInfo modInfo) {
         final IModFile modFile = ModList.get().getModFileById(modInfo.getModId()).getFile();
         if (modFile.getLocator().isValid(modFile)) {
             addModResourcePack(modFile);
@@ -130,8 +127,7 @@ public final class Resources {
     }
 
     private static void addModResourcePack(IModFile modFile) {
-        final Path treesPath = modFile.getLocator()
-                .findPath(modFile, TREES)
+        final Path treesPath = modFile.findResource(TREES)
                 .toAbsolutePath();
 
         if (Files.exists(treesPath)) {
@@ -156,23 +152,24 @@ public final class Resources {
 
     @SubscribeEvent
     public static void addReloadListeners(final AddReloadListenerEvent event) {
-        event.addListener(new ReloadListener(event.getDataPackRegistries()));
+        event.addListener(new ReloadListener(event.getServerResources()));
     }
 
     /**
      * Listens for datapack reloads for actions such as reloading the trees resource manager and registering dirt bucket
      * recipes.
      */
-    public static final class ReloadListener implements IFutureReloadListener {
-        private final DataPackRegistries dataPackRegistries;
+    public static final class ReloadListener implements PreparableReloadListener {
+        private final ReloadableServerResources dataPackRegistries;
 
-        public ReloadListener(DataPackRegistries dataPackRegistries) {
+        public ReloadListener(ReloadableServerResources dataPackRegistries) {
             this.dataPackRegistries = dataPackRegistries;
         }
 
+
         @Override
-        public CompletableFuture<Void> reload(IStage stage, IResourceManager resourceManager,
-                                              IProfiler preparationsProfiler, IProfiler reloadProfiler,
+        public CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager,
+                                              ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
                                               Executor backgroundExecutor, Executor gameExecutor) {
             final CompletableFuture<?>[] futures = MANAGER.prepareReload(gameExecutor, backgroundExecutor);
 
@@ -188,14 +185,14 @@ public final class Resources {
                 return;
             }
 
-            final Map<IRecipeType<?>, Map<ResourceLocation, IRecipe<?>>> recipes = new HashMap<>();
+            final Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes = new HashMap<>();
 
             // Put the recipes into the new map and make each type's recipes mutable.
             this.dataPackRegistries.getRecipeManager().recipes.forEach(((recipeType, currentRecipes) ->
                     recipes.put(recipeType, new HashMap<>(currentRecipes))));
 
             // Register dirt bucket recipes.
-            DTRecipes.registerDirtBucketRecipes(recipes.get(IRecipeType.CRAFTING));
+            DTRecipes.registerDirtBucketRecipes(recipes.get(RecipeType.CRAFTING));
 
             // Revert each type's recipes back to immutable.
             recipes.forEach(

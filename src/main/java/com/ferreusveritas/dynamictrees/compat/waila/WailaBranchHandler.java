@@ -1,3 +1,4 @@
+/*
 package com.ferreusveritas.dynamictrees.compat.waila;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -14,18 +15,18 @@ import mcp.mobius.waila.api.IComponentProvider;
 import mcp.mobius.waila.api.IDataAccessor;
 import mcp.mobius.waila.api.IPluginConfig;
 import mcp.mobius.waila.api.RenderableTextComponent;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,8 +37,10 @@ public class WailaBranchHandler implements IComponentProvider {
     private Species lastSpecies = Species.NULL_SPECIES;
     private NetVolumeNode.Volume lastVolume = new NetVolumeNode.Volume();
 
+
+
     @Override
-    public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
+    public void appendBody(List<TextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
         if (WailaOther.invalid) {
             lastPos = BlockPos.ZERO;
             lastSpecies = Species.NULL_SPECIES;
@@ -46,7 +49,7 @@ public class WailaBranchHandler implements IComponentProvider {
             WailaOther.invalid = false;
         }
 
-        CompoundNBT nbtData = accessor.getServerData();
+        CompoundTag nbtData = accessor.getServerData();
         BlockPos pos = accessor.getPosition();
         Species species = Species.NULL_SPECIES;
 
@@ -79,11 +82,11 @@ public class WailaBranchHandler implements IComponentProvider {
 
         if (species != Species.NULL_SPECIES) {
             if (species.showSpeciesOnWaila()) {
-                tooltip.add(new TranslationTextComponent("tooltip.dynamictrees.species", species.getTextComponent()));
+                tooltip.add(new TranslatableComponent("tooltip.dynamictrees.species", species.getTextComponent()));
             }
 
             if (Minecraft.getInstance().options.advancedItemTooltips) {
-                tooltip.add(new StringTextComponent(TextFormatting.DARK_GRAY + species.getRegistryName().toString()));
+                tooltip.add(new TextComponent(ChatFormatting.DARK_GRAY + species.getRegistryName().toString()));
             }
 
             ItemStack seedStack = species.getSeedStack(1);
@@ -113,7 +116,7 @@ public class WailaBranchHandler implements IComponentProvider {
         }
     }
 
-    private NetVolumeNode.Volume getTreeVolume(World world, BlockPos pos) {
+    private NetVolumeNode.Volume getTreeVolume(Level world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
 
@@ -148,12 +151,12 @@ public class WailaBranchHandler implements IComponentProvider {
 //		compoundNBT.putString("species", string);
 //	}
 
-    private Species getWailaSpecies(World world, BlockPos pos) {
+    private Species getWailaSpecies(Level world, BlockPos pos) {
         return TreeHelper.getBestGuessSpecies(world, pos);
     }
 
     private static RenderableTextComponent getRenderable(ItemStack stack) {
-        CompoundNBT tag = new CompoundNBT();
+        CompoundTag tag = new CompoundTag();
         if (!stack.isEmpty()) {
             tag.putString("id", stack.getItem().getRegistryName().toString());
             tag.putInt("count", stack.getCount());
@@ -167,3 +170,4 @@ public class WailaBranchHandler implements IComponentProvider {
         }
     }
 }
+*/

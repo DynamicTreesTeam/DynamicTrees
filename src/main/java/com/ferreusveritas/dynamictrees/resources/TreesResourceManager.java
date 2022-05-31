@@ -1,17 +1,17 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
-import com.ferreusveritas.dynamictrees.api.resource.ResourceManager;
+import com.ferreusveritas.dynamictrees.api.resource.TreeResourceManager;
 import com.ferreusveritas.dynamictrees.api.resource.TreeResourcePack;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ResourceLoader;
 import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.google.common.collect.Lists;
-import net.minecraft.resources.IResource;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.resources.IResourcePack;
-import net.minecraft.resources.SimpleResource;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimpleResource;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 /**
  * @author Harley O'Connor
  */
-public final class TreesResourceManager implements IResourceManager, ResourceManager {
+public final class TreesResourceManager implements ResourceManager, TreeResourceManager {
 
     private final List<TreeResourcePack> resourcePacks = Lists.newArrayList();
     private final List<ResourceLoader<?>> resourceLoaders = Lists.newArrayList();
@@ -116,8 +116,8 @@ public final class TreesResourceManager implements IResourceManager, ResourceMan
     }
 
     @Override
-    public IResource getResource(final ResourceLocation location) throws IOException {
-        final List<IResource> resources = this.getResources(location);
+    public Resource getResource(final ResourceLocation location) throws IOException {
+        final List<Resource> resources = this.getResources(location);
 
         if (resources.isEmpty()) {
             throw new FileNotFoundException("Could not find path '" + location + "' in any tree packs.");
@@ -135,18 +135,18 @@ public final class TreesResourceManager implements IResourceManager, ResourceMan
         }
     }
 
-    private static final IResource NULL_RESOURCE =
+    private static final Resource NULL_RESOURCE =
             new SimpleResource(null, null, null, null);
 
     @Override
-    public List<IResource> getResources(ResourceLocation path) throws IOException {
+    public List<Resource> getResources(ResourceLocation path) throws IOException {
         return this.resourcePacks.stream()
                 .map(resourcePack -> getResource(path, resourcePack))
                 .filter(resourcePack -> resourcePack != NULL_RESOURCE)
                 .collect(Collectors.toList());
     }
 
-    private IResource getResource(ResourceLocation path, TreeResourcePack resourcePack) {
+    private Resource getResource(ResourceLocation path, TreeResourcePack resourcePack) {
         final InputStream stream;
 
         try {
@@ -175,7 +175,7 @@ public final class TreesResourceManager implements IResourceManager, ResourceMan
     }
 
     @Override
-    public Stream<IResourcePack> listPacks() {
+    public Stream<PackResources> listPacks() {
         return this.resourcePacks.stream().map(treeResourcePack -> treeResourcePack);
     }
 

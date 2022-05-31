@@ -6,26 +6,14 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.GenerationContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostRotContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PreGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
 import com.ferreusveritas.dynamictrees.util.function.CanGrowPredicate;
 import com.ferreusveritas.dynamictrees.util.function.TriFunction;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-
-import java.util.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Base class for all gen features. These are features that grow on/in/around a tree on generation, or whilst growing,
@@ -154,7 +142,6 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     }
 
     /**
-     * Performs a post-rot action on a tree. This is invoked after the tree's {@linkplain Species#rot(IWorld, BlockPos,
      * int, int, int, Random, boolean, boolean) rot action} has occurred.
      *
      * @param configuration the configuration
@@ -166,10 +153,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     }
 
     /**
-     * Performs a full generation action of a tree. This is invoked before the {@link JoCode#generate(World, IWorld,
-     * Species, BlockPos, Biome, Direction, int, SafeChunkBounds, boolean)} and acts as a replacement for it. The
-     * implementor should therefore note that other methods in this class will not be invoked by default.
-     *
+
      * @param configuration the configuration
      * @param context       the context
      * @return {@code true} if this {@link GenFeature} handles full generation and so generation from a {@link JoCode}

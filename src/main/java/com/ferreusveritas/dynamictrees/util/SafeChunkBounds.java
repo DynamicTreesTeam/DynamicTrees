@@ -1,12 +1,12 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkStatus;
 
 public class SafeChunkBounds {
 
@@ -47,7 +47,7 @@ public class SafeChunkBounds {
         center = null;
     }
 
-    public SafeChunkBounds(ISeedReader world, ChunkPos pos) {
+    public SafeChunkBounds(WorldGenLevel world, ChunkPos pos) {
         this.center = pos;
 
         for (final Tile tile : TILES) {
@@ -103,11 +103,11 @@ public class SafeChunkBounds {
                 this.inBounds(new BlockPos(max.getX(), 0, min.getZ()), gap);
     }
 
-    public void setBlockState(IWorld world, BlockPos pos, BlockState state, boolean gap) {
+    public void setBlockState(LevelAccessor world, BlockPos pos, BlockState state, boolean gap) {
         this.setBlockState(world, pos, state, 3, gap);
     }
 
-    public void setBlockState(IWorld world, BlockPos pos, BlockState state, int flags, boolean gap) {
+    public void setBlockState(LevelAccessor world, BlockPos pos, BlockState state, int flags, boolean gap) {
         if (this.inBounds(pos, gap)) {
             world.setBlock(pos, state, flags);
         }

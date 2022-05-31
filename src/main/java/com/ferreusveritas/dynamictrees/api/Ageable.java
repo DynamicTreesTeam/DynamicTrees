@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Random;
 
@@ -17,6 +17,6 @@ public interface Ageable {
      * @param rand  random number generator
      * @return -1 if block was destroyed after the ageing, otherwise the hydro value of the block
      */
-    int age(IWorld world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds);
+    int age(LevelAccessor world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds);
 
 }

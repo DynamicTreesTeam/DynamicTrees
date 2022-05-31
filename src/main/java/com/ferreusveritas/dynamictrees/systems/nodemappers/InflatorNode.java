@@ -6,10 +6,10 @@ import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class InflatorNode implements NodeInspector {
 
@@ -28,7 +28,7 @@ public class InflatorNode implements NodeInspector {
     }
 
     @Override
-    public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+    public boolean run(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir) {
         BranchBlock branch = TreeHelper.getBranch(blockState);
 
         if (branch != null) {
@@ -42,7 +42,7 @@ public class InflatorNode implements NodeInspector {
     }
 
     @Override
-    public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+    public boolean returnRun(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir) {
         //Calculate Branch Thickness based on neighboring branches
 
         BranchBlock branch = TreeHelper.getBranch(blockState);

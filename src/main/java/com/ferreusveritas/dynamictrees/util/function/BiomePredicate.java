@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.util.function;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.biome.Biome;
 
 import java.util.function.Predicate;
 

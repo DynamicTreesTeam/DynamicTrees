@@ -5,7 +5,7 @@ import com.ferreusveritas.dynamictrees.api.configurations.TemplateRegistry;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 
 /**
  * @author Harley O'Connor

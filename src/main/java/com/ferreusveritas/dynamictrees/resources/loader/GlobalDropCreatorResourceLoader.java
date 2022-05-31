@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.resources.loader;
 
-import com.ferreusveritas.dynamictrees.api.resource.Resource;
+import com.ferreusveritas.dynamictrees.api.resource.DTResource;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplicationException;
@@ -9,8 +9,8 @@ import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.GlobalDropCreators;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,11 +28,11 @@ public final class GlobalDropCreatorResourceLoader extends AbstractResourceLoade
     }
 
     @Override
-    public void applyOnReload(ResourceAccessor<JsonElement> resourceAccessor, IResourceManager resourceManager) {
+    public void applyOnReload(ResourceAccessor<JsonElement> resourceAccessor, ResourceManager resourceManager) {
         resourceAccessor.forEach(this::tryReadEntry);
     }
 
-    private void tryReadEntry(Resource<JsonElement> resource) {
+    private void tryReadEntry(DTResource<JsonElement> resource) {
         try {
             this.readEntry(resource);
         } catch (ApplicationException e) {
@@ -41,7 +41,7 @@ public final class GlobalDropCreatorResourceLoader extends AbstractResourceLoade
         }
     }
 
-    private void readEntry(Resource<JsonElement> resource) throws ApplicationException {
+    private void readEntry(DTResource<JsonElement> resource) throws ApplicationException {
         throwIfNotJsonObject(resource.getResource(), () -> new ApplicationException("Root element is not a Json object."));
         this.deserialiseAndPutEntry(resource.getLocation(), resource.getResource().getAsJsonObject());
     }

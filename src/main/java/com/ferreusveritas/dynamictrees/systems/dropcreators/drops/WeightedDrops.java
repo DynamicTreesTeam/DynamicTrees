@@ -3,9 +3,9 @@ package com.ferreusveritas.dynamictrees.systems.dropcreators.drops;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.WeightedList;
+import net.minecraft.util.random.SimpleWeightedRandomList;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Map;
@@ -94,12 +94,12 @@ public final class WeightedDrops implements Drops {
     public void appendDrops(List<ItemStack> drops, Random random, int fortune) {
         final int chance = Drops.getChance(fortune, this.baseChance);
         final int attempts = MathHelper.randomBetween(random, this.minAttempts, this.maxAttempts);
-
-        WeightedList<Item> list = new WeightedList<>();
-        this.items.forEach(list::add);
+        SimpleWeightedRandomList.Builder<Item> builder = new SimpleWeightedRandomList.Builder<>();
+        this.items.forEach(builder::add);
+        SimpleWeightedRandomList<Item> list = builder.build();
         for (int i = 0; i < attempts; i++) {
             if (random.nextInt(Math.max((int) (chance / this.rarity), 1)) == 0) {
-                drops.add(new ItemStack(list.getOne(random)));
+                drops.add(new ItemStack(list.getRandomValue(random).get()));
             }
         }
 

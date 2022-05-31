@@ -9,12 +9,12 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowConte
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import net.minecraft.block.*;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.*;
 
 import java.util.List;
 import java.util.Random;
@@ -35,7 +35,7 @@ public class PodzolGenFeature extends GenFeature {
             return false;
         }
 
-        final World world = context.world();
+        final Level world = context.world();
         final FindEndsNode endFinder = new FindEndsNode();
         TreeHelper.startAnalysisFromRoot(world, context.pos(), new MapSignal(endFinder));
         final List<BlockPos> endPoints = endFinder.getEnds();
@@ -63,13 +63,13 @@ public class PodzolGenFeature extends GenFeature {
                     continue;
                 } else if (block instanceof FlowerBlock || block instanceof TallGrassBlock || block instanceof DoublePlantBlock) {
                     // Kill plants.
-                    if (world.getBrightness(LightType.SKY, offPos) <= darkThreshold) {
+                    if (world.getBrightness(LightLayer.SKY, offPos) <= darkThreshold) {
                         world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                     }
                     continue;
                 } else if (block == Blocks.DIRT || block == Blocks.GRASS) {
                     // Convert grass or dirt to podzol.
-                    if (world.getBrightness(LightType.SKY, offPos.above()) <= darkThreshold) {
+                    if (world.getBrightness(LightLayer.SKY, offPos.above()) <= darkThreshold) {
                         world.setBlockAndUpdate(offPos, BlockStates.PODZOL);
                     } else {
                         spreadPodzol(world, pos);
@@ -81,7 +81,7 @@ public class PodzolGenFeature extends GenFeature {
         return true;
     }
 
-    public static void spreadPodzol(World world, BlockPos pos) {
+    public static void spreadPodzol(Level world, BlockPos pos) {
         int podzolish = 0;
 
         for (Direction dir : CoordUtils.HORIZONTALS) {

@@ -4,21 +4,21 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Random;
 
@@ -31,7 +31,7 @@ public class PalmLeavesProperties extends LeavesProperties {
     }
 
     @Override
-    protected DynamicLeavesBlock createDynamicLeaves(AbstractBlock.Properties properties) {
+    protected DynamicLeavesBlock createDynamicLeaves(BlockBehaviour.Properties properties) {
         return new DynamicPalmLeavesBlock(this, properties);
     }
 
@@ -51,7 +51,7 @@ public class PalmLeavesProperties extends LeavesProperties {
         };
 
         @Override
-        public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
+        public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random rand) {
             if (state.getBlock() == this) {
                 int dist = state.getValue(DISTANCE);
                 if ((dist == 1 || dist == 2) && state.getValue(DIRECTION) == 0) {
@@ -68,7 +68,7 @@ public class PalmLeavesProperties extends LeavesProperties {
         }
 
         @Override
-        protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+        protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
             super.createBlockStateDefinition(builder);
             builder.add(DIRECTION);
         }
@@ -81,12 +81,12 @@ public class PalmLeavesProperties extends LeavesProperties {
         }
 
         @Override
-        public int getRadiusForConnection(BlockState state, IBlockReader reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
+        public int getRadiusForConnection(BlockState state, BlockGetter reader, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
             return side == Direction.UP && from.getFamily().isCompatibleDynamicLeaves(Species.NULL_SPECIES, state, reader, pos) ? fromRadius : 0;
         }
 
         @Override
-        public int branchSupport(BlockState state, IBlockReader reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+        public int branchSupport(BlockState state, BlockGetter reader, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
             return branch.getFamily() == getFamily(state, reader, pos) ? BranchBlock.setSupport(0, 1) : 0;
         }
 
@@ -96,7 +96,7 @@ public class PalmLeavesProperties extends LeavesProperties {
         }
 
         @Override
-        public BlockState getLeavesBlockStateForPlacement(IWorld world, BlockPos pos, BlockState leavesStateWithHydro, int oldHydro, boolean worldGen) {
+        public BlockState getLeavesBlockStateForPlacement(LevelAccessor world, BlockPos pos, BlockState leavesStateWithHydro, int oldHydro, boolean worldGen) {
             for (CoordUtils.Surround surround : CoordUtils.Surround.values()) {
                 BlockState offstate = world.getBlockState(pos.offset(surround.getOffset()));
                 if (offstate.getBlock() == this && offstate.getValue(DISTANCE) == 3) {
@@ -107,11 +107,11 @@ public class PalmLeavesProperties extends LeavesProperties {
         }
 
         @Override
-        public VoxelShape getOcclusionShape(BlockState state, IBlockReader world, BlockPos pos) {
-            AxisAlignedBB base = super.getOcclusionShape(state, world, pos).bounds();
+        public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
+            AABB base = super.getOcclusionShape(state, world, pos).bounds();
             base.inflate(1, 0, 1);
             base.inflate(-1, -0, -1);
-            return VoxelShapes.create(base);
+            return Shapes.create(base);
         }
 
     }

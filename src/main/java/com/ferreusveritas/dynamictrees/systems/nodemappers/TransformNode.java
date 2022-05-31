@@ -6,10 +6,10 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TransformNode implements NodeInspector {
 
@@ -22,7 +22,7 @@ public class TransformNode implements NodeInspector {
     }
 
     @Override
-    public boolean run(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+    public boolean run(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir) {
         BranchBlock branch = TreeHelper.getBranch(blockState);
 
         if (branch != null && fromSpecies.getFamily() == branch.getFamily()) {
@@ -46,13 +46,13 @@ public class TransformNode implements NodeInspector {
     }
 
     @Override
-    public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+    public boolean returnRun(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir) {
         return false;
     }
 
     private static final int TEST_LEAVES_RADIUS = 3;
 
-    public void transformSurroundingLeaves(IWorld world, BlockPos twigPos) {
+    public void transformSurroundingLeaves(LevelAccessor world, BlockPos twigPos) {
         if (world.isClientSide()) {
             return;
         }

@@ -45,73 +45,50 @@ import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.GlobalDropCreators;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.*;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostRotContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PreGenerationContext;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.DiseaseNode;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.InflatorNode;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.ShrinkerNode;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
-import com.ferreusveritas.dynamictrees.util.BlockStates;
-import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
-import com.ferreusveritas.dynamictrees.util.Optionals;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.tags.ITag;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -119,24 +96,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator.RARITY;
@@ -160,17 +125,17 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public boolean plantSapling(IWorld world, BlockPos pos, boolean locationOverride) {
+        public boolean plantSapling(LevelAccessor world, BlockPos pos, boolean locationOverride) {
             return false;
         }
 
         @Override
-        public boolean generate(World worldObj, IWorld world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+        public boolean generate(Level worldObj, LevelAccessor world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
             return false;
         }
 
         @Override
-        public float biomeSuitability(World world, BlockPos pos) {
+        public float biomeSuitability(Level world, BlockPos pos) {
             return 0.0f;
         }
 
@@ -180,7 +145,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public Species setSeed(Seed seed) {
+        public Species setSeed(Supplier<Seed> seedSup) {
             return this;
         }
 
@@ -195,12 +160,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public ITextComponent getTextComponent() {
-            return this.formatComponent(new TranslationTextComponent("gui.none"), TextFormatting.DARK_RED);
+        public Component getTextComponent() {
+            return this.formatComponent(new TranslatableComponent("gui.none"), ChatFormatting.DARK_RED);
         }
 
         @Override
-        public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
+        public boolean update(Level world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
             return false;
         }
     };
@@ -293,12 +258,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * The seed used to reproduce this species.  Drops from the tree and can plant itself
      */
-    protected Seed seed;
+    protected Supplier<Seed> seed;
 
     /**
      * A blockState that will turn itself into this tree
      */
-    protected DynamicSaplingBlock saplingBlock;
+    protected Supplier<DynamicSaplingBlock> saplingBlock;
 
     protected List<DropCreatorConfiguration> dropCreators = new ArrayList<>();
 
@@ -414,7 +379,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Gets the default chance to use for the {@link #seed} for the {@link net.minecraft.block.ComposterBlock}.
      *
      * @return The default chance for the compostable {@link Seed} to be successfully composted.
      */
@@ -458,7 +422,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * #family}; {@code false} otherwise.
      */
     public boolean isSeedCommon() {
-        return this.getCommonSpecies().getSeed().orElse(null) == this.seed;
+        return this.getCommonSpecies().getSeed().orElse(null) == this.seed.get();
     }
 
     public Species setUnlocalizedName(String name) {
@@ -475,8 +439,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     @Override
-    public ITextComponent getTextComponent() {
-        return this.formatComponent(new TranslationTextComponent(this.getUnlocalizedName()), TextFormatting.AQUA);
+    public Component getTextComponent() {
+        return this.formatComponent(new TranslatableComponent(this.getUnlocalizedName()), ChatFormatting.AQUA);
     }
 
     public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
@@ -512,11 +476,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return signalEnergy;
     }
 
-    public float getEnergy(World world, BlockPos rootPos) {
+    public float getEnergy(Level world, BlockPos rootPos) {
         return this.logicKit.getEnergy(new PositionalSpeciesContext(world, rootPos, this));
     }
 
-    public float getGrowthRate(World world, BlockPos rootPos) {
+    public float getGrowthRate(Level world, BlockPos rootPos) {
         return this.growthRate * this.seasonalGrowthFactor(world, rootPos);
     }
 
@@ -546,11 +510,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Works out if this {@link Species} will require a {@link SpeciesTileEntity} at the given position. It should
      * require one if it's not the common species and it's not in its common species override for the given position.
      *
-     * @param world The {@link IWorld} the tree is being planted in.
+     * @param world The {@link LevelAccessor} the tree is being planted in.
      * @param pos   The {@link BlockPos} at which the tree is being planted at.
      * @return True if it will require a {@link SpeciesTileEntity}.
      */
-    public boolean doesRequireTileEntity(IWorld world, BlockPos pos) {
+    public boolean doesRequireTileEntity(LevelAccessor world, BlockPos pos) {
         return !this.isCommonSpecies() && !this.shouldOverrideCommon(world, pos);
     }
 
@@ -582,12 +546,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.commonOverride = commonOverride;
     }
 
-    public boolean shouldOverrideCommon(final IBlockReader world, final BlockPos trunkPos) {
+    public boolean shouldOverrideCommon(final BlockGetter world, final BlockPos trunkPos) {
         return this.hasCommonOverride() && this.commonOverride.test(world, trunkPos);
     }
 
     @FunctionalInterface
-    public interface CommonOverride extends BiPredicate<IBlockReader, BlockPos> {
+    public interface CommonOverride extends BiPredicate<BlockGetter, BlockPos> {
 
     }
 
@@ -657,7 +621,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return defaultColor;
     }
 
-    public int leafColorMultiplier(World world, BlockPos pos) {
+    public int leafColorMultiplier(Level world, BlockPos pos) {
         return getLeavesProperties().treeFallColorMultiplier(getLeavesProperties().getDynamicLeavesState(), world, pos);
     }
 
@@ -672,7 +636,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return An {@link ItemStack} with the {@link Seed} inside.
      */
     public ItemStack getSeedStack(int qty) {
-        return !this.hasSeed() ? ItemStack.EMPTY : new ItemStack(this.seed, qty);
+        return !this.hasSeed() ? ItemStack.EMPTY : new ItemStack(this.seed.get(), qty);
     }
 
     public boolean hasSeed() {
@@ -680,7 +644,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public Optional<Seed> getSeed() {
-        return Optional.ofNullable(this.seed);
+        return Optional.ofNullable(this.seed == null ? null : this.seed.get());
     }
 
     /**
@@ -733,17 +697,17 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public Species generateSeed() {
         return !this.shouldGenerateSeed() || this.seed != null ? this :
-                this.setSeed(RegistryHandler.addItem(getSeedName(), new Seed(this)));
+                this.setSeed(RegistryHandler.addItem(getSeedName(), () -> new Seed(this)));
     }
 
     /**
-     * Sets the {@link Seed} object for this {@link Species}.
+     * Sets the {@link Seed} supplier for this {@link Species}.
      *
-     * @param seed The {@link Seed} to set.
+     * @param seedSup The supplier of the {@link Seed} to set.
      * @return This {@link Species} object for chaining.
      */
-    public Species setSeed(final Seed seed) {
-        this.seed = seed;
+    public Species setSeed(final Supplier<Seed> seedSup) {
+        this.seed = seedSup;
         return this;
     }
 
@@ -853,7 +817,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param fertility
      * @return true if seed was dropped
      */
-    public boolean handleVoluntaryDrops(World world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
+    public boolean handleVoluntaryDrops(Level world, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
         int tickSpeed = world.getGameRules().getInt(GameRules.RULE_RANDOMTICKING);
         if (tickSpeed > 0) {
             double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
@@ -871,10 +835,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
                         if (itemPos != BlockPos.ZERO) {
                             ItemEntity itemEntity = new ItemEntity(world, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
-                            Vector3d motion = new Vector3d(itemPos.getX(), itemPos.getY(), itemPos.getZ()).subtract(new Vector3d(treePos.getX(), treePos.getY(), treePos.getZ()));
+                            Vec3 motion = new Vec3(itemPos.getX(), itemPos.getY(), itemPos.getZ()).subtract(new Vec3(treePos.getX(), treePos.getY(), treePos.getZ()));
                             float distAngle = 15;//The spread angle(center to edge)
                             float launchSpeed = 4;//Blocks(meters) per second
-                            motion = new Vector3d(motion.x, 0, motion.y).normalize().yRot((world.random.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed / 20f);
+                            motion = new Vec3(motion.x, 0, motion.y).normalize().yRot((world.random.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed / 20f);
                             itemEntity.setDeltaMovement(motion.x, motion.y, motion.z);
                             return world.addFreshEntity(itemEntity);
                         }
@@ -910,7 +874,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
-    public Species setSapling(DynamicSaplingBlock sapling) {
+    public Species setSapling(Supplier<DynamicSaplingBlock> sapling) {
         saplingBlock = sapling;
         return this;
     }
@@ -973,22 +937,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public Species generateSapling() {
         return !this.shouldGenerateSapling() || this.saplingBlock != null ? this :
-                this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), new DynamicSaplingBlock(this)));
+                this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), () -> new DynamicSaplingBlock(this)));
     }
 
     public Optional<DynamicSaplingBlock> getSapling() {
-        return Optional.ofNullable(saplingBlock);
+        return Optional.ofNullable(this.saplingBlock == null ? null : this.saplingBlock.get());
     }
 
     /**
-     * Returns the {@link Species} override for the specified {@link BlockPos} in the specified {@link World} if {@link
+     * Returns the {@link Species} override for the specified {@link BlockPos} in the specified {@link Level} if {@link
      * #shouldUseLocationOverride()}, or returns {@code this} {@link Species} otherwise.
      *
-     * @param world The {@link IWorld} to check for the override in.
+     * @param world The {@link LevelAccessor} to check for the override in.
      * @param pos   The {@link BlockPos} to check.
      * @return The relevant {@link Species} override or {@code this} {@link Species}.
      */
-    public Species selfOrLocationOverride(final IBlockReader world, BlockPos pos) {
+    public Species selfOrLocationOverride(final BlockGetter world, BlockPos pos) {
         return this.shouldUseLocationOverride() ? this.getFamily().getSpeciesForLocation(world, pos, this)
                 : this;
     }
@@ -1009,8 +973,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param pos
      * @return true if the planting was successful
      */
-    public boolean plantSapling(IWorld world, BlockPos pos, boolean locationOverride) {
-        final DynamicSaplingBlock sapling = this.getSapling().orElse(this.getCommonSpecies().saplingBlock);
+    public boolean plantSapling(LevelAccessor world, BlockPos pos, boolean locationOverride) {
+        final DynamicSaplingBlock sapling = this.getSapling().orElse(this.getCommonSpecies().saplingBlock.get());
 
         if (sapling == null || !world.getBlockState(pos).getMaterial().isReplaceable() ||
                 !DynamicSaplingBlock.canSaplingStay(world, this, pos)) {
@@ -1028,11 +992,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * Checks if the sapling can grow at the given position.
      *
-     * @param world The {@link World} object.
+     * @param world The {@link Level} object.
      * @param pos   The {@link BlockPos} the sapling is on.
      * @return True if it can grow.
      */
-    public boolean canSaplingGrow(World world, BlockPos pos) {
+    public boolean canSaplingGrow(Level world, BlockPos pos) {
         return this.acceptableBlocksForGrowth.isEmpty() || this.acceptableBlocksForGrowth.stream().anyMatch(block -> block == world.getBlockState(pos.below()).getBlock());
     }
 
@@ -1047,22 +1011,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Determines whether or not the {@link #saplingBlock} should be able to grow without player intervention
      * (bone-mealing).
      *
-     * @param world The {@link World} instance.
+     * @param world The {@link Level} instance.
      * @param pos   The {@link BlockPos} of the {@link DynamicSaplingBlock}.
      * @return {@code true} if the sapling can and should grow naturally; {@code false} otherwise.
      */
-    public boolean canSaplingGrowNaturally(World world, BlockPos pos) {
+    public boolean canSaplingGrowNaturally(Level world, BlockPos pos) {
         return this.canSaplingGrowNaturally && this.canSaplingGrow(world, pos);
     }
 
     //Returns if sapling should consume bonemeal when used on it.
     //if true is returned canSaplingUseBoneMeal is then run to determine if the sapling grows or not.
-    public boolean canSaplingConsumeBoneMeal(World world, BlockPos pos) {
+    public boolean canSaplingConsumeBoneMeal(Level world, BlockPos pos) {
         return canBoneMealTree() && canSaplingGrow(world, pos);
     }
 
     //Returns whether or not the bonemealing should cause sapling growth.
-    public boolean canSaplingGrowAfterBoneMeal(World world, Random rand, BlockPos pos) {
+    public boolean canSaplingGrowAfterBoneMeal(Level world, Random rand, BlockPos pos) {
         return canBoneMealTree() && canSaplingGrow(world, pos);
     }
 
@@ -1074,7 +1038,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return 0;
     }
 
-    public boolean transitionToTree(World world, BlockPos pos) {
+    public boolean transitionToTree(Level world, BlockPos pos) {
 
         //Ensure planting conditions are right
         Family family = getFamily();
@@ -1087,8 +1051,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             placeRootyDirtBlock(world, pos.below(), 15);
 
             if (doesRequireTileEntity(world, pos)) {
-                SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
-                world.setBlockEntity(pos.below(), speciesTE);
+                SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create(pos.below(),world.getBlockState(pos));
+                world.setBlockEntity(speciesTE);
                 if (speciesTE != null) {
                     speciesTE.setSpecies(this);
                 }
@@ -1126,7 +1090,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         saplingName = name;
     }
 
-    public int saplingColorMultiplier(BlockState state, IBlockDisplayReader access, BlockPos pos, int tintIndex) {
+    public int saplingColorMultiplier(BlockState state, BlockAndTintGetter access, BlockPos pos, int tintIndex) {
         return getLeavesProperties().foliageColorMultiplier(state, access, pos);
     }
 
@@ -1145,7 +1109,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     //DIRT
     ///////////////////////////////////////////
 
-    public boolean placeRootyDirtBlock(IWorld world, BlockPos rootPos, int fertility) {
+    public boolean placeRootyDirtBlock(LevelAccessor world, BlockPos rootPos, int fertility) {
         BlockState dirtState = world.getBlockState(rootPos);
         Block dirt = dirtState.getBlock();
 
@@ -1163,7 +1127,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             this.placeRootyDirtBlock(world, rootPos, dirtState, fertility);
         }
 
-        TileEntity tileEntity = world.getBlockEntity(rootPos);
+        BlockEntity tileEntity = world.getBlockEntity(rootPos);
         if (tileEntity instanceof SpeciesTileEntity) {
             SpeciesTileEntity speciesTE = (SpeciesTileEntity) tileEntity;
             speciesTE.setSpecies(this);
@@ -1172,14 +1136,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return true;
     }
 
-    private void placeRootyDirtBlock(IWorld world, BlockPos rootPos, BlockState primitiveDirtState, int fertility) {
+    private void placeRootyDirtBlock(LevelAccessor world, BlockPos rootPos, BlockState primitiveDirtState, int fertility) {
         final SoilProperties soilProperties = SoilHelper.getProperties(primitiveDirtState.getBlock());
         soilProperties.getBlock().ifPresent(block ->
                 world.setBlock(rootPos, soilProperties.getSoilState(primitiveDirtState, fertility, this.doesRequireTileEntity(world, rootPos)), 3)
         );
     }
 
-    private void updateRootyDirtBlock(IWorld world, BlockPos rootPos, BlockState soilState, int fertility) {
+    private void updateRootyDirtBlock(LevelAccessor world, BlockPos rootPos, BlockState soilState, int fertility) {
         if (soilState.getBlock() instanceof RootyBlock)
             world.setBlock(rootPos, soilState.setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(world, rootPos)), 3);
     }
@@ -1189,7 +1153,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
-    public int getSoilLongevity(World world, BlockPos rootPos) {
+    public int getSoilLongevity(Level world, BlockPos rootPos) {
         return (int) (biomeSuitability(world, rootPos) * soilLongevity);
     }
 
@@ -1202,7 +1166,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public void setMaxBranchRadius(int maxBranchRadius) {
-        this.maxBranchRadius = MathHelper.clamp(maxBranchRadius, 1, this.getFamily().getMaxBranchRadius());
+        this.maxBranchRadius = Mth.clamp(maxBranchRadius, 1, this.getFamily().getMaxBranchRadius());
     }
 
     public Species addAcceptableSoils(String... soilTypes) {
@@ -1231,6 +1195,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
+     * Moves ground position for world generation purposes to allow trees in snow-covered biomes, for example.
+     */
+    public BlockPos moveGroundPosWorldgen(LevelAccessor world, BlockPos pos, BlockState soilBlockState) {
+        if (!soilBlockState.is(BlockTags.SNOW))
+            return pos;
+
+        for (int steps = 8; steps > 0 && soilBlockState.is(BlockTags.SNOW); steps--) {
+            pos = pos.below();
+            soilBlockState = world.getBlockState(pos);
+        }
+
+        return pos;
+    }
+
+    /**
      * Soil acceptability tester.  Mostly to test if the block is dirt but could be overridden to allow gravel, sand, or
      * whatever makes sense for the tree species.
      *
@@ -1250,7 +1229,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param soilBlockState
      * @return
      */
-    public boolean isAcceptableSoil(IWorldReader world, BlockPos pos, BlockState soilBlockState) {
+    public boolean isAcceptableSoil(LevelReader world, BlockPos pos, BlockState soilBlockState) {
         return isAcceptableSoil(soilBlockState);
     }
 
@@ -1262,7 +1241,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param soilBlockState
      * @return
      */
-    public boolean isAcceptableSoilForWorldgen(IWorld world, BlockPos pos, BlockState soilBlockState) {
+    public boolean isAcceptableSoilForWorldgen(LevelAccessor world, BlockPos pos, BlockState soilBlockState) {
         final boolean isAcceptableSoil = isAcceptableSoil(world, pos, soilBlockState);
 
         // If the block is water, check the block below it is valid soil (and not water).
@@ -1301,7 +1280,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
      * is on)
      */
-    public boolean update(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+    public boolean update(Level world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 
         //Analyze structure to gather all of the endpoints.  They will be useful for this entire update
         List<BlockPos> ends = getEnds(world, treePos, treeBase);
@@ -1332,7 +1311,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param treeBase The tree part that is the base of the {@link Family} trunk.  Provided for easy analysis.
      * @return A list of all branch endpoints for the {@link Family}
      */
-    final protected List<BlockPos> getEnds(World world, BlockPos treePos, TreePart treeBase) {
+    final protected List<BlockPos> getEnds(Level world, BlockPos treePos, TreePart treeBase) {
         FindEndsNode endFinder = new FindEndsNode();
         treeBase.analyse(world.getBlockState(treePos), world, treePos, null, new MapSignal(endFinder));
         return endFinder.getEnds();
@@ -1349,7 +1328,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param safeBounds The defined boundaries where it is safe to make block changes
      * @return true if last piece of tree rotted away.
      */
-    public boolean handleRot(IWorld world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int fertility, SafeChunkBounds safeBounds) {
+    public boolean handleRot(LevelAccessor world, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int fertility, SafeChunkBounds safeBounds) {
 
         Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
         SimpleVoxmap leafMap = getLeavesProperties().getCellKit().getLeafCluster();
@@ -1395,7 +1374,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param growLeaves    {@code true} if this rot should attempt to grow leaves first.
      * @return true if the branch should rot
      */
-    public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
+    public boolean rot(LevelAccessor world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
         if (!doesRot) {
             return false;
         }
@@ -1429,11 +1408,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * @deprecated No longe in use due to extra parameter. Use/override {@link #rot(IWorld, BlockPos, int, int, int,
+     * @deprecated No longe in use due to extra parameter. Use/override {@link #rot(LevelAccessor, BlockPos, int, int, int,
      * Random, boolean, boolean)} instead.
      */
     @Deprecated
-    public boolean rot(IWorld world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
+    public boolean rot(LevelAccessor world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
         return false;
     }
 
@@ -1450,7 +1429,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param radius The radius of the {@link BranchBlock}
      * @return The chance this will postRot. 0.0(never) -> 1.0(always)
      */
-    public float rotChance(IWorld world, BlockPos pos, Random rand, int radius) {
+    public float rotChance(LevelAccessor world, BlockPos pos, Random rand, int radius) {
         if (radius == 0) {
             return 0;
         }
@@ -1472,7 +1451,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
      * is on)
      */
-    public boolean grow(World world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+    public boolean grow(Level world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean natural) {
 
         float growthRate = (float) (getGrowthRate(world, rootPos) * DTConfigs.TREE_GROWTH_MULTIPLIER.get() * DTConfigs.TREE_GROWTH_FOLDING.get());
         do {
@@ -1543,7 +1522,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      *                  false then this member is being used to grow a tree with a growth accelerant like bonemeal or
      *                  the potion of burgeoning.
      */
-    public boolean postGrow(World world, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
+    public boolean postGrow(Level world, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
         this.genFeatures.forEach(configuration ->
                 configuration.generate(
                         GenFeature.Type.POST_GROW,
@@ -1561,7 +1540,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param random
      * @return true if the tree became diseased
      */
-    public boolean handleDisease(World world, TreePart baseTreePart, BlockPos treePos, Random random, int fertility) {
+    public boolean handleDisease(Level world, TreePart baseTreePart, BlockPos treePos, Random random, int fertility) {
         if (fertility == 0 && DTConfigs.DISEASE_CHANCE.get() > random.nextFloat()) {
             baseTreePart.analyse(world.getBlockState(treePos), world, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
             return true;
@@ -1581,13 +1560,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * @param world The {@link World} object.
+     * @param world The {@link Level} object.
      * @param pos
      * @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
      */
-    public float biomeSuitability(World world, BlockPos pos) {
+    public float biomeSuitability(Level world, BlockPos pos) {
 
-        Biome biome = world.getBiome(pos);
+        Holder<Biome> biomeHolder = world.getBiome(pos);
+        Biome biome = biomeHolder.value();
 
         //An override to allow other mods to change the behavior of the suitability for a world location. Such as Terrafirmacraft.
         BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(world, biome, this, pos);
@@ -1604,14 +1584,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         float suit = defaultSuitability();
 
-        for (BiomeDictionary.Type t : BiomeDictionary.getTypes(RegistryKey.create(net.minecraft.util.registry.Registry.BIOME_REGISTRY, biome.getRegistryName()))) {
+        for (BiomeDictionary.Type t : BiomeDictionary.getTypes(biomeHolder.unwrapKey().orElseThrow())) {
             suit *= envFactors.getOrDefault(t, 1.0f);
         }
 
         //Linear interpolation of suitability with universal growth scalar
         suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
 
-        return MathHelper.clamp(suit, 0.0f, 1.0f);
+        return Mth.clamp(suit, 0.0f, 1.0f);
     }
 
     /**
@@ -1632,20 +1612,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param biome The biome being tested
      * @return True if biome is "perfect" false otherwise.
      */
-    public boolean isBiomePerfect(RegistryKey<Biome> biome) {
+    public boolean isBiomePerfect(ResourceKey<Biome> biome) {
         return false;
     }
 
     public List<Biome> getPerfectBiomes() {
         return perfectBiomes;
-    }
-
-    public static Biome getBiome(final RegistryKey<Biome> biomeKey) {
-        return Objects.requireNonNull(ForgeRegistries.BIOMES.getValue(biomeKey.getRegistryName()));
-    }
-
-    public static RegistryKey<Biome> getBiomeKey(final Biome biome) {
-        return RegistryKey.create(net.minecraft.util.registry.Registry.BIOME_REGISTRY, Objects.requireNonNull(biome.getRegistryName()));
     }
 
     /**
@@ -1663,8 +1635,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return True if a match is found. False if not.
      */
     @SafeVarargs
-    public static boolean isOneOfBiomes(RegistryKey<Biome> biomeToCheck, RegistryKey<Biome>... biomes) {
-        for (RegistryKey<Biome> biome : biomes) {
+    public static boolean isOneOfBiomes(ResourceKey<Biome> biomeToCheck, ResourceKey<Biome>... biomes) {
+        for (ResourceKey<Biome> biome : biomes) {
             if (biomeToCheck.equals(biome)) {
                 return true;
             }
@@ -1711,21 +1683,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Pulls data from the {@link NormalSeasonManager} to determine the rate of
      * tree growth for the current season.
      *
-     * @param world   The {@link World} object.
+     * @param world   The {@link Level} object.
      * @param rootPos the {@link BlockPos} of the {@link RootyBlock}.
      * @return Factor from 0.0 (no growth) to 1.0 (full growth).
      */
-    public float seasonalGrowthFactor(World world, BlockPos rootPos) {
+    public float seasonalGrowthFactor(Level world, BlockPos rootPos) {
         return DTConfigs.ENABLE_SEASONAL_GROWTH_FACTOR.get() && seasonalGrowthOffset != null ?
                 SeasonHelper.globalSeasonalGrowthFactor(world, rootPos, -seasonalGrowthOffset) : 1.0f;
     }
 
-    public float seasonalSeedDropFactor(World world, BlockPos pos) {
+    public float seasonalSeedDropFactor(Level world, BlockPos pos) {
         return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() && seasonalSeedDropOffset != null ?
                 SeasonHelper.globalSeasonalSeedDropFactor(world, pos, -seasonalSeedDropOffset) : 1.0f;
     }
 
-    public float seasonalFruitProductionFactor(World world, BlockPos pos) {
+    public float seasonalFruitProductionFactor(Level world, BlockPos pos) {
         return DTConfigs.ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR.get() && seasonalFruitingOffset != null ?
                 SeasonHelper.globalSeasonalFruitProductionFactor(world, pos, -seasonalFruitingOffset, false) : 1.0f;
     }
@@ -1733,7 +1705,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * 1 = Spring 2 = Summer 4 = Autumn 8 = Winter Values are OR'ed together for the return
      */
-    public int getSeasonalTooltipFlags(final World world) {
+    public int getSeasonalTooltipFlags(final Level world) {
         final float seasonStart = 1f / 6;
         final float seasonEnd = 1 - 1f / 6;
         final float threshold = 0.75f;
@@ -1794,7 +1766,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 
         // Bonemeal fertilizes the soil and causes a single growth pulse.
-        if (canBoneMealTree() && itemStack.getItem().is(DTItemTags.FERTILIZER)) {
+        if (canBoneMealTree() && itemStack.is(DTItemTags.FERTILIZER)) {
             return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(DTConfigs.BONE_MEAL_GROWTH_PULSES::get);
         }
 
@@ -1805,7 +1777,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         // Enhanced fertilizer applies the Burgeoning potion effect.
-        if (itemStack.getItem().is(DTItemTags.ENHANCED_FERTILIZER)) {
+        if (itemStack.is(DTItemTags.ENHANCED_FERTILIZER)) {
             return new GrowthSubstance();
         }
 
@@ -1822,7 +1794,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param itemStack The itemstack to be used.
      * @return true if item was used, false otherwise
      */
-    public boolean applySubstance(World world, BlockPos rootPos, BlockPos hitPos, PlayerEntity player, Hand hand, ItemStack itemStack) {
+    public boolean applySubstance(Level world, BlockPos rootPos, BlockPos hitPos, Player player, InteractionHand hand, ItemStack itemStack) {
         final SubstanceEffect effect = getSubstanceEffect(itemStack);
 
         if (effect != null) {
@@ -1845,13 +1817,13 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param rootPos  The  {@link BlockPos} of the {@link RootyBlock}
      * @param hitPos   The {@link BlockPos} of the {@link Block} that was hit.
      * @param state    The {@link BlockState} of the hit {@link Block}.
-     * @param player   The {@link PlayerEntity} that hit the {@link Block}
+     * @param player   The {@link Player} that hit the {@link Block}
      * @param hand     Hand used to peform the action
-     * @param heldItem The {@link ItemStack} the {@link PlayerEntity} hit the {@link Block} with.
+     * @param heldItem The {@link ItemStack} the {@link Player} hit the {@link Block} with.
      * @param hit      The block ray trace of the clicking action
      * @return True if action was handled, false otherwise.
      */
-    public boolean onTreeActivated(World world, BlockPos rootPos, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, @Nullable ItemStack heldItem, BlockRayTraceResult hit) {
+    public boolean onTreeActivated(Level world, BlockPos rootPos, BlockPos hitPos, BlockState state, Player player, InteractionHand hand, @Nullable ItemStack heldItem, BlockHitResult hit) {
 
         if (heldItem != null) { // Ensure there is something in the player's hand.
             if (applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
@@ -1870,7 +1842,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param hand     Hand holding the item
      * @param heldItem The item to be consumed
      */
-    public static void consumePlayerItem(PlayerEntity player, Hand hand, ItemStack heldItem) {
+    public static void consumePlayerItem(Player player, InteractionHand hand, ItemStack heldItem) {
         if (!player.isCreative()) {
             if (heldItem.getItem() instanceof Emptiable) { // A substance deployed from a refillable container.
                 final Emptiable emptiable = (Emptiable) heldItem.getItem();
@@ -1962,7 +1934,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return The {@link PottedSaplingBlock} for this {@link Species}.
      */
     public PottedSaplingBlock getPottedSapling() {
-        return DTRegistries.POTTED_SAPLING;
+        return DTRegistries.POTTED_SAPLING.get();
     }
 
 
@@ -1980,7 +1952,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param radius  The radius of the tree generation boundary
      * @return true if tree was generated. false otherwise.
      */
-    public boolean generate(World worldObj, IWorld world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+    public boolean generate(Level worldObj, LevelAccessor world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
         final AtomicBoolean fullGen = new AtomicBoolean(false);
         final FullGenerationContext context = new FullGenerationContext(world, rootPos, this, biome, radius, safeBounds);
 
@@ -2062,7 +2034,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param joCode       The joCode that will be used to grow the tree
      * @return new blockposition of root block.  BlockPos.ZERO to cancel generation
      */
-    public BlockPos preGeneration(IWorld world, BlockPos rootPosition, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
+    public BlockPos preGeneration(LevelAccessor world, BlockPos rootPosition, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
         final AtomicReference<BlockPos> rootPos = new AtomicReference<>(rootPosition);
 
         this.genFeatures.forEach(configuration -> rootPos.set(
@@ -2125,11 +2097,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return CoordUtils.coordHashCode(pos, 2);
     }
 
-    public List<ITag.INamedTag<Block>> defaultSaplingTags() {
+    public List<TagKey<Block>> defaultSaplingTags() {
         return Collections.singletonList(DTBlockTags.SAPLINGS);
     }
 
-    public List<ITag.INamedTag<Item>> defaultSeedTags() {
+    public List<TagKey<Item>> defaultSeedTags() {
         return Collections.singletonList(DTItemTags.SEEDS);
     }
 
@@ -2179,8 +2151,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     @Override
     public String toLoadDataString() {
         final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
-        return this.getString(Pair.of("seed", this.seed != null ? registryHandler.getRegName(this.seed) : null),
-                Pair.of("sapling", this.saplingBlock != null ? "Block{" + registryHandler.getRegName(this.saplingBlock) + "}" : null));
+        return this.getString(Pair.of("seed", this.seed != null ? registryHandler.getRegName(this.seed.get()) : null),
+                Pair.of("sapling", this.saplingBlock != null ? "Block{" + registryHandler.getRegName(this.saplingBlock.get()) + "}" : null));
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.ChunkPos;
 
 import java.util.Iterator;
 import java.util.List;

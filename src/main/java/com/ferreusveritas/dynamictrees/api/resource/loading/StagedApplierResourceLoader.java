@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.Resource
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.deserialisation.PropertyAppliers;
 import com.ferreusveritas.dynamictrees.resources.Resources;
-import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 
 import java.util.function.Function;
 
@@ -22,7 +21,7 @@ public abstract class StagedApplierResourceLoader<I, R> extends AbstractResource
     protected final PropertyAppliers<R, I> loadAppliers;
 
     /**
-     * Appliers that should only be applied on {@link GatherDataEvent}.
+     * Appliers that should only be applied on {@link net.minecraftforge.forge.event.lifecycle.GatherDataEvent}.
      */
     protected final PropertyAppliers<R, I> gatherDataAppliers;
 

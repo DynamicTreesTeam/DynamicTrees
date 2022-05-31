@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.cells;
 
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 /**
  * A voxelmap of a leaf cluster for a species.  Values represent hydration value. This leaf cluster map is "stamped" on

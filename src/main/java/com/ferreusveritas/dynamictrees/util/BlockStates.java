@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * @author Harley O'Connor

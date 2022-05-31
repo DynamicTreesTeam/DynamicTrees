@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.registry;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistry;
 
 import java.util.Collections;

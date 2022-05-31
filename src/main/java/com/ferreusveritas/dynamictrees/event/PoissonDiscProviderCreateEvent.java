@@ -1,14 +1,14 @@
 package com.ferreusveritas.dynamictrees.event;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.PoissonDiscProvider;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.event.world.WorldEvent;
 
 public class PoissonDiscProviderCreateEvent extends WorldEvent {
 
     private PoissonDiscProvider poissonDiscProvider;
 
-    public PoissonDiscProviderCreateEvent(IWorld world, PoissonDiscProvider poissonDiscProvider) {
+    public PoissonDiscProviderCreateEvent(LevelAccessor world, PoissonDiscProvider poissonDiscProvider) {
         super(world);
         this.poissonDiscProvider = poissonDiscProvider;
     }

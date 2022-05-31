@@ -1,39 +1,38 @@
 package com.ferreusveritas.dynamictrees.entities.render;
 
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
-import net.minecraft.client.renderer.culling.ClippingHelper;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * @author Harley O'Connor
  */
 public class LingeringEffectorRenderer extends EntityRenderer<LingeringEffectorEntity> {
 
-    public LingeringEffectorRenderer(EntityRendererManager renderManager) {
+    public LingeringEffectorRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public boolean shouldRender(LingeringEffectorEntity livingEntityIn, ClippingHelper camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(LingeringEffectorEntity livingEntityIn, Frustum camera, double camX, double camY, double camZ) {
         return false;
     }
 
     @Override
     public ResourceLocation getTextureLocation(LingeringEffectorEntity entity) {
-        return MissingTextureSprite.getLocation();
+        return MissingTextureAtlasSprite.getLocation();
     }
 
-    public static class Factory implements IRenderFactory<LingeringEffectorEntity> {
-
-        @Override
-        public EntityRenderer<LingeringEffectorEntity> createRenderFor(EntityRendererManager manager) {
-            return new LingeringEffectorRenderer(manager);
-        }
-
-    }
+//    public static class Factory implements IRenderFactory<LingeringEffectorEntity> {
+//
+//        @Override
+//        public EntityRenderer<LingeringEffectorEntity> createRenderFor(EntityRenderDispatcher manager) {
+//            return new LingeringEffectorRenderer(manager);
+//        }
+//
+//    }
 
 }

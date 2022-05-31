@@ -2,11 +2,7 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.data.BranchItemModelGenerator;
-import com.ferreusveritas.dynamictrees.api.data.BranchStateGenerator;
-import com.ferreusveritas.dynamictrees.api.data.Generator;
-import com.ferreusveritas.dynamictrees.api.data.StrippedBranchStateGenerator;
-import com.ferreusveritas.dynamictrees.api.data.SurfaceRootStateGenerator;
+import com.ferreusveritas.dynamictrees.api.data.*;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
@@ -30,53 +26,51 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
 import com.ferreusveritas.dynamictrees.util.Optionals;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.Items;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryModifiable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.prefix;
 import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.suffix;
@@ -110,7 +104,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         }
 
         @Override
-        public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
+        public boolean onTreeActivated(Level world, BlockPos hitPos, BlockState state, Player player, InteractionHand hand, ItemStack heldItem, BlockHitResult hit) {
             return false;
         }
 
@@ -125,7 +119,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         }
 
         @Override
-        public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
+        public Species getSpeciesForLocation(LevelAccessor world, BlockPos trunkPos) {
             return Species.NULL_SPECIES;
         }
     };
@@ -143,19 +137,19 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     /**
      * The dynamic branch used by this tree family
      */
-    private BranchBlock branch;
+    private Supplier<BranchBlock> branch;
     /**
      * The stripped variant of the branch used by this tree family
      */
-    private BranchBlock strippedBranch;
+    private Supplier<BranchBlock> strippedBranch;
     /**
      * The dynamic branch's block item
      */
-    private Item branchItem;
+    private Supplier<Item> branchItem;
     /**
      * The surface root used by this tree family
      */
-    private SurfaceRootBlock surfaceRoot;
+    private Supplier<SurfaceRootBlock> surfaceRoot;
     /**
      * The primitive (vanilla) log to base the texture, drops, and other behavior from
      */
@@ -259,27 +253,13 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // SPECIES LOCATION OVERRIDES
     ///////////////////////////////////////////
 
-    /**
-     * This is only used by Rooty Dirt to get the appropriate species for this tree. For instance Oak may use this to
-     * select a Swamp Oak species if the coordinates are in a swamp.
-     *
-     * @param world    The {@link IWorld} object.
-     * @param trunkPos The {@link BlockPos} of the trunk.
-     * @return The {@link Species} for the specified position.
-     */
-    public Species getSpeciesForLocation(IWorld world, BlockPos trunkPos) {
+//
+    public Species getSpeciesForLocation(LevelAccessor world, BlockPos trunkPos) {
         return this.getSpeciesForLocation(world, trunkPos, this.commonSpecies);
     }
 
-    /**
-     * This is only used by Rooty Dirt to get the appropriate species for this tree. For instance Oak may use this to
-     * select a Swamp Oak species if the coordinates are in a swamp.
-     *
-     * @param world    The {@link IWorld} object.
-     * @param trunkPos The {@link BlockPos} of the trunk.
-     * @return The {@link Species} for the specified position.
-     */
-    public Species getSpeciesForLocation(IBlockReader world, BlockPos trunkPos, Species defaultSpecies) {
+
+    public Species getSpeciesForLocation(BlockGetter world, BlockPos trunkPos, Species defaultSpecies) {
         for (final Species species : this.species) {
             if (species.shouldOverrideCommon(world, trunkPos)) {
                 return species;
@@ -293,7 +273,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // INTERACTION
     ///////////////////////////////////////////
 
-    public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, @Nullable ItemStack heldItem, BlockRayTraceResult hit) {
+    public boolean onTreeActivated(Level world, BlockPos hitPos, BlockState state, Player player, InteractionHand hand, @Nullable ItemStack heldItem, BlockHitResult hit) {
 
         if (this.canSupportCocoa) {
             BlockPos pos = hit.getBlockPos();
@@ -305,10 +285,10 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
                             pos = pos.relative(hit.getDirection());
                         }
                         if (world.isEmptyBlock(pos)) {
-                            BlockState cocoaState = DTRegistries.COCOA_FRUIT.getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, hand, hit)));
+                            BlockState cocoaState = DTRegistries.COCOA_FRUIT.get().getStateForPlacement(new BlockPlaceContext(new UseOnContext(player, hand, hit)));
                             assert cocoaState != null;
-                            Direction facing = cocoaState.getValue(HorizontalBlock.FACING);
-                            world.setBlock(pos, DTRegistries.COCOA_FRUIT.defaultBlockState().setValue(HorizontalBlock.FACING, facing), 2);
+                            Direction facing = cocoaState.getValue(HorizontalDirectionalBlock.FACING);
+                            world.setBlock(pos, DTRegistries.COCOA_FRUIT.get().defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing), 2);
                             if (!player.isCreative()) {
                                 heldItem.shrink(1);
                             }
@@ -332,7 +312,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return false;
     }
 
-    public boolean canStripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
+    public boolean canStripBranch(BlockState state, Level world, BlockPos pos, Player player, ItemStack heldItem) {
         BranchBlock branchBlock = TreeHelper.getBranch(state);
 		if (branchBlock == null) {
 			return false;
@@ -340,12 +320,12 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return branchBlock.canBeStripped(state, world, pos, player, heldItem);
     }
 
-    public boolean stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
+    public boolean stripBranch(BlockState state, Level world, BlockPos pos, Player player, ItemStack heldItem) {
         if (this.hasStrippedBranch()) {
             this.getBranch().ifPresent(branch -> {
                 branch.stripBranch(state, world, pos, player, heldItem);
                 if (world.isClientSide) {
-                    world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
                     WailaOther.invalidateWailaPosition();
                 }
             });
@@ -368,9 +348,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * Creates the branch block. Can be overridden by sub-classes who want full control over registry and instantiation
      * of the branch.
      *
-     * @return The instantiated and registered {@link BranchBlock}.
+     * @return A supplier for the {@link BranchBlock}.
      */
-    public BranchBlock createBranch() {
+    public Supplier<BranchBlock> createBranch() {
         return this.createBranch(this.getBranchRegName(""));
     }
 
@@ -402,47 +382,61 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * Creates branch block and adds it to the relevant {@link RegistryHandler}.
      *
      * @param registryName The {@link ResourceLocation} registry name.
-     * @return The created {@link BranchBlock}.
+     * @return A supplier for the {@link BranchBlock}.
      */
-    protected BranchBlock createBranch(final ResourceLocation registryName) {
-        return RegistryHandler.addBlock(registryName, this.createBranchBlock());
+    protected Supplier<BranchBlock> createBranch(final ResourceLocation registryName) {
+        return RegistryHandler.addBlock(registryName, this::createBranchBlock);
     }
 
     /**
      * Creates and registers a {@link BlockItem} for the given branch with the given registry name.
      *
      * @param registryName The {@link ResourceLocation} registry name for the item.
-     * @param branch       The {@link BranchBlock} to create the {@link BlockItem} for.
-     * @return The created and registered {@link BlockItem} object.
+     * @param branchSup    A supplier for the {@link BranchBlock} to create the {@link BlockItem} for.
+     * @return A supplier for the {@link BlockItem}.
      */
-    public BlockItem createBranchItem(final ResourceLocation registryName, final BranchBlock branch) {
-        return RegistryHandler.addItem(registryName, new BlockItem(branch, new Item.Properties()));
+    public Supplier<BlockItem> createBranchItem(final ResourceLocation registryName, final Supplier<BranchBlock> branchSup) {
+        return RegistryHandler.addItem(registryName, () -> new BlockItem(branchSup.get(), new Item.Properties()));
     }
 
-    protected Family setBranch(final BranchBlock branch) {
-        this.branch = this.setupBranch(branch, this.hasStrippedBranch);
+    protected Family setBranch(final Supplier<BranchBlock> branchSup) {
+        this.branch = this.setupBranch(branchSup, this.hasStrippedBranch);
         return this;
     }
 
-    protected Family setStrippedBranch(final BranchBlock branch) {
+    protected Family setStrippedBranch(final Supplier<BranchBlock> branch) {
         this.strippedBranch = this.setupBranch(branch, false);
         return this;
     }
 
-    protected BranchBlock setupBranch(final BranchBlock branchBlock, final boolean canBeStripped) {
+    protected Supplier<BranchBlock> setupBranch(final Supplier<BranchBlock> branchBlockSup, final boolean canBeStripped) {
+        BranchBlock branchBlock = branchBlockSup.get();
         branchBlock.setFamily(this); // Link the branch to the tree.
         branchBlock.setCanBeStripped(canBeStripped);
         this.addValidBranches(branchBlock); // Add the branch as a valid branch.
-        return branchBlock;
+        return branchBlockSup;
     }
 
-    protected Family setBranchItem(Item branchItem) {
-        this.branchItem = branchItem;
+    @SuppressWarnings("unchecked")
+    protected <T extends Item> Family setBranchItem(Supplier<T> branchItemSup) {
+        this.branchItem = (Supplier<Item>) branchItemSup;
         return this;
     }
 
     public Optional<BranchBlock> getBranch() {
-        return Optionals.ofBlock(branch);
+        return Optionals.ofBlock(branch.get());
+    }
+    /**
+     * Version of getBranch() used by jocodes to generate the tree.
+     * By default it acts just like getBranch() but it can be overriden
+     * by addons to customize the branch selected by the jocode
+     * @param world     The world the tree is generating in
+     * @param species   The species of the tree generated
+     * @param pos       The position of the branch block
+     * @return branch block picked
+     */
+    public Optional<BranchBlock> getBranchForPlacement(LevelAccessor world, Species species, BlockPos pos) {
+        return getBranch();
     }
 
     /**
@@ -459,11 +453,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public Optional<BranchBlock> getStrippedBranch() {
-        return Optionals.ofBlock(strippedBranch);
+        return Optionals.ofBlock(strippedBranch.get());
     }
 
     public Optional<Item> getBranchItem() {
-        return Optionals.ofItem(branchItem);
+        return Optionals.ofItem(branchItem.get());
     }
 
     public boolean isThick() {
@@ -505,7 +499,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @return an {@link ItemStack} of sticky things
      */
     public ItemStack getStick(int qty) {
-        return this.stick == Items.AIR ? ItemStack.EMPTY : new ItemStack(this.stick, MathHelper.clamp(qty, 0, 64));
+        return this.stick == Items.AIR ? ItemStack.EMPTY : new ItemStack(this.stick, Mth.clamp(qty, 0, 64));
     }
 
     public void setCanSupportCocoa(boolean canSupportCocoa) {
@@ -524,7 +518,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.primitiveLog = primitiveLog;
 
 		if (this.branch != null) {
-			this.branch.setPrimitiveLogDrops(new ItemStack(primitiveLog));
+			this.branch.get().setPrimitiveLogDrops(new ItemStack(primitiveLog));
 		}
 
         return this;
@@ -534,7 +528,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.primitiveStrippedLog = primitiveStrippedLog;
 
 		if (this.strippedBranch != null) {
-			this.strippedBranch.setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
+			this.strippedBranch.get().setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
 		}
 
         return this;
@@ -573,16 +567,24 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.isFireProof = isFireProof;
     }
 
-    public SoundType getBranchSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
+    public SoundType getBranchSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
         return this.getDefaultBranchSoundType();
     }
 
-    public ToolType getBranchHarvestTool(BlockState state) {
-        return ToolType.AXE;
+    /**
+     * {@code null} = can harvest with hand
+     */
+    @Nullable
+    public Tier getDefaultBranchHarvestTier() {
+        return null;
     }
 
-    public int getBranchHarvestLevel(BlockState state) {
-        return 0;
+    /**
+     * {@code null} = can harvest with hand
+     */
+    @Nullable
+    public Tier getDefaultStrippedBranchHarvestTier() {
+        return null;
     }
 
     public Material getDefaultBranchMaterial() {
@@ -593,34 +595,25 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return SoundType.WOOD;
     }
 
-    public ToolType getDefaultBranchTool() {
-        return ToolType.AXE;
+    public BlockBehaviour.Properties getDefaultBranchProperties(final Material material, final MaterialColor materialColor) {
+        return BlockBehaviour.Properties.of(material, materialColor).sound(this.getDefaultBranchSoundType())
+                .noDrops().requiresCorrectToolForDrops();
     }
 
-    public AbstractBlock.Properties getDefaultBranchProperties(final Material material, final MaterialColor materialColor) {
-        return AbstractBlock.Properties.of(material, materialColor).sound(this.getDefaultBranchSoundType())
-                .noDrops().harvestLevel(0).harvestTool(this.getDefaultBranchTool());
-    }
-
-    private AbstractBlock.Properties properties;
+    private BlockBehaviour.Properties properties;
 
     /**
      * Gets the {@link #properties} for this {@link Family} object.
      *
      * @return The {@link #properties} for this {@link Family} object.
      */
-    public AbstractBlock.Properties getProperties() {
+    public BlockBehaviour.Properties getProperties() {
         return this.properties == null ? this.getDefaultBranchProperties(this.getDefaultBranchMaterial(),
                 this.getDefaultBranchMaterial().getColor()) : this.properties;
     }
 
-    /**
-     * Sets the {@link #properties} for this {@link Family} object to the given {@code properties}.
-     *
-     * @param properties The new {@link AbstractBlock.Properties} object to set.
-     * @return This {@link Family} object for chaining.
-     */
-    public Family setProperties(AbstractBlock.Properties properties) {
+
+    public Family setProperties(BlockBehaviour.Properties properties) {
         this.properties = properties;
         return this;
     }
@@ -629,7 +622,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     //BRANCHES
     ///////////////////////////////////////////
 
-    public int getRadiusForCellKit(IBlockReader blockAccess, BlockPos pos, BlockState blockState, Direction dir, BranchBlock branch) {
+    public int getRadiusForCellKit(BlockGetter blockAccess, BlockPos pos, BlockState blockState, Direction dir, BranchBlock branch) {
         int radius = branch.getRadius(blockState);
         int meta = MetadataCell.NONE;
         if (hasConiferVariants && radius == getPrimaryThickness()) {
@@ -734,16 +727,16 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.hasSurfaceRoot = hasSurfaceRoot;
     }
 
-    public SurfaceRootBlock createSurfaceRoot() {
-        return RegistryHandler.addBlock(suffix(this.getRegistryName(), "_root"), new SurfaceRootBlock(this));
+    public Supplier<SurfaceRootBlock> createSurfaceRoot() {
+        return RegistryHandler.addBlock(suffix(this.getRegistryName(), "_root"), () -> new SurfaceRootBlock(this));
     }
 
     public Optional<SurfaceRootBlock> getSurfaceRoot() {
-        return Optionals.ofBlock(this.surfaceRoot);
+        return Optionals.ofBlock(this.surfaceRoot.get());
     }
 
-    protected Family setSurfaceRoot(SurfaceRootBlock surfaceRoot) {
-        this.surfaceRoot = surfaceRoot;
+    protected Family setSurfaceRoot(Supplier<SurfaceRootBlock> surfaceRootSup) {
+        this.surfaceRoot = surfaceRootSup;
         return this;
     }
 
@@ -769,13 +762,13 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return bounds.expand(3);
     }
 
-    public boolean isCompatibleDynamicLeaves(Species species, BlockState blockState, IBlockReader blockAccess, BlockPos pos) {
+    public boolean isCompatibleDynamicLeaves(Species species, BlockState blockState, BlockGetter blockAccess, BlockPos pos) {
         final DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);
         return (leaves != null) && (this == leaves.getFamily(blockState, blockAccess, pos)
                 || species.isValidLeafBlock(leaves));
     }
 
-    public boolean isCompatibleGenericLeaves(final Species species, BlockState blockState, IWorld blockAccess, BlockPos pos) {
+    public boolean isCompatibleGenericLeaves(final Species species, BlockState blockState, LevelAccessor blockAccess, BlockPos pos) {
         return this.isCompatibleDynamicLeaves(species, blockState, blockAccess, pos);
     }
 
@@ -788,17 +781,17 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         properties.setFamily(this);
     }
 
-    public List<ITag.INamedTag<Block>> defaultBranchTags() {
+    public List<TagKey<Block>> defaultBranchTags() {
         return this.isFireProof ? Collections.singletonList(DTBlockTags.BRANCHES) :
                 Collections.singletonList(DTBlockTags.BRANCHES_THAT_BURN);
     }
 
-    public List<ITag.INamedTag<Item>> defaultBranchItemTags() {
+    public List<TagKey<Item>> defaultBranchItemTags() {
         return this.isFireProof ? Collections.singletonList(DTItemTags.BRANCHES) :
                 Collections.singletonList(DTItemTags.BRANCHES_THAT_BURN);
     }
 
-    public List<ITag.INamedTag<Block>> defaultStrippedBranchTags() {
+    public List<TagKey<Block>> defaultStrippedBranchTags() {
         return this.isFireProof ? Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES) :
                 Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN);
     }

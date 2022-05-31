@@ -3,12 +3,13 @@ package com.ferreusveritas.dynamictrees.tileentity;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,12 +19,12 @@ import javax.annotation.Nullable;
  *
  * @author ferreusveritas
  */
-public class SpeciesTileEntity extends TileEntity {
+public class SpeciesTileEntity extends BlockEntity {
 
     private Species species = Species.NULL_SPECIES;
 
-    public SpeciesTileEntity() {
-        super(DTRegistries.speciesTE);
+    public SpeciesTileEntity(BlockPos pos, BlockState state) {
+        super(DTRegistries.speciesTE, pos, state);
     }
 
     public Species getSpecies() {
@@ -36,34 +37,35 @@ public class SpeciesTileEntity extends TileEntity {
     }
 
     @Override
-    public void load(BlockState state, CompoundNBT tag) {
+    public void load(CompoundTag tag) {
         if (tag.contains("species")) {
             ResourceLocation speciesName = new ResourceLocation(tag.getString("species"));
             species = TreeRegistry.findSpecies(speciesName);
         }
-        super.load(state, tag);
+        super.load( tag);
     }
 
     @Nonnull
     @Override
-    public CompoundNBT save(CompoundNBT tag) {
+    public void saveAdditional(CompoundTag tag) {
         tag.putString("species", species.getRegistryName().toString());
-        return super.save(tag);
     }
 
     @Nullable
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        return new SUpdateTileEntityPacket(this.worldPosition, 0, this.getUpdateTag());
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        load(getBlockState(), pkt.getTag());
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+        load(pkt.getTag());
     }
 
     @Override
-    public CompoundNBT getUpdateTag() {
-        return save(new CompoundNBT());
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = super.getUpdateTag();
+        this.saveAdditional(tag);
+        return tag;
     }
 
 }

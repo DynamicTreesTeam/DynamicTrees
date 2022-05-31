@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * @author Harley O'Connor

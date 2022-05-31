@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Collection;

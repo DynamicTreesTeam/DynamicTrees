@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.client;
 
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.FaceBakery;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 import java.util.Arrays;
 
@@ -18,7 +18,7 @@ public class BakedQuadRetextured extends BakedQuad {
 
     private void remapQuad() {
         for (int i = 0; i < 4; ++i) {
-            int j = DefaultVertexFormats.BLOCK.getIntegerSize() * i;
+            int j = DefaultVertexFormat.BLOCK.getIntegerSize() * i;
             int uvIndex = 4;
             this.vertices[j + uvIndex] = Float.floatToRawIntBits(this.texture.getU(getUnInterpolatedU(this.sprite, Float.intBitsToFloat(this.vertices[j + uvIndex]))));
             this.vertices[j + uvIndex + 1] = Float.floatToRawIntBits(this.texture.getV(getUnInterpolatedV(this.sprite, Float.intBitsToFloat(this.vertices[j + uvIndex + 1]))));

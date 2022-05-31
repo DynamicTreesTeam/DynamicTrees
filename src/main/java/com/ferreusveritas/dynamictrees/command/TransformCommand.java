@@ -10,19 +10,19 @@ import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
-import net.minecraft.block.BlockState;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * @author Harley O'Connor
  */
 public final class TransformCommand extends SubCommand {
 
-    private static final Dynamic2CommandExceptionType SPECIES_EQUAL = new Dynamic2CommandExceptionType((toSpecies, fromSpecies) -> new TranslationTextComponent("commands.dynamictrees.error.species_equal", darkRed(toSpecies), darkRed(fromSpecies)));
+    private static final Dynamic2CommandExceptionType SPECIES_EQUAL = new Dynamic2CommandExceptionType((toSpecies, fromSpecies) -> new TranslatableComponent("commands.dynamictrees.error.species_equal", darkRed(toSpecies), darkRed(fromSpecies)));
 
     @Override
     protected String getName() {
@@ -35,13 +35,13 @@ public final class TransformCommand extends SubCommand {
     }
 
     @Override
-    public ArgumentBuilder<CommandSource, ?> registerArgument() {
+    public ArgumentBuilder<CommandSourceStack, ?> registerArgument() {
         return blockPosArgument().then(transformableSpeciesArgument().executes(context -> executesSuccess(() ->
                 this.transformSpecies(context.getSource(), rootPosArgument(context), speciesArgument(context)))));
     }
 
-    private void transformSpecies(final CommandSource source, final BlockPos rootPos, final Species toSpecies) throws CommandSyntaxException {
-        final World world = source.getLevel();
+    private void transformSpecies(final CommandSourceStack source, final BlockPos rootPos, final Species toSpecies) throws CommandSyntaxException {
+        final Level world = source.getLevel();
 
         final Species fromSpecies = TreeHelper.getExactSpecies(world, rootPos);
 
@@ -64,8 +64,8 @@ public final class TransformCommand extends SubCommand {
             toSpecies.placeRootyDirtBlock(world, rootPos, rootyBlock.getFertility(rootyState, world, rootPos));
         }
 
-        sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.transform",
-                fromSpecies.getTextComponent(), CommandHelper.posComponent(rootPos, TextFormatting.AQUA),
+        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.transform",
+                fromSpecies.getTextComponent(), CommandHelper.posComponent(rootPos, ChatFormatting.AQUA),
                 toSpecies.getTextComponent()));
 
         WailaOther.invalidateWailaPosition();

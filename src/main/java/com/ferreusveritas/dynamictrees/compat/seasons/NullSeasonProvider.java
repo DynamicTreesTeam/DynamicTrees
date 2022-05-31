@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.compat.seasons;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 /**
  * Season provider that does nothing at all
@@ -14,16 +14,16 @@ public class NullSeasonProvider implements SeasonProvider {
     }
 
     @Override
-    public Float getSeasonValue(World world, BlockPos pos) {
+    public Float getSeasonValue(Level world, BlockPos pos) {
         return null;
     }
 
     @Override
-    public void updateTick(World world, long worldTicks) {
+    public void updateTick(Level world, long worldTicks) {
     }
 
     @Override
-    public boolean shouldSnowMelt(World world, BlockPos pos) {
+    public boolean shouldSnowMelt(Level world, BlockPos pos) {
         return false;
     }
 

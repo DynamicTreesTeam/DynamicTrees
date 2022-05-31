@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.poissondisc;
 
 import com.ferreusveritas.dynamictrees.util.SimpleBitmap;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public class PoissonDisc extends Vec2i {
 
@@ -116,7 +116,7 @@ public class PoissonDisc extends Vec2i {
     }
 
     public PoissonDisc setRadius(int radius) {
-        this.radius = net.minecraft.util.math.MathHelper.clamp(radius, 2, 8);
+        this.radius = net.minecraft.util.Mth.clamp(radius, 2, 8);
         return this;
     }
 

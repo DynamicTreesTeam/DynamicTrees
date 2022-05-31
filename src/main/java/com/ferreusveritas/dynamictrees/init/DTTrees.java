@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.init;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.Registries;
+import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
@@ -22,16 +23,18 @@ import com.ferreusveritas.dynamictrees.trees.families.NetherFungusFamily;
 import com.ferreusveritas.dynamictrees.trees.species.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.PalmSpecies;
 import com.ferreusveritas.dynamictrees.trees.species.SwampOakSpecies;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.WeightedList;
-import net.minecraft.world.gen.blockstateprovider.WeightedBlockStateProvider;
-import net.minecraft.world.gen.feature.Features;
+import net.minecraft.data.worldgen.features.NetherFeatures;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.configurations.NetherForestVegetationConfig;
+import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.NewRegistryEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,7 +93,7 @@ public class DTTrees {
     }
 
     @SubscribeEvent
-    public static void newRegistry(RegistryEvent.NewRegistry event) {
+    public static void newRegistry(NewRegistryEvent event) {
         final List<SimpleRegistry<?>> registries = Registries.REGISTRIES.stream()
                 .filter(registry -> registry instanceof SimpleRegistry)
                 .map(registry -> (SimpleRegistry<?>) registry)
@@ -105,29 +108,34 @@ public class DTTrees {
         JsonDeserialisers.registerForgeEntryGetters();
         JsonDeserialisers.postRegistryEvent();
 
-        // Register any registry entries from Json files.
-        Resources.MANAGER.load();
-
-        // Lock all the registries.
-        registries.forEach(SimpleRegistry::lock);
-
         // Register feature cancellers.
         FeatureCanceller.REGISTRY.postRegistryEvent();
         FeatureCanceller.REGISTRY.lock();
     }
 
+    @SubscribeEvent
+    public static void onRegisterBlocks(RegistryEvent.Register<Block> event) {
+        // Register any registry entries from Json files.
+        Resources.MANAGER.load();
+
+        // Lock all the registries.
+        Registries.REGISTRIES.stream()
+                .filter(registry -> registry instanceof SimpleRegistry)
+                .forEach(Registry::lock);
+    }
+
     public static void replaceNyliumFungiFeatures() {
         TreeRegistry.findSpecies(CRIMSON).getSapling().ifPresent(crimsonSapling ->
                 TreeRegistry.findSpecies(WARPED).getSapling().ifPresent(warpedSapling -> {
-                    replaceFeatureConfigs(((WeightedBlockStateProvider) Features.Configs.CRIMSON_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
-                    replaceFeatureConfigs(((WeightedBlockStateProvider) Features.Configs.WARPED_FOREST_CONFIG.stateProvider), crimsonSapling, warpedSapling);
+                    replaceFeatureConfigs(((WeightedStateProvider) new NetherForestVegetationConfig(NetherFeatures.CRIMSON_VEGETATION_PROVIDER, 8, 4).stateProvider), crimsonSapling, warpedSapling);
+                    replaceFeatureConfigs(((WeightedStateProvider) new NetherForestVegetationConfig(NetherFeatures.WARPED_VEGETATION_PROVIDER, 8, 4).stateProvider), crimsonSapling, warpedSapling);
                 })
         );
     }
 
-    private static void replaceFeatureConfigs(WeightedBlockStateProvider featureConfig, Block crimsonSapling, Block warpedSapling) {
-        for (final WeightedList.Entry<BlockState> entry : featureConfig.weightedList.entries) {
-			if (entry.data.getBlock() == Blocks.CRIMSON_FUNGUS) {
+    private static void replaceFeatureConfigs(WeightedStateProvider featureConfig, Block crimsonSapling, Block warpedSapling) {
+        for (final WeightedEntry.Wrapper<BlockState> entry : featureConfig.weightedList.items) {
+			if (entry.getData().getBlock() == Blocks.CRIMSON_FUNGUS) {
                 entry.data = crimsonSapling.defaultBlockState();
             }
 			if (entry.data.getBlock() == Blocks.WARPED_FUNGUS) {

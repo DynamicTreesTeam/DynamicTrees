@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.data;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import net.minecraft.loot.LootParameterSet;
-import net.minecraft.loot.LootParameterSets;
-import net.minecraft.loot.LootParameters;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 import java.util.function.Consumer;
 
@@ -12,39 +12,39 @@ import java.util.function.Consumer;
  */
 public final class DTLootParameterSets {
 
-    public static final LootParameterSet HARVEST = register("harvest", builder ->
-            builder.required(LootParameters.BLOCK_STATE)
+    public static final LootContextParamSet HARVEST = register("harvest", builder ->
+            builder.required(LootContextParams.BLOCK_STATE)
                     .required(DTLootParameters.SPECIES)
                     .required(DTLootParameters.FERTILITY)
                     .required(DTLootParameters.FORTUNE)
     );
 
-    public static final LootParameterSet VOLUNTARY = register("voluntary", builder ->
-            builder.required(LootParameters.BLOCK_STATE)
+    public static final LootContextParamSet VOLUNTARY = register("voluntary", builder ->
+            builder.required(LootContextParams.BLOCK_STATE)
                     .required(DTLootParameters.SPECIES)
                     .required(DTLootParameters.FERTILITY)
     );
 
-    public static final LootParameterSet LEAVES = register("leaves", builder ->
-            builder.required(LootParameters.BLOCK_STATE)
-                    .required(LootParameters.TOOL)
+    public static final LootContextParamSet LEAVES = register("leaves", builder ->
+            builder.required(LootContextParams.BLOCK_STATE)
+                    .required(LootContextParams.TOOL)
                     .required(DTLootParameters.SPECIES)
                     .required(DTLootParameters.FORTUNE)
     );
 
-    public static final LootParameterSet LOGS = register("logs", builder ->
-            builder.required(LootParameters.BLOCK_STATE)
-                    .required(LootParameters.TOOL)
+    public static final LootContextParamSet LOGS = register("logs", builder ->
+            builder.required(LootContextParams.BLOCK_STATE)
+                    .required(LootContextParams.TOOL)
                     .required(DTLootParameters.SPECIES)
                     .required(DTLootParameters.LOGS_AND_STICKS)
     );
 
-    private static LootParameterSet register(String path, Consumer<LootParameterSet.Builder> builderConsumer) {
-        final LootParameterSet.Builder builder = new LootParameterSet.Builder();
+    private static LootContextParamSet register(String path, Consumer<LootContextParamSet.Builder> builderConsumer) {
+        final LootContextParamSet.Builder builder = new LootContextParamSet.Builder();
         builderConsumer.accept(builder);
 
-        final LootParameterSet paramSet = builder.build();
-        LootParameterSets.REGISTRY.put(DynamicTrees.resLoc(path), paramSet);
+        final LootContextParamSet paramSet = builder.build();
+        LootContextParamSets.REGISTRY.put(DynamicTrees.resLoc(path), paramSet);
 
         return paramSet;
     }

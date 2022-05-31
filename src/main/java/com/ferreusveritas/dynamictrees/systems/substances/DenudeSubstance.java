@@ -7,10 +7,10 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.DenuderNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.block.BlockState;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * An {@link SubstanceEffect} that "denudes" the tree. This involves stripping all branches and removing all leaves.
@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 public class DenudeSubstance implements SubstanceEffect {
 
     @Override
-    public boolean apply(World world, BlockPos rootPos) {
+    public boolean apply(Level world, BlockPos rootPos) {
         final BlockState rootState = world.getBlockState(rootPos);
         final RootyBlock dirt = TreeHelper.getRooty(rootState);
 

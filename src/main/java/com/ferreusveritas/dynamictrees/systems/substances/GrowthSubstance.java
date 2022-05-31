@@ -3,10 +3,10 @@ package com.ferreusveritas.dynamictrees.systems.substances;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.entities.LingeringEffectorEntity;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.Level;
 
 public class GrowthSubstance implements SubstanceEffect {
 
@@ -30,7 +30,7 @@ public class GrowthSubstance implements SubstanceEffect {
     }
 
     @Override
-    public boolean apply(World world, BlockPos rootPos) {
+    public boolean apply(Level world, BlockPos rootPos) {
         // Don't apply if there is already a growth substance.
         if (LingeringEffectorEntity.treeHasEffectorForEffect(world, rootPos, this)) {
             return false;
@@ -46,7 +46,7 @@ public class GrowthSubstance implements SubstanceEffect {
     private int pulseCount;
 
     @Override
-    public boolean update(World world, BlockPos rootPos, int deltaTicks, int fertility) {
+    public boolean update(Level world, BlockPos rootPos, int deltaTicks, int fertility) {
         // Stop when fertility has depleted.
         if (fertility <= 0 || this.pulseCount >= this.pulses) {
             return false;

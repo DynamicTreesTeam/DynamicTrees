@@ -7,10 +7,10 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * @author Harley O'Connor
@@ -26,7 +26,7 @@ public class DenuderNode implements NodeInspector {
     }
 
     @Override
-    public boolean run(BlockState state, IWorld world, BlockPos pos, Direction fromDir) {
+    public boolean run(BlockState state, LevelAccessor world, BlockPos pos, Direction fromDir) {
         final BranchBlock branch = TreeHelper.getBranch(state);
 
         if (branch == null || this.family.getBranch().map(other -> branch != other).orElse(false)) {
@@ -45,11 +45,11 @@ public class DenuderNode implements NodeInspector {
     }
 
     @Override
-    public boolean returnRun(BlockState blockState, IWorld world, BlockPos pos, Direction fromDir) {
+    public boolean returnRun(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir) {
         return false;
     }
 
-    public void removeSurroundingLeaves(IWorld world, BlockPos twigPos) {
+    public void removeSurroundingLeaves(LevelAccessor world, BlockPos twigPos) {
         if (world.isClientSide()) {
             return;
         }

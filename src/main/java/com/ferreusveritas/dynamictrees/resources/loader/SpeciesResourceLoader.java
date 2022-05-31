@@ -20,13 +20,13 @@ import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.JsonObject;
-import net.minecraft.block.Block;
-import net.minecraft.block.ComposterBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ComposterBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
@@ -61,8 +61,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
 
         JsonDeserialisers.register(Species.CommonOverride.class, input ->
                 JsonDeserialisers.BIOME_PREDICATE.deserialise(input)
-                        .map(biomePredicate -> (world, pos) -> world instanceof IWorldReader &&
-                                biomePredicate.test(((IWorldReader) world).getBiome(pos)))
+                        .map(biomePredicate -> (world, pos) -> world instanceof LevelReader &&
+                                biomePredicate.test(((LevelReader) world).getBiome(pos).value()))
         );
 
         this.loadAppliers
@@ -99,7 +99,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("seed_drop_rarity", Float.class, Species::setupStandardSeedDropping)
                 .register("stick_drop_rarity", Float.class, Species::setupStandardStickDropping)
                 .register("mega_species", ResourceLocation.class, this::setMegaSpecies)
-                .register("seed", Seed.class, Species::setSeed)
+                .register("seed", Seed.class, (species, seed) -> species.setSeed(() -> seed))
                 .register("seed_composter_chance", Float.class, this.composterChanceCache::put)
                 .register("sapling_grows_naturally", Boolean.class, Species::setCanSaplingGrowNaturally)
                 .register("primitive_sapling", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
@@ -123,7 +123,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         CommonSetup.runOnCommonSetup(event -> {
             final Item seed = ForgeRegistries.ITEMS.getValue(processedSeedName);
             if (seed instanceof Seed) {
-                species.setSeed((Seed) seed);
+                species.setSeed(() -> (Seed) seed);
             } else {
                 LOGGER.warn("Could not find valid seed item from registry name \"" + seedName + "\".");
             }

@@ -3,8 +3,8 @@ package com.ferreusveritas.dynamictrees.growthlogic.context;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 /**
  * @author Harley O'Connor
@@ -13,7 +13,7 @@ public class DirectionManipulationContext extends DirectionSelectionContext {
     private final int radius;
     private int[] probMap;
 
-    public DirectionManipulationContext(World world, BlockPos pos, Species species,
+    public DirectionManipulationContext(Level world, BlockPos pos, Species species,
                                         BranchBlock branch,
                                         GrowSignal signal, int radius, int[] probMap) {
         super(world, pos, species, branch, signal);

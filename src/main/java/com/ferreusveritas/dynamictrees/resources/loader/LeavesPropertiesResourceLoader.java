@@ -10,12 +10,11 @@ import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.util.ToolTypes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -111,7 +110,7 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
     }
 
     private void generateBlocks(LeavesProperties leavesProperties, JsonObject json) {
-        final AbstractBlock.Properties blockProperties = JsonHelper.getBlockProperties(
+        final BlockBehaviour.Properties blockProperties = JsonHelper.getBlockProperties(
                 json,
                 leavesProperties.getDefaultMaterial(),
                 leavesProperties.getDefaultMaterial().getColor(),
@@ -120,9 +119,8 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 warning -> this.logWarning(leavesProperties.getRegistryName(), warning)
         );
 
-        if (blockProperties.getHarvestTool() == ToolTypes.SHEARS) {
-            leavesProperties.setRequiresShears(true);
-        }
+        leavesProperties.setRequiresShears(true);
+
 
         leavesProperties.generateDynamicLeaves(blockProperties);
     }

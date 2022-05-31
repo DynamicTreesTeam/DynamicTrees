@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import com.ferreusveritas.dynamictrees.api.seasons.ClimateZoneType;
 import com.ferreusveritas.dynamictrees.api.seasons.SeasonGrowthCalculator;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class SeasonContext {
     private final SeasonProvider provider;
@@ -23,7 +23,7 @@ public class SeasonContext {
         this.calculator = calculator;
     }
 
-    public void updateTick(World world, long worldTicks) {
+    public void updateTick(Level world, long worldTicks) {
 
         if (methodTicks % 20 == 0) {
             provider.updateTick(world, worldTicks);

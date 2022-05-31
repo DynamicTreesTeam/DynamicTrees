@@ -10,6 +10,8 @@ import java.time.format.DateTimeFormatter
 fun property(key: String) = project.findProperty(key).toString()
 fun optionalProperty(key: String) = project.findProperty(key)?.toString()
 
+apply(from = "https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle")
+
 plugins {
     id("java")
     id("net.minecraftforge.gradle")
@@ -123,11 +125,6 @@ dependencies {
     // Not sure if we need this one, what is a "forge" anyway?
     minecraft("net.minecraftforge:forge:$mcVersion-${property("forgeVersion")}")
 
-    // Compile Hwyla API, but don"t include in runtime.
-    compileOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api"))
-    // At runtime, use the full Hwyla mod.
-    runtimeOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}"))
-
     // Compile JEI API, but don"t include in runtime.
     compileOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}:api"))
     // At runtime, use the full JEI mod.
@@ -138,19 +135,21 @@ dependencies {
 
     // At runtime use, CC for creating growth chambers.
     //runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
-    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3236650"))
+    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3770724"))
 
     // Compile Serene Seasons.
-    compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))
+    compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3693807"))
 
     // Compile Better Weather API.
-    compileOnly(fg.deobf("curse.maven:BetterWeatherAPI-400714:3403615"))
+//    compileOnly(fg.deobf("curse.maven:BetterWeatherAPI-400714:3403615"))
 
 //    useSereneSeasons(this)
 //    useBetterWeather(this)
 
     // At runtime, use suggestion provider fix mod.
-    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:$mcVersion-${property("suggestionProviderFixVersion")}"))
+//    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:$mcVersion-${property("suggestionProviderFixVersion")}"))
+
+    compileOnly(fg.deobf("curse.maven:suggestion-provider-fix-469647:3623382"))
 }
 
 fun useSereneSeasons(depHandler: DependencyHandlerScope) {
@@ -191,7 +190,7 @@ java {
     withSourcesJar()
 
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -206,36 +205,36 @@ fun readChangelog(): String? {
         ?.get(project.version.toString())?.asString
 }
 
-curseforge {
-    if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
-        apiKey = property("curseApiKey")
-
-        project {
-            id = "252818"
-
-            addGameVersion("1.16.4")
-            addGameVersion(mcVersion)
-
-            changelog = readChangelog() ?: "No changelog provided."
-            changelogType = "markdown"
-            releaseType = property("curseFileType")
-
-            addArtifact(tasks.findByName("sourcesJar"))
-
-            mainArtifact(tasks.findByName("jar")) {
-                relations {
-                    optionalDependency("dynamictreesplus")
-                    optionalDependency("chunk-saving-fix")
-                }
-            }
-        }
-    } else {
-        project.logger.log(
-            LogLevel.WARN,
-            "API Key and file type for CurseForge not detected; uploading will be disabled."
-        )
-    }
-}
+//curseforge {
+//    if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
+//        apiKey = property("curseApiKey")
+//
+//        project {
+//            id = "252818"
+//
+//            addGameVersion("1.18.1")
+//            addGameVersion(mcVersion)
+//
+//            changelog = readChangelog() ?: "No changelog provided."
+//            changelogType = "markdown"
+//            releaseType = property("curseFileType")
+//
+//            addArtifact(tasks.findByName("sourcesJar"))
+//
+//            mainArtifact(tasks.findByName("jar")) {
+//                relations {
+//                    optionalDependency("dynamictreesplus")
+//                    optionalDependency("chunk-saving-fix")
+//                }
+//            }
+//        }
+//    } else {
+//        project.logger.log(
+//            LogLevel.WARN,
+//            "API Key and file type for CurseForge not detected; uploading will be disabled."
+//        )
+//    }
+//}
 
 tasks.withType<GenerateModuleMetadata> {
     enabled = false

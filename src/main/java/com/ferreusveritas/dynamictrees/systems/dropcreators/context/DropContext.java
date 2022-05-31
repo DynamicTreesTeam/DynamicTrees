@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators.context;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.Random;
  */
 public class DropContext {
 
-    private final World world;
+    private final Level world;
     private final Random random;
     private final BlockPos pos;
 
@@ -27,15 +27,15 @@ public class DropContext {
     private final int fertility;
     private final int fortune;
 
-    public DropContext(@Nullable World world, BlockPos pos, Species species, List<ItemStack> dropList) {
+    public DropContext(@Nullable Level world, BlockPos pos, Species species, List<ItemStack> dropList) {
         this(world, pos, species, dropList, ItemStack.EMPTY, -1, 0);
     }
 
-    public DropContext(World world, Random random, BlockPos pos, Species species, List<ItemStack> dropList, int fertility, int fortune) {
+    public DropContext(Level world, Random random, BlockPos pos, Species species, List<ItemStack> dropList, int fertility, int fortune) {
         this(world, pos, species, dropList, ItemStack.EMPTY, fertility, fortune);
     }
 
-    public DropContext(@Nullable World world, BlockPos pos, Species species, List<ItemStack> dropList, ItemStack tool, int fertility, int fortune) {
+    public DropContext(@Nullable Level world, BlockPos pos, Species species, List<ItemStack> dropList, ItemStack tool, int fertility, int fortune) {
         this.world = world;
         this.random = world == null ? new Random() : world.random;
         this.pos = pos;
@@ -46,7 +46,7 @@ public class DropContext {
         this.fortune = fortune;
     }
 
-    public World world() {
+    public Level world() {
         return world;
     }
 

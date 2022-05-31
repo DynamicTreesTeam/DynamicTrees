@@ -3,14 +3,14 @@ package com.ferreusveritas.dynamictrees.client;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class TooltipHandler {
 
         Seed seed = (Seed) item;
 
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         if (player == null || player.level == null || SeasonHelper.getSeasonValue(player.level, BlockPos.ZERO) == null) {
             return;
         }
@@ -41,24 +41,24 @@ public class TooltipHandler {
         applySeasonalTooltips(event.getToolTip(), flags);
     }
 
-    public static void applySeasonalTooltips(List<ITextComponent> tipList, int flags) {
+    public static void applySeasonalTooltips(List<Component> tipList, int flags) {
         if (flags != 0) {
-            tipList.add(new TranslationTextComponent("desc.sereneseasons.fertile_seasons").append(":"));
+            tipList.add(new TranslatableComponent("desc.sereneseasons.fertile_seasons").append(":"));
 
             if ((flags & 15) == 15) {
-                tipList.add(new StringTextComponent(" ").append(new TranslationTextComponent("desc.sereneseasons.year_round").withStyle(TextFormatting.LIGHT_PURPLE)));
+                tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.sereneseasons.year_round").withStyle(ChatFormatting.LIGHT_PURPLE)));
             } else {
                 if ((flags & 1) != 0) {
-                    tipList.add(new StringTextComponent(" ").append(new TranslationTextComponent("desc.sereneseasons.spring").withStyle(TextFormatting.GREEN)));
+                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.sereneseasons.spring").withStyle(ChatFormatting.GREEN)));
                 }
                 if ((flags & 2) != 0) {
-                    tipList.add(new StringTextComponent(" ").append(new TranslationTextComponent("desc.sereneseasons.summer").withStyle(TextFormatting.YELLOW)));
+                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.sereneseasons.summer").withStyle(ChatFormatting.YELLOW)));
                 }
                 if ((flags & 4) != 0) {
-                    tipList.add(new StringTextComponent(" ").append(new TranslationTextComponent("desc.sereneseasons.autumn").withStyle(TextFormatting.GOLD)));
+                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.sereneseasons.autumn").withStyle(ChatFormatting.GOLD)));
                 }
                 if ((flags & 8) != 0) {
-                    tipList.add(new StringTextComponent(" ").append(new TranslationTextComponent("desc.sereneseasons.winter").withStyle(TextFormatting.AQUA)));
+                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.sereneseasons.winter").withStyle(ChatFormatting.AQUA)));
                 }
             }
         }

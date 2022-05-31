@@ -1,3 +1,4 @@
+/*
 package com.ferreusveritas.dynamictrees.compat.waila;
 
 import com.ferreusveritas.dynamictrees.blocks.DynamicCocoaBlock;
@@ -26,3 +27,4 @@ public class WailaCompat implements IWailaPlugin {
     }
 
 }
+*/
