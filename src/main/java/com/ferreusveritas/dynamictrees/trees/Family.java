@@ -439,19 +439,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return getBranch();
     }
 
-    /**
-     * Version of getBranch() used by jocodes to generate the tree.
-     * By default it acts just like getBranch() but it can be overriden
-     * by addons to customize the branch selected by the jocode
-     * @param world     The world the tree is generating in
-     * @param species   The species of the tree generated
-     * @param pos       The position of the branch block
-     * @return branch block picked
-     */
-    public Optional<BranchBlock> getBranchForPlacement(IWorld world, Species species, BlockPos pos) {
-        return getBranch();
-    }
-
     public Optional<BranchBlock> getStrippedBranch() {
         return Optionals.ofBlock(strippedBranch.get());
     }
