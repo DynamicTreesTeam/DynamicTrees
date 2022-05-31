@@ -140,7 +140,7 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     @Nullable
     public ResourceLocation getRegName(final Block block) {
-        return this.blocks.entrySet().stream().filter(entry -> entry.getValue() == block).map(Map.Entry::getKey).findAny().orElse(null);
+        return this.blocks.entrySet().stream().filter(entry -> entry.getValue().get() == block).map(Map.Entry::getKey).findAny().orElse(null);
     }
 
     @Nullable
@@ -150,7 +150,7 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     @Nullable
     public ResourceLocation getRegName(final Item item) {
-        return this.items.entrySet().stream().filter(entry -> entry.getValue() == item).map(Map.Entry::getKey).findAny().orElse(null);
+        return this.items.entrySet().stream().filter(entry -> entry.getValue().get() == item).map(Map.Entry::getKey).findAny().orElse(null);
     }
 
     @SuppressWarnings("unchecked")

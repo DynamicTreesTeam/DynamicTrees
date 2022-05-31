@@ -8,12 +8,17 @@ import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
 import com.ferreusveritas.dynamictrees.util.function.CanGrowPredicate;
 import com.ferreusveritas.dynamictrees.util.function.TriFunction;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 
 /**
  * Base class for all gen features. These are features that grow on/in/around a tree on generation, or whilst growing,
@@ -153,7 +158,10 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     }
 
     /**
-
+     * Performs a full generation action of a tree. This is invoked before the {@link JoCode#generate(Level, LevelAccessor,
+     * Species, BlockPos, Biome, Direction, int, SafeChunkBounds, boolean)} and acts as a replacement for it. The
+     * implementor should therefore note that other methods in this class will not be invoked by default.
+     *
      * @param configuration the configuration
      * @param context       the context
      * @return {@code true} if this {@link GenFeature} handles full generation and so generation from a {@link JoCode}

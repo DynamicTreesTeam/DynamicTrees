@@ -182,6 +182,20 @@
     }
   },
   {
+    "__comment" : "All lush caves can generate subterranean azalea trees",
+    "select": { "name": "minecraft:lush_caves" },
+    "apply": {
+      "subterranean": true,
+      "species" : {
+        "random" : {
+          "azalea" : 1,
+          "flowering_azalea" : 1
+        }
+      },
+      "chance": 0.66
+    }
+  },
+  {
     "_comment": "Windswept Forests are denser and spawn more trees.",
     "select": "minecraft:windswept_forest",
     "apply": {

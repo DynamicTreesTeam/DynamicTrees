@@ -424,7 +424,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public Optional<BranchBlock> getBranch() {
-        return Optionals.ofBlock(branch.get());
+        return Optionals.ofBlock(this.branch);
     }
     /**
      * Version of getBranch() used by jocodes to generate the tree.
@@ -440,11 +440,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public Optional<BranchBlock> getStrippedBranch() {
-        return Optionals.ofBlock(strippedBranch.get());
+        return Optionals.ofBlock(this.strippedBranch);
     }
 
     public Optional<Item> getBranchItem() {
-        return Optionals.ofItem(branchItem.get());
+        return Optionals.ofItem(this.branchItem);
     }
 
     public boolean isThick() {
@@ -719,7 +719,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public Optional<SurfaceRootBlock> getSurfaceRoot() {
-        return Optionals.ofBlock(this.surfaceRoot.get());
+        return Optionals.ofBlock(this.surfaceRoot);
     }
 
     protected Family setSurfaceRoot(Supplier<SurfaceRootBlock> surfaceRootSup) {
