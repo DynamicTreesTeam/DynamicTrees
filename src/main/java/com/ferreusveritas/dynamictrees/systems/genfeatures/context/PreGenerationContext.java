@@ -22,7 +22,7 @@ public class PreGenerationContext extends GenerationContext<LevelAccessor> {
     /**
      * Instantiates a new {@link PreGenerationContext} object.
      *
-     * @param world   The {@link IWorld} object.
+     * @param world   The {@link LevelAccessor} object.
      * @param rootPos The {@link BlockPos} of the {@link RootyBlock} the generated tree is planted on.
      * @param species The {@link Species} being grown.
      * @param radius  The radius of the {@link PoissonDisc} the tree generated in.

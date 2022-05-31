@@ -27,6 +27,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.*;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -391,7 +392,7 @@ public class JoCode {
             return true;
 
         BlockState blockState = level.getBlockState(pos);
-        return blockState.getMaterial().isLiquid() || blockState.is(BlockTags.SNOW) || blockState.is(DTBlockTags.FOLIAGE) || blockState.is(BlockTags.FLOWERS);
+        return blockState.getMaterial().isReplaceable() && blockState.getMaterial().isLiquid() || blockState.is(DTBlockTags.FOLIAGE) || blockState.is(BlockTags.FLOWERS);
     }
 
     /**
