@@ -1,24 +1,26 @@
 package com.ferreusveritas.dynamictrees.blocks;
 
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
-import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.BlockStates;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.ItemEntity;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.IGrowable;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.state.IntegerProperty;
+import net.minecraft.loot.*;
+import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.*;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
@@ -26,309 +28,206 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
-import java.util.function.Supplier;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
-import static com.ferreusveritas.dynamictrees.util.ShapeUtils.createFruitShape;
+/**
+ * @author Harley O'Connor
+ */
+public class FruitBlock extends Block implements IGrowable, GrowableBlock {
 
-@SuppressWarnings({"deprecation", "unused"})
-public class FruitBlock extends Block implements IGrowable {
+    private final Fruit fruit;
 
-    enum MatureFruitAction {
-        NOTHING,
-        DROP,
-        ROT,
-        CUSTOM
-    }
+    public FruitBlock(Properties properties, Fruit fruit) {
+        super(properties);
+        this.fruit = fruit;
 
-    /**
-     * Default shapes for the apple fruit, each element is the shape for each growth stage.
-     */
-    protected AxisAlignedBB[] FRUIT_AABB = new AxisAlignedBB[]{
-            createFruitShape(1, 1, 0, 16),
-            createFruitShape(1, 2, 0, 16),
-            createFruitShape(2.5f, 5, 0),
-            createFruitShape(2.5f, 5, 1.25f)
-    };
-
-    public static final IntegerProperty AGE = BlockStateProperties.AGE_3;
-
-    private static final Map<Species, Set<FruitBlock>> SPECIES_FRUIT_MAP = new HashMap<>();
-
-    @Nonnull
-    public static Set<FruitBlock> getFruitBlocksForSpecies(Species species) {
-        return SPECIES_FRUIT_MAP.getOrDefault(species, new HashSet<>());
-    }
-
-    protected ItemStack droppedFruit = ItemStack.EMPTY;
-    protected Supplier<Boolean> canBoneMeal = () -> false; // Q: Does dusting an apple with bone dust make it grow faster? A: Not by default.
-    protected Vector3d itemSpawnOffset = new Vector3d(0.5, 0.6, 0.5);
-    private Species species;
-
-    public FruitBlock() {
-        super(Properties.of(Material.PLANT)
-                .randomTicks()
-                .strength(0.3f));
-    }
-
-    public FruitBlock setCanBoneMeal(boolean canBoneMeal) {
-        return this.setCanBoneMeal(() -> canBoneMeal);
-    }
-
-    public FruitBlock setCanBoneMeal(Supplier<Boolean> canBoneMeal) {
-        this.canBoneMeal = canBoneMeal;
-        return this;
-    }
-
-    public void setItemSpawnOffset(float x, float y, float z) {
-        this.itemSpawnOffset = new Vector3d(Math.min(Math.max(x, 0), 1), Math.min(Math.max(y, 0), 1), Math.min(Math.max(z, 0), 1));
-    }
-
-    public void setSpecies(Species species) {
-        if (SPECIES_FRUIT_MAP.containsKey(species)) {
-            SPECIES_FRUIT_MAP.get(species).add(this);
-        } else {
-            Set<FruitBlock> set = new HashSet<>();
-            set.add(this);
-            SPECIES_FRUIT_MAP.put(species, set);
-        }
-        this.species = species;
-    }
-
-    public Species getSpecies() {
-        return this.species == null ? Species.NULL_SPECIES : this.species;
-    }
-
-    public float getMinimumSeasonalValue() {
-        return 0.3f;
+        // Reset block state definition, as we need the fruit to be set to create it properly.
+        StateContainer.Builder<Block, BlockState> builder = new StateContainer.Builder<>(this);
+        this.createBlockStateDefinition(builder);
+        this.stateDefinition = builder.create(Block::defaultBlockState, BlockState::new);
+        this.registerDefaultState(this.stateDefinition.any());
     }
 
     @Override
-    public void tick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
-        this.doTick(state, world, pos, rand);
+    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+        if (fruit != null) {
+            builder.add(fruit.getAgeProperty());
+        }
     }
 
-    public void doTick(BlockState state, World world, BlockPos pos, Random rand) {
-        if (this.shouldBlockDrop(world, pos, state)) {
-            this.dropBlock(world, state, pos);
+    @SuppressWarnings("deprecation")
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+        return fruit.getBlockShape(getAge(state));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void tick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        doTick(state, world, pos, random);
+    }
+
+    public void doTick(BlockState state, World world, BlockPos pos, Random random) {
+        if (!this.isSupported(world, pos, state)) {
+            drop(world, pos, state);
             return;
         }
 
-        final int age = state.getValue(AGE);
-        final Float season = SeasonHelper.getSeasonValue(world, pos);
-        final Species species = this.getSpecies();
+        final int age = getAge(state);
+        final Float season = SeasonHelper.getSeasonValue(WorldContext.create(world), pos);
 
-        if (season != null && species.isValid()) { // Non-Null means we are season capable.
-            if (species.seasonalFruitProductionFactor(world, pos) < getMinimumSeasonalValue()) {
-                this.outOfSeasonAction(world, pos); // Destroy the block or similar action.
+        if (season != null) { // Non-Null means we are season capable.
+            if (fruit.isOutOfSeason(world, pos)) {
+                this.outOfSeason(world, pos); // Destroy the block or similar action.
                 return;
             }
-            if (age == 0 && species.testFlowerSeasonHold(season)) {
-                return; // Keep fruit at the flower stage.
+            if (age == 0 && fruit.isInFlowerHoldPeriod(world, pos, season)) {
+                return;
             }
         }
 
-        if (age < 3) {
-            final boolean doGrow = rand.nextFloat() < this.getGrowthChance(world, pos);
-            final boolean eventGrow = ForgeHooks.onCropsGrowPre(world, pos, state, doGrow);
-            if (season != null ? doGrow || eventGrow : eventGrow) { // Prevent a seasons mod from canceling the growth, we handle that ourselves.
-                world.setBlock(pos, state.setValue(AGE, age + 1), 2);
-                ForgeHooks.onCropsGrowPost(world, pos, state);
-            }
+        if (age < fruit.getMaxAge()) {
+            tryGrow(state, world, pos, random, age, season);
         } else {
-            if (age == 3) {
-                switch (this.matureAction(world, pos, state, rand)) {
-                    case NOTHING:
-                    case CUSTOM:
-                        break;
-                    case DROP:
-                        this.dropBlock(world, state, pos);
-                        break;
-                    case ROT:
-                        world.setBlockAndUpdate(pos, BlockStates.AIR);
-                        break;
-                }
-            }
+            tickMature(world, pos, state);
         }
     }
 
-    protected float getGrowthChance(World world, BlockPos blockPos) {
-        return 0.2f;
+    private void outOfSeason(World world, BlockPos pos) {
+        world.destroyBlock(pos, false);
+    }
+
+    private void tryGrow(BlockState state, World world, BlockPos pos, Random random, int age,
+                         @Nullable Float season) {
+        final boolean doGrow = random.nextFloat() < getGrowthChance(world, pos);
+        final boolean eventGrow = ForgeHooks.onCropsGrowPre(world, pos, state, doGrow);
+        // Prevent a seasons mod from canceling the growth, we handle that ourselves.
+        if (season != null ? doGrow || eventGrow : eventGrow) {
+            setAge(world, pos, state, age + 1);
+            ForgeHooks.onCropsGrowPost(world, pos, state);
+        }
+    }
+
+    private float getGrowthChance(World world, BlockPos pos) {
+        return fruit.getGrowthChance();
+    }
+
+    public void tickMature(World world, BlockPos pos, BlockState state) {
+        fruit.performMatureAction(new Info(world, pos, state));
     }
 
     /**
-     * Override this to make the fruit do something once it's mature.
-     *
-     * @param world The world
-     * @param pos   The position of the fruit block
-     * @param state The current blockstate of the fruit
-     * @param rand  A random number generator
-     * @return MatureFruitAction action to take
+     * {@inheritDoc}
      */
-    protected MatureFruitAction matureAction(World world, BlockPos pos, BlockState state, Random rand) {
-        return MatureFruitAction.NOTHING;
-    }
-
-    protected void outOfSeasonAction(World world, BlockPos pos) {
-        world.setBlockAndUpdate(pos, BlockStates.AIR);
-    }
-
     @Override
-    public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos neighbor, boolean isMoving) {
-        this.onNeighborChange(state, world, pos, neighbor);
+    public void performMatureAction(IWorld world, BlockPos pos, BlockState state) {
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public void onNeighborChange(BlockState state, IWorldReader world, BlockPos pos, BlockPos neighbor) {
-        if (this.shouldBlockDrop(world, pos, state)) {
-            this.dropBlock((World) world, state, pos);
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos,
+                                boolean isMoving) {
+        if (!this.isSupported(world, pos, state)) {
+            drop(world, pos, state);
         }
+        super.neighborChanged(state, world, pos, block, fromPos, isMoving);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (state.getValue(AGE) >= 3) {
-            this.dropBlock(worldIn, state, pos);
-            return ActionResultType.SUCCESS;
-        }
-
-        return ActionResultType.FAIL;
+    public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
+        return isSupported(world, pos, state);
     }
 
-    protected void dropBlock(World worldIn, BlockState state, BlockPos pos) {
-        worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-        if (state.getValue(AGE) >= 3) {
-            worldIn.addFreshEntity(new ItemEntity(worldIn, pos.getX() + itemSpawnOffset.x, pos.getY() + itemSpawnOffset.y, pos.getZ() + itemSpawnOffset.z, this.getFruitDrop(fruitDropCount(state, worldIn, pos))));
+    /**
+     * Checks if the block is supported. An unsupported fruit block should drop.
+     * <p>
+     * Base implementation checks that there is a leaf block directly above the fruit block.
+     *
+     * @return {@code true} if this block is supported
+     */
+    @Override
+    public boolean isSupported(IBlockReader world, BlockPos pos, BlockState state) {
+        return world.getBlockState(pos.above()).getBlock() instanceof LeavesBlock;
+    }
+
+    protected void drop(World world, BlockPos pos, BlockState state) {
+        world.destroyBlock(pos, true);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public List<ItemStack> getDrops(BlockState pState, LootContext.Builder pBuilder) {
+        ResourceLocation resourcelocation = this.getLootTable();
+        if (resourcelocation == LootTables.EMPTY) return Collections.emptyList();
+        else {
+            LootContext lootcontext = pBuilder.withParameter(LootParameters.BLOCK_STATE, pState).create(LootParameterSets.BLOCK);
+            LootTable loottable = lootcontext.getLevel().getServer().getLootTables().get(resourcelocation);
+
+            //If no loot table is set up, the default behaviour is to drop the fruit item if the age is max.
+            if (loottable == LootTable.EMPTY &&
+                    pState.hasProperty(fruit.getAgeProperty()) && pState.getValue(fruit.getAgeProperty()) == fruit.getMaxAge())
+                return Collections.singletonList(fruit.getItemStack());
+
+            return loottable.getRandomItems(lootcontext);
         }
     }
 
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        return this.getFruitDrop(1);
+        return fruit.getItemStack();
     }
 
-    /**
-     * Checks if Leaves of any kind are above this block. Not picky.
-     *
-     * @param world
-     * @param pos
-     * @param state
-     * @return True if it should drop (leaves are not above).
-     */
-    public boolean shouldBlockDrop(IBlockReader world, BlockPos pos, BlockState state) {
-        return !(world.getBlockState(pos.above()).getBlock() instanceof LeavesBlock);
-    }
-
-
-    ///////////////////////////////////////////
-    //BONEMEAL
-    ///////////////////////////////////////////
-
+    @SuppressWarnings("deprecation")
     @Override
-    public boolean isValidBonemealTarget(IBlockReader worldIn, BlockPos pos, BlockState state, boolean isClient) {
-        return state.getValue(AGE) < 3;
+    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
+                                BlockRayTraceResult hit) {
+        // Drop fruit if mature.
+        if (getAge(state) >= fruit.getMaxAge()) {
+            drop(world, pos, state);
+            return ActionResultType.SUCCESS;
+        }
+        return ActionResultType.PASS;
     }
 
     @Override
-    public boolean isBonemealSuccess(World world, Random rand, BlockPos pos, BlockState state) {
-        return this.canBoneMeal.get();
+    public boolean isValidBonemealTarget(IBlockReader world, BlockPos pos, BlockState state, boolean isClient) {
+        return fruit.canBoneMeal() && getAge(state) < fruit.getMaxAge();
     }
 
     @Override
-    public void performBonemeal(ServerWorld world, Random rand, BlockPos pos, BlockState state) {
-        final int age = state.getValue(AGE);
-        final int newAge = MathHelper.clamp(age + 1, 0, 3);
+    public boolean isBonemealSuccess(World world, Random random, BlockPos pos, BlockState state) {
+        return true;
+    }
+
+    @Override
+    public void performBonemeal(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        final int age = getAge(state);
+        final int newAge = Math.min(age + 1, fruit.getMaxAge());
         if (newAge != age) {
-            world.setBlock(pos, state.setValue(AGE, newAge), 2);
+            setAge(world, pos, state, newAge);
         }
     }
 
+    public int getAge(BlockState state) {
+        return state.getValue(fruit.getAgeProperty());
+    }
 
-    ///////////////////////////////////////////
-    //DROPS
-    ///////////////////////////////////////////
+    public int getMaxAge() {
+        return fruit.getMaxAge();
+    }
 
+    private void setAge(World world, BlockPos pos, BlockState state, int newAge) {
+        world.setBlock(pos, state.setValue(fruit.getAgeProperty(), newAge), 2);
+    }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        // If a loot table has been added load those drops instead (until drop creators).
-        if (builder.getLevel().getServer().getLootTables().getIds().contains(this.getLootTable())) {
-            return super.getDrops(state, builder);
-        }
-
-        final List<ItemStack> drops = new ArrayList<>();
-
-        if (state.getValue(AGE) >= 3) {
-            final ItemStack toDrop = this.getFruitDrop(fruitDropCount(state, builder.getLevel(), BlockPos.ZERO));
-            if (!toDrop.isEmpty()) {
-                drops.add(toDrop);
-            }
-        }
-
-        return drops;
+    public boolean isPathfindable(BlockState pState, IBlockReader pLevel, BlockPos pPos, PathType pType) {
+        return false;
     }
-
-    public FruitBlock setDroppedItem(ItemStack stack) {
-        this.droppedFruit = stack;
-        return this;
-    }
-
-    //Override this for a custom item drop
-    public ItemStack getFruitDrop(int count) {
-        ItemStack stack = droppedFruit.copy();
-        stack.setCount(count);
-        return stack;
-    }
-
-    //pos could be BlockPos.ZERO
-    protected int fruitDropCount(BlockState state, World world, BlockPos pos) {
-        return 1;
-    }
-
-    ///////////////////////////////////////////
-    // BOUNDARIES
-    ///////////////////////////////////////////
-
-    public FruitBlock setShape(int stage, AxisAlignedBB boundingBox) {
-        FRUIT_AABB[stage] = boundingBox;
-        return this;
-    }
-
-    public FruitBlock setShape(AxisAlignedBB[] boundingBox) {
-        FRUIT_AABB = boundingBox;
-        return this;
-    }
-
-    @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return VoxelShapes.create(FRUIT_AABB[state.getValue(AGE)]);
-    }
-
-    ///////////////////////////////////////////
-    // BLOCKSTATE
-    ///////////////////////////////////////////
-
-    @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(AGE);
-    }
-
-    public BlockState getStateForAge(int age) {
-        return this.defaultBlockState().setValue(AGE, age);
-    }
-
-    public int getAgeForSeasonalWorldGen(IWorld world, BlockPos pos, @Nullable Float seasonValue) {
-        if (seasonValue == null) {
-            return 3;
-        }
-
-        if (this.getSpecies().testFlowerSeasonHold(seasonValue)) {
-            return 0; // Fruit is as the flower stage.
-        }
-
-        return Math.min(world.getRandom().nextInt(6), 3); // Half the time the fruit is fully mature.
-    }
-
 }

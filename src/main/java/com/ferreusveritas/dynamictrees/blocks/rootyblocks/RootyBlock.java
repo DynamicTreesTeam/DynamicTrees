@@ -41,7 +41,12 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.*;
+import net.minecraft.world.Explosion;
+import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -300,8 +305,13 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart {
     }
 
     @Override
-    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getItemInHand(handIn), hit) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+        final ItemStack heldItem = player.getItemInHand(hand);
+        return getFamily(state, world, pos).onTreeActivated(
+                new Family.TreeActivationContext(
+                        world, TreeHelper.findRootNode(world, pos), pos, state, player, hand, heldItem, hit
+                )
+        ) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
     }
 
     public void destroyTree(World world, BlockPos rootPos) {

@@ -5,23 +5,26 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.configurations.PropertyDefinition;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
+import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
+import com.ferreusveritas.dynamictrees.compat.seasons.FlowerHoldPeriod;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
-import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
@@ -46,6 +49,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
@@ -234,6 +238,10 @@ public final class JsonDeserialisers {
             register(Family.class, new RegistryEntryDeserialiser<>(Family.REGISTRY));
     public static final JsonDeserialiser<DropCreator> DROP_CREATOR =
             register(DropCreator.class, new RegistryEntryDeserialiser<>(DropCreator.REGISTRY));
+    public static final JsonDeserialiser<Fruit> FRUIT =
+            register(Fruit.class, new RegistryEntryDeserialiser<>(Fruit.REGISTRY));
+    public static final JsonDeserialiser<Pod> POD =
+            register(Pod.class, new RegistryEntryDeserialiser<>(Pod.REGISTRY));
     public static final JsonDeserialiser<Species> SPECIES =
             register(Species.class, new RegistryEntryDeserialiser<>(Species.REGISTRY));
     public static final JsonDeserialiser<FeatureCanceller> FEATURE_CANCELLER =
@@ -265,10 +273,6 @@ public final class JsonDeserialisers {
             register(BranchBlock.class, jsonElement -> BLOCK.deserialise(jsonElement)
                     .mapIfValid(block -> block instanceof BranchBlock, "Block \"{}\" is not a branch.",
                             block -> (BranchBlock) block));
-    public static final JsonDeserialiser<FruitBlock> FRUIT =
-            register(FruitBlock.class, jsonElement -> BLOCK.deserialise(jsonElement)
-                    .mapIfValid(block -> block instanceof FruitBlock, "Block \"{}\" is not a fruit.",
-                            block -> (FruitBlock) block));
 
     public static final JsonDeserialiser<VinesGenFeature.VineType> VINE_TYPE =
             register(VinesGenFeature.VineType.class, new EnumDeserialiser<>(VinesGenFeature.VineType.class));
@@ -276,6 +280,8 @@ public final class JsonDeserialisers {
             register(BiomeDatabase.Operation.class, new EnumDeserialiser<>(BiomeDatabase.Operation.class));
     public static final JsonDeserialiser<GenerationStage.Decoration> DECORATION_STAGE =
             register(GenerationStage.Decoration.class, new EnumDeserialiser<>(GenerationStage.Decoration.class));
+    public static final JsonDeserialiser<GrowableBlock.MatureAction> MATURE_ACTION =
+            register(GrowableBlock.MatureAction.class, new EnumDeserialiser<>(GrowableBlock.MatureAction.class));
 
     public static final JsonDeserialiser<BiomeList> BIOME_LIST = register(BiomeList.class, new BiomeListDeserialiser());
     public static final JsonDeserialiser<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
@@ -307,6 +313,10 @@ public final class JsonDeserialisers {
     private static final Map<String, ToolType> TOOL_TYPES =
             ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");
 
+    public static final JsonDeserialiser<IBooleanFunction> BOOLEAN_FUNCTION = register(
+            IBooleanFunction.class, new BooleanFunctionDeserialiser()
+    );
+
     public static final JsonDeserialiser<ToolType> TOOL_TYPE = register(ToolType.class, jsonElement ->
             STRING.deserialise(jsonElement).map(TOOL_TYPES::get, "Could not get tool type from \"{}\"."));
 
@@ -314,6 +324,10 @@ public final class JsonDeserialisers {
 
     public static final JsonDeserialiser<PropertyDefinition<?>> VARIABLE_DEFINITION =
             register(PropertyDefinition.captureClass(), new PropertyDefinitionDeserialiser());
+
+    public static final JsonDeserialiser<FlowerHoldPeriod> FLOWER_PERIOD = register(
+            FlowerHoldPeriod.class, new CodecDeserialiserWrapper<>(FlowerHoldPeriod.CODEC)
+    );
 
     /**
      * Registers {@link ForgeRegistryEntryDeserialiser} objects. This should be called after the registries are

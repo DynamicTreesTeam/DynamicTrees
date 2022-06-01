@@ -9,7 +9,7 @@ import net.minecraft.world.biome.Biome;
 /**
  * @author Harley O'Connor
  */
-public final class FullGenerationContext extends GenerationContext<IWorld> {
+public final class FullGenerationContext extends GenerationContext {
 
     private final Biome biome;
     private final int radius;

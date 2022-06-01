@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.seasons;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 /**
@@ -22,7 +23,9 @@ public interface SeasonManager {
 
     Float getSeasonValue(World world, BlockPos rootPos);
 
-    boolean isTropical(World world, BlockPos rootPos);
+    Float getPeakFruitProductionSeasonValue(World world, BlockPos rootPos, float offset);
+
+    boolean isTropical(IWorld world, BlockPos rootPos);
 
     boolean shouldSnowMelt(World world, BlockPos pos);
 

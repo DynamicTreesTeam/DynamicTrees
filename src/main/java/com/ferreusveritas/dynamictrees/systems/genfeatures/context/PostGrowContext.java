@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 /**
  * @author Harley O'Connor
  */
-public class PostGrowContext extends GenerationContext<World> {
+public class PostGrowContext extends GenerationContext {
 
     private final BlockPos treePos;
     private final int fertility;

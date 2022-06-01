@@ -1,7 +1,13 @@
 package com.ferreusveritas.dynamictrees.compat;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.compat.seasons.*;
+import com.ferreusveritas.dynamictrees.compat.seasons.ActiveSeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.compat.seasons.BetterWeatherSeasonProvider;
+import com.ferreusveritas.dynamictrees.compat.seasons.NormalSeasonManager;
+import com.ferreusveritas.dynamictrees.compat.seasons.NullSeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.compat.seasons.NullSeasonProvider;
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
+import com.ferreusveritas.dynamictrees.compat.seasons.SereneSeasonsSeasonProvider;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
 import corgitaco.betterweather.api.season.Season;
@@ -9,6 +15,7 @@ import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import sereneseasons.config.BiomeConfig;

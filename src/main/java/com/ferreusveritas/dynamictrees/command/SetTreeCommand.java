@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.ferreusveritas.dynamictrees.util.Null;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.command.CommandSource;
@@ -16,7 +17,12 @@ import net.minecraft.world.server.ServerWorld;
 
 import java.util.stream.Collectors;
 
-import static com.ferreusveritas.dynamictrees.command.CommandConstants.*;
+import static com.ferreusveritas.dynamictrees.command.CommandConstants.DEFAULT_TURNS;
+import static com.ferreusveritas.dynamictrees.command.CommandConstants.FERTILITY;
+import static com.ferreusveritas.dynamictrees.command.CommandConstants.FERTILITY_SUGGESTIONS;
+import static com.ferreusveritas.dynamictrees.command.CommandConstants.JO_CODE;
+import static com.ferreusveritas.dynamictrees.command.CommandConstants.TURNS;
+import static com.ferreusveritas.dynamictrees.command.CommandConstants.TURNS_SUGGESTIONS;
 
 public final class SetTreeCommand extends SubCommand {
 
@@ -54,7 +60,7 @@ public final class SetTreeCommand extends SubCommand {
 
         sendSuccessAndLog(source, new TranslationTextComponent("commands.dynamictrees.success.set_tree", CommandHelper.posComponent(rootPos),
                 species.getTextComponent(), joCode.getTextComponent()));
-        joCode.generate(world, world, species, rootPos, source.getLevel().getBiome(rootPos),
+        joCode.generate(WorldContext.create(world), species, rootPos, source.getLevel().getBiome(rootPos),
                 Direction.SOUTH, 8, SafeChunkBounds.ANY, false);
 
         // Try to set the fertility.

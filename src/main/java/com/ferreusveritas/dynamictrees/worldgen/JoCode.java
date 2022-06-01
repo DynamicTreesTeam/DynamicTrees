@@ -21,6 +21,7 @@ import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
@@ -162,7 +163,8 @@ public class JoCode {
      * @param radius            The radius constraint.
      * @param secondChanceRegen Ensures second chance regen doesn't recurse too far.
      */
-    public void generate(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
+    public void generate(WorldContext worldContext, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
+        final IWorld world = worldContext.access();
         final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
         // A Tree generation boundary radius is at least 2 and at most 8.
@@ -206,7 +208,7 @@ public class JoCode {
         firstBranch.analyse(treeState, world, treePos, Direction.DOWN, signal);
 
         if (signal.foundRoot || signal.overflow) { // Something went terribly wrong.
-            this.tryGenerateAgain(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds, worldGen, treePos, treeState, endFinder, secondChanceRegen);
+            this.tryGenerateAgain(worldContext, species, rootPosIn, biome, facing, radius, safeBounds, worldGen, treePos, treeState, endFinder, secondChanceRegen);
             return;
         }
 
@@ -246,15 +248,15 @@ public class JoCode {
 
         // Allow for special decorations by the tree itself.
         species.postGeneration(new PostGenerationContext(world, rootPos, species, biome, radius, endPoints,
-                safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos),
-                species.seasonalFruitProductionFactor(worldObj, rootPos)));
+                safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldContext, rootPos),
+                species.seasonalFruitProductionFactor(worldContext, rootPos)));
         MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
 
         // Add snow to parts of the tree in chunks where snow was already placed.
         this.addSnow(leafMap, world, rootPos, biome);
     }
 
-    private void tryGenerateAgain(World worldObj, IWorld world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder, boolean secondChanceRegen) {
+    private void tryGenerateAgain(WorldContext worldContext, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder, boolean secondChanceRegen) {
         // Don't log the error if it didn't happen during world gen (so we don't fill the logs if players spam the staff in cramped positions).
         if (worldGen) {
             if (!secondChanceRegen) {
@@ -269,11 +271,11 @@ public class JoCode {
         }
 
         // Completely blow away any improperly defined network nodes.
-        this.cleanupFrankentree(world, treePos, treeState, endFinder.getEnds(), safeBounds);
+        this.cleanupFrankentree(worldContext.access(), treePos, treeState, endFinder.getEnds(), safeBounds);
 
         // Now that everything is clear we may as well regenerate the tree that screwed everything up.
         if (!secondChanceRegen) {
-            this.generate(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds, true);
+            this.generate(worldContext, species, rootPosIn, biome, facing, radius, safeBounds, true);
         }
     }
 

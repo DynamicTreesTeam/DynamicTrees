@@ -52,7 +52,7 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
         try {
             return this.value == null ? MappedJsonResult.mapErrorneous(this) :
                     MappedJsonResult.map(mapper.apply(this.value, this.warnings::add), this);
-        } catch (DeserialisationException e) {
+        } catch (DeserialisationException | RuntimeException e) {
             return MappedJsonResult.errorneousMap(e.getMessage(), this);
         }
     }

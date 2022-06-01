@@ -25,7 +25,6 @@ import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
@@ -34,17 +33,14 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Items;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
@@ -110,7 +106,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         }
 
         @Override
-        public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult hit) {
+        public boolean onTreeActivated(TreeActivationContext context) {
             return false;
         }
 
@@ -190,10 +186,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * The stick that is returned when a whole log can't be dropped
      */
     private Item stick = Items.STICK;
-    /**
-     * Weather the branch can support cocoa pods on it's surface [default = false]
-     */
-    public boolean canSupportCocoa = false;
 
     @OnlyIn(Dist.CLIENT)
     public int woodRingColor; // For rooty blocks
@@ -293,40 +285,39 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // INTERACTION
     ///////////////////////////////////////////
 
-    public boolean onTreeActivated(World world, BlockPos hitPos, BlockState state, PlayerEntity player, Hand hand, @Nullable ItemStack heldItem, BlockRayTraceResult hit) {
+    public static class TreeActivationContext {
+        public final World world;
+        public final BlockPos rootPos;
+        public final BlockPos hitPos;
+        public final BlockState hitState;
+        public final PlayerEntity player;
+        public final Hand hand;
+        @Nullable
+        public final ItemStack heldItem;
+        public final BlockRayTraceResult hitResult;
 
-        if (this.canSupportCocoa) {
-            BlockPos pos = hit.getBlockPos();
-            if (heldItem != null) {
-                if (heldItem.getItem() == Items.COCOA_BEANS) {
-                    BranchBlock branch = TreeHelper.getBranch(state);
-                    if (branch != null && branch.getRadius(state) == 8) {
-                        if (hit.getDirection() != Direction.UP && hit.getDirection() != Direction.DOWN) {
-                            pos = pos.relative(hit.getDirection());
-                        }
-                        if (world.isEmptyBlock(pos)) {
-                            BlockState cocoaState = DTRegistries.COCOA_FRUIT.getStateForPlacement(new BlockItemUseContext(new ItemUseContext(player, hand, hit)));
-                            assert cocoaState != null;
-                            Direction facing = cocoaState.getValue(HorizontalBlock.FACING);
-                            world.setBlock(pos, DTRegistries.COCOA_FRUIT.defaultBlockState().setValue(HorizontalBlock.FACING, facing), 2);
-                            if (!player.isCreative()) {
-                                heldItem.shrink(1);
-                            }
-                            return true;
-                        }
-                    }
-                }
-            }
+        public TreeActivationContext(World world, BlockPos rootPos, BlockPos hitPos, BlockState hitState,
+                                     PlayerEntity player, Hand hand, @Nullable ItemStack heldItem,
+                                     BlockRayTraceResult hitResult) {
+            this.world = world;
+            this.rootPos = rootPos;
+            this.hitPos = hitPos;
+            this.hitState = hitState;
+            this.player = player;
+            this.hand = hand;
+            this.heldItem = heldItem;
+            this.hitResult = hitResult;
         }
 
-        BlockPos rootPos = TreeHelper.findRootNode(world, hitPos);
+    }
 
-        if (canStripBranch(state, world, hitPos, player, heldItem)) {
-            return stripBranch(state, world, hitPos, player, heldItem);
+    public boolean onTreeActivated(TreeActivationContext context) {
+        if (canStripBranch(context.hitState, context.world, context.hitPos, context.player, context.heldItem)) {
+            return stripBranch(context.hitState, context.world, context.hitPos, context.player, context.heldItem);
         }
 
-        if (rootPos != BlockPos.ZERO) {
-            return TreeHelper.getExactSpecies(world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, hit);
+        if (context.rootPos != BlockPos.ZERO) {
+            return TreeHelper.getExactSpecies(context.world, context.hitPos).onTreeActivated(context);
         }
 
         return false;
@@ -506,10 +497,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      */
     public ItemStack getStick(int qty) {
         return this.stick == Items.AIR ? ItemStack.EMPTY : new ItemStack(this.stick, MathHelper.clamp(qty, 0, 64));
-    }
-
-    public void setCanSupportCocoa(boolean canSupportCocoa) {
-        this.canSupportCocoa = canSupportCocoa;
     }
 
     /**
@@ -862,7 +849,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return this.getString(Pair.of("commonLeaves", this.commonLeaves), Pair.of("maxBranchRadius", this.maxBranchRadius),
                 Pair.of("commonSpecies", this.commonSpecies), Pair.of("primitiveLog", this.primitiveLog),
                 Pair.of("primitiveStrippedLog", this.primitiveStrippedLog), Pair.of("stick", this.stick),
-                Pair.of("hasConiferVariants", this.hasConiferVariants), Pair.of("canSupportCocoa", this.canSupportCocoa));
+                Pair.of("hasConiferVariants", this.hasConiferVariants));
     }
 
 }

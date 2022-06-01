@@ -25,4 +25,9 @@ public class NullSeasonGrowthCalculator implements SeasonGrowthCalculator {
         return 1.0f;
     }
 
+    @Override
+    public Float getPeakFruitProductionSeasonValue(ClimateZoneType type) {
+        return null;
+    }
+
 }

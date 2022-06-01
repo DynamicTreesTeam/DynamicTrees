@@ -1,9 +1,11 @@
 package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.server.ServerWorld;
@@ -44,21 +46,21 @@ public class PoissonDiscEventHandler {
         final UniversalPoissonDiscProvider discProvider = TreeGenerator.getTreeGenerator().getCircleProvider();
 
         final ChunkPos chunkPos = event.getChunk().getPos();
-        discProvider.setChunkPoissonData((ServerWorld) world, chunkPos, circleData);
+        discProvider.setChunkPoissonData(WorldContext.create(((World) world)), chunkPos, circleData);
     }
 
     @SubscribeEvent
     public void onChunkDataSave(ChunkDataEvent.Save event) {
-        final ServerWorld world = (ServerWorld) event.getWorld();
+        final WorldContext worldContext = WorldContext.create(((World) event.getWorld()));
         final UniversalPoissonDiscProvider discProvider = TreeGenerator.getTreeGenerator().getCircleProvider();
         final IChunk chunk = event.getChunk();
         final ChunkPos chunkPos = chunk.getPos();
 
-        final byte[] circleData = discProvider.getChunkPoissonData(world, chunkPos);
+        final byte[] circleData = discProvider.getChunkPoissonData(worldContext, chunkPos);
         event.getData().putByteArray(CIRCLE_DATA_ID, circleData); // Set circle data.
 
 		if (chunk instanceof Chunk && !((Chunk) chunk).loaded) {
-			discProvider.unloadChunkPoissonData(world, chunkPos);
+			discProvider.unloadChunkPoissonData(worldContext, chunkPos);
 		}
     }
 

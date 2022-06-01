@@ -27,6 +27,8 @@ import java.util.concurrent.Executor;
  */
 public class ApplierRegistryEvent<O, I> extends GenericEvent<O> implements IModBusEvent {
 
+    public static final String FRUITS = "fruits";
+    public static final String PODS = "pods";
     public static final String SPECIES = "species";
     public static final String FAMILY = "family";
     public static final String LEAVES_PROPERTIES = "leaves_properties";

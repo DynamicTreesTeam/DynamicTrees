@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import com.ferreusveritas.dynamictrees.api.seasons.ClimateZoneType;
 import com.ferreusveritas.dynamictrees.api.seasons.SeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -16,11 +17,16 @@ public class SeasonContext {
     private float tropicalFruitProductionFactor;
     private Float seasonValue;
 
+    private final Float temperatePeakFruitProductionSeasonValue;
+    private final Float tropicalPeakFruitProductionSeasonValue;
+
     private long methodTicks = 0;
 
     public SeasonContext(SeasonProvider provider, SeasonGrowthCalculator calculator) {
         this.provider = provider;
         this.calculator = calculator;
+        this.temperatePeakFruitProductionSeasonValue = calculator.getPeakFruitProductionSeasonValue(ClimateZoneType.TEMPERATE);
+        this.tropicalPeakFruitProductionSeasonValue = calculator.getPeakFruitProductionSeasonValue(ClimateZoneType.TROPICAL);
     }
 
     public void updateTick(World world, long worldTicks) {
@@ -69,6 +75,14 @@ public class SeasonContext {
 
     public float getTropicalFruitProductionFactor(float offset) {
         return (offset == 0 || seasonValue == null) ? tropicalFruitProductionFactor : calculator.calcFruitProduction(seasonValue + offset, ClimateZoneType.TROPICAL);
+    }
+
+    public Float getTemperatePeakFruitProductionSeasonValue(float offset) {
+        return (temperatePeakFruitProductionSeasonValue == null) ? null : temperatePeakFruitProductionSeasonValue + offset;
+    }
+
+    public Float getTropicalPeakFruitProductionSeasonValue(float offset) {
+        return (tropicalPeakFruitProductionSeasonValue == null) ? null : tropicalPeakFruitProductionSeasonValue + offset;
     }
 
 }

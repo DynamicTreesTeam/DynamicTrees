@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationTemplateR
 import com.ferreusveritas.dynamictrees.api.event.Hooks;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceManager;
 import com.ferreusveritas.dynamictrees.data.DTRecipes;
+import com.ferreusveritas.dynamictrees.systems.fruit.FruitResourceLoader;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
@@ -19,6 +20,7 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
+import com.ferreusveritas.dynamictrees.systems.pod.PodResourceLoader;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
@@ -82,6 +84,8 @@ public final class Resources {
             GrowthLogicKitConfiguration.TEMPLATES
     );
 
+    public static final FruitResourceLoader FRUIT_LOADER = new FruitResourceLoader();
+    public static final PodResourceLoader POD_LOADER = new PodResourceLoader();
     public static final SpeciesResourceLoader SPECIES_LOADER = new SpeciesResourceLoader();
 
 
@@ -109,6 +113,8 @@ public final class Resources {
                 DROP_CREATOR_TEMPLATE_LOADER,
                 GEN_FEATURE_TEMPLATE_LOADER,
                 GROWTH_LOGIC_KIT_TEMPLATE_LOADER,
+                FRUIT_LOADER,
+                POD_LOADER,
                 SPECIES_LOADER,
                 JO_CODE_LOADER,
                 BIOME_DATABASE_LOADER,

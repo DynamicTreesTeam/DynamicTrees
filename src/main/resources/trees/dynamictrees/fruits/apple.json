@@ -1,0 +1,11 @@
+{
+  "_todo": "Remove block registry name in 1.18 so it is called `dynamictrees:apple`.",
+  "block_registry_name": "apple_fruit",
+  "item_stack": "apple",
+  "block_shapes": [
+    { "function": "fruit", "parameters": { "radius": 1, "height": 1, "stem_length": 0, "fraction": 16 } },
+    { "function": "fruit", "parameters": { "radius": 1, "height": 2, "stem_length": 0, "fraction": 16 } },
+    { "function": "fruit", "parameters": { "radius": 2.5, "height": 5, "stem_length": 0 } },
+    { "function": "fruit", "parameters": { "radius": 2.5, "height": 5, "stem_length": 1.25 } }
+  ]
+}

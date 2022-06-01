@@ -1,0 +1,26 @@
+{
+  "item_stack": "cocoa_beans",
+  "block_shapes": {
+    "east": [
+      { "function": "pod", "parameters": { "radius": 2, "height": 5, "stem_length": 4, "side_offset": 5, "side": "east" } },
+      { "function": "pod", "parameters": { "radius": 3, "height": 7, "stem_length": 4, "side_offset": 4, "side": "east" } },
+      { "function": "pod", "parameters": { "radius": 4, "height": 9, "stem_length": 4, "side_offset": 3, "side": "east" } }
+    ],
+    "west": [
+      { "function": "pod", "parameters": { "radius": 2, "height": 5, "stem_length": 4, "side_offset": 5, "side": "west" } },
+      { "function": "pod", "parameters": { "radius": 3, "height": 7, "stem_length": 4, "side_offset": 4, "side": "west" } },
+      { "function": "pod", "parameters": { "radius": 4, "height": 9, "stem_length": 4, "side_offset": 3, "side": "west" } }
+    ],
+    "north": [
+      { "function": "pod", "parameters": { "radius": 2, "height": 5, "stem_length": 4, "side_offset": 5, "side": "north" } },
+      { "function": "pod", "parameters": { "radius": 3, "height": 7, "stem_length": 4, "side_offset": 4, "side": "north" } },
+      { "function": "pod", "parameters": { "radius": 4, "height": 9, "stem_length": 4, "side_offset": 3, "side": "north" } }
+    ],
+    "south": [
+      { "function": "pod", "parameters": { "radius": 2, "height": 5, "stem_length": 4, "side_offset": 5, "side": "south" } },
+      { "function": "pod", "parameters": { "radius": 3, "height": 7, "stem_length": 4, "side_offset": 4, "side": "south" } },
+      { "function": "pod", "parameters": { "radius": 4, "height": 9, "stem_length": 4, "side_offset": 3, "side": "south" } }
+    ]
+  },
+  "flower_hold_period_length": 0
+}

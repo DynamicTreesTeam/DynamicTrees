@@ -127,6 +127,7 @@ public class DynamicSaplingBlock extends Block implements IGrowable, IPlantable 
         if (!this.canSurvive(state, world, pos)) {
             this.dropBlock(world, state, pos);
         }
+        super.neighborChanged(state, world, pos, blockIn, fromPos, isMoving);
     }
 
     protected void dropBlock(World world, BlockState state, BlockPos pos) {

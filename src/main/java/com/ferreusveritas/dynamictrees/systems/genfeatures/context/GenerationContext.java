@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.genfeatures.context;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
@@ -9,20 +10,24 @@ import java.util.Random;
 /**
  * @author Harley O'Connor
  */
-public abstract class GenerationContext<W extends IWorld> {
+public abstract class GenerationContext {
 
-    private final W world;
+    private final WorldContext worldContext;
     private final BlockPos pos;
     private final Species species;
 
-    public GenerationContext(W world, BlockPos pos, Species species) {
-        this.world = world;
+    public GenerationContext(IWorld world, BlockPos pos, Species species) {
+        this.worldContext = WorldContext.create(world);
         this.pos = pos;
         this.species = species;
     }
 
-    public W world() {
-        return world;
+    public WorldContext worldContext() {
+        return worldContext;
+    }
+
+    public IWorld world() {
+        return worldContext.access();
     }
 
     public BlockPos pos() {
@@ -34,7 +39,7 @@ public abstract class GenerationContext<W extends IWorld> {
     }
 
     public final Random random() {
-        return this.world.getRandom();
+        return this.worldContext.access().getRandom();
     }
 
 }

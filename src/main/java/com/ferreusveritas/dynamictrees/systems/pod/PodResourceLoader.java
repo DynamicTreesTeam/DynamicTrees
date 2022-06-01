@@ -1,0 +1,112 @@
+package com.ferreusveritas.dynamictrees.systems.pod;
+
+import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
+import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
+import com.ferreusveritas.dynamictrees.compat.seasons.FlowerHoldPeriod;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
+import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
+import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
+import com.ferreusveritas.dynamictrees.util.Null;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.shapes.VoxelShape;
+
+import javax.annotation.Nullable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
+/**
+ * @author Harley O'Connor
+ */
+public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
+
+    public PodResourceLoader() {
+        super(Pod.REGISTRY, ApplierRegistryEvent.PODS);
+    }
+
+    @Override
+    public void registerAppliers() {
+        this.loadAppliers
+                .register("max_age", Integer.class, Pod::setMaxAge);
+
+        this.commonAppliers
+                .register("block_shapes", JsonObject.class, this::readBlockShapes);
+
+        this.reloadAppliers
+                .register("can_bone_meal", Boolean.class, Pod::setCanBoneMeal)
+                .register("item_stack", ItemStack.class, Pod::setItemStack)
+                .register("growth_chance", Float.class, Pod::setGrowthChance)
+                .register("season_offset", Float.class, Pod::setSeasonOffset)
+                .register("flower_hold_period_length", Float.class, Pod::setFlowerHoldPeriodLength)
+                .register("min_production_factor", Float.class, Pod::setMinProductionFactor)
+                .register("mature_action", GrowableBlock.MatureAction.class, Pod::setMatureAction);
+    }
+
+    private void readBlockShapes(Pod pod, JsonObject json) {
+        Direction.Plane.HORIZONTAL.stream().forEach(facing -> {
+            JsonElement shapeArrayElement = json.get(facing.getName().toLowerCase(Locale.ROOT));
+            if (!shapeArrayElement.isJsonArray()) {
+                return;
+            }
+            List<VoxelShape> shapes = new LinkedList<>();
+            shapeArrayElement.getAsJsonArray().forEach(shapeElement ->
+                    JsonDeserialisers.VOXEL_SHAPE.deserialise(shapeElement).ifSuccess(shapes::add)
+            );
+            pod.setBlockShapes(facing, shapes.toArray(new VoxelShape[0]));
+        });
+    }
+
+    @Override
+    protected void applyLoadAppliers(JsonRegistryResourceLoader<Pod>.LoadData loadData, JsonObject json) {
+        super.applyLoadAppliers(loadData, json);
+        final JsonObject propertiesJson = getBlockPropertiesJson(json);
+        if (propertiesJson == null) {
+            this.createBlock(loadData.getResource(), json);
+        } else {
+            this.createBlock(loadData.getResource(), json, propertiesJson);
+        }
+    }
+
+    @Nullable
+    private JsonObject getBlockPropertiesJson(JsonObject json) {
+        return Null.applyIfNonnull(json.get("block_properties"), element ->
+                JsonDeserialisers.JSON_OBJECT.deserialise(element).orElse(null)
+        );
+    }
+
+    private void createBlock(Pod pod, JsonObject json) {
+        pod.createBlock(getBlockRegistryName(pod, json), pod.getDefaultBlockProperties());
+    }
+
+    private void createBlock(Pod pod, JsonObject json, JsonObject propertiesJson) {
+        final AbstractBlock.Properties blockProperties = JsonHelper.getBlockProperties(
+                propertiesJson,
+                pod.getDefaultMaterial(),
+                pod.getDefaultMaterialColor(),
+                pod::getDefaultBlockProperties,
+                error -> this.logError(pod.getRegistryName(), error),
+                warning -> this.logWarning(pod.getRegistryName(), warning)
+        );
+        pod.createBlock(getBlockRegistryName(pod, json), blockProperties);
+    }
+
+    /**
+     * @return the registry name to set for the pod block, or {@code null} if it was not set (which defaults to the
+     * using the pod's registry name)
+     */
+    @Nullable
+    private ResourceLocation getBlockRegistryName(Pod pod, JsonObject json) {
+        return Null.applyIfNonnull(json.get("block_registry_name"), element ->
+                ResourceLocationDeserialiser.create(pod.getRegistryName().getNamespace())
+                        .deserialise(element)
+                        .orElse(null)
+        );
+    }
+
+}

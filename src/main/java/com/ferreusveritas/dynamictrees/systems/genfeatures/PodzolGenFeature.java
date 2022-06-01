@@ -9,12 +9,19 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowConte
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.DoublePlantBlock;
+import net.minecraft.block.FlowerBlock;
+import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.MushroomBlock;
+import net.minecraft.block.TallGrassBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
-import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 
 import java.util.List;
 import java.util.Random;
@@ -35,7 +42,7 @@ public class PodzolGenFeature extends GenFeature {
             return false;
         }
 
-        final World world = context.world();
+        final IWorld world = context.world();
         final FindEndsNode endFinder = new FindEndsNode();
         TreeHelper.startAnalysisFromRoot(world, context.pos(), new MapSignal(endFinder));
         final List<BlockPos> endPoints = endFinder.getEnds();
@@ -64,13 +71,13 @@ public class PodzolGenFeature extends GenFeature {
                 } else if (block instanceof FlowerBlock || block instanceof TallGrassBlock || block instanceof DoublePlantBlock) {
                     // Kill plants.
                     if (world.getBrightness(LightType.SKY, offPos) <= darkThreshold) {
-                        world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                        world.setBlock(pos, Blocks.AIR.defaultBlockState(), Constants.BlockFlags.DEFAULT);
                     }
                     continue;
                 } else if (block == Blocks.DIRT || block == Blocks.GRASS) {
                     // Convert grass or dirt to podzol.
                     if (world.getBrightness(LightType.SKY, offPos.above()) <= darkThreshold) {
-                        world.setBlockAndUpdate(offPos, BlockStates.PODZOL);
+                        world.setBlock(offPos, BlockStates.PODZOL, Constants.BlockFlags.DEFAULT);
                     } else {
                         spreadPodzol(world, pos);
                     }
@@ -81,7 +88,7 @@ public class PodzolGenFeature extends GenFeature {
         return true;
     }
 
-    public static void spreadPodzol(World world, BlockPos pos) {
+    public static void spreadPodzol(IWorld world, BlockPos pos) {
         int podzolish = 0;
 
         for (Direction dir : CoordUtils.HORIZONTALS) {
@@ -90,7 +97,7 @@ public class PodzolGenFeature extends GenFeature {
             podzolish += (testBlock == Blocks.PODZOL) ? 1 : 0;
             podzolish += testBlock instanceof RootyBlock ? 1 : 0;
             if (podzolish >= 3) {
-                world.setBlockAndUpdate(pos, BlockStates.PODZOL);
+                world.setBlock(pos, BlockStates.PODZOL, Constants.BlockFlags.DEFAULT);
                 break;
             }
         }

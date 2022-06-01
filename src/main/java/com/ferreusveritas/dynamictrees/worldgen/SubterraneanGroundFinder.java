@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.Heightmap;
 
@@ -63,7 +62,7 @@ public class SubterraneanGroundFinder implements GroundFinder {
     }
 
     @Override
-    public List<BlockPos> findGround(ISeedReader world, BlockPos start) {
+    public List<BlockPos> findGround(IWorld world, BlockPos start) {
         final ArrayList<Integer> layers = findSubterraneanLayerHeights(world, start);
         if (layers.size() < 1) {
             return NO_LAYERS;

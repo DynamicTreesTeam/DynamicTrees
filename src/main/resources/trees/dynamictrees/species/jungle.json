@@ -16,6 +16,9 @@
     "perfect_biomes": { "type": "jungle" },
     "primitive_sapling": "jungle_sapling",
     "mega_species": "mega_jungle",
+    "pods": [
+        "cocoa"
+    ],
     "features" : [
         {
             "name": "vines",
@@ -24,7 +27,12 @@
                 "max_length": 16
             }
         },
-        "cocoa",
+        {
+            "name": "pod",
+            "properties": {
+                "pod": "cocoa"
+            }
+        },
         "undergrowth"
     ]
 }
