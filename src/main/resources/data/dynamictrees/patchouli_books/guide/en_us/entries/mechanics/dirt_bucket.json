@@ -2,7 +2,7 @@
     "name": "Dirt Bucket",
     "read_by_default": "true",
     "icon": "dynamictrees:dirt_bucket",
-    "category": "mechanics",
+    "category": "dynamictrees:mechanics",
 	"sortnum": "3",
   "pages": [
 	{

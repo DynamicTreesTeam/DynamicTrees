@@ -1,7 +1,7 @@
 {
     "name": "Potion of Depletion",
     "icon": "dynamictrees:dendro_potion{potion_index:1}",
-    "category": "potions",
+    "category": "dynamictrees:potions",
 	"sortnum": "2",
   "pages": [
 	{
