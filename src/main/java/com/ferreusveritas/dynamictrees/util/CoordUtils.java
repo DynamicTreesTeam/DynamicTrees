@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.AbstractIterator;
+import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -99,7 +100,7 @@ public final class CoordUtils {
             // Handles other instances where it should be safe.
             return (blockReader instanceof ChunkAccess ||
                     blockReader instanceof EmptyBlockGetter ||
-//                    blockReader instanceof NoiseColumn ||
+                    blockReader instanceof RenderChunkRegion ||
                     blockReader.getClass().getSimpleName().contains("ChunkRenderCache") || // Check for ChunkRenderCache (we can't call instanceof as this a client-side only class).
                     blockReader.getClass().getSimpleName().contains("ChunkCache")); // Checks for OptiFine's custom ChunkRenderCache.
         }
