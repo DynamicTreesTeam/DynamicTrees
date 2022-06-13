@@ -7,8 +7,10 @@ import com.google.common.collect.AbstractIterator;
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.*;
@@ -93,17 +95,13 @@ public final class CoordUtils {
     @SuppressWarnings("deprecation")
     public static boolean canAccessStateSafely(BlockGetter blockReader, BlockPos pos) {
         if (blockReader instanceof LevelReader) { // Handles most cases.
-            return ((LevelReader) blockReader).hasChunkAt(pos);
+            return ((LevelReader) blockReader).hasChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
         } else if (blockReader instanceof PathNavigationRegion) { // Handles Region.
             return !(((PathNavigationRegion) blockReader).getChunk(pos) instanceof EmptyLevelChunk);
-        } else {
-            // Handles other instances where it should be safe.
-            return (blockReader instanceof ChunkAccess ||
-                    blockReader instanceof EmptyBlockGetter ||
-                    blockReader instanceof RenderChunkRegion ||
-                    blockReader.getClass().getSimpleName().contains("ChunkRenderCache") || // Check for ChunkRenderCache (we can't call instanceof as this a client-side only class).
-                    blockReader.getClass().getSimpleName().contains("ChunkCache")); // Checks for OptiFine's custom ChunkRenderCache.
         }
+        // Otherwise assume we can access state safely. In most cases this is true, and if not we know it is a
+        // mod compatibility issue and a crash or logging will be more helpful in solving the problem.
+        return true;
     }
 
     /**
