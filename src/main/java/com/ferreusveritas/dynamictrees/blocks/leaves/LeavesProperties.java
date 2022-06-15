@@ -193,7 +193,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     public Optional<Block> getPrimitiveLeavesBlock() {
-        return Optionals.ofBlock(this.primitiveLeaves.getBlock());
+        return Optionals.ofBlock(this.primitiveLeaves == null ? null : this.primitiveLeaves.getBlock());
     }
 
     public void setPrimitiveLeaves(final Block primitiveLeaves) {

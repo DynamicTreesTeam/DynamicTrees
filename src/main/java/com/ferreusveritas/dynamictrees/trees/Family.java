@@ -440,11 +440,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public Optional<BranchBlock> getStrippedBranch() {
-        return Optionals.ofBlock(strippedBranch);
+        return Optionals.ofBlock(this.strippedBranch);
     }
 
     public Optional<Item> getBranchItem() {
-        return Optionals.ofItem(branchItem.get());
+        return Optionals.ofItem(this.branchItem);
     }
 
     public boolean isThick() {

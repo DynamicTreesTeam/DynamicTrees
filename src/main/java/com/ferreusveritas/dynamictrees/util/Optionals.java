@@ -15,6 +15,9 @@ import java.util.function.Supplier;
  * @author Harley O'Connor
  */
 public final class Optionals {
+    public static <B extends Block> Optional<B> ofBlock(@Nullable Supplier<B> blockSup) {
+        return blockSup == null ? Optional.empty() : ofBlock(blockSup.get());
+    }
 
     public static <B extends Block> Optional<B> ofBlock(@Nullable Supplier<B> blockSup) {
         return blockSup == null ? Optional.empty() : ofBlock(blockSup.get());
@@ -22,6 +25,10 @@ public final class Optionals {
     public static <B extends Block> Optional<B> ofBlock(@Nullable B block) {
         return Optional.ofNullable(block == Blocks.AIR ? null : block);
     }
+    public static <I extends Item> Optional<I> ofItem(@Nullable Supplier<I> itemSup) {
+        return itemSup == null ? Optional.empty() : ofItem(itemSup.get());
+    }
+
     public static <I extends Item> Optional<I> ofItem(@Nullable Supplier<I> itemSup) {
         return itemSup == null ? Optional.empty() : ofItem(itemSup.get());
     }
