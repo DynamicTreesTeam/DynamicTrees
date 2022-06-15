@@ -53,7 +53,7 @@ public class SafeChunkBounds {
         for (final Tile tile : TILES) {
             ChunkPos cp = new ChunkPos(pos.x + tile.pos.x, pos.z + tile.pos.z);
             final boolean loaded = world.getChunkSource().getChunk(cp.x, cp.z, ChunkStatus.EMPTY, false) != null;
-            this.chunkBounds[tile.index] = loaded ? new BlockBounds(cp) : BlockBounds.INVALID;
+            this.chunkBounds[tile.index] = loaded ? new BlockBounds(world, cp) : BlockBounds.INVALID;
         }
 
         for (Tile tile : TILES) {
