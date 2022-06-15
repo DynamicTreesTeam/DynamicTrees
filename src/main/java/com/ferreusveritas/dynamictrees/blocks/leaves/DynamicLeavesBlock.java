@@ -448,8 +448,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 		    If it's empty space then don't create leaves unless it's sufficiently bright.
 		    The range allows for adaptation to the hysteric effect that could cause blocks to rapidly appear and disappear. */
 
-        return (DTConfigs.REQUIRE_SKY_LIGHT.get() ? world.getBrightness(LightType.SKY, pos) : world.getRawBrightness(pos, 0))
-                >= (TreeHelper.isLeaves(blockState) ? leavesProperties.getLightRequirement() - 2 : leavesProperties.getLightRequirement());
+        return world.getBrightness(LightType.SKY, pos) >= (TreeHelper.isLeaves(blockState) ? leavesProperties.getLightRequirement() - 2 : leavesProperties.getLightRequirement());
     }
 
     /**

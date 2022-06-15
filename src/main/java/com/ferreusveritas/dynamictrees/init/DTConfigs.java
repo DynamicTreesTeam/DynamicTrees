@@ -42,8 +42,6 @@ public class DTConfigs {
     public static final ForgeConfigSpec.EnumValue<DynamicTrees.SwampOakWaterState> SWAMP_OAKS_IN_WATER;
     public static final ForgeConfigSpec.IntValue BONE_MEAL_GROWTH_PULSES;
 
-    public static final ForgeConfigSpec.BooleanValue REQUIRE_SKY_LIGHT;
-
     public static final ForgeConfigSpec.BooleanValue IS_LEAVES_PASSABLE;
     public static final ForgeConfigSpec.BooleanValue VANILLA_LEAVES_COLLISION;
     public static final ForgeConfigSpec.BooleanValue ENABLE_BRANCH_CLIMBING;
@@ -122,8 +120,6 @@ public class DTConfigs {
                 defineEnum("swampOaksInWater", DynamicTrees.SwampOakWaterState.ROOTED);
         BONE_MEAL_GROWTH_PULSES = SERVER_BUILDER.comment("The amount of growth pulses to send when bone meal is applied to a tree. Warning: setting values higher than 64 is not recommended other than for testing purposes. ").
                 defineInRange("boneMealGrowthPulses", 1, 1, 512);
-        REQUIRE_SKY_LIGHT = SERVER_BUILDER.comment("If enabled leaves require sky light to grow.").
-                define("requireSkyLight", true);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.comment("Interaction Settings").push("interaction");
