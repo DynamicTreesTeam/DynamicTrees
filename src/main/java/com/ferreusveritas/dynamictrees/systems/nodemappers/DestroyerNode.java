@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
@@ -52,7 +53,7 @@ public class DestroyerNode implements NodeInspector {
                 blockState.getBlock().removedByPlayer(blockState, (World) world, pos, player, true, world.getFluidState(pos));
                 blockState.getBlock().playerDestroy((World) world, player, pos, blockState, te, player.getMainHandItem());
             } else {
-                world.removeBlock(pos, false);
+                world.setBlock(pos, BlockStates.AIR, 0);
             }
             return true;
         }

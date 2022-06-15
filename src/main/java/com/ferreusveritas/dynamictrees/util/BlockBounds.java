@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.util;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
 
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +44,16 @@ public class BlockBounds implements Iterable<BlockPos> {
         this.maxX = maxX;
         this.maxY = maxY;
         this.maxZ = maxZ;
+    }
+
+    public BlockBounds(World world, ChunkPos cPos) {
+        minX = cPos.getMinBlockX();
+        minY = 0;
+        minZ = cPos.getMinBlockZ();
+
+        maxX = cPos.getMaxBlockX();
+        maxY = world.getHeight();
+        maxZ = cPos.getMaxBlockZ();
     }
 
     public BlockBounds(ChunkPos cPos) {

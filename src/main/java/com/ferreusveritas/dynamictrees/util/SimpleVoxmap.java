@@ -165,6 +165,7 @@ public class SimpleVoxmap {
     }
 
     public SimpleVoxmap filter(FilterOp op) {
+        Arrays.fill(touched, true);
         for (int i = 0; i < data.length; i++) {
             data[i] = op.getOp(data[i]);
         }
@@ -212,6 +213,10 @@ public class SimpleVoxmap {
         setVoxel(pos.getX(), pos.getY(), pos.getZ(), value);
     }
 
+    public void setVoxelOr(BlockPos pos, byte value) {
+        setVoxelOr(pos.getX(), pos.getY(), pos.getZ(), value);
+    }
+
     public void setVoxel(int x, int y, int z, byte value) {
         x += center.getX();
         y += center.getY();
@@ -221,6 +226,18 @@ public class SimpleVoxmap {
                 setYTouched(y - center.getY());
             }
             data[calcPos(x, y, z)] = value;
+        }
+    }
+
+    public void setVoxelOr(int x, int y, int z, byte value) {
+        x += center.getX();
+        y += center.getY();
+        z += center.getZ();
+        if (testBounds(x, y, z)) {
+            if (value != 0) {
+                setYTouched(y - center.getY());
+            }
+            data[calcPos(x, y, z)] |= value;
         }
     }
 
@@ -484,6 +501,7 @@ public class SimpleVoxmap {
 
         StringBuilder buffer;
         for (int y = 0; y < lenY; y++) {
+            System.out.println("Touched: " + touched[y]);
             for (int z = 0; z < lenZ; z++) {
                 buffer = new StringBuilder();
                 for (int x = 0; x < lenX; x++) {
