@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase.Entry;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.DyeColor;
 import net.minecraft.util.ResourceLocation;
@@ -19,17 +20,29 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class TreeGenerator {
+
+    /**
+     * Array of colored concrete blocks, indexed by {@link net.minecraft.item.DyeColor} IDs.
+     */
+    private static Block[] concreteBlocks;
 
     protected static TreeGenerator INSTANCE;
 
     protected final UniversalPoissonDiscProvider circleProvider;
     protected final RandomXOR random = new RandomXOR();
 
-    public static void setup() {
+    public static void initialise() {
         new TreeGenerator();
+    }
+
+    public static void setup() {
+        concreteBlocks = Arrays.stream(DyeColor.values())
+                .map(color -> ForgeRegistries.BLOCKS.getValue(new ResourceLocation(color.getName() + "_concrete")))
+                .toArray(Block[]::new);
     }
 
     public static TreeGenerator getTreeGenerator() {
@@ -63,6 +76,10 @@ public class TreeGenerator {
             return this.color;
         }
 
+        public BlockState getColoredBlock() {
+            return concreteBlocks[color.getId()].defaultBlockState();
+        }
+
     }
 
     public UniversalPoissonDiscProvider getCircleProvider() {
@@ -81,16 +98,16 @@ public class TreeGenerator {
         for (int ix = -circle.radius; ix <= circle.radius; ix++) {
             for (int iz = -circle.radius; iz <= circle.radius; iz++) {
                 if (circle.isEdge(circle.x + ix, circle.z + iz)) {
-                    safeBounds.setBlockState(world, new BlockPos(circle.x + ix, h, circle.z + iz), this.getConcreteByColor(DyeColor.byId((circle.x ^ circle.z) & 0xF)), flags, true);
+                    safeBounds.setBlockState(world, new BlockPos(circle.x + ix, h, circle.z + iz), concreteBlocks[(circle.x ^ circle.z) & 0xF].defaultBlockState(), flags, true);
                 }
             }
         }
 
         if (resultType != GeneratorResult.GENERATED) {
             final BlockPos pos = new BlockPos(circle.x, h, circle.z);
-            final DyeColor color = resultType.getColor();
-            safeBounds.setBlockState(world, pos, this.getConcreteByColor(color), true);
-            safeBounds.setBlockState(world, pos.above(), this.getConcreteByColor(color), true);
+            final BlockState coloredBlock = resultType.getColoredBlock();
+            safeBounds.setBlockState(world, pos, coloredBlock, true);
+            safeBounds.setBlockState(world, pos.above(), coloredBlock, true);
         }
     }
 
