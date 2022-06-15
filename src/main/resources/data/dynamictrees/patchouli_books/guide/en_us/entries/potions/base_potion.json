@@ -1,7 +1,7 @@
 {
     "name": "Biochar Base Potion",
     "icon": "dynamictrees:dendro_potion",
-    "category": "potions",
+    "category": "dynamictrees:potions",
 	"sortnum": "1",
   "pages": [
 	{

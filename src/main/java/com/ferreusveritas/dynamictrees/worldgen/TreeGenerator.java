@@ -96,7 +96,8 @@ public class TreeGenerator {
 
     public void makeTrees(WorldGenLevel world, BiomeDatabase biomeDataBase, PoissonDisc circle, SafeChunkBounds safeBounds) {
         circle.add(8, 8); // Move the circle into the "stage".
-        BlockPos pos = new BlockPos(circle.x, 0, circle.z);
+        // TODO: De-couple ground finder from biomes, now that they can vary based on height.
+        BlockPos pos = new BlockPos(circle.x, world.getMaxBuildHeight(), circle.z);
         final Entry entry = biomeDataBase.getEntry(world.getBiome(pos).value());
         for (BlockPos groundPos : entry.getGroundFinder().findGround(world, pos)) {
             makeTree(world, entry, circle, groundPos, safeBounds);
@@ -128,11 +129,11 @@ public class TreeGenerator {
         if (speciesSelection.isHandled()) {
             final Species species = speciesSelection.getSpecies();
             if (species.isValid()) {
-                BlockPos newGroundPos = species.moveGroundPosWorldgen(world, groundPos, dirtState);
-                if (!newGroundPos.equals(groundPos)) {
-                    groundPos = newGroundPos;
-                    dirtState = world.getBlockState(newGroundPos);
-                }
+//                BlockPos newGroundPos = species.moveGroundPosWorldgen(world, groundPos, dirtState);
+//                if (!newGroundPos.equals(groundPos)) {
+//                    groundPos = newGroundPos;
+//                    dirtState = world.getBlockState(newGroundPos);
+//                }
                 if (species.isAcceptableSoilForWorldgen(world, groundPos, dirtState)) {
                     if (biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == Chance.OK) {
                         if (!species.generate(world.getLevel(), world, groundPos, biome, random, circle.radius, safeBounds)) {

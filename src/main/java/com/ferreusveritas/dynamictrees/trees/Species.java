@@ -974,7 +974,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if the planting was successful
      */
     public boolean plantSapling(LevelAccessor world, BlockPos pos, boolean locationOverride) {
-        final DynamicSaplingBlock sapling = this.getSapling().orElse(this.getCommonSpecies().saplingBlock.get());
+
+        final DynamicSaplingBlock sapling = this.getSapling().or(() -> this.getCommonSpecies().getSapling()).orElse(null);
 
         if (sapling == null || !world.getBlockState(pos).getMaterial().isReplaceable() ||
                 !DynamicSaplingBlock.canSaplingStay(world, this, pos)) {
@@ -1128,8 +1129,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         BlockEntity tileEntity = world.getBlockEntity(rootPos);
-        if (tileEntity instanceof SpeciesTileEntity) {
-            SpeciesTileEntity speciesTE = (SpeciesTileEntity) tileEntity;
+        if (tileEntity instanceof SpeciesTileEntity speciesTE) {
             speciesTE.setSpecies(this);
         }
 
@@ -1194,20 +1194,20 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this.soilTypeFlags != 0;
     }
 
-    /**
-     * Moves ground position for world generation purposes to allow trees in snow-covered biomes, for example.
-     */
-    public BlockPos moveGroundPosWorldgen(LevelAccessor world, BlockPos pos, BlockState soilBlockState) {
-        if (!soilBlockState.is(BlockTags.SNOW))
-            return pos;
-
-        for (int steps = 8; steps > 0 && soilBlockState.is(BlockTags.SNOW); steps--) {
-            pos = pos.below();
-            soilBlockState = world.getBlockState(pos);
-        }
-
-        return pos;
-    }
+//    /**
+//     * Moves ground position for world generation purposes to allow trees in snow-covered biomes, for example.
+//     */
+//    public BlockPos moveGroundPosWorldgen(LevelAccessor world, BlockPos pos, BlockState soilBlockState) {
+//        if (!soilBlockState.is(BlockTags.SNOW))
+//            return pos;
+//
+//        for (int steps = 8; steps > 0 && soilBlockState.is(BlockTags.SNOW); steps--) {
+//            pos = pos.below();
+//            soilBlockState = world.getBlockState(pos);
+//        }
+//
+//        return pos;
+//    }
 
     /**
      * Soil acceptability tester.  Mostly to test if the block is dirt but could be overridden to allow gravel, sand, or
@@ -1216,8 +1216,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param soilBlockState
      * @return
      */
-    public boolean isAcceptableSoil(BlockState soilBlockState) {
-        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags);
+    public boolean isAcceptableSoil(BlockState soilBlockState, boolean worldgen) {
+        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags, worldgen);
     }
 
     /**
@@ -1230,7 +1230,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return
      */
     public boolean isAcceptableSoil(LevelReader world, BlockPos pos, BlockState soilBlockState) {
-        return isAcceptableSoil(soilBlockState);
+        return isAcceptableSoil(world, pos, soilBlockState, false);
+    }
+
+    public boolean isAcceptableSoil(LevelReader world, BlockPos pos, BlockState soilBlockState, boolean worldgen) {
+        return isAcceptableSoil(soilBlockState, worldgen);
     }
 
     /**
@@ -1242,21 +1246,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return
      */
     public boolean isAcceptableSoilForWorldgen(LevelAccessor world, BlockPos pos, BlockState soilBlockState) {
-        final boolean isAcceptableSoil = isAcceptableSoil(world, pos, soilBlockState);
+        final boolean isAcceptableSoil = isAcceptableSoil(world, pos, soilBlockState, true);
 
         // If the block is water, check the block below it is valid soil (and not water).
         if (isAcceptableSoil && isWater(soilBlockState)) {
             final BlockPos down = pos.below();
             final BlockState downState = world.getBlockState(pos.below());
 
-            return !isWater(downState) && this.isAcceptableSoil(world, down, downState);
+            return !isWater(downState) && this.isAcceptableSoil(world, down, downState, true);
         }
 
         return isAcceptableSoil;
     }
 
     protected boolean isWater(BlockState soilBlockState) {
-        return SoilHelper.isSoilAcceptable(soilBlockState, SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE));
+        return SoilHelper.isSoilAcceptable(soilBlockState, SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE), true);
     }
 
 

@@ -1,0 +1,5 @@
+{
+  "primitive_soil": "snow_block",
+  "acceptable_soils": [ "snow_like" ],
+  "worldgen_only": true
+}

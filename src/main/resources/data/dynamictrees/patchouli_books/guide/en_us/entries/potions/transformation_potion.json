@@ -1,7 +1,7 @@
 {
     "name": "Potion of Transformation",
     "icon": "dynamictrees:dendro_potion{potion_index:6}",
-    "category": "potions",
+    "category": "dynamictrees:potions",
 	"sortnum": "3",
   "pages": [
 	{

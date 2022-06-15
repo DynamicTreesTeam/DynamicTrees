@@ -1,7 +1,7 @@
 {
     "name": "Potion of Gigas",
     "icon": "dynamictrees:dendro_potion{potion_index:2}",
-    "category": "potions",
+    "category": "dynamictrees:potions",
 	"sortnum": "5",
   "pages": [
 	{

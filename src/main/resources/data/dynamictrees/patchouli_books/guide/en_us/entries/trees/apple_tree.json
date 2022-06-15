@@ -1,7 +1,7 @@
 {
   "name": "Apple Trees",
   "icon": "dynamictrees:apple_oak_seed",
-  "category": "trees",
+  "category": "dynamictrees:trees",
   "sortnum": "3",
   "pages": [
 	{

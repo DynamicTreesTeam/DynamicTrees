@@ -535,7 +535,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     public GrowSignal branchOut(Level world, BlockPos pos, GrowSignal signal) {
 
         Species species = signal.getSpecies();
-        LeavesProperties leavesProperties = signal.getSpecies().getLeavesProperties();
+        LeavesProperties leavesProperties = species.getLeavesProperties();
 
         //Check to be sure the placement for a branch is valid by testing to see if it would first support a leaves block
         if (!needLeaves(world, pos, leavesProperties, species)) {
@@ -561,7 +561,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         if (hasLeaves) {
             //Finally set the leaves block to a branch
             Family family = species.getFamily();
-            family.getBranchForPlacement(world,species,pos).ifPresent(branch ->
+            family.getBranchForPlacement(world, species, pos).ifPresent(branch ->
                     branch.setRadius(world, pos, family.getPrimaryThickness(), null)
             );
             signal.radius = family.getSecondaryThickness();//For the benefit of the parent branch

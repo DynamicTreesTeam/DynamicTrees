@@ -1,7 +1,7 @@
 {
   "name": "Features",
   "icon": "minecraft:bone_meal",
-  "category": "trees",
+  "category": "dynamictrees:trees",
   "sortnum": "1",
   "pages": [
 	{

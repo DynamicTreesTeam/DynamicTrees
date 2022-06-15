@@ -35,7 +35,8 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
 
         this.registerSpreadableAppliers();
 
-        this.commonAppliers.registerArrayApplier("acceptable_soils", String.class, this::registerAcceptableSoil);
+        this.commonAppliers.registerArrayApplier("acceptable_soils", String.class, this::registerAcceptableSoil)
+                .register("worldgen_only",Boolean.class, SoilProperties::setWorldGenOnly);
 
         super.registerAppliers();
     }
