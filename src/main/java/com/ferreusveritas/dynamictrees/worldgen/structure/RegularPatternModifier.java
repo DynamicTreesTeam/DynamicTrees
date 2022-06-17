@@ -17,23 +17,27 @@ public class RegularPatternModifier implements PatternModifier {
         this.pattern = pattern;
     }
 
-    public PatternModifier replacePiece(int index, Pair<JigsawPiece, Integer> rawPiece) {
-        pattern.rawTemplates.remove(index);
-        pattern.rawTemplates.add(index, rawPiece);
-        pattern.templates.remove(index);
-        pattern.templates.add(index, rawPiece.getFirst());
+    public PatternModifier replaceTemplate(int index, JigsawPiece newTemplate) {
+        Pair<JigsawPiece, Integer> removedRawTemplate = pattern.rawTemplates.remove(index);
+        pattern.rawTemplates.add(index, Pair.of(newTemplate, removedRawTemplate.getSecond()));
+        pattern.templates.replaceAll(template -> {
+            if (template == removedRawTemplate.getFirst()) {
+                return newTemplate;
+            }
+            return template;
+        });
         return this;
     }
 
     @Override
-    public PatternModifier removePiece(int index) {
-        pattern.rawTemplates.remove(index);
-        pattern.templates.remove(index);
+    public PatternModifier removeTemplate(int index) {
+        Pair<JigsawPiece, Integer> removedRawTemplate = pattern.rawTemplates.remove(index);
+        pattern.templates.removeIf(template -> template == removedRawTemplate.getFirst());
         return this;
     }
 
     @Override
-    public void removeAllPieces() {
+    public void removeAllTemplates() {
         pattern.rawTemplates.clear();
         pattern.templates.clear();
     }

@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.worldgen.structure;
 
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPiece;
 
 /**
@@ -9,17 +8,15 @@ import net.minecraft.world.gen.feature.jigsaw.JigsawPiece;
 public interface PatternModifier {
 
     PatternModifier NULL = new PatternModifier() {
-        @Override public PatternModifier replacePiece(int index, Pair<JigsawPiece, Integer> rawPiece) { return this; }
-        @Override public PatternModifier removePiece(int index) {
-            return this;
-        }
-        @Override public void removeAllPieces() {}
+        @Override public PatternModifier replaceTemplate(int index, JigsawPiece template) { return this; }
+        @Override public PatternModifier removeTemplate(int index) { return this; }
+        @Override public void removeAllTemplates() {}
     };
 
-    PatternModifier replacePiece(int index, Pair<JigsawPiece, Integer> rawPiece);
+    PatternModifier replaceTemplate(int index, JigsawPiece template);
 
-    PatternModifier removePiece(int index);
+    PatternModifier removeTemplate(int index);
 
-    void removeAllPieces();
+    void removeAllTemplates();
 
 }

@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen.structure;
 
-import com.mojang.datafixers.util.Pair;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPiece;
 import net.minecraft.world.gen.feature.template.ProcessorLists;
@@ -16,41 +17,42 @@ public final class VillageTreeReplacement {
 
     public static void replaceTreesFromVanillaVillages() {
         // Replace Oak tree in Plains village town center.
-        RegularPatternModifier.village("plains", "town_centers").replacePiece(3,
-                Pair.of(JigsawPiece.legacy("dynamictrees:village/plains/town_centers/plains_meeting_point_3",
-                        ProcessorLists.MOSSIFY_70_PERCENT).apply(JigsawPattern.PlacementBehaviour.RIGID), 50)
+        RegularPatternModifier.village("plains", "town_centers").replaceTemplate(3,
+                JigsawPiece.legacy("dynamictrees:village/plains/town_centers/plains_meeting_point_3",
+                        ProcessorLists.MOSSIFY_70_PERCENT).apply(JigsawPattern.PlacementBehaviour.RIGID)
+        ).replaceTemplate(7,
+                JigsawPiece.legacy("dynamictrees:village/plains/town_centers/plains_meeting_point_3",
+                        ProcessorLists.ZOMBIE_PLAINS).apply(JigsawPattern.PlacementBehaviour.RIGID)
         );
-        RegularPatternModifier.village("plains", "zombie/town_centers").replacePiece(3,
-                Pair.of(JigsawPiece.legacy("dynamictrees:village/plains/town_centers/plains_meeting_point_3",
-                        ProcessorLists.ZOMBIE_PLAINS).apply(JigsawPattern.PlacementBehaviour.RIGID), 1)
-        );
 
-        removeTreesFromVanillaVillages();
-    }
+        // Replace Oak trees from Plains village.
+        final TreeJigsawPiece oakTreePattern = new TreeJigsawPiece(Species.REGISTRY.get(DTTrees.OAK),
+                JigsawPattern.PlacementBehaviour.TERRAIN_MATCHING);
+        RegularPatternModifier.village("plains", "trees").replaceTemplate(0, oakTreePattern);
+        RegularPatternModifier.village("plains", "decor").replaceTemplate(1, oakTreePattern);
+        RegularPatternModifier.village("plains", "zombie/decor").replaceTemplate(1, oakTreePattern);
 
-    private static void removeTreesFromVanillaVillages() {
-        // Remove Oak trees from Plains village.
-        RegularPatternModifier.village("plains", "trees").removeAllPieces();
-        RegularPatternModifier.village("plains", "decor").removePiece(1);
-        RegularPatternModifier.village("plains", "zombie/decor").removePiece(1);
+        // Replace Acacia trees from Savanna village.
+        final TreeJigsawPiece acaciaTreePattern = new TreeJigsawPiece(Species.REGISTRY.get(DTTrees.ACACIA),
+                JigsawPattern.PlacementBehaviour.TERRAIN_MATCHING);
+        RegularPatternModifier.village("savanna", "trees").replaceTemplate(0, acaciaTreePattern);
+        RegularPatternModifier.village("savanna", "decor").replaceTemplate(1, acaciaTreePattern);
+        RegularPatternModifier.village("savanna", "zombie/decor").replaceTemplate(1, acaciaTreePattern);
 
-        // Remove Acacia trees from Savanna village.
-        RegularPatternModifier.village("savanna", "trees").removeAllPieces();
-        RegularPatternModifier.village("savanna", "decor").removePiece(1);
-        RegularPatternModifier.village("savanna", "zombie/decor").removePiece(1);
+        // Replace Spruce trees from Snowy village.
+        final TreeJigsawPiece spruceTreePattern = new TreeJigsawPiece(Species.REGISTRY.get(DTTrees.SPRUCE),
+                JigsawPattern.PlacementBehaviour.TERRAIN_MATCHING);
+        RegularPatternModifier.village("snowy", "trees").replaceTemplate(0, spruceTreePattern);
+        RegularPatternModifier.village("snowy", "decor").replaceTemplate(3, spruceTreePattern);
+        RegularPatternModifier.village("snowy", "zombie/decor").replaceTemplate(3, spruceTreePattern);
 
-        // Remove Spruce trees from Snowy village.
-        RegularPatternModifier.village("snowy", "trees").removeAllPieces();
-        RegularPatternModifier.village("snowy", "decor").removePiece(3);
-        RegularPatternModifier.village("snowy", "zombie/decor").removePiece(3);
-
-        // Remove Spruce and Pine trees from Taiga village.
+        // Replace Spruce and Pine trees from Taiga village.
         RegularPatternModifier.village("taiga", "decor")
-                .removePiece(7)
-                .removePiece(8);
+                .replaceTemplate(7, spruceTreePattern)
+                .replaceTemplate(8, spruceTreePattern);
         RegularPatternModifier.village("taiga", "zombie/decor")
-                .removePiece(4)
-                .removePiece(5);
+                .replaceTemplate(4, spruceTreePattern)
+                .replaceTemplate(5, spruceTreePattern);
     }
 
 }
