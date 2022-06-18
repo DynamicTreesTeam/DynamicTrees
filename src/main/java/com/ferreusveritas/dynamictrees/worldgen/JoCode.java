@@ -44,6 +44,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
+import static net.minecraft.tags.BlockTags.LOGS;
+
 /**
  * So named because the base64 codes it generates almost always start with "JO"
  *
@@ -382,10 +384,11 @@ public class JoCode {
     }
 
     protected boolean setBlockForGeneration(IWorld world, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
-        if (((world.getBlockState(pos).canBeReplacedByLogs(world, pos)) ||
-                world.getBlockState(pos).getMaterial().isLiquid() ||
-                world.getBlockState(pos).getBlock().is(DTBlockTags.FOLIAGE) ||
-                world.getBlockState(pos).getBlock().is(BlockTags.FLOWERS)) &&
+        final BlockState state = world.getBlockState(pos);
+        if (((state.canBeReplacedByLogs(world, pos) && !state.getBlock().is(LOGS)) ||
+                state.getMaterial().isLiquid() ||
+                state.getBlock().is(DTBlockTags.FOLIAGE) ||
+                state.getBlock().is(BlockTags.FLOWERS)) &&
                 (!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
             species.getFamily().getBranchForPlacement(world, species, pos).ifPresent(branch ->
                     branch.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)
