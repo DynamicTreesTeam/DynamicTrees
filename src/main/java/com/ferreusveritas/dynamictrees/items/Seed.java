@@ -35,6 +35,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -47,18 +48,14 @@ public class Seed extends Item implements IPlantable {
     /**
      * If set to {@code true} in the item stack tag, forces the tree to be planted before despawning.
      */
-    public static final String FORCE_PLANT_KEY = "forceplant";
-    public static final String LIFESPAN_KEY = "lifespan";
+    public static final String FORCE_PLANT_KEY = "ForcePlant";
+    public static final String LIFESPAN_KEY = "Lifespan";
     /**
      * If set in the item stack tag, generates the tree with the corresponding {@link JoCode} if the seed is planted.
+     * If set as an integer, selects a random code of the corresponding radius to generate the tree with if the seed is
+     * planted.
      */
-    public static final String CODE_KEY = "code";
-    /**
-     * If set in the item stack tag, selects a random code of the corresponding radius to generate the tree with if the
-     * seed is planted.
-     */
-    public static final String CODE_RADIUS_KEY = "CodeRadius";
-
+    public static final String CODE_KEY = "Code";
     private final Species species;//The tree this seed creates
 
     public Seed() {
@@ -101,10 +98,6 @@ public class Seed extends Item implements IPlantable {
         }
 
         return false;
-        //posX = 96347
-        //posY = 4
-        //posZ = 197
-        //BlockPos{x=96346, y=4, z=196}
     }
 
     public boolean doPlanting(World world, BlockPos pos, @Nullable PlayerEntity planter, ItemStack seedStack) {
@@ -175,16 +168,25 @@ public class Seed extends Item implements IPlantable {
     public String getCode(ItemStack seedStack, Random random) {
         String joCode = "";
         if (seedStack.hasTag()) {
-            CompoundNBT nbtData = seedStack.getTag();
-            assert nbtData != null;
-            if (nbtData.contains(CODE_KEY)) {
-                joCode = nbtData.getString(CODE_KEY);
-            } else if (nbtData.contains(CODE_RADIUS_KEY)) {
-                joCode = String.valueOf(JoCodeRegistry.getRandomCode(species.getRegistryName(),
-                        MathHelper.clamp(nbtData.getInt(CODE_RADIUS_KEY), 2, 8), random));
+            CompoundNBT tag = seedStack.getTag();
+            assert tag != null;
+            if (tag.contains(CODE_KEY)) {
+                if (tag.getTagType(CODE_KEY) == Constants.NBT.TAG_STRING) {
+                    joCode = tag.getString(CODE_KEY);
+                } else if (tag.getTagType(CODE_KEY) == Constants.NBT.TAG_INT) {
+                    final JoCode code = getJoCodeForRadius(random, tag.getInt(CODE_KEY));
+                    if (code != null) {
+                        joCode = code.toString();
+                    }
+                }
             }
         }
         return joCode;
+    }
+
+    @Nullable
+    private JoCode getJoCodeForRadius(Random random, int radius) {
+        return JoCodeRegistry.getRandomCode(species.getRegistryName(), MathHelper.clamp(radius, 2, 8), random);
     }
 
     public ActionResultType onItemUseFlowerPot(ItemUseContext context) {

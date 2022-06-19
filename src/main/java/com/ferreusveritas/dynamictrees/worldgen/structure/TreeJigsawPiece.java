@@ -99,7 +99,7 @@ public final class TreeJigsawPiece extends JigsawPiece {
         final ItemStack seedStack = new ItemStack(seed);
         final CompoundNBT tag = new CompoundNBT();
         tag.putBoolean(Seed.FORCE_PLANT_KEY, true);
-        tag.putInt(Seed.CODE_RADIUS_KEY, random.nextInt(7) + 2);
+        tag.putInt(Seed.CODE_KEY, random.nextInt(7) + 2);
         tag.putInt(Seed.LIFESPAN_KEY, 0);
         seedStack.setTag(tag);
 
