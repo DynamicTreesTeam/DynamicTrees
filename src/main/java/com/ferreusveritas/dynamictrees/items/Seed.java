@@ -101,6 +101,10 @@ public class Seed extends Item implements IPlantable {
         }
 
         return false;
+        //posX = 96347
+        //posY = 4
+        //posZ = 197
+        //BlockPos{x=96346, y=4, z=196}
     }
 
     public boolean doPlanting(World world, BlockPos pos, @Nullable PlayerEntity planter, ItemStack seedStack) {

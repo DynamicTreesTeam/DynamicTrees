@@ -39,6 +39,7 @@ public final class TreeJigsawPiece extends JigsawPiece {
 
     public static final Codec<TreeJigsawPiece> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(Species.CODEC.fieldOf("species").forGetter(TreeJigsawPiece::getSpecies),
+                    BlockPos.CODEC.fieldOf("offset").forGetter(TreeJigsawPiece::getOffset),
                     projectionCodec())
             .apply(instance, TreeJigsawPiece::new));
 
@@ -47,11 +48,18 @@ public final class TreeJigsawPiece extends JigsawPiece {
     );
 
     private final Species species;
+
+    private final BlockPos offset;
     private final CompoundNBT defaultJigsawNBT;
 
     public TreeJigsawPiece(Species species, JigsawPattern.PlacementBehaviour projection) {
+        this(species, BlockPos.ZERO, projection);
+    }
+
+    public TreeJigsawPiece(Species species, BlockPos offset, JigsawPattern.PlacementBehaviour projection) {
         super(projection);
         this.species = species;
+        this.offset = offset;
         this.defaultJigsawNBT = this.fillDefaultJigsawNBT();
     }
 
@@ -65,16 +73,18 @@ public final class TreeJigsawPiece extends JigsawPiece {
         return compoundnbt;
     }
 
-    public List<Template.BlockInfo> getShuffledJigsawBlocks(TemplateManager templateManager, BlockPos pos, Rotation rotation, Random random) {
+    public List<Template.BlockInfo> getShuffledJigsawBlocks(TemplateManager templateManager, BlockPos pos,
+                                                            Rotation rotation, Random random) {
         List<Template.BlockInfo> list = Lists.newArrayList();
-        list.add(new Template.BlockInfo(pos, Blocks.JIGSAW.defaultBlockState().setValue(JigsawBlock.ORIENTATION, JigsawOrientation.fromFrontAndTop(
-                Direction.DOWN, Direction.SOUTH)), this.defaultJigsawNBT));
+        list.add(new Template.BlockInfo(pos,
+                Blocks.JIGSAW.defaultBlockState().setValue(JigsawBlock.ORIENTATION, JigsawOrientation.fromFrontAndTop(
+                        Direction.DOWN, Direction.SOUTH)), this.defaultJigsawNBT));
         return list;
     }
 
     @Override
     public MutableBoundingBox getBoundingBox(TemplateManager templateManager, BlockPos pos, Rotation rotation) {
-        return new MutableBoundingBox(pos.getX() - 1, pos.getY(), pos.getZ() - 1, pos.getX() + 1, pos.getY() + 3, pos.getZ() + 1);
+        return new MutableBoundingBox(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
@@ -90,11 +100,26 @@ public final class TreeJigsawPiece extends JigsawPiece {
         final CompoundNBT tag = new CompoundNBT();
         tag.putBoolean(Seed.FORCE_PLANT_KEY, true);
         tag.putInt(Seed.CODE_RADIUS_KEY, random.nextInt(7) + 2);
-        tag.putInt(Seed.LIFESPAN_KEY, 20);
+        tag.putInt(Seed.LIFESPAN_KEY, 0);
         seedStack.setTag(tag);
 
-        world.addFreshEntity(new ItemEntity(world.getLevel(), pos.getX(), pos.getY() + 1, pos.getZ(), seedStack));
+        final int posX = pos.getX() + getOffsetX(rotation);
+        final int posY = pos.getY() + getOffsetY(rotation);
+        final int posZ = pos.getZ() + getOffsetZ(rotation);
+        world.addFreshEntity(new ItemEntity(world.getLevel(), posX, posY, posZ, seedStack));
         return true;
+    }
+
+    private int getOffsetX(Rotation rotation) {
+        return offset.getX() * (rotation.rotation().inverts(Direction.Axis.X) ? -1 : 1);
+    }
+
+    private int getOffsetY(Rotation rotation) {
+        return offset.getY();
+    }
+
+    private int getOffsetZ(Rotation rotation) {
+        return offset.getZ() * (rotation.rotation().inverts(Direction.Axis.Z) ? -1 : 1);
     }
 
     @Override
@@ -105,4 +130,9 @@ public final class TreeJigsawPiece extends JigsawPiece {
     public Species getSpecies() {
         return species;
     }
+
+    private BlockPos getOffset() {
+        return offset;
+    }
+
 }
