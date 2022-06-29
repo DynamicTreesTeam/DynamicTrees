@@ -29,9 +29,5 @@
             }
         },
         "mushroom_rot"
-    ],
-    "drop_creators": [
-        "log",
-        "seed"
     ]
 }

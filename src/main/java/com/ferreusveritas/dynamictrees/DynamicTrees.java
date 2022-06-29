@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.loot.DTLoot;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -89,6 +90,8 @@ public final class DynamicTrees {
 
         EventHandlers.registerCommon();
         CompatHandler.registerBuiltInSeasonManagers();
+
+        DTLoot.load();
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {

@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.loot.LootTable;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nullable;
@@ -21,6 +22,10 @@ public final class Optionals {
 
     public static <I extends Item> Optional<I> ofItem(@Nullable I item) {
         return Optional.ofNullable(item == Items.AIR ? null : item);
+    }
+
+    public static <T extends LootTable> Optional<T> ofLootTable(@Nullable T lootTable) {
+        return Optional.ofNullable(lootTable == LootTable.EMPTY ? null : lootTable);
     }
 
     public static <A, B> void ifAllPresent(BiConsumer<A, B> consumer, Optional<A> aOptional, Optional<B> bOptional) {

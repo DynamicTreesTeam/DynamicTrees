@@ -26,7 +26,7 @@ public class WartProperties extends SolidLeavesProperties {
     }
 
     @Override
-    protected String getBlockRegistryNameSuffix() {
+    public String getBlockRegistryNameSuffix() {
         return "_wart";
     }
 

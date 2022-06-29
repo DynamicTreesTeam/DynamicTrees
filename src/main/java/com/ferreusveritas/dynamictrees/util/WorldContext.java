@@ -6,6 +6,8 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
 
@@ -70,6 +72,15 @@ public final class WorldContext {
             seed = ((ISeedReader) access).getSeed();
         }
         return new WorldContext(level.dimension(), seed, access, level);
+    }
+
+    public static ServerWorld getServerWorldOrThrow(IWorld access) {
+        if (access instanceof ServerWorld) {
+            return ((ServerWorld) access);
+        } else if (access instanceof IServerWorld) {
+            return ((IServerWorld) access).getLevel();
+        }
+        throw new IllegalArgumentException("Cannot get ServerWorld from IWorld of type: " + access.getClass());
     }
 
 }

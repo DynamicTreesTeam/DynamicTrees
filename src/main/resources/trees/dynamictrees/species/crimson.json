@@ -19,15 +19,6 @@
     "acceptable_growth_blocks": ["minecraft:crimson_nylium", "dynamictrees:rooty_crimson_nylium"],
     "mega_species": "mega_crimson",
     "sapling_shape": "round_mushroom_rim",
-    "drop_creators": [
-        "log",
-        {
-            "name": "wart_block",
-            "properties": {
-                "block": "nether_wart_block"
-            }
-        }
-    ],
     "features": [
         {
             "name": "vines",

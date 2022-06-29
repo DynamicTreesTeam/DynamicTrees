@@ -12,9 +12,11 @@ import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.loot.DTLootParameterSets;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -27,6 +29,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShearsItem;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -160,7 +164,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
      * A shears {@link ToolType} doesn't exist by default, so we use this as a backup for shears extending
      * {@link ShearsItem} but not registering a shears tool type.
      */
-    protected boolean requiresShears = true;
+    protected boolean canBeSheared = true;
 
     private LeavesProperties() {
     }
@@ -250,7 +254,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
      *
      * @return A default suffix for {@link #blockRegistryName}.
      */
-    protected String getBlockRegistryNameSuffix() {
+    public String getBlockRegistryNameSuffix() {
         return "_leaves";
     }
 
@@ -480,12 +484,12 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return (fromRadius == twigRadius || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(from.getFamily().getCommonSpecies(), blockAccess.getBlockState(pos), blockAccess, pos) ? twigRadius : 0;
     }
 
-    public boolean doRequireShears() {
-        return requiresShears;
+    public boolean canBeSheared() {
+        return canBeSheared;
     }
 
-    public void setRequiresShears(boolean requiresShears) {
-        this.requiresShears = requiresShears;
+    public void setCanBeSheared(boolean canBeSheared) {
+        this.canBeSheared = canBeSheared;
     }
 
     public List<ITag.INamedTag<Block>> defaultLeavesTags() {

@@ -661,6 +661,14 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.hasStrippedBranch = hasStrippedBranch;
     }
 
+    public List<BranchBlock> getValidBranchBlocks() {
+        return Collections.unmodifiableList(validBranches);
+    }
+
+    public int getNumberOfValidBranchBlocks() {
+        return validBranches.size();
+    }
+
     public void addValidBranches(BranchBlock... branches) {
         this.validBranches.addAll(Arrays.asList(branches));
     }
