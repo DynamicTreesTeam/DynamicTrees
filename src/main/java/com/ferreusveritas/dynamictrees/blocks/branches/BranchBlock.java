@@ -537,7 +537,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final NetVolumeNode.Volume woodVolume =
                 destroyData.woodVolume; // The amount of wood calculated from the body of the tree network.
         woodVolume.multiplyVolume(fortuneFactor);
-        final List<ItemStack> woodItems = destroyData.species.getWoodDrops(world, cutPos, woodVolume, heldItem);
+        final List<ItemStack> woodItems = destroyData.species.getWoodDrops(world, woodVolume, heldItem);
 
         // Drop the FallingTreeEntity into the world.
         FallingTreeEntity.dropTree(world, destroyData, woodItems, DestroyType.HARVEST);
@@ -579,7 +579,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
                 this.destroyBranchFromNode(world, cutPos, Direction.DOWN, false, null);
 
         // Get all of the wood drops.
-        final List<ItemStack> woodDropList = destroyData.species.getWoodDrops(world, cutPos, destroyData.woodVolume);
+        final List<ItemStack> woodDropList = destroyData.species.getWoodDrops(world, destroyData.woodVolume);
 
         // If sloppy break drops are off clear all drops.
         if (!DTConfigs.SLOPPY_BREAK_DROPS.get()) {
@@ -756,7 +756,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final BranchDestructionData destroyData = destroyBranchFromNode(world, pos, Direction.DOWN, false, null);
         final NetVolumeNode.Volume woodVolume = destroyData.woodVolume;
         final List<ItemStack> woodDropList =
-                species.getWoodDrops(world, pos, woodVolume, ItemStack.EMPTY, explosion.radius);
+                species.getWoodDrops(world, woodVolume, ItemStack.EMPTY, explosion.radius);
         final FallingTreeEntity treeEntity =
                 FallingTreeEntity.dropTree(world, destroyData, woodDropList, DestroyType.BLAST);
 

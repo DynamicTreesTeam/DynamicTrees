@@ -808,15 +808,15 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return table == EMPTY ? (this.isCommonSpecies() ? lootTables.get(nameFunction.apply(getCommonSpecies())) : EMPTY) : table;
     }
 
-    public List<ItemStack> getWoodDrops(World world, BlockPos pos, NetVolumeNode.Volume volume) {
-        return getWoodDrops(world, pos, volume, ItemStack.EMPTY);
+    public List<ItemStack> getWoodDrops(World world, NetVolumeNode.Volume volume) {
+        return getWoodDrops(world, volume, ItemStack.EMPTY);
     }
 
-    public List<ItemStack> getWoodDrops(World world, BlockPos pos, NetVolumeNode.Volume volume, ItemStack tool) {
-        return getWoodDrops(world, pos, volume, tool, null);
+    public List<ItemStack> getWoodDrops(World world, NetVolumeNode.Volume volume, ItemStack tool) {
+        return getWoodDrops(world, volume, tool, null);
     }
 
-    public List<ItemStack> getWoodDrops(World world, BlockPos pos, NetVolumeNode.Volume volume,
+    public List<ItemStack> getWoodDrops(World world, NetVolumeNode.Volume volume,
                                         ItemStack tool, @Nullable Float explosionRadius) {
         volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
         if (world.isClientSide) {
@@ -883,16 +883,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume) {
         List<ItemStack> logsList = new LinkedList<>();
         int[] volArray = volume.getRawVolumesArray();
-        float prevVol = 0;
+        float stickVol = 0;
         for (int i = 0; i < volArray.length; i++) {
             float vol = (volArray[i] / (float) NetVolumeNode.Volume.VOXELSPERLOG);
             if (vol > 0) {
-                vol += prevVol;
-                prevVol = getFamily().getValidBranchBlock(i).getPrimitiveLogs(vol, logsList);
+                stickVol += getFamily().getValidBranchBlock(i).getPrimitiveLogs(vol, logsList);
             }
         }
-        int sticks = (int) (prevVol *
-                8); // A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
+        int sticks = (int) (stickVol * 8); // A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
         return new LogsAndSticks(logsList, sticks);
     }
 
