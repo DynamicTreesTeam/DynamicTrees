@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 public abstract class BlockWithDynamicHardness extends Block {
 
     public BlockWithDynamicHardness(Properties properties) {
-        super(properties);
+        super(properties.destroyTime(2.0f));
 
         // Create and fill a new state container.
         final StateDefinition.Builder<Block, BlockState> builder = new StateDefinition.Builder<>(this);
