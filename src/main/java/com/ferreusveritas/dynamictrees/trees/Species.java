@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.data.Generator;
 import com.ferreusveritas.dynamictrees.api.data.SaplingStateGenerator;
 import com.ferreusveritas.dynamictrees.api.data.SeedItemModelGenerator;
+import com.ferreusveritas.dynamictrees.api.event.TransitionSaplingToTreeEvent;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
@@ -116,6 +117,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -1087,30 +1089,40 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return 0;
     }
 
-    public boolean transitionToTree(World world, BlockPos pos) {
+    public final boolean transitionToTree(World world, BlockPos pos) {
+        Event event = new TransitionSaplingToTreeEvent(this, world, pos);
+        MinecraftForge.EVENT_BUS.post(event);
 
-        //Ensure planting conditions are right
-        Family family = getFamily();
-        if (world.isEmptyBlock(pos.above()) && isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()))) {
-            // Set to a single branch with 1 radius.
-            family.getBranch().ifPresent(branch -> branch.setRadius(world, pos, family.getPrimaryThickness(), null));
-            // Place a single leaf block on top.
-            world.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState());
-            // Set to fully fertilized rooty dirt underneath.
-            placeRootyDirtBlock(world, pos.below(), 15);
-
-            if (doesRequireTileEntity(world, pos)) {
-                SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
-                world.setBlockEntity(pos.below(), speciesTE);
-                if (speciesTE != null) {
-                    speciesTE.setSpecies(this);
-                }
-            }
-
-            return true;
+        // Transition if event wasn't cancelled and conditions are met.
+        if (!event.isCanceled() && shouldTransitionToTree(world, pos)) {
+            return transitionToTree(world, pos, getFamily());
         }
 
         return false;
+    }
+
+    protected boolean shouldTransitionToTree(World world, BlockPos pos) {
+        return world.isEmptyBlock(pos.above()) &&
+                isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()));
+    }
+
+    protected boolean transitionToTree(World world, BlockPos pos, Family family) {
+        // Set to a single branch with 1 radius.
+        family.getBranch().ifPresent(branch -> branch.setRadius(world, pos, family.getPrimaryThickness(), null));
+        // Place a single leaf block on top.
+        world.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState());
+        // Set to fully fertilized rooty dirt underneath.
+        placeRootyDirtBlock(world, pos.below(), 15);
+
+        if (doesRequireTileEntity(world, pos)) {
+            SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create();
+            world.setBlockEntity(pos.below(), speciesTE);
+            if (speciesTE != null) {
+                speciesTE.setSpecies(this);
+            }
+        }
+
+        return true;
     }
 
     private VoxelShape saplingShape = CommonVoxelShapes.SAPLING;

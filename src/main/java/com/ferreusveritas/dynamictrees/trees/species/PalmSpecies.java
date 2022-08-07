@@ -22,7 +22,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -63,20 +62,16 @@ public class PalmSpecies extends Species {
         return super.postGrow(world, rootPos, treePos, fertility, natural);
     }
 
-    public boolean transitionToTree(World world, BlockPos pos) {
-        //Ensure planting conditions are right
-        Family family = getFamily();
-        if (world.isEmptyBlock(pos.above()) && isAcceptableSoil(world, pos.below(), world.getBlockState(pos.below()))) {
-            family.getBranch().ifPresent(branch ->
-                    // Set to a single branch with 1 radius.
-                    branch.setRadius(world, pos, family.getPrimaryThickness(), null)
-            );
-            world.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 4));//Place 2 leaf blocks on top
-            world.setBlockAndUpdate(pos.above(2), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 3));
-            placeRootyDirtBlock(world, pos.below(), 15);//Set to fully fertilized rooty dirt underneath
-            return true;
-        }
-        return false;
+    @Override
+    protected boolean transitionToTree(World world, BlockPos pos, Family family) {
+        family.getBranch().ifPresent(branch ->
+                // Set to a single branch with 1 radius.
+                branch.setRadius(world, pos, family.getPrimaryThickness(), null)
+        );
+        world.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 4));//Place 2 leaf blocks on top
+        world.setBlockAndUpdate(pos.above(2), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 3));
+        placeRootyDirtBlock(world, pos.below(), 15);//Set to fully fertilized rooty dirt underneath
+        return true;
     }
 
     @Override
