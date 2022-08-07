@@ -238,7 +238,7 @@ public class DTLootTableProvider extends LootTableProvider {
                                 .apply(MultiplySticksCount.multiplySticksCount())
                                 .apply(ExplosionDecay.explosionDecay())
                 )
-        ).setParamSet(DTLootParameterSets.WOOD);
+        ).setParamSet(DTLootParameterSets.BRANCHES);
     }
 
     private void writeTables(DirectoryCache cache) {

@@ -1,5 +1,5 @@
 {
-  "type": "dynamictrees:wood",
+  "type": "dynamictrees:branches",
   "pools": [
     {
       "rolls": 1,
@@ -14,7 +14,7 @@
               "function": "minecraft:explosion_decay"
             }
           ],
-          "name": "minecraft:stripped_jungle_log"
+          "name": "minecraft:oak_log"
         }
       ]
     },

@@ -74,7 +74,10 @@ import java.util.stream.Collectors;
 public abstract class BranchBlock extends BlockWithDynamicHardness implements TreePart, FutureBreakable {
 
     public static final int MAX_RADIUS = 8;
+
+    public static final String NAME_SUFFIX = "_branch";
     public static DynamicTrees.DestroyMode destroyMode = DynamicTrees.DestroyMode.SLOPPY;
+
 
     /**
      * The {@link Family} for this {@link BranchBlock}.
@@ -485,7 +488,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     ///////////////////////////////////////////
 
     private final LazyValue<ResourceLocation> lootTableName =
-            LazyValue.supplied(() -> ResourceLocationUtils.prefix(getRegistryName(), "trees/wood/"));
+            LazyValue.supplied(() -> ResourceLocationUtils.prefix(
+                    ResourceLocationUtils.removeSuffix(getRegistryName(), "_branch"),
+                    "trees/branches/"
+            ));
 
     public ResourceLocation getLootTableName() {
         return lootTableName.get();

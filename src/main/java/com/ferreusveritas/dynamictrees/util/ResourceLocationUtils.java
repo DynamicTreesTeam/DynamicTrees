@@ -30,4 +30,12 @@ public final class ResourceLocationUtils {
         return new ResourceLocation(resourceLocation.getNamespace(), prefix + resourceLocation.getPath() + suffix);
     }
 
+    public static ResourceLocation removeSuffix(final ResourceLocation resourceLocation, final String suffix) {
+        final String path = resourceLocation.getPath();
+        if (path.endsWith(suffix)) {
+            return new ResourceLocation(resourceLocation.getNamespace(), path.substring(0, path.length() - suffix.length()));
+        }
+        return resourceLocation;
+    }
+
 }

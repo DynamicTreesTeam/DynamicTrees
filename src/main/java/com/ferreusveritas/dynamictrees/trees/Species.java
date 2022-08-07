@@ -875,7 +875,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 .withParameter(LootParameters.TOOL, tool)
                 .withParameter(DTLootParameters.VOLUME, volume)
                 .withOptionalParameter(LootParameters.EXPLOSION_RADIUS, explosionRadius)
-                .create(DTLootParameterSets.WOOD);
+                .create(DTLootParameterSets.BRANCHES);
     }
 
     public static class LogsAndSticks {

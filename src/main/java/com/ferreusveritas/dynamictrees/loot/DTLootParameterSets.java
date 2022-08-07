@@ -25,7 +25,7 @@ public final class DTLootParameterSets {
                     .required(DTLootParameters.FERTILITY)
     );
 
-    public static final LootParameterSet WOOD = register("wood", builder ->
+    public static final LootParameterSet BRANCHES = register("branches", builder ->
             builder.required(LootParameters.TOOL)
                     .required(DTLootParameters.VOLUME)
                     .optional(LootParameters.EXPLOSION_RADIUS)

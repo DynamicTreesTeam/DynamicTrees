@@ -372,7 +372,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @return The {@link ResourceLocation} registry name for the branch.
      */
     protected ResourceLocation getBranchRegName(final String prefix) {
-        return suffix(prefix(this.getRegistryName(), prefix), "_branch");
+        return suffix(prefix(this.getRegistryName(), prefix), BranchBlock.NAME_SUFFIX);
     }
 
     /**
