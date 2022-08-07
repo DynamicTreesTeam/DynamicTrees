@@ -123,10 +123,12 @@ dependencies {
     // Not sure if we need this one, what is a "forge" anyway?
     minecraft("net.minecraftforge:forge:$mcVersion-${property("forgeVersion")}")
 
+    // Temp as TehNut Maven is down.
+    implementation(fg.deobf("curse.maven:hwyla-253449:3033593"))
     // Compile Hwyla API, but don"t include in runtime.
-    compileOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api"))
+//    compileOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api"))
     // At runtime, use the full Hwyla mod.
-    runtimeOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}"))
+//    runtimeOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}"))
 
     // Compile JEI API, but don"t include in runtime.
     compileOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}:api"))
