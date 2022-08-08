@@ -43,10 +43,12 @@ public final class VoluntarySeedDropChance implements ILootCondition {
     }
 
     public static class Serializer implements ILootSerializer<VoluntarySeedDropChance> {
+        @Override
         public void serialize(JsonObject json, VoluntarySeedDropChance value, JsonSerializationContext context) {
             json.addProperty("rarity", value.rarity);
         }
 
+        @Override
         public VoluntarySeedDropChance deserialize(JsonObject json, JsonDeserializationContext context) {
             return new VoluntarySeedDropChance(JSONUtils.getAsFloat(json, "rarity", 1.0F));
         }

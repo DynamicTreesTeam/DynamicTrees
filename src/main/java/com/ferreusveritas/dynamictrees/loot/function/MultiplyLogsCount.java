@@ -39,10 +39,12 @@ public final class MultiplyLogsCount extends LootFunction {
     }
 
     public static class Serializer extends LootFunction.Serializer<MultiplyLogsCount> {
+        @Override
         public void serialize(JsonObject json, MultiplyLogsCount value, JsonSerializationContext context) {
             super.serialize(json, value, context);
         }
 
+        @Override
         public MultiplyLogsCount deserialize(JsonObject json, JsonDeserializationContext context, ILootCondition[] conditions) {
             return new MultiplyLogsCount(conditions);
         }

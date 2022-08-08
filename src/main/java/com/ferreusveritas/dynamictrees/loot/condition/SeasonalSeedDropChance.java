@@ -35,9 +35,11 @@ public final class SeasonalSeedDropChance implements ILootCondition {
     }
 
     public static class Serializer implements ILootSerializer<SeasonalSeedDropChance> {
+        @Override
         public void serialize(JsonObject json, SeasonalSeedDropChance value, JsonSerializationContext context) {
         }
 
+        @Override
         public SeasonalSeedDropChance deserialize(JsonObject json, JsonDeserializationContext context) {
             return SeasonalSeedDropChance.INSTANCE;
         }

@@ -818,16 +818,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return table == EMPTY ? (this.isCommonSpecies() ? lootTables.get(nameFunction.apply(getCommonSpecies())) : EMPTY) : table;
     }
 
-    public List<ItemStack> getWoodDrops(World world, NetVolumeNode.Volume volume) {
-        return getWoodDrops(world, volume, ItemStack.EMPTY);
+    public List<ItemStack> getBranchesDrops(World world, NetVolumeNode.Volume volume) {
+        return getBranchesDrops(world, volume, ItemStack.EMPTY);
     }
 
-    public List<ItemStack> getWoodDrops(World world, NetVolumeNode.Volume volume, ItemStack tool) {
-        return getWoodDrops(world, volume, tool, null);
+    public List<ItemStack> getBranchesDrops(World world, NetVolumeNode.Volume volume, ItemStack tool) {
+        return getBranchesDrops(world, volume, tool, null);
     }
 
-    public List<ItemStack> getWoodDrops(World world, NetVolumeNode.Volume volume,
-                                        ItemStack tool, @Nullable Float explosionRadius) {
+    public List<ItemStack> getBranchesDrops(World world, NetVolumeNode.Volume volume,
+                                            ItemStack tool, @Nullable Float explosionRadius) {
         volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
         if (world.isClientSide) {
             return Collections.emptyList();
@@ -837,17 +837,27 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             int branchVolume = volume.getRawVolume(i);
             if (branchVolume > 0) {
                 final BranchBlock branchBlock = family.getValidBranchBlock(i);
-                drops.addAll(getDropsForBranch(world, tool, explosionRadius, branchVolume, branchBlock));
+                drops.addAll(getDropsForBranchType(world, tool, explosionRadius, branchVolume, branchBlock));
             }
         }
         cleanDropsList(drops);
         return drops;
     }
 
-    private List<ItemStack> getDropsForBranch(World world, ItemStack tool, @Nullable Float explosionRadius,
-                                              int branchVolume, BranchBlock branchBlock) {
+    private List<ItemStack> getDropsForBranchType(World world, ItemStack tool, @Nullable Float explosionRadius,
+                                                  int branchVolume, BranchBlock branchBlock) {
         return world.getServer().getLootTables().get(branchBlock.getLootTableName())
-                .getRandomItems(createWoodLootContext(world, branchVolume, tool, explosionRadius));
+                .getRandomItems(createBranchesLootContext(world, branchVolume, tool, explosionRadius));
+    }
+
+    private LootContext createBranchesLootContext(World world, int volume, ItemStack tool,
+                                                  @Nullable Float explosionRadius) {
+        return new LootContext.Builder(WorldContext.getServerWorldOrThrow(world))
+                .withParameter(LootParameters.TOOL, tool)
+                .withParameter(DTLootParameters.SPECIES, this)
+                .withParameter(DTLootParameters.VOLUME, volume)
+                .withOptionalParameter(LootParameters.EXPLOSION_RADIUS, explosionRadius)
+                .create(DTLootParameterSets.BRANCHES);
     }
 
     /**
@@ -867,15 +877,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 drop.setCount(drop.getMaxStackSize());
             }
         }
-    }
-
-    private LootContext createWoodLootContext(World world, int volume, ItemStack tool,
-                                              @Nullable Float explosionRadius) {
-        return new LootContext.Builder(WorldContext.getServerWorldOrThrow(world))
-                .withParameter(LootParameters.TOOL, tool)
-                .withParameter(DTLootParameters.VOLUME, volume)
-                .withOptionalParameter(LootParameters.EXPLOSION_RADIUS, explosionRadius)
-                .create(DTLootParameterSets.BRANCHES);
     }
 
     public static class LogsAndSticks {
