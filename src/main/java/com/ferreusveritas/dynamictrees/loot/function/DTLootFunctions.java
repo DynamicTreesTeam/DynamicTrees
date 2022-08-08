@@ -11,6 +11,7 @@ import net.minecraft.util.registry.Registry;
  */
 public final class DTLootFunctions {
 
+    public static LootFunctionType MULTIPLY_COUNT = register("dynamictrees:multiply_count", new MultiplyCount.Serializer());
     public static LootFunctionType MULTIPLY_LOGS_COUNT = register("dynamictrees:multiply_logs_count", new MultiplyLogsCount.Serializer());
     public static LootFunctionType MULTIPLY_STICKS_COUNT = register("dynamictrees:multiply_sticks_count", new MultiplySticksCount.Serializer());
 
