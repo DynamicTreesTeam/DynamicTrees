@@ -11,7 +11,7 @@ import net.minecraft.util.registry.Registry;
  */
 public final class DTLootConditions {
 
-    public static final LootConditionType IS_SPECIES = register("dynamictrees:is_species", new IsSpecies.Serializer());
+    public static final LootConditionType SPECIES_MATCHES = register("dynamictrees:species_matches", new SpeciesMatches.Serializer());
     public static final LootConditionType SEASONAL_SEED_DROP_CHANCE = register("dynamictrees:seasonal_seed_drop_chance", new SeasonalSeedDropChance.Serializer());
     public static final LootConditionType VOLUNTARY_SEED_DROP_CHANCE = register("dynamictrees:voluntary_seed_drop_chance", new VoluntarySeedDropChance.Serializer());
 

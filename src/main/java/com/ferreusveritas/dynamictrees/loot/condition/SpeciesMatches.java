@@ -10,44 +10,43 @@ import net.minecraft.loot.LootConditionType;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.conditions.ILootCondition;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
 
 /**
  * @author Harley O'Connor
  */
-public final class IsSpecies implements ILootCondition {
+public final class SpeciesMatches implements ILootCondition {
 
-    private final ResourceLocation name;
+    private final String regex;
 
-    public IsSpecies(ResourceLocation name) {
-        this.name = name;
+    public SpeciesMatches(String regex) {
+        this.regex = regex;
     }
 
     @Override
     public LootConditionType getType() {
-        return DTLootConditions.IS_SPECIES;
+        return DTLootConditions.SPECIES_MATCHES;
     }
 
     @Override
     public boolean test(LootContext context) {
         final Species species = context.getParamOrNull(DTLootParameters.SPECIES);
         assert species != null;
-        return species.getRegistryName().equals(name);
+        return String.valueOf(species.getRegistryName()).matches(regex);
     }
 
-    public static ILootCondition.IBuilder isSpecies(ResourceLocation name) {
-        return () -> new IsSpecies(name);
+    public static ILootCondition.IBuilder speciesMatches(String regex) {
+        return () -> new SpeciesMatches(regex);
     }
 
-    public static class Serializer implements ILootSerializer<IsSpecies> {
+    public static class Serializer implements ILootSerializer<SpeciesMatches> {
         @Override
-        public void serialize(JsonObject json, IsSpecies value, JsonSerializationContext context) {
-            json.addProperty("name", String.valueOf(value.name));
+        public void serialize(JsonObject json, SpeciesMatches value, JsonSerializationContext context) {
+            json.addProperty("name", String.valueOf(value.regex));
         }
 
         @Override
-        public IsSpecies deserialize(JsonObject json, JsonDeserializationContext context) {
-            return new IsSpecies(new ResourceLocation(JSONUtils.getAsString(json, "name")));
+        public SpeciesMatches deserialize(JsonObject json, JsonDeserializationContext context) {
+            return new SpeciesMatches(JSONUtils.getAsString(json, "name"));
         }
     }
 
