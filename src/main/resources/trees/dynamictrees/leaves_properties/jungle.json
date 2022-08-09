@@ -1,4 +1,7 @@
 {
   "primitive_leaves": "minecraft:jungle_leaves",
-  "light_requirement": 12
+  "light_requirement": 12,
+
+  "_comment": "Seed chances are for data gen only, changing these will NOT have an effect until data is regenerated.",
+  "seed_drop_chances": [ 0.025, 0.027777778, 0.03125, 0.041666668, 0.1 ]
 }

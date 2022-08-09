@@ -14,6 +14,7 @@ public final class DTLootParameterSets {
 
     public static final LootParameterSet LEAVES = register("leaves", builder ->
             builder.required(LootParameters.BLOCK_STATE)
+                    .required(DTLootParameters.SPECIES)
                     .required(DTLootParameters.SEASONAL_SEED_DROP_FACTOR)
                     .required(LootParameters.TOOL)
                     .optional(LootParameters.EXPLOSION_RADIUS)
@@ -27,6 +28,7 @@ public final class DTLootParameterSets {
 
     public static final LootParameterSet BRANCHES = register("branches", builder ->
             builder.required(LootParameters.TOOL)
+                    .required(DTLootParameters.SPECIES)
                     .required(DTLootParameters.VOLUME)
                     .optional(LootParameters.EXPLOSION_RADIUS)
     );

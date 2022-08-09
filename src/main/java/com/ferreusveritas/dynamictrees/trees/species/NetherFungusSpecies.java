@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
-import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -16,7 +15,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.item.Item;
-import net.minecraft.loot.LootTable;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -105,26 +103,6 @@ public class NetherFungusSpecies extends Species {
         textureConsumer.accept("particle", capLocation);
         textureConsumer.accept("stem", barkTextureLocation);
         textureConsumer.accept("cap", capLocation);
-    }
-
-    @Override
-    public boolean shouldGenerateLeavesBlockDrops() {
-        return getPrimitiveLeaves().isPresent();
-    }
-
-    @Override
-    public LootTable.Builder createLeavesBlockDrops() {
-        return DTLootTableProvider.createWartBlockDrops(getPrimitiveLeaves().get());
-    }
-
-    @Override
-    public boolean shouldGenerateLeavesDrops() {
-        return getPrimitiveLeaves().isPresent();
-    }
-
-    @Override
-    public LootTable.Builder createLeavesDrops() {
-        return DTLootTableProvider.createWartDrops(getPrimitiveLeaves().get());
     }
 
 }

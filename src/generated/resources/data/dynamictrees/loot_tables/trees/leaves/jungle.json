@@ -5,7 +5,7 @@
       "rolls": 1,
       "entries": [
         {
-          "type": "minecraft:item",
+          "type": "dynamictrees:seed_item",
           "conditions": [
             {
               "condition": "minecraft:survives_explosion"
@@ -24,8 +24,7 @@
             {
               "condition": "dynamictrees:seasonal_seed_drop_chance"
             }
-          ],
-          "name": "dynamictrees:jungle_seed"
+          ]
         }
       ]
     },

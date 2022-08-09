@@ -11,8 +11,10 @@ import net.minecraft.util.registry.Registry;
  */
 public final class DTLootEntries {
 
-    public static LootPoolEntryType
-            ITEM_BY_SPECIES = register("dynamictrees:item_by_species", new ItemBySpeciesLootEntry.Serializer());
+    public static LootPoolEntryType ITEM_BY_SPECIES =
+            register("dynamictrees:item_by_species", new ItemBySpeciesLootEntry.Serializer());
+    public static LootPoolEntryType SEED_ITEM =
+            register("dynamictrees:seed_item", new SeedItemLootEntry.Serializer());
 
     private static LootPoolEntryType register(String name, ILootSerializer<? extends LootEntry> serializer) {
         return Registry.register(Registry.LOOT_POOL_ENTRY_TYPE, new ResourceLocation(name), new LootPoolEntryType(serializer));

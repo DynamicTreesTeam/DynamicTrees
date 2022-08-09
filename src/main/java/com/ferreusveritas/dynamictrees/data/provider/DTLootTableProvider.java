@@ -1,9 +1,11 @@
 package com.ferreusveritas.dynamictrees.data.provider;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.loot.DTLootParameterSets;
 import com.ferreusveritas.dynamictrees.loot.condition.SeasonalSeedDropChance;
 import com.ferreusveritas.dynamictrees.loot.condition.VoluntarySeedDropChance;
+import com.ferreusveritas.dynamictrees.loot.entry.SeedItemLootEntry;
 import com.ferreusveritas.dynamictrees.loot.function.MultiplyLogsCount;
 import com.ferreusveritas.dynamictrees.loot.function.MultiplySticksCount;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -87,65 +89,65 @@ public class DTLootTableProvider extends LootTableProvider {
             if (!species.getRegistryName().getNamespace().equals(modId)) {
                 return;
             }
-            if (species.shouldGenerateLeavesBlockDrops()) {
-                final ResourceLocation leavesBlockTablePath = getFullDropsPath(species.getLeavesBlockDropsPath());
-                if (!existingFileHelper.exists(leavesBlockTablePath, ResourcePackType.SERVER_DATA)) {
-                    lootTables.put(leavesBlockTablePath, species.createLeavesBlockDrops());
-                }
-            }
-            if (species.shouldGenerateLeavesDrops()) {
-                final ResourceLocation leavesTablePath = getFullDropsPath(species.getLeavesDropsPath());
-                if (!existingFileHelper.exists(leavesTablePath, ResourcePackType.SERVER_DATA)) {
-                    lootTables.put(leavesTablePath, species.createLeavesDrops());
-                }
-            }
-            if (species.shouldGenerateVoluntaryDrops()) {
-                final ResourceLocation leavesTablePath = getFullDropsPath(species.getVoluntaryDropsPath());
-                if (!existingFileHelper.exists(leavesTablePath, ResourcePackType.SERVER_DATA)) {
-                    lootTables.put(leavesTablePath, species.createVoluntaryDrops());
-                }
-            }
+            addVoluntaryTable(species);
         });
+
         ForgeRegistries.BLOCKS.getValues().stream()
                 .filter(block -> block instanceof BranchBlock)
                 .map(block -> (BranchBlock) block)
                 .filter(block -> block.getRegistryName().getNamespace().equals(modId))
-                .forEach(branchBlock -> {
-                    if (branchBlock.shouldGenerateBranchDrops()) {
-                        final ResourceLocation branchTablePath = getFullDropsPath(branchBlock.getLootTableName());
-                        if (!existingFileHelper.exists(branchTablePath, ResourcePackType.SERVER_DATA)) {
-                            lootTables.put(branchTablePath, branchBlock.createBranchDrops());
-                        }
-                    }
-                });
+                .forEach(this::addBranchTable);
+
+        LeavesProperties.REGISTRY.forEach(leavesProperties -> {
+            addLeavesBlockTable(leavesProperties);
+            addLeavesTable(leavesProperties);
+        });
+    }
+
+    private void addVoluntaryTable(Species species) {
+        if (species.shouldGenerateVoluntaryDrops()) {
+            final ResourceLocation leavesTablePath = getFullDropsPath(species.getVoluntaryDropsPath());
+            if (!existingFileHelper.exists(leavesTablePath, ResourcePackType.SERVER_DATA)) {
+                lootTables.put(leavesTablePath, species.createVoluntaryDrops());
+            }
+        }
+    }
+
+    private void addBranchTable(BranchBlock branchBlock) {
+        if (branchBlock.shouldGenerateBranchDrops()) {
+            final ResourceLocation branchTablePath = getFullDropsPath(branchBlock.getLootTableName());
+            if (!existingFileHelper.exists(branchTablePath, ResourcePackType.SERVER_DATA)) {
+                lootTables.put(branchTablePath, branchBlock.createBranchDrops());
+            }
+        }
+    }
+
+    private void addLeavesBlockTable(LeavesProperties leavesProperties) {
+        if (leavesProperties.shouldGenerateBlockDrops()) {
+            final ResourceLocation leavesBlockTablePath = getFullDropsPath(leavesProperties.getBlockDropsPath());
+            if (!existingFileHelper.exists(leavesBlockTablePath, ResourcePackType.SERVER_DATA)) {
+                lootTables.put(leavesBlockTablePath, leavesProperties.createBlockDrops());
+            }
+        }
+    }
+
+    private void addLeavesTable(LeavesProperties leavesProperties) {
+        if (leavesProperties.shouldGenerateDrops()) {
+            final ResourceLocation leavesTablePath = getFullDropsPath(leavesProperties.getDropsPath());
+            if (!existingFileHelper.exists(leavesTablePath, ResourcePackType.SERVER_DATA)) {
+                lootTables.put(leavesTablePath, leavesProperties.createDrops());
+            }
+        }
     }
 
     private ResourceLocation getFullDropsPath(ResourceLocation path) {
         return ResourceLocationUtils.surround(path, "loot_tables/", ".json");
     }
 
-    public static LootTable.Builder createLeavesBlockDrops(Block primitiveLeavesBlock) {
-        return LootTable.lootTable().withPool(
-                LootPool.lootPool().setRolls(ConstantRange.exactly(1))
-                        .add(ItemLootEntry.lootTableItem(primitiveLeavesBlock).when(HAS_SHEARS_OR_SILK_TOUCH))
-        ).withPool(
-                LootPool.lootPool().setRolls(ConstantRange.exactly(1)).when(HAS_NO_SHEARS_OR_SILK_TOUCH).add(
-                        ItemLootEntry.lootTableItem(Items.STICK)
-                                .apply(SetCount.setCount(RandomValueRange.between(1.0F, 2.0F)))
-                                .apply(ExplosionDecay.explosionDecay())
-                                .when(TableBonus.bonusLevelFlatChance(
-                                        Enchantments.BLOCK_FORTUNE, 0.02F, 0.022222223F, 0.025F, 0.033333335F,
-                                        0.1F
-                                ))
-                )
-        ).setParamSet(LootParameterSets.BLOCK);
-    }
-
-    public static LootTable.Builder createLeavesBlockDrops(Block primitiveLeavesBlock, Item seedItem,
-                                                           float[] seedChances) {
+    public static LootTable.Builder createLeavesBlockDrops(Block primitiveLeavesBlock, float[] seedChances) {
         return BlockLootTables.createSilkTouchOrShearsDispatchTable(
                 primitiveLeavesBlock,
-                ItemLootEntry.lootTableItem(seedItem)
+                SeedItemLootEntry.lootTableSeedItem()
                         .when(SurvivesExplosion.survivesExplosion())
                         .when(TableBonus.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, seedChances))
                         .when(SeasonalSeedDropChance.seasonalSeedDropChance())
@@ -169,24 +171,10 @@ public class DTLootTableProvider extends LootTableProvider {
         );
     }
 
-    public static LootTable.Builder createLeavesDrops() {
+    public static LootTable.Builder createLeavesDrops(float[] seedChances, LootParameterSet parameterSet) {
         return LootTable.lootTable().withPool(
                 LootPool.lootPool().setRolls(ConstantRange.exactly(1)).add(
-                        ItemLootEntry.lootTableItem(Items.STICK)
-                                .apply(SetCount.setCount(RandomValueRange.between(1.0F, 2.0F)))
-                                .apply(ExplosionDecay.explosionDecay())
-                                .when(TableBonus.bonusLevelFlatChance(
-                                        Enchantments.BLOCK_FORTUNE, 0.02F, 0.022222223F, 0.025F, 0.033333335F,
-                                        0.1F
-                                ))
-                )
-        ).setParamSet(LootParameterSets.BLOCK);
-    }
-
-    public static LootTable.Builder createLeavesDrops(Item seedItem, float[] seedChances, LootParameterSet parameterSet) {
-        return LootTable.lootTable().withPool(
-                LootPool.lootPool().setRolls(ConstantRange.exactly(1)).add(
-                        ItemLootEntry.lootTableItem(seedItem)
+                        SeedItemLootEntry.lootTableSeedItem()
                                 .when(SurvivesExplosion.survivesExplosion())
                                 .when(TableBonus.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, seedChances))
                                 .when(SeasonalSeedDropChance.seasonalSeedDropChance())

@@ -11,7 +11,6 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.loot.DTLootParameterSets;
 import com.ferreusveritas.dynamictrees.loot.DTLootParameters;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.trees.Family;
@@ -70,7 +69,7 @@ import java.util.Random;
 @SuppressWarnings("deprecation")
 public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable, RayTraceCollision {
 
-    public LeavesProperties properties = LeavesProperties.NULL_PROPERTIES;
+    public LeavesProperties properties = LeavesProperties.NULL;
 
     public DynamicLeavesBlock(final LeavesProperties leavesProperties, final Properties properties) {
         this(properties);
@@ -623,8 +622,9 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
             lootTableName = getLootTable();
         } else {
             pos = new BlockPos(originPos.x(), originPos.y(), originPos.z());
-            species = getExactSpecies(builder.getLevel(), pos, getProperties(state));
-            lootTableName = species.getLeavesBlockDropsPath();
+            LeavesProperties leavesProperties = getProperties(state);
+            lootTableName = leavesProperties.getBlockDropsPath();
+            species = getExactSpecies(builder.getLevel(), pos, leavesProperties);
         }
 
         if (lootTableName == LootTables.EMPTY) {
@@ -633,6 +633,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
             ServerWorld world = builder.getLevel();
             LootContext context = builder
                     .withParameter(LootParameters.BLOCK_STATE, state)
+                    .withParameter(DTLootParameters.SPECIES, species)
                     .withParameter(DTLootParameters.SEASONAL_SEED_DROP_FACTOR,
                             species.seasonalSeedDropFactor(WorldContext.create(world), pos))
                     .create(LootParameterSets.BLOCK);

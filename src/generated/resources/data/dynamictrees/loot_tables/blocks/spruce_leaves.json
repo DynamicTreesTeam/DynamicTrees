@@ -38,7 +38,7 @@
               "name": "minecraft:spruce_leaves"
             },
             {
-              "type": "minecraft:item",
+              "type": "dynamictrees:seed_item",
               "conditions": [
                 {
                   "condition": "minecraft:survives_explosion"
@@ -56,8 +56,7 @@
                 {
                   "condition": "dynamictrees:seasonal_seed_drop_chance"
                 }
-              ],
-              "name": "dynamictrees:spruce_seed"
+              ]
             }
           ]
         }

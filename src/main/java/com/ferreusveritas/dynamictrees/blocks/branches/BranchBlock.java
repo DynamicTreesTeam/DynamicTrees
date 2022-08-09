@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity.DestroyType;
@@ -466,14 +467,17 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         // Destroy all family compatible leaves.
         for (final Cell cell : leafMap.getAllNonZeroCells()) {
             final BlockPos.Mutable pos = cell.getPos();
-            final BlockState blockState = world.getBlockState(pos);
-            if (family.isCompatibleGenericLeaves(species, blockState, world, pos)) {
+            final BlockState state = world.getBlockState(pos);
+            if (family.isCompatibleGenericLeaves(species, state, world, pos)) {
                 dropList.clear();
-                dropList.addAll(species.getLeavesDrops(world, pos, tool));
+                LeavesProperties leaves = TreeHelper.getLeavesOpt(state)
+                        .map(block -> block.getProperties(state))
+                        .orElse(LeavesProperties.NULL);
+                dropList.addAll(leaves.getDrops(world, pos, tool, species));
                 final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
                 final BlockPos relPos = imPos.subtract(cutPos);
                 world.setBlock(imPos, BlockStates.AIR, 3);
-                destroyedLeaves.put(relPos, blockState);
+                destroyedLeaves.put(relPos, state);
                 dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)));
             }
         }

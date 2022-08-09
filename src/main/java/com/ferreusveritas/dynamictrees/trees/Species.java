@@ -94,7 +94,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameterSets;
 import net.minecraft.loot.LootParameters;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTableManager;
@@ -221,7 +220,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                                 .forGetter(Species::getRegistryName),
                         Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
                         LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
-                                LeavesProperties.NULL_PROPERTIES).forGetter(Species::getLeavesProperties))
+                                LeavesProperties.NULL).forGetter(Species::getLeavesProperties))
                 .apply(instance, constructor));
     }
 
@@ -291,7 +290,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected final List<Block> acceptableBlocksForGrowth = Lists.newArrayList();
 
     //Leaves
-    protected LeavesProperties leavesProperties = LeavesProperties.NULL_PROPERTIES;
+    protected LeavesProperties leavesProperties = LeavesProperties.NULL;
 
     /**
      * A list of leaf blocks the species accepts as its own. Used for the falling tree renderer
@@ -391,8 +390,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public Species setPreReloadDefaults() {
         return this.setDefaultGrowingParameters()
                 .setSaplingShape(CommonVoxelShapes.SAPLING)
-                .setSaplingSound(SoundType.GRASS)
-                .setSeedChances(new float[]{0.05F, 0.0625F, 0.083333336F, 0.1F});
+                .setSaplingSound(SoundType.GRASS);
     }
 
     /**
@@ -759,41 +757,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public Species setSeed(final Seed seed) {
         this.seed = seed;
         return this;
-    }
-
-    /**
-     * Chances for leaves to drop seeds. Used in data gen for loot tables.
-     */
-    private float[] seedChances = new float[]{0.05F, 0.0625F, 0.083333336F, 0.1F};
-
-    public Species setSeedChances(float[] seedChances) {
-        this.seedChances = (float[]) seedChances;
-        return this;
-    }
-
-    public Species setSeedChances(Collection<Float> seedChances) {
-        this.seedChances = new float[seedChances.size()];
-        Iterator<Float> iterator = seedChances.iterator();
-        for (int i = 0; i < seedChances.size(); i++) {
-            this.seedChances[i] = iterator.next();
-        }
-        return this;
-    }
-
-    public List<ItemStack> getLeavesDrops(World world, BlockPos pos, ItemStack tool) {
-        if (world.isClientSide) {
-            return Collections.emptyList();
-        }
-        return getLootTable(world.getServer().getLootTables(), species -> species.leavesDropsPath.get())
-                .getRandomItems(createLeavesLootContext(world, pos, tool));
-    }
-
-    private LootContext createLeavesLootContext(World world, BlockPos pos, ItemStack tool) {
-        return new LootContext.Builder(WorldContext.getServerWorldOrThrow(world))
-                .withParameter(LootParameters.BLOCK_STATE, world.getBlockState(pos))
-                .withParameter(DTLootParameters.SEASONAL_SEED_DROP_FACTOR, seasonalSeedDropFactor(WorldContext.create(world), pos))
-                .withParameter(LootParameters.TOOL, tool)
-                .create(DTLootParameterSets.LEAVES);
     }
 
     public List<ItemStack> getVoluntaryDrops(World world, BlockPos rootPos, int fertility) {
@@ -2293,55 +2256,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public void generateItemModelData(DTItemModelProvider provider) {
         // Generate seed models.
         this.seedModelGenerator.get().generate(provider, this);
-    }
-
-    public boolean shouldGenerateLeavesBlockDrops() {
-        return shouldGenerateLeavesDrops();
-    }
-
-    private final LazyValue<ResourceLocation> leavesBlockDropsTableName = LazyValue.supplied(() -> {
-        LeavesProperties leavesProperties = this.leavesProperties;
-        if (leavesProperties == null) {
-            leavesProperties = getCommonSpecies().leavesProperties;
-        }
-        return ResourceLocationUtils.suffix(getRegistryName(),
-                (leavesProperties == null ? "_leaves" : leavesProperties.getBlockRegistryNameSuffix()));
-    });
-
-    private final LazyValue<ResourceLocation> leavesBlockDropsPath = LazyValue.supplied(() ->
-            ResourceLocationUtils.prefix(leavesBlockDropsTableName.get(), "blocks/"));
-
-    public ResourceLocation getLeavesBlockDropsPath() {
-        return leavesBlockDropsPath.get();
-    }
-
-    public LootTable.Builder createLeavesBlockDrops() {
-        if (getPrimitiveLeaves().isPresent() && seed != null) {
-            return DTLootTableProvider.createLeavesBlockDrops(getPrimitiveLeaves().get(), this.seed, seedChances);
-        } else if (seed == null) {
-            return DTLootTableProvider.createLeavesBlockDrops(getPrimitiveLeaves().get());
-        }
-        return DTLootTableProvider.createLeavesDrops(seed, seedChances, LootParameterSets.BLOCK);
-    }
-
-    public boolean shouldGenerateLeavesDrops() {
-        final boolean hasPrimitiveLeaves = getPrimitiveLeaves().isPresent();
-        final boolean hasSeed = this.seed != null;
-        return ((hasPrimitiveLeaves || hasSeed) && isCommonSpecies()) || (hasPrimitiveLeaves && hasSeed);
-    }
-
-    private final LazyValue<ResourceLocation> leavesDropsPath = LazyValue.supplied(() ->
-            ResourceLocationUtils.prefix(getRegistryName(), "trees/leaves/"));
-
-    public ResourceLocation getLeavesDropsPath() {
-        return leavesDropsPath.get();
-    }
-
-    public LootTable.Builder createLeavesDrops() {
-        if (seed == null) {
-            return DTLootTableProvider.createLeavesDrops();
-        }
-        return DTLootTableProvider.createLeavesDrops(seed, seedChances, DTLootParameterSets.LEAVES);
     }
 
     public boolean shouldGenerateVoluntaryDrops() {

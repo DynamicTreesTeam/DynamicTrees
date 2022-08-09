@@ -133,7 +133,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     protected Species commonSpecies;
 
-    protected LeavesProperties commonLeaves = LeavesProperties.NULL_PROPERTIES;
+    protected LeavesProperties commonLeaves = LeavesProperties.NULL;
 
     //Branches
     /**
