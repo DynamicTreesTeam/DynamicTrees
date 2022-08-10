@@ -488,7 +488,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     /**
      * Chances for leaves to drop seeds. Used in data gen for loot tables.
      */
-    private float[] seedDropChances = new float[]{0.05F, 0.0625F, 0.083333336F, 0.1F};
+    private float[] seedDropChances = new float[]{0.015625F, 0.03125F, 0.046875F, 0.0625F};
 
     public void setSeedDropChances(float[] seedDropChances) {
         this.seedDropChances = (float[]) seedDropChances;
