@@ -6,10 +6,13 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
 import com.ferreusveritas.dynamictrees.blocks.PodBlock;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
+import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
 import com.ferreusveritas.dynamictrees.util.AgeProperties;
+import com.ferreusveritas.dynamictrees.util.LazyValue;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.google.common.collect.Maps;
 import net.minecraft.block.AbstractBlock;
@@ -20,6 +23,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootTable;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
@@ -321,6 +325,21 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
     public void setMatureAction(GrowableBlock.MatureAction matureAction) {
         this.matureAction = matureAction;
+    }
+
+    public boolean shouldGenerateBlockDrops() {
+        return true;
+    }
+
+    private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
+            ResourceLocationUtils.prefix(block.getRegistryName(), "blocks/"));
+
+    public ResourceLocation getBlockDropsPath() {
+        return blockDropsPath.get();
+    }
+
+    public LootTable.Builder createBlockDrops() {
+        return DTLootTableProvider.createPodDrops(block, itemStack.getItem(), ageProperty, maxAge);
     }
 
     @Nonnull

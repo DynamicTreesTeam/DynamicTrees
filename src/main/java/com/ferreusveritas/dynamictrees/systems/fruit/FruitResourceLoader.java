@@ -34,6 +34,8 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
                         fruit.setBlockShapes(list.toArray(new VoxelShape[0]))
                 );
 
+        this.gatherDataAppliers.register("item_stack", ItemStack.class, Fruit::setItemStack);
+
         this.reloadAppliers
                 .register("can_bone_meal", Boolean.class, Fruit::setCanBoneMeal)
                 .register("item_stack", ItemStack.class, Fruit::setItemStack)

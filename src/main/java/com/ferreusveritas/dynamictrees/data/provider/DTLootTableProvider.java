@@ -8,6 +8,8 @@ import com.ferreusveritas.dynamictrees.loot.condition.VoluntarySeedDropChance;
 import com.ferreusveritas.dynamictrees.loot.entry.SeedItemLootEntry;
 import com.ferreusveritas.dynamictrees.loot.function.MultiplyLogsCount;
 import com.ferreusveritas.dynamictrees.loot.function.MultiplySticksCount;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.google.gson.Gson;
@@ -15,6 +17,7 @@ import com.google.gson.GsonBuilder;
 import net.minecraft.advancements.criterion.EnchantmentPredicate;
 import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.advancements.criterion.MinMaxBounds;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
@@ -32,6 +35,7 @@ import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTableManager;
 import net.minecraft.loot.RandomValueRange;
+import net.minecraft.loot.conditions.BlockStateProperty;
 import net.minecraft.loot.conditions.ILootCondition;
 import net.minecraft.loot.conditions.MatchTool;
 import net.minecraft.loot.conditions.SurvivesExplosion;
@@ -39,6 +43,7 @@ import net.minecraft.loot.conditions.TableBonus;
 import net.minecraft.loot.functions.ExplosionDecay;
 import net.minecraft.loot.functions.SetCount;
 import net.minecraft.resources.ResourcePackType;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -85,12 +90,7 @@ public class DTLootTableProvider extends LootTableProvider {
     }
 
     private void addTables() {
-        Species.REGISTRY.forEach(species -> {
-            if (!species.getRegistryName().getNamespace().equals(modId)) {
-                return;
-            }
-            addVoluntaryTable(species);
-        });
+        Species.REGISTRY.dataGenerationStream(modId).forEach(this::addVoluntaryTable);
 
         ForgeRegistries.BLOCKS.getValues().stream()
                 .filter(block -> block instanceof BranchBlock)
@@ -98,13 +98,13 @@ public class DTLootTableProvider extends LootTableProvider {
                 .filter(block -> block.getRegistryName().getNamespace().equals(modId))
                 .forEach(this::addBranchTable);
 
-        LeavesProperties.REGISTRY.forEach(leavesProperties -> {
-            if (!leavesProperties.getRegistryName().getNamespace().equals(modId)) {
-                return;
-            }
+        LeavesProperties.REGISTRY.dataGenerationStream(modId).forEach(leavesProperties -> {
             addLeavesBlockTable(leavesProperties);
             addLeavesTable(leavesProperties);
         });
+
+        Fruit.REGISTRY.dataGenerationStream(modId).forEach(this::addFruitBlockTable);
+        Pod.REGISTRY.dataGenerationStream(modId).forEach(this::addPodBlockTable);
     }
 
     private void addVoluntaryTable(Species species) {
@@ -139,6 +139,24 @@ public class DTLootTableProvider extends LootTableProvider {
             final ResourceLocation leavesTablePath = getFullDropsPath(leavesProperties.getDropsPath());
             if (!existingFileHelper.exists(leavesTablePath, ResourcePackType.SERVER_DATA)) {
                 lootTables.put(leavesTablePath, leavesProperties.createDrops());
+            }
+        }
+    }
+
+    private void addFruitBlockTable(Fruit fruit) {
+        if (fruit.shouldGenerateBlockDrops()) {
+            final ResourceLocation fruitBlockTablePath = getFullDropsPath(fruit.getBlockDropsPath());
+            if (!existingFileHelper.exists(fruitBlockTablePath, ResourcePackType.SERVER_DATA)) {
+                lootTables.put(fruitBlockTablePath, fruit.createBlockDrops());
+            }
+        }
+    }
+
+    private void addPodBlockTable(Pod pod) {
+        if (pod.shouldGenerateBlockDrops()) {
+            final ResourceLocation fruitBlockTablePath = getFullDropsPath(pod.getBlockDropsPath());
+            if (!existingFileHelper.exists(fruitBlockTablePath, ResourcePackType.SERVER_DATA)) {
+                lootTables.put(fruitBlockTablePath, pod.createBlockDrops());
             }
         }
     }
@@ -230,6 +248,40 @@ public class DTLootTableProvider extends LootTableProvider {
                                 .apply(ExplosionDecay.explosionDecay())
                 )
         ).setParamSet(DTLootParameterSets.BRANCHES);
+    }
+
+    public static LootTable.Builder createFruitDrops(Block fruitBlock, Item fruitItem, IntegerProperty ageProperty, int matureAge) {
+        return LootTable.lootTable().withPool(
+                LootPool.lootPool().setRolls(ConstantRange.exactly(1)).add(
+                        ItemLootEntry.lootTableItem(fruitItem)
+                                .when(
+                                        BlockStateProperty.hasBlockStateProperties(fruitBlock)
+                                                .setProperties(
+                                                        StatePropertiesPredicate.Builder.properties()
+                                                                .hasProperty(ageProperty, matureAge)
+                                                )
+                                )
+                )
+        ).apply(ExplosionDecay.explosionDecay()).setParamSet(LootParameterSets.BLOCK);
+    }
+
+    public static LootTable.Builder createPodDrops(Block podBlock, Item podItem, IntegerProperty ageProperty, int matureAge) {
+        return LootTable.lootTable().withPool(
+                LootPool.lootPool().setRolls(ConstantRange.exactly(1)).add(
+                        ItemLootEntry.lootTableItem(podItem)
+                                .apply(
+                                        SetCount.setCount(ConstantRange.exactly(3))
+                                                .when(
+                                                        BlockStateProperty.hasBlockStateProperties(podBlock)
+                                                                .setProperties(
+                                                                        StatePropertiesPredicate.Builder.properties()
+                                                                                .hasProperty(ageProperty, matureAge)
+                                                                )
+                                                )
+                                )
+                                .apply(ExplosionDecay.explosionDecay())
+                )
+        ).setParamSet(LootParameterSets.BLOCK);
     }
 
     private void writeTables(DirectoryCache cache) {
