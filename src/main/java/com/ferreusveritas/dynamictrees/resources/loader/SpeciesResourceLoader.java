@@ -81,7 +81,9 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("sapling_shape", VoxelShape.class, Species::setSaplingShape);
 
         // We need the sapling shape to know which parent smartmodel the sapling model should use.
-        this.gatherDataAppliers.register("sapling_shape", VoxelShape.class, Species::setSaplingShape);
+        this.gatherDataAppliers
+                .register("sapling_shape", VoxelShape.class, Species::setSaplingShape)
+                .register("drop_seeds", Boolean.class, Species::setDropSeeds);
 
         this.reloadAppliers
                 .register("tapering", Float.class, Species::setTapering)
@@ -110,7 +112,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .registerArrayApplier("features", GenFeatureConfiguration.class, Species::addGenFeature)
                 .register("does_rot", Boolean.class, Species::setDoesRot)
                 .registerListApplier("fruits", Fruit.class, Species::addFruits)
-                .registerListApplier("pods", Pod.class, Species::addPods);
+                .registerListApplier("pods", Pod.class, Species::addPods)
+                .register("drop_seeds", Boolean.class, Species::setDropSeeds);
 
         super.registerAppliers();
     }

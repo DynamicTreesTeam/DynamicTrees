@@ -31,7 +31,7 @@ public final class SeedItemLootEntry extends StandaloneLootEntry {
     protected void createItemStack(Consumer<ItemStack> stackConsumer, LootContext context) {
         final Species species = context.getParamOrNull(DTLootParameters.SPECIES);
         assert species != null;
-        stackConsumer.accept(species.getSeedStack(1));
+        stackConsumer.accept(species.shouldDropSeeds() ? species.getSeedStack(1) : ItemStack.EMPTY);
     }
 
     public static StandaloneLootEntry.Builder<?> lootTableSeedItem() {

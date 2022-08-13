@@ -304,6 +304,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected Seed seed;
 
     /**
+     * If non-null, overrides result of {@link #shouldDropSeeds}, preventing this species from dropping seeds from
+     * leaves if {@link com.ferreusveritas.dynamictrees.loot.entry.SeedItemLootEntry} is used.
+     */
+    protected Boolean dropSeeds = null;
+
+    /**
      * A blockState that will turn itself into this tree
      */
     protected DynamicSaplingBlock saplingBlock;
@@ -2271,6 +2277,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public LootTable.Builder createVoluntaryDrops() {
         return DTLootTableProvider.createVoluntaryDrops(seed);
+    }
+
+    public void setDropSeeds(boolean dropSeeds) {
+        this.dropSeeds = dropSeeds;
+    }
+
+    public boolean shouldDropSeeds() {
+        return Optional.ofNullable(dropSeeds).orElse(!this.hasFruits());
     }
 
     @Override
