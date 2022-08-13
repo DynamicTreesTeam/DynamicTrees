@@ -99,6 +99,9 @@ public class DTLootTableProvider extends LootTableProvider {
                 .forEach(this::addBranchTable);
 
         LeavesProperties.REGISTRY.forEach(leavesProperties -> {
+            if (!leavesProperties.getRegistryName().getNamespace().equals(modId)) {
+                return;
+            }
             addLeavesBlockTable(leavesProperties);
             addLeavesTable(leavesProperties);
         });
