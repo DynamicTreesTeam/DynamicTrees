@@ -10,23 +10,18 @@ import net.minecraft.world.World;
 
 public class GrowthSubstance implements SubstanceEffect {
 
-    private final int pulses;
     private final int ticksPerPulse;
-    private final int ticksPerParticlePulse = 8;
+    private final int ticksPerParticlePulse;
     private final boolean fillFertility;
 
     public GrowthSubstance() {
-        this(-1, 24);
+        this(24, 8, true);
     }
 
-    public GrowthSubstance(int pulses, int ticksPerPulse) {
-        this(pulses, ticksPerPulse, true);
-    }
-
-    public GrowthSubstance(int pulses, int ticksPerPulse, boolean fillFertility) {
-        this.pulses = pulses;
+    public GrowthSubstance(int ticksPerPulse, int ticksPerParticlePulse, boolean fillFertility) {
         this.ticksPerPulse = ticksPerPulse;
-     	this.fillFertility = fillFertility;
+        this.ticksPerParticlePulse = ticksPerParticlePulse;
+        this.fillFertility = fillFertility;
     }
 
     @Override
@@ -43,12 +38,10 @@ public class GrowthSubstance implements SubstanceEffect {
         return true;
     }
 
-    private int pulseCount;
-
     @Override
     public boolean update(World world, BlockPos rootPos, int deltaTicks, int fertility) {
         // Stop when fertility has depleted.
-        if (fertility <= 0 || this.pulseCount >= this.pulses) {
+        if (fertility <= 0) {
             return false;
         }
 
@@ -59,7 +52,6 @@ public class GrowthSubstance implements SubstanceEffect {
         } else {
             if (deltaTicks % this.ticksPerPulse == 0) {
                 TreeHelper.growPulse(world, rootPos);
-                this.pulseCount++;
             }
         }
 
