@@ -184,6 +184,16 @@ public class DTLootTableProvider extends LootTableProvider {
         ).setParamSet(LootParameterSets.BLOCK);
     }
 
+    public static LootTable.Builder createPalmLeavesBlockDrops(Block primitiveLeavesBlock, float[] seedChances) {
+        return BlockLootTables.createSilkTouchOrShearsDispatchTable(
+                primitiveLeavesBlock,
+                SeedItemLootEntry.lootTableSeedItem()
+                        .when(SurvivesExplosion.survivesExplosion())
+                        .when(TableBonus.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, seedChances))
+                        .when(SeasonalSeedDropChance.seasonalSeedDropChance())
+        ).setParamSet(LootParameterSets.BLOCK);
+    }
+
     public static LootTable.Builder createWartBlockDrops(Block primitiveWartBlock) {
         return LootTable.lootTable().withPool(
                 LootPool.lootPool().setRolls(ConstantRange.exactly(1))
@@ -210,6 +220,17 @@ public class DTLootTableProvider extends LootTableProvider {
                                 .when(TableBonus.bonusLevelFlatChance(
                                         Enchantments.BLOCK_FORTUNE, 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F
                                 ))
+                )
+        ).setParamSet(parameterSet);
+    }
+
+    public static LootTable.Builder createPalmLeavesDrops(float[] seedChances, LootParameterSet parameterSet) {
+        return LootTable.lootTable().withPool(
+                LootPool.lootPool().setRolls(ConstantRange.exactly(1)).add(
+                        SeedItemLootEntry.lootTableSeedItem()
+                                .when(SurvivesExplosion.survivesExplosion())
+                                .when(TableBonus.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE, seedChances))
+                                .when(SeasonalSeedDropChance.seasonalSeedDropChance())
                 )
         ).setParamSet(parameterSet);
     }
