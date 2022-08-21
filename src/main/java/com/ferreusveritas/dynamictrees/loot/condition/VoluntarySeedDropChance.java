@@ -31,7 +31,7 @@ public final class VoluntarySeedDropChance implements ILootCondition {
     public boolean test(LootContext context) {
         final Float seasonalSeedDropFactor = context.getParamOrNull(DTLootParameters.SEASONAL_SEED_DROP_FACTOR);
         assert seasonalSeedDropFactor != null;
-        return rarity * DTConfigs.SEED_DROP_RATE.get() * seasonalSeedDropFactor > context.getRandom().nextFloat();
+        return rarity * DTConfigs.VOLUNTARY_SEED_DROP_RATE.get() * seasonalSeedDropFactor > context.getRandom().nextFloat();
     }
 
     public static ILootCondition.IBuilder voluntarySeedDropChance() {

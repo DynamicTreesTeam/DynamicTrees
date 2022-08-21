@@ -20,7 +20,7 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
-import com.ferreusveritas.dynamictrees.util.LazyValue;
+import com.ferreusveritas.dynamictrees.util.LootTableSupplier;
 import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
 import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
@@ -45,6 +45,7 @@ import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameterSets;
 import net.minecraft.loot.LootParameters;
 import net.minecraft.loot.LootTable;
+import net.minecraft.loot.LootTableManager;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -183,6 +184,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     protected boolean canBeSheared = true;
 
     private LeavesProperties() {
+        this.blockLootTableSupplier = new LootTableSupplier("null/", DTTrees.NULL);
+        this.lootTableSupplier = new LootTableSupplier("null/", DTTrees.NULL);
     }
 
     public LeavesProperties(final ResourceLocation registryName) {
@@ -199,6 +202,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.cellKit = cellKit;
         this.setRegistryName(registryName);
         this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
+        this.blockLootTableSupplier = new LootTableSupplier("blocks/", blockRegistryName);
+        this.lootTableSupplier = new LootTableSupplier("trees/leaves/", registryName);
     }
 
     ///////////////////////////////////////////
@@ -502,11 +507,14 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         }
     }
 
-    private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
-            ResourceLocationUtils.prefix(blockRegistryName, "blocks/"));
+    private final LootTableSupplier blockLootTableSupplier;
 
-    public ResourceLocation getBlockDropsPath() {
-        return blockDropsPath.get();
+    public ResourceLocation getBlockLootTableName() {
+        return blockLootTableSupplier.getName();
+    }
+
+    public LootTable getBlockLootTable(LootTableManager lootTableManager, Species species) {
+        return blockLootTableSupplier.get(lootTableManager, species);
     }
 
     public boolean shouldGenerateBlockDrops() {
@@ -520,11 +528,14 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return DTLootTableProvider.createLeavesDrops(seedDropChances, LootParameterSets.BLOCK);
     }
 
-    private final LazyValue<ResourceLocation> dropsPath = LazyValue.supplied(() ->
-            ResourceLocationUtils.prefix(getRegistryName(), "trees/leaves/"));
+    private final LootTableSupplier lootTableSupplier;
 
-    public ResourceLocation getDropsPath() {
-        return dropsPath.get();
+    public ResourceLocation getLootTableName() {
+        return lootTableSupplier.getName();
+    }
+
+    public LootTable getLootTable(LootTableManager lootTableManager, Species species) {
+        return lootTableSupplier.get(lootTableManager, species);
     }
 
     public boolean shouldGenerateDrops() {
@@ -539,7 +550,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         if (world.isClientSide) {
             return Collections.emptyList();
         }
-        return world.getServer().getLootTables().get(getDropsPath())
+        return getLootTable(world.getServer().getLootTables(), species)
                 .getRandomItems(createLootContext(world, pos, tool, species));
     }
 

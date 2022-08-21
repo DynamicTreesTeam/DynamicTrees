@@ -28,6 +28,7 @@ import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -61,17 +62,26 @@ public class BasicBranchBlock extends BranchBlock implements IWaterLoggable {
 
     private final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
 
-    public BasicBranchBlock(Material material) {
-        this(AbstractBlock.Properties.of(material).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
+    /**
+     * @param name name of branch, without a {@code _branch} suffix
+     */
+    public BasicBranchBlock(ResourceLocation name, Material material) {
+        this(name, AbstractBlock.Properties.of(material).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
     }
 
-    public BasicBranchBlock(Properties properties) {
-        this(properties, RADIUS, MAX_RADIUS);
+    /**
+     * @param name name of branch, without a {@code _branch} suffix
+     */
+    public BasicBranchBlock(ResourceLocation name, Properties properties) {
+        this(name, properties, RADIUS, MAX_RADIUS);
     }
 
-    // Useful for more unique subclasses
-    public BasicBranchBlock(AbstractBlock.Properties properties, final IntegerProperty radiusProperty, final int maxRadius) {
-        super(properties);
+    /**
+     * @param name name of branch, without a {@code _branch} suffix
+     */
+    public BasicBranchBlock(ResourceLocation name, AbstractBlock.Properties properties, IntegerProperty radiusProperty,
+                            int maxRadius) {
+        super(name, properties);
 
         // Create branch state cache.
         this.branchStates = this.createBranchStates(radiusProperty, maxRadius);

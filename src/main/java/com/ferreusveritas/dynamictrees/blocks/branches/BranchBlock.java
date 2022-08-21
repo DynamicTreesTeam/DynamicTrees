@@ -23,7 +23,7 @@ import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.Connections;
-import com.ferreusveritas.dynamictrees.util.LazyValue;
+import com.ferreusveritas.dynamictrees.util.LootTableSupplier;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
@@ -41,6 +41,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTable;
+import net.minecraft.loot.LootTableManager;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -87,12 +88,19 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     private ItemStack[] primitiveLogDrops = new ItemStack[]{};
     private boolean canBeStripped;
 
-    public BranchBlock(Material material) {
-        this(Properties.of(material));
+    /**
+     * @param name name of branch, without a {@code _branch} suffix
+     */
+    public BranchBlock(ResourceLocation name, Material material) {
+        this(name, Properties.of(material));
     }
 
-    public BranchBlock(Properties properties) {
+    /**
+     * @param name name of branch, without a {@code _branch} suffix
+     */
+    public BranchBlock(ResourceLocation name, Properties properties) {
         super(properties); //removes drops from block
+        lootTableSupplier = new LootTableSupplier("trees/branches/", name);
     }
 
     public BranchBlock setCanBeStripped(boolean truth) {
@@ -491,14 +499,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     // DROPS AND HARVESTING
     ///////////////////////////////////////////
 
-    private final LazyValue<ResourceLocation> lootTableName =
-            LazyValue.supplied(() -> ResourceLocationUtils.prefix(
-                    ResourceLocationUtils.removeSuffix(getRegistryName(), "_branch"),
-                    "trees/branches/"
-            ));
+    private final LootTableSupplier lootTableSupplier;
 
     public ResourceLocation getLootTableName() {
-        return lootTableName.get();
+        return lootTableSupplier.getName();
+    }
+
+    public LootTable getLootTable(LootTableManager lootTableManager, Species species) {
+        return lootTableSupplier.get(lootTableManager, species);
     }
 
     public LootTable.Builder createBranchDrops() {

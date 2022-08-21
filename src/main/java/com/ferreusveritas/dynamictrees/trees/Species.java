@@ -815,7 +815,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     private List<ItemStack> getDropsForBranchType(World world, ItemStack tool, @Nullable Float explosionRadius,
                                                   int branchVolume, BranchBlock branchBlock) {
-        return world.getServer().getLootTables().get(branchBlock.getLootTableName())
+        return branchBlock.getLootTable(world.getServer().getLootTables(), this)
                 .getRandomItems(createBranchesLootContext(world, branchVolume, tool, explosionRadius));
     }
 

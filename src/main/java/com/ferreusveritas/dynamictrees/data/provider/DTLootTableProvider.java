@@ -127,7 +127,7 @@ public class DTLootTableProvider extends LootTableProvider {
 
     private void addLeavesBlockTable(LeavesProperties leavesProperties) {
         if (leavesProperties.shouldGenerateBlockDrops()) {
-            final ResourceLocation leavesBlockTablePath = getFullDropsPath(leavesProperties.getBlockDropsPath());
+            final ResourceLocation leavesBlockTablePath = getFullDropsPath(leavesProperties.getBlockLootTableName());
             if (!existingFileHelper.exists(leavesBlockTablePath, ResourcePackType.SERVER_DATA)) {
                 lootTables.put(leavesBlockTablePath, leavesProperties.createBlockDrops());
             }
@@ -136,7 +136,7 @@ public class DTLootTableProvider extends LootTableProvider {
 
     private void addLeavesTable(LeavesProperties leavesProperties) {
         if (leavesProperties.shouldGenerateDrops()) {
-            final ResourceLocation leavesTablePath = getFullDropsPath(leavesProperties.getDropsPath());
+            final ResourceLocation leavesTablePath = getFullDropsPath(leavesProperties.getLootTableName());
             if (!existingFileHelper.exists(leavesTablePath, ResourcePackType.SERVER_DATA)) {
                 lootTables.put(leavesTablePath, leavesProperties.createDrops());
             }

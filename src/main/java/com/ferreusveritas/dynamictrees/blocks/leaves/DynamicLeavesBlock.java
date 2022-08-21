@@ -614,31 +614,30 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         final Vector3d originPos = builder.getOptionalParameter(LootParameters.ORIGIN);
-        final ResourceLocation lootTableName;
+        final LootTable lootTable;
         Species species = Species.NULL_SPECIES;
         BlockPos pos = BlockPos.ZERO;
+        ServerWorld world = builder.getLevel();
 
         if (originPos == null) {
-            lootTableName = getLootTable();
+            lootTable = world.getServer().getLootTables().get(getLootTable());
         } else {
             pos = new BlockPos(originPos.x(), originPos.y(), originPos.z());
             LeavesProperties leavesProperties = getProperties(state);
-            lootTableName = leavesProperties.getBlockDropsPath();
-            species = getExactSpecies(builder.getLevel(), pos, leavesProperties);
+            species = getExactSpecies(world, pos, leavesProperties);
+            lootTable = leavesProperties.getBlockLootTable(world.getServer().getLootTables(), species);
         }
 
-        if (lootTableName == LootTables.EMPTY) {
+        if (lootTable.getLootTableId() == LootTables.EMPTY) {
             return Collections.emptyList();
         } else {
-            ServerWorld world = builder.getLevel();
             LootContext context = builder
                     .withParameter(LootParameters.BLOCK_STATE, state)
                     .withParameter(DTLootParameters.SPECIES, species)
                     .withParameter(DTLootParameters.SEASONAL_SEED_DROP_FACTOR,
                             species.seasonalSeedDropFactor(WorldContext.create(world), pos))
                     .create(LootParameterSets.BLOCK);
-            LootTable table = world.getServer().getLootTables().get(lootTableName);
-            return table.getRandomItems(context);
+            return lootTable.getRandomItems(context);
         }
     }
 
