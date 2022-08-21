@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.loot.condition;
 
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.loot.DTLootParameters;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
@@ -27,7 +28,7 @@ public final class SeasonalSeedDropChance implements ILootCondition {
     public boolean test(LootContext context) {
         final Float seasonalSeedDropFactor = context.getParamOrNull(DTLootParameters.SEASONAL_SEED_DROP_FACTOR);
         assert seasonalSeedDropFactor != null;
-        return seasonalSeedDropFactor > context.getRandom().nextFloat();
+        return DTConfigs.SEED_DROP_RATE.get() * seasonalSeedDropFactor > context.getRandom().nextFloat();
     }
 
     public static ILootCondition.IBuilder seasonalSeedDropChance() {
