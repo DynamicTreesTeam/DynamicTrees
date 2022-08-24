@@ -16,6 +16,9 @@ public final class DTLootEntries {
     public static LootPoolEntryType SEED_ITEM =
             register("dynamictrees:seed_item", new SeedItemLootEntry.Serializer());
 
+    public static LootPoolEntryType WEIGHTED_ITEM =
+            register("dynamictrees:weighted_item", new WeightedItemLootEntry.Serializer());
+
     private static LootPoolEntryType register(String name, ILootSerializer<? extends LootEntry> serializer) {
         return Registry.register(Registry.LOOT_POOL_ENTRY_TYPE, new ResourceLocation(name), new LootPoolEntryType(serializer));
     }

@@ -797,7 +797,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public List<ItemStack> getBranchesDrops(World world, NetVolumeNode.Volume volume,
                                             ItemStack tool, @Nullable Float explosionRadius) {
-        volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
+        processVolume(volume);
         if (world.isClientSide) {
             return Collections.emptyList();
         }
@@ -811,6 +811,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
         cleanDropsList(drops);
         return drops;
+    }
+
+    protected void processVolume(NetVolumeNode.Volume volume) {
+        volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
     }
 
     private List<ItemStack> getDropsForBranchType(World world, ItemStack tool, @Nullable Float explosionRadius,

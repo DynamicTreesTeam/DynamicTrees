@@ -88,9 +88,9 @@ public class DTConfigs {
 
         SERVER_BUILDER.comment("Seed Settings").push("seeds");
         SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds drop from leaves.").
-                defineInRange("seedDropRate", 1.0, 0.0, 64.0);
+                defineInRange("leavesSeedDropRate", 1.0, 0.0, 64.0);
         VOLUNTARY_SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
-                defineInRange("voluntarySeedDropRate", 0.01, 0.0, 1.0);
+                defineInRange("seedDropRate", 0.01, 0.0, 1.0);
         SEED_PLANT_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
                 defineInRange("seedPlantRate", 1f / 6f, 0.0, 1.0);
         SEED_TIME_TO_LIVE = SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
