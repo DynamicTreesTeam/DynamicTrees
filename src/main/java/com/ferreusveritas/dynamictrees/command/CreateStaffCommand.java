@@ -13,7 +13,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.stream.Collectors;
@@ -77,7 +76,7 @@ public final class CreateStaffCommand extends SubCommand {
 
         ItemUtils.spawnItemStack(source.getLevel(), pos, wandStack, true);
 
-        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.create_staff", species.getTextComponent(),
+        sendSuccessAndLog(source, Component.translatable("commands.dynamictrees.success.create_staff", species.getTextComponent(),
                 new JoCode(code).getTextComponent(), aqua(String.format("#%08X", colour)), aqua(readOnly), aqua(maxUses), CommandHelper.posComponent(pos, ChatFormatting.AQUA)));
 
         return 1;

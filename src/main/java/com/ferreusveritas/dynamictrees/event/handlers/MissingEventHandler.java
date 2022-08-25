@@ -5,11 +5,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.event.RegistryEvent.MissingMappings;
-import net.minecraftforge.event.RegistryEvent.MissingMappings.Mapping;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.MissingMappingsEvent;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,9 +27,9 @@ public class MissingEventHandler {
      */
     //Missing Blocks Resolved Here
     @SubscribeEvent
-    public void missingBlockMappings(MissingMappings<Block> event) {
-        for (Mapping<Block> missing : event.getMappings()) {
-            ResourceLocation resLoc = missing.key;
+    public void missingBlockMappings(MissingMappingsEvent event) {
+        for (MissingMappingsEvent.Mapping<Block> missing : event.getAllMappings(ForgeRegistries.Keys.BLOCKS)) {
+            ResourceLocation resLoc = missing.getKey();
             String domain = resLoc.getNamespace();
             String path = resLoc.getPath();
             if (domain.equals("growingtrees")) {
@@ -42,13 +41,8 @@ public class MissingEventHandler {
                 }
             }
         }
-    }
-
-    //Missing Items Resolved Here
-    @SubscribeEvent
-    public void missingItemMappings(MissingMappings<Item> event) {
-        for (Mapping<Item> missing : event.getMappings()) {
-            ResourceLocation resLoc = missing.key;
+        for (MissingMappingsEvent.Mapping<Item> missing : event.getAllMappings(ForgeRegistries.Keys.ITEMS)) {
+            ResourceLocation resLoc = missing.getKey();
             String domain = resLoc.getNamespace();
             String path = resLoc.getPath();
             if (domain.equals("growingtrees")) {
@@ -60,5 +54,22 @@ public class MissingEventHandler {
             }
         }
     }
+
+    //Missing Items Resolved Here
+//    @SubscribeEvent
+//    public void missingItemMappings(MissingMappings<Item> event) {
+//        for (Mapping<Item> missing : event.getMappings()) {
+//            ResourceLocation resLoc = missing.key;
+//            String domain = resLoc.getNamespace();
+//            String path = resLoc.getPath();
+//            if (domain.equals("growingtrees")) {
+//                Logger.getLogger(DynamicTrees.MOD_ID).log(Level.CONFIG, "Remapping Missing Item: " + path);
+//                Item mappedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(DynamicTrees.MOD_ID, path));
+//                if (mappedItem != null) { //Null is what you get when do don't get what you're looking for.
+//                    missing.remap(mappedItem);
+//                }
+//            }
+//        }
+//    }
 
 }

@@ -31,10 +31,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.NetherForestVegetationConfig;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.NewRegistryEvent;
+import net.minecraftforge.registries.RegisterEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -114,14 +115,17 @@ public class DTTrees {
     }
 
     @SubscribeEvent
-    public static void onRegisterBlocks(RegistryEvent.Register<Block> event) {
-        // Register any registry entries from Json files.
-        Resources.MANAGER.load();
+    public static void onRegisterBlocks(RegisterEvent event) {
+        event.register(ForgeRegistries.Keys.BLOCKS,(a)->{
+            // Register any registry entries from Json files.
+            Resources.MANAGER.load();
 
-        // Lock all the registries.
-        Registries.REGISTRIES.stream()
-                .filter(registry -> registry instanceof SimpleRegistry)
-                .forEach(Registry::lock);
+            // Lock all the registries.
+            Registries.REGISTRIES.stream()
+                    .filter(registry -> registry instanceof SimpleRegistry)
+                    .forEach(Registry::lock);
+        });
+
     }
 
     public static void replaceNyliumFungiFeatures() {

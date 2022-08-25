@@ -17,23 +17,19 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 @Mod(DynamicTrees.MOD_ID)
 public final class DynamicTrees {
 
-    static {
-        DTArgumentTypes.register();
-    }
+
 
     public static final String MOD_ID = "dynamictrees";
     public static final String NAME = "Dynamic Trees";
@@ -89,6 +85,7 @@ public final class DynamicTrees {
 
         EventHandlers.registerCommon();
         CompatHandler.registerBuiltInSeasonManagers();
+        DTArgumentTypes.ARGUMENT_TYPES.register(modEventBus);
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {

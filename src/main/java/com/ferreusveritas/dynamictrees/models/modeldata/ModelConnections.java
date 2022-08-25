@@ -4,16 +4,15 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.Connections;
 import net.minecraft.core.Direction;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.minecraftforge.client.model.data.ModelData;
 
 import javax.annotation.Nullable;
 
 /**
- * Extension of {@link Connections} to implement {@link IModelData}, so connections can be transferred to the baked
+ * Extension of {@link Connections} to implement { IModelData}, so connections can be transferred to the baked
  * model.
  */
-public class ModelConnections extends Connections implements IModelData {
+public class ModelConnections extends Connections /*implements ModelData */{
 
     private Direction ringOnly = null;
     private Family family = Family.NULL_FAMILY;
@@ -53,22 +52,22 @@ public class ModelConnections extends Connections implements IModelData {
         return family;
     }
 
-    @Override
-    public boolean hasProperty(ModelProperty<?> prop) {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public <T> T getData(ModelProperty<T> prop) {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public <T> T setData(ModelProperty<T> prop, T data) {
-        return null;
-    }
+//    @Override
+//    public boolean hasProperty(ModelProperty<?> prop) {
+//        return false;
+//    }
+//
+//    @Nullable
+//    @Override
+//    public <T> T getData(ModelProperty<T> prop) {
+//        return null;
+//    }
+//
+//    @Nullable
+//    @Override
+//    public <T> T setData(ModelProperty<T> prop, T data) {
+//        return null;
+//    }
 
 
     public Direction getRingOnly() {

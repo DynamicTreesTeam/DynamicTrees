@@ -8,16 +8,16 @@ import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Harley O'Connor
@@ -45,14 +45,12 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
                 .noneMatch(type -> typeMatches(typeRegex, type)));
     }
 
-    private static boolean typeMatches(String typeRegex, BiomeDictionary.Type type) {
+    private static boolean typeMatches(String typeRegex, TagKey<Biome> type) {
         return type.toString().toLowerCase().matches(typeRegex);
     }
 
-    private static Set<BiomeDictionary.Type> getBiomeTypes(Biome biome) {
-        return BiomeDictionary.getTypes(
-                ResourceKey.create(ForgeRegistries.Keys.BIOMES, Objects.requireNonNull(biome.getRegistryName()))
-        );
+    private static Set<TagKey<Biome>> getBiomeTypes(Biome biome) {
+        return ForgeRegistries.BIOMES.tags().getReverseTag(biome).get().getTagKeys().collect(Collectors.toSet());
     }
 
 
@@ -75,7 +73,9 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
     }
 
     private static boolean biomeCategoryMatches(String categoryRegex, Biome biome) {
-        return biome.getBiomeCategory().toString().toLowerCase().matches(categoryRegex);
+//        return biome.getBiomeCategory().toString().toLowerCase().matches(categoryRegex);
+//todo: fix this
+        return ForgeRegistries.BIOMES.tags().getReverseTag(biome).get().containsTag(TagKey.create(ForgeRegistries.Keys.BIOMES,new ResourceLocation(categoryRegex)));
     }
 
 
@@ -103,7 +103,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
     }
 
     private static boolean biomeNameMatches(String nameRegex, Biome biome) {
-        return String.valueOf(biome.getRegistryName()).matches(nameRegex);
+        return String.valueOf(ForgeRegistries.BIOMES.getKey(biome)).matches(nameRegex);
     }
 
 

@@ -3,16 +3,12 @@ package com.ferreusveritas.dynamictrees.client.thickrings;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
 import com.ferreusveritas.dynamictrees.client.TextureUtils.PixelBuffer;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
-
-import java.util.Collection;
 
 public class ThickRingTextureAtlasSprite extends TextureAtlasSprite {
 

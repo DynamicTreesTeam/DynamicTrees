@@ -27,7 +27,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,8 +55,14 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
 
     @Override
     public void registerAppliers () {
-        BiomeDictionary.Type.getAll().stream().map(type -> new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
+        ForgeRegistries.BIOMES.tags().stream().map((key) ->
+            new JsonPropertyApplier<>(key.getKey().toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(key.getKey(), factor)))
                 .forEach(this.environmentFactorAppliers::register);
+
+//
+//        BiomeDictionary.Type.getAll().stream().map(type ->
+//                        new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
+//                .forEach(this.environmentFactorAppliers::register);
 
         JsonDeserialisers.register(Species.CommonOverride.class, input ->
                 JsonDeserialisers.BIOME_PREDICATE.deserialise(input)

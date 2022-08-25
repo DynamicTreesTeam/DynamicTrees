@@ -12,7 +12,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
@@ -83,7 +82,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
         }
 
         public Component getDescription() {
-            return new TranslatableComponent("potion." + this.name +
+            return Component.translatable("potion." + this.name +
                     ".description" + (this == TRANSFORM ? ".empty" : ""))
                     .withStyle(style -> style.withColor(ChatFormatting.GRAY));
         }
@@ -218,7 +217,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
         }
 
         final Species species = this.getTargetSpecies(stack);
-        tooltip.add(new TranslatableComponent("potion.transform.description", species.getTextComponent())
+        tooltip.add(Component.translatable("potion.transform.description", species.getTextComponent())
                 .withStyle(style -> style.withColor(ChatFormatting.GRAY)));
     }
 

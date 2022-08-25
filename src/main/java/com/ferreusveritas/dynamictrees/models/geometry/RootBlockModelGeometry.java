@@ -9,7 +9,7 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.IModelConfiguration;
+import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 
 import java.util.function.Function;
 
@@ -25,7 +25,7 @@ public class RootBlockModelGeometry extends BranchBlockModelGeometry {
     }
 
     @Override
-    public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+    public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
         return new RootBlockBakedModel(modelLocation, this.barkResLoc);
     }
 

@@ -11,7 +11,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 
 import java.util.stream.Collectors;
@@ -52,7 +51,7 @@ public final class SetTreeCommand extends SubCommand {
         final ServerLevel world = source.getLevel();
         final JoCode joCode = species.getJoCode(codeString).rotate(Direction.from2DDataValue((3 - (turns % 4)) + 3)).setCareful(true);
 
-        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.set_tree", CommandHelper.posComponent(rootPos),
+        sendSuccessAndLog(source, Component.translatable("commands.dynamictrees.success.set_tree", CommandHelper.posComponent(rootPos),
                 species.getTextComponent(), joCode.getTextComponent()));
         joCode.generate(world, world, species, rootPos, source.getLevel().getBiome(rootPos).value(),
                 Direction.SOUTH, 8, SafeChunkBounds.ANY, false);

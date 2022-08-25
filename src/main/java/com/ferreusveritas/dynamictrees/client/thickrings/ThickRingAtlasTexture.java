@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -134,22 +135,43 @@ public class ThickRingAtlasTexture extends TextureAtlas {
                     ResourceLocation baseSpritePath = this.getSpritePath(baseSpriteLocation);
 
                     TextureAtlasSprite.Info textureatlassprite$info;
-                    try (Resource baseRingResource = resourceManagerIn.getResource(baseSpritePath)) {
-                        PngInfo pngsizeinfo = new PngInfo(baseRingResource.toString(), baseRingResource.getInputStream());
-                        AnimationMetadataSection animationmetadatasection = baseRingResource.getMetadata(AnimationMetadataSection.SERIALIZER);
-                        if (animationmetadatasection == null) {
-                            animationmetadatasection = AnimationMetadataSection.EMPTY;
+                    Optional<Resource> baseRingResource = resourceManagerIn.getResource(baseSpritePath);
+                    if(baseRingResource.isPresent()) {
+                        try {
+                            PngInfo pngsizeinfo = new PngInfo(() -> baseRingResource.toString(), baseRingResource.get().open());
+                            AnimationMetadataSection animationmetadatasection = baseRingResource.get().metadata().getSection(AnimationMetadataSection.SERIALIZER).get();
+                            if (animationmetadatasection == null) {
+                                animationmetadatasection = AnimationMetadataSection.EMPTY;
+                            }
+                            Pair<Integer, Integer> pair = animationmetadatasection.getFrameSize(pngsizeinfo.width, pngsizeinfo.height);
+                            textureatlassprite$info = new TextureAtlasSprite.Info(baseSpriteLocation, pair.getFirst(), pair.getSecond(), animationmetadatasection);
+                        } catch (RuntimeException runtimeexception) {
+                            LOGGER.error("Unable to parse metadata from {} : {}", baseSpritePath, runtimeexception);
+                            return;
+                        } catch (IOException ioexception) {
+                            LOGGER.error("Using missing texture, unable to load {} : {}", baseSpritePath, ioexception);
+                            return;
                         }
-
-                        Pair<Integer, Integer> pair = animationmetadatasection.getFrameSize(pngsizeinfo.width, pngsizeinfo.height);
-                        textureatlassprite$info = new TextureAtlasSprite.Info(baseSpriteLocation, pair.getFirst(), pair.getSecond(), animationmetadatasection);
-                    } catch (RuntimeException runtimeexception) {
-                        LOGGER.error("Unable to parse metadata from {} : {}", baseSpritePath, runtimeexception);
-                        return;
-                    } catch (IOException ioexception) {
-                        LOGGER.error("Using missing texture, unable to load {} : {}", baseSpritePath, ioexception);
+                    } else {
                         return;
                     }
+
+//                    try (Resource baseRingResource = resourceManagerIn.getResource(baseSpritePath).get()) {
+//                        PngInfo pngsizeinfo = new PngInfo(() -> baseRingResource.toString(), baseRingResource.open());
+//                        AnimationMetadataSection animationmetadatasection = baseRingResource.getMetadata(AnimationMetadataSection.SERIALIZER);
+//                        if (animationmetadatasection == null) {
+//                            animationmetadatasection = AnimationMetadataSection.EMPTY;
+//                        }
+//
+//                        Pair<Integer, Integer> pair = animationmetadatasection.getFrameSize(pngsizeinfo.width, pngsizeinfo.height);
+//                        textureatlassprite$info = new TextureAtlasSprite.Info(baseSpriteLocation, pair.getFirst(), pair.getSecond(), animationmetadatasection);
+//                    } catch (RuntimeException runtimeexception) {
+//                        LOGGER.error("Unable to parse metadata from {} : {}", baseSpritePath, runtimeexception);
+//                        return;
+//                    } catch (IOException ioexception) {
+//                        LOGGER.error("Using missing texture, unable to load {} : {}", baseSpritePath, ioexception);
+//                        return;
+//                    }
 
                     concurrentlinkedqueue.add(textureatlassprite$info);
                 }, Util.backgroundExecutor()));
@@ -192,18 +214,31 @@ public class ThickRingAtlasTexture extends TextureAtlas {
                 spriteInfoIn.height() * spriteSizeMultiplier,
                 AnimationMetadataSection.EMPTY);
 
-        try (Resource iresource = resourceManagerIn.getResource(baseSpritePath)) {
-            NativeImage nativeimage = NativeImage.read(iresource.getInputStream());
-            TextureAtlasSprite thinRings = new TextureAtlasSprite(this, spriteInfoIn, mipmapLevelIn, widthIn, heightIn, originX, originY, nativeimage) {
-            };
-            return new ThickRingTextureAtlasSprite(this, thickSpriteInfo, mipmapLevelIn, widthIn, heightIn, originX, originY, thinRings, baseSpritePath);
-        } catch (RuntimeException runtimeexception) {
-            LOGGER.error("Unable to parse metadata from {}", baseSpritePath, runtimeexception);
-            return null;
-        } catch (IOException ioexception) {
-            LOGGER.error("Using missing texture, unable to load {}", baseSpritePath, ioexception);
-            return null;
+        Optional<Resource> thesource = resourceManagerIn.getResource(baseSpritePath);
+        if (thesource.isPresent()) {
+            try {
+                NativeImage nativeimage = NativeImage.read(thesource.get().open());
+                TextureAtlasSprite thinRings = new TextureAtlasSprite(this, spriteInfoIn, mipmapLevelIn, widthIn, heightIn, originX, originY, nativeimage) {
+                };
+                return new ThickRingTextureAtlasSprite(this, thickSpriteInfo, mipmapLevelIn, widthIn, heightIn, originX, originY, thinRings, baseSpritePath);
+            } catch (IOException ioexception) {
+                LOGGER.error("Using missing texture, unable to load {}", baseSpritePath, ioexception);
+                return null;
+            }
         }
+        return null;
+//        try (Resource iresource = thesource.get()) {
+//            NativeImage nativeimage = NativeImage.read(iresource.getInputStream());
+//            TextureAtlasSprite thinRings = new TextureAtlasSprite(this, spriteInfoIn, mipmapLevelIn, widthIn, heightIn, originX, originY, nativeimage) {
+//            };
+//            return new ThickRingTextureAtlasSprite(this, thickSpriteInfo, mipmapLevelIn, widthIn, heightIn, originX, originY, thinRings, baseSpritePath);
+//        } catch (RuntimeException runtimeexception) {
+//            LOGGER.error("Unable to parse metadata from {}", baseSpritePath, runtimeexception);
+//            return null;
+//        } catch (IOException ioexception) {
+//            LOGGER.error("Using missing texture, unable to load {}", baseSpritePath, ioexception);
+//            return null;
+//        }
     }
 
     private ResourceLocation getSpritePath(ResourceLocation location) {

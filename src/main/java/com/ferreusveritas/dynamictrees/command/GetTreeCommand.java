@@ -7,8 +7,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 
 import java.util.Optional;
@@ -41,13 +39,13 @@ public final class GetTreeCommand extends SubCommand {
                     final Optional<JoCode> joCode = TreeHelper.getJoCode(world, pos);
 
                     if (codeRaw) {
-                        sendSuccess(source, new TextComponent(joCode.map(JoCode::toString).orElse("?")));
+                        sendSuccess(source, Component.literal(joCode.map(JoCode::toString).orElse("?")));
                     } else {
-                        sendSuccess(source, new TranslatableComponent("commands.dynamictrees.success.get_tree",
+                        sendSuccess(source, Component.translatable("commands.dynamictrees.success.get_tree",
                                 species.getTextComponent(), joCode.map(JoCode::getTextComponent)
-                                .orElse(new TextComponent("?"))));
+                                .orElse(Component.literal("?"))));
                     }
-                }, () -> sendFailure(source, new TranslatableComponent("commands.dynamictrees.error.get_tree",
+                }, () -> sendFailure(source, Component.translatable("commands.dynamictrees.error.get_tree",
                         CommandHelper.posComponent(pos).copy().withStyle(style -> style.withColor(ChatFormatting.DARK_RED))))
         ) ? 1 : 0;
     }

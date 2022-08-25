@@ -129,7 +129,7 @@ public final class JsonDeserialisers {
      * @param <T>          The type of the object getter.
      * @return The {@link JsonDeserialiser} given.
      */
-    public static <T> JsonDeserialiser<T> register(final Class<T> outputClass, final JsonDeserialiser<T> deserialiser) {
+    public static <T> JsonDeserialiser register(final Class<T> outputClass, final JsonDeserialiser<T> deserialiser) {
         DESERIALISERS.put(outputClass, deserialiser);
         return deserialiser;
     }
@@ -279,8 +279,8 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
             BIOME_LIST.deserialise(jsonElement).map(biomeList ->
                     biome -> biomeList.stream().anyMatch(currentBiome -> Objects.equals(
-                            currentBiome.getRegistryName(),
-                            biome.getRegistryName()
+                            ForgeRegistries.BIOMES.getKey(currentBiome),
+                            ForgeRegistries.BIOMES.getKey(biome)
                     ))
             ));
 
@@ -319,9 +319,9 @@ public final class JsonDeserialisers {
      */
     public static void registerForgeEntryGetters() {
         BLOCK = register(Block.class,
-                new ForgeRegistryEntryDeserialiser<>(ForgeRegistries.BLOCKS, "block", Blocks.AIR));
-        ITEM = register(Item.class, new ForgeRegistryEntryDeserialiser<>(ForgeRegistries.ITEMS, "item", Items.AIR));
-        BIOME = register(Biome.class, new ForgeRegistryEntryDeserialiser<>(ForgeRegistries.BIOMES, "biome"));
+                new ForgeRegistryEntryDeserialiser(ForgeRegistries.BLOCKS, "block", Blocks.AIR));
+        ITEM = register(Item.class, new ForgeRegistryEntryDeserialiser(ForgeRegistries.ITEMS, "item", Items.AIR));
+        BIOME = register(Biome.class, new ForgeRegistryEntryDeserialiser(ForgeRegistries.BIOMES, "biome"));
     }
 
     public static void postRegistryEvent() {

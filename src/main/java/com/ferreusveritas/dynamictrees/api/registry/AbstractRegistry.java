@@ -6,7 +6,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModLoader;
-import net.minecraftforge.fml.loading.AdvancedLogMessageAdapter;
 import net.minecraftforge.registries.ForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
@@ -278,11 +277,12 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
      */
     @Override
     public final void dump() {
-        LogManager.getLogger().debug(REGISTRY_DUMP, () -> new AdvancedLogMessageAdapter(builder -> {
-            builder.append("Name: ").append(this.name).append('\n');
-            this.getAll().stream().sorted(this.comparator).forEach(entry -> builder.append("\tEntry: ")
-                    .append(entry.getRegistryName()).append(", ").append(entry).append('\n'));
-        }));
+
+        StringBuilder builder = new StringBuilder();
+        this.getAll().stream().sorted(this.comparator).forEach(entry -> builder.append("\tEntry: ")
+                .append(entry.getRegistryName()).append(", ").append(entry).append('\n'));
+        builder.append("Name: ").append(this.name).append('\n');
+        LogManager.getLogger().debug(REGISTRY_DUMP, builder.toString());
     }
 
     @Override

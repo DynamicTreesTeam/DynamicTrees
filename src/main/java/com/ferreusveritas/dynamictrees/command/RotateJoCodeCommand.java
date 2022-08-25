@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.Collections;
 
@@ -30,7 +29,7 @@ public final class RotateJoCodeCommand extends SubCommand {
     }
 
     private void rotateJoCode(final CommandSourceStack source, final String code, final int turns) {
-        sendSuccess(source, new TranslatableComponent("commands.dynamictrees.success.rotate_jo_code",
+        sendSuccess(source, Component.translatable("commands.dynamictrees.success.rotate_jo_code",
                 new JoCode(code).rotate(Direction.from2DDataValue((3 - (turns % 4)) + 3)).getTextComponent()));
     }
 

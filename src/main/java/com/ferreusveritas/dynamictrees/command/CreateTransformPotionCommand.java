@@ -10,7 +10,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -46,7 +45,7 @@ public final class CreateTransformPotionCommand extends SubCommand {
         dendroPotion.setTargetSpecies(dendroPotionStack, species); // Tell it to set the target tree to the selected family.
 
         ItemUtils.spawnItemStack(source.getLevel(), pos, dendroPotionStack, true); // Spawn potion in the world.
-        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.create_transform_potion",
+        sendSuccessAndLog(source, Component.translatable("commands.dynamictrees.success.create_transform_potion",
                 species.getTextComponent(), CommandHelper.posComponent(pos, ChatFormatting.AQUA)));
 
         return 1;

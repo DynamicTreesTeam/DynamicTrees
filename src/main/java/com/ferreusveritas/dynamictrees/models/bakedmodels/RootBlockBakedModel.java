@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -170,7 +170,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 
     @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull ModelData extraData) {
         if (side != null || state == null) {
             return Collections.emptyList();
         }
@@ -229,7 +229,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 
     @Nonnull
     @Override
-    public IModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+    public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData) {
         Block block = state.getBlock();
         return block instanceof SurfaceRootBlock ? new RootModelConnections(((SurfaceRootBlock) block).getConnectionData(world, pos)) : new RootModelConnections();
     }

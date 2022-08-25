@@ -45,7 +45,6 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -56,14 +55,13 @@ import net.minecraft.world.level.levelgen.feature.configurations.HugeMushroomFea
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
@@ -84,7 +82,7 @@ public class DTRegistries {
         }
     };
 
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITIES, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, DynamicTrees.MOD_ID);
     public static final DeferredRegister<ConfiguredFeature<?, ?>> CONFIGURED_FEATURES = DeferredRegister.create(Registry.CONFIGURED_FEATURE_REGISTRY, DynamicTrees.MOD_ID);
     public static final DeferredRegister<PlacedFeature> PLACED_FEATURES = DeferredRegister.create(Registry.PLACED_FEATURE_REGISTRY, DynamicTrees.MOD_ID);
 
@@ -154,12 +152,13 @@ public class DTRegistries {
     }
 
     @SubscribeEvent
-    public static void onBlocksRegistry(final RegistryEvent.Register<Block> event) {
-        final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
-
-        if (appleOak.isValid()) {
-            APPLE_FRUIT.get().setSpecies(appleOak);
-        }
+    public static void onBlocksRegistry(final RegisterEvent event) {
+        event.register(ForgeRegistries.Keys.BLOCKS,(a)->{
+            final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
+            if (appleOak.isValid()) {
+                APPLE_FRUIT.get().setSpecies(appleOak);
+            }
+        });
     }
 
     ///////////////////////////////////////////
@@ -224,26 +223,32 @@ public class DTRegistries {
     }
 
     @SubscribeEvent
-    public static void onTileEntitiesRegistry(final RegistryEvent.Register<BlockEntityType<?>> tileEntityRegistryEvent) {
+    public static void onTileEntitiesRegistry(final RegisterEvent tileEntityRegistryEvent) {
         setupTileEntities();
-
-        tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(PottedSaplingBlock.REG_NAME));
-        tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(DynamicTrees.resLoc("tile_entity_species")));
+        tileEntityRegistryEvent.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, (m)->
+        {
+            m.register(PottedSaplingBlock.REG_NAME, bonsaiTE);
+            m.register(DynamicTrees.resLoc("tile_entity_species"), speciesTE);
+        });
+//        tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(PottedSaplingBlock.REG_NAME));
+//        tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(DynamicTrees.resLoc("tile_entity_species")));
     }
 
     ///////////////////////////////////////////
     // WORLD GEN
     ///////////////////////////////////////////
 
-    public static final DynamicTreeFeature DYNAMIC_TREE_FEATURE = new DynamicTreeFeature();
 
-    @SubscribeEvent
-    public static void onFeatureRegistry(final RegistryEvent.Register<Feature<?>> event) {
-        event.getRegistry().register(DYNAMIC_TREE_FEATURE);
-    }
+//    @SubscribeEvent
+//    public static void onFeatureRegistry(final RegistryEvent.Register<Feature<?>> event) {
+//        event.getRegistry().register(DYNAMIC_TREE_FEATURE);
+//    }
+
+    public static DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, DynamicTrees.MOD_ID);
+    public static final RegistryObject<DynamicTreeFeature> DYNAMIC_TREE_FEATURE = FEATURES.register("dynamic_tree", DynamicTreeFeature::new);
 
     public static final RegistryObject<ConfiguredFeature<NoneFeatureConfiguration, ?>> DYNAMIC_TREE_CONFIGURED_FEATURE = CONFIGURED_FEATURES.register("dynamic_tree",
-            () -> new ConfiguredFeature<>(DYNAMIC_TREE_FEATURE, NoneFeatureConfiguration.INSTANCE));
+            () -> new ConfiguredFeature<>(DYNAMIC_TREE_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
 
     public static final RegistryObject<PlacedFeature> DYNAMIC_TREE_PLACED_FEATURE = PLACED_FEATURES.register("dynamic_tree_placed_feature",
             () -> new PlacedFeature(Holder.hackyErase(DYNAMIC_TREE_CONFIGURED_FEATURE.getHolder().get()), List.of()/*VegetationPlacements.treePlacement(PlacementUtils.countExtra(10, 0.1F, 1))*/));

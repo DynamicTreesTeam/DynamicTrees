@@ -8,26 +8,26 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 
 public class CommonEventHandler {
 
     @SubscribeEvent
-    public void onWorldTick(TickEvent.WorldTickEvent event) {
+    public void onWorldTick(TickEvent.LevelTickEvent event) {
         if (event.side == LogicalSide.SERVER) {
-            FutureBreak.process(event.world);
+            FutureBreak.process(event.level);
         }
 
-        if (event.type == TickEvent.Type.WORLD && event.phase == TickEvent.Phase.START) {
-            SeasonHelper.updateTick(event.world, event.world.getDayTime());
+        if (event.type == TickEvent.Type.LEVEL && event.phase == TickEvent.Phase.START) {
+            SeasonHelper.updateTick(event.level, event.level.getDayTime());
         }
     }
 
     @SubscribeEvent
-    public void onWorldLoad(WorldEvent.Load event) {
-        if (event.getWorld().isClientSide()) {
+    public void onWorldLoad(LevelEvent.Load event) {
+        if (event.getLevel().isClientSide()) {
             DTClient.discoverWoodColors();
         }
     }

@@ -82,11 +82,11 @@ public class WailaBranchHandler implements IComponentProvider {
 
         if (species != Species.NULL_SPECIES) {
             if (species.showSpeciesOnWaila()) {
-                tooltip.add(new TranslatableComponent("tooltip.dynamictrees.species", species.getTextComponent()));
+                tooltip.add(Component.translatable("tooltip.dynamictrees.species", species.getTextComponent()));
             }
 
             if (Minecraft.getInstance().options.advancedItemTooltips) {
-                tooltip.add(new TextComponent(ChatFormatting.DARK_GRAY + species.getRegistryName().toString()));
+                tooltip.add(Component.literal(ChatFormatting.DARK_GRAY + species.getRegistryName().toString()));
             }
 
             ItemStack seedStack = species.getSeedStack(1);

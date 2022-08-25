@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -102,7 +102,8 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrides.EMPTY).particle(bark);
+//        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrides.EMPTY,true).particle(bark);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel, ItemOverrides.EMPTY,true).particle(bark);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
@@ -125,7 +126,9 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrides.EMPTY).particle(icon);
+        //todo: might not be right
+//        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrides.EMPTY).particle(icon);
+        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel, ItemOverrides.EMPTY,true).particle(icon);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
@@ -146,16 +149,12 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
         if (axis == Axis.Y) { //UP / DOWN
             return 0;
         } else if (axis == Axis.Z) {//NORTH / SOUTH
-            switch (face) {
-                case UP:
-                    return 0;
-                case WEST:
-                    return 270;
-                case DOWN:
-                    return 180;
-                default:
-                    return 90;
-            }
+            return switch (face) {
+                case UP -> 0;
+                case WEST -> 270;
+                case DOWN -> 180;
+                default -> 90;
+            };
         } else { //EAST/WEST
             return (face == Direction.NORTH) ? 270 : 90;
         }
@@ -163,7 +162,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
     @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull ModelData extraData) {
         if (state == null || side != null) {
             return Collections.emptyList();
         }
@@ -180,6 +179,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
         Direction forceRingDir = null;
         final AtomicInteger twigRadius = new AtomicInteger(1);
 
+        extraData.derive().with
         if (extraData instanceof ModelConnections) {
             final ModelConnections connectionsData = (ModelConnections) extraData;
             connections = connectionsData.getAllRadii();
@@ -238,7 +238,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
      */
     @Nonnull
     @Override
-    public IModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+    public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData) {
         final Block block = state.getBlock();
 
         if (!(block instanceof BranchBlock)) {

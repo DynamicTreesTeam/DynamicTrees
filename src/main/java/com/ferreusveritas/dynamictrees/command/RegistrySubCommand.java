@@ -7,7 +7,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TextComponent;
 
 import static com.ferreusveritas.dynamictrees.command.CommandConstants.RAW;
 
@@ -43,11 +42,11 @@ public final class RegistrySubCommand<V extends RegistryEntry<V>> extends SubCom
 
     private void listEntries(final CommandSourceStack source, final boolean raw) {
         if (raw) {
-            this.registry.getAll().forEach(entry -> source.sendSuccess(new TextComponent(entry.getRegistryName().toString()), false));
+            this.registry.getAll().forEach(entry -> source.sendSuccess(Component.literal(entry.getRegistryName().toString()), false));
             return;
         }
 
-        this.registry.getAll().forEach(entry -> source.sendSuccess(new TextComponent("- ")
+        this.registry.getAll().forEach(entry -> source.sendSuccess(Component.literal("- ")
                 .append(entry.getTextComponent()).withStyle(ChatFormatting.GREEN), false));
     }
 

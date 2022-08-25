@@ -1,19 +1,25 @@
 package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import net.minecraft.commands.synchronization.ArgumentTypes;
-import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
+import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.commands.synchronization.ArgumentTypeInfos;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
+import net.minecraft.core.Registry;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
 
 /**
  * @author Harley O'Connor
  */
 public final class DTArgumentTypes {
 
-    private DTArgumentTypes() {
-    }
+    public static final DeferredRegister<ArgumentTypeInfo<?,?> >ARGUMENT_TYPES = DeferredRegister.create(Registry.COMMAND_ARGUMENT_TYPE_REGISTRY, DynamicTrees.MOD_ID);
 
-    public static void register() {
-        ArgumentTypes.register(DynamicTrees.MOD_ID + ":hex_color", HexColorArgument.class, new EmptyArgumentSerializer<>(HexColorArgument::hex));
-    }
+    public static final RegistryObject<SingletonArgumentInfo<HexColorArgument>> HEX_COLOR = ARGUMENT_TYPES.register("hex_color", ()-> ArgumentTypeInfos.registerByClass(HexColorArgument.class, SingletonArgumentInfo.contextFree(HexColorArgument::hex)));
+
+
+
+
+
 
 }

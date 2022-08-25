@@ -13,8 +13,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -42,7 +40,8 @@ public class Seed extends Item implements IPlantable {
 
     public Seed() {
         super(new Item.Properties());
-        this.setRegistryName("null");
+        //todo: add seed to seed registry
+//        this.setRegistryName("null");
         this.species = Species.NULL_SPECIES;
     }
 
@@ -235,11 +234,11 @@ public class Seed extends Item implements IPlantable {
         if (stack.hasTag()) {
             final String joCode = this.getCode(stack);
             if (!joCode.isEmpty()) {
-                tooltip.add(new TranslatableComponent("tooltip.dynamictrees.jo_code", new JoCode(joCode).getTextComponent()));
+                tooltip.add(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(joCode).getTextComponent()));
             }
             if (this.hasForcePlant(stack)) {
-                tooltip.add(new TranslatableComponent("tooltip.dynamictrees.force_planting",
-                        new TranslatableComponent("tooltip.dynamictrees.enabled")
+                tooltip.add(Component.translatable("tooltip.dynamictrees.force_planting",
+                        Component.translatable("tooltip.dynamictrees.enabled")
                                 .withStyle(style -> style.withColor(ChatFormatting.DARK_AQUA)))
                 );
             }
@@ -247,8 +246,8 @@ public class Seed extends Item implements IPlantable {
             assert nbtData != null;
 
             if (nbtData.contains(LIFESPAN_TAG)) {
-                tooltip.add(new TranslatableComponent("tooltip.dynamictrees.seed_life_span" +
-                        new TextComponent(String.valueOf(nbtData.getInt(LIFESPAN_TAG)))
+                tooltip.add(Component.translatable("tooltip.dynamictrees.seed_life_span" +
+                        Component.literal(String.valueOf(nbtData.getInt(LIFESPAN_TAG)))
                                 .withStyle(style -> style.withColor(ChatFormatting.DARK_AQUA)))
                 );
             }

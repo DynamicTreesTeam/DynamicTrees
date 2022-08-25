@@ -11,9 +11,8 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.event.ModelEvent.BakingCompleted;
+import net.minecraftforge.client.event.ModelEvent.RegisterGeometryLoaders;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -28,22 +27,22 @@ public final class BakedModelEventHandler {
     public static final ResourceLocation THICK_BRANCH = DynamicTrees.resLoc("thick_branch");
 
     @SubscribeEvent
-    public static void onModelRegistryEvent(ModelRegistryEvent event) {
+    public static void onModelRegistryEvent(RegisterGeometryLoaders event) {
         // Register model loaders for baked models.
-        ModelLoaderRegistry.registerLoader(BRANCH, new BranchBlockModelLoader());
-        ModelLoaderRegistry.registerLoader(ROOT, new RootBlockModelLoader());
-        ModelLoaderRegistry.registerLoader(THICK_BRANCH, new ThickBranchBlockModelLoader());
+        event.register("branch", new BranchBlockModelLoader());
+        event.register("root", new RootBlockModelLoader());
+        event.register("thick_branch", new ThickBranchBlockModelLoader());
     }
 
     @SubscribeEvent
-    public static void onModelBake(ModelBakeEvent event) {
+    public static void onModelBake(BakingCompleted event) {
         // Setup branch baked models (bakes cores and sleeves).
         BranchBlockBakedModel.INSTANCES.forEach(BranchBlockBakedModel::setupModels);
         BranchBlockBakedModel.INSTANCES.clear();
 
         // Put bonsai pot baked model into its model location.
-        BakedModel flowerPotModel = event.getModelRegistry().get(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""));
-        event.getModelRegistry().put(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""),
+        BakedModel flowerPotModel = event.getModelManager().getModel(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""));
+        event.getModels().put(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""),
                 new BakedModelBlockBonsaiPot(flowerPotModel));
 
         ////Highly experimental code

@@ -1,14 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraftforge.event.world.BiomeLoadingEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /**
  * Handles events relating to world gen, including adding {@link DynamicTreeFeature} objects to biomes, and registering
@@ -18,11 +10,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
  */
 public final class WorldGenEventHandler {
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void addDynamicTrees(final BiomeLoadingEvent event) {
-        event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                DTRegistries.DYNAMIC_TREE_PLACED_FEATURE.getHolder().get());
-    }
+//    @SubscribeEvent(priority = EventPriority.HIGH)
+//    public void addDynamicTrees(final BiomeLoadingEvent event) {
+//        event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
+//                DTRegistries.DYNAMIC_TREE_PLACED_FEATURE.getHolder().get());
+//    }
 
     /**
      * This is not an ideal way of removing trees, but it's the best way I've currently found. It currently loops
@@ -30,34 +22,34 @@ public final class WorldGenEventHandler {
      *
      * @param event The biome loading event.
      */
-    @SubscribeEvent
-    public void removeVanillaTrees(final BiomeLoadingEvent event) {
-        // Currently, any mods that don't create their own Feature for trees will have it removed (if they use a ConfiguredFeature that uses Feature.TREE).
-        // This may just have to be an unfortunate consequence to Dynamic Trees for now, as without making an overly complex system I can't see any other
-        // way of removing features to rectify this.
-
-        final ResourceLocation biomeName = event.getName();
-
-        if (biomeName == null) {
-            return;
-        }
-
-        final BiomePropertySelectors.FeatureCancellations featureCancellations = BiomeDatabases.getDefault()
-                .getEntry(biomeName).getFeatureCancellations();
-
-        featureCancellations.getStages().forEach(stage -> event.getGeneration().getFeatures(stage).removeIf(placedFeatureHolder -> {
-            PlacedFeature placedFeature = placedFeatureHolder.value();
-
-            return placedFeature.getFeatures().anyMatch(configuredFeature -> {
-                for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {
-                    if (featureCanceller.shouldCancel(configuredFeature, featureCancellations)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            });
-        }));
-    }
+//    @SubscribeEvent
+//    public void removeVanillaTrees(final BiomeLoadingEvent event) {
+//        // Currently, any mods that don't create their own Feature for trees will have it removed (if they use a ConfiguredFeature that uses Feature.TREE).
+//        // This may just have to be an unfortunate consequence to Dynamic Trees for now, as without making an overly complex system I can't see any other
+//        // way of removing features to rectify this.
+//
+//        final ResourceLocation biomeName = event.getName();
+//
+//        if (biomeName == null) {
+//            return;
+//        }
+//
+//        final BiomePropertySelectors.FeatureCancellations featureCancellations = BiomeDatabases.getDefault()
+//                .getEntry(biomeName).getFeatureCancellations();
+//
+//        featureCancellations.getStages().forEach(stage -> event.getGeneration().getFeatures(stage).removeIf(placedFeatureHolder -> {
+//            PlacedFeature placedFeature = placedFeatureHolder.value();
+//
+//            return placedFeature.getFeatures().anyMatch(configuredFeature -> {
+//                for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {
+//                    if (featureCanceller.shouldCancel(configuredFeature, featureCancellations)) {
+//                        return true;
+//                    }
+//                }
+//
+//                return false;
+//            });
+//        }));
+//    }
 
 }

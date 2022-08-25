@@ -4,18 +4,21 @@ import com.ferreusveritas.dynamictrees.client.QuadManipulator;
 import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IDynamicBakedModel;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.IDynamicBakedModel;
+import net.minecraftforge.client.model.data.ModelData;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,17 +34,21 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
         this.basePotModel = basePotModel;
     }
 
-    @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
+    public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand) {
+        return IDynamicBakedModel.super.getQuads(state, side, rand);
+    }
+
+    @Override
+    public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData, RenderType renderType) {
         List<BakedQuad> quads = new ArrayList<>();
 
-        if (side != null || state == null || !extraData.hasProperty(PottedSaplingTileEntity.SPECIES) || !extraData.hasProperty(PottedSaplingTileEntity.POT_MIMIC)) {
+        if (side != null || state == null || !extraData.has(PottedSaplingTileEntity.SPECIES) || !extraData.has(PottedSaplingTileEntity.POT_MIMIC)) {
             return quads;
         }
 
-        final Species species = extraData.getData(PottedSaplingTileEntity.SPECIES);
-        final BlockState potState = extraData.getData(PottedSaplingTileEntity.POT_MIMIC);
+        final Species species = extraData.get(PottedSaplingTileEntity.SPECIES);
+        final BlockState potState = extraData.get(PottedSaplingTileEntity.POT_MIMIC);
 
         if (species == null || potState == null || !species.isValid() || !species.getSapling().isPresent()) {
             return quads;
@@ -53,7 +60,7 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
         BakedModel potModel = dispatcher.getBlockModel(potState);
         BakedModel saplingModel = dispatcher.getBlockModel(saplingState);
 
-        quads.addAll(potModel.getQuads(potState, side, rand, extraData));
+        quads.addAll(potModel.getQuads(potState, side, rand, extraData, renderType));
         quads.addAll(cachedSaplingQuads.computeIfAbsent(species, s -> QuadManipulator.getQuads(saplingModel, saplingState, new Vec3(0, 0.25, 0), rand, extraData)));
 
         return quads;

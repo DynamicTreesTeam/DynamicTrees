@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.models.modeldata;
 
 import com.ferreusveritas.dynamictrees.util.RootConnections;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 
 import javax.annotation.Nullable;
@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
  *
  * @author Harley O'Connor
  */
-public class RootModelConnections extends RootConnections implements IModelData {
+public class RootModelConnections extends RootConnections implements ModelData {
 
     public RootModelConnections() {
     }

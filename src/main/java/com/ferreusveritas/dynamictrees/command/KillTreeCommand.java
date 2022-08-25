@@ -6,7 +6,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 
 import java.util.Objects;
@@ -32,7 +31,7 @@ public final class KillTreeCommand extends SubCommand {
         final Level world = source.getLevel();
 
         Objects.requireNonNull(TreeHelper.getRooty(world.getBlockState(rootPos))).destroyTree(world, rootPos);
-        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.kill_tree",
+        sendSuccessAndLog(source, Component.translatable("commands.dynamictrees.success.kill_tree",
                 CommandHelper.posComponent(rootPos, ChatFormatting.AQUA)));
     }
 

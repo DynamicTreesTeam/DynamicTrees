@@ -24,7 +24,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -158,7 +158,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
     @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable final BlockState state, @Nullable final Direction side, final Random rand, final IModelData extraData) {
+    public List<BakedQuad> getQuads(@Nullable final BlockState state, @Nullable final Direction side, final Random rand, final ModelData extraData) {
         if (state == null || side != null) {
             return Collections.emptyList();
         }

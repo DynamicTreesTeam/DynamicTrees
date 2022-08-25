@@ -16,7 +16,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -296,8 +295,8 @@ public class Staff extends Item {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip.add(new TranslatableComponent("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
-        tooltip.add(new TranslatableComponent("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
+        tooltip.add(Component.translatable("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
+        tooltip.add(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
     }
 
     /**

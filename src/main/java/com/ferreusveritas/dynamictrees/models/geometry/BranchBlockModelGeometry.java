@@ -13,8 +13,8 @@ import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.IModelConfiguration;
-import net.minecraftforge.client.model.geometry.IModelGeometry;
+import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
+import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * @author Harley O'Connor
  */
 @OnlyIn(Dist.CLIENT)
-public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModelGeometry> {
+public class BranchBlockModelGeometry implements IUnbakedGeometry<BranchBlockModelGeometry> {
 
     protected final Set<ResourceLocation> textures = new HashSet<>();
     protected final ResourceLocation barkResLoc;
@@ -69,7 +69,7 @@ public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModel
     }
 
     @Override
-    public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+    public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
         if (!this.useThickModel(this.setFamily(modelLocation))) {
             return new BasicBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc);
         } else {
@@ -97,7 +97,7 @@ public class BranchBlockModelGeometry implements IModelGeometry<BranchBlockModel
 
     @SuppressWarnings("deprecation")
     @Override
-    public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
+    public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
         if (this.thickRingsResLoc == null && this.useThickModel(this.setFamily(new ResourceLocation(owner.getModelName())))) {
             this.thickRingsResLoc = ThickRingTextureManager.addRingTextureLocation(this.ringsResLoc);
             this.addTextures(this.thickRingsResLoc);

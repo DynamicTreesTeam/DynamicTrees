@@ -4,14 +4,13 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.IModelLoader;
-import net.minecraftforge.client.model.geometry.IModelGeometry;
+import net.minecraftforge.client.model.geometry.IGeometryLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,7 +25,7 @@ import javax.annotation.Nullable;
  * @author Harley O'Connor
  */
 @OnlyIn(Dist.CLIENT)
-public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeometry> {
+public class BranchBlockModelLoader implements IGeometryLoader<BranchBlockModelGeometry> {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
@@ -34,12 +33,12 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
     private static final String BARK = "bark";
     private static final String RINGS = "rings";
 
-    @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {
-    }
+//    @Override
+//    public void onResourceManagerReload(ResourceManager resourceManager) {
+//    }
 
     @Override
-    public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelObject) {
+    public BranchBlockModelGeometry read(JsonObject modelObject, JsonDeserializationContext deserializationContext) throws JsonParseException {
         final JsonObject textures = this.getTexturesObject(modelObject);
         final ResourceLocation familyResLoc = this.getResLoc(modelObject);
 
@@ -112,12 +111,12 @@ public class BranchBlockModelLoader implements IModelLoader<BranchBlockModelGeom
     }
 
     /**
-     * Gets the {@link IModelGeometry} object from the given bark and rings texture locations. Can be overridden by
-     * sub-classes to provide their custom {@link IModelGeometry}.
+     * Gets the { IModelGeometry} object from the given bark and rings texture locations. Can be overridden by
+     * sub-classes to provide their custom { IModelGeometry}.
      *
      * @param barkResLoc  The {@link ResourceLocation} object for the bark.
      * @param ringsResLoc The {@link ResourceLocation} object for the rings.
-     * @return The {@link IModelGeometry} object.
+     * @return The { IModelGeometry} object.
      */
     protected BranchBlockModelGeometry getModelGeometry(final ResourceLocation barkResLoc,
                                                         final ResourceLocation ringsResLoc,

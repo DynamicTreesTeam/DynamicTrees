@@ -2,11 +2,9 @@ package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import com.ferreusveritas.dynamictrees.event.handlers.BakedModelEventHandler;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.ItemOverride;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.data.IDynamicBakedModel;
+import net.minecraftforge.client.model.IDynamicBakedModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;

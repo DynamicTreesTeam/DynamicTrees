@@ -3,7 +3,9 @@ package com.ferreusveritas.dynamictrees.api.registry;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -123,13 +125,13 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     }
 
     public Component getTextComponent() {
-        return this.formatComponent(new TextComponent(this.getRegistryName().toString()), ChatFormatting.AQUA);
+        return this.formatComponent(Component.literal(this.getRegistryName().toString()), ChatFormatting.AQUA);
     }
 
     protected Component formatComponent(final Component component, final ChatFormatting colour) {
         return component.copy().withStyle(style -> style.withColor(colour)
                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                        new TranslatableComponent("chat.registry_name", this.getRegistryName())))
+                        Component.translatable("chat.registry_name", this.getRegistryName())))
                 .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD,
                         this.getRegistryName().toString())));
     }

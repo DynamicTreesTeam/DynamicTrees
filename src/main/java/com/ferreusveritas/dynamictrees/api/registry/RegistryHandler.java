@@ -6,10 +6,11 @@ import com.google.common.base.Suppliers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
@@ -87,7 +88,7 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     /**
      * Adds a {@link Block} to be registered with the given registry name, for the namespace of that registry name.
-     * {@link Block#setRegistryName(ResourceLocation)} will be called by us on the correct registry event to prevent
+     * { Block#setRegistryName(ResourceLocation)} will be called by us on the correct registry event to prevent
      * Forge from complaining - so it shouldn't have been called on the block already!
      *
      * @param registryName The {@link ResourceLocation} registry name to set for the block.
@@ -104,7 +105,7 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     /**
      * Adds an {@link Item} to be registered with the given registry name, for the namespace of that registry name.
-     * {@link Item#setRegistryName(ResourceLocation)} will be called by us on the correct registry event to prevent
+     * { Item#setRegistryName(ResourceLocation)} will be called by us on the correct registry event to prevent
      * Forge from complaining - so it shouldn't have been called on the block already!
      *
      * @param registryName The {@link ResourceLocation} registry name to set for the block.
@@ -187,13 +188,15 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     // LOWEST allows DT to accumulate blocks & items from inside other listeners to this Register event if necessary
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onBlockRegistry(final RegistryEvent.Register<Block> event) {
-        this.blocks.forEach((resourceLocation, block) -> event.getRegistry().register(block.get().setRegistryName(resourceLocation)));
+    public void onBlockRegistry(final RegisterEvent event) {
+
+        event.register(ForgeRegistries.Keys.BLOCKS,(registryHelper)->{
+            this.blocks.forEach((resourceLocation,block)->registryHelper.register(resourceLocation,block.get()));
+        });
+        event.register(ForgeRegistries.Keys.ITEMS,(registryHelper)->{
+            this.items.forEach((resourceLocation,item)->registryHelper.register(resourceLocation,item.get()));
+        });
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onItemRegistry(final RegistryEvent.Register<Item> event) {
-        this.items.forEach((resourceLocation, item) -> event.getRegistry().register(item.get().setRegistryName(resourceLocation)));
-    }
 
 }

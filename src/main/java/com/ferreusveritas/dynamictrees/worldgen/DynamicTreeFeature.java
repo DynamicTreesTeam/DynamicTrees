@@ -2,17 +2,12 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
-
-import java.util.Random;
 
 /**
  * @author Harley O'Connor
@@ -21,7 +16,7 @@ public final class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> 
 
     public DynamicTreeFeature() {
         super(NoneFeatureConfiguration.CODEC);
-        this.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "tree"));
+//        this.setRegistryName(new ResourceLocation(DynamicTrees.MOD_ID, "tree"));
     }
 
     @Override

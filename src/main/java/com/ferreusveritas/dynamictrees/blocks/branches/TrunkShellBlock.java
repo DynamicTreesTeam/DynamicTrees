@@ -36,9 +36,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.ScheduledTick;
 import net.minecraft.world.ticks.TickPriority;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.IBlockRenderProperties;
+import net.minecraftforge.client.extensions.common.IClientBlockExtensions;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -341,8 +339,8 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
 
     @Override
-    public void initializeClient(Consumer<IBlockRenderProperties> consumer) {
-        consumer.accept(new IBlockRenderProperties() {
+    public void initializeClient(Consumer<IClientBlockExtensions> consumer) {
+        consumer.accept(new IClientBlockExtensions() {
             @Override
             public boolean addHitEffects(BlockState state, Level world, HitResult target, ParticleEngine manager) {
                 BlockPos shellPos;

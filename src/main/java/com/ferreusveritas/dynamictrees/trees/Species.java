@@ -67,12 +67,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -89,7 +88,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
@@ -161,7 +159,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         @Override
         public Component getTextComponent() {
-            return this.formatComponent(new TranslatableComponent("gui.none"), ChatFormatting.DARK_RED);
+            return this.formatComponent(Component.translatable("gui.none"), ChatFormatting.DARK_RED);
         }
 
         @Override
@@ -271,7 +269,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * A map of environmental biome factors that change a tree's suitability
      */
-    protected Map<BiomeDictionary.Type, Float> envFactors = new HashMap<>();//Environmental factors
+    protected Map<TagKey<Biome>, Float> envFactors = new HashMap<>();//Environmental factors
 
     protected List<Biome> perfectBiomes = new ArrayList<>();
 
@@ -440,7 +438,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     @Override
     public Component getTextComponent() {
-        return this.formatComponent(new TranslatableComponent(this.getUnlocalizedName()), ChatFormatting.AQUA);
+        return this.formatComponent(Component.translatable(this.getUnlocalizedName()), ChatFormatting.AQUA);
     }
 
     public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
@@ -1116,7 +1114,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock)) {
             //soil is not valid so we default to dirt
-            LogManager.getLogger().warn("Rooty Dirt block NOT FOUND for soil " + dirt.getRegistryName()); //default to dirt and print error
+            LogManager.getLogger().warn("Rooty Dirt block NOT FOUND for soil " + ForgeRegistries.BLOCKS.getKey(dirt)); //default to dirt and print error
             this.placeRootyDirtBlock(world, rootPos, Blocks.DIRT.defaultBlockState(), fertility);
             return false;
         }
@@ -1378,7 +1376,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param growLeaves    {@code true} if this rot should attempt to grow leaves first.
      * @return true if the branch should rot
      */
-    public boolean rot(LevelAccessor world, BlockPos pos, int neighborCount, int radius, int fertility, Random random, boolean rapid, boolean growLeaves) {
+    public boolean rot(LevelAccessor world, BlockPos pos, int neighborCount, int radius, int fertility, RandomSource random, boolean rapid, boolean growLeaves) {
         if (!doesRot) {
             return false;
         }
@@ -1413,10 +1411,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     /**
      * @deprecated No longe in use due to extra parameter. Use/override {@link #rot(LevelAccessor, BlockPos, int, int, int,
-     * Random, boolean, boolean)} instead.
+     * RandomSource, boolean, boolean)} instead.
      */
     @Deprecated
-    public boolean rot(LevelAccessor world, BlockPos pos, int neighborCount, int radius, Random random, boolean rapid) {
+    public boolean rot(LevelAccessor world, BlockPos pos, int neighborCount, int radius, RandomSource random, boolean rapid) {
         return false;
     }
 
@@ -1433,7 +1431,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param radius The radius of the {@link BranchBlock}
      * @return The chance this will postRot. 0.0(never) -> 1.0(always)
      */
-    public float rotChance(LevelAccessor world, BlockPos pos, Random rand, int radius) {
+    public float rotChance(LevelAccessor world, BlockPos pos, RandomSource rand, int radius) {
         if (radius == 0) {
             return 0;
         }
@@ -1558,7 +1556,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     // BIOME HANDLING
     //////////////////////////////
 
-    public Species envFactor(BiomeDictionary.Type type, float factor) {
+    public Species envFactor(TagKey<Biome> type, float factor) {
         envFactors.put(type, factor);
         return this;
     }
@@ -1588,7 +1586,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         float suit = defaultSuitability();
 
-        for (BiomeDictionary.Type t : BiomeDictionary.getTypes(biomeHolder.unwrapKey().orElseThrow())) {
+        for (TagKey<Biome> t : ForgeRegistries.BIOMES.tags().getReverseTag(biome).get().getTagKeys().toList()) {
             suit *= envFactors.getOrDefault(t, 1.0f);
         }
 

@@ -21,7 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                     RootyBlock rootyBlock = TreeHelper.getRooty(bottomState);
                     if (rootyBlock != null && rootyBlock.fallWithTree(bottomState, entity.level, bottomPos)) {
                         BakedModel rootyModel = dispatcher.getBlockModel(bottomState);
-                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, bottomState, new Vec3(0, -1, 0), EmptyModelData.INSTANCE),
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, bottomState, new Vec3(0, -1, 0), ModelData.EMPTY),
                                 destructionData.species.getFamily().getRootColor(bottomState, rootyBlock.getColorFromBark()),
                                 bottomState));
                         rootyBlockAdded = true;
@@ -126,7 +126,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                 if (leavesClusters != null) {
                     for (Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
                         BlockState leafState = leafLoc.getValue();
-                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(dispatcher.getBlockModel(leafState), leafState, new Vec3(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), EmptyModelData.INSTANCE),
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(dispatcher.getBlockModel(leafState), leafState, new Vec3(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), ModelData.EMPTY),
                                 species.leafColorMultiplier(entity.level, rootPos.offset(leafLoc.getKey())), leafState));
                     }
                 } else {
@@ -134,7 +134,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                         BlockPos relPos = destructionData.getLeavesRelPos(index);
                         BlockState leafState = destructionData.getLeavesBlockState(index);
                         BakedModel leavesModel = dispatcher.getBlockModel(leafState);
-                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, leafState, new Vec3(relPos.getX(), relPos.getY(), relPos.getZ()), EmptyModelData.INSTANCE),
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, leafState, new Vec3(relPos.getX(), relPos.getY(), relPos.getZ()), ModelData.EMPTY),
                                 destructionData.getLeavesProperties(index).treeFallColorMultiplier(leafState, entity.level, rootPos.offset(relPos)), leafState));
                     }
                 }

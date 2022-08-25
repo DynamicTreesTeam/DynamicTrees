@@ -10,8 +10,6 @@ import java.time.format.DateTimeFormatter
 fun property(key: String) = project.findProperty(key).toString()
 fun optionalProperty(key: String) = project.findProperty(key)?.toString()
 
-apply(from = "https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle")
-
 plugins {
     id("java")
     id("net.minecraftforge.gradle")
@@ -22,7 +20,11 @@ plugins {
     id("com.harleyoconnor.translationsheet") version "0.1.1"
 }
 
+apply(from = "https://raw.githubusercontent.com/SizableShrimp/ForgeUpdatesRemapper/main/remapper.gradle")
+
 repositories {
+    maven("https://dvs1.progwml6.com/files/maven/")
+    maven("https://modmaven.dev")
     maven("https://ldtteam.jfrog.io/ldtteam/modding/")
     maven("https://maven.tehnut.info")
     maven("https://www.cursemaven.com") {
@@ -43,7 +45,7 @@ version = "$mcVersion-$modVersion"
 group = property("group")
 
 minecraft {
-    mappings("parchment", "${property("mappingsVersion")}-$mcVersion")
+    mappings("parchment", "${property("mappingsVersion")}-1.19.2")
     accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
 
     runs {
@@ -125,10 +127,11 @@ dependencies {
     // Not sure if we need this one, what is a "forge" anyway?
     minecraft("net.minecraftforge:forge:$mcVersion-${property("forgeVersion")}")
 
-    // Compile JEI API, but don"t include in runtime.
-    compileOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}:api"))
-    // At runtime, use the full JEI mod.
-    runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}"))
+
+    compileOnly(fg.deobf("mezz.jei:jei-$mcVersion-common-api:${property("jeiVersion")}"))
+    compileOnly(fg.deobf("mezz.jei:jei-$mcVersion-forge-api:${property("jeiVersion")}"))
+    // at runtime, use the full JEI jar for Forge
+    runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion-forge:${property("jeiVersion")}"))
 
     // At runtime, use Patchouli mod (for the guide book, which is Json so we don"t need the API).
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))

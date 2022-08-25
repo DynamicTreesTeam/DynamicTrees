@@ -31,6 +31,7 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockGetter;
@@ -41,7 +42,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -101,10 +101,10 @@ public class DTClient {
     @OnlyIn(Dist.CLIENT)
     private static int getFaceColor(BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
         final BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-        List<BakedQuad> quads = model.getQuads(state, face, new Random(), EmptyModelData.INSTANCE);
+        List<BakedQuad> quads = model.getQuads(state, face, Minecraft.getInstance().level.random);
         if (quads.isEmpty()) // If the quad list is empty, means there is no face on that side, so we try with null.
         {
-            quads = model.getQuads(state, null, new Random(), EmptyModelData.INSTANCE);
+            quads = model.getQuads(state, null, Minecraft.getInstance().level.random);
         }
         if (quads.isEmpty()) { // If null still returns empty, there is nothing we can do so we just warn and exit.
             LogManager.getLogger().warn("Could not get color of " + face + " side for " + state.getBlock() + "! Branch needs to be handled manually!");
@@ -243,7 +243,7 @@ public class DTClient {
 
     public static void crushLeavesBlock(Level world, BlockPos pos, BlockState blockState, Entity entity) {
         if (world.isClientSide) {
-            Random random = world.random;
+            RandomSource random = world.random;
             TreePart treePart = TreeHelper.getTreePart(blockState);
             if (treePart instanceof DynamicLeavesBlock) {
                 DynamicLeavesBlock leaves = (DynamicLeavesBlock) treePart;

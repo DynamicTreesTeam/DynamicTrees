@@ -7,8 +7,8 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraftforge.event.world.ChunkDataEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.ChunkDataEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class PoissonDiscEventHandler {
@@ -25,8 +25,8 @@ public class PoissonDiscEventHandler {
      * We'll use this instead because at least new chunks aren't created after the world is unloaded. I hope. >:(
      */
     @SubscribeEvent
-    public void onWorldUnload(WorldEvent.Unload event) {
-        final LevelAccessor world = event.getWorld();
+    public void onWorldUnload(LevelEvent.Unload event) {
+        final LevelAccessor world = event.getLevel();
         if (!world.isClientSide()) {
             TreeGenerator.getTreeGenerator().getCircleProvider().unloadWorld((ServerLevel) world);//clears the circles
         }
@@ -34,7 +34,7 @@ public class PoissonDiscEventHandler {
 
     @SubscribeEvent
     public void onChunkDataLoad(ChunkDataEvent.Load event) {
-        final LevelAccessor world = event.getWorld();
+        final LevelAccessor world = event.getLevel();
 
 		if (world == null || world.isClientSide()) {
 			return;
@@ -49,7 +49,7 @@ public class PoissonDiscEventHandler {
 
     @SubscribeEvent
     public void onChunkDataSave(ChunkDataEvent.Save event) {
-        final ServerLevel world = (ServerLevel) event.getWorld();
+        final ServerLevel world = (ServerLevel) event.getLevel();
         final UniversalPoissonDiscProvider discProvider = TreeGenerator.getTreeGenerator().getCircleProvider();
         final ChunkAccess chunk = event.getChunk();
         final ChunkPos chunkPos = chunk.getPos();

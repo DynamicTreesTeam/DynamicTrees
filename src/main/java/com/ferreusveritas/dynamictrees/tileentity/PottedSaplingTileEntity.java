@@ -13,9 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.ModelDataManager;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -85,7 +83,7 @@ public class PottedSaplingTileEntity extends BlockEntity {
         this.handleUpdateTag(pkt.getTag());
 
         if (!oldPotState.equals(potState)) {
-            ModelDataManager.requestModelDataRefresh(this);
+            level.getModelDataManager().requestRefresh(this);
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
         }
     }
@@ -104,14 +102,14 @@ public class PottedSaplingTileEntity extends BlockEntity {
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
-        tag.putString(POT_MIMIC_TAG, potState.getBlock().getRegistryName().toString());
+        tag.putString(POT_MIMIC_TAG, ForgeRegistries.BLOCKS.getKey(potState.getBlock()).toString());
         tag.putString(SPECIES_TAG, this.species.getRegistryName().toString());
     }
 
     @Nonnull
     @Override
-    public IModelData getModelData() {
-        return new ModelDataMap.Builder().withInitial(POT_MIMIC, potState).withInitial(SPECIES, species).build();
+    public ModelData getModelData() {
+        return ModelData.builder().with(POT_MIMIC, potState).with(SPECIES, species).build();
     }
 
 }

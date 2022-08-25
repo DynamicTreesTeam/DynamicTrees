@@ -25,6 +25,7 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -140,7 +141,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      *                  generation scenario as opposed to natural tree updates
      * @return true if the branch was destroyed because of postRot
      */
-    public abstract boolean checkForRot(LevelAccessor world, BlockPos pos, Species species, int fertility, int radius, Random rand, float chance, boolean rapid);
+    public abstract boolean checkForRot(LevelAccessor world, BlockPos pos, Species species, int fertility, int radius, RandomSource rand, float chance, boolean rapid);
 
     public static int setSupport(int branches, int leaves) {
         return ((branches & 0xf) << 4) | (leaves & 0xf);

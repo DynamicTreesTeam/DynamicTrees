@@ -16,9 +16,9 @@ public class WailaCocoaHandler implements IComponentProvider {
     public void appendBody(List<Component> tooltip, IDataAccessor accessor, IPluginConfig config) {
         float growthValue = accessor.getBlockState().getValue(BlockStateProperties.AGE_2) / 2.0F * 100.0F;
         if (growthValue < 100.0F) {
-            tooltip.add(new TranslatableComponent("tooltip.waila.crop_growth", String.format("%.0f%%", growthValue)));
+            tooltip.add(Component.translatable("tooltip.waila.crop_growth", String.format("%.0f%%", growthValue)));
         } else {
-            tooltip.add(new TranslatableComponent("tooltip.waila.crop_growth", new TranslatableComponent("tooltip.waila.crop_mature")));
+            tooltip.add(Component.translatable("tooltip.waila.crop_growth", Component.translatable("tooltip.waila.crop_mature")));
         }
     }
 }
