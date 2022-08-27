@@ -24,7 +24,6 @@ import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.Connections;
 import com.ferreusveritas.dynamictrees.util.LootTableSupplier;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.block.Block;
@@ -230,7 +229,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      */
     public void stripBranch(BlockState state, World world, BlockPos pos, PlayerEntity player, ItemStack heldItem) {
         final int radius = this.getRadius(state);
-        this.damageAxe(player, heldItem, radius / 2, new NetVolumeNode.Volume((radius * radius * 64) / 2), false);
+        this.damageTool(player, heldItem, radius / 2, new NetVolumeNode.Volume((radius * radius * 64) / 2), false);
 
         this.stripBranch(state, world, pos, radius);
     }
@@ -561,7 +560,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         FallingTreeEntity.dropTree(world, destroyData, woodItems, DestroyType.HARVEST);
 
         // Damage the axe by a prescribed amount.
-        this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);
+        if (heldItem != ItemStack.EMPTY) {
+            this.damageTool(entity, heldItem, this.getRadius(state), woodVolume, true);
+        }
     }
 
     /**
@@ -624,18 +625,12 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         Vector3d vec3d1 = entity.getViewVector(partialTicks);
         Vector3d vec3d2 =
                 vec3d.add(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
-        return entity.level.clip(
-                new RayTraceContext(vec3d, vec3d2, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE,
-                        entity));
+        return entity.level.clip(new RayTraceContext(vec3d, vec3d2, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity));
     }
 
 
-    public void damageAxe(final LivingEntity entity, @Nullable final ItemStack heldItem, final int radius,
-                          final NetVolumeNode.Volume woodVolume, final boolean forBlockBreak) {
-        if (heldItem == null || !this.isAxe(heldItem)) {
-            return;
-        }
-
+    public void damageTool(final LivingEntity entity, @Nullable final ItemStack heldItem, final int radius,
+                           final NetVolumeNode.Volume woodVolume, final boolean forBlockBreak) {
         int damage;
 
         switch (DTConfigs.AXE_DAMAGE_MODE.get()) {

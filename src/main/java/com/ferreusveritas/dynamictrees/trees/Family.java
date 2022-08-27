@@ -36,7 +36,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -53,7 +52,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -551,18 +549,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     public void setIsFireProof(boolean isFireProof) {
         this.isFireProof = isFireProof;
-    }
-
-    public SoundType getBranchSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-        return this.getDefaultBranchSoundType();
-    }
-
-    public ToolType getBranchHarvestTool(BlockState state) {
-        return ToolType.AXE;
-    }
-
-    public int getBranchHarvestLevel(BlockState state) {
-        return 0;
     }
 
     public Material getDefaultBranchMaterial() {
