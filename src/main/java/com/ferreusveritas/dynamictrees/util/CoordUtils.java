@@ -19,7 +19,6 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.*;
 import net.minecraft.world.chunk.EmptyChunk;
-import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
 
 import javax.annotation.Nonnull;
@@ -89,17 +88,13 @@ public final class CoordUtils {
     @SuppressWarnings("deprecation")
     public static boolean canAccessStateSafely(IBlockReader blockReader, BlockPos pos) {
         if (blockReader instanceof IWorldReader) { // Handles most cases.
-            return ((IWorldReader) blockReader).hasChunkAt(pos);
+            return ((IWorldReader) blockReader).hasChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
         } else if (blockReader instanceof Region) { // Handles Region.
             return !(((Region) blockReader).getChunk(pos) instanceof EmptyChunk);
-        } else {
-            // Handles other instances where it should be safe.
-            return (blockReader instanceof IChunk ||
-                    blockReader instanceof EmptyBlockReader ||
-                    blockReader instanceof Blockreader ||
-                    blockReader.getClass().getSimpleName().contains("ChunkRenderCache") || // Check for ChunkRenderCache (we can't call instanceof as this a client-side only class).
-                    blockReader.getClass().getSimpleName().contains("ChunkCache")); // Checks for OptiFine's custom ChunkRenderCache.
         }
+        // Otherwise assume we can access state safely. In most cases this is true, and if not we know it is a
+        // mod compatibility issue and a crash or logging will be more helpful in solving the problem.
+        return true;
     }
 
     /**
