@@ -36,7 +36,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -53,7 +52,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -133,7 +131,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     protected Species commonSpecies;
 
-    protected LeavesProperties commonLeaves = LeavesProperties.NULL_PROPERTIES;
+    protected LeavesProperties commonLeaves = LeavesProperties.NULL;
 
     //Branches
     /**
@@ -212,11 +210,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public void setupBlocks() {
-        this.setBranch(this.createBranch());
-        this.setBranchItem(this.createBranchItem(this.getBranchRegName(""), this.branch));
+        this.setBranch(this.createBranch(this.getBranchName()));
+        this.setBranchItem(this.createBranchItem(this.getBranchName(), this.branch));
 
         if (this.hasStrippedBranch()) {
-            this.setStrippedBranch(this.createBranch(this.getBranchRegName("stripped_")));
+            this.setStrippedBranch(this.createBranch(this.getBranchName("stripped_")));
         }
 
         if (this.hasSurfaceRoot()) {
@@ -355,24 +353,12 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return true;
     }
 
-    /**
-     * Creates the branch block. Can be overridden by sub-classes who want full control over registry and instantiation
-     * of the branch.
-     *
-     * @return The instantiated and registered {@link BranchBlock}.
-     */
-    public BranchBlock createBranch() {
-        return this.createBranch(this.getBranchRegName(""));
+    protected ResourceLocation getBranchName() {
+        return getBranchName("");
     }
 
-    /**
-     * Gets a branch name with the given prefix and <tt>_branch</tt> as the suffix.
-     *
-     * @param prefix The prefix.
-     * @return The {@link ResourceLocation} registry name for the branch.
-     */
-    protected ResourceLocation getBranchRegName(final String prefix) {
-        return suffix(prefix(this.getRegistryName(), prefix), "_branch");
+    protected ResourceLocation getBranchName(final String prefix) {
+        return prefix(this.getRegistryName(), prefix);
     }
 
     /**
@@ -381,8 +367,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      *
      * @return The instantiated {@link BranchBlock}.
      */
-    protected BranchBlock createBranchBlock() {
-        final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(this.getProperties()) : new BasicBranchBlock(this.getProperties());
+    protected BranchBlock createBranchBlock(ResourceLocation name) {
+        final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(name, this.getProperties()) :
+                new BasicBranchBlock(name, this.getProperties());
 		if (this.isFireProof()) {
 			branch.setFireSpreadSpeed(0).setFlammability(0);
 		}
@@ -392,22 +379,26 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     /**
      * Creates branch block and adds it to the relevant {@link RegistryHandler}.
      *
-     * @param registryName The {@link ResourceLocation} registry name.
+     * @param name The {@link ResourceLocation} registry name.
      * @return The created {@link BranchBlock}.
      */
-    protected BranchBlock createBranch(final ResourceLocation registryName) {
-        return RegistryHandler.addBlock(registryName, this.createBranchBlock());
+    protected BranchBlock createBranch(final ResourceLocation name) {
+        return RegistryHandler.addBlock(suffix(name, getBranchNameSuffix()), this.createBranchBlock(name));
+    }
+
+    protected String getBranchNameSuffix() {
+        return BranchBlock.NAME_SUFFIX;
     }
 
     /**
      * Creates and registers a {@link BlockItem} for the given branch with the given registry name.
      *
-     * @param registryName The {@link ResourceLocation} registry name for the item.
-     * @param branch       The {@link BranchBlock} to create the {@link BlockItem} for.
+     * @param name   the name of the branch to create an item for
+     * @param branch the {@link BranchBlock} to create the {@link BlockItem} for
      * @return The created and registered {@link BlockItem} object.
      */
-    public BlockItem createBranchItem(final ResourceLocation registryName, final BranchBlock branch) {
-        return RegistryHandler.addItem(registryName, new BlockItem(branch, new Item.Properties()));
+    public BlockItem createBranchItem(final ResourceLocation name, final BranchBlock branch) {
+        return RegistryHandler.addItem(suffix(name, getBranchNameSuffix()), new BlockItem(branch, new Item.Properties()));
     }
 
     protected Family setBranch(final BranchBlock branch) {
@@ -560,18 +551,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.isFireProof = isFireProof;
     }
 
-    public SoundType getBranchSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
-        return this.getDefaultBranchSoundType();
-    }
-
-    public ToolType getBranchHarvestTool(BlockState state) {
-        return ToolType.AXE;
-    }
-
-    public int getBranchHarvestLevel(BlockState state) {
-        return 0;
-    }
-
     public Material getDefaultBranchMaterial() {
         return Material.WOOD;
     }
@@ -659,6 +638,14 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     public void setHasStrippedBranch(boolean hasStrippedBranch) {
         this.hasStrippedBranch = hasStrippedBranch;
+    }
+
+    public List<BranchBlock> getValidBranchBlocks() {
+        return Collections.unmodifiableList(validBranches);
+    }
+
+    public int getNumberOfValidBranchBlocks() {
+        return validBranches.size();
     }
 
     public void addValidBranches(BranchBlock... branches) {

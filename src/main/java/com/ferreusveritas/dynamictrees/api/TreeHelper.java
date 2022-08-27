@@ -381,6 +381,10 @@ public class TreeHelper {
         return getLeaves(state.getBlock());
     }
 
+    public static Optional<DynamicLeavesBlock> getLeavesOpt(BlockState state) {
+        return Optional.ofNullable(getLeaves(state.getBlock()));
+    }
+
     //Rooty
 
     public static boolean isRooty(Block block) {

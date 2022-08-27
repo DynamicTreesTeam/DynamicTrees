@@ -25,6 +25,7 @@ public class DTConfigs {
     public static final ForgeConfigSpec CLIENT_CONFIG;
 
     public static final ForgeConfigSpec.DoubleValue SEED_DROP_RATE;
+    public static final ForgeConfigSpec.DoubleValue VOLUNTARY_SEED_DROP_RATE;
     public static final ForgeConfigSpec.DoubleValue SEED_PLANT_RATE;
     public static final ForgeConfigSpec.IntValue SEED_TIME_TO_LIVE;
     public static final ForgeConfigSpec.BooleanValue SEED_ONLY_FOREST;
@@ -86,7 +87,9 @@ public class DTConfigs {
         final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
 
         SERVER_BUILDER.comment("Seed Settings").push("seeds");
-        SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
+        SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds drop from leaves.").
+                defineInRange("leavesSeedDropRate", 1.0, 0.0, 64.0);
+        VOLUNTARY_SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
                 defineInRange("seedDropRate", 0.01, 0.0, 1.0);
         SEED_PLANT_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
                 defineInRange("seedPlantRate", 1f / 6f, 0.0, 1.0);

@@ -98,21 +98,25 @@ public class WaterSoilProperties extends SoilProperties {
             return VoxelShapes.create(WATER_ROOTS_AABB);
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public VoxelShape getBlockSupportShape(BlockState state, IBlockReader reader, BlockPos pos) {
             return VoxelShapes.empty();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public boolean canBeReplaced(BlockState state, BlockItemUseContext useContext) {
             return false;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public FluidState getFluidState(BlockState state) {
             return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
             if (stateIn.getValue(WATERLOGGED)) {

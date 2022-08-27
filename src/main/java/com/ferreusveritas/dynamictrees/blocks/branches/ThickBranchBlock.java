@@ -13,6 +13,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -32,12 +33,12 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, MAX_RADIUS_THICK); //39 ?
 
-    public ThickBranchBlock(Material material) {
-        this(Properties.of(material));
+    public ThickBranchBlock(ResourceLocation name, Material material) {
+        this(name, Properties.of(material));
     }
 
-    public ThickBranchBlock(Properties properties) {
-        super(properties, RADIUS_DOUBLE, MAX_RADIUS_THICK);
+    public ThickBranchBlock(ResourceLocation name, Properties properties) {
+        super(name, properties, RADIUS_DOUBLE, MAX_RADIUS_THICK);
     }
 
     public TrunkShellBlock getTrunkShell() {

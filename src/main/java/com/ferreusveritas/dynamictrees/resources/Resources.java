@@ -5,19 +5,16 @@ import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationTemplateR
 import com.ferreusveritas.dynamictrees.api.event.Hooks;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceManager;
 import com.ferreusveritas.dynamictrees.data.DTRecipes;
-import com.ferreusveritas.dynamictrees.systems.fruit.FruitResourceLoader;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.resources.loader.BiomeDatabaseResourceLoader;
 import com.ferreusveritas.dynamictrees.resources.loader.FamilyResourceLoader;
-import com.ferreusveritas.dynamictrees.resources.loader.GlobalDropCreatorResourceLoader;
 import com.ferreusveritas.dynamictrees.resources.loader.JoCodeResourceLoader;
 import com.ferreusveritas.dynamictrees.resources.loader.LeavesPropertiesResourceLoader;
 import com.ferreusveritas.dynamictrees.resources.loader.SoilPropertiesResourceLoader;
 import com.ferreusveritas.dynamictrees.resources.loader.SpeciesResourceLoader;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
+import com.ferreusveritas.dynamictrees.systems.fruit.FruitResourceLoader;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.pod.PodResourceLoader;
@@ -63,13 +60,6 @@ public final class Resources {
     public static final SoilPropertiesResourceLoader SOIL_PROPERTIES_LOADER = new SoilPropertiesResourceLoader();
     public static final FamilyResourceLoader FAMILY_LOADER = new FamilyResourceLoader();
 
-    public static final ConfigurationTemplateResourceLoader<DropCreatorConfiguration, DropCreator>
-            DROP_CREATOR_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
-            "drop_creators/configurations",
-            DropCreator.REGISTRY,
-            DropCreatorConfiguration.TEMPLATES
-    );
-
     public static final ConfigurationTemplateResourceLoader<GenFeatureConfiguration, GenFeature>
             GEN_FEATURE_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
             "gen_features/configurations",
@@ -91,8 +81,6 @@ public final class Resources {
 
     public static final JoCodeResourceLoader JO_CODE_LOADER = new JoCodeResourceLoader();
     public static final BiomeDatabaseResourceLoader BIOME_DATABASE_LOADER = new BiomeDatabaseResourceLoader();
-    public static final GlobalDropCreatorResourceLoader GLOBAL_DROP_CREATOR_LOADER =
-            new GlobalDropCreatorResourceLoader();
 
     public static void setupTreesResourceManager() {
         addDefaultLoaders();
@@ -110,15 +98,13 @@ public final class Resources {
                 LEAVES_PROPERTIES_LOADER,
                 SOIL_PROPERTIES_LOADER,
                 FAMILY_LOADER,
-                DROP_CREATOR_TEMPLATE_LOADER,
                 GEN_FEATURE_TEMPLATE_LOADER,
                 GROWTH_LOGIC_KIT_TEMPLATE_LOADER,
                 FRUIT_LOADER,
                 POD_LOADER,
                 SPECIES_LOADER,
                 JO_CODE_LOADER,
-                BIOME_DATABASE_LOADER,
-                GLOBAL_DROP_CREATOR_LOADER
+                BIOME_DATABASE_LOADER
         );
     }
 

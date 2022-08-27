@@ -4,7 +4,6 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.pod.Pod;
@@ -30,7 +29,6 @@ public final class Registries {
                     GrowthLogicKit.REGISTRY,
                     Family.REGISTRY,
                     GenFeature.REGISTRY,
-                    DropCreator.REGISTRY,
                     Fruit.REGISTRY,
                     Pod.REGISTRY,
                     Species.REGISTRY,

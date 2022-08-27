@@ -16,7 +16,7 @@ public class SolidLeavesProperties extends LeavesProperties {
 
     public SolidLeavesProperties(ResourceLocation registryName) {
         super(registryName);
-        this.requiresShears = false;
+        this.canBeSheared = false;
     }
 
     @Override

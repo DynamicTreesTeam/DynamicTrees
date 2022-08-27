@@ -2,11 +2,13 @@ package com.ferreusveritas.dynamictrees.blocks.leaves;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
+import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.loot.LootTable;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ToolType;
@@ -26,7 +28,7 @@ public class WartProperties extends SolidLeavesProperties {
     }
 
     @Override
-    protected String getBlockRegistryNameSuffix() {
+    public String getBlockRegistryNameSuffix() {
         return "_wart";
     }
 
@@ -43,6 +45,16 @@ public class WartProperties extends SolidLeavesProperties {
     @Override
     public List<ITag.INamedTag<Block>> defaultLeavesTags() {
         return Collections.singletonList(DTBlockTags.WART_BLOCKS);
+    }
+
+    @Override
+    public LootTable.Builder createBlockDrops() {
+        return DTLootTableProvider.createWartBlockDrops(primitiveLeaves.getBlock());
+    }
+
+    @Override
+    public LootTable.Builder createDrops() {
+        return DTLootTableProvider.createWartDrops(primitiveLeaves.getBlock());
     }
 
 }

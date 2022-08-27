@@ -11,14 +11,28 @@ import com.ferreusveritas.dynamictrees.cells.CellKits;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
+import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.loot.DTLootParameterSets;
+import com.ferreusveritas.dynamictrees.loot.DTLootParameters;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
-import com.ferreusveritas.dynamictrees.util.*;
+import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
+import com.ferreusveritas.dynamictrees.util.LootTableSupplier;
+import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
+import com.ferreusveritas.dynamictrees.util.Optionals;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
+import com.ferreusveritas.dynamictrees.util.ToolTypes;
+import com.ferreusveritas.dynamictrees.util.WorldContext;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.block.*;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.Minecraft;
@@ -27,6 +41,11 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShearsItem;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameterSets;
+import net.minecraft.loot.LootParameters;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.LootTableManager;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -44,7 +63,9 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -61,7 +82,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
             .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString()).forGetter(LeavesProperties::getRegistryName))
             .apply(instance, LeavesProperties::new));
 
-    public static final LeavesProperties NULL_PROPERTIES = new LeavesProperties() {
+    public static final LeavesProperties NULL = new LeavesProperties() {
         @Override
         public LeavesProperties setFamily(Family family) {
             return this;
@@ -131,7 +152,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     /**
      * Central registry for all {@link LeavesProperties} objects.
      */
-    public static final TypedRegistry<LeavesProperties> REGISTRY = new TypedRegistry<>(LeavesProperties.class, NULL_PROPERTIES, new TypedRegistry.EntryType<>(CODEC));
+    public static final TypedRegistry<LeavesProperties> REGISTRY = new TypedRegistry<>(LeavesProperties.class, NULL, new TypedRegistry.EntryType<>(CODEC));
 
     protected static final int maxHydro = 7;
 
@@ -160,9 +181,11 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
      * A shears {@link ToolType} doesn't exist by default, so we use this as a backup for shears extending
      * {@link ShearsItem} but not registering a shears tool type.
      */
-    protected boolean requiresShears = true;
+    protected boolean canBeSheared = true;
 
     private LeavesProperties() {
+        this.blockLootTableSupplier = new LootTableSupplier("null/", DTTrees.NULL);
+        this.lootTableSupplier = new LootTableSupplier("null/", DTTrees.NULL);
     }
 
     public LeavesProperties(final ResourceLocation registryName) {
@@ -179,6 +202,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.cellKit = cellKit;
         this.setRegistryName(registryName);
         this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
+        this.blockLootTableSupplier = new LootTableSupplier("blocks/", blockRegistryName);
+        this.lootTableSupplier = new LootTableSupplier("trees/leaves/", registryName);
     }
 
     ///////////////////////////////////////////
@@ -195,6 +220,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     public Optional<Block> getPrimitiveLeavesBlock() {
+        if (this.primitiveLeaves == null) {
+            return Optional.empty();
+        }
         return Optionals.ofBlock(this.primitiveLeaves.getBlock());
     }
 
@@ -250,7 +278,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
      *
      * @return A default suffix for {@link #blockRegistryName}.
      */
-    protected String getBlockRegistryNameSuffix() {
+    public String getBlockRegistryNameSuffix() {
         return "_leaves";
     }
 
@@ -459,6 +487,83 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     ///////////////////////////////////////////
+    // LOOT
+    ///////////////////////////////////////////
+
+    /**
+     * Chances for leaves to drop seeds. Used in data gen for loot tables.
+     */
+    protected float[] seedDropChances = new float[]{0.015625F, 0.03125F, 0.046875F, 0.0625F};
+
+    public void setSeedDropChances(float[] seedDropChances) {
+        this.seedDropChances = (float[]) seedDropChances;
+    }
+
+    public void setSeedDropChances(Collection<Float> seedDropChances) {
+        this.seedDropChances = new float[seedDropChances.size()];
+        Iterator<Float> iterator = seedDropChances.iterator();
+        for (int i = 0; i < seedDropChances.size(); i++) {
+            this.seedDropChances[i] = iterator.next();
+        }
+    }
+
+    private final LootTableSupplier blockLootTableSupplier;
+
+    public ResourceLocation getBlockLootTableName() {
+        return blockLootTableSupplier.getName();
+    }
+
+    public LootTable getBlockLootTable(LootTableManager lootTableManager, Species species) {
+        return blockLootTableSupplier.get(lootTableManager, species);
+    }
+
+    public boolean shouldGenerateBlockDrops() {
+        return shouldGenerateDrops();
+    }
+
+    public LootTable.Builder createBlockDrops() {
+        if (primitiveLeaves != null && getPrimitiveLeavesBlock().isPresent()) {
+            return DTLootTableProvider.createLeavesBlockDrops(primitiveLeaves.getBlock(), seedDropChances);
+        }
+        return DTLootTableProvider.createLeavesDrops(seedDropChances, LootParameterSets.BLOCK);
+    }
+
+    private final LootTableSupplier lootTableSupplier;
+
+    public ResourceLocation getLootTableName() {
+        return lootTableSupplier.getName();
+    }
+
+    public LootTable getLootTable(LootTableManager lootTableManager, Species species) {
+        return lootTableSupplier.get(lootTableManager, species);
+    }
+
+    public boolean shouldGenerateDrops() {
+        return getPrimitiveLeavesBlock().isPresent();
+    }
+
+    public LootTable.Builder createDrops() {
+        return DTLootTableProvider.createLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES);
+    }
+
+    public List<ItemStack> getDrops(World world, BlockPos pos, ItemStack tool, Species species) {
+        if (world.isClientSide) {
+            return Collections.emptyList();
+        }
+        return getLootTable(world.getServer().getLootTables(), species)
+                .getRandomItems(createLootContext(world, pos, tool, species));
+    }
+
+    private LootContext createLootContext(World world, BlockPos pos, ItemStack tool, Species species) {
+        return new LootContext.Builder(WorldContext.getServerWorldOrThrow(world))
+                .withParameter(LootParameters.BLOCK_STATE, world.getBlockState(pos))
+                .withParameter(DTLootParameters.SPECIES, species)
+                .withParameter(DTLootParameters.SEASONAL_SEED_DROP_FACTOR, species.seasonalSeedDropFactor(WorldContext.create(world), pos))
+                .withParameter(LootParameters.TOOL, tool)
+                .create(DTLootParameterSets.LEAVES);
+    }
+
+    ///////////////////////////////////////////
     // INTERACTION
     ///////////////////////////////////////////
 
@@ -480,12 +585,12 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return (fromRadius == twigRadius || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(from.getFamily().getCommonSpecies(), blockAccess.getBlockState(pos), blockAccess, pos) ? twigRadius : 0;
     }
 
-    public boolean doRequireShears() {
-        return requiresShears;
+    public boolean canBeSheared() {
+        return canBeSheared;
     }
 
-    public void setRequiresShears(boolean requiresShears) {
-        this.requiresShears = requiresShears;
+    public void setCanBeSheared(boolean canBeSheared) {
+        this.canBeSheared = canBeSheared;
     }
 
     public List<ITag.INamedTag<Block>> defaultLeavesTags() {

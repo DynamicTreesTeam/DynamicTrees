@@ -5,11 +5,13 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
+import com.ferreusveritas.dynamictrees.api.treepacks.VoidApplier;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.ToolTypes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,6 +19,8 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
+
+import java.util.List;
 
 /**
  * @author Harley O'Connor
@@ -33,7 +37,9 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 .register("color", Integer.class, LeavesProperties::setColorNumber);
 
         // Primitive leaves are needed before gathering data.
-        this.gatherDataAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves);
+        this.gatherDataAppliers
+                .register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
+                .registerListApplier("seed_drop_chances", Float.class, LeavesProperties::setSeedDropChances);
 
         // Primitive leaves are needed both client and server (so cannot be done on load).
         this.setupAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
@@ -48,7 +54,7 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                     ));
                 });
 
-        this.reloadAppliers.register("requires_shears", Boolean.class, LeavesProperties::setRequiresShears)
+        this.reloadAppliers.register("requires_shears", Boolean.class, LeavesProperties::setCanBeSheared)
                 .register("cell_kit", CellKit.class, LeavesProperties::setCellKit)
                 .register("smother", Integer.class, LeavesProperties::setSmotherLeavesMax)
                 .register("light_requirement", Integer.class, LeavesProperties::setLightRequirement)
@@ -121,7 +127,7 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
         );
 
         if (blockProperties.getHarvestTool() == ToolTypes.SHEARS) {
-            leavesProperties.setRequiresShears(true);
+            leavesProperties.setCanBeSheared(true);
         }
 
         leavesProperties.generateDynamicLeaves(blockProperties);

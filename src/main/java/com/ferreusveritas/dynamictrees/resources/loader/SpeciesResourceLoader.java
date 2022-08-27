@@ -10,11 +10,10 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
-import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.trees.Species;
@@ -83,7 +82,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
 
         // We need the sapling shape to know which parent smartmodel the sapling model should use.
         this.gatherDataAppliers
-                .register("sapling_shape", VoxelShape.class, Species::setSaplingShape);
+                .register("sapling_shape", VoxelShape.class, Species::setSaplingShape)
+                .register("drop_seeds", Boolean.class, Species::setDropSeeds);
 
         this.reloadAppliers
                 .register("tapering", Float.class, Species::setTapering)
@@ -98,8 +98,6 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("leaves_properties", LeavesProperties.class, Species::setLeavesProperties)
                 .register("world_gen_leaf_map_height", Integer.class, Species::setWorldGenLeafMapHeight)
                 .register("environment_factors", JsonObject.class, this::applyEnvironmentFactors)
-                .register("seed_drop_rarity", Float.class, Species::setupStandardSeedDropping)
-                .register("stick_drop_rarity", Float.class, Species::setupStandardStickDropping)
                 .register("mega_species", ResourceLocation.class, this::setMegaSpecies)
                 .register("seed", Seed.class, Species::setSeed)
                 .register("seed_composter_chance", Float.class, this.composterChanceCache::put)
@@ -112,10 +110,10 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (Applier<Species, String>) this::addAcceptableSoil)
                 .registerArrayApplier("features", GenFeatureConfiguration.class, Species::addGenFeature)
-                .registerArrayApplier("drop_creators", DropCreatorConfiguration.class, Species::addDropCreators)
                 .register("does_rot", Boolean.class, Species::setDoesRot)
                 .registerListApplier("fruits", Fruit.class, Species::addFruits)
-                .registerListApplier("pods", Pod.class, Species::addPods);
+                .registerListApplier("pods", Pod.class, Species::addPods)
+                .register("drop_seeds", Boolean.class, Species::setDropSeeds);
 
         super.registerAppliers();
     }
@@ -169,9 +167,6 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     protected void postLoadOnReload(LoadData loadData, JsonObject json) {
         final Species species = loadData.getResource();
         this.composterChanceCache.put(species, species.defaultSeedComposterChance());
-        if (this.shouldClearDropCreators(json)) {
-            species.getDropCreators().clear();
-        }
         super.postLoadOnReload(loadData, json);
         this.registerComposterChances();
     }
@@ -183,10 +178,6 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
             }
         });
         this.composterChanceCache.clear();
-    }
-
-    private boolean shouldClearDropCreators(JsonObject json) {
-        return json.has("drop_creators") && json.get("drop_creators").isJsonArray();
     }
 
 }

@@ -18,7 +18,6 @@ import net.minecraft.block.LeavesBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +38,7 @@ public class AlternativeLeavesGenFeature extends GenFeature {
     }
 
     public GenFeatureConfiguration createDefaultConfiguration() {
-        return super.createDefaultConfiguration().with(ALT_LEAVES, LeavesProperties.NULL_PROPERTIES).with(ALT_LEAVES_BLOCK, Blocks.AIR)
+        return super.createDefaultConfiguration().with(ALT_LEAVES, LeavesProperties.NULL).with(ALT_LEAVES_BLOCK, Blocks.AIR)
                 .with(PLACE_CHANCE, 0.5f).with(QUANTITY, 5);
     }
 
