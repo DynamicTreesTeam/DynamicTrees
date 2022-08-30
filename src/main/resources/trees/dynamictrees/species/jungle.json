@@ -8,10 +8,10 @@
     "growth_logic_kit": "jungle",
     "leaves_properties": "jungle",
     "environment_factors" : {
-        "cold": 0.15,
-        "dry": 0.2,
-        "hot": 1.1,
-        "wet": 1.1
+        "#forge:is_cold": 0.15,
+        "#forge:is_dry": 0.2,
+        "#forge:is_hot": 1.1,
+        "#forge:is_wet": 1.1
     },
     "perfect_biomes": { "type": "jungle" },
     "primitive_sapling": "jungle_sapling",

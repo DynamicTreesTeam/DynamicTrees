@@ -7,10 +7,10 @@
     "growth_rate": 1.25,
     "leaves_properties": "birch",
     "environment_factors" : {
-        "cold": 0.75,
-        "hot": 0.5,
-        "dry": 0.5,
-        "forest": 1.05
+        "#forge:is_cold": 0.75,
+        "#forge:is_hot": 0.5,
+        "#forge:is_dry": 0.5,
+        "#is_forest": 1.05
     },
     "perfect_biomes": { "name": "minecraft:.*birch.*" },
     "primitive_sapling": "birch_sapling",

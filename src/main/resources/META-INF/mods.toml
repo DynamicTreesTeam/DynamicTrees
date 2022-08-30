@@ -1,6 +1,6 @@
 license="MIT"
 modLoader="javafml"
-loaderVersion="[40,)"
+loaderVersion="[41,)"
 issueTrackerURL="https://github.com/DynamicTreesTeam/DynamicTrees/issues"
 
 [[mods]]
@@ -10,7 +10,7 @@ displayName="Dynamic Trees"
 updateJSONURL="https://github.com/DynamicTreesTeam/DynamicTreesVersionInfo/blob/master/DynamicTrees.json?raw=true"
 displayURL="http://minecraft.curseforge.com/projects/dynamictrees"
 logoFile="logo.png"
-credits="MaxHyper & Harley O'Connor for the 1.16 port\nNyfaria & SizeableShrimp for the 1.18 port"
+credits="MaxHyper & Harley O'Connor for the 1.16 port\nNyfaria & SizableShrimp for the 1.18 and 1.19 port"
 authors="Ferreusveritas"
 description='''
 Progressively growing trees.. forests that spread'''
@@ -18,13 +18,13 @@ Progressively growing trees.. forests that spread'''
 [[dependencies.dynamictrees]]
     modId="forge"
     mandatory=true
-    versionRange="[40.1.0,)"
+    versionRange="[41.1.0,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.dynamictrees]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18.2,1.19)"
+    versionRange="[1.19,1.20)"
     ordering="NONE"
     side="BOTH"

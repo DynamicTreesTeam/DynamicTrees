@@ -128,20 +128,20 @@ dependencies {
     minecraft("net.minecraftforge:forge:$mcVersion-${property("forgeVersion")}")
 
 
-    compileOnly(fg.deobf("mezz.jei:jei-$mcVersion-common-api:${property("jeiVersion")}"))
-    compileOnly(fg.deobf("mezz.jei:jei-$mcVersion-forge-api:${property("jeiVersion")}"))
+    compileOnly(fg.deobf("mezz.jei:jei-${property("jeiMcVersion")}-common-api:${property("jeiVersion")}"))
+    compileOnly(fg.deobf("mezz.jei:jei-${property("jeiMcVersion")}-forge-api:${property("jeiVersion")}"))
     // at runtime, use the full JEI jar for Forge
-    runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion-forge:${property("jeiVersion")}"))
+    runtimeOnly(fg.deobf("mezz.jei:jei-${property("jeiMcVersion")}-forge:${property("jeiVersion")}"))
 
-    // At runtime, use Patchouli mod (for the guide book, which is Json so we don"t need the API).
+    // At runtime, use Patchouli mod (for the guide book, which is Json, so we don't need the API).
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
 
     // At runtime use, CC for creating growth chambers.
     //runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
-    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3770724"))
+    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:${property("ccTweakedFileId")}"))
 
     // Compile Serene Seasons.
-    compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3693807"))
+    compileOnly(fg.deobf("curse.maven:serene-seasons-291874:${property("sereneSeasonsFileId")}"))
 
     // Compile Better Weather API.
 //    compileOnly(fg.deobf("curse.maven:BetterWeatherAPI-400714:3403615"))
@@ -152,12 +152,12 @@ dependencies {
     // At runtime, use suggestion provider fix mod.
 //    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:$mcVersion-${property("suggestionProviderFixVersion")}"))
 
-    compileOnly(fg.deobf("curse.maven:suggestion-provider-fix-469647:3623382"))
+    runtimeOnly(fg.deobf("curse.maven:suggestion-provider-fix-469647:${property("suggestionProviderFixFileId")}"))
 }
 
 fun useSereneSeasons(depHandler: DependencyHandlerScope) {
     // At runtime, use full Serene Seasons mod.
-    depHandler.runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:3510900"))
+    depHandler.runtimeOnly(fg.deobf("curse.maven:serene-seasons-291874:${property("sereneSeasonsFileId")}"))
 }
 
 fun useBetterWeather(depHandler: DependencyHandlerScope) {

@@ -7,9 +7,9 @@
     "growth_rate": 0.7,
     "leaves_properties": "acacia",
     "environment_factors" : {
-        "cold": 0.25,
-        "nether": 0.75,
-        "wet": 0.75
+        "#forge:is_cold": 0.25,
+        "#is_nether": 0.75,
+        "#forge:is_wet": 0.75
     },
     "perfect_biomes": { "type": "savanna" },
     "primitive_sapling": "acacia_sapling"

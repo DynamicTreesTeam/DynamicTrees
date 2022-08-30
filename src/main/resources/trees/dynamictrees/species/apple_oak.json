@@ -9,9 +9,9 @@
     "growth_rate": 0.7,
     "leaves_properties": "oak",
     "environment_factors" : {
-        "cold": 0.75,
-        "hot": 0.75,
-        "dry": 0.25
+        "#forge:is_cold": 0.75,
+        "#forge:is_hot": 0.75,
+        "#forge:is_dry": 0.25
     },
     "primitive_sapling": {
         "sapling_item": "apple",

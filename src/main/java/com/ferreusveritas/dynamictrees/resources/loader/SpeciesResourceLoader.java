@@ -4,12 +4,12 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.treepacks.Applier;
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
+import com.ferreusveritas.dynamictrees.deserialisation.TagKeyJsonPropertyApplier;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
@@ -20,9 +20,12 @@ import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.JsonObject;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -30,6 +33,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +46,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * A {@link JsonPropertyAppliers} for applying environment factors to {@link Species} objects. (based on {@link
-     * net.minecraftforge.common.BiomeManager.BiomeType}).
+     * A {@link JsonPropertyAppliers} for applying environment factors to {@link Species} objects.
      */
     private final JsonPropertyAppliers<Species> environmentFactorAppliers = new JsonPropertyAppliers<>(Species.class);
 
@@ -53,16 +56,11 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         super(Species.REGISTRY, ApplierRegistryEvent.SPECIES);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void registerAppliers() {
-        // TODO: Tags may not exist here yet
-        ForgeRegistries.BIOMES.tags().stream().map((key) ->
-            new JsonPropertyApplier<>(key.getKey().toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(key.getKey(), factor)))
-                .forEach(this.environmentFactorAppliers::register);
-
-//        BiomeDictionary.Type.getAll().stream().map(type ->
-//                        new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
-//                .forEach(this.environmentFactorAppliers::register);
+        this.environmentFactorAppliers.register(new TagKeyJsonPropertyApplier<>(Registry.BIOME_REGISTRY, Species.class, Float.class,
+                (TriConsumer<TagKey<Biome>, Species, Float>) (tagKey, species, factor) -> species.envFactor(tagKey, factor)));
 
         JsonDeserialisers.register(Species.CommonOverride.class, input ->
                 JsonDeserialisers.BIOME_PREDICATE.deserialise(input)

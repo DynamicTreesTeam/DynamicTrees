@@ -6,8 +6,8 @@
     "growth_rate": 0.8,
     "leaves_properties": "oak",
     "environment_factors" : {
-        "cold": 0.5,
-        "dry": 0.5
+        "#forge:is_cold": 0.5,
+        "#forge:is_dry": 0.5
     },
     "common_override": { "type": "swamp" },
     "perfect_biomes": { "type": "swamp" },
