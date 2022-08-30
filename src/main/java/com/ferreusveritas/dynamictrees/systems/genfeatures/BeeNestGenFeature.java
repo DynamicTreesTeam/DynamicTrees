@@ -8,9 +8,11 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Bee;
@@ -24,7 +26,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.Tags;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -45,10 +47,10 @@ public class BeeNestGenFeature extends GenFeature {
     public static final ConfigurationProperty<WorldGenChanceFunction> WORLD_GEN_CHANCE_FUNCTION = ConfigurationProperty.property("world_gen_chance", WorldGenChanceFunction.class);
 
     private static final double MEADOWS_CHANCE = 1.0D;
-    private static final double PLAINS_CHANCE = 0.05f;
-    private static final double FLOWER_FOREST_CHANCE = 0.02f;
-    private static final double FOREST_CHANCE = 0.0005f;
-    private static final double CHANCE = 0.001f;
+    private static final double PLAINS_CHANCE = 0.05D;
+    private static final double FLOWER_FOREST_CHANCE = 0.02D;
+    private static final double FOREST_CHANCE = 0.0002D;
+    private static final double GROW_CHANCE = 0.001D;
 
     public BeeNestGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -62,11 +64,11 @@ public class BeeNestGenFeature extends GenFeature {
     @Override
     public GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos) -> {
-            if (world.getRandom().nextFloat() > CHANCE) {
+            if (world.getRandom().nextFloat() > GROW_CHANCE) {
                 return false;
             }
-            // Default flower check predicate, straight from the sapling class
-            for (BlockPos blockpos : BlockPos.MutableBlockPos.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
+            // Default flower check predicate, straight from AbstractTreeGrower
+            for (BlockPos blockpos : BlockPos.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
                 if (world.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
                     return true;
                 }
@@ -74,19 +76,18 @@ public class BeeNestGenFeature extends GenFeature {
             return false;
         }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
             // Default biome check chance function. Uses vanilla chances
-            ResourceKey<Biome> biomeKey = world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).unwrapKey().orElseThrow();
+            Holder<Biome> biomeHolder = world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2);
+            ResourceKey<Biome> biomeKey = biomeHolder.unwrapKey().orElseThrow();
             if (biomeKey == Biomes.MEADOW)
                 return MEADOWS_CHANCE;
-            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS)) {
+
+            if (biomeHolder.is(Tags.Biomes.IS_PLAINS))
                 return PLAINS_CHANCE;
-            }
-            if (biomeKey == Biomes.FLOWER_FOREST) {
+
+            if (biomeKey == Biomes.FLOWER_FOREST)
                 return FLOWER_FOREST_CHANCE;
-            }
-            if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.FOREST)) {
-                return FOREST_CHANCE;
-            }
-            return 0D;
+
+            return biomeHolder.is(BiomeTags.IS_FOREST) ? FOREST_CHANCE : 0;
         }).with(MAX_COUNT, 1);
     }
 
@@ -94,7 +95,7 @@ public class BeeNestGenFeature extends GenFeature {
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         final LevelAccessor world = context.world();
         final BlockPos rootPos = context.pos();
-        return !(world.getRandom().nextFloat() > configuration.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos)) &&
+        return world.getRandom().nextFloat() <= configuration.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos) &&
                 this.placeBeeNestInValidPlace(configuration, world, rootPos, true);
     }
 

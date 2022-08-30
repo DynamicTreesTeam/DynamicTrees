@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.data.provider.BranchLoaderBuilder;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
 
@@ -20,10 +21,10 @@ public class SurfaceRootStateGenerator implements Generator<DTBlockStateProvider
     public void generate(DTBlockStateProvider provider, Family input, Dependencies dependencies) {
         final SurfaceRootBlock surfaceRoot = dependencies.get(SURFACE_ROOT);
         provider.simpleBlock(surfaceRoot,
-                provider.models().getBuilder(Objects.requireNonNull(surfaceRoot.getRegistryName()).getPath())
+                provider.models().getBuilder(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(surfaceRoot)).getPath())
                         .customLoader(BranchLoaderBuilder::root)
                         .texture("bark", provider.block(
-                                Objects.requireNonNull(dependencies.get(PRIMITIVE_LOG).getRegistryName())
+                                Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LOG)))
                         )).end()
         );
     }

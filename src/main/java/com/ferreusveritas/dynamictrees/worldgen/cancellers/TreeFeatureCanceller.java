@@ -11,6 +11,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraftforge.registries.ForgeRegistries;
 
 
 public class TreeFeatureCanceller<T extends FeatureConfiguration> extends FeatureCanceller {
@@ -38,7 +39,7 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
             String nameSpace = "";
             final ConfiguredFeature<?, ?> nextConfiguredFeature = configuredFeature.getFeatures().findFirst().get();
             final FeatureConfiguration nextFeatureConfig = nextConfiguredFeature.config();
-            final ResourceLocation featureRegistryName = nextConfiguredFeature.feature().getRegistryName();
+            final ResourceLocation featureRegistryName = ForgeRegistries.FEATURES.getKey(nextConfiguredFeature.feature());
             if(featureRegistryName != null) {
                 nameSpace = featureRegistryName.getNamespace();
             }
@@ -61,7 +62,7 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
     private boolean doesContainTrees(RandomFeatureConfiguration featureConfig, BiomePropertySelectors.FeatureCancellations featureCancellations) {
         for (WeightedPlacedFeature feature : featureConfig.features) {
             final PlacedFeature currentConfiguredFeature = feature.feature.value();
-            final ResourceLocation featureRegistryName = currentConfiguredFeature.getFeatures().findFirst().get().feature().getRegistryName();
+            final ResourceLocation featureRegistryName = ForgeRegistries.FEATURES.getKey(currentConfiguredFeature.getFeatures().findFirst().get().feature());
 
             if (this.treeFeatureConfigClass.isInstance(currentConfiguredFeature.placement()) && featureRegistryName != null &&
                     featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace())) {

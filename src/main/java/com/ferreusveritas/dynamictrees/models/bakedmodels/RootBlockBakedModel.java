@@ -2,31 +2,38 @@ package com.ferreusveritas.dynamictrees.models.bakedmodels;
 
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
-import com.ferreusveritas.dynamictrees.models.modeldata.RootModelConnections;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.RootConnections;
 import com.google.common.collect.Maps;
 import com.mojang.math.Vector3f;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockElement;
+import net.minecraft.client.renderer.block.model.BlockElementFace;
+import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.SimpleBakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class RootBlockBakedModel extends BranchBlockBakedModel {
@@ -101,7 +108,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(this.barkTexture);
+        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, this.barkTexture);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
@@ -113,7 +120,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 
     private BakedModel bakeVert(int radius, Direction dir) {
         int radialHeight = getRadialHeight(radius);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(this.barkTexture);
+        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, this.barkTexture);
 
         AABB partBoundary = new AABB(8 - radius, radialHeight, 8 - radius, 8 + radius, 16 + radialHeight, 8 + radius)
                 .move(dir.getStepX() * 7, 0, dir.getStepZ() * 7);
@@ -158,7 +165,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.customData, ItemOverrides.EMPTY).particle(icon);
+        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, icon);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
@@ -170,7 +177,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 
     @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull ModelData extraData) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull RandomSource rand, @Nonnull ModelData extraData, @Nullable RenderType renderType) {
         if (side != null || state == null) {
             return Collections.emptyList();
         }
@@ -181,8 +188,8 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 
         int[] connections = new int[]{0, 0, 0, 0};
         RootConnections.ConnectionLevel[] connectionLevels = RootConnections.PLACEHOLDER_CONNECTION_LEVELS.clone();
-        if (extraData instanceof RootConnections) {
-            RootConnections connectionData = (RootConnections) extraData;
+        RootConnections connectionData = extraData.get(RootConnections.ROOT_CONNECTIONS_PROPERTY);
+        if (connectionData != null) {
             connections = connectionData.getAllRadii();
             connectionLevels = connectionData.getConnectionLevels();
         }
@@ -203,7 +210,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
         for (Direction face : Direction.values()) {
             //Get quads for core model
             if (isGrounded) {
-                quads.addAll(cores[coreDir][coreRadius - 1].getQuads(state, face, rand, extraData));
+                quads.addAll(cores[coreDir][coreRadius - 1].getQuads(state, face, rand, extraData, renderType));
             }
 
             //Get quads for sleeves models
@@ -214,10 +221,10 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
                     //If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves(which are partly transparent).
                     if (connRadius > 0) {//  && (connRadius == 1 || side != connDir)) {
                         if (isGrounded) {
-                            quads.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData));
+                            quads.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData, renderType));
                         }
                         if (connectionLevels[idx] == RootConnections.ConnectionLevel.HIGH) {
-                            quads.addAll(verts[idx][connRadius - 1].getQuads(state, face, rand, extraData));
+                            quads.addAll(verts[idx][connRadius - 1].getQuads(state, face, rand, extraData, renderType));
                         }
                     }
                 }
@@ -230,8 +237,10 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
     @Nonnull
     @Override
     public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData) {
-        Block block = state.getBlock();
-        return block instanceof SurfaceRootBlock ? new RootModelConnections(((SurfaceRootBlock) block).getConnectionData(world, pos)) : new RootModelConnections();
+        RootConnections rootConnections = state.getBlock() instanceof SurfaceRootBlock surfaceRootBlock
+                ? new RootConnections(surfaceRootBlock.getConnectionData(world, pos))
+                : new RootConnections();
+        return ModelData.builder().with(RootConnections.ROOT_CONNECTIONS_PROPERTY, rootConnections).build();
     }
 
     /**

@@ -1,5 +1,6 @@
 {
     "ambientocclusion": false,
+    "render_type": "cutout_mipped",
     "textures": {
         "particle": "dynamictrees:block/apple",
         "apple": "dynamictrees:block/apple"

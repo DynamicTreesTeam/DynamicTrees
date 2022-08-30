@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.event.handlers;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.worldgen.WorldGenEventHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 
@@ -19,7 +18,6 @@ public final class EventHandlers {
     public static final LeafUpdateEventHandler LEAF_UPDATE_EVENT_HANDLER = new LeafUpdateEventHandler();
 
     public static final VanillaSaplingEventHandler VANILLA_SAPLING_EVENT_HANDLER = new VanillaSaplingEventHandler();
-    public static final WorldGenEventHandler WORLD_GEN_EVENT_HANDLER = new WorldGenEventHandler();
     public static final PoissonDiscEventHandler POISSON_DISC_EVENT_HANDLER = new PoissonDiscEventHandler();
 
     /**
@@ -40,7 +38,6 @@ public final class EventHandlers {
      */
     public static void configReload() {
         registerOrUnregister(VANILLA_SAPLING_EVENT_HANDLER, DTConfigs.REPLACE_VANILLA_SAPLING.get());
-        registerOrUnregister(WORLD_GEN_EVENT_HANDLER, DTConfigs.WORLD_GEN.get());
         registerOrUnregister(POISSON_DISC_EVENT_HANDLER, DTConfigs.WORLD_GEN.get());
     }
 

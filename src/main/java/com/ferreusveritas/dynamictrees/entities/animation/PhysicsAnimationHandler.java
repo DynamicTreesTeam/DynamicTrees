@@ -9,6 +9,7 @@ import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -19,8 +20,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import java.util.Random;
 
 public class PhysicsAnimationHandler implements AnimationHandler {
     @Override
@@ -43,7 +42,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         final BlockPos cutPos = entity.getDestroyData().cutPos;
 
         final long seed = entity.level.random.nextLong();
-        final Random random = new Random(seed ^ (((long) cutPos.getX()) << 32 | ((long) cutPos.getZ())));
+        final RandomSource random = RandomSource.create(seed ^ (((long) cutPos.getX()) << 32 | ((long) cutPos.getZ())));
         final float mass = entity.getDestroyData().woodVolume.getVolume();
         final float inertialMass = Mth.clamp(mass, 1, 3);
         entity.setDeltaMovement(entity.getDeltaMovement().x / inertialMass,

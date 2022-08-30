@@ -3,13 +3,13 @@ package com.ferreusveritas.dynamictrees.systems.dropcreators.drops;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Can drop only one item picked randomly from the selection of all items with weighted odds.
@@ -91,7 +91,7 @@ public final class WeightedDrops implements Drops {
     }
 
     @Override
-    public void appendDrops(List<ItemStack> drops, Random random, int fortune) {
+    public void appendDrops(List<ItemStack> drops, RandomSource random, int fortune) {
         final int chance = Drops.getChance(fortune, this.baseChance);
         final int attempts = MathHelper.randomBetween(random, this.minAttempts, this.maxAttempts);
         SimpleWeightedRandomList.Builder<Item> builder = new SimpleWeightedRandomList.Builder<>();

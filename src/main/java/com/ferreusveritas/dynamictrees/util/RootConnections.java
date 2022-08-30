@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.util;
 
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
+import net.minecraftforge.client.model.data.ModelProperty;
 
 /**
  * Extension of regular {@link Connections} data, modified for surface roots. This is needed because roots only have
@@ -11,7 +12,8 @@ import net.minecraft.util.StringRepresentable;
  */
 public class RootConnections extends Connections {
 
-    public final static ConnectionLevel[] PLACEHOLDER_CONNECTION_LEVELS = new ConnectionLevel[]{ConnectionLevel.MID, ConnectionLevel.MID, ConnectionLevel.MID, ConnectionLevel.MID};
+    public static final ModelProperty<RootConnections> ROOT_CONNECTIONS_PROPERTY = new ModelProperty<>();
+    public static final ConnectionLevel[] PLACEHOLDER_CONNECTION_LEVELS = new ConnectionLevel[]{ConnectionLevel.MID, ConnectionLevel.MID, ConnectionLevel.MID, ConnectionLevel.MID};
 
     /**
      * An array of connection levels, with the index being equivalent to their horizontal index of the connection
@@ -24,6 +26,11 @@ public class RootConnections extends Connections {
         // Surface roots only need horizontal connections, so the radii has 4 items with equivalent index to the horizontal index of the respective Direction.
         this.radii = new int[]{0, 0, 0, 0};
         this.connectionLevels = PLACEHOLDER_CONNECTION_LEVELS.clone();
+    }
+
+    public RootConnections(RootConnections connections) {
+        this.setAllRadii(connections.getAllRadii());
+        this.setConnectionLevels(connections.getConnectionLevels());
     }
 
     public ConnectionLevel[] getConnectionLevels() {

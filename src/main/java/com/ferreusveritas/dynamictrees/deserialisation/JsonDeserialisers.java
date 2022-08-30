@@ -279,6 +279,7 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
             BIOME_LIST.deserialise(jsonElement).map(biomeList ->
                     biome -> biomeList.stream().anyMatch(currentBiome -> Objects.equals(
+                            // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
                             ForgeRegistries.BIOMES.getKey(currentBiome),
                             ForgeRegistries.BIOMES.getKey(biome)
                     ))
@@ -321,6 +322,7 @@ public final class JsonDeserialisers {
         BLOCK = register(Block.class,
                 new ForgeRegistryEntryDeserialiser(ForgeRegistries.BLOCKS, "block", Blocks.AIR));
         ITEM = register(Item.class, new ForgeRegistryEntryDeserialiser(ForgeRegistries.ITEMS, "item", Items.AIR));
+        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
         BIOME = register(Biome.class, new ForgeRegistryEntryDeserialiser(ForgeRegistries.BIOMES, "biome"));
     }
 

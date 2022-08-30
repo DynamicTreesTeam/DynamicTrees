@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.ColorUtil;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.ImmutableMultimap;
@@ -32,7 +33,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.List;
 
 
@@ -230,7 +230,7 @@ public class Staff extends Item {
 
             if (tag.contains(HANDLE)) {
                 try {
-                    color = Color.decode(tag.getString(HANDLE)).getRGB();
+                    color = ColorUtil.decodeARGB32(tag.getString(HANDLE));
                 } catch (NumberFormatException e) {
                     tag.remove(HANDLE);
                 }
@@ -270,7 +270,7 @@ public class Staff extends Item {
         tag.remove(COLOR);
 
         try {
-            tag.putInt(COLOR, Color.decode(color).getRGB());
+            tag.putInt(COLOR, ColorUtil.decodeARGB32(color));
         } catch (final NumberFormatException ignored) {
         }
     }

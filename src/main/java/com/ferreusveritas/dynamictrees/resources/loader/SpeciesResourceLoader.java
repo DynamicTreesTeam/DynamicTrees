@@ -54,12 +54,12 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     }
 
     @Override
-    public void registerAppliers () {
+    public void registerAppliers() {
+        // TODO: Tags may not exist here yet
         ForgeRegistries.BIOMES.tags().stream().map((key) ->
             new JsonPropertyApplier<>(key.getKey().toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(key.getKey(), factor)))
                 .forEach(this.environmentFactorAppliers::register);
 
-//
 //        BiomeDictionary.Type.getAll().stream().map(type ->
 //                        new JsonPropertyApplier<>(type.toString().toLowerCase(), Species.class, Float.class, (species, factor) -> species.envFactor(type, factor)))
 //                .forEach(this.environmentFactorAppliers::register);

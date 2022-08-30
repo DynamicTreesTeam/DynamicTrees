@@ -52,10 +52,8 @@ public class TreeHelper {
     /**
      * Pulses an entire leafMap volume of blocks each with an age signal. Warning: CPU intensive and should be used
      * sparingly.
-     * <p>
-     * {@link net.minecraft.util.Direction.Axis}
      *
-     * @param world      The {@link IWorld} instance.
+     * @param world      The {@link LevelAccessor} instance.
      * @param leafMap    The voxel map of hydro values to use as an iterator.
      * @param iterations The number of times to age the volume.
      */
@@ -169,7 +167,7 @@ public class TreeHelper {
      * This is resource intensive.  Use only for interaction code. Only the root node can determine the exact species
      * and it has to be found by mapping the branch network.
      *
-     * @param world The {@link World} instance.
+     * @param world The {@link Level} instance.
      * @param pos   The {@link BlockPos} to find the {@link Species} at.
      * @return The {@link Species}, or {@link Species#NULL_SPECIES} if one couldn't be found.
      */

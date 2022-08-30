@@ -2,9 +2,8 @@ package com.ferreusveritas.dynamictrees.systems.genfeatures.context;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
-
-import java.util.Random;
 
 /**
  * @author Harley O'Connor
@@ -33,7 +32,7 @@ public abstract class GenerationContext<W extends LevelAccessor> {
         return species;
     }
 
-    public final Random random() {
+    public final RandomSource random() {
         return this.world.getRandom();
     }
 

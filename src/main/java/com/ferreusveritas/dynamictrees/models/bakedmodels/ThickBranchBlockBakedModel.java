@@ -9,26 +9,34 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.google.common.collect.Maps;
 import com.mojang.math.Vector3f;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockElement;
+import net.minecraft.client.renderer.block.model.BlockElementFace;
+import net.minecraft.client.renderer.block.model.BlockFaceUV;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.SimpleBakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
@@ -75,7 +83,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
     public BakedModel bakeTrunkBark(int radius, TextureAtlasSprite bark, boolean side) {
 
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrides.EMPTY).particle(bark);
+        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, bark);
         AABB wholeVolume = new AABB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
 
         final Direction[] run = side ? CoordUtils.HORIZONTALS : new Direction[]{Direction.UP, Direction.DOWN};
@@ -112,7 +120,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
     }
 
     public BakedModel bakeTrunkRings(int radius, TextureAtlasSprite ring, Direction face) {
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrides.EMPTY).particle(ring);
+        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, ring);
         AABB wholeVolume = new AABB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
         int wholeVolumeWidth = 48;
 
@@ -158,7 +166,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
     @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable final BlockState state, @Nullable final Direction side, final Random rand, final ModelData extraData) {
+    public List<BakedQuad> getQuads(@Nullable final BlockState state, @Nullable final Direction side, final RandomSource rand, final ModelData extraData, @Nullable RenderType renderType) {
         if (state == null || side != null) {
             return Collections.emptyList();
         }
@@ -166,7 +174,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
         int coreRadius = this.getRadius(state);
 
         if (coreRadius <= BranchBlock.MAX_RADIUS) {
-            return super.getQuads(state, null, rand, extraData);
+            return super.getQuads(state, null, rand, extraData, renderType);
         }
 
         coreRadius = Mth.clamp(coreRadius, 9, 24);
@@ -177,8 +185,8 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
         Direction forceRingDir = null;
         int twigRadius = 1;
 
-        if (extraData instanceof ModelConnections) {
-            ModelConnections connectionsData = (ModelConnections) extraData;
+        ModelConnections connectionsData = extraData.get(ModelConnections.CONNECTIONS_PROPERTY);
+        if (connectionsData != null) {
             connections = connectionsData.getAllRadii();
             forceRingDir = connectionsData.getRingOnly();
             Family family = connectionsData.getFamily();
@@ -199,17 +207,17 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
         if (forceRingDir != null) {
             connections[forceRingDir.get3DDataValue()] = 0;
-            quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, forceRingDir, rand, extraData));
+            quads.addAll(this.trunksBotRings[coreRadius - 9].getQuads(state, forceRingDir, rand, extraData, renderType));
         }
 
         boolean branchesAround = connections[2] + connections[3] + connections[4] + connections[5] != 0;
         for (Direction face : Direction.values()) {
-            quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData));
+            quads.addAll(this.trunksBark[coreRadius - 9].getQuads(state, face, rand, extraData, renderType));
             if (face == Direction.UP || face == Direction.DOWN) {
                 if (connections[face.get3DDataValue()] < twigRadius && !branchesAround) {
-                    quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData));
+                    quads.addAll(this.trunksTopRings[coreRadius - 9].getQuads(state, face, rand, extraData, renderType));
                 } else if (connections[face.get3DDataValue()] < coreRadius) {
-                    quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData));
+                    quads.addAll(this.trunksTopBark[coreRadius - 9].getQuads(state, face, rand, extraData, renderType));
                 }
             }
         }

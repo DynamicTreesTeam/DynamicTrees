@@ -40,8 +40,8 @@ public class Seed extends Item implements IPlantable {
 
     public Seed() {
         super(new Item.Properties());
-        //todo: add seed to seed registry
-//        this.setRegistryName("null");
+        // TODO: Set null name? -SizableShrimp
+        // this.setRegistryName("null");
         this.species = Species.NULL_SPECIES;
     }
 

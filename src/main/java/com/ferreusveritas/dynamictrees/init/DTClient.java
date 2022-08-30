@@ -48,7 +48,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
-import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -68,7 +67,6 @@ public class DTClient {
 
     public static void setup() {
 
-        registerRenderLayers();
         registerJsonColorMultipliers();
 
 
@@ -128,16 +126,6 @@ public class DTClient {
 
     private static boolean isValid(BlockGetter access, BlockPos pos) {
         return access != null && pos != null;
-    }
-
-    private static void registerRenderLayers() {
-        ItemBlockRenderTypes.setRenderLayer(DTRegistries.POTTED_SAPLING.get(), RenderType.cutoutMipped());
-
-        ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block == DTRegistries.COCOA_FRUIT.get() || block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof FruitBlock)
-                .forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped()));
-
-//		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof ThickBranchBlock)
-//				.forEach(block -> RenderTypeLookup.setRenderLayer(block , ThickRingTextureManager.BRANCH_SOLID));
     }
 
     private static void registerColorHandlers() {
@@ -219,11 +207,11 @@ public class DTClient {
         }
     }
 
-    public static void spawnParticles(Level world, SimpleParticleType particleType, BlockPos pos, int numParticles, Random random) {
+    public static void spawnParticles(Level world, SimpleParticleType particleType, BlockPos pos, int numParticles, RandomSource random) {
         spawnParticles(world, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, random);
     }
 
-    public static void spawnParticles(LevelAccessor world, SimpleParticleType particleType, int x, int y, int z, int numParticles, Random random) {
+    public static void spawnParticles(LevelAccessor world, SimpleParticleType particleType, int x, int y, int z, int numParticles, RandomSource random) {
         for (int i1 = 0; i1 < numParticles; ++i1) {
             double mx = random.nextGaussian() * 0.02D;
             double my = random.nextGaussian() * 0.02D;

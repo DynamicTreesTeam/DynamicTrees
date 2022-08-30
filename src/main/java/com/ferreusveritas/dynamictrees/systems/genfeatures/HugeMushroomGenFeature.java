@@ -8,13 +8,12 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.google.common.collect.Iterables;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Random;
 
 import static net.minecraft.world.level.block.HugeMushroomBlock.*;
 
@@ -177,7 +176,7 @@ public class HugeMushroomGenFeature extends GenFeature {
     }
 
     //Override this for custom mushroom heights
-    protected int getMushroomHeight(LevelAccessor world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+    protected int getMushroomHeight(LevelAccessor world, BlockPos rootPos, Biome biome, RandomSource random, int radius, SafeChunkBounds safeBounds) {
         return this.height > 0 ? this.height : random.nextInt(9) + 2;
     }
 

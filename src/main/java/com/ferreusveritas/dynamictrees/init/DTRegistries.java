@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.registry.RegistryEvent;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.blocks.DynamicCocoaBlock;
@@ -30,10 +31,13 @@ import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
+import com.ferreusveritas.dynamictrees.worldgen.biomemodifiers.AddDynamicTreesBiomeModifier;
+import com.ferreusveritas.dynamictrees.worldgen.biomemodifiers.RunFeatureCancellersBiomeModifier;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.FungusFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.MushroomFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.TreeFeatureCanceller;
 import com.google.common.base.Suppliers;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -55,6 +59,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.HugeMushroomFea
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -85,6 +90,8 @@ public class DTRegistries {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, DynamicTrees.MOD_ID);
     public static final DeferredRegister<ConfiguredFeature<?, ?>> CONFIGURED_FEATURES = DeferredRegister.create(Registry.CONFIGURED_FEATURE_REGISTRY, DynamicTrees.MOD_ID);
     public static final DeferredRegister<PlacedFeature> PLACED_FEATURES = DeferredRegister.create(Registry.PLACED_FEATURE_REGISTRY, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<Codec<? extends BiomeModifier>> BIOME_MODIFIER_SERIALIZERS = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, DynamicTrees.MOD_ID);
 
     ///////////////////////////////////////////
     // BLOCKS
@@ -116,6 +123,8 @@ public class DTRegistries {
         ENTITY_TYPES.register(modBus);
         CONFIGURED_FEATURES.register(modBus);
         PLACED_FEATURES.register(modBus);
+        FEATURES.register(modBus);
+        BIOME_MODIFIER_SERIALIZERS.register(modBus);
 
         setupBlocks();
         setupConnectables();
@@ -224,27 +233,17 @@ public class DTRegistries {
 
     @SubscribeEvent
     public static void onTileEntitiesRegistry(final RegisterEvent tileEntityRegistryEvent) {
-        setupTileEntities();
-        tileEntityRegistryEvent.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, (m)->
-        {
-            m.register(PottedSaplingBlock.REG_NAME, bonsaiTE);
-            m.register(DynamicTrees.resLoc("tile_entity_species"), speciesTE);
+        tileEntityRegistryEvent.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, registerHelper -> {
+            setupTileEntities();
+            registerHelper.register(PottedSaplingBlock.REG_NAME, bonsaiTE);
+            registerHelper.register(DynamicTrees.resLoc("tile_entity_species"), speciesTE);
         });
-//        tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(PottedSaplingBlock.REG_NAME));
-//        tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(DynamicTrees.resLoc("tile_entity_species")));
     }
 
     ///////////////////////////////////////////
     // WORLD GEN
     ///////////////////////////////////////////
 
-
-//    @SubscribeEvent
-//    public static void onFeatureRegistry(final RegistryEvent.Register<Feature<?>> event) {
-//        event.getRegistry().register(DYNAMIC_TREE_FEATURE);
-//    }
-
-    public static DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, DynamicTrees.MOD_ID);
     public static final RegistryObject<DynamicTreeFeature> DYNAMIC_TREE_FEATURE = FEATURES.register("dynamic_tree", DynamicTreeFeature::new);
 
     public static final RegistryObject<ConfiguredFeature<NoneFeatureConfiguration, ?>> DYNAMIC_TREE_CONFIGURED_FEATURE = CONFIGURED_FEATURES.register("dynamic_tree",
@@ -253,6 +252,11 @@ public class DTRegistries {
     public static final RegistryObject<PlacedFeature> DYNAMIC_TREE_PLACED_FEATURE = PLACED_FEATURES.register("dynamic_tree_placed_feature",
             () -> new PlacedFeature(Holder.hackyErase(DYNAMIC_TREE_CONFIGURED_FEATURE.getHolder().get()), List.of()/*VegetationPlacements.treePlacement(PlacementUtils.countExtra(10, 0.1F, 1))*/));
 
+    public static final RegistryObject<Codec<AddDynamicTreesBiomeModifier>> ADD_DYNAMIC_TREES_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("add_dynamic_trees",
+            () -> Codec.unit(AddDynamicTreesBiomeModifier::new));
+    public static final RegistryObject<Codec<RunFeatureCancellersBiomeModifier>> RUN_FEATURE_CANCELLERS_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("run_feature_cancellers",
+            () -> Codec.unit(RunFeatureCancellersBiomeModifier::new));
+
     public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.resLoc("tree"), TreeConfiguration.class);
 
     public static final FeatureCanceller FUNGUS_CANCELLER = new FungusFeatureCanceller<>(DynamicTrees.resLoc("fungus"), HugeFungusConfiguration.class);
@@ -260,7 +264,7 @@ public class DTRegistries {
     public static final FeatureCanceller MUSHROOM_CANCELLER = new MushroomFeatureCanceller<>(DynamicTrees.resLoc("mushroom"), HugeMushroomFeatureConfiguration.class);
 
     @SubscribeEvent
-    public static void onFeatureCancellerRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<FeatureCanceller> event) {
+    public static void onFeatureCancellerRegistry(final RegistryEvent<FeatureCanceller> event) {
         event.getRegistry().registerAll(TREE_CANCELLER, FUNGUS_CANCELLER, MUSHROOM_CANCELLER);
     }
 
@@ -269,22 +273,22 @@ public class DTRegistries {
     ///////////////////////////////////////////
 
     @SubscribeEvent
-    public static void onCellKitRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<CellKit> event) {
+    public static void onCellKitRegistry(final RegistryEvent<CellKit> event) {
         CellKits.register(event.getRegistry());
     }
 
     @SubscribeEvent
-    public static void onGrowthLogicKitRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GrowthLogicKit> event) {
+    public static void onGrowthLogicKitRegistry(final RegistryEvent<GrowthLogicKit> event) {
         GrowthLogicKits.register(event.getRegistry());
     }
 
     @SubscribeEvent
-    public static void onGenFeatureRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GenFeature> event) {
+    public static void onGenFeatureRegistry(final RegistryEvent<GenFeature> event) {
         GenFeatures.register(event.getRegistry());
     }
 
     @SubscribeEvent
-    public static void onDropCreatorRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<DropCreator> event) {
+    public static void onDropCreatorRegistry(final RegistryEvent<DropCreator> event) {
         DropCreators.register(event.getRegistry());
     }
 

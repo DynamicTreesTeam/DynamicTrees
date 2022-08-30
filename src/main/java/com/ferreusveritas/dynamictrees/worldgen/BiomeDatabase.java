@@ -42,14 +42,17 @@ public class BiomeDatabase {
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
 
     public Entry getEntry(@Nullable Biome biome) {
-		if (biome == null) {
+        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
+        ResourceLocation key = ForgeRegistries.BIOMES.getKey(biome);
+        if (biome == null || key == null) {
 			return BAD_ENTRY;
 		}
 
-        return this.entries.computeIfAbsent(biome.getRegistryName(), k -> new Entry(this, biome));
+        return this.entries.computeIfAbsent(key, k -> new Entry(this, biome));
     }
 
     public Entry getEntry(ResourceLocation biomeResLoc) {
+        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
         return this.getEntry(ForgeRegistries.BIOMES.getValue(biomeResLoc));
     }
 
@@ -71,11 +74,12 @@ public class BiomeDatabase {
     }
 
     public boolean isValid() {
-        for (Biome biome : ForgeRegistries.BIOMES) {
-            final Entry entry = this.getEntry(biome);
-            final ResourceLocation biomeRegistryName = entry.getBiome().getRegistryName();
+        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
+        for (var registryEntry : ForgeRegistries.BIOMES.getEntries()) {
+            final Entry entry = this.getEntry(registryEntry.getValue());
+            final ResourceLocation biomeRegistryName = ForgeRegistries.BIOMES.getKey(entry.getBiome());
 
-            if (biomeRegistryName != null && !biomeRegistryName.equals(biome.getRegistryName())) {
+            if (biomeRegistryName != null && !biomeRegistryName.equals(registryEntry.getKey().location())) {
                 return false;
             }
         }
@@ -103,7 +107,7 @@ public class BiomeDatabase {
 
         public Entry() {
             this.database = null;
-            this.biome = ForgeRegistries.BIOMES.getValue(Biomes.OCEAN.getRegistryName());
+            this.biome = ForgeRegistries.BIOMES.getValue(Biomes.OCEAN.location());
         }
 
         public Entry(final BiomeDatabase database, final Biome biome) {

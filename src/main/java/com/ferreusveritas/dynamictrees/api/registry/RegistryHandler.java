@@ -189,13 +189,8 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
     // LOWEST allows DT to accumulate blocks & items from inside other listeners to this Register event if necessary
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onBlockRegistry(final RegisterEvent event) {
-
-        event.register(ForgeRegistries.Keys.BLOCKS,(registryHelper)->{
-            this.blocks.forEach((resourceLocation,block)->registryHelper.register(resourceLocation,block.get()));
-        });
-        event.register(ForgeRegistries.Keys.ITEMS,(registryHelper)->{
-            this.items.forEach((resourceLocation,item)->registryHelper.register(resourceLocation,item.get()));
-        });
+        event.register(ForgeRegistries.Keys.BLOCKS, registryHelper -> this.blocks.forEach((resourceLocation, blockSup) -> registryHelper.register(resourceLocation, blockSup.get())));
+        event.register(ForgeRegistries.Keys.ITEMS, registryHelper -> this.items.forEach((resourceLocation, itemSup) -> registryHelper.register(resourceLocation, itemSup.get())));
     }
 
 

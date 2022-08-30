@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.Tags;
 
 import java.util.Collections;
 import java.util.List;
@@ -58,8 +58,8 @@ public class NetherFungusSpecies extends Species {
                 .setSaplingSound(SoundType.FUNGUS)
                 .setCanSaplingGrowNaturally(false)
                 .addDropCreators(DropCreators.LOG)
-                .envFactor(BiomeDictionary.Type.COLD, 0.25f)
-                .envFactor(BiomeDictionary.Type.WET, 0.75f);
+                .envFactor(Tags.Biomes.IS_COLD, 0.25f)
+                .envFactor(Tags.Biomes.IS_WET, 0.75f);
     }
 
     @Override

@@ -10,6 +10,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Blocks;
@@ -28,7 +29,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -113,7 +113,7 @@ public final class CoordUtils {
         return canAccessStateSafely(blockReader, blockPos) ? blockReader.getBlockState(blockPos) : null;
     }
 
-    public static Direction getRandomDir(Random rand) {
+    public static Direction getRandomHorizontalDir(RandomSource rand) {
         return Direction.values()[2 + rand.nextInt(4)];//Return NSWE
     }
 

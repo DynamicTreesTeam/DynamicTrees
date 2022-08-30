@@ -4,13 +4,13 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
 
 /**
  * Provides the forest density for a given biome. Mods should implement this interface and register it via the {@link
@@ -22,17 +22,17 @@ public class BiomePropertySelectors {
 
     @FunctionalInterface
     public interface ChanceSelector {
-        Chance getChance(Random random, @Nonnull Species species, int radius);
+        Chance getChance(RandomSource random, @Nonnull Species species, int radius);
     }
 
     @FunctionalInterface
     public interface DensitySelector {
-        double getDensity(Random random, double noiseDensity);
+        double getDensity(RandomSource random, double noiseDensity);
     }
 
     @FunctionalInterface
     public interface SpeciesSelector {
-        SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, Random random);
+        SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, RandomSource random);
     }
 
     public static final class FeatureCancellations {
@@ -126,7 +126,7 @@ public class BiomePropertySelectors {
         }
 
         @Override
-        public SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, Random random) {
+        public SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, RandomSource random) {
             return decision;
         }
     }
@@ -163,7 +163,7 @@ public class BiomePropertySelectors {
         }
 
         @Override
-        public SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, Random random) {
+        public SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, RandomSource random) {
             int chance = random.nextInt(totalWeight);
 
             for (Entry entry : decisionTable) {

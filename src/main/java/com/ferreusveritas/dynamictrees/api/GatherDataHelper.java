@@ -23,21 +23,22 @@ public final class GatherDataHelper {
 
     public static void gatherTagData(final String modId, final GatherDataEvent event) {
         final DataGenerator generator = event.getGenerator();
+        final boolean includeServer = event.includeServer();
 
         final DTBlockTagsProvider blockTagsProvider = new DTBlockTagsProvider(generator, modId, event.getExistingFileHelper());
         final DTItemTagsProvider itemTagsProvider = new DTItemTagsProvider(generator, modId, blockTagsProvider, event.getExistingFileHelper());
 
-        generator.addProvider(blockTagsProvider);
-        generator.addProvider(itemTagsProvider);
+        generator.addProvider(includeServer, blockTagsProvider);
+        generator.addProvider(includeServer, itemTagsProvider);
     }
 
     public static void gatherBlockStateAndModelData(final String modId, final GatherDataEvent event, Registry<?>... registries) {
-        event.getGenerator().addProvider(new DTBlockStateProvider(event.getGenerator(), modId,
+        event.getGenerator().addProvider(event.includeClient(), new DTBlockStateProvider(event.getGenerator(), modId,
                 event.getExistingFileHelper(), Arrays.asList(registries)));
     }
 
     public static void gatherItemModelData(final String modId, final GatherDataEvent event, Registry<?>... registries) {
-        event.getGenerator().addProvider(new DTItemModelProvider(event.getGenerator(), modId,
+        event.getGenerator().addProvider(event.includeClient(), new DTItemModelProvider(event.getGenerator(), modId,
                 event.getExistingFileHelper(), Arrays.asList(registries)));
     }
 

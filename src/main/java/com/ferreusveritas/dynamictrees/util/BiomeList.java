@@ -20,6 +20,7 @@ public final class BiomeList extends LinkedList<Biome> {
 
     public static BiomeList getAll() {
         final BiomeList biomes = new BiomeList();
+        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
         biomes.addAll(ForgeRegistries.BIOMES.getValues());
         return biomes;
     }

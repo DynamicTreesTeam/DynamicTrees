@@ -1,5 +1,5 @@
 {
     "variants": {
-        "": { "model": "block/flower_pot" }
+        "": { "model": "dynamictrees:block/potted_sapling" }
     }
 }

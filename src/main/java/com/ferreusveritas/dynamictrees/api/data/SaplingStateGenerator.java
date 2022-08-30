@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -22,16 +23,13 @@ public class SaplingStateGenerator implements Generator<DTBlockStateProvider, Sp
     @Override
     public void generate(DTBlockStateProvider provider, Species input, Dependencies dependencies) {
         final Optional<ResourceLocation> leavesTextureLocation = dependencies.getOptional(PRIMITIVE_LEAVES)
-                .map(primitiveLeaves -> provider.block(Objects.requireNonNull(primitiveLeaves.getRegistryName())));
-        final ResourceLocation primitiveLogLocation = Objects.requireNonNull(
-                dependencies.get(PRIMITIVE_LOG).getRegistryName()
-        );
+                .map(primitiveLeaves -> provider.block(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(primitiveLeaves))));
+        final ResourceLocation primitiveLogLocation = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LOG)));
 
-        final BlockModelBuilder builder = provider.models().getBuilder(
-                "block/saplings/" + input.getRegistryName().getPath()
-        ).parent(provider.models().getExistingFile(input.getSaplingSmartModelLocation()));
-        input.addSaplingTextures(builder::texture, leavesTextureLocation.orElse(primitiveLogLocation),
-                provider.block(primitiveLogLocation));
+        final BlockModelBuilder builder = provider.models().getBuilder("block/saplings/" + input.getRegistryName().getPath())
+                .parent(provider.models().getExistingFile(input.getSaplingSmartModelLocation()))
+                .renderType("cutout_mipped");
+        input.addSaplingTextures(builder::texture, leavesTextureLocation.orElse(primitiveLogLocation), provider.block(primitiveLogLocation));
         provider.simpleBlock(dependencies.get(SAPLING), builder);
     }
 

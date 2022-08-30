@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
+import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * @author Harley O'Connor
@@ -17,12 +18,12 @@ public class BranchItemModelGenerator implements Generator<DTItemModelProvider, 
     @Override
     public void generate(DTItemModelProvider provider, Family input, Dependencies dependencies) {
         final ItemModelBuilder builder = provider.withExistingParent(
-                String.valueOf(dependencies.get(PRIMITIVE_LOG_ITEM).getRegistryName()),
+                String.valueOf(ForgeRegistries.ITEMS.getKey(dependencies.get(PRIMITIVE_LOG_ITEM))),
                 input.getBranchItemParentLocation()
         );
         input.addBranchTextures(
                 builder::texture,
-                provider.block(dependencies.get(PRIMITIVE_LOG_BLOCK).getRegistryName())
+                provider.block(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LOG_BLOCK)))
         );
     }
 

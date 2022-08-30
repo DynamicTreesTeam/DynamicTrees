@@ -26,7 +26,7 @@ public final class JsonPropertyApplierLists {
             .register("light", Integer.class, (properties, light) -> properties.lightLevel(state -> light))
             .registerIfTrueApplier("tick_randomly", BlockBehaviour.Properties::randomTicks)
             .registerIfTrueApplier("variable_opacity", BlockBehaviour.Properties::dynamicShape)
-            .registerIfTrueApplier("no_drops", BlockBehaviour.Properties::noDrops)
+            .registerIfTrueApplier("no_drops", BlockBehaviour.Properties::noLootTable)
             .registerIfTrueApplier("air", BlockBehaviour.Properties::air)
             .registerIfTrueApplier("requires_tool", BlockBehaviour.Properties::requiresCorrectToolForDrops);
 

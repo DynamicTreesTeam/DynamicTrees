@@ -11,19 +11,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleResource;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -116,62 +115,59 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
     }
 
     @Override
-    public Resource getResource(final ResourceLocation location) throws IOException {
-        final List<Resource> resources = this.getResources(location);
+    public Optional<Resource> getResource(final ResourceLocation location) {
+        final List<Resource> resources = this.getResourceStack(location);
 
-        if (resources.isEmpty()) {
-            throw new FileNotFoundException("Could not find path '" + location + "' in any tree packs.");
-        }
-
-        return resources.get(resources.size() - 1);
+        return resources.isEmpty() ? Optional.empty() : Optional.of(resources.get(resources.size() - 1));
     }
 
     @Override
-    public boolean hasResource(ResourceLocation path) {
-        try {
-            return !this.getResources(path).isEmpty();
-        } catch (IOException e) {
-            return false;
-        }
+    public Resource getResourceOrThrow(ResourceLocation location) throws FileNotFoundException {
+        return getResource(location).orElseThrow(() -> new FileNotFoundException("Could not find path '" + location + "' in any tree packs."));
     }
 
-    private static final Resource NULL_RESOURCE =
-            new SimpleResource(null, null, null, null);
-
     @Override
-    public List<Resource> getResources(ResourceLocation path) throws IOException {
+    public List<Resource> getResourceStack(ResourceLocation path) {
         return this.resourcePacks.stream()
                 .map(resourcePack -> getResource(path, resourcePack))
-                .filter(resourcePack -> resourcePack != NULL_RESOURCE)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private Resource getResource(ResourceLocation path, TreeResourcePack resourcePack) {
-        final InputStream stream;
-
-        try {
-            stream = resourcePack.getResource(path);
-        } catch (final IOException e) {
-            return NULL_RESOURCE;
-        }
-
-        return new SimpleResource(resourcePack.getName(), path, stream, null);
-    }
-
-    private Stream<ResourceLocation> resourceLocationStream(String path, Predicate<String> filter) {
-        return this.resourcePacks.stream()
-                .map(
-                        resourcePack -> resourcePack.getNamespaces().stream()
-                                .map(namespace -> resourcePack.getResources(namespace, path,
-                                        Integer.MAX_VALUE, filter))
-                                .flatMap(Collection::stream)
-                                .collect(CommonCollectors.toLinkedSet())
-                ).flatMap(Collection::stream);
+        return new Resource(resourcePack.getName(), () -> resourcePack.getResource(path));
     }
 
     @Override
-    public Collection<ResourceLocation> listResources(String path, Predicate<String> filter) {
-        return this.resourceLocationStream(path, filter).collect(CommonCollectors.toAlternateLinkedSet());
+    public Map<ResourceLocation, Resource> listResources(String path, Predicate<ResourceLocation> filter) {
+        Map<ResourceLocation, Resource> resources = new TreeMap<>();
+
+        for (TreeResourcePack pack : this.resourcePacks) {
+            for (String namespace : pack.getNamespaces()) {
+                Collection<ResourceLocation> subResources = pack.getResources(namespace, path, filter);
+                for (ResourceLocation location : subResources) {
+                    // TODO Should this throw or doing anything if the key already has an associated value?
+                    resources.computeIfAbsent(location, loc -> getResource(loc, pack));
+                }
+            }
+        }
+
+        return resources;
+    }
+
+    @Override
+    public Map<ResourceLocation, List<Resource>> listResourceStacks(String path, Predicate<ResourceLocation> filter) {
+        Map<ResourceLocation, List<Resource>> resources = new TreeMap<>();
+
+        for (TreeResourcePack pack : this.resourcePacks) {
+            for (String namespace : pack.getNamespaces()) {
+                Collection<ResourceLocation> subResources = pack.getResources(namespace, path, filter);
+                for (ResourceLocation location : subResources) {
+                    resources.computeIfAbsent(location, this::getResourceStack);
+                }
+            }
+        }
+
+        return resources;
     }
 
     @Override

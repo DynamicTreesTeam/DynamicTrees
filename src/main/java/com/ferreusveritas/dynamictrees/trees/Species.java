@@ -45,16 +45,36 @@ import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.*;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.GlobalDropCreators;
+import com.ferreusveritas.dynamictrees.systems.dropcreators.SeedDropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostRotContext;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PreGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.DiseaseNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.InflatorNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.ShrinkerNode;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
-import com.ferreusveritas.dynamictrees.util.*;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
+import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
+import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
+import com.ferreusveritas.dynamictrees.util.Optionals;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
@@ -78,7 +98,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -94,7 +119,18 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -128,12 +164,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public boolean generate(Level worldObj, LevelAccessor world, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+        public boolean generate(Level worldObj, LevelAccessor world, BlockPos pos, Biome biome, RandomSource random, int radius, SafeChunkBounds safeBounds) {
             return false;
         }
 
         @Override
-        public float biomeSuitability(Level world, BlockPos pos) {
+        public float biomeSuitability(Level level, BlockPos pos) {
             return 0.0f;
         }
 
@@ -163,7 +199,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public boolean update(Level world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean rapid) {
+        public boolean update(Level world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean rapid) {
             return false;
         }
     };
@@ -1025,7 +1061,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     //Returns whether or not the bonemealing should cause sapling growth.
-    public boolean canSaplingGrowAfterBoneMeal(Level world, Random rand, BlockPos pos) {
+    public boolean canSaplingGrowAfterBoneMeal(Level world, RandomSource rand, BlockPos pos) {
         return canBoneMealTree() && canSaplingGrow(world, pos);
     }
 
@@ -1282,7 +1318,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
      * is on)
      */
-    public boolean update(Level world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+    public boolean update(Level world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
 
         //Analyze structure to gather all of the endpoints.  They will be useful for this entire update
         List<BlockPos> ends = getEnds(world, treePos, treeBase);
@@ -1453,7 +1489,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
      * is on)
      */
-    public boolean grow(Level world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, Random random, boolean natural) {
+    public boolean grow(Level world, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
 
         float growthRate = (float) (getGrowthRate(world, rootPos) * DTConfigs.TREE_GROWTH_MULTIPLIER.get() * DTConfigs.TREE_GROWTH_FOLDING.get());
         do {
@@ -1542,7 +1578,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param random
      * @return true if the tree became diseased
      */
-    public boolean handleDisease(Level world, TreePart baseTreePart, BlockPos treePos, Random random, int fertility) {
+    public boolean handleDisease(Level world, TreePart baseTreePart, BlockPos treePos, RandomSource random, int fertility) {
         if (fertility == 0 && DTConfigs.DISEASE_CHANCE.get() > random.nextFloat()) {
             baseTreePart.analyse(world.getBlockState(treePos), world, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
             return true;
@@ -1562,17 +1598,17 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * @param world The {@link Level} object.
+     * @param level The {@link Level} object.
      * @param pos
      * @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
      */
-    public float biomeSuitability(Level world, BlockPos pos) {
+    public float biomeSuitability(Level level, BlockPos pos) {
 
-        Holder<Biome> biomeHolder = world.getBiome(pos);
+        Holder<Biome> biomeHolder = level.getBiome(pos);
         Biome biome = biomeHolder.value();
 
         //An override to allow other mods to change the behavior of the suitability for a world location. Such as Terrafirmacraft.
-        BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(world, biome, this, pos);
+        BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(level, biome, this, pos);
         MinecraftForge.EVENT_BUS.post(suitabilityEvent);
         if (suitabilityEvent.isHandled()) {
             return suitabilityEvent.getSuitability();
@@ -1586,7 +1622,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         float suit = defaultSuitability();
 
-        for (TagKey<Biome> t : ForgeRegistries.BIOMES.tags().getReverseTag(biome).get().getTagKeys().toList()) {
+        for (TagKey<Biome> t : biomeHolder.tags().toList()) {
             suit *= envFactors.getOrDefault(t, 1.0f);
         }
 
@@ -1954,7 +1990,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param radius  The radius of the tree generation boundary
      * @return true if tree was generated. false otherwise.
      */
-    public boolean generate(Level worldObj, LevelAccessor world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+    public boolean generate(Level worldObj, LevelAccessor world, BlockPos rootPos, Biome biome, RandomSource random, int radius, SafeChunkBounds safeBounds) {
         final AtomicBoolean fullGen = new AtomicBoolean(false);
         final FullGenerationContext context = new FullGenerationContext(world, rootPos, this, biome, radius, safeBounds);
 
@@ -1966,7 +2002,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return true;
         }
 
-        final Direction facing = CoordUtils.getRandomDir(random);
+        final Direction facing = CoordUtils.getRandomHorizontalDir(random);
         if (!JoCodeRegistry.getCodes(this.getRegistryName()).isEmpty()) {
             final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), radius, random);
             if (code != null) {

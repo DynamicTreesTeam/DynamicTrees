@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Resettable;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
+import com.ferreusveritas.dynamictrees.util.ColorUtil;
 import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
 import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
@@ -28,6 +29,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -48,11 +50,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 /**
  * This class provides a means of holding individual properties for leaves.  This is necessary since leaves can contain
@@ -128,7 +128,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         }
 
         @Override
-        public boolean updateTick(Level worldIn, BlockPos pos, BlockState state, Random rand) {
+        public boolean updateTick(Level worldIn, BlockPos pos, BlockState state, RandomSource rand) {
             return false;
         }
     }.setRegistryName(DTTrees.NULL).setBlockRegistryName(DTTrees.NULL);
@@ -464,7 +464,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     ///////////////////////////////////////////
 
 
-    public boolean updateTick(Level worldIn, BlockPos pos, BlockState state, Random rand) {
+    public boolean updateTick(Level worldIn, BlockPos pos, BlockState state, RandomSource rand) {
         return getDoesAge(false, state);
     }
 
@@ -547,7 +547,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
                     LogManager.getLogger().error("ColorMultiplier resource '{}' could not be found.", code);
                 }
             } else {
-                color = Color.decode(code).getRGB();
+                color = ColorUtil.decodeARGB32(code);
             }
         }
         int c = color;

@@ -1,0 +1,4 @@
+{
+    "parent": "minecraft:block/cocoa_stage0",
+    "render_type": "cutout_mipped"
+}

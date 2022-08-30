@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.util.BlockStates;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -36,7 +37,12 @@ import net.minecraftforge.common.ForgeHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static com.ferreusveritas.dynamictrees.util.ShapeUtils.createFruitShape;
@@ -114,11 +120,11 @@ public class FruitBlock extends Block implements BonemealableBlock {
     }
 
     @Override
-    public void tick(BlockState state, ServerLevel world, BlockPos pos, Random rand) {
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rand) {
         this.doTick(state, world, pos, rand);
     }
 
-    public void doTick(BlockState state, Level world, BlockPos pos, Random rand) {
+    public void doTick(BlockState state, Level world, BlockPos pos, RandomSource rand) {
         if (this.shouldBlockDrop(world, pos, state)) {
             this.dropBlock(world, state, pos);
             return;
@@ -175,7 +181,7 @@ public class FruitBlock extends Block implements BonemealableBlock {
      * @param rand  A random number generator
      * @return MatureFruitAction action to take
      */
-    protected MatureFruitAction matureAction(Level world, BlockPos pos, BlockState state, Random rand) {
+    protected MatureFruitAction matureAction(Level world, BlockPos pos, BlockState state, RandomSource rand) {
         return MatureFruitAction.NOTHING;
     }
 
@@ -240,12 +246,12 @@ public class FruitBlock extends Block implements BonemealableBlock {
     }
 
     @Override
-    public boolean isBonemealSuccess(Level world, Random rand, BlockPos pos, BlockState state) {
+    public boolean isBonemealSuccess(Level world, RandomSource rand, BlockPos pos, BlockState state) {
         return this.canBoneMeal.get();
     }
 
     @Override
-    public void performBonemeal(ServerLevel world, Random rand, BlockPos pos, BlockState state) {
+    public void performBonemeal(ServerLevel world, RandomSource rand, BlockPos pos, BlockState state) {
         final int age = state.getValue(AGE);
         final int newAge = Mth.clamp(age + 1, 0, 3);
         if (newAge != age) {

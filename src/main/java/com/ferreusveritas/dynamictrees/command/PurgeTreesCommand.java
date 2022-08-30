@@ -2,6 +2,7 @@ package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.util.ChunkTreeHelper;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 

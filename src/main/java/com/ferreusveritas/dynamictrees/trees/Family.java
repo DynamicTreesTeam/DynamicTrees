@@ -576,8 +576,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public BlockBehaviour.Properties getDefaultBranchProperties(final Material material, final MaterialColor materialColor) {
-        return BlockBehaviour.Properties.of(material, materialColor).sound(this.getDefaultBranchSoundType())
-                .noDrops().requiresCorrectToolForDrops();
+        return BlockBehaviour.Properties.of(material, materialColor).sound(this.getDefaultBranchSoundType()).noLootTable().requiresCorrectToolForDrops();
     }
 
     private BlockBehaviour.Properties properties;

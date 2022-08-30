@@ -98,7 +98,8 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                 if (!rootyBlockAdded && connectionArray[cutDir.get3DDataValue()] > 0) {
                     BlockPos offsetPos = BlockPos.ZERO.relative(cutDir);
                     float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.MAX_RADIUS)) / 16f;
-                    treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, new ModelConnections(cutDir).setFamily(TreeHelper.getBranch(exState))),
+                    treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null},
+                                    new ModelConnections(cutDir).setFamily(TreeHelper.getBranch(exState)).toModelData()),
                             exState));
                     bottomRingsAdded = true;
                 }
@@ -117,7 +118,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                     if (index == 0 && bottomRingsAdded) {
                         modelConnections.setForceRing(cutDir);
                     }
-                    treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3(relPos.getX(), relPos.getY(), relPos.getZ()), modelConnections),
+                    treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3(relPos.getX(), relPos.getY(), relPos.getZ()), modelConnections.toModelData()),
                             exState));
                 }
 

@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
 import java.util.Collections;
 

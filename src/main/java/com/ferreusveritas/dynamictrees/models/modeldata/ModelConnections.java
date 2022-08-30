@@ -5,20 +5,20 @@ import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.util.Connections;
 import net.minecraft.core.Direction;
 import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.data.ModelProperty;
 
 import javax.annotation.Nullable;
 
 /**
- * Extension of {@link Connections} to implement { IModelData}, so connections can be transferred to the baked
- * model.
+ * Extension of {@link Connections} for storing and transferring model data to baked models.
  */
-public class ModelConnections extends Connections /*implements ModelData */{
+public class ModelConnections extends Connections {
+    public static final ModelProperty<ModelConnections> CONNECTIONS_PROPERTY = new ModelProperty<>();
 
     private Direction ringOnly = null;
     private Family family = Family.NULL_FAMILY;
 
-    public ModelConnections() {
-    }
+    public ModelConnections() {}
 
     public ModelConnections(Connections connections) {
         this.setAllRadii(connections.getAllRadii());
@@ -52,24 +52,6 @@ public class ModelConnections extends Connections /*implements ModelData */{
         return family;
     }
 
-//    @Override
-//    public boolean hasProperty(ModelProperty<?> prop) {
-//        return false;
-//    }
-//
-//    @Nullable
-//    @Override
-//    public <T> T getData(ModelProperty<T> prop) {
-//        return null;
-//    }
-//
-//    @Nullable
-//    @Override
-//    public <T> T setData(ModelProperty<T> prop, T data) {
-//        return null;
-//    }
-
-
     public Direction getRingOnly() {
         return ringOnly;
     }
@@ -78,4 +60,11 @@ public class ModelConnections extends Connections /*implements ModelData */{
         ringOnly = ringSide;
     }
 
+    public ModelData toModelData() {
+        return ModelData.builder().with(CONNECTIONS_PROPERTY, this).build();
+    }
+
+    public ModelData toModelData(ModelData baseData) {
+        return baseData.derive().with(CONNECTIONS_PROPERTY, this).build();
+    }
 }

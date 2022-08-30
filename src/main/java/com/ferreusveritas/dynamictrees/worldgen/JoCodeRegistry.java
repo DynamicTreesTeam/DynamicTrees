@@ -2,9 +2,14 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.trees.Species;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Harley O'Connor
@@ -58,7 +63,7 @@ public final class JoCodeRegistry {
      * @return the randomly selected {@linkplain JoCode}; otherwise {@code null} if there were none to choose from
      */
     @Nullable
-    public static JoCode getRandomCode(ResourceLocation speciesName, int radius, Random random) {
+    public static JoCode getRandomCode(ResourceLocation speciesName, int radius, RandomSource random) {
         final List<JoCode> list = getCodes(speciesName, radius);
 
         if (list.isEmpty()) {

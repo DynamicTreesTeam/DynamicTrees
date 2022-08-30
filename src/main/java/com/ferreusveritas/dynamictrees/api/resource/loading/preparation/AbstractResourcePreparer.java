@@ -2,19 +2,21 @@ package com.ferreusveritas.dynamictrees.api.resource.loading.preparation;
 
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceCollector;
+import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Harley O'Connor
  */
 public abstract class AbstractResourcePreparer<R> implements ResourcePreparer<R> {
 
+    private static final Logger LOGGER = LogUtils.getLogger();
     private final String folderName;
     private final String extension;
     private final int extensionLength;
@@ -29,27 +31,26 @@ public abstract class AbstractResourcePreparer<R> implements ResourcePreparer<R>
 
     @Override
     public ResourceAccessor<R> prepare(ResourceManager resourceManager) {
-        this.readAndPutResources(this.collectResources(resourceManager), resourceManager);
+        this.readAndPutResources(resourceManager, this.collectResources(resourceManager));
         ResourceAccessor<R> accessor = this.resourceCollector.createAccessor();
         this.resourceCollector.clear(); // Refresh collector for future use.
         return accessor;
     }
 
-    protected Collection<ResourceLocation> collectResources(ResourceManager resourceManager) {
-        return resourceManager.listResources(this.folderName, (fileName) -> fileName.endsWith(this.extension));
+    protected Map<ResourceLocation, Resource> collectResources(ResourceManager resourceManager) {
+        return resourceManager.listResources(this.folderName, (fileName) -> fileName.getPath().endsWith(this.extension));
     }
 
-    protected void readAndPutResources(Collection<ResourceLocation> resourceLocations, ResourceManager resourceManager) {
-        resourceLocations.forEach(location -> {
+    protected void readAndPutResources(ResourceManager resourceManager, Map<ResourceLocation, Resource> resourceMap) {
+        resourceMap.forEach((location, resource) -> {
             final ResourceLocation resourceName = this.getResourceName(location);
-            this.tryReadAndPutResource(resourceManager, location, resourceName);
+            this.tryReadAndPutResource(resource, location, resourceName);
         });
     }
 
-    private void tryReadAndPutResource(ResourceManager resourceManager, ResourceLocation location,
-                                       ResourceLocation resourceName) {
+    private void tryReadAndPutResource(Resource resource, ResourceLocation location, ResourceLocation resourceName) {
         try {
-            this.readAndPutResource(resourceManager.getResource(location), resourceName);
+            this.readAndPutResource(resource, resourceName);
         } catch (PreparationException | IOException e) {
             this.logError(location, e);
         }
@@ -59,7 +60,7 @@ public abstract class AbstractResourcePreparer<R> implements ResourcePreparer<R>
             throws PreparationException, IOException;
 
     protected void logError(ResourceLocation location, Exception e) {
-        LogManager.getLogger().error("Could not read file \"" + location + "\" due to exception.", e);
+        LOGGER.error("Could not read file \"{}\" due to exception.", location, e);
     }
 
     protected ResourceLocation getResourceName(ResourceLocation location) {

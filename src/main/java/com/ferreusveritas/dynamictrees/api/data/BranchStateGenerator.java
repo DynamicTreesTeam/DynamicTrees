@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.data.provider.BranchLoaderBuilder;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
 
@@ -20,9 +21,9 @@ public class BranchStateGenerator implements Generator<DTBlockStateProvider, Fam
     public void generate(DTBlockStateProvider provider, Family input, Dependencies dependencies) {
         final BranchBlock branch = dependencies.get(BRANCH);
         final BranchLoaderBuilder builder = provider.models().getBuilder(
-                Objects.requireNonNull(branch.getRegistryName()).getPath()
+                Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(branch)).getPath()
         ).customLoader(branch.getFamily().getBranchLoaderConstructor());
-        input.addBranchTextures(builder::texture, provider.block(dependencies.get(PRIMITIVE_LOG).getRegistryName()));
+        input.addBranchTextures(builder::texture, provider.block(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LOG))));
         provider.simpleBlock(branch, builder.end());
     }
 

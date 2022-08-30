@@ -24,7 +24,6 @@ import javax.annotation.Nullable;
  *
  * @author Harley O'Connor
  */
-@OnlyIn(Dist.CLIENT)
 public class BranchBlockModelLoader implements IGeometryLoader<BranchBlockModelGeometry> {
 
     public static final Logger LOGGER = LogManager.getLogger();

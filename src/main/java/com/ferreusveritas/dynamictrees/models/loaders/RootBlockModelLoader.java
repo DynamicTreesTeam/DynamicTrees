@@ -14,7 +14,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class RootBlockModelLoader extends BranchBlockModelLoader {
 
     @Override
-    public BranchBlockModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelObject) {
+    public BranchBlockModelGeometry read(JsonObject modelObject, JsonDeserializationContext deserializationContext) {
         final JsonObject textures = this.getTexturesObject(modelObject);
         return new RootBlockModelGeometry(this.getBarkResLoc(textures));
     }

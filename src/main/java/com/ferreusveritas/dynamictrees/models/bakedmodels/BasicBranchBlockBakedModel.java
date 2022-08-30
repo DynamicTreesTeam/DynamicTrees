@@ -6,7 +6,12 @@ import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.google.common.collect.Maps;
 import com.mojang.math.Vector3f;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockElement;
+import net.minecraft.client.renderer.block.model.BlockElementFace;
+import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
@@ -16,16 +21,20 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.ModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @OnlyIn(Dist.CLIENT)
@@ -126,9 +135,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-        //todo: might not be right
-//        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrides.EMPTY).particle(icon);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel, ItemOverrides.EMPTY,true).particle(icon);
+        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, icon);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
@@ -162,7 +169,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
 
     @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull ModelData extraData) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull RandomSource rand, @Nonnull ModelData extraData, @Nullable RenderType renderType) {
         if (state == null || side != null) {
             return Collections.emptyList();
         }
@@ -179,9 +186,8 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
         Direction forceRingDir = null;
         final AtomicInteger twigRadius = new AtomicInteger(1);
 
-        extraData.derive().with
-        if (extraData instanceof ModelConnections) {
-            final ModelConnections connectionsData = (ModelConnections) extraData;
+        ModelConnections connectionsData = extraData.get(ModelConnections.CONNECTIONS_PROPERTY);
+        if (connectionsData != null) {
             connections = connectionsData.getAllRadii();
             forceRingDir = connectionsData.getRingOnly();
 
@@ -196,7 +202,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
         }
 
         if (numConnections == 0 && forceRingDir != null) {
-            quadsList.addAll(rings[coreRadius - 1].getQuads(state, forceRingDir, rand, extraData));
+            quadsList.addAll(rings[coreRadius - 1].getQuads(state, forceRingDir, rand, extraData, renderType));
         } else {
             // The source direction is the biggest connection from one of the 6 directions.
             final Direction sourceDir = getSourceDir(coreRadius, connections);
@@ -209,9 +215,9 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
                 // Get quads for core model.
                 if (coreRadius != connections[face.get3DDataValue()]) {
                     if ((coreRingDir == null || coreRingDir != face)) {
-                        quadsList.addAll(cores[coreDir][coreRadius - 1].getQuads(state, face, rand, extraData));
+                        quadsList.addAll(cores[coreDir][coreRadius - 1].getQuads(state, face, rand, extraData, renderType));
                     } else {
-                        quadsList.addAll(rings[coreRadius - 1].getQuads(state, face, rand, extraData));
+                        quadsList.addAll(rings[coreRadius - 1].getQuads(state, face, rand, extraData, renderType));
                     }
                 }
                 // Get quads for sleeves models.
@@ -221,7 +227,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
                         final int connRadius = connections[idx];
                         // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves (which are partly transparent).
                         if (connRadius > 0 && (connRadius == twigRadius.get() || face != connDir)) {
-                            quadsList.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData));
+                            quadsList.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData, renderType));
                         }
                     }
                 }
@@ -239,14 +245,14 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
     @Nonnull
     @Override
     public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData) {
-        final Block block = state.getBlock();
-
-        if (!(block instanceof BranchBlock)) {
-            return new ModelConnections();
+        ModelConnections modelConnections;
+        if (state.getBlock() instanceof BranchBlock branchBlock) {
+            modelConnections = new ModelConnections(branchBlock.getConnectionData(world, pos, state)).setFamily(branchBlock.getFamily());
+        } else {
+            modelConnections = new ModelConnections();
         }
 
-        return new ModelConnections(((BranchBlock) block).getConnectionData(world, pos, state))
-                .setFamily(((BranchBlock) block).getFamily());
+        return modelConnections.toModelData(tileData);
     }
 
     /**
@@ -317,11 +323,6 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
     @Override
     public ItemOverrides getOverrides() {
         return ItemOverrides.EMPTY;
-    }
-
-    @Override
-    public boolean doesHandlePerspectives() {
-        return false;
     }
 
     @Override

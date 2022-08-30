@@ -103,7 +103,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
 
     @Override
     public void fillItemCategory(final CreativeModeTab group, final NonNullList<ItemStack> items) {
-        if (this.allowdedIn(group)) {
+        if (this.allowedIn(group)) {
             for (final DendroPotionType potion : DendroPotionType.values()) {
                 if (potion.isActive()) {
                     items.add(this.applyIndexTag(new ItemStack(this, 1), potion.getIndex()));

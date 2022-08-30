@@ -23,6 +23,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Bee;
@@ -39,7 +40,12 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -59,7 +65,10 @@ import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @SuppressWarnings("deprecation")
 public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable, RayTraceCollision {
@@ -127,7 +136,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random rand) {
+    public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rand) {
         if (rand.nextInt(DTConfigs.TREE_GROWTH_FOLDING.get()) != 0) {
             return;
         }
@@ -155,10 +164,10 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource rand) {
     }
 
-    protected void doTick(Level world, BlockPos pos, BlockState state, Random rand) {
+    protected void doTick(Level world, BlockPos pos, BlockState state, RandomSource rand) {
         if (canTickAt(world, pos) && getProperties(state).updateTick(world, pos, state, rand)) {
             age(world, pos, state, rand, SafeChunkBounds.ANY);
         }
@@ -179,7 +188,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public int age(LevelAccessor world, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
+    public int age(LevelAccessor world, BlockPos pos, BlockState state, RandomSource rand, SafeChunkBounds safeBounds) {
         final LeavesProperties leavesProperties = getProperties(state);
         final int oldHydro = state.getValue(DynamicLeavesBlock.DISTANCE);
 

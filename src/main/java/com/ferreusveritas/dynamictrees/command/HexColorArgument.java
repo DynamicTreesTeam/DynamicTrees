@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.command;
 
+import com.ferreusveritas.dynamictrees.util.ColorUtil;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -8,8 +9,8 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
-import java.awt.*;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
@@ -28,15 +29,12 @@ public final class HexColorArgument implements ArgumentType<Integer> {
     @Override
     public Integer parse(StringReader reader) throws CommandSyntaxException {
         final String in = reader.readString();
-        final int colour;
 
         try {
-            colour = Color.decode((in.startsWith("#") ? "" : "#") + in).getRGB();
+            return ColorUtil.decodeARGB32(in.charAt(0) == '#' ? in : "#" + in);
         } catch (NumberFormatException e) {
             throw COLOR_INVALID.create(in);
         }
-
-        return colour;
     }
 
     @Override

@@ -57,8 +57,7 @@ public class QuadManipulator {
 
         if (stateIn != null) {
             for (Direction dir : sides) {
-                //todo: maybe?
-                outQuads.addAll(modelIn.getQuads(stateIn, dir, rand, modelData, RenderType.cutout()));
+                outQuads.addAll(modelIn.getQuads(stateIn, dir, rand, modelData, null));
             }
         }
 
@@ -127,21 +126,18 @@ public class QuadManipulator {
             float closest = Float.POSITIVE_INFINITY;
             ResourceLocation closestTex = new ResourceLocation("missingno");
             if (model != null) {
-                //todo: check if this is correct
-//                for (ResourceLocation tex : model.getParticleIcon().getName()) {
-                ResourceLocation tex = model.getParticleIcon().getName();
-                    TextureAtlasSprite tas = bakedTextureGetter.apply(tex);
-                    float u = tas.getU(8);
-                    float v = tas.getV(8);
-                    sprites.add(tas);
-                    float du = u - uvs[0];
-                    float dv = v - uvs[1];
-                    float distSq = du * du + dv * dv;
-                    if (distSq < closest) {
-                        closest = distSq;
-                        closestTex = tex;
-                    }
-//                }
+                ResourceLocation tex = model.getParticleIcon(ModelData.EMPTY).getName();
+                TextureAtlasSprite tas = bakedTextureGetter.apply(tex);
+                float u = tas.getU(8);
+                float v = tas.getV(8);
+                sprites.add(tas);
+                float du = u - uvs[0];
+                float dv = v - uvs[1];
+                float distSq = du * du + dv * dv;
+                if (distSq < closest) {
+                    closest = distSq;
+                    closestTex = tex;
+                }
             }
 
             return closestTex;
@@ -152,9 +148,10 @@ public class QuadManipulator {
 
     public static float[] getSpriteUVFromBlockState(BlockState state, Direction side) {
         BakedModel bakedModel = getModelManager().getBlockModelShaper().getBlockModel(state);
-        List<BakedQuad> quads = new ArrayList<BakedQuad>();
-        quads.addAll(bakedModel.getQuads(state, side, null, null,RenderType.cutout()));
-        quads.addAll(bakedModel.getQuads(state, null, null, null,RenderType.cutout()));
+        List<BakedQuad> quads = new ArrayList<>();
+        RandomSource random = RandomSource.create();
+        quads.addAll(bakedModel.getQuads(state, side, random, ModelData.EMPTY, null));
+        quads.addAll(bakedModel.getQuads(state, null, random, ModelData.EMPTY, null));
 
         Optional<BakedQuad> quad = quads.stream().filter(q -> q.getDirection() == side).findFirst();
 

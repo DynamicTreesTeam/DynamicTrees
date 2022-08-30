@@ -1,5 +1,6 @@
 {
     "parent": "block/block",
+    "render_type": "cutout_mipped",
     "textures": {
 		"roots": "dynamictrees:block/roots",
         "roots_bottom": "dynamictrees:block/roots_bottom",

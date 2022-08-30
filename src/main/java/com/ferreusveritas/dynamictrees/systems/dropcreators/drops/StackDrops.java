@@ -3,10 +3,10 @@ package com.ferreusveritas.dynamictrees.systems.dropcreators.drops;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Each item individually attempts to drop with a global rarity. Can drop multiple items, or none.
@@ -61,7 +61,7 @@ public final class StackDrops implements Drops {
     }
 
     @Override
-    public void appendDrops(List<ItemStack> drops, Random random, int fortune) {
+    public void appendDrops(List<ItemStack> drops, RandomSource random, int fortune) {
         final int chance = Drops.getChance(fortune, this.baseChance);
 
         if (this.rarity > 0) {

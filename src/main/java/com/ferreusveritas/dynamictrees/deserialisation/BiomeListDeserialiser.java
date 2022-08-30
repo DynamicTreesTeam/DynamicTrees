@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
     }
 
     private static Set<TagKey<Biome>> getBiomeTypes(Biome biome) {
+        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
         return ForgeRegistries.BIOMES.tags().getReverseTag(biome).get().getTagKeys().collect(Collectors.toSet());
     }
 
@@ -73,9 +75,8 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
     }
 
     private static boolean biomeCategoryMatches(String categoryRegex, Biome biome) {
-//        return biome.getBiomeCategory().toString().toLowerCase().matches(categoryRegex);
-//todo: fix this
-        return ForgeRegistries.BIOMES.tags().getReverseTag(biome).get().containsTag(TagKey.create(ForgeRegistries.Keys.BIOMES,new ResourceLocation(categoryRegex)));
+        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
+        return ForgeRegistries.BIOMES.tags().getReverseTag(biome).get().getTagKeys().anyMatch(tagKey -> tagKey.location().toString().toLowerCase(Locale.ROOT).matches(categoryRegex));
     }
 
 
@@ -103,6 +104,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
     }
 
     private static boolean biomeNameMatches(String nameRegex, Biome biome) {
+        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
         return String.valueOf(ForgeRegistries.BIOMES.getKey(biome)).matches(nameRegex);
     }
 
@@ -135,12 +137,14 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
     }
 
     private static void populateWhitelistForName(BiomeList whitelist, String nameRegex) {
+        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
         ForgeRegistries.BIOMES.getValues().stream()
                 .filter(biome -> biomeNameMatches(nameRegex, biome))
                 .forEach(whitelist::add);
     }
 
     private static void populateBlacklistForName(BiomeList blacklist, String nameRegex) {
+        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
         ForgeRegistries.BIOMES.getValues().stream()
                 .filter(biome -> !biomeNameMatches(nameRegex, biome))
                 .forEach(blacklist::add);
