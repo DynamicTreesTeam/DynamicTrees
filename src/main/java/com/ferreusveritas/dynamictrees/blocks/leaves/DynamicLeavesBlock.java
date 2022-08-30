@@ -83,17 +83,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
     public DynamicLeavesBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(DISTANCE, LeavesProperties.maxHydro).setValue(PERSISTENT, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(DISTANCE, LeavesProperties.maxHydro).setValue(PERSISTENT, false).setValue(WATERLOGGED, false));
     }
 
     @Override
     public boolean isRandomlyTicking(BlockState state) {
         return !state.getValue(PERSISTENT);
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(DISTANCE, PERSISTENT);
     }
 
     public void setProperties(LeavesProperties properties) {

@@ -2189,8 +2189,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     @Override
     public String toLoadDataString() {
         final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
-        return this.getString(Pair.of("seed", this.seed != null ? registryHandler.getRegName(this.seed.get()) : null),
-                Pair.of("sapling", this.saplingBlock != null ? "Block{" + registryHandler.getRegName(this.saplingBlock.get()) + "}" : null));
+        return this.getString(Pair.of("seed", this.seed != null ? ForgeRegistries.ITEMS.getKey(this.seed.get()) : null),
+                Pair.of("sapling", this.saplingBlock != null ? "Block{" + ForgeRegistries.BLOCKS.getKey(this.saplingBlock.get()) + "}" : null));
     }
 
     @Override

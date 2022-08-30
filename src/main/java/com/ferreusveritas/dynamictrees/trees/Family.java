@@ -403,11 +403,13 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     protected Supplier<BranchBlock> setupBranch(final Supplier<BranchBlock> branchBlockSup, final boolean canBeStripped) {
-        BranchBlock branchBlock = branchBlockSup.get();
-        branchBlock.setFamily(this); // Link the branch to the tree.
-        branchBlock.setCanBeStripped(canBeStripped);
-        this.addValidBranches(branchBlock); // Add the branch as a valid branch.
-        return branchBlockSup;
+        return () -> {
+            BranchBlock branchBlock = branchBlockSup.get();
+            branchBlock.setFamily(this); // Link the branch to the tree.
+            branchBlock.setCanBeStripped(canBeStripped);
+            this.addValidBranches(branchBlock); // Add the branch as a valid branch.
+            return branchBlock;
+        };
     }
 
     @SuppressWarnings("unchecked")

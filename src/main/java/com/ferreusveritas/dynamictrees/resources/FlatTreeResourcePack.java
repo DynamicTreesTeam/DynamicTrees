@@ -53,6 +53,11 @@ public class FlatTreeResourcePack extends AbstractPackResources implements TreeR
     }
 
     @Override
+    public boolean hasResource(ResourceLocation location) {
+        return Files.exists(this.getPath(location.getNamespace(), location.getPath()));
+    }
+
+    @Override
     protected boolean hasResource(String resourcePath) {
         // We never use this method, so just return false.
         return false;
@@ -65,14 +70,14 @@ public class FlatTreeResourcePack extends AbstractPackResources implements TreeR
             Path inputPath = root.getFileSystem().getPath(pathIn);
 
             return Files.walk(root)
-                    .map(root::relativize)
+                    .map(path -> root.relativize(path.toAbsolutePath()))
                     .filter(path -> !path.toString().endsWith(".mcmeta") && path.startsWith(inputPath))
                     // It is VERY IMPORTANT that we do not rely on Path.toString as this is inconsistent between operating systems
                     // Join the path names ourselves to force forward slashes #8813
                     .filter(path -> ResourceLocation.isValidPath(Joiner.on('/').join(path))) // Only process valid paths Fixes the case where people put invalid resources in their jar.
                     .map(path -> new ResourceLocation(namespace, Joiner.on('/').join(path)))
                     .filter(filter)
-                    .collect(Collectors.toList());
+                    .collect(CommonCollectors.toAlternateLinkedSet());
         } catch (IOException e) {
             return Collections.emptyList();
         }

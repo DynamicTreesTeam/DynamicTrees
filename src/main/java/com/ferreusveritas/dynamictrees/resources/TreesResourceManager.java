@@ -129,6 +129,7 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
     @Override
     public List<Resource> getResourceStack(ResourceLocation path) {
         return this.resourcePacks.stream()
+                .filter(resourcePack -> resourcePack.hasResource(path))
                 .map(resourcePack -> getResource(path, resourcePack))
                 .toList();
     }
