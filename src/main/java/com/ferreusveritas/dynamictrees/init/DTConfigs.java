@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
@@ -204,17 +205,13 @@ public class DTConfigs {
     }
 
     @SubscribeEvent
-    public static void onLoad(final ModConfigEvent.Loading event) {
-        EventHandlers.configReload();
-        CompatHandler.reloadSeasonManager();
-        BiomeDatabases.populateBlacklistFromConfig();
-    }
-
-    @SubscribeEvent
-    public static void onReload(final ModConfigEvent.Reloading event) {
-        EventHandlers.configReload();
-        CompatHandler.reloadSeasonManager();
-        BiomeDatabases.populateBlacklistFromConfig();
+    public static void onModConfigLoadReload(final ModConfigEvent event) {
+        if (event.getConfig().getType() == ModConfig.Type.COMMON) {
+            // These config options are in the common config so should only be reloaded then
+            EventHandlers.configReload();
+            CompatHandler.reloadSeasonManager();
+            BiomeDatabases.populateBlacklistFromConfig();
+        }
     }
 
 }

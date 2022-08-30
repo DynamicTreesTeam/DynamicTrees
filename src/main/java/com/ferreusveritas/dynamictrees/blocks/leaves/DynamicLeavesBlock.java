@@ -265,7 +265,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
         if (isLeavesPassable() || this.isEntityPassable(context)) {
             return Shapes.empty();
-        } else if (DTConfigs.VANILLA_LEAVES_COLLISION.get()) {
+        } else if (DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.VANILLA_LEAVES_COLLISION.get()) {
             return Shapes.block();
         } else {
             return Shapes.create(new AABB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
@@ -273,7 +273,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     protected boolean isLeavesPassable() {
-        return DTConfigs.IS_LEAVES_PASSABLE.get() || ModList.get().isLoaded(DynamicTrees.PASSABLE_FOLIAGE);
+        return (DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.IS_LEAVES_PASSABLE.get()) || ModList.get().isLoaded(DynamicTrees.PASSABLE_FOLIAGE);
     }
 
     public boolean isEntityPassable(CollisionContext context) {
