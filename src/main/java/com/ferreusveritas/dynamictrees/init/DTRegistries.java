@@ -30,6 +30,8 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
+import com.ferreusveritas.dynamictrees.util.holderset.NameRegexMatchHolderSet;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import com.ferreusveritas.dynamictrees.worldgen.biomemodifiers.AddDynamicTreesBiomeModifier;
 import com.ferreusveritas.dynamictrees.worldgen.biomemodifiers.RunFeatureCancellersBiomeModifier;
@@ -68,6 +70,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.holdersets.HolderSetType;
 
 import java.util.List;
 import java.util.Optional;
@@ -92,6 +95,7 @@ public class DTRegistries {
     public static final DeferredRegister<PlacedFeature> PLACED_FEATURES = DeferredRegister.create(Registry.PLACED_FEATURE_REGISTRY, DynamicTrees.MOD_ID);
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, DynamicTrees.MOD_ID);
     public static final DeferredRegister<Codec<? extends BiomeModifier>> BIOME_MODIFIER_SERIALIZERS = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<HolderSetType> HOLDER_SET_TYPES = DeferredRegister.create(ForgeRegistries.Keys.HOLDER_SET_TYPES, DynamicTrees.MOD_ID);
 
     ///////////////////////////////////////////
     // BLOCKS
@@ -125,6 +129,7 @@ public class DTRegistries {
         PLACED_FEATURES.register(modBus);
         FEATURES.register(modBus);
         BIOME_MODIFIER_SERIALIZERS.register(modBus);
+        HOLDER_SET_TYPES.register(modBus);
 
         setupBlocks();
         setupConnectables();
@@ -162,7 +167,7 @@ public class DTRegistries {
 
     @SubscribeEvent
     public static void onBlocksRegistry(final RegisterEvent event) {
-        event.register(ForgeRegistries.Keys.BLOCKS,(a)->{
+        event.register(ForgeRegistries.Keys.BLOCKS, registerHelper -> {
             final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
             if (appleOak.isValid()) {
                 APPLE_FRUIT.get().setSpecies(appleOak);
@@ -256,6 +261,10 @@ public class DTRegistries {
             () -> Codec.unit(AddDynamicTreesBiomeModifier::new));
     public static final RegistryObject<Codec<RunFeatureCancellersBiomeModifier>> RUN_FEATURE_CANCELLERS_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("run_feature_cancellers",
             () -> Codec.unit(RunFeatureCancellersBiomeModifier::new));
+
+    public static final RegistryObject<HolderSetType> INCLUDES_EXCLUDES_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("includes_excludes", () -> IncludesExcludesHolderSet::codec);
+    public static final RegistryObject<HolderSetType> NAME_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("name_regex_match", () -> NameRegexMatchHolderSet::codec);
+    public static final RegistryObject<HolderSetType> TAGS_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("tags_regex_match", () -> NameRegexMatchHolderSet::codec);
 
     public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.resLoc("tree"), TreeConfiguration.class);
 

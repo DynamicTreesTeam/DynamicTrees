@@ -2,7 +2,11 @@ package com.ferreusveritas.dynamictrees.trees;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.data.*;
+import com.ferreusveritas.dynamictrees.api.data.BranchItemModelGenerator;
+import com.ferreusveritas.dynamictrees.api.data.BranchStateGenerator;
+import com.ferreusveritas.dynamictrees.api.data.Generator;
+import com.ferreusveritas.dynamictrees.api.data.StrippedBranchStateGenerator;
+import com.ferreusveritas.dynamictrees.api.data.SurfaceRootStateGenerator;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
@@ -36,7 +40,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
@@ -60,7 +68,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -246,7 +260,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // SPECIES LOCATION OVERRIDES
     ///////////////////////////////////////////
 
-//
     public Species getSpeciesForLocation(LevelAccessor world, BlockPos trunkPos) {
         return this.getSpeciesForLocation(world, trunkPos, this.commonSpecies);
     }
@@ -307,9 +320,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     public boolean canStripBranch(BlockState state, Level world, BlockPos pos, Player player, ItemStack heldItem) {
         BranchBlock branchBlock = TreeHelper.getBranch(state);
-		if (branchBlock == null) {
-			return false;
-		}
+        if (branchBlock == null) {
+            return false;
+        }
         return branchBlock.canBeStripped(state, world, pos, player, heldItem);
     }
 
@@ -322,10 +335,10 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
                     WailaOther.invalidateWailaPosition();
                 }
             });
-			return this.getBranch().isPresent();
-		} else {
-			return false;
-		}
+            return this.getBranch().isPresent();
+        } else {
+            return false;
+        }
     }
 
 
@@ -365,9 +378,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      */
     protected BranchBlock createBranchBlock() {
         final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(this.getProperties()) : new BasicBranchBlock(this.getProperties());
-		if (this.isFireProof()) {
-			branch.setFireSpreadSpeed(0).setFlammability(0);
-		}
+        if (this.isFireProof()) {
+            branch.setFireSpreadSpeed(0).setFlammability(0);
+        }
         return branch;
     }
 
@@ -385,7 +398,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * Creates and registers a {@link BlockItem} for the given branch with the given registry name.
      *
      * @param registryName The {@link ResourceLocation} registry name for the item.
-     * @param branchSup    A supplier for the {@link BranchBlock} to create the {@link BlockItem} for.
+     * @param branchSup A supplier for the {@link BranchBlock} to create the {@link BlockItem} for.
      * @return A supplier for the {@link BlockItem}.
      */
     public Supplier<BlockItem> createBranchItem(final ResourceLocation registryName, final Supplier<BranchBlock> branchSup) {
@@ -421,13 +434,15 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public Optional<BranchBlock> getBranch() {
         return Optionals.ofBlock(this.branch);
     }
+
     /**
      * Version of getBranch() used by jocodes to generate the tree.
      * By default it acts just like getBranch() but it can be overriden
      * by addons to customize the branch selected by the jocode
-     * @param world     The world the tree is generating in
-     * @param species   The species of the tree generated
-     * @param pos       The position of the branch block
+     *
+     * @param world The world the tree is generating in
+     * @param species The species of the tree generated
+     * @param pos The position of the branch block
      * @return branch block picked
      */
     public Optional<BranchBlock> getBranchForPlacement(LevelAccessor world, Species species, BlockPos pos) {
@@ -499,9 +514,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public Family setPrimitiveLog(Block primitiveLog) {
         this.primitiveLog = primitiveLog;
 
-		if (this.branch != null) {
-			this.branch.get().setPrimitiveLogDrops(new ItemStack(primitiveLog));
-		}
+        if (this.branch != null) {
+            this.branch.get().setPrimitiveLogDrops(new ItemStack(primitiveLog));
+        }
 
         return this;
     }
@@ -509,9 +524,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public Family setPrimitiveStrippedLog(Block primitiveStrippedLog) {
         this.primitiveStrippedLog = primitiveStrippedLog;
 
-		if (this.strippedBranch != null) {
-			this.strippedBranch.get().setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
-		}
+        if (this.strippedBranch != null) {
+            this.strippedBranch.get().setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
+        }
 
         return this;
     }
@@ -672,7 +687,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     //Useful for addons
-    public boolean isValidBranchBlock (BranchBlock block){
+    public boolean isValidBranchBlock(BranchBlock block) {
         return this.validBranches.contains(block);
     }
 

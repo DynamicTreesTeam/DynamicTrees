@@ -2,7 +2,7 @@
     "name": "Biochar Base Potion",
     "icon": "dynamictrees:dendro_potion",
     "category": "dynamictrees:potions",
-	"sortnum": "1",
+	"sortnum": 1,
   "pages": [
 	{
       "type": "brewing",

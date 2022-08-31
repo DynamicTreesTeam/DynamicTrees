@@ -102,8 +102,6 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     /**
      * Adds a {@link Block} to be registered with the given registry name, for the namespace of that registry name.
-     * { Block#setRegistryName(ResourceLocation)} will be called by us on the correct registry event to prevent
-     * Forge from complaining - so it shouldn't have been called on the block already!
      *
      * @param registryName The {@link ResourceLocation} registry name to set for the block.
      * @param blockSup The supplier of the {@link Block} object to register.
@@ -117,8 +115,6 @@ public class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     /**
      * Adds an {@link Item} to be registered with the given registry name, for the namespace of that registry name.
-     * { Item#setRegistryName(ResourceLocation)} will be called by us on the correct registry event to prevent
-     * Forge from complaining - so it shouldn't have been called on the block already!
      *
      * @param registryName The {@link ResourceLocation} registry name to set for the block.
      * @param itemSup The supplier of the {@link Item} object to register.

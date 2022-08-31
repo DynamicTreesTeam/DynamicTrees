@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase.Entry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.LevelAccessor;
@@ -98,7 +99,7 @@ public class TreeGenerator {
         circle.add(8, 8); // Move the circle into the "stage".
         // TODO: De-couple ground finder from biomes, now that they can vary based on height.
         BlockPos pos = new BlockPos(circle.x, world.getMaxBuildHeight(), circle.z);
-        final Entry entry = biomeDataBase.getEntry(world.getBiome(pos).value());
+        final Entry entry = biomeDataBase.getEntry(world.getBiome(pos));
         for (BlockPos groundPos : entry.getGroundFinder().findGround(world, pos)) {
             makeTree(world, entry, circle, groundPos, safeBounds);
         }
@@ -107,7 +108,7 @@ public class TreeGenerator {
 
     public GeneratorResult makeTree(WorldGenLevel world, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {
 
-        final Biome biome = world.getBiome(groundPos).value();
+        final Holder<Biome> biome = world.getBiome(groundPos);
 
         if (biomeEntry.isBlacklisted()) {
             return GeneratorResult.UNHANDLED_BIOME;

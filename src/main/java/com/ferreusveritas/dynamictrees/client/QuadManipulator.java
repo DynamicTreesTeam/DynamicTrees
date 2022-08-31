@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.client;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -12,7 +11,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -29,11 +27,11 @@ public class QuadManipulator {
     public static final Direction[] everyFace = {Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null};
 
     public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, ModelData modelData) {
-        return getQuads(modelIn, stateIn, Vec3.ZERO, everyFace, new LegacyRandomSource(0), modelData);
+        return getQuads(modelIn, stateIn, Vec3.ZERO, everyFace, RandomSource.create(), modelData);
     }
 
     public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, Direction[] sides, ModelData modelData) {
-        return getQuads(modelIn, stateIn, Vec3.ZERO, sides, new LegacyRandomSource(0), modelData);
+        return getQuads(modelIn, stateIn, Vec3.ZERO, sides, RandomSource.create(), modelData);
     }
 
     public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, RandomSource rand, ModelData modelData) {
@@ -45,11 +43,11 @@ public class QuadManipulator {
     }
 
     public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, Vec3 offset, ModelData modelData) {
-        return getQuads(modelIn, stateIn, offset, everyFace, new LegacyRandomSource(0), modelData);
+        return getQuads(modelIn, stateIn, offset, everyFace, RandomSource.create(), modelData);
     }
 
     public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, Vec3 offset, Direction[] sides, ModelData modelData) {
-        return getQuads(modelIn, stateIn, offset, sides, new LegacyRandomSource(0), modelData);
+        return getQuads(modelIn, stateIn, offset, sides, RandomSource.create(), modelData);
     }
 
     public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, Vec3 offset, Direction[] sides, RandomSource rand, ModelData modelData) {

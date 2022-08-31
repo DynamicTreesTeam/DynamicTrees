@@ -10,7 +10,7 @@
   },
   {
     "__comment": "Cancel standard tree features from the overworld.",
-    "select": { "name": "minecraft.*", "type": "overworld" },
+    "select": { "name": "minecraft:.*", "tag": "#minecraft:is_overworld" },
     "cancellers": {
       "type": "tree",
       "namespace": "minecraft"
@@ -25,7 +25,7 @@
   },
   {
     "__comment" : "Default for a Forest which generates a Birch Tree 1/5 of the time.",
-    "select": { "type": "forest", "name": "minecraft:.*" },
+    "select": { "name": "minecraft:.*", "tag": "#minecraft:is_forest" },
     "apply": {
       "species" : {
         "random" : {
@@ -46,21 +46,21 @@
   },
   {
     "__comment" : "Anything cold will have spruce trees",
-    "select": { "type": "cold",	"name": "minecraft:.*" },
+    "select": { "name": "minecraft:.*", "tag": "#forge:is_cold" },
     "apply": {
       "species" : "spruce"
     }
   },
   {
     "__comment" : "Any wasteland will be treeless",
-    "select": { "type": "wasteland", "name": "minecraft:.*" },
+    "select": { "name": "minecraft:.*", "tag": "#forge:is_wasteland" },
     "apply": {
       "species" : "..."
     }
   },
   {
     "__comment" : "Generates an alternative oak style in swamps",
-    "select": { "type": "swamp", "name": "minecraft:.*" },
+    "select": { "name": "minecraft:.*", "tag": "#forge:is_swamp" },
     "apply": {
       "species" : "swamp_oak",
       "density": [ 0.2 ],
@@ -68,20 +68,20 @@
     }
   },
   {
-    "select": { "type": "savanna", "name": "minecraft:.*" },
+    "select": { "name": "minecraft:.*", "tag": "#minecraft:is_savanna" },
     "apply": {
       "species" : "acacia",
       "density": [ 0.1 ]
     }
   },
   {
-    "select": { "name": "minecraft:windswept_savanna.*" },
+    "select": { "name": "minecraft:windswept_savanna" },
     "apply": {
       "density": [ 0.2 ]
     }
   },
   {
-    "select": { "type": "jungle", "name": "minecraft:.*" },
+    "select": { "name": "minecraft:.*", "tag": "#minecraft:is_jungle" },
     "apply": {
       "species" : {
         "random" : {
@@ -94,7 +94,7 @@
     }
   },
   {
-    "select": { "name": "minecraft:.*sparse_jungle" },
+    "select": { "name": "minecraft:sparse_jungle" },
     "apply": {
       "density": [ 0.2 ],
       "chance": 0.5
@@ -102,7 +102,7 @@
   },
   {
     "__comment" : "Mushroom Islands",
-    "select": { "type": "mushroom",	"name": "minecraft:.*" },
+    "select": { "name": "minecraft:.*", "tag": "#forge:is_mushroom" },
     "apply": {
       "species" : {
         "random" : {
@@ -118,7 +118,7 @@
     }
   },
   {
-    "select": { "type": "coniferous", "name": "minecraft:.*" },
+    "select": { "name": "minecraft:.*", "tag": "#forge:coniferous" },
     "apply": {
       "species" : "spruce",
       "density": [ 1 ],
@@ -127,7 +127,7 @@
   },
   {
     "__comment" : "Roofed forests are handled specially. Multipass tries to close canopy as much as possible",
-    "select": { "type": "spooky", "name": "minecraft:.*" },
+    "select": { "name": "minecraft:.*", "tags": [ "#forge:is_spooky", "#minecraft:is_forest" ] },
     "apply": {
       "species" : "dark_oak",
       "density" : { "math": { "div" : [ "noise", 3.0 ] } },
@@ -135,7 +135,7 @@
     }
   },
   {
-    "select": { "name": "minecraft:.*beach.*" },
+    "select": { "name": "minecraft:.*", "tag": "#minecraft:is_beach" },
     "apply": {
       "chance": 0.0
     }
@@ -148,15 +148,15 @@
     }
   },
   {
-    "__comment": "Any biome with 'tall_birch' in the name is 100% tall birch",
+    "__comment": "Any biome with 'old_growth_birch_forest' (previously named 'tall_birch') in the name is 100% tall birch",
     "select": { "name": "minecraft:.*old_growth_birch_forest.*" },
     "apply": {
       "species" : "tall_birch"
     }
   },
   {
-    "__comment": "1/25 chance to spawn apple trees in any minecraft biome that ends in 'plains'",
-    "select": { "name": "minecraft:.*plains" },
+    "__comment": "1/25 chance to spawn apple trees in any minecraft biome in the #forge:is_plains tag",
+    "select": { "name": "minecraft:.*", "tag": "#forge:is_plains" },
     "apply": {
       "species" : {
         "random" : {
@@ -211,7 +211,7 @@
   },
   {
     "__comment": "Flag nether as being subterranean.",
-    "select": { "name": "minecraft:.*", "type": "nether" },
+    "select": { "name": "minecraft:.*", "tag": "#minecraft:is_nether" },
     "apply": {
       "subterranean": true,
       "chance": 0.4
@@ -229,7 +229,7 @@
   },
   {
     "__comment": "Cancel huge fungus features from namespace 'minecraft' in the nether forests.",
-    "select": { "name": "minecraft:.*forest", "type": "nether" },
+    "select": { "name": "minecraft:.*forest", "tag": "#minecraft:is_nether" },
     "cancellers": {
       "type": "fungus",
       "namespace": "minecraft"

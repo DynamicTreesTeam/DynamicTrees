@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/dirt",
+  "render_type": "minecraft:cutout_mipped"
+}

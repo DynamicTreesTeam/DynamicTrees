@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/mycelium",
+  "render_type": "minecraft:cutout_mipped"
+}

@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/sand"
+        "model": "dynamictrees:block/rooty_sand"
       }
     },
     {

@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/mycelium"
+        "model": "dynamictrees:block/rooty_mycelium"
       }
     },
     {

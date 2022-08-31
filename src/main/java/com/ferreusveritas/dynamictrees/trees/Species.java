@@ -75,6 +75,7 @@ import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
@@ -164,7 +165,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public boolean generate(Level worldObj, LevelAccessor world, BlockPos pos, Biome biome, RandomSource random, int radius, SafeChunkBounds safeBounds) {
+        public boolean generate(Level worldObj, LevelAccessor world, BlockPos pos, Holder<Biome> biome, RandomSource random, int radius, SafeChunkBounds safeBounds) {
             return false;
         }
 
@@ -307,7 +308,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     protected Map<TagKey<Biome>, Float> envFactors = new HashMap<>();//Environmental factors
 
-    protected List<Biome> perfectBiomes = new ArrayList<>();
+    protected IncludesExcludesHolderSet<Biome> perfectBiomes = IncludesExcludesHolderSet.emptyAnds();
 
     protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
 
@@ -363,7 +364,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.dropCreators.clear();
         this.acceptableBlocksForGrowth.clear();
         this.primitiveSaplingRecipe.clear();
-        this.perfectBiomes.clear();
+        this.perfectBiomes.getIncludeComponents().clear();
+        this.perfectBiomes.getExcludeComponents().clear();
 
         this.clearAcceptableSoils();
 
@@ -1616,7 +1618,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         float ugs = (float) (double) DTConfigs.SCALE_BIOME_GROWTH_RATE.get(); // Universal growth scalar.
 
-        if (ugs == 1.0f || this.isBiomePerfect(biome)) {
+        if (ugs == 1.0f || this.isBiomePerfect(biomeHolder)) {
             return 1.0f;
         }
 
@@ -1636,11 +1638,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Used to determine if the provided {@link Biome} argument will yield unhindered growth to Maximum potential. This
      * has the affect of the suitability being 100%(or 1.0f)
      *
-     * @param biome The biome being tested
-     * @return True if biome is "perfect" false otherwise.
+     * @param biomeHolder The biome holder being tested
+     * @return True if biome is "perfect", false otherwise.
      */
-    public boolean isBiomePerfect(final Biome biome) {
-        return this.perfectBiomes.contains(biome);
+    public boolean isBiomePerfect(final Holder<Biome> biomeHolder) {
+        return this.perfectBiomes.contains(biomeHolder);
     }
 
     /**
@@ -1654,8 +1656,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return false;
     }
 
-    public List<Biome> getPerfectBiomes() {
-        return perfectBiomes;
+    public IncludesExcludesHolderSet<Biome> getPerfectBiomes() {
+        return this.perfectBiomes;
     }
 
     /**
@@ -1990,7 +1992,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param radius  The radius of the tree generation boundary
      * @return true if tree was generated. false otherwise.
      */
-    public boolean generate(Level worldObj, LevelAccessor world, BlockPos rootPos, Biome biome, RandomSource random, int radius, SafeChunkBounds safeBounds) {
+    public boolean generate(Level worldObj, LevelAccessor world, BlockPos rootPos, Holder<Biome> biome, RandomSource random, int radius, SafeChunkBounds safeBounds) {
         final AtomicBoolean fullGen = new AtomicBoolean(false);
         final FullGenerationContext context = new FullGenerationContext(world, rootPos, this, biome, radius, safeBounds);
 

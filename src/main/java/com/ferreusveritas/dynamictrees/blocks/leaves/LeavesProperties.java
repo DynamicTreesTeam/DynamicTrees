@@ -380,13 +380,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     /**
-     * @deprecated use {@link #shouldAge(boolean, BlockState)}
-     */
-    public boolean getDoesAge(boolean worldGen, BlockState state) {
-        return shouldAge(worldGen, state);
-    }
-
-    /**
      * If the leaves block should tick and age. May return {@code false} to allow for dead leaves.
      *
      * @param worldGen {@code true} if called during world gen
@@ -465,7 +458,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 
     public boolean updateTick(Level worldIn, BlockPos pos, BlockState state, RandomSource rand) {
-        return getDoesAge(false, state);
+        return shouldAge(false, state);
     }
 
     public int getRadiusForConnection(BlockState state, BlockGetter blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {

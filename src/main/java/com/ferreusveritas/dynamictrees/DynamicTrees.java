@@ -29,8 +29,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod(DynamicTrees.MOD_ID)
 public final class DynamicTrees {
 
-
-
     public static final String MOD_ID = "dynamictrees";
     public static final String NAME = "Dynamic Trees";
 

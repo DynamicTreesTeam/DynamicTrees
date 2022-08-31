@@ -17,7 +17,7 @@ public final class Hooks {
     }
 
     public static void onAddFeatureCancellers() {
-        ModLoader.get().postEvent(new AddFeatureCancellersEvent(getDefault()));
+        // ModLoader.get().postEvent(new AddFeatureCancellersEvent(getDefault()));
     }
 
     public static void onPopulateDefaultDatabase() {

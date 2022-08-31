@@ -1,59 +1,64 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.*;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Chance;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.ChanceSelector;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.DensitySelector;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelector;
 import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 
 public class BiomeDatabase {
 
-    public static final Entry BAD_ENTRY = new Entry() {
-        @Override
-        public void setChanceSelector(ChanceSelector chanceSelector) {
-        }
-
-        @Override
-        public void setDensitySelector(DensitySelector densitySelector) {
-        }
-
-        @Override
-        public void setSpeciesSelector(SpeciesSelector speciesSelector) {
-        }
-
-        @Override
-        public void setSubterranean(boolean is) {
-        }
-    };
-
+    private final Map<IncludesExcludesHolderSet<Biome>, Entry> jsonEntries = new LinkedHashMap<>();
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
 
-    public Entry getEntry(@Nullable Biome biome) {
-        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
-        ResourceLocation key = ForgeRegistries.BIOMES.getKey(biome);
-        if (biome == null || key == null) {
-			return BAD_ENTRY;
-		}
+    public Entry getJsonEntry(IncludesExcludesHolderSet<Biome> biomes) {
+        return this.jsonEntries.computeIfAbsent(biomes, k -> new Entry(this, null, null));
+    }
 
-        return this.entries.computeIfAbsent(key, k -> new Entry(this, biome));
+    public Entry getEntry(Holder<Biome> biomeHolder) {
+        ResourceKey<Biome> biomeKey = biomeHolder.unwrapKey().orElseThrow();
+        ResourceLocation biomeRegistryName = biomeKey.location();
+
+        if (this.entries.containsKey(biomeRegistryName))
+            return this.entries.get(biomeRegistryName);
+
+        Entry entry = new Entry(this, biomeKey, biomeHolder.value());
+        this.entries.put(biomeRegistryName, entry);
+
+        for (Map.Entry<IncludesExcludesHolderSet<Biome>, Entry> jsonEntry : this.jsonEntries.entrySet()) {
+            if (jsonEntry.getKey().contains(biomeHolder)) {
+                // Copy any data explicitly set from json
+                entry.copyFrom(jsonEntry.getValue());
+            }
+        }
+
+        // Finally, initialize any defaults that were not already set
+        entry.initializeDefaults();
+
+        return entry;
     }
 
     public Entry getEntry(ResourceLocation biomeResLoc) {
-        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
-        return this.getEntry(ForgeRegistries.BIOMES.getValue(biomeResLoc));
+        return this.entries.get(biomeResLoc);
     }
 
     public Collection<Entry> getAllEntries() {
@@ -62,8 +67,6 @@ public class BiomeDatabase {
 
     /**
      * Resets all entries in the database.
-     *
-     * @implNote does not reset cancellers, since they are only applied once on initial load
      */
     public void reset() {
         this.entries.values().forEach(Entry::reset);
@@ -73,50 +76,87 @@ public class BiomeDatabase {
         this.entries.clear();
     }
 
-    public boolean isValid() {
-        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
-        for (var registryEntry : ForgeRegistries.BIOMES.getEntries()) {
-            final Entry entry = this.getEntry(registryEntry.getValue());
-            final ResourceLocation biomeRegistryName = ForgeRegistries.BIOMES.getKey(entry.getBiome());
-
-            if (biomeRegistryName != null && !biomeRegistryName.equals(registryEntry.getKey().location())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    // public boolean isValid() {
+    //     for (var registryEntry : ForgeRegistries.BIOMES.getEntries()) {
+    //         final Entry entry = this.getEntry(registryEntry.getValue());
+    //         final ResourceLocation biomeRegistryName = ForgeRegistries.BIOMES.getKey(entry.getBiome());
+    //
+    //         if (biomeRegistryName != null && !biomeRegistryName.equals(registryEntry.getKey().location())) {
+    //             return false;
+    //         }
+    //     }
+    //
+    //     return true;
+    // }
 
     public boolean isPopulated() {
-        return this.entries.size() > 0;
+        return !this.entries.isEmpty();
     }
 
     public static class Entry {
         private final BiomeDatabase database;
+        private final ResourceKey<Biome> biomeKey;
         private final Biome biome;
-        private ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
-        private DensitySelector densitySelector = (rnd, nd) -> -1;
-        private SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
-        private final FeatureCancellations featureCancellations = new FeatureCancellations();
-        private boolean blacklisted = false;
-        private boolean subterranean = false;
-        private float forestness = 0.0f;
-        private final static Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
-        private Function<Integer, Integer> multipass = defaultMultipass;
-        private GroundFinder groundFinder = GroundFinder.OVERWORLD;
+        private ChanceSelector chanceSelector;
+        private DensitySelector densitySelector;
+        private SpeciesSelector speciesSelector;
+        private Boolean blacklisted;
+        private Boolean subterranean;
+        private Float forestness;
+        private static final IntUnaryOperator defaultMultipass = pass -> (pass == 0 ? 0 : -1);
+        private IntUnaryOperator multipass;
+        private GroundFinder groundFinder;
 
-        public Entry() {
-            this.database = null;
-            this.biome = ForgeRegistries.BIOMES.getValue(Biomes.OCEAN.location());
+        public Entry(final BiomeDatabase database, final ResourceKey<Biome> biomeKey, final Biome biome) {
+            this.database = database;
+            this.biomeKey = biomeKey;
+            this.biome = biome;
         }
 
-        public Entry(final BiomeDatabase database, final Biome biome) {
-            this.database = database;
-            this.biome = biome;
+        public void initializeDefaults() {
+            if (this.chanceSelector == null)
+                this.chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
+            if (this.densitySelector == null)
+                this.densitySelector = (rnd, nd) -> -1;
+            if (this.speciesSelector == null)
+                this.speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
+            if (this.blacklisted == null)
+                this.blacklisted = false;
+            if (this.subterranean == null)
+                this.subterranean = false;
+            if (this.forestness == null)
+                this.forestness = 0.0f;
+            if (this.multipass == null)
+                this.multipass = defaultMultipass;
+            if (this.groundFinder == null)
+                this.groundFinder = GroundFinder.OVERWORLD;
+        }
+
+        public void copyFrom(Entry entry) {
+            if (entry.chanceSelector != null)
+                this.chanceSelector = entry.chanceSelector;
+            if (entry.densitySelector != null)
+                this.densitySelector = entry.densitySelector;
+            if (entry.speciesSelector != null)
+                this.speciesSelector = entry.speciesSelector;
+            if (entry.blacklisted != null)
+                this.blacklisted = entry.blacklisted;
+            if (entry.subterranean != null)
+                this.subterranean = entry.subterranean;
+            if (entry.forestness != null)
+                this.forestness = entry.forestness;
+            if (entry.multipass != null)
+                this.multipass = entry.multipass;
+            if (entry.groundFinder != null)
+                this.groundFinder = entry.groundFinder;
         }
 
         public BiomeDatabase getDatabase() {
             return database;
+        }
+
+        public ResourceKey<Biome> getBiomeKey() {
+            return biomeKey;
         }
 
         public Biome getBiome() {
@@ -147,10 +187,6 @@ public class BiomeDatabase {
             this.speciesSelector = speciesSelector;
         }
 
-        public FeatureCancellations getFeatureCancellations() {
-            return featureCancellations;
-        }
-
         public void setBlacklisted(boolean blacklisted) {
             this.blacklisted = blacklisted;
         }
@@ -176,11 +212,11 @@ public class BiomeDatabase {
             return forestness;
         }
 
-        public void setMultipass(Function<Integer, Integer> multipass) {
+        public void setMultipass(IntUnaryOperator multipass) {
             this.multipass = multipass;
         }
 
-        public Function<Integer, Integer> getMultipass() {
+        public IntUnaryOperator getMultipass() {
             return multipass;
         }
 
@@ -234,9 +270,9 @@ public class BiomeDatabase {
         }
 
         public void reset() {
-            this.speciesSelector = (pos, dirt, rnd) -> new BiomePropertySelectors.SpeciesSelection();
-            this.densitySelector = (rnd, nd) -> -1;
             this.chanceSelector = (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
+            this.densitySelector = (rnd, nd) -> -1;
+            this.speciesSelector = (pos, dirt, rnd) -> new BiomePropertySelectors.SpeciesSelection();
             this.forestness = 0.0F;
             this.blacklisted = false;
             this.subterranean = false;
@@ -245,32 +281,31 @@ public class BiomeDatabase {
 
     }
 
-    public SpeciesSelector getSpecies(Biome biome) {
+    public SpeciesSelector getSpecies(Holder<Biome> biome) {
         return getEntry(biome).speciesSelector;
     }
 
-    public ChanceSelector getChance(Biome biome) {
+    public ChanceSelector getChance(Holder<Biome> biome) {
         return getEntry(biome).chanceSelector;
     }
 
-    public DensitySelector getDensitySelector(Biome biome) {
+    public DensitySelector getDensitySelector(Holder<Biome> biome) {
         return getEntry(biome).densitySelector;
     }
 
-    public float getForestness(Biome biome) {
+    public float getForestness(Holder<Biome> biome) {
         return getEntry(biome).getForestness();
     }
 
-    public Function<Integer, Integer> getMultipass(Biome biome) {
+    public IntUnaryOperator getMultipass(Holder<Biome> biome) {
         return getEntry(biome).getMultipass();
     }
 
-    public BiomeDatabase setSpeciesSelector(final Biome biome, @Nullable final SpeciesSelector selector, final Operation op) {
-		if (selector == null) {
-			return this;
-		}
+    public BiomeDatabase setSpeciesSelector(final Entry entry, @Nullable final SpeciesSelector selector, final Operation op) {
+        if (selector == null) {
+            return this;
+        }
 
-        final Entry entry = getEntry(biome);
         final SpeciesSelector existing = entry.getSpeciesSelector();
 
         switch (op) {
@@ -294,12 +329,11 @@ public class BiomeDatabase {
         return this;
     }
 
-    public BiomeDatabase setChanceSelector(final Biome biome, @Nullable final ChanceSelector selector, final Operation op) {
-		if (selector == null) {
-			return this;
-		}
+    public BiomeDatabase setChanceSelector(final Entry entry, @Nullable final ChanceSelector selector, final Operation op) {
+        if (selector == null) {
+            return this;
+        }
 
-        final Entry entry = getEntry(biome);
         final ChanceSelector existing = entry.getChanceSelector();
 
         switch (op) {
@@ -323,12 +357,11 @@ public class BiomeDatabase {
         return this;
     }
 
-    public BiomeDatabase setDensitySelector(final Biome biome, @Nullable final DensitySelector selector, final Operation op) {
-		if (selector == null) {
-			return this;
-		}
+    public BiomeDatabase setDensitySelector(final Entry entry, @Nullable final DensitySelector selector, final Operation op) {
+        if (selector == null) {
+            return this;
+        }
 
-        final Entry entry = getEntry(biome);
         final DensitySelector existing = entry.getDensitySelector();
 
         switch (op) {
@@ -352,17 +385,17 @@ public class BiomeDatabase {
         return this;
     }
 
-    public BiomeDatabase setIsSubterranean(Biome biome, boolean is) {
+    public BiomeDatabase setIsSubterranean(Holder<Biome> biome, boolean is) {
         getEntry(biome).setSubterranean(is);
         return this;
     }
 
-    public BiomeDatabase setForestness(Biome biome, float forestness) {
+    public BiomeDatabase setForestness(Holder<Biome> biome, float forestness) {
         getEntry(biome).setForestness((float) Math.max(forestness, DTConfigs.SEED_MIN_FORESTNESS.get()));
         return this;
     }
 
-    public BiomeDatabase setMultipass(Biome biome, Function<Integer, Integer> multipass) {
+    public BiomeDatabase setMultipass(Holder<Biome> biome, IntUnaryOperator multipass) {
         getEntry(biome).setMultipass(multipass);
         return this;
     }

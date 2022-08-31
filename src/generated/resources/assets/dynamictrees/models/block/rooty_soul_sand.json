@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/soul_sand",
+  "render_type": "minecraft:cutout_mipped"
+}

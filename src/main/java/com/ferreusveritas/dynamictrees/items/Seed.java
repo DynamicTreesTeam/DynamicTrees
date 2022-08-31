@@ -40,7 +40,7 @@ public class Seed extends Item implements IPlantable {
 
     public Seed() {
         super(new Item.Properties());
-        // TODO: Set null name? -SizableShrimp
+        // TODO: Set null name? Is this still used? -SizableShrimp
         // this.setRegistryName("null");
         this.species = Species.NULL_SPECIES;
     }
@@ -87,7 +87,7 @@ public class Seed extends Item implements IPlantable {
             String joCode = getCode(seedStack);
             if (!joCode.isEmpty()) {
                 world.removeBlock(pos, false); // Remove the newly created dynamic sapling
-                species.getJoCode(joCode).setCareful(true).generate(world, world, species, pos.below(), world.getBiome(pos).value(), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY, false);
+                species.getJoCode(joCode).setCareful(true).generate(world, world, species, pos.below(), world.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY, false);
             }
             return true;
         }
@@ -108,7 +108,7 @@ public class Seed extends Item implements IPlantable {
 
         if (DTConfigs.SEED_ONLY_FOREST.get()) {
             plantChance *= BiomeDatabases.getDimensionalOrDefault(world.dimension().location())
-                    .getForestness(world.getBiome(pos).value());
+                    .getForestness(world.getBiome(pos));
         }
 
         float accum = 1.0f;

@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/soul_soil"
+        "model": "dynamictrees:block/rooty_soul_soil"
       }
     },
     {

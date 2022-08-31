@@ -42,9 +42,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
@@ -99,10 +99,10 @@ public class DTClient {
     @OnlyIn(Dist.CLIENT)
     private static int getFaceColor(BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
         final BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-        List<BakedQuad> quads = model.getQuads(state, face, Minecraft.getInstance().level.random);
+        List<BakedQuad> quads = model.getQuads(state, face, RandomSource.create(), ModelData.EMPTY, null);
         if (quads.isEmpty()) // If the quad list is empty, means there is no face on that side, so we try with null.
         {
-            quads = model.getQuads(state, null, Minecraft.getInstance().level.random);
+            quads = model.getQuads(state, null, RandomSource.create(), ModelData.EMPTY, null);
         }
         if (quads.isEmpty()) { // If null still returns empty, there is nothing we can do so we just warn and exit.
             LogManager.getLogger().warn("Could not get color of " + face + " side for " + state.getBlock() + "! Branch needs to be handled manually!");

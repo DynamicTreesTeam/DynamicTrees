@@ -77,14 +77,13 @@ public class BeeNestGenFeature extends GenFeature {
         }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
             // Default biome check chance function. Uses vanilla chances
             Holder<Biome> biomeHolder = world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2);
-            ResourceKey<Biome> biomeKey = biomeHolder.unwrapKey().orElseThrow();
-            if (biomeKey == Biomes.MEADOW)
+            if (biomeHolder.is(Biomes.MEADOW))
                 return MEADOWS_CHANCE;
 
             if (biomeHolder.is(Tags.Biomes.IS_PLAINS))
                 return PLAINS_CHANCE;
 
-            if (biomeKey == Biomes.FLOWER_FOREST)
+            if (biomeHolder.is(Biomes.FLOWER_FOREST))
                 return FLOWER_FOREST_CHANCE;
 
             return biomeHolder.is(BiomeTags.IS_FOREST) ? FOREST_CHANCE : 0;

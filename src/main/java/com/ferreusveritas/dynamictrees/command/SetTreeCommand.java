@@ -54,7 +54,7 @@ public final class SetTreeCommand extends SubCommand {
 
         sendSuccessAndLog(source, Component.translatable("commands.dynamictrees.success.set_tree", CommandHelper.posComponent(rootPos),
                 species.getTextComponent(), joCode.getTextComponent()));
-        joCode.generate(world, world, species, rootPos, source.getLevel().getBiome(rootPos).value(),
+        joCode.generate(world, world, species, rootPos, source.getLevel().getBiome(rootPos),
                 Direction.SOUTH, 8, SafeChunkBounds.ANY, false);
 
         // Try to set the fertility.

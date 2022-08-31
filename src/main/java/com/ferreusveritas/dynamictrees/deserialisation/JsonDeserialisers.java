@@ -24,8 +24,8 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfigurati
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
+import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.ChanceSelectorDeserialiser;
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.DensitySelectorDeserialiser;
@@ -55,7 +55,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -95,7 +94,7 @@ public final class JsonDeserialisers {
      * Gets the {@link JsonDeserialiser} for the given class type.
      *
      * @param type The {@link Class} of the object to get.
-     * @param <T>  The type of the object.
+     * @param <T> The type of the object.
      * @return The {@link JsonDeserialiser} for the class, or {@link #NULL} if it wasn't found.
      */
     @SuppressWarnings("unchecked")
@@ -124,12 +123,12 @@ public final class JsonDeserialisers {
     /**
      * Registers an {@link JsonDeserialiser} to the registry.
      *
-     * @param outputClass  The {@link Class} of the object that will be obtained.
+     * @param outputClass The {@link Class} of the object that will be obtained.
      * @param deserialiser The {@link JsonDeserialiser} to register.
-     * @param <T>          The type of the object getter.
+     * @param <T> The type of the object getter.
      * @return The {@link JsonDeserialiser} given.
      */
-    public static <T> JsonDeserialiser register(final Class<T> outputClass, final JsonDeserialiser<T> deserialiser) {
+    public static <T> JsonDeserialiser<T> register(final Class<T> outputClass, final JsonDeserialiser<T> deserialiser) {
         DESERIALISERS.put(outputClass, deserialiser);
         return deserialiser;
     }
@@ -206,7 +205,7 @@ public final class JsonDeserialisers {
 
     public static JsonDeserialiser<Block> BLOCK;
     public static JsonDeserialiser<Item> ITEM;
-    public static JsonDeserialiser<Biome> BIOME;
+    // public static JsonDeserialiser<Biome> BIOME;
 
     // TODO: Read json object for quantity and NBT.
     public static JsonDeserialiser<ItemStack> ITEM_STACK = register(ItemStack.class,
@@ -275,14 +274,11 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<GenerationStep.Decoration> DECORATION_STAGE =
             register(GenerationStep.Decoration.class, new EnumDeserialiser<>(GenerationStep.Decoration.class));
 
-    public static final JsonDeserialiser<BiomeList> BIOME_LIST = register(BiomeList.class, new BiomeListDeserialiser());
+    public static final JsonDeserialiser<IncludesExcludesHolderSet<Biome>> BIOME_LIST = register(IncludesExcludesHolderSet.getCastedClass(),
+            new BiomeListDeserialiser());
     public static final JsonDeserialiser<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
             BIOME_LIST.deserialise(jsonElement).map(biomeList ->
-                    biome -> biomeList.stream().anyMatch(currentBiome -> Objects.equals(
-                            // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
-                            ForgeRegistries.BIOMES.getKey(currentBiome),
-                            ForgeRegistries.BIOMES.getKey(biome)
-                    ))
+                    biome -> biomeList.stream().anyMatch(currentBiomeHolder -> currentBiomeHolder.equals(biome) || biome.unwrapKey().map(currentBiomeHolder::is).orElse(false))
             ));
 
     public static final JsonDeserialiser<BiomePropertySelectors.SpeciesSelector> SPECIES_SELECTOR = register(
@@ -303,11 +299,11 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<SoundType> SOUND_TYPE =
             register(SoundType.class, new SoundTypeDeserialiser());
 
-//    private static final Map<String, ToolType> TOOL_TYPES =
-//            ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");
-//
-//    public static final JsonDeserialiser<ToolType> TOOL_TYPE = register(ToolType.class, jsonElement ->
-//            STRING.deserialise(jsonElement).map(TOOL_TYPES::get, "Could not get tool type from \"{}\"."));
+    // private static final Map<String, ToolType> TOOL_TYPES =
+    //         ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");
+    //
+    // public static final JsonDeserialiser<ToolType> TOOL_TYPE = register(ToolType.class, jsonElement ->
+    //         STRING.deserialise(jsonElement).map(TOOL_TYPES::get, "Could not get tool type from \"{}\"."));
 
     public static final JsonDeserialiser<Class<?>> DESERIALISABLE_CLASS = new DeserialisableClassDeserialiser();
 
@@ -320,10 +316,11 @@ public final class JsonDeserialisers {
      */
     public static void registerForgeEntryGetters() {
         BLOCK = register(Block.class,
-                new ForgeRegistryEntryDeserialiser(ForgeRegistries.BLOCKS, "block", Blocks.AIR));
-        ITEM = register(Item.class, new ForgeRegistryEntryDeserialiser(ForgeRegistries.ITEMS, "item", Items.AIR));
-        // TODO: ForgeRegistries.BIOMES does not contain any biomes declared in datapacks. But we don't have a world yet. Anything we can do? -SizableShrimp
-        BIOME = register(Biome.class, new ForgeRegistryEntryDeserialiser(ForgeRegistries.BIOMES, "biome"));
+                new ForgeRegistryEntryDeserialiser<>(ForgeRegistries.BLOCKS, "block", Blocks.AIR));
+        ITEM = register(Item.class, new ForgeRegistryEntryDeserialiser<>(ForgeRegistries.ITEMS, "item", Items.AIR));
+        // ForgeRegistries.BIOMES does not contain any biomes declared in datapacks.
+        // This is best switched to delayed holder sets, and it looks like this isn't used much anywhere.
+        // BIOME = register(Biome.class, new ForgeRegistryEntryDeserialiser<>(ForgeRegistries.BIOMES, "biome"));
     }
 
     public static void postRegistryEvent() {

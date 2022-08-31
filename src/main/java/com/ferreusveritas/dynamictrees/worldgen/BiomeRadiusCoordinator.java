@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.RadiusCoordinator;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
@@ -10,7 +11,7 @@ import net.minecraft.world.level.levelgen.synth.PerlinSimplexNoise;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 
 public class BiomeRadiusCoordinator implements RadiusCoordinator {
 
@@ -19,7 +20,7 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
     protected final LevelAccessor world;
     protected final ResourceLocation dimRegName;
     protected int pass;
-    protected Function<Integer, Integer> chunkMultipass;
+    protected IntUnaryOperator chunkMultipass;
 
     public BiomeRadiusCoordinator(TreeGenerator treeGenerator, ResourceLocation dimRegName, LevelAccessor world) {
         this.noiseGenerator = new PerlinSimplexNoise(new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(96)), new ArrayList<>(Collections.singletonList(1)));
@@ -30,13 +31,13 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
 
     @Override
     public int getRadiusAtCoords(int x, int z) {
-        int rad = this.chunkMultipass.apply(pass);
+        int rad = this.chunkMultipass.applyAsInt(pass);
         if (rad >= 2 && rad <= 8) {
             return rad;
         }
 
         final double scale = 128; // Effectively scales up the noisemap
-        final Biome biome = this.world.getUncachedNoiseBiome((x + 8) >> 2, world.getMaxBuildHeight() >> 2, (z + 8) >> 2).value(); // Placement is offset by +8,+8
+        final Holder<Biome> biome = this.world.getUncachedNoiseBiome((x + 8) >> 2, world.getMaxBuildHeight() >> 2, (z + 8) >> 2); // Placement is offset by +8,+8
 
         final double noiseDensity = (this.noiseGenerator.getValue(x / scale, z / scale, false) + 1D) / 2.0D; // Gives 0.0 to 1.0
         final double density = BiomeDatabases.getDimensionalOrDefault(this.dimRegName)
@@ -57,11 +58,11 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
         this.pass = pass;
 
         if (pass == 0) {
-            final Biome biome = this.world.getUncachedNoiseBiome(((chunkX << 4) + 8) >> 2, world.getMaxBuildHeight() >> 2, ((chunkZ << 4) + 8) >> 2).value(); // Aim at center of chunk
+            final Holder<Biome> biome = this.world.getUncachedNoiseBiome(((chunkX << 4) + 8) >> 2, world.getMaxBuildHeight() >> 2, ((chunkZ << 4) + 8) >> 2); // Aim at center of chunk
             this.chunkMultipass = BiomeDatabases.getDimensionalOrDefault(this.dimRegName).getMultipass(biome);
         }
 
-        return this.chunkMultipass.apply(pass) >= 0;
+        return this.chunkMultipass.applyAsInt(pass) >= 0;
     }
 
 }

@@ -2,7 +2,7 @@
     "name": "Potion of Depletion",
     "icon": "dynamictrees:dendro_potion{potion_index:1}",
     "category": "dynamictrees:potions",
-	"sortnum": "2",
+	"sortnum": 2,
   "pages": [
 	{
       "type": "brewing",

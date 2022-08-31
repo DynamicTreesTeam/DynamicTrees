@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/netherrack"
+        "model": "dynamictrees:block/rooty_netherrack"
       }
     },
     {

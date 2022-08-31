@@ -19,10 +19,12 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
@@ -34,13 +36,9 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
         this.basePotModel = basePotModel;
     }
 
+    @NotNull
     @Override
-    public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand) {
-        return IDynamicBakedModel.super.getQuads(state, side, rand);
-    }
-
-    @Override
-    public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData, RenderType renderType) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData, @Nullable RenderType renderType) {
         List<BakedQuad> quads = new ArrayList<>();
 
         if (side != null || state == null || !extraData.has(PottedSaplingTileEntity.SPECIES) || !extraData.has(PottedSaplingTileEntity.POT_MIMIC)) {

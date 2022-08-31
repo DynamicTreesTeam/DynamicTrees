@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/dirt"
+        "model": "dynamictrees:block/rooty_dirt"
       }
     },
     {

@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/sand",
+  "render_type": "minecraft:cutout_mipped"
+}

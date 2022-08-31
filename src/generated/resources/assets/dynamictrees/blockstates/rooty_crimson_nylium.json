@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/crimson_nylium"
+        "model": "dynamictrees:block/rooty_crimson_nylium"
       }
     },
     {

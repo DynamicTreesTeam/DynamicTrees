@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
@@ -18,11 +19,20 @@ public class SoilStateGenerator implements Generator<DTBlockStateProvider, SoilP
 
     @Override
     public void generate(DTBlockStateProvider provider, SoilProperties input, Dependencies dependencies) {
-        provider.getMultipartBuilder(dependencies.get(SOIL))
-                .part().modelFile(provider.models().getExistingFile(
-                        provider.block(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_SOIL))))
-                )).addModel().end()
-                .part().modelFile(provider.models().getExistingFile(input.getRootsOverlayLocation())).addModel().end();
+        RootyBlock soilBlock = dependencies.get(SOIL);
+        BlockModelBuilder soilModelBuilder = provider.models().getBuilder(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(soilBlock)).getPath())
+                .parent(provider.models().getExistingFile(provider.block(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_SOIL))))))
+                .renderType("cutout_mipped");
+
+        provider.getMultipartBuilder(soilBlock)
+                .part()
+                .modelFile(soilModelBuilder)
+                .addModel()
+                .end()
+                .part()
+                .modelFile(provider.models().getExistingFile(input.getRootsOverlayLocation()))
+                .addModel()
+                .end();
     }
 
     @Override

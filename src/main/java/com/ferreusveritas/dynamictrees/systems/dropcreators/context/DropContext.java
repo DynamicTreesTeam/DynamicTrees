@@ -38,7 +38,7 @@ public class DropContext {
 
     public DropContext(@Nullable Level world, BlockPos pos, Species species, List<ItemStack> dropList, ItemStack tool, int fertility, int fortune) {
         this.world = world;
-        this.random = world == null ? new LegacyRandomSource(0) : world.random;
+        this.random = world == null ? RandomSource.create() : world.random;
         this.pos = pos;
         this.species = species;
         this.dropList = dropList;

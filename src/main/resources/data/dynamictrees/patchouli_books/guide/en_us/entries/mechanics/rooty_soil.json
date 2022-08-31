@@ -3,7 +3,7 @@
     "read_by_default": "true",
     "icon": "minecraft:grass_block",
     "category": "dynamictrees:mechanics",
-	"sortnum": "2",
+	"sortnum": 2,
   "pages": [
 	{
       "type": "text",

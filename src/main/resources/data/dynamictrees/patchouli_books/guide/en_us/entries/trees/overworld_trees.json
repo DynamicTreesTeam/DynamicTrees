@@ -2,7 +2,7 @@
   "name": "Overworld Trees",
   "icon": "dynamictrees:birch_seed",
   "category": "dynamictrees:trees",
-  "sortnum": "2",
+  "sortnum": 2,
   "pages": [
 	{
       "type": "text",

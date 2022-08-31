@@ -3,7 +3,7 @@
     "read_by_default": "true",
     "icon": "dynamictrees:dirt_bucket",
     "category": "dynamictrees:mechanics",
-	"sortnum": "3",
+	"sortnum": 3,
   "pages": [
 	{
       "type": "spotlight",

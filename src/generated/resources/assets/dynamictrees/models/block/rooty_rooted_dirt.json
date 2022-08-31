@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/rooted_dirt",
+  "render_type": "minecraft:cutout_mipped"
+}

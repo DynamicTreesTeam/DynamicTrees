@@ -41,7 +41,7 @@ public final class DTJeiPlugin implements IModPlugin {
         DendroPotion.brewingRecipes.forEach(recipe ->
                 brewingRecipes.add(makeJeiBrewingRecipe(factory, recipe.getInput(), recipe.getIngredient(), recipe.getOutput())));
 
-        registration.addRecipes(RecipeTypes.BREWING,brewingRecipes );
+        registration.addRecipes(RecipeTypes.BREWING, brewingRecipes);
     }
 
     private static IJeiBrewingRecipe makeJeiBrewingRecipe(IVanillaRecipeFactory factory, final ItemStack inputStack, final ItemStack ingredientStack, ItemStack output) {

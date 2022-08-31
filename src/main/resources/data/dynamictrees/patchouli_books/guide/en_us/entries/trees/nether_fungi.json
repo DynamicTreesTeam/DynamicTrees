@@ -2,7 +2,7 @@
   "name": "Nether Fungi",
   "icon": "dynamictrees:crimson_seed",
   "category": "dynamictrees:trees",
-  "sortnum": "4",
+  "sortnum": 4,
   "pages": [
 	{
       "type": "text",

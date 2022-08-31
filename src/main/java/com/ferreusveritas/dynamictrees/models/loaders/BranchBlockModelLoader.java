@@ -8,8 +8,6 @@ import com.google.gson.JsonParseException;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.geometry.IGeometryLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,10 +29,6 @@ public class BranchBlockModelLoader implements IGeometryLoader<BranchBlockModelG
     private static final String TEXTURES = "textures";
     private static final String BARK = "bark";
     private static final String RINGS = "rings";
-
-//    @Override
-//    public void onResourceManagerReload(ResourceManager resourceManager) {
-//    }
 
     @Override
     public BranchBlockModelGeometry read(JsonObject modelObject, JsonDeserializationContext deserializationContext) throws JsonParseException {
@@ -110,16 +104,16 @@ public class BranchBlockModelLoader implements IGeometryLoader<BranchBlockModelG
     }
 
     /**
-     * Gets the { IModelGeometry} object from the given bark and rings texture locations. Can be overridden by
-     * sub-classes to provide their custom { IModelGeometry}.
+     * Gets the {@link BranchBlockModelGeometry} object from the given bark and rings texture locations.
+     * Can be overridden by subclasses to provide their custom {@link BranchBlockModelGeometry}.
      *
-     * @param barkResLoc  The {@link ResourceLocation} object for the bark.
+     * @param barkResLoc The {@link ResourceLocation} object for the bark.
      * @param ringsResLoc The {@link ResourceLocation} object for the rings.
-     * @return The { IModelGeometry} object.
+     * @return The {@link BranchBlockModelGeometry} object.
      */
     protected BranchBlockModelGeometry getModelGeometry(final ResourceLocation barkResLoc,
-                                                        final ResourceLocation ringsResLoc,
-                                                        @Nullable final ResourceLocation familyResLoc) {
+            final ResourceLocation ringsResLoc,
+            @Nullable final ResourceLocation familyResLoc) {
         return new BranchBlockModelGeometry(barkResLoc, ringsResLoc, familyResLoc, false);
     }
 

@@ -16,9 +16,9 @@ import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
+import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
 import com.google.gson.JsonObject;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -65,7 +65,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         JsonDeserialisers.register(Species.CommonOverride.class, input ->
                 JsonDeserialisers.BIOME_PREDICATE.deserialise(input)
                         .map(biomePredicate -> (world, pos) -> world instanceof LevelReader &&
-                                biomePredicate.test(((LevelReader) world).getBiome(pos).value()))
+                                biomePredicate.test(((LevelReader) world).getBiome(pos)))
         );
 
         this.loadAppliers
@@ -108,7 +108,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("primitive_sapling", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .registerArrayApplier("primitive_saplings", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .register("common_override", Species.CommonOverride.class, Species::setCommonOverride)
-                .register("perfect_biomes", BiomeList.class, (species, biomeList) -> species.getPerfectBiomes().addAll(biomeList))
+                .register("perfect_biomes", IncludesExcludesHolderSet.<Biome>getCastedClass(),
+                        (species, biomeList) -> species.getPerfectBiomes().getIncludeComponents().add(biomeList))
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (Applier<Species, String>) this::addAcceptableSoil)

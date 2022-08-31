@@ -116,7 +116,7 @@ public class DTTrees {
 
     @SubscribeEvent
     public static void onRegisterBlocks(RegisterEvent event) {
-        event.register(ForgeRegistries.Keys.BLOCKS,(a)->{
+        event.register(ForgeRegistries.Keys.BLOCKS, registerHelper -> {
             // Register any registry entries from Json files.
             Resources.MANAGER.load();
 
@@ -125,7 +125,6 @@ public class DTTrees {
                     .filter(registry -> registry instanceof SimpleRegistry)
                     .forEach(Registry::lock);
         });
-
     }
 
     public static void replaceNyliumFungiFeatures() {

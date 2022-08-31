@@ -19,11 +19,10 @@ public class VanillaSaplingEventHandler {
     public void onPlayerPlaceBlock(BlockEvent.EntityPlaceEvent event) {
         final BlockState state = event.getPlacedBlock();
 
-        if (!(event.getLevel() instanceof Level) || !TreeRegistry.SAPLING_REPLACERS.containsKey(state)) {
+        if (!(event.getLevel() instanceof Level world) || !TreeRegistry.SAPLING_REPLACERS.containsKey(state)) {
             return;
         }
 
-        final Level world = (Level) event.getLevel();
         final BlockPos pos = event.getPos();
         final Species targetSpecies = TreeRegistry.SAPLING_REPLACERS.get(state);
 

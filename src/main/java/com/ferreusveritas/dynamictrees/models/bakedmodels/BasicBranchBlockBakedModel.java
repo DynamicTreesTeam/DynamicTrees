@@ -111,8 +111,7 @@ public class BasicBranchBlockBakedModel extends BranchBlockBakedModel {
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-//        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel.customData, ItemOverrides.EMPTY,true).particle(bark);
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(this.blockModel, ItemOverrides.EMPTY,true).particle(bark);
+        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, bark);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();

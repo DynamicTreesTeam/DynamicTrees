@@ -2,7 +2,7 @@
   "name": "Apple Trees",
   "icon": "dynamictrees:apple_oak_seed",
   "category": "dynamictrees:trees",
-  "sortnum": "3",
+  "sortnum": 3,
   "pages": [
 	{
       "type": "text",

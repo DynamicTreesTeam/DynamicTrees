@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/moss_block",
+  "render_type": "minecraft:cutout_mipped"
+}

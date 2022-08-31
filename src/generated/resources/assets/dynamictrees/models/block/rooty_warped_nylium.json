@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/warped_nylium",
+  "render_type": "minecraft:cutout_mipped"
+}

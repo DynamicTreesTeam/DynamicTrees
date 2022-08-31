@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/gravel"
+        "model": "dynamictrees:block/rooty_gravel"
       }
     },
     {

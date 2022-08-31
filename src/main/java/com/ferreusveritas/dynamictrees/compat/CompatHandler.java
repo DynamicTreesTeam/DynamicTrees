@@ -1,7 +1,12 @@
 package com.ferreusveritas.dynamictrees.compat;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.compat.seasons.*;
+import com.ferreusveritas.dynamictrees.compat.seasons.ActiveSeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.compat.seasons.NormalSeasonManager;
+import com.ferreusveritas.dynamictrees.compat.seasons.NullSeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.compat.seasons.NullSeasonProvider;
+import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
+import com.ferreusveritas.dynamictrees.compat.seasons.SereneSeasonsSeasonProvider;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
 import net.minecraft.util.Tuple;
@@ -29,7 +34,7 @@ public final class CompatHandler {
      * <p>The season manager to use is then selected by {@link DTConfigs#PREFERRED_SEASON_MOD}
      * on config reload.</p>
      *
-     * @param modId    The mod ID the season manager handles.
+     * @param modId The mod ID the season manager handles.
      * @param supplier The {@link NormalSeasonManager} supplier.
      */
     public static void registerSeasonManager(final String modId, Supplier<NormalSeasonManager> supplier) {
@@ -46,7 +51,7 @@ public final class CompatHandler {
             seasonManager.setTropicalPredicate((world, pos) -> BiomeConfig.usesTropicalSeasons(world.getBiome(pos)));
             return seasonManager;
         });
-        
+
     }
 
     public static final String DISABLED = "!";

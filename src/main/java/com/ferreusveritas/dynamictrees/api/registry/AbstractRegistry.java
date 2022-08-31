@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.registries.ForgeRegistry;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -27,6 +28,7 @@ import java.util.stream.Stream;
  */
 public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Registry<V> {
 
+    protected static final Logger LOGGER = LogManager.getLogger();
     protected static final Marker REGISTRY_DUMP = MarkerManager.getMarker("REGISTRY_DUMP");
     protected static final Comparator<String> STRING_COMPARATOR = Comparator.naturalOrder();
 
@@ -277,12 +279,14 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
      */
     @Override
     public final void dump() {
+        if (!LOGGER.isDebugEnabled(REGISTRY_DUMP))
+            return;
 
         StringBuilder builder = new StringBuilder();
         this.getAll().stream().sorted(this.comparator).forEach(entry -> builder.append("\tEntry: ")
                 .append(entry.getRegistryName()).append(", ").append(entry).append('\n'));
         builder.append("Name: ").append(this.name).append('\n');
-        LogManager.getLogger().debug(REGISTRY_DUMP, builder.toString());
+        LOGGER.debug(REGISTRY_DUMP, builder.toString());
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -161,7 +162,7 @@ public class JoCode {
      * @param radius            The radius constraint.
      * @param secondChanceRegen Ensures second chance regen doesn't recurse too far.
      */
-    public void generate(Level worldObj, LevelAccessor world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
+    public void generate(Level worldObj, LevelAccessor world, Species species, BlockPos rootPosIn, Holder<Biome> biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
         final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
         // A Tree generation boundary radius is at least 2 and at most 8.
@@ -253,7 +254,7 @@ public class JoCode {
         this.addSnow(leafMap, world, rootPos, biome);
     }
 
-    private void tryGenerateAgain(Level worldObj, LevelAccessor world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder, boolean secondChanceRegen) {
+    private void tryGenerateAgain(Level worldObj, LevelAccessor world, Species species, BlockPos rootPosIn, Holder<Biome> biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder, boolean secondChanceRegen) {
         // Don't log the error if it didn't happen during world gen (so we don't fill the logs if players spam the staff in cramped positions).
         if (worldGen) {
             if (!secondChanceRegen) {
@@ -456,8 +457,8 @@ public class JoCode {
         return true;
     }
 
-    protected void addSnow(SimpleVoxmap leafMap, LevelAccessor world, BlockPos rootPos, Biome biome) {
-        if (biome.getBaseTemperature() >= 0.4f) {
+    protected void addSnow(SimpleVoxmap leafMap, LevelAccessor world, BlockPos rootPos, Holder<Biome> biome) {
+        if (biome.value().getBaseTemperature() >= 0.4f) {
             return;
         }
 

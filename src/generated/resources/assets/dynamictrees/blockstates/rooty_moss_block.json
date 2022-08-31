@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/moss_block"
+        "model": "dynamictrees:block/rooty_moss_block"
       }
     },
     {

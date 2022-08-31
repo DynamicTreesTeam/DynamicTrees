@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/terracotta"
+        "model": "dynamictrees:block/rooty_terracotta"
       }
     },
     {

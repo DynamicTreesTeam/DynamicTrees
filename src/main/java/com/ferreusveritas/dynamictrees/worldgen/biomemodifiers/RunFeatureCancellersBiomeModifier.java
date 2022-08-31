@@ -5,11 +5,11 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
+import com.ferreusveritas.dynamictrees.worldgen.FeatureCancellationRegistry;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
@@ -27,13 +27,23 @@ public class RunFeatureCancellersBiomeModifier implements BiomeModifier {
         if (phase == Phase.REMOVE && DTConfigs.WORLD_GEN.get()) {
             BiomeGenerationSettingsBuilder generationSettings = builder.getGenerationSettings();
 
-            final ResourceLocation biomeName = biome.unwrapKey().map(ResourceKey::location).orElse(null);
+            BiomePropertySelectors.FeatureCancellations featureCancellations = new BiomePropertySelectors.FeatureCancellations();
 
-            if (biomeName == null) {
-                return;
+            for (FeatureCancellationRegistry.Entry entry : FeatureCancellationRegistry.getCancellations()) {
+                if (entry.biomes().contains(biome)) {
+                    if (entry.operation() == BiomeDatabase.Operation.REPLACE)
+                        featureCancellations.reset();
+                    featureCancellations.addAllFrom(entry.cancellations());
+                }
             }
 
-            final BiomePropertySelectors.FeatureCancellations featureCancellations = BiomeDatabases.getDefault().getEntry(biomeName).getFeatureCancellations();
+            // final ResourceLocation biomeName = biome.unwrapKey().map(ResourceKey::location).orElse(null);
+            //
+            // if (biomeName == null) {
+            //     return;
+            // }
+            //
+            // final BiomePropertySelectors.FeatureCancellations featureCancellations = BiomeDatabases.getDefault().getEntry(biomeName).getFeatureCancellations();
 
             featureCancellations.getStages().forEach(stage -> generationSettings.getFeatures(stage).removeIf(placedFeatureHolder -> {
                 // If you want a placed feature to be entirely excluded from cancellation by any feature cancellers,

@@ -31,7 +31,7 @@ public final class HexColorArgument implements ArgumentType<Integer> {
         final String in = reader.readString();
 
         try {
-            return ColorUtil.decodeARGB32(in.charAt(0) == '#' ? in : "#" + in);
+            return ColorUtil.decodeARGB32('#' + in);
         } catch (NumberFormatException e) {
             throw COLOR_INVALID.create(in);
         }

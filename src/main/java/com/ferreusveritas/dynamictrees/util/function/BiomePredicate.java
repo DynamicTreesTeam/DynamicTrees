@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.util.function;
 
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.function.Predicate;
@@ -12,5 +13,5 @@ import java.util.function.Predicate;
  * @author Harley O'Connor
  */
 @FunctionalInterface
-public interface BiomePredicate extends Predicate<Biome> {
+public interface BiomePredicate extends Predicate<Holder<Biome>> {
 }

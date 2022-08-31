@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/end_stone"
+        "model": "dynamictrees:block/rooty_end_stone"
       }
     },
     {
