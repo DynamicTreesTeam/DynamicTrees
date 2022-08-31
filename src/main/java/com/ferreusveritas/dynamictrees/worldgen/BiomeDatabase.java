@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Speci
 import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,10 +27,10 @@ import java.util.function.IntUnaryOperator;
 
 public class BiomeDatabase {
 
-    private final Map<IncludesExcludesHolderSet<Biome>, Entry> jsonEntries = new LinkedHashMap<>();
+    private final Map<DTBiomeHolderSet, Entry> jsonEntries = new LinkedHashMap<>();
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
 
-    public Entry getJsonEntry(IncludesExcludesHolderSet<Biome> biomes) {
+    public Entry getJsonEntry(DTBiomeHolderSet biomes) {
         return this.jsonEntries.computeIfAbsent(biomes, k -> new Entry(this, null, null));
     }
 
@@ -44,7 +44,7 @@ public class BiomeDatabase {
         Entry entry = new Entry(this, biomeKey, biomeHolder.value());
         this.entries.put(biomeRegistryName, entry);
 
-        for (Map.Entry<IncludesExcludesHolderSet<Biome>, Entry> jsonEntry : this.jsonEntries.entrySet()) {
+        for (Map.Entry<DTBiomeHolderSet, Entry> jsonEntry : this.jsonEntries.entrySet()) {
             if (jsonEntry.getKey().contains(biomeHolder)) {
                 // Copy any data explicitly set from json
                 entry.copyFrom(jsonEntry.getValue());

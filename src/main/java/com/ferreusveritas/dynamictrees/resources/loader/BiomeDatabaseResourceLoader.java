@@ -19,8 +19,8 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.ferreusveritas.dynamictrees.util.holderset.DelayedAnyHolderSet;
-import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.ferreusveritas.dynamictrees.worldgen.FeatureCancellationRegistry;
@@ -28,14 +28,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
@@ -214,7 +212,7 @@ public final class BiomeDatabaseResourceLoader
 
         throwIfShouldNotLoad(json);
 
-        final IncludesExcludesHolderSet<Biome> biomes = this.collectBiomes(json, warningConsumer);
+        final DTBiomeHolderSet biomes = this.collectBiomes(json, warningConsumer);
 
         // Running this now would be too early!
         // if (biomes.isEmpty()) {
@@ -232,16 +230,16 @@ public final class BiomeDatabaseResourceLoader
                 .orElseThrow();
     }
 
-    private IncludesExcludesHolderSet<Biome> collectBiomes(JsonObject json, Consumer<String> warningConsumer) throws DeserialisationException {
+    private DTBiomeHolderSet collectBiomes(JsonObject json, Consumer<String> warningConsumer) throws DeserialisationException {
         return JsonResult.forInput(json)
-                .mapIfContains(SELECT, IncludesExcludesHolderSet.<Biome>getCastedClass(), list -> list)
+                .mapIfContains(SELECT, DTBiomeHolderSet.class, list -> list)
                 .forEachWarning(warningConsumer)
                 .orElseThrow();
     }
 
     private PropertyApplierResult applyCanceller(ResourceLocation location,
                                                  Consumer<String> errorConsumer,
-                                                 Consumer<String> warningConsumer, IncludesExcludesHolderSet<Biome> biomes,
+                                                 Consumer<String> warningConsumer, DTBiomeHolderSet biomes,
                                                  JsonObject json) {
         final BiomePropertySelectors.FeatureCancellations cancellations =
                 new BiomePropertySelectors.FeatureCancellations();
@@ -353,7 +351,7 @@ public final class BiomeDatabaseResourceLoader
     private void readPopulatorSection(BiomeDatabase database, ResourceLocation location, JsonObject json)
             throws DeserialisationException {
 
-        final IncludesExcludesHolderSet<Biome> biomes = this.collectBiomes(json, warning ->
+        final DTBiomeHolderSet biomes = this.collectBiomes(json, warning ->
                 LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning));
 
         // Running this now would be too early!
@@ -389,10 +387,10 @@ public final class BiomeDatabaseResourceLoader
     //             !suppress.getAsJsonPrimitive().getAsBoolean();
     // }
 
-    private void applyWhite(BiomeDatabase database, ResourceLocation location, IncludesExcludesHolderSet<Biome> biomes, String type)
+    private void applyWhite(BiomeDatabase database, ResourceLocation location, DTBiomeHolderSet biomes, String type)
             throws DeserialisationException {
         if (type.equalsIgnoreCase("all")) {
-            IncludesExcludesHolderSet<Biome> allBiomes = IncludesExcludesHolderSet.emptyAnds();
+            DTBiomeHolderSet allBiomes = new DTBiomeHolderSet();
             allBiomes.getIncludeComponents().add(new DelayedAnyHolderSet<>(BiomeListDeserialiser.DELAYED_BIOME_REGISTRY));
             database.getJsonEntry(allBiomes).setBlacklisted(false);
         } else if (type.equalsIgnoreCase("selected")) {

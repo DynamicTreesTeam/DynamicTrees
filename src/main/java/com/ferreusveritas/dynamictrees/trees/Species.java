@@ -75,7 +75,7 @@ import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
@@ -308,7 +308,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     protected Map<TagKey<Biome>, Float> envFactors = new HashMap<>();//Environmental factors
 
-    protected IncludesExcludesHolderSet<Biome> perfectBiomes = IncludesExcludesHolderSet.emptyAnds();
+    protected DTBiomeHolderSet perfectBiomes = new DTBiomeHolderSet();
 
     protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
 
@@ -364,8 +364,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.dropCreators.clear();
         this.acceptableBlocksForGrowth.clear();
         this.primitiveSaplingRecipe.clear();
-        this.perfectBiomes.getIncludeComponents().clear();
-        this.perfectBiomes.getExcludeComponents().clear();
+        this.perfectBiomes.clear();
 
         this.clearAcceptableSoils();
 
@@ -1656,7 +1655,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return false;
     }
 
-    public IncludesExcludesHolderSet<Biome> getPerfectBiomes() {
+    public DTBiomeHolderSet getPerfectBiomes() {
         return this.perfectBiomes;
     }
 

@@ -25,7 +25,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
-import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.ChanceSelectorDeserialiser;
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.DensitySelectorDeserialiser;
@@ -39,7 +39,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
@@ -274,8 +273,7 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<GenerationStep.Decoration> DECORATION_STAGE =
             register(GenerationStep.Decoration.class, new EnumDeserialiser<>(GenerationStep.Decoration.class));
 
-    public static final JsonDeserialiser<IncludesExcludesHolderSet<Biome>> BIOME_LIST = register(IncludesExcludesHolderSet.getCastedClass(),
-            new BiomeListDeserialiser());
+    public static final JsonDeserialiser<DTBiomeHolderSet> BIOME_LIST = register(DTBiomeHolderSet.class, new BiomeListDeserialiser());
     public static final JsonDeserialiser<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
             BIOME_LIST.deserialise(jsonElement).map(biomeList ->
                     biome -> biomeList.stream().anyMatch(currentBiomeHolder -> currentBiomeHolder.equals(biome) || biome.unwrapKey().map(currentBiomeHolder::is).orElse(false))

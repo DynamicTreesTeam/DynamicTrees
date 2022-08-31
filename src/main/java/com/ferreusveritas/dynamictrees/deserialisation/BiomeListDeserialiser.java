@@ -6,8 +6,8 @@ import com.ferreusveritas.dynamictrees.api.treepacks.VoidApplier;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.ferreusveritas.dynamictrees.util.holderset.DelayedTagEntriesHolderSet;
-import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
 import com.ferreusveritas.dynamictrees.util.holderset.NameRegexMatchHolderSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -31,11 +31,11 @@ import java.util.function.Supplier;
 /**
  * @author Harley O'Connor
  */
-public final class BiomeListDeserialiser implements JsonDeserialiser<IncludesExcludesHolderSet<Biome>> {
+public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHolderSet> {
 
     public static final Supplier<Registry<Biome>> DELAYED_BIOME_REGISTRY = () -> ServerLifecycleHooks.getCurrentServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
 
-    private static final Applier<IncludesExcludesHolderSet<Biome>, String> TAG_APPLIER = (biomeList, tagString) -> {
+    private static final Applier<DTBiomeHolderSet, String> TAG_APPLIER = (biomeList, tagString) -> {
         tagString = tagString.toLowerCase();
         final boolean notOperator = usingNotOperator(tagString);
         if (notOperator)
@@ -55,7 +55,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<IncludesExc
         return PropertyApplierResult.success();
     };
 
-    private static final VoidApplier<IncludesExcludesHolderSet<Biome>, String> NAME_APPLIER = (biomeList, nameRegex) -> {
+    private static final VoidApplier<DTBiomeHolderSet, String> NAME_APPLIER = (biomeList, nameRegex) -> {
         nameRegex = nameRegex.toLowerCase();
         final boolean notOperator = usingNotOperator(nameRegex);
         if (notOperator)
@@ -68,7 +68,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<IncludesExc
         return categoryString.charAt(0) == '!';
     }
 
-    private static final VoidApplier<IncludesExcludesHolderSet<Biome>, JsonArray> NAMES_OR_APPLIER = (biomeList, json) -> {
+    private static final VoidApplier<DTBiomeHolderSet, JsonArray> NAMES_OR_APPLIER = (biomeList, json) -> {
         final List<String> nameRegexes = JsonResult.forInput(json)
                 .mapEachIfArray(String.class, (Result.SimpleMapper<String, String>) String::toLowerCase)
                 .orElse(Collections.emptyList(), LogManager.getLogger()::error, LogManager.getLogger()::warn);
@@ -90,13 +90,13 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<IncludesExc
             biomeList.getExcludeComponents().add(new OrHolderSet<>(orExcludes));
     };
 
-    private final VoidApplier<IncludesExcludesHolderSet<Biome>, JsonObject> andOperator =
+    private final VoidApplier<DTBiomeHolderSet, JsonObject> andOperator =
             (biomes, jsonObject) -> applyAllAppliers(jsonObject, biomes);
 
-    private final VoidApplier<IncludesExcludesHolderSet<Biome>, JsonArray> orOperator = (biomeList, json) -> {
+    private final VoidApplier<DTBiomeHolderSet, JsonArray> orOperator = (biomeList, json) -> {
         JsonResult.forInput(json)
                 .mapEachIfArray(JsonObject.class, object -> {
-                    IncludesExcludesHolderSet<Biome> subList = IncludesExcludesHolderSet.emptyAnds();
+                    DTBiomeHolderSet subList = new DTBiomeHolderSet();
                     applyAllAppliers(object, subList);
                     biomeList.getIncludeComponents().add(subList);
                     return object;
@@ -104,13 +104,13 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<IncludesExc
                 .orElse(null, LogManager.getLogger()::error, LogManager.getLogger()::warn);
     };
 
-    private final VoidApplier<IncludesExcludesHolderSet<Biome>, JsonObject> notOperator = (biomeList, jsonObject) -> {
-        final IncludesExcludesHolderSet<Biome> notBiomeList = IncludesExcludesHolderSet.emptyAnds();
+    private final VoidApplier<DTBiomeHolderSet, JsonObject> notOperator = (biomeList, jsonObject) -> {
+        final DTBiomeHolderSet notBiomeList = new DTBiomeHolderSet();
         applyAllAppliers(jsonObject, notBiomeList);
         biomeList.getExcludeComponents().add(notBiomeList);
     };
 
-    private final JsonPropertyAppliers<IncludesExcludesHolderSet<Biome>> appliers = new JsonPropertyAppliers<>(IncludesExcludesHolderSet.getCastedClass());
+    private final JsonPropertyAppliers<DTBiomeHolderSet> appliers = new JsonPropertyAppliers<>(DTBiomeHolderSet.class);
 
     public BiomeListDeserialiser() {
         registerAppliers();
@@ -128,20 +128,20 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<IncludesExc
                 .register("NOT", JsonObject.class, notOperator);
     }
 
-    private void applyAllAppliers(JsonObject json, IncludesExcludesHolderSet<Biome> biomes) {
+    private void applyAllAppliers(JsonObject json, DTBiomeHolderSet biomes) {
         appliers.applyAll(new JsonMapWrapper(json), biomes);
     }
 
     @Override
-    public Result<IncludesExcludesHolderSet<Biome>, JsonElement> deserialise(final JsonElement input) {
+    public Result<DTBiomeHolderSet, JsonElement> deserialise(final JsonElement input) {
         return JsonResult.forInput(input)
                 .mapIfType(String.class, biomeName -> {
-                    IncludesExcludesHolderSet<Biome> biomes = IncludesExcludesHolderSet.emptyAnds();
+                    DTBiomeHolderSet biomes = new DTBiomeHolderSet();
                     biomes.getIncludeComponents().add(new NameRegexMatchHolderSet<>(DELAYED_BIOME_REGISTRY, biomeName.toLowerCase(Locale.ROOT)));
                     return biomes;
                 })
                 .elseMapIfType(JsonObject.class, selectorObject -> {
-                    final IncludesExcludesHolderSet<Biome> biomes = IncludesExcludesHolderSet.emptyAnds();
+                    final DTBiomeHolderSet biomes = new DTBiomeHolderSet();
                     // Apply from all appliers
                     applyAllAppliers(selectorObject, biomes);
                     return biomes;

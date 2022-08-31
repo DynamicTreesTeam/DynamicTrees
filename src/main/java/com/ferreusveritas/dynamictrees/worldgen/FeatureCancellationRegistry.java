@@ -1,8 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
-import net.minecraft.world.level.biome.Biome;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.List;
 public class FeatureCancellationRegistry {
     private static final List<Entry> CANCELLATIONS = new ArrayList<>();
 
-    public static void addCancellations(IncludesExcludesHolderSet<Biome> biomes, BiomeDatabase.Operation operation, BiomePropertySelectors.FeatureCancellations cancellations) {
+    public static void addCancellations(DTBiomeHolderSet biomes, BiomeDatabase.Operation operation, BiomePropertySelectors.FeatureCancellations cancellations) {
         CANCELLATIONS.add(new Entry(biomes, operation, cancellations));
     }
 
@@ -18,5 +17,5 @@ public class FeatureCancellationRegistry {
         return CANCELLATIONS;
     }
 
-    public record Entry(IncludesExcludesHolderSet<Biome> biomes, BiomeDatabase.Operation operation, BiomePropertySelectors.FeatureCancellations cancellations) {}
+    public record Entry(DTBiomeHolderSet biomes, BiomeDatabase.Operation operation, BiomePropertySelectors.FeatureCancellations cancellations) {}
 }

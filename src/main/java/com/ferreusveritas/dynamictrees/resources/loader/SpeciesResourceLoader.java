@@ -18,7 +18,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfigurati
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
-import com.ferreusveritas.dynamictrees.util.holderset.IncludesExcludesHolderSet;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.google.gson.JsonObject;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -108,7 +108,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("primitive_sapling", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .registerArrayApplier("primitive_saplings", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .register("common_override", Species.CommonOverride.class, Species::setCommonOverride)
-                .register("perfect_biomes", IncludesExcludesHolderSet.<Biome>getCastedClass(),
+                .register("perfect_biomes", DTBiomeHolderSet.class,
                         (species, biomeList) -> species.getPerfectBiomes().getIncludeComponents().add(biomeList))
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)

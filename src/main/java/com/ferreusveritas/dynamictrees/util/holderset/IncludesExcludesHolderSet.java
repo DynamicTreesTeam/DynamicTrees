@@ -8,12 +8,10 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.HolderSetCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.registries.holdersets.AndHolderSet;
 import net.minecraftforge.registries.holdersets.CompositeHolderSet;
 import net.minecraftforge.registries.holdersets.HolderSetType;
 import net.minecraftforge.registries.holdersets.ICustomHolderSet;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,15 +27,6 @@ public class IncludesExcludesHolderSet<T> extends CompositeHolderSet<T> {
 
     private final HolderSet<T> includes;
     private final HolderSet<T> excludes;
-
-    @SuppressWarnings("unchecked")
-    public static <T> Class<IncludesExcludesHolderSet<T>> getCastedClass() {
-        return (Class<IncludesExcludesHolderSet<T>>) (Class<?>) IncludesExcludesHolderSet.class;
-    }
-
-    public static <T> IncludesExcludesHolderSet<T> emptyAnds() {
-        return new IncludesExcludesHolderSet<>(new AndHolderSet<>(new ArrayList<>()), new AndHolderSet<>(new ArrayList<>()));
-    }
 
     public IncludesExcludesHolderSet(HolderSet<T> includes, HolderSet<T> excludes) {
         super(List.of(includes, excludes));
@@ -55,6 +44,11 @@ public class IncludesExcludesHolderSet<T> extends CompositeHolderSet<T> {
 
     public List<HolderSet<T>> getExcludeComponents() {
         return this.excludes instanceof CompositeHolderSet<T> compositeHolderSet ? compositeHolderSet.getComponents() : null;
+    }
+
+    public void clear() {
+        this.getIncludeComponents().clear();
+        this.getExcludeComponents().clear();
     }
 
     public HolderSet<T> excludes() {
