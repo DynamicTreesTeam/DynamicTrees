@@ -112,13 +112,11 @@ public class TreeGenerator {
     }
 
     public void makeTrees(WorldContext worldContext, BiomeDatabase biomeDataBase, PoissonDisc circle, SafeChunkBounds safeBounds) {
-        circle.add(8, 8); // Move the circle into the "stage".
         BlockPos pos = new BlockPos(circle.x, 0, circle.z);
         final Entry entry = biomeDataBase.getEntry(worldContext.access().getBiome(pos));
         for (BlockPos groundPos : entry.getGroundFinder().findGround(worldContext.access(), pos)) {
             makeTree(worldContext, entry, circle, groundPos, safeBounds);
         }
-        circle.sub(8, 8); // Move the circle back to normal coords.
     }
 
     public GeneratorResult makeTree(WorldContext worldContext, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {

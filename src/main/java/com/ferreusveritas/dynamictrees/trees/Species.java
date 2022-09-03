@@ -51,31 +51,13 @@ import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.FullGenerationContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostRotContext;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PreGenerationContext;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.DiseaseNode;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.InflatorNode;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.ShrinkerNode;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
+import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
 import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
-import com.ferreusveritas.dynamictrees.util.BlockStates;
-import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
-import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.LazyValue;
-import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
-import com.ferreusveritas.dynamictrees.util.Optionals;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-import com.ferreusveritas.dynamictrees.util.WorldContext;
+import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
@@ -110,13 +92,9 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.feature.TreeFeature;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
@@ -125,19 +103,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -2037,6 +2003,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         if (fullGen.get()) {
             return true;
         }
+        if (!shouldGenerate(worldContext, rootPos)) {
+            return false;
+        }
 
         final Direction facing = CoordUtils.getRandomDir(random);
         if (!JoCodeRegistry.getCodes(this.getRegistryName()).isEmpty()) {
@@ -2048,6 +2017,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         return false;
+    }
+
+    private boolean shouldGenerate(WorldContext worldContext, BlockPos rootPos) {
+        // World gen would be slowed down if we did as extensive a check as vanilla. This is good enough to at least
+        // prevent trees generating if there's a structure/mountain overhang above.
+        BlockPos.Mutable pos = rootPos.above().mutable();
+        for (int i = 0; i < signalEnergy; i++) {
+            if (!TreeFeature.validTreePos(worldContext.access(), pos)) {
+                return false;
+            }
+            pos.move(Direction.UP);
+        }
+        return true;
     }
 
     public JoCode getJoCode(String joCodeString) {
