@@ -49,7 +49,7 @@ public class FruitGenFeature extends GenFeature {
 
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
-        if (context.endPoints().isEmpty()) {
+        if (!context.endPoints().isEmpty()) {
             int qty = configuration.get(QUANTITY);
             qty *= context.fruitProductionFactor();
             for (int i = 0; i < qty; i++) {
