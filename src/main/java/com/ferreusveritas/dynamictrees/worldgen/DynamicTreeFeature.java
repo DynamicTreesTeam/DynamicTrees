@@ -40,7 +40,7 @@ public final class DynamicTreeFeature extends Feature<NoFeatureConfig> {
 
         // Get chunk pos and create safe bounds, which ensure we do not try to generate in an unloaded chunk.
         final ChunkPos chunkPos = world.getChunk(pos).getPos();
-        final SafeChunkBounds chunkBounds = new SafeChunkBounds(world, chunkPos);
+        final SafeChunkBounds chunkBounds = SafeChunkBounds.ANY_WG;
         final WorldContext worldContext = new WorldContext(world.getLevel().dimension(), world.getSeed(), world, world.getLevel());
 
         // Generate trees.

@@ -8,9 +8,22 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.ChunkStatus;
 
+@Deprecated
 public class SafeChunkBounds {
 
     public static final SafeChunkBounds ANY = new SafeChunkBounds() {
+        @Override
+        public boolean inBounds(BlockPos pos, boolean gap) {
+            return true;
+        }
+    };
+
+    /**
+     * Used to disable safe chunk bounds during world gen. This must be separate from {@link #ANY} so the
+     * {@code safeChunkBounds == SafeChunkBounds.ANY} comparison can still be used to determine if we are currently in
+     * world gen.
+     */
+    public static final SafeChunkBounds ANY_WG = new SafeChunkBounds() {
         @Override
         public boolean inBounds(BlockPos pos, boolean gap) {
             return true;
