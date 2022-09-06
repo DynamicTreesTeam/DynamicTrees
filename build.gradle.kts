@@ -1,9 +1,8 @@
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.matthewprenger.cursegradle.CurseArtifact
+import com.matthewprenger.cursegradle.CurseExtension
 import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.CurseRelation
-import java.io.InputStreamReader
+import net.minecraftforge.gradle.common.util.RunConfig
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
@@ -46,13 +45,7 @@ minecraft {
 
     runs {
         create("client") {
-            workingDirectory = file("run").absolutePath
-
-            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
-            property("forge.logging.console.level", "debug")
-
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
+            applyDefaultConfiguration()
 
             if (project.hasProperty("mcUuid")) {
                 args("--uuid", property("mcUuid"))
@@ -63,54 +56,21 @@ minecraft {
             if (project.hasProperty("mcAccessToken")) {
                 args("--accessToken", property("mcAccessToken"))
             }
-
-            mods {
-                create(modId) {
-                    source(sourceSets.main.get())
-                }
-            }
         }
 
         create("server") {
-            workingDirectory = file("run").absolutePath
-
-            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
-            property("forge.logging.console.level", "debug")
-
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
-
-            mods {
-                create(modId) {
-                    source(sourceSets.main.get())
-                }
-            }
+            applyDefaultConfiguration("run-server")
         }
 
         create("data") {
-            workingDirectory = file("run").absolutePath
-
-            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
-            property("forge.logging.console.level", "debug")
-
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
+            applyDefaultConfiguration()
 
             args(
-                "--mod",
-                modId,
+                "--mod", modId,
                 "--all",
-                "--output",
-                file("src/generated/resources/"),
-                "--existing",
-                file("src/main/resources")
+                "--output", file("src/generated/resources/"),
+                "--existing", file("src/main/resources")
             )
-
-            mods {
-                create(modId) {
-                    source(sourceSets.main.get())
-                }
-            }
         }
     }
 }
@@ -120,48 +80,30 @@ sourceSets.main.get().resources {
 }
 
 dependencies {
-    // Not sure if we need this one, what is a "forge" anyway?
     minecraft("net.minecraftforge:forge:$mcVersion-${property("forgeVersion")}")
 
-    // Temp as TehNut Maven is down.
     implementation(fg.deobf("curse.maven:hwyla-253449:3033593"))
-    // Compile Hwyla API, but don"t include in runtime.
-//    compileOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}:api"))
-    // At runtime, use the full Hwyla mod.
-//    runtimeOnly(fg.deobf("mcp.mobius.waila:Hwyla:${property("hwylaVersion")}"))
 
-    // Compile JEI API, but don"t include in runtime.
     compileOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}:api"))
-    // At runtime, use the full JEI mod.
     runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}"))
 
-    // At runtime, use Patchouli mod (for the guide book, which is Json so we don"t need the API).
-    runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
-
-    // At runtime use, CC for creating growth chambers.
-    //runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
-    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3236650"))
-
-    // Compile Serene Seasons.
     compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3202233"))
-
-    // Compile Better Weather API.
     compileOnly(fg.deobf("curse.maven:BetterWeatherAPI-400714:3403615"))
 
+    // Uncomment as required for testing at runtime
 //    useSereneSeasons(this)
-    useBetterWeather(this)
+//    useBetterWeather(this)
 
-    // At runtime, use suggestion provider fix mod.
+    runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
+    runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
     runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:$mcVersion-${property("suggestionProviderFixVersion")}"))
 }
 
 fun useSereneSeasons(depHandler: DependencyHandlerScope) {
-    // At runtime, use full Serene Seasons mod.
     depHandler.runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:3650681"))
 }
 
 fun useBetterWeather(depHandler: DependencyHandlerScope) {
-    // At runtime, use the full Better Weather mod.
     depHandler.runtimeOnly(fg.deobf("curse.maven:BetterWeather-400714:3420517"))
 }
 
@@ -197,17 +139,6 @@ java {
     }
 }
 
-fun readChangelog(): String? {
-    val versionInfoFile = file(
-        (optionalProperty("dynamictrees.version_info_repo.directory") ?: return null)
-                + File.separatorChar + "DynamicTrees.json"
-    )
-    val jsonObject = Gson().fromJson(InputStreamReader(versionInfoFile.inputStream()), JsonObject::class.java)
-    return jsonObject
-        .get(mcVersion)?.asJsonObject
-        ?.get(project.version.toString())?.asString
-}
-
 curseforge {
     if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
         apiKey = property("curseApiKey")
@@ -215,10 +146,9 @@ curseforge {
         project {
             id = "252818"
 
-            addGameVersion("1.16.4")
             addGameVersion(mcVersion)
 
-            changelog = readChangelog() ?: "No changelog provided."
+            changelog = "Changelog will be added shortly..."
             changelogType = "markdown"
             releaseType = property("curseFileType")
 
@@ -253,7 +183,7 @@ publishing {
 
             pom {
                 name.set(modName)
-                url.set("https://github.com/ferreusveritas/$modName")
+                url.set("https://github.com/DynamicTreesTeam/$modName")
                 licenses {
                     license {
                         name.set("MIT")
@@ -276,9 +206,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:git://github.com/ferreusveritas/$modName.git")
-                    developerConnection.set("scm:git:ssh://github.com/ferreusveritas/$modName.git")
-                    url.set("https://github.com/ferreusveritas/$modName")
+                    connection.set("scm:git:git://github.com/DynamicTreesTeam/$modName.git")
+                    developerConnection.set("scm:git:ssh://github.com/DynamicTreesTeam/$modName.git")
+                    url.set("https://github.com/DynamicTreesTeam/$modName")
                 }
             }
 
@@ -315,9 +245,23 @@ tasks.register("publishToAllPlatforms") {
     this.dependsOn("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
 }
 
-// Extensions to make CurseGradle extension slightly neater.
+fun RunConfig.applyDefaultConfiguration(runDirectory: String = "run") {
+    workingDirectory = file(runDirectory).absolutePath
 
-fun com.matthewprenger.cursegradle.CurseExtension.project(action: CurseProject.() -> Unit) {
+    property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
+    property("forge.logging.console.level", "debug")
+
+    property("mixin.env.remapRefMap", "true")
+    property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
+
+    mods {
+        create(modId) {
+            source(sourceSets.main.get())
+        }
+    }
+}
+
+fun CurseExtension.project(action: CurseProject.() -> Unit) {
     this.project(closureOf(action))
 }
 
