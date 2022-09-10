@@ -44,18 +44,19 @@ public class LevelPoissonDiscProvider implements PoissonDiscProvider {
 
     @Override
     public List<PoissonDisc> getPoissonDiscs(int chunkX, int chunkY, int chunkZ) {
-        this.random.setXOR(new BlockPos(chunkX, chunkY, chunkZ));
-        final PoissonDiscChunkSet cSet = getChunkDiscSet(chunkX, chunkZ);
-        if (cSet.generated) {
-            return this.getChunkPoissonDiscs(chunkX, chunkZ);
-        } else {
-            int i = 0;
-            List<PoissonDisc> output = null;
-            while (this.radiusCoordinator.runPass(chunkX, chunkZ, i++)) {
-                output = this.generatePoissonDiscs(random, chunkX, chunkZ);
+        synchronized (this) {
+            this.random.setXOR(new BlockPos(chunkX, chunkY, chunkZ));
+            final PoissonDiscChunkSet cSet = getChunkDiscSet(chunkX, chunkZ);
+            if (cSet.generated) {
+                return this.getChunkPoissonDiscs(chunkX, chunkZ);
+            } else {
+                int i = 0;
+                List<PoissonDisc> output = null;
+                while (this.radiusCoordinator.runPass(chunkX, chunkZ, i++)) {
+                    output = this.generatePoissonDiscs(random, chunkX, chunkZ);
+                }
+                return output;
             }
-
-            return output;
         }
     }
 
