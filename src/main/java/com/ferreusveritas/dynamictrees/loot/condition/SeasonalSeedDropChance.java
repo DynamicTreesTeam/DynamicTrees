@@ -26,9 +26,11 @@ public final class SeasonalSeedDropChance implements ILootCondition {
 
     @Override
     public boolean test(LootContext context) {
-        final Float seasonalSeedDropFactor = context.getParamOrNull(DTLootParameters.SEASONAL_SEED_DROP_FACTOR);
+        Float seasonalSeedDropFactor = context.getParamOrNull(DTLootParameters.SEASONAL_SEED_DROP_FACTOR);
         assert seasonalSeedDropFactor != null;
-        return DTConfigs.SEED_DROP_RATE.get() * seasonalSeedDropFactor > context.getRandom().nextFloat();
+        // Adjusted to a minimum of 0.15 to ensure there are at least some seed drops all year round.
+        float adjustedSeasonalSeedDropFactor = Math.min(seasonalSeedDropFactor + 0.15F, 1.0F);
+        return DTConfigs.SEED_DROP_RATE.get() * adjustedSeasonalSeedDropFactor > context.getRandom().nextFloat();
     }
 
     public static ILootCondition.IBuilder seasonalSeedDropChance() {
