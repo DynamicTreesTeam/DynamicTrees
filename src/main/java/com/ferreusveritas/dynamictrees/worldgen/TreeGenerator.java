@@ -95,14 +95,12 @@ public class TreeGenerator {
     }
 
     public void makeTrees(WorldGenLevel world, BiomeDatabase biomeDataBase, PoissonDisc circle, SafeChunkBounds safeBounds) {
-        circle.add(8, 8); // Move the circle into the "stage".
         // TODO: De-couple ground finder from biomes, now that they can vary based on height.
         BlockPos pos = new BlockPos(circle.x, world.getMaxBuildHeight(), circle.z);
         final Entry entry = biomeDataBase.getEntry(world.getBiome(pos).value());
         for (BlockPos groundPos : entry.getGroundFinder().findGround(world, pos)) {
             makeTree(world, entry, circle, groundPos, safeBounds);
         }
-        circle.sub(8, 8); // Move the circle back to normal coords.
     }
 
     public GeneratorResult makeTree(WorldGenLevel world, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {

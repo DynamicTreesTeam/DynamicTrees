@@ -86,6 +86,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -1967,6 +1968,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         if (fullGen.get()) {
             return true;
         }
+        if (!shouldGenerate(world, rootPos)) {
+            return false;
+        }
 
         final Direction facing = CoordUtils.getRandomDir(random);
         if (!JoCodeRegistry.getCodes(this.getRegistryName()).isEmpty()) {
@@ -1978,6 +1982,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         return false;
+    }
+
+    private boolean shouldGenerate(LevelAccessor level, BlockPos rootPos) {
+        // World gen would be slowed down if we did as extensive a check as vanilla. This is good enough to at least
+        // prevent trees generating if there's a structure/mountain overhang above.
+        BlockPos.MutableBlockPos pos = rootPos.above().mutable();
+        for (int i = 0; i < signalEnergy; i++) {
+            if (!TreeFeature.validTreePos(level, pos)) {
+                return false;
+            }
+            pos.move(Direction.UP);
+        }
+        return true;
     }
 
     public JoCode getJoCode(String joCodeString) {
