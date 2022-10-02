@@ -71,11 +71,11 @@ public class NetherFungusSpecies extends Species {
     }
 
     @Override
-    public boolean isAcceptableSoilForWorldgen(LevelAccessor world, BlockPos pos, BlockState soilBlockState) {
+    public boolean isAcceptableSoilForWorldgen(LevelAccessor level, BlockPos pos, BlockState soilBlockState) {
         if (soilBlockState.getBlock() == Blocks.NETHERRACK) {
             return true; //Soil exception for worldgen
         }
-        return super.isAcceptableSoilForWorldgen(world, pos, soilBlockState);
+        return super.isAcceptableSoilForWorldgen(level, pos, soilBlockState);
     }
 
     @Override

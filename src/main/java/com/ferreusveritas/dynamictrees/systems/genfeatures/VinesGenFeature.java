@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowConte
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -111,7 +112,7 @@ public class VinesGenFeature extends GenFeature {
         final BranchBlock branch = TreeHelper.getBranch(blockState);
 
         if (branch != null && branch.getRadius(blockState) >= fruitingRadius && context.natural()) {
-            if (species.seasonalFruitProductionFactor(world, rootPos) > world.random.nextFloat()) {
+            if (species.seasonalFruitProductionFactor(LevelContext.create(world), rootPos) > world.random.nextFloat()) {
                 final FindEndsNode endFinder = new FindEndsNode();
                 TreeHelper.startAnalysisFromRoot(world, rootPos, new MapSignal(endFinder));
                 final List<BlockPos> endPoints = endFinder.getEnds();

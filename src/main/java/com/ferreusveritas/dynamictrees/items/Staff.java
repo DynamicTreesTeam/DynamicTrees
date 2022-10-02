@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.ImmutableMultimap;
@@ -86,23 +87,23 @@ public class Staff extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        Level world = context.getLevel();
+        Level level = context.getLevel();
         ItemStack heldStack = context.getPlayer().getItemInHand(context.getHand());
 
         BlockPos pos = context.getClickedPos();
-        BlockState state = world.getBlockState(pos);
+        BlockState state = level.getBlockState(pos);
 
-        BlockPos rootPos = TreeHelper.findRootNode(world, pos);
-        TreePart treePart = TreeHelper.getTreePart(world.getBlockState(rootPos));
+        BlockPos rootPos = TreeHelper.findRootNode(level, pos);
+        TreePart treePart = TreeHelper.getTreePart(level.getBlockState(rootPos));
 
         // Get the code from a tree or rooty dirt and set it in the staff
         if (!isReadOnly(heldStack) && treePart.isRootNode()) {
-            Species species = TreeHelper.getExactSpecies(world, rootPos);
+            Species species = TreeHelper.getExactSpecies(level, rootPos);
             if (species.isValid()) {
                 if (!context.getPlayer().isShiftKeyDown()) {
-                    String code = new JoCode(world, rootPos, context.getPlayer().getDirection()).toString();
+                    String code = new JoCode(level, rootPos, context.getPlayer().getDirection()).toString();
                     setCode(heldStack, code);
-                    if (world.isClientSide) { // Make sure this doesn't run on the server
+                    if (level.isClientSide) { // Make sure this doesn't run on the server
                         Minecraft.getInstance().keyboardHandler.setClipboard(code); // Put the code in the system clipboard to annoy everyone.
                     }
                 }
@@ -113,8 +114,8 @@ public class Staff extends Item {
 
         //Create a tree from right clicking on soil
         Species species = getSpecies(heldStack);
-        if (species.isValid() && species.isAcceptableSoil(world, pos, state)) {
-            species.getJoCode(getCode(heldStack)).setCareful(true).generate(world, world, species, pos, world.getBiome(pos).value(), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY, false);
+        if (species.isValid() && species.isAcceptableSoil(level, pos, state)) {
+            species.getJoCode(getCode(heldStack)).setCareful(true).generate(LevelContext.create(level), species, pos, level.getBiome(pos).value(), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY, false);
             if (hasMaxUses(heldStack)) {
                 if (decUses(heldStack)) {
                     heldStack.shrink(1);//If the player is in creative this will have no effect.

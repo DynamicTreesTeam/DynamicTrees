@@ -38,7 +38,7 @@ public class PostGenerationContext extends GenerationContext<LevelAccessor> {
      * @param seasonValue           The current season value, as obtained from {@link SeasonProvider#getSeasonValue(net.minecraft.world.level.Level,
      *                              BlockPos)}.
      * @param fruitProductionFactor The current fruit production factor, as obtained from {@link
-     *                              Species#seasonalFruitProductionFactor(net.minecraft.world.level.Level, BlockPos)}.
+     *                              Species#seasonalFruitProductionFactor(com.ferreusveritas.dynamictrees.util.LevelContext, BlockPos)}.
      */
     public PostGenerationContext(LevelAccessor world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints,
                                  SafeChunkBounds bounds, BlockState initialDirtState, Float seasonValue, Float fruitProductionFactor) {

@@ -20,36 +20,36 @@ public class SubterraneanGroundFinder implements GroundFinder {
 
     private static final List<BlockPos> NO_LAYERS = Collections.singletonList(BlockPos.ZERO);
 
-    protected boolean isReplaceable(final LevelAccessor world, final BlockPos pos) {
-        return (world.isEmptyBlock(pos) || !world.getBlockState(pos).getMaterial().blocksMotion() || world.getBlockState(pos).getBlock() instanceof DynamicSaplingBlock) && !world.getBlockState(pos).getMaterial().isLiquid();
+    protected boolean isReplaceable(final LevelAccessor level, final BlockPos pos) {
+        return (level.isEmptyBlock(pos) || !level.getBlockState(pos).getMaterial().blocksMotion() || level.getBlockState(pos).getBlock() instanceof DynamicSaplingBlock) && !level.getBlockState(pos).getMaterial().isLiquid();
     }
 
     protected boolean inRange(final BlockPos pos, final int minY, final int maxY) {
         return pos.getY() >= minY && pos.getY() <= maxY;
     }
 
-    protected int getTopY(final LevelAccessor world, final BlockPos pos) {
-        return world.getChunk(pos).getHeight(Heightmap.Types.WORLD_SURFACE_WG, pos.getX(), pos.getZ());
+    protected int getTopY(final LevelAccessor level, final BlockPos pos) {
+        return level.getChunk(pos).getHeight(Heightmap.Types.WORLD_SURFACE_WG, pos.getX(), pos.getZ());
     }
 
-    protected ArrayList<Integer> findSubterraneanLayerHeights(final LevelAccessor world, final BlockPos start) {
-        final int maxY = this.getTopY(world, start);
+    protected ArrayList<Integer> findSubterraneanLayerHeights(final LevelAccessor level, final BlockPos start) {
+        final int maxY = this.getTopY(level, start);
 
         final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(start.getX(), 0, start.getZ());
         final ArrayList<Integer> layers = new ArrayList<>();
 
         while (this.inRange(pos, 0, maxY)) {
-            while (!isReplaceable(world, pos) && this.inRange(pos, 0, maxY)) {
+            while (!isReplaceable(level, pos) && this.inRange(pos, 0, maxY)) {
                 pos.move(Direction.UP, 4); // Zip up 4 blocks at a time until we hit air
             }
-            while (isReplaceable(world, pos) && this.inRange(pos, 0, maxY)) {
+            while (isReplaceable(level, pos) && this.inRange(pos, 0, maxY)) {
                 pos.move(Direction.DOWN); // Move down 1 block at a time until we hit not-air
             }
-            if (isReplaceable(world, pos.above(6))) { // If there is air 6 blocks above it is likely that the layer is not too cramped
+            if (isReplaceable(level, pos.above(6))) { // If there is air 6 blocks above it is likely that the layer is not too cramped
                 layers.add(pos.getY()); // Record this position
             }
             pos.move(Direction.UP, 8); // Move up 8 blocks
-            while (isReplaceable(world, pos) && this.inRange(pos, 0, maxY)) {
+            while (isReplaceable(level, pos) && this.inRange(pos, 0, maxY)) {
                 pos.move(Direction.UP, 4); // Zip up 4 blocks at a time until we hit ground
             }
         }
@@ -63,8 +63,8 @@ public class SubterraneanGroundFinder implements GroundFinder {
     }
 
     @Override
-    public List<BlockPos> findGround(WorldGenLevel world, BlockPos start) {
-        final ArrayList<Integer> layers = findSubterraneanLayerHeights(world, start);
+    public List<BlockPos> findGround(LevelAccessor level, BlockPos start) {
+        final ArrayList<Integer> layers = findSubterraneanLayerHeights(level, start);
         if (layers.size() < 1) {
             return NO_LAYERS;
         }

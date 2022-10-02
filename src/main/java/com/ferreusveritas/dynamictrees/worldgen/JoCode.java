@@ -18,6 +18,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
@@ -27,7 +28,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.*;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -153,42 +153,42 @@ public class JoCode {
     /**
      * Generate a tree from this {@link JoCode} instruction list.
      *
-     * @param world             The {@link Level} instance.
      * @param rootPosIn         The position of what will become the {@link com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock}.
      * @param biome             The {@link Biome} at {@code rootPosIn}.
      * @param facing            The {@link Direction} of the tree.
      * @param radius            The radius constraint.
      * @param secondChanceRegen Ensures second chance regen doesn't recurse too far.
      */
-    public void generate(Level worldObj, LevelAccessor world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
+    public void generate(LevelContext levelContext, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
+        final LevelAccessor level = levelContext.access();
         final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
         // A Tree generation boundary radius is at least 2 and at most 8.
         radius = Mth.clamp(radius, 2, 8);
 
         this.setFacing(facing);
-        final BlockPos rootPos = species.preGeneration(world, rootPosIn, radius, facing, safeBounds, this);
+        final BlockPos rootPos = species.preGeneration(level, rootPosIn, radius, facing, safeBounds, this);
 
         if (rootPos == BlockPos.ZERO) {
             return;
         }
 
-        final BlockState initialDirtState = world.getBlockState(rootPos); // Save the initial state of the dirt in case this fails.
-        species.placeRootyDirtBlock(world, rootPos, 0); // Set to unfertilized rooty dirt.
+        final BlockState initialDirtState = level.getBlockState(rootPos); // Save the initial state of the dirt in case this fails.
+        species.placeRootyDirtBlock(level, rootPos, 0); // Set to unfertilized rooty dirt.
 
         // Make the tree branch structure.
-        this.generateFork(world, species, 0, rootPos, false);
+        this.generateFork(level, species, 0, rootPos, false);
 
         // Establish a position for the bottom block of the trunk.
         final BlockPos treePos = rootPos.above();
 
         // Fix branch thicknesses and map out leaf locations.
-        final BlockState treeState = world.getBlockState(treePos);
+        final BlockState treeState = level.getBlockState(treePos);
         final BranchBlock firstBranch = TreeHelper.getBranch(treeState);
 
         // If a branch doesn't exist the growth failed.. turn the soil back to what it was.
         if (firstBranch == null) {
-            world.setBlock(rootPos, initialDirtState, this.careful ? 3 : 2);
+            level.setBlock(rootPos, initialDirtState, this.careful ? 3 : 2);
             return;
         }
 
@@ -201,10 +201,10 @@ public class JoCode {
         final MapSignal signal = new MapSignal(inflator, endFinder); // The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
         signal.destroyLoopedNodes = this.careful;
 
-        firstBranch.analyse(treeState, world, treePos, Direction.DOWN, signal);
+        firstBranch.analyse(treeState, level, treePos, Direction.DOWN, signal);
 
         if (signal.foundRoot || signal.overflow) { // Something went terribly wrong.
-            this.tryGenerateAgain(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds, worldGen, treePos, treeState, endFinder, secondChanceRegen);
+            this.tryGenerateAgain(levelContext, species, rootPosIn, biome, facing, radius, safeBounds, worldGen, treePos, treeState, endFinder, secondChanceRegen);
             return;
         }
 
@@ -217,9 +217,9 @@ public class JoCode {
             final BlockPos.MutableBlockPos cellPos = cell.getPos();
 
             if (safeBounds.inBounds(cellPos, false)) {
-                final BlockState testBlockState = world.getBlockState(cellPos);
+                final BlockState testBlockState = level.getBlockState(cellPos);
                 if (testBlockState.isAir() || testBlockState.is(BlockTags.LEAVES)) {
-                    world.setBlock(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2); // Flag 16 to prevent observers from causing cascading lag.
+                    level.setBlock(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2); // Flag 16 to prevent observers from causing cascading lag.
                 }
             } else {
                 leafMap.setVoxel(cellPos, (byte) 0);
@@ -235,24 +235,24 @@ public class JoCode {
         }
 
         // Age volume for 3 cycles using a leafmap.
-        TreeHelper.ageVolume(world, leafMap, species.getWorldGenAgeIterations(), safeBounds);
+        TreeHelper.ageVolume(level, leafMap, species.getWorldGenAgeIterations(), safeBounds);
 
         // Rot the unsupported branches.
-        if (species.handleRot(world, endPoints, rootPos, treePos, 0, safeBounds)) {
+        if (species.handleRot(level, endPoints, rootPos, treePos, 0, safeBounds)) {
             return; // The entire tree rotted away before it had a chance.
         }
 
         // Allow for special decorations by the tree itself.
-        species.postGeneration(new PostGenerationContext(world, rootPos, species, biome, radius, endPoints,
-                safeBounds, initialDirtState, SeasonHelper.getSeasonValue(worldObj, rootPos),
-                species.seasonalFruitProductionFactor(worldObj, rootPos)));
-        MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(world, species, rootPos, endPoints, safeBounds, initialDirtState));
+        species.postGeneration(new PostGenerationContext(level, rootPos, species, biome, radius, endPoints,
+                safeBounds, initialDirtState, SeasonHelper.getSeasonValue(levelContext, rootPos),
+                species.seasonalFruitProductionFactor(levelContext, rootPos)));
+        MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(level, species, rootPos, endPoints, safeBounds, initialDirtState));
 
         // Add snow to parts of the tree in chunks where snow was already placed.
-        this.addSnow(leafMap, world, rootPos, biome);
+        this.addSnow(leafMap, level, rootPos, biome);
     }
 
-    private void tryGenerateAgain(Level worldObj, LevelAccessor world, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder, boolean secondChanceRegen) {
+    private void tryGenerateAgain(LevelContext levelContext, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder, boolean secondChanceRegen) {
         // Don't log the error if it didn't happen during world gen (so we don't fill the logs if players spam the staff in cramped positions).
         if (worldGen) {
             if (!secondChanceRegen) {
@@ -267,11 +267,11 @@ public class JoCode {
         }
 
         // Completely blow away any improperly defined network nodes.
-        this.cleanupFrankentree(world, treePos, treeState, endFinder.getEnds(), safeBounds);
+        this.cleanupFrankentree(levelContext.access(), treePos, treeState, endFinder.getEnds(), safeBounds);
 
         // Now that everything is clear we may as well regenerate the tree that screwed everything up.
         if (!secondChanceRegen) {
-            this.generate(worldObj, world, species, rootPosIn, biome, facing, radius, safeBounds, true);
+            this.generate(levelContext, species, rootPosIn, biome, facing, radius, safeBounds, true);
         }
     }
 

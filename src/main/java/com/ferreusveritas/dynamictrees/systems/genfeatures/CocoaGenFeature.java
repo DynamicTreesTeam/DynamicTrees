@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.CocoaFruitNode;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -26,7 +27,7 @@ public class CocoaGenFeature extends GenFeature {
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
         if (context.fertility() == 0 && context.random().nextInt() % 16 == 0) {
             final Level world = context.world();
-            if (context.species().seasonalFruitProductionFactor(world, context.treePos()) > context.random().nextFloat()) {
+            if (context.species().seasonalFruitProductionFactor(LevelContext.create(world), context.treePos()) > context.random().nextFloat()) {
                 this.addCocoa(world, context.pos(), false);
             }
         }

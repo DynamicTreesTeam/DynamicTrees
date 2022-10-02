@@ -76,7 +76,7 @@ public final class DynamicTrees {
 
 //        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DTClient::clientStart);
 
-        TreeGenerator.setup();
+        TreeGenerator.initialise();
 
         RegistryHandler.setup(MOD_ID);
 
@@ -96,6 +96,8 @@ public final class DynamicTrees {
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {
+        TreeGenerator.setup();
+
         // Clears and locks registry handlers to free them from memory.
         RegistryHandler.REGISTRY.clear();
 

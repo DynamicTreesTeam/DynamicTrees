@@ -1,6 +1,6 @@
-@MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
+@ParametersAreNonnullByDefault @MethodsReturnNonnullByDefault
 package com.ferreusveritas.dynamictrees.blocks.leaves;
 
-import mezz.jei.api.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

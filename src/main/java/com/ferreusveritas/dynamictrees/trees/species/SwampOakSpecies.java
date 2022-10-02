@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -25,12 +26,12 @@ public class SwampOakSpecies extends Species {
     private static final int minRadiusForSunkGeneration = 5;
 
     @Override
-    public boolean generate(Level worldObj, LevelAccessor world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-        if (isWater(world.getBlockState(rootPos))) {
+    public boolean generate(LevelContext levelContext, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+        if (isWater(levelContext.access().getBlockState(rootPos))) {
             switch (DTConfigs.SWAMP_OAKS_IN_WATER.get()) {
                 case SUNK: //generate 1 block down
                     if (radius >= minRadiusForSunkGeneration) {
-                        return super.generate(worldObj, world, rootPos.below(), biome, random, radius, safeBounds);
+                        return super.generate(levelContext, rootPos.below(), biome, random, radius, safeBounds);
                     } else {
                         return false;
                     }
@@ -39,7 +40,7 @@ public class SwampOakSpecies extends Species {
                 case ROOTED: //just generate normally
             }
         }
-        return super.generate(worldObj, world, rootPos, biome, random, radius, safeBounds);
+        return super.generate(levelContext, rootPos, biome, random, radius, safeBounds);
     }
 
 }

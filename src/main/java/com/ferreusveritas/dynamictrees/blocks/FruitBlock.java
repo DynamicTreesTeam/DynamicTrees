@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.blocks;
 import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -118,19 +119,20 @@ public class FruitBlock extends Block implements BonemealableBlock {
         this.doTick(state, world, pos, rand);
     }
 
-    public void doTick(BlockState state, Level world, BlockPos pos, Random rand) {
-        if (this.shouldBlockDrop(world, pos, state)) {
-            this.dropBlock(world, state, pos);
+    public void doTick(BlockState state, Level level, BlockPos pos, Random rand) {
+        if (this.shouldBlockDrop(level, pos, state)) {
+            this.dropBlock(level, state, pos);
             return;
         }
 
+        LevelContext levelContext = LevelContext.create(level);
         final int age = state.getValue(AGE);
-        final Float season = SeasonHelper.getSeasonValue(world, pos);
+        final Float season = SeasonHelper.getSeasonValue(levelContext, pos);
         final Species species = this.getSpecies();
 
         if (season != null && species.isValid()) { // Non-Null means we are season capable.
-            if (species.seasonalFruitProductionFactor(world, pos) < getMinimumSeasonalValue()) {
-                this.outOfSeasonAction(world, pos); // Destroy the block or similar action.
+            if (species.seasonalFruitProductionFactor(levelContext, pos) < getMinimumSeasonalValue()) {
+                this.outOfSeasonAction(level, pos); // Destroy the block or similar action.
                 return;
             }
             if (age == 0 && species.testFlowerSeasonHold(season)) {
@@ -139,23 +141,23 @@ public class FruitBlock extends Block implements BonemealableBlock {
         }
 
         if (age < 3) {
-            final boolean doGrow = rand.nextFloat() < this.getGrowthChance(world, pos);
-            final boolean eventGrow = ForgeHooks.onCropsGrowPre(world, pos, state, doGrow);
+            final boolean doGrow = rand.nextFloat() < this.getGrowthChance(level, pos);
+            final boolean eventGrow = ForgeHooks.onCropsGrowPre(level, pos, state, doGrow);
             if (season != null ? doGrow || eventGrow : eventGrow) { // Prevent a seasons mod from canceling the growth, we handle that ourselves.
-                world.setBlock(pos, state.setValue(AGE, age + 1), 2);
-                ForgeHooks.onCropsGrowPost(world, pos, state);
+                level.setBlock(pos, state.setValue(AGE, age + 1), 2);
+                ForgeHooks.onCropsGrowPost(level, pos, state);
             }
         } else {
             if (age == 3) {
-                switch (this.matureAction(world, pos, state, rand)) {
+                switch (this.matureAction(level, pos, state, rand)) {
                     case NOTHING:
                     case CUSTOM:
                         break;
                     case DROP:
-                        this.dropBlock(world, state, pos);
+                        this.dropBlock(level, state, pos);
                         break;
                     case ROT:
-                        world.setBlockAndUpdate(pos, BlockStates.AIR);
+                        level.setBlockAndUpdate(pos, BlockStates.AIR);
                         break;
                 }
             }

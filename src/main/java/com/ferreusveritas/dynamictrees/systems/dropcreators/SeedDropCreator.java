@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.event.VoluntarySeedDropEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -53,7 +54,7 @@ public class SeedDropCreator extends DropCreator {
     public void appendHarvestDrops(DropCreatorConfiguration configuration, DropContext context) {
         float rarity = this.rarityOrDefault(configuration, HARVEST_RARITY);
         rarity *= (context.fortune() + 1) / 64f;
-        rarity *= Math.min(context.species().seasonalSeedDropFactor(context.world(), context.pos()) + 0.15f, 1.0);
+        rarity *= Math.min(context.species().seasonalSeedDropFactor(LevelContext.create(context.world()), context.pos()) + 0.15f, 1.0);
 
         if (rarity > context.random().nextFloat()) {//1 in 64 chance to drop a seed on destruction..
             context.drops().add(getSeedStack(context.species(), configuration));
@@ -63,7 +64,7 @@ public class SeedDropCreator extends DropCreator {
     @Override
     public void appendVoluntaryDrops(DropCreatorConfiguration configuration, DropContext context) {
         if (this.rarityOrDefault(configuration, VOLUNTARY_RARITY) * DTConfigs.SEED_DROP_RATE.get() *
-                context.species().seasonalSeedDropFactor(context.world(), context.pos())
+                context.species().seasonalSeedDropFactor(LevelContext.create(context.world()), context.pos())
                 > context.random().nextFloat()) {
             context.drops().add(getSeedStack(context.species(), configuration));
             VoluntarySeedDropEvent seedDropEvent = new VoluntarySeedDropEvent(context.world(), context.pos(), context.species(), context.drops());
@@ -88,7 +89,7 @@ public class SeedDropCreator extends DropCreator {
         float seasonFactor = 1.0f;
 
         if (!context.world().isClientSide) {
-            seasonFactor = context.species().seasonalSeedDropFactor(context.world(), context.pos());
+            seasonFactor = context.species().seasonalSeedDropFactor(LevelContext.create(context.world()), context.pos());
         }
 
         if (context.random().nextInt((int) (chance / this.rarityOrDefault(configuration, LEAVES_RARITY))) == 0) {

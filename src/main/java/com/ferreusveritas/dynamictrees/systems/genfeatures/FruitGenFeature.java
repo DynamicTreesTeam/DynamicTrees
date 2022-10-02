@@ -13,6 +13,7 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowConte
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -71,7 +72,7 @@ public class FruitGenFeature extends GenFeature {
 
         if (branch != null && branch.getRadius(blockState) >= configuration.get(FRUITING_RADIUS) && context.natural()) {
             final BlockPos rootPos = context.pos();
-            final float fruitingFactor = context.species().seasonalFruitProductionFactor(world, rootPos);
+            final float fruitingFactor = context.species().seasonalFruitProductionFactor(LevelContext.create(world), rootPos);
 
             if (fruitingFactor > configuration.get(FRUIT_BLOCK).get().getMinimumSeasonalValue() && fruitingFactor > world.random.nextFloat()) {
                 final FindEndsNode endFinder = new FindEndsNode();
@@ -82,7 +83,7 @@ public class FruitGenFeature extends GenFeature {
                     for (int i = 0; i < qty; i++) {
                         final BlockPos endPoint = endPoints.get(world.random.nextInt(endPoints.size()));
                         this.addFruit(configuration, world, context.species(), rootPos.above(), endPoint, false, true,
-                                SafeChunkBounds.ANY, SeasonHelper.getSeasonValue(world, rootPos));
+                                SafeChunkBounds.ANY, SeasonHelper.getSeasonValue(LevelContext.create(world), rootPos));
                     }
                 }
             }

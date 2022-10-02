@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -82,13 +83,13 @@ public class Seed extends Item implements IPlantable {
         return false;
     }
 
-    public boolean doPlanting(Level world, BlockPos pos, @Nullable Player planter, ItemStack seedStack) {
-        final Species species = this.getSpecies().selfOrLocationOverride(world, pos);
-        if (species.plantSapling(world, pos, this.getSpecies() != species)) { // Do the planting
+    public boolean doPlanting(Level level, BlockPos pos, @Nullable Player planter, ItemStack seedStack) {
+        final Species species = this.getSpecies().selfOrLocationOverride(level, pos);
+        if (species.plantSapling(level, pos, this.getSpecies() != species)) { // Do the planting
             String joCode = getCode(seedStack);
             if (!joCode.isEmpty()) {
-                world.removeBlock(pos, false); // Remove the newly created dynamic sapling
-                species.getJoCode(joCode).setCareful(true).generate(world, world, species, pos.below(), world.getBiome(pos).value(), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY, false);
+                level.removeBlock(pos, false); // Remove the newly created dynamic sapling
+                species.getJoCode(joCode).setCareful(true).generate(LevelContext.create(level), species, pos.below(), level.getBiome(pos).value(), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY, false);
             }
             return true;
         }

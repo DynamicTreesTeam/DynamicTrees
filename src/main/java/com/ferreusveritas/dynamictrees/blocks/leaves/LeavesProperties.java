@@ -379,6 +379,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     /**
      * @deprecated use {@link #shouldAge(boolean, BlockState)}
      */
+    @Deprecated
     public boolean getDoesAge(boolean worldGen, BlockState state) {
         return shouldAge(worldGen, state);
     }

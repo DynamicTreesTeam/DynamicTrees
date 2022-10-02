@@ -2,6 +2,8 @@ package com.ferreusveritas.dynamictrees.compat.seasons;
 
 import com.ferreusveritas.dynamictrees.api.seasons.SeasonManager;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
@@ -41,37 +43,37 @@ public class SeasonHelper {
         seasonManager.updateTick(world, worldTicks);
     }
 
-    static public float globalSeasonalGrowthFactor(Level world, BlockPos rootPos) {
-        return globalSeasonalGrowthFactor(world, rootPos, 0);
+    static public float globalSeasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos) {
+        return globalSeasonalGrowthFactor(levelContext, rootPos, 0);
     }
 
-    static public float globalSeasonalGrowthFactor(Level world, BlockPos rootPos, float offset) {
-        return seasonManager.getGrowthFactor(world, rootPos, offset);
+    static public float globalSeasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos, float offset) {
+        return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() ? seasonManager.getGrowthFactor(levelContext.level(), rootPos, offset) : 1.0F;
     }
 
-    static public float globalSeasonalSeedDropFactor(Level world, BlockPos pos) {
-        return globalSeasonalSeedDropFactor(world, pos, 0);
+    static public float globalSeasonalSeedDropFactor(LevelContext levelContext, BlockPos pos) {
+        return globalSeasonalSeedDropFactor(levelContext, pos, 0);
     }
 
-    static public float globalSeasonalSeedDropFactor(Level world, BlockPos pos, float offset) {
-        return seasonManager.getSeedDropFactor(world, pos, offset);
+    static public float globalSeasonalSeedDropFactor(LevelContext levelContext, BlockPos pos, float offset) {
+        return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() ? seasonManager.getSeedDropFactor(levelContext.level(), pos, offset) : 1.0F;
     }
 
-    static public float globalSeasonalFruitProductionFactor(Level world, BlockPos pos, boolean getAsScan) {
-        return globalSeasonalFruitProductionFactor(world, pos, 0, getAsScan);
+    static public float globalSeasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos, boolean getAsScan) {
+        return globalSeasonalFruitProductionFactor(levelContext, pos, 0, getAsScan);
     }
 
-    static public float globalSeasonalFruitProductionFactor(Level world, BlockPos pos, float offset, boolean getAsScan) {
-        return seasonManager.getFruitProductionFactor(world, pos, offset, getAsScan);
+    static public float globalSeasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos, float offset, boolean getAsScan) {
+        return DTConfigs.ENABLE_SEASONAL_SEED_DROP_FACTOR.get() ? seasonManager.getFruitProductionFactor(levelContext.level(), pos, offset, getAsScan) : 1.0F;
     }
 
     /**
-     * @param world The world
+     * @param levelContext The world
      * @return season value 0.0(Early Spring, Inclusive) -> 4.0(Later Winter, Exclusive) or null if there's no seasons
      * in the world.
      */
-    static public Float getSeasonValue(Level world, BlockPos pos) {
-        return seasonManager.getSeasonValue(world, pos);
+    static public Float getSeasonValue(LevelContext levelContext, BlockPos pos) {
+        return seasonManager.getSeasonValue(levelContext.level(), pos);
     }
 
     /**
