@@ -110,9 +110,9 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (Applier<Species, String>) this::addAcceptableSoil)
                 .registerListApplier("fruits", Fruit.class, Species::addFruits)
+                .registerListApplier("pods", Pod.class, Species::addPods)
                 .registerArrayApplier("features", GenFeatureConfiguration.class, Species::addGenFeature)
                 .register("does_rot", Boolean.class, Species::setDoesRot)
-                .registerListApplier("pods", Pod.class, Species::addPods)
                 .register("drop_seeds", Boolean.class, Species::setDropSeeds);
 
         super.registerAppliers();
