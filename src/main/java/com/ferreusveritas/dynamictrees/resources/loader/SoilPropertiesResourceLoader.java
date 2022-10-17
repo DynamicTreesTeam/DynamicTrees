@@ -81,17 +81,18 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
     @Override
     protected void postLoadOnLoad(LoadData loadData, JsonObject json) {
         super.postLoadOnLoad(loadData, json);
-        this.setSubstituteSoil(loadData.getResource(), json);
+        SoilProperties soilProperties = loadData.getResource();
+        if (soilProperties.hasSubstitute()) {
+            SoilProperties.REGISTRY.runOnNextLock(() -> this.setSubstituteSoil(soilProperties, json));
+        } else {
+            this.generateSoilBlock(soilProperties, json);
+        }
     }
 
     private void setSubstituteSoil(SoilProperties soilProperties, JsonObject json) {
-        SoilProperties substitute = JsonHelper.getOrDefault(json, "substitute_soil", SoilProperties.class,
-                SoilProperties.NULL_SOIL_PROPERTIES);
-
+        SoilProperties substitute = JsonHelper.getOrDefault(json, "substitute_soil", SoilProperties.class, SoilProperties.NULL_SOIL_PROPERTIES);
         if (substitute.isValid()) {
             this.useSubstituteSoilBlock(soilProperties, substitute);
-        } else {
-            this.generateSoilBlock(soilProperties, json);
         }
     }
 
