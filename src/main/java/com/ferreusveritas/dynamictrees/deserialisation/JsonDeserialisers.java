@@ -5,7 +5,6 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.configurations.PropertyDefinition;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
@@ -19,9 +18,11 @@ import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.trees.Family;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
@@ -47,6 +48,7 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
@@ -212,7 +214,7 @@ public final class JsonDeserialisers {
     public static JsonDeserialiser<ItemStack> ITEM_STACK = register(ItemStack.class,
             input -> ITEM.deserialise(input).map((Result.SimpleMapper<Item, ItemStack>) ItemStack::new));
 
-    public static final JsonDeserialiser<AABB> AXIS_ALIGNED_BB =
+    public static final JsonDeserialiser<AABB> AABB =
             register(AABB.class, new AxisAlignedBBDeserialiser());
     public static final JsonDeserialiser<VoxelShape> VOXEL_SHAPE =
             register(VoxelShape.class, new VoxelShapeDeserialiser());
@@ -230,6 +232,10 @@ public final class JsonDeserialisers {
             register(GenFeature.class, new RegistryEntryDeserialiser<>(GenFeature.REGISTRY));
     public static final JsonDeserialiser<Family> FAMILY =
             register(Family.class, new RegistryEntryDeserialiser<>(Family.REGISTRY));
+    public static final JsonDeserialiser<Fruit> FRUIT =
+            register(Fruit.class, new RegistryEntryDeserialiser<>(Fruit.REGISTRY));
+    public static final JsonDeserialiser<Pod> POD =
+            register(Pod.class, new RegistryEntryDeserialiser<>(Pod.REGISTRY));
     public static final JsonDeserialiser<DropCreator> DROP_CREATOR =
             register(DropCreator.class, new RegistryEntryDeserialiser<>(DropCreator.REGISTRY));
     public static final JsonDeserialiser<Species> SPECIES =
@@ -263,10 +269,6 @@ public final class JsonDeserialisers {
             register(BranchBlock.class, jsonElement -> BLOCK.deserialise(jsonElement)
                     .mapIfValid(block -> block instanceof BranchBlock, "Block \"{}\" is not a branch.",
                             block -> (BranchBlock) block));
-    public static final JsonDeserialiser<FruitBlock> FRUIT =
-            register(FruitBlock.class, jsonElement -> BLOCK.deserialise(jsonElement)
-                    .mapIfValid(block -> block instanceof FruitBlock, "Block \"{}\" is not a fruit.",
-                            block -> (FruitBlock) block));
 
     public static final JsonDeserialiser<VinesGenFeature.VineType> VINE_TYPE =
             register(VinesGenFeature.VineType.class, new EnumDeserialiser<>(VinesGenFeature.VineType.class));
@@ -301,6 +303,10 @@ public final class JsonDeserialisers {
             register(MaterialColor.class, new MaterialColorDeserialiser());
     public static final JsonDeserialiser<SoundType> SOUND_TYPE =
             register(SoundType.class, new SoundTypeDeserialiser());
+
+    public static final JsonDeserialiser<BooleanOp> BOOLEAN_FUNCTION = register(
+            BooleanOp.class, new BooleanOpDeserialiser()
+    );
 
 //    private static final Map<String, ToolType> TOOL_TYPES =
 //            ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");

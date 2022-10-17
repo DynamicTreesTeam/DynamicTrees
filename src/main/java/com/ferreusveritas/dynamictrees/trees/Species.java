@@ -47,10 +47,12 @@ import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.*;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.*;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.*;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.systems.substances.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
@@ -283,6 +285,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     private String unlocalizedName = "";
 
+    private Set<Fruit> fruits = new HashSet<>();
+
+    private Set<Pod> pods = new HashSet<>();
+
     /**
      * Blank constructor for {@link #NULL_SPECIES}.
      */
@@ -323,6 +329,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     @Override
     public Species reset() {
+        this.fruits.clear();
+        this.pods.clear();
         this.envFactors.clear();
         this.genFeatures.clear();
         this.dropCreators.clear();
@@ -1709,7 +1717,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         final float seasonEnd = 1 - 1f / 6;
         final float threshold = 0.75f;
 
-        if (!FruitBlock.getFruitBlocksForSpecies(this).isEmpty()) {
+        if (this.hasFruits()) {
             int seasonFlags = 0;
             for (int i = 0; i < 4; i++) {
                 boolean isValidSeason = false;
@@ -1812,21 +1820,13 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * Called when a player right clicks a {@link Species} of tree anywhere on it's branches.
      *
-     * @param world    The world
-     * @param rootPos  The  {@link BlockPos} of the {@link RootyBlock}
-     * @param hitPos   The {@link BlockPos} of the {@link Block} that was hit.
-     * @param state    The {@link BlockState} of the hit {@link Block}.
-     * @param player   The {@link Player} that hit the {@link Block}
-     * @param hand     Hand used to peform the action
-     * @param heldItem The {@link ItemStack} the {@link Player} hit the {@link Block} with.
-     * @param hit      The block ray trace of the clicking action
      * @return True if action was handled, false otherwise.
      */
-    public boolean onTreeActivated(Level world, BlockPos rootPos, BlockPos hitPos, BlockState state, Player player, InteractionHand hand, @Nullable ItemStack heldItem, BlockHitResult hit) {
-
-        if (heldItem != null) { // Ensure there is something in the player's hand.
-            if (applySubstance(world, rootPos, hitPos, player, hand, heldItem)) {
-                consumePlayerItem(player, hand, heldItem);
+    public boolean onTreeActivated(Family.TreeActivationContext context) {
+        if (context.heldItem != null) { // Ensure there is something in the player's hand.
+            if (applySubstance(context.level, context.rootPos, context.hitPos, context.player, context.hand,
+                    context.heldItem)) {
+                consumePlayerItem(context.player, context.hand, context.heldItem);
                 return true;
             }
         }
@@ -2109,6 +2109,38 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public int coordHashCode(BlockPos pos) {
         return CoordUtils.coordHashCode(pos, 2);
+    }
+
+    public boolean hasFruit(Fruit fruit) {
+        return fruits.contains(fruit);
+    }
+
+    public boolean hasFruits() {
+        return !fruits.isEmpty();
+    }
+
+    public void addFruits(Collection<Fruit> fruits) {
+        this.fruits.addAll(fruits);
+    }
+
+    public Set<Fruit> getFruits() {
+        return Collections.unmodifiableSet(fruits);
+    }
+
+    public boolean hasPod(Pod pod) {
+        return pods.contains(pod);
+    }
+
+    public boolean hasPods() {
+        return !pods.isEmpty();
+    }
+
+    public void addPods(Collection<Pod> pods) {
+        this.pods.addAll(pods);
+    }
+
+    public Set<Pod> getPods() {
+        return Collections.unmodifiableSet(pods);
     }
 
     public List<TagKey<Block>> defaultSaplingTags() {

@@ -55,7 +55,7 @@ public class AlternativeLeavesGenFeature extends GenFeature {
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         final BlockBounds bounds = context.species().getFamily().expandLeavesBlockBounds(new BlockBounds(context.endPoints()));
-        return this.setAltLeaves(configuration, context.world(), bounds, context.bounds(), context.species());
+        return this.setAltLeaves(configuration, context.level(), bounds, context.bounds(), context.species());
     }
 
     @Override
@@ -64,7 +64,7 @@ public class AlternativeLeavesGenFeature extends GenFeature {
             return false;
         }
 
-        final Level world = context.world();
+        final LevelAccessor world = context.level();
         final Species species = context.species();
 
         final FindEndsNode endFinder = new FindEndsNode();

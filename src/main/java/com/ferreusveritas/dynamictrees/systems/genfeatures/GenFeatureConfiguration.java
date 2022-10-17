@@ -46,7 +46,7 @@ public class GenFeatureConfiguration extends Configuration<GenFeatureConfigurati
      * @param <R>     the return type of the action
      * @return the return of the executed action
      */
-    public <C extends GenerationContext<?>, R> R generate(GenFeature.Type<C, R> type, C context) {
+    public <C extends GenerationContext, R> R generate(GenFeature.Type<C, R> type, C context) {
         return this.configurable.generate(this, type, context);
     }
 

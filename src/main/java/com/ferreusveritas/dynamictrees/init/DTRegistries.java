@@ -6,8 +6,6 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.blocks.DynamicCocoaBlock;
-import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.TrunkShellBlock;
@@ -28,7 +26,6 @@ import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatures;
 import com.ferreusveritas.dynamictrees.tileentity.PottedSaplingTileEntity;
 import com.ferreusveritas.dynamictrees.tileentity.SpeciesTileEntity;
-import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.FungusFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.cancellers.MushroomFeatureCanceller;
@@ -44,8 +41,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -63,7 +58,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
@@ -93,17 +87,6 @@ public class DTRegistries {
     ///////////////////////////////////////////
 
     /**
-     * An apple fruit block.
-     */
-    public static final Supplier<FruitBlock> APPLE_FRUIT = Suppliers.memoize(() -> new FruitBlock().setDroppedItem(new ItemStack(Items.APPLE))
-            .setCanBoneMeal(DTConfigs.CAN_BONE_MEAL_APPLE::get));
-
-    /**
-     * A modified cocoa fruit block (for dynamic trees).
-     */
-    public static final Supplier<DynamicCocoaBlock> COCOA_FRUIT = Suppliers.memoize(DynamicCocoaBlock::new);
-
-    /**
      * A potted sapling block, which is a normal pot but for dynamic saplings.
      */
     public static final Supplier<PottedSaplingBlock> POTTED_SAPLING = Suppliers.memoize(PottedSaplingBlock::new);
@@ -125,8 +108,6 @@ public class DTRegistries {
     }
 
     private static void setupBlocks() {
-        RegistryHandler.addBlock(DynamicTrees.resLoc("apple_fruit"), APPLE_FRUIT);
-        RegistryHandler.addBlock(DynamicTrees.resLoc("cocoa"), COCOA_FRUIT);
         RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, POTTED_SAPLING);
         RegistryHandler.addBlock(DynamicTrees.resLoc("trunk_shell"), TRUNK_SHELL);
     }
@@ -151,15 +132,6 @@ public class DTRegistries {
             }
             return 0;
         });
-    }
-
-    @SubscribeEvent
-    public static void onBlocksRegistry(final RegistryEvent.Register<Block> event) {
-        final Species appleOak = Species.REGISTRY.get(DynamicTrees.resLoc("apple_oak"));
-
-        if (appleOak.isValid()) {
-            APPLE_FRUIT.get().setSpecies(appleOak);
-        }
     }
 
     ///////////////////////////////////////////

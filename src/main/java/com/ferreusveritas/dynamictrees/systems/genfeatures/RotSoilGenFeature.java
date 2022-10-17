@@ -35,15 +35,15 @@ public class RotSoilGenFeature extends GenFeature {
 
     @Override
     protected boolean postRot(GenFeatureConfiguration configuration, PostRotContext context) {
-        final LevelAccessor world = context.world();
+        final LevelAccessor level = context.level();
         final BlockPos belowPos = context.pos().below();
 
-        if (!TreeHelper.isRooty(world.getBlockState(belowPos))) {
+        if (!TreeHelper.isRooty(level.getBlockState(belowPos))) {
             return false;
         }
 
         // Change rooty dirt to rotted soil.
-        world.setBlock(belowPos, configuration.get(ROTTEN_SOIL).defaultBlockState(), 3);
+        level.setBlock(belowPos, configuration.get(ROTTEN_SOIL).defaultBlockState(), Block.UPDATE_ALL);
         return true;
     }
 

@@ -47,7 +47,7 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature {
             return false;
         }
 
-        final LevelAccessor world = context.world();
+        final LevelAccessor level = context.level();
         final BlockPos rootPos = context.pos();
         final BlockPos lowest = Collections.min(context.endPoints(), Comparator.comparingInt(Vec3i::getY));
         final Random rand = context.random();
@@ -62,7 +62,7 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature {
 
             BlockPos mushPos = rootPos.offset(xOff, 0, zOff);
 
-            mushPos = CoordUtils.findWorldSurface(world, new BlockPos(mushPos), context.isWorldGen()).above();
+            mushPos = CoordUtils.findWorldSurface(level, new BlockPos(mushPos), context.isWorldGen()).above();
 
             if (context.bounds().inBounds(mushPos, true)) {
                 int maxHeight = lowest.getY() - mushPos.getY();
@@ -70,7 +70,7 @@ public class HugeMushroomsGenFeature extends HugeMushroomGenFeature {
                     int height = Mth.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
 
                     if (this.setHeight(height).generate(configuration, new FullGenerationContext(
-                            context.world(),
+                            context.level(),
                             context.pos(),
                             context.species(),
                             context.biome(),

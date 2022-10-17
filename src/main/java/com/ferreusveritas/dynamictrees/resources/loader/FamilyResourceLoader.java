@@ -53,7 +53,6 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
 
         this.reloadAppliers
                 .register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
-                .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa)
                 .register("primary_thickness", Integer.class, Family::setPrimaryThickness)
                 .register("secondary_thickness", Integer.class, Family::setSecondaryThickness)
                 .register("branch_is_ladder", Boolean.class, Family::setBranchIsLadder)

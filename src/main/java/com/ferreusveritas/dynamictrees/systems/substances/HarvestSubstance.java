@@ -1,12 +1,13 @@
 package com.ferreusveritas.dynamictrees.systems.substances;
 
-import com.ferreusveritas.dynamictrees.api.GeneratesFruit;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTClient;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
+import com.ferreusveritas.dynamictrees.systems.genfeatures.FruitGenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGrowContext;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
@@ -34,7 +35,6 @@ public class HarvestSubstance implements SubstanceEffect {
     private final int ticksPerSpawnAttempt;
 
     public final Set<BlockPos> fruitPositions = Sets.newHashSet();
-    private final Set<FruitBlock> compatibleFruitBlocks = Sets.newHashSet();
 
     public HarvestSubstance() {
         this(1600, 12, 12, 1, 16);
@@ -58,10 +58,9 @@ public class HarvestSubstance implements SubstanceEffect {
         }
 
         this.species = rootyBlock.getSpecies(rootState, world, rootPos);
-        this.compatibleFruitBlocks.addAll(FruitBlock.getFruitBlocksForSpecies(species));
 
-        // If the species is invalid or doesn't have any compatible fruit, don't apply substance.
-        if (!this.species.isValid() || this.compatibleFruitBlocks.size() < 1) {
+        // If the species doesn't have any fruit, don't apply substance.
+        if (!species.hasFruits()) {
             return false;
         }
 
@@ -70,43 +69,54 @@ public class HarvestSubstance implements SubstanceEffect {
         return true;
     }
 
-    private void recalculateFruitPositions(final LevelAccessor world, final BlockPos rootPos, final RootyBlock rootyBlock) {
+    private void recalculateFruitPositions(final LevelAccessor level, final BlockPos rootPos, final RootyBlock rootyBlock) {
         this.fruitPositions.clear();
 
         final FindEndsNode findEndsNode = new FindEndsNode();
-        rootyBlock.startAnalysis(world, rootPos, new MapSignal(findEndsNode));
+        rootyBlock.startAnalysis(level, rootPos, new MapSignal(findEndsNode));
 
         findEndsNode.getEnds().forEach(endPos ->
-                BlockPos.betweenClosedStream(endPos.offset(-3, -3, -3), endPos.offset(3, 3, 3)).forEach(pos -> {
-                    final BlockState state = world.getBlockState(pos);
-                    final Block block = state.getBlock();
-
-                    if (block instanceof FruitBlock && this.compatibleFruitBlocks.contains(block)) {
+                BlockPos.betweenClosedStream(
+                        endPos.offset(-3, -3, -3),
+                        endPos.offset(3, 3, 3)
+                ).forEach(pos -> {
+                    if (isCompatibleFruitBlock(level, pos)) {
                         this.fruitPositions.add(pos.immutable());
                     }
                 })
         );
     }
 
+    private boolean isCompatibleFruitBlock(LevelAccessor level, BlockPos pos) {
+        final Block block = level.getBlockState(pos).getBlock();
+        return isCompatibleFruitBlock(block);
+    }
+
+    private boolean isCompatibleFruitBlock(Block block) {
+        return block instanceof FruitBlock &&
+                this.species.getFruits().stream().map(Fruit::getBlock).anyMatch(block::equals);
+    }
+
     @Override
-    public boolean update(Level world, BlockPos rootPos, int deltaTicks, int fertility) {
+    public boolean update(Level level, BlockPos rootPos, int deltaTicks, int fertility) {
         if (deltaTicks > this.duration) {
             return false;
         }
 
-        final RootyBlock rootyBlock = TreeHelper.getRooty(world.getBlockState(rootPos));
+        final RootyBlock rootyBlock = TreeHelper.getRooty(level.getBlockState(rootPos));
 
         if (rootyBlock == null) {
             return false;
         }
 
-        if (world.isClientSide) {
+        if (level.isClientSide) {
             if (deltaTicks % this.ticksPerParticlePulse == 0) {
                 // Recalculate fruit positions every time in case new fruit spawned.
-                this.recalculateFruitPositions(world, rootPos, rootyBlock);
+                this.recalculateFruitPositions(level, rootPos, rootyBlock);
 
                 this.fruitPositions.forEach(fruitPos ->
-                        DTClient.spawnParticles(world, ParticleTypes.EFFECT, fruitPos.getX(), fruitPos.getY(), fruitPos.getZ(), 3, world.getRandom())
+                        DTClient.spawnParticles(level, ParticleTypes.EFFECT, fruitPos.getX(), fruitPos.getY(),
+                                fruitPos.getZ(), 3, level.getRandom())
                 );
             }
         } else {
@@ -115,21 +125,21 @@ public class HarvestSubstance implements SubstanceEffect {
 
             // Only recalculate fruit positions if necessary, and don't do it twice.
             if (growPulse || spawnAttempt) {
-                this.recalculateFruitPositions(world, rootPos, rootyBlock);
+                this.recalculateFruitPositions(level, rootPos, rootyBlock);
             }
 
             if (growPulse) {
                 this.fruitPositions.removeIf(fruitPos -> {
-                    final BlockState state = world.getBlockState(fruitPos);
+                    final BlockState state = level.getBlockState(fruitPos);
                     final Block block = state.getBlock();
 
-                    if (!(block instanceof FruitBlock) || !this.compatibleFruitBlocks.contains(block)) {
+                    if (!isCompatibleFruitBlock(block)) {
                         return true;
                     }
 
                     // Force tick for each fruit block - effectively multiplies growth speed.
                     for (int i = 0; i < this.growthPulses; i++) {
-                        ((FruitBlock) block).doTick(state, world, fruitPos, world.random);
+                        ((FruitBlock) block).doTick(state, level, fruitPos, level.random);
                     }
                     return false;
                 });
@@ -139,15 +149,15 @@ public class HarvestSubstance implements SubstanceEffect {
             if (spawnAttempt) {
                 this.species.getGenFeatures().stream()
                         .filter(configuration ->
-                                configuration.getGenFeature().getClass().isAnnotationPresent(GeneratesFruit.class)
+                                configuration.getGenFeature() instanceof FruitGenFeature
                         )
                         .forEach(configuration -> configuration.generate(
                                 GenFeature.Type.POST_GROW,
                                 new PostGrowContext(
-                                        world,
+                                        level,
                                         rootPos,
                                         species,
-                                        rootPos.relative(rootyBlock.getTrunkDirection(world, rootPos)),
+                                        rootPos.relative(rootyBlock.getTrunkDirection(level, rootPos)),
                                         fertility,
                                         true
                                 )

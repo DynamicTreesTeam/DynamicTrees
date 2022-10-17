@@ -170,9 +170,13 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     ///////////////////////////////////////////
 
     @Deprecated
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         final ItemStack heldItem = player.getItemInHand(hand);
-        return TreeHelper.getTreePart(state).getFamily(state, world, pos).onTreeActivated(world, pos, state, player, hand, heldItem, hit) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+        return TreeHelper.getTreePart(state).getFamily(state, level, pos).onTreeActivated(
+                new Family.TreeActivationContext(
+                        level, TreeHelper.findRootNode(level, pos), pos, state, player, hand, heldItem, hitResult
+                )
+        ) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
 
     public boolean canBeStripped(BlockState state, Level world, BlockPos pos, Player player, ItemStack heldItem) {

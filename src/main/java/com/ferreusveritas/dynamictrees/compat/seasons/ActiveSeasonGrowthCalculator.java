@@ -17,14 +17,11 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
             return 1.0f;
         }
 
-        switch (type) {
-            case TEMPERATE:
-                return clippedsineWave(seasonValue, 7, 0.8f, 1.0f);
-            case TROPICAL:
-                return clippedsineWave(seasonValue, 2, 0.31f, 0.9f);
-            default:
-                return 1.0f;
-        }
+        return switch (type) {
+            case TEMPERATE -> clippedsineWave(seasonValue, 7, 0.8f, 1.0f);
+            case TROPICAL -> clippedsineWave(seasonValue, 2, 0.31f, 0.9f);
+            default -> 1.0f;
+        };
     }
 
     @Override
@@ -34,14 +31,11 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
             return 1.0f;
         }
 
-        switch (type) {
-            case TEMPERATE:
-                return clippedsineWave(seasonValue, 5, 1.5f, -0.25f);
-            case TROPICAL:
-                return clippedsineWave(seasonValue, 7, 0.31f, 0.9f);
-            default:
-                return 1.0f;
-        }
+        return switch (type) {
+            case TEMPERATE -> clippedsineWave(seasonValue, 5, 1.5f, -0.25f);
+            case TROPICAL -> clippedsineWave(seasonValue, 7, 0.31f, 0.9f);
+            default -> 1.0f;
+        };
     }
 
     @Override
@@ -51,14 +45,20 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
             return 1.0f;
         }
 
-        switch (type) {
-            case TEMPERATE:
-                return clippedsineWave(seasonValue, 7, 1.0f, 1.0f);
-            case TROPICAL:
-                return clippedsineWave(seasonValue, 1, 0.31f, 0.9f);
-            default:
-                return 1.0f;
-        }
+        return switch (type) {
+            case TEMPERATE -> clippedsineWave(seasonValue, 7, 1.0f, 1.0f);
+            case TROPICAL -> clippedsineWave(seasonValue, 1, 0.31f, 0.9f);
+            default -> 1.0f;
+        };
+    }
+
+    @Override
+    public Float getPeakFruitProductionSeasonValue(ClimateZoneType type) {
+        return switch (type) {
+            case TEMPERATE -> 1.5F;
+            case TROPICAL -> 0.5F;
+            default -> null;
+        };
     }
 
 }

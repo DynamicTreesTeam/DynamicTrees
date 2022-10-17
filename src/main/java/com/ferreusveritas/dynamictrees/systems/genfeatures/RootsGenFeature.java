@@ -16,8 +16,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 
@@ -76,51 +76,51 @@ public class RootsGenFeature extends GenFeature {
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         final BlockPos treePos = context.pos().above();
-        final int trunkRadius = TreeHelper.getRadius(context.world(), treePos);
+        final int trunkRadius = TreeHelper.getRadius(context.level(), treePos);
         return trunkRadius >= configuration.get(MIN_TRUNK_RADIUS) &&
-                this.startRoots(configuration, context.world(), treePos, context.species(), trunkRadius);
+                this.startRoots(configuration, context.level(), treePos, context.species(), trunkRadius);
     }
 
     @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
-        final Level world = context.world();
+        final LevelAccessor level = context.level();
         final BlockPos treePos = context.treePos();
-        final int trunkRadius = TreeHelper.getRadius(world, treePos);
+        final int trunkRadius = TreeHelper.getRadius(level, treePos);
 
         if (context.fertility() > 0 && trunkRadius >= configuration.get(MIN_TRUNK_RADIUS)) {
-            final Surround surr = Surround.values()[world.random.nextInt(8)];
+            final Surround surr = Surround.values()[level.getRandom().nextInt(8)];
             final BlockPos dPos = treePos.offset(surr.getOffset());
-            if (world.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
-                world.setBlockAndUpdate(dPos, DTRegistries.TRUNK_SHELL.get().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()));
+            if (level.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
+                level.setBlock(dPos, DTRegistries.TRUNK_SHELL.get().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()), Block.UPDATE_ALL);
             }
 
-            this.startRoots(configuration, world, treePos, context.species(), trunkRadius);
+            this.startRoots(configuration, level, treePos, context.species(), trunkRadius);
         }
 
         return true;
     }
 
-    public boolean startRoots(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos treePos, Species species, int trunkRadius) {
+    public boolean startRoots(GenFeatureConfiguration configuration, LevelAccessor level, BlockPos treePos, Species species, int trunkRadius) {
         int hash = CoordUtils.coordHashCode(treePos, 2);
         SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
-        this.nextRoot(world, rootMap, treePos, species, trunkRadius, configuration.get(MIN_TRUNK_RADIUS), configuration.get(SCALE_FACTOR), BlockPos.ZERO, 0,
+        this.nextRoot(level, rootMap, treePos, species, trunkRadius, configuration.get(MIN_TRUNK_RADIUS), configuration.get(SCALE_FACTOR), BlockPos.ZERO, 0,
                 -1, null, 0, configuration.get(LEVEL_LIMIT));
         return true;
     }
 
-    protected void nextRoot(LevelAccessor world, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, int minTrunkRadius, float scaleFactor, BlockPos pos, int height, int levelCount, Direction fromDir, int radius, int levelLimit) {
+    protected void nextRoot(LevelAccessor level, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, int minTrunkRadius, float scaleFactor, BlockPos pos, int height, int levelCount, Direction fromDir, int radius, int levelLimit) {
 
         for (int depth = 0; depth < 2; depth++) {
             BlockPos currPos = trunkPos.offset(pos).above(height - depth);
-            BlockState placeState = world.getBlockState(currPos);
-            BlockState belowState = world.getBlockState(currPos.below());
+            BlockState placeState = level.getBlockState(currPos);
+            BlockState belowState = level.getBlockState(currPos.below());
 
-            boolean onNormalCube = belowState.isRedstoneConductor(world, currPos.below());
+            boolean onNormalCube = belowState.isRedstoneConductor(level, currPos.below());
 
-            if (pos == BlockPos.ZERO || isReplaceableWithRoots(world, placeState, currPos) && (depth == 1 || onNormalCube)) {
+            if (pos == BlockPos.ZERO || isReplaceableWithRoots(level, placeState, currPos) && (depth == 1 || onNormalCube)) {
                 if (radius > 0) {
                     species.getFamily().getSurfaceRoot().ifPresent(root ->
-                            root.setRadius(world, currPos, radius, 3)
+                            root.setRadius(level, currPos, radius, 3)
                     );
                 }
                 if (onNormalCube) {
@@ -133,7 +133,7 @@ public class RootsGenFeature extends GenFeature {
                             }
                             int thisLevelCount = depth == 1 ? 1 : levelCount + 1;
                             if (nextRad > 0 && thisLevelCount <= levelLimit) {//Don't go longer than 2 adjacent blocks on a single level
-                                nextRoot(world, rootMap, trunkPos, species, trunkRadius, minTrunkRadius, scaleFactor, dPos, height - depth, thisLevelCount, dir.getOpposite(), nextRad, levelLimit);//Recurse here
+                                nextRoot(level, rootMap, trunkPos, species, trunkRadius, minTrunkRadius, scaleFactor, dPos, height - depth, thisLevelCount, dir.getOpposite(), nextRad, levelLimit);//Recurse here
                             }
                         }
                     }
@@ -144,8 +144,8 @@ public class RootsGenFeature extends GenFeature {
 
     }
 
-    protected boolean isReplaceableWithRoots(LevelAccessor world, BlockState placeState, BlockPos pos) {
-        if (world.isEmptyBlock(pos) || placeState.getBlock() instanceof TrunkShellBlock) {
+    protected boolean isReplaceableWithRoots(LevelAccessor level, BlockState placeState, BlockPos pos) {
+        if (level.isEmptyBlock(pos) || placeState.getBlock() instanceof TrunkShellBlock) {
             return true;
         }
 

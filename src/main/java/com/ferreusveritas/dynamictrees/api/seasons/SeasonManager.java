@@ -10,20 +10,22 @@ import net.minecraft.world.level.Level;
  */
 public interface SeasonManager {
 
-    void updateTick(Level world, long worldTicks);
+    void updateTick(Level level, long worldTicks);
 
     void flushMappings();
 
-    float getGrowthFactor(Level world, BlockPos rootPos, float offset);
+    float getGrowthFactor(Level level, BlockPos rootPos, float offset);
 
-    float getSeedDropFactor(Level world, BlockPos rootPos, float offset);
+    float getSeedDropFactor(Level level, BlockPos rootPos, float offset);
 
-    float getFruitProductionFactor(Level world, BlockPos rootPos, float offset, boolean getAsScan);
+    float getFruitProductionFactor(Level level, BlockPos rootPos, float offset, boolean getAsScan);
 
-    Float getSeasonValue(Level world, BlockPos rootPos);
+    Float getSeasonValue(Level level, BlockPos rootPos);
 
-    boolean isTropical(Level world, BlockPos rootPos);
+    Float getPeakFruitProductionSeasonValue(Level level, BlockPos rootPos, float offset);
 
-    boolean shouldSnowMelt(Level world, BlockPos pos);
+    boolean isTropical(Level level, BlockPos rootPos);
+
+    boolean shouldSnowMelt(Level level, BlockPos pos);
 
 }

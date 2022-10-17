@@ -22,12 +22,12 @@ public interface SubstanceEffect {
     /**
      * For a continuously updating effect.
      *
-     * @param world
+     * @param level
      * @param rootPos
      * @param deltaTicks
      * @return true to stay alive. false to kill effector
      */
-    default boolean update(Level world, BlockPos rootPos, int deltaTicks, int fertility) {
+    default boolean update(Level level, BlockPos rootPos, int deltaTicks, int fertility) {
         return false;
     }
 

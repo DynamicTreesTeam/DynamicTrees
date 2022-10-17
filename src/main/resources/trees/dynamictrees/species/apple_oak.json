@@ -18,8 +18,16 @@
         "can_craft_seed_to_sapling": false
     },
     "perfect_biomes": { "name": "minecraft:plains" },
-    "features" : [
-        "fruit"
+    "fruits": [
+        "apple"
+    ],
+    "features": [
+        {
+            "name": "fruit",
+            "properties": {
+                "fruit": "apple"
+            }
+        }
     ],
     "drop_creators": [
         "log",

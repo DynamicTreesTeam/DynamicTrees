@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @author Harley O'Connor
  */
-public class PostGenerationContext extends GenerationContext<LevelAccessor> {
+public class PostGenerationContext extends GenerationContext {
 
     private final Biome biome;
     private final int radius;
@@ -28,11 +28,11 @@ public class PostGenerationContext extends GenerationContext<LevelAccessor> {
     /**
      * Instantiates a new {@link PostGenerationContext} object.
      *
-     * @param world                 The {@link LevelAccessor} object.
+     * @param level                 The {@link LevelAccessor} object.
      * @param rootPos               The {@link BlockPos} of the {@link RootyBlock} the generated tree is planted on.
      * @param biome                 The {@link Biome} the tree has generated in.
      * @param radius                The radius of the {@link PoissonDisc} the tree generated in.
-     * @param endPoints             A {@link List} of {@link BlockPos} in the world designating branch endpoints.
+     * @param endPoints             A {@link List} of {@link BlockPos} in the level designating branch endpoints.
      * @param bounds                The {@link SafeChunkBounds} to generate in.
      * @param initialDirtState      The {@link BlockState} of the dirt that became rooty. Useful for matching terrain.
      * @param seasonValue           The current season value, as obtained from {@link SeasonProvider#getSeasonValue(net.minecraft.world.level.Level,
@@ -40,9 +40,9 @@ public class PostGenerationContext extends GenerationContext<LevelAccessor> {
      * @param fruitProductionFactor The current fruit production factor, as obtained from {@link
      *                              Species#seasonalFruitProductionFactor(com.ferreusveritas.dynamictrees.util.LevelContext, BlockPos)}.
      */
-    public PostGenerationContext(LevelAccessor world, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints,
+    public PostGenerationContext(LevelAccessor level, BlockPos rootPos, Species species, Biome biome, int radius, List<BlockPos> endPoints,
                                  SafeChunkBounds bounds, BlockState initialDirtState, Float seasonValue, Float fruitProductionFactor) {
-        super(world, rootPos, species);
+        super(level, rootPos, species);
         this.biome = biome;
         this.radius = radius;
         this.endPoints = endPoints;

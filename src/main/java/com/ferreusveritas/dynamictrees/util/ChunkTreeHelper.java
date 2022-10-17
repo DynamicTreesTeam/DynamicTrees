@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.blocks.DynamicCocoaBlock;
 import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
+import com.ferreusveritas.dynamictrees.blocks.PodBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
@@ -207,7 +207,7 @@ public class ChunkTreeHelper {
         Block block = state.getBlock();
 
         // Cleanup snow layers, hanging fruit(apples), trunk fruit(cocoa), and surface roots.
-        if (block instanceof SnowLayerBlock || block instanceof FruitBlock || block instanceof DynamicCocoaBlock ||
+        if (block instanceof SnowLayerBlock || block instanceof FruitBlock || block instanceof PodBlock ||
                 block instanceof SurfaceRootBlock) {
             level.setBlock(pos, BlockStates.AIR, Block.UPDATE_CLIENTS);
         } else if (block instanceof VineBlock) {

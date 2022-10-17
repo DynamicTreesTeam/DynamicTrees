@@ -46,19 +46,19 @@ public class GrowthSubstance implements SubstanceEffect {
     private int pulseCount;
 
     @Override
-    public boolean update(Level world, BlockPos rootPos, int deltaTicks, int fertility) {
+    public boolean update(Level level, BlockPos rootPos, int deltaTicks, int fertility) {
         // Stop when fertility has depleted.
         if (fertility <= 0 || this.pulseCount >= this.pulses) {
             return false;
         }
 
-        if (world.isClientSide) {
+        if (level.isClientSide) {
             if (deltaTicks % this.ticksPerParticlePulse == 0) {
-                TreeHelper.rootParticles(world, rootPos, Direction.UP, ParticleTypes.EFFECT, 1);
+                TreeHelper.rootParticles(level, rootPos, Direction.UP, ParticleTypes.EFFECT, 1);
             }
         } else {
             if (deltaTicks % this.ticksPerPulse == 0) {
-                TreeHelper.growPulse(world, rootPos);
+                TreeHelper.growPulse(level, rootPos);
                 this.pulseCount++;
             }
         }

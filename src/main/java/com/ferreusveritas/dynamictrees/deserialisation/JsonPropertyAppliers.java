@@ -99,6 +99,18 @@ public final class JsonPropertyAppliers<O> implements PropertyAppliers<O, JsonEl
     }
 
     @Override
+    public <V> PropertyAppliers<O, JsonElement> registerListApplier(String key, Class<V> valueClass,
+                                                                    Applier<O, List<V>> applier) {
+        return this.registerListApplier(key, this.objectType, valueClass, applier);
+    }
+
+    @Override
+    public <V> PropertyAppliers<O, JsonElement> registerListApplier(String key, Class<V> valueClass,
+                                                                    VoidApplier<O, List<V>> applier) {
+        return this.registerListApplier(key, this.objectType, valueClass, applier);
+    }
+
+    @Override
     public JsonPropertyAppliers<O> registerIfTrueApplier(final String key, final IfTrueApplier<O> applier) {
         return this.registerIfTrueApplier(key, this.objectType, applier);
     }
@@ -130,7 +142,7 @@ public final class JsonPropertyAppliers<O> implements PropertyAppliers<O, JsonEl
     public <E extends O, V> JsonPropertyAppliers<O> registerArrayApplier(final String key, final Class<E> subClass,
                                                                          final Class<V> valueClass,
                                                                          final Applier<E, V> applier) {
-        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass,
+        return this.register(ArrayIteratorPropertyApplier.json(key, subClass, valueClass,
                 new JsonPropertyApplier<>("", subClass, valueClass, applier)));
     }
 
@@ -138,8 +150,22 @@ public final class JsonPropertyAppliers<O> implements PropertyAppliers<O, JsonEl
     public <E extends O, V> JsonPropertyAppliers<O> registerArrayApplier(final String key, final Class<E> subClass,
                                                                          final Class<V> valueClass,
                                                                          final VoidApplier<E, V> applier) {
-        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass,
+        return this.register(ArrayIteratorPropertyApplier.json(key, subClass, valueClass,
                 new JsonPropertyApplier<>("", subClass, valueClass, applier)));
+    }
+
+    @Override
+    public <E extends O, V> PropertyAppliers<O, JsonElement> registerListApplier(String key, Class<E> subClass,
+                                                                                 Class<V> valueClass,
+                                                                                 Applier<E, List<V>> applier) {
+        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass, applier));
+    }
+
+    @Override
+    public <E extends O, V> PropertyAppliers<O, JsonElement> registerListApplier(String key, Class<E> subClass,
+                                                                                 Class<V> valueClass,
+                                                                                 VoidApplier<E, List<V>> applier) {
+        return this.register(ArrayPropertyApplier.json(key, subClass, valueClass, applier));
     }
 
     @Override

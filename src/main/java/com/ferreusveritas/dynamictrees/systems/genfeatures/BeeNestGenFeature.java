@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
@@ -31,7 +30,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.BiFunction;
 
 /**
@@ -63,20 +61,20 @@ public class BeeNestGenFeature extends GenFeature {
 
     @Override
     public GenFeatureConfiguration createDefaultConfiguration() {
-        return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos) -> {
-            if (world.getRandom().nextFloat() > CHANCE) {
+        return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (level, pos) -> {
+            if (level.getRandom().nextFloat() > CHANCE) {
                 return false;
             }
             // Default flower check predicate, straight from the sapling class
             for (BlockPos blockpos : BlockPos.MutableBlockPos.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
-                if (world.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
+                if (level.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
                     return true;
                 }
             }
             return false;
-        }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
+        }).with(WORLD_GEN_CHANCE_FUNCTION, (level, pos) -> {
             // Default biome check chance function. Uses vanilla chances
-            ResourceKey<Biome> biomeKey = world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).unwrapKey().orElseThrow();
+            ResourceKey<Biome> biomeKey = level.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).unwrapKey().orElseThrow();
             if (biomeKey == Biomes.MEADOW)
                 return MEADOWS_CHANCE;
             if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.PLAINS)) {
@@ -94,43 +92,43 @@ public class BeeNestGenFeature extends GenFeature {
 
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
-        final LevelAccessor world = context.world();
+        final LevelAccessor level = context.level();
         final BlockPos rootPos = context.pos();
-        return !(world.getRandom().nextFloat() > configuration.get(WORLD_GEN_CHANCE_FUNCTION).apply(world, rootPos)) &&
-                this.placeBeeNestInValidPlace(configuration, world, rootPos, true);
+        return !(level.getRandom().nextFloat() > configuration.get(WORLD_GEN_CHANCE_FUNCTION).apply(level, rootPos)) &&
+                this.placeBeeNestInValidPlace(configuration, level, rootPos, true);
     }
 
     @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
-        if (!context.natural() || !configuration.get(CAN_GROW_PREDICATE).test(context.world(), context.pos().above()) ||
+        if (!context.natural() || !configuration.get(CAN_GROW_PREDICATE).test(context.level(), context.pos().above()) ||
                 context.fertility() == 0) {
             return false;
         }
 
-        return this.placeBeeNestInValidPlace(configuration, context.world(), context.pos(), false);
+        return this.placeBeeNestInValidPlace(configuration, context.level(), context.pos(), false);
     }
 
-    private boolean placeBeeNestInValidPlace(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, boolean worldGen) {
+    private boolean placeBeeNestInValidPlace(GenFeatureConfiguration configuration, LevelAccessor level, BlockPos rootPos, boolean worldGen) {
         Block nestBlock = configuration.get(NEST_BLOCK);
 
-        int treeHeight = getTreeHeight(world, rootPos, configuration.get(MAX_HEIGHT));
+        int treeHeight = getTreeHeight(level, rootPos, configuration.get(MAX_HEIGHT));
         //This prevents trees from having multiple bee nests. There should be only one per tree.
-        if (nestAlreadyPresent(world, nestBlock, rootPos, treeHeight)) {
+        if (nestAlreadyPresent(level, nestBlock, rootPos, treeHeight)) {
             return false;
         }
 
         //Finds the valid places next to the trunk and under an existing branch.
         //The places are mapped to a direction list that hold the valid orientations with an air block in front
-        List<Pair<BlockPos, List<Direction>>> validSpaces = findBranchPits(configuration, world, rootPos, treeHeight);
+        List<Pair<BlockPos, List<Direction>>> validSpaces = findBranchPits(configuration, level, rootPos, treeHeight);
         if (validSpaces == null) {
             return false;
         }
         if (validSpaces.size() > 0) {
-            Pair<BlockPos, List<Direction>> chosenSpace = validSpaces.get(world.getRandom().nextInt(validSpaces.size()));
+            Pair<BlockPos, List<Direction>> chosenSpace = validSpaces.get(level.getRandom().nextInt(validSpaces.size()));
             //There is always AT LEAST one valid direction, since if there were none the pos would not have been added to validSpaces
-            Direction chosenDir = chosenSpace.getValue().get(world.getRandom().nextInt(chosenSpace.getValue().size()));
+            Direction chosenDir = chosenSpace.getValue().get(level.getRandom().nextInt(chosenSpace.getValue().size()));
 
-            return placeBeeNestWithBees(world, nestBlock, chosenSpace.getKey(), chosenDir, worldGen);
+            return placeBeeNestWithBees(level, nestBlock, chosenSpace.getKey(), chosenDir, worldGen);
         }
         return false;
     }

@@ -14,34 +14,18 @@ import java.util.List;
  */
 public class MultiPropertyApplier<T, I> extends PropertyApplier<T, Object, I> {
 
-    private final List<PropertyApplier<T, ?, I>> appliers = Lists.newLinkedList();
+    private final List<PropertyApplier<T, Object, I>> appliers = Lists.newLinkedList();
 
     @SafeVarargs
-    public MultiPropertyApplier(final String key, final Class<T> objectClass, final PropertyApplier<T, ?, I>... appliers) {
-        super(key, objectClass, Object.class, (object, value) -> {
+    public MultiPropertyApplier(final String key, final Class<T> objectClass,
+                                final PropertyApplier<T, Object, I>... appliers) {
+        super(key, objectClass, (object, value) -> {
         });
         this.appliers.addAll(Arrays.asList(appliers));
     }
 
-    public void addApplier(final PropertyApplier<T, ?, I> applier) {
+    public void addApplier(final PropertyApplier<T, Object, I> applier) {
         this.appliers.add(applier);
-    }
-
-    @Nullable
-    @Override
-    public PropertyApplierResult applyIfShould(String key, Object object, I input) {
-        if (!this.key.equalsIgnoreCase(key) || !this.objectClass.isInstance(object)) {
-            return null;
-        }
-
-        final Iterator<PropertyApplier<T, ?, I>> iterator = appliers.iterator();
-        PropertyApplierResult applierResult;
-
-        do {
-            applierResult = this.applyIfShould(object, input, iterator.next());
-        } while (applierResult == null || !applierResult.wasSuccessful());
-
-        return applierResult;
     }
 
     /**
@@ -50,13 +34,24 @@ public class MultiPropertyApplier<T, I> extends PropertyApplier<T, Object, I> {
     @Deprecated
     @Nullable
     @Override
-    protected <S, R> PropertyApplierResult applyIfShould(Object object, I input, Class<R> valueClass, Applier<S, R> applier) {
-        return PropertyApplierResult.success();
+    protected PropertyApplierResult applyIfShould(T object, I input, Applier<T, Object> applier) {
+        final Iterator<PropertyApplier<T, Object, I>> iterator = appliers.iterator();
+        PropertyApplierResult applierResult;
+
+        do {
+            applierResult = applyNext(object, input, applier, iterator);
+        } while (applierResult == null || !applierResult.wasSuccessful());
+
+        return applierResult;
     }
 
     @Nullable
-    private <S, R> PropertyApplierResult applyIfShould(final Object object, final I input, final PropertyApplier<S, R, I> applier) {
-        return this.applyIfShould(object, input, applier.getValueClass(), applier.applier);
+    private PropertyApplierResult applyNext(T object, I input, Applier<T, Object> applier,
+                                                   Iterator<PropertyApplier<T, Object, I>> iterator) {
+        if (!iterator.hasNext()) {
+            return null;
+        }
+        return iterator.next().applyIfShould(object, input, applier);
     }
 
 }

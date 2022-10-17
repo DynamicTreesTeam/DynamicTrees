@@ -52,17 +52,17 @@ public class MoundGenFeature extends GenFeature {
      */
     @Override
     protected BlockPos preGenerate(GenFeatureConfiguration configuration, PreGenerationContext context) {
-        final LevelAccessor world = context.world();
+        final LevelAccessor level = context.level();
         BlockPos rootPos = context.pos();
 
         if (context.radius() >= configuration.get(MOUND_CUTOFF_RADIUS) && context.isWorldGen()) {
-            BlockState initialDirtState = world.getBlockState(rootPos);
-            BlockState initialUnderState = world.getBlockState(rootPos.below());
+            BlockState initialDirtState = level.getBlockState(rootPos);
+            BlockState initialUnderState = level.getBlockState(rootPos.below());
 
             if (initialUnderState.getMaterial() == Material.AIR ||
                     (initialUnderState.getMaterial() != Material.DIRT && initialUnderState.getMaterial() != Material.STONE)
             ) {
-                final Biome biome = world.getUncachedNoiseBiome(
+                final Biome biome = level.getUncachedNoiseBiome(
                         rootPos.getX() >> 2,
                         rootPos.getY() >> 2,
                         rootPos.getZ() >> 2
@@ -75,7 +75,7 @@ public class MoundGenFeature extends GenFeature {
 
             for (Cell cell : moundMap.getAllNonZeroCells()) {
                 final BlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;
-                world.setBlock(rootPos.offset(cell.getPos()), placeState, 3);
+                level.setBlock(rootPos.offset(cell.getPos()), placeState, 3);
             }
         }
 
@@ -94,18 +94,18 @@ public class MoundGenFeature extends GenFeature {
             return false;
         }
 
-        final LevelAccessor world = context.world();
+        final LevelAccessor level = context.level();
         final BlockPos rootPos = context.pos();
         final BlockPos treePos = rootPos.above();
-        final BlockState belowState = world.getBlockState(rootPos.below());
+        final BlockState belowState = level.getBlockState(rootPos.below());
 
         // Place dirt blocks around rooty dirt block if tree has a > 8 radius.
-        final BlockState branchState = world.getBlockState(treePos);
+        final BlockState branchState = level.getBlockState(treePos);
         if (TreeHelper.getTreePart(branchState).getRadius(branchState) > BranchBlock.MAX_RADIUS) {
             for (Surround dir : Surround.values()) {
                 BlockPos dPos = rootPos.offset(dir.getOffset());
-                world.setBlock(dPos, context.initialDirtState(), 3);
-                world.setBlock(dPos.below(), belowState, 3);
+                level.setBlock(dPos, context.initialDirtState(), 3);
+                level.setBlock(dPos.below(), belowState, 3);
             }
             return true;
         }

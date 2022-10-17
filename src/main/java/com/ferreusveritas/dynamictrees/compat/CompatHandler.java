@@ -51,7 +51,6 @@ public final class CompatHandler {
             seasonManager.setTropicalPredicate((world, pos) -> BiomeConfig.usesTropicalSeasons(world.getBiome(pos)));
             return seasonManager;
         });
-        
     }
 
     public static final String DISABLED = "!";

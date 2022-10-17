@@ -46,28 +46,28 @@ public class ShroomlightGenFeature extends GenFeature {
         return super.createDefaultConfiguration()
                 .with(SHROOMLIGHT_BLOCK, Blocks.SHROOMLIGHT)
                 .with(MAX_HEIGHT, 32)
-                .with(CAN_GROW_PREDICATE, (world, blockPos) ->
-                        world.getRandom().nextFloat() <= VANILLA_GROW_CHANCE)
+                .with(CAN_GROW_PREDICATE, (level, blockPos) ->
+                        level.getRandom().nextFloat() <= VANILLA_GROW_CHANCE)
                 .with(PLACE_CHANCE, .4f)
                 .with(MAX_COUNT, 4);
     }
 
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
-        return this.placeShroomlightsInValidPlace(configuration, context.world(), context.pos(), true);
+        return this.placeShroomlightsInValidPlace(configuration, context.level(), context.pos(), true);
     }
 
     @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
-        return context.natural() && configuration.get(CAN_GROW_PREDICATE).test(context.world(), context.pos().above())
-                && context.fertility() != 0 && this.placeShroomlightsInValidPlace(configuration, context.world(), context.pos(), false);
+        return context.natural() && configuration.get(CAN_GROW_PREDICATE).test(context.level(), context.pos().above())
+                && context.fertility() != 0 && this.placeShroomlightsInValidPlace(configuration, context.level(), context.pos(), false);
     }
 
-    private boolean placeShroomlightsInValidPlace(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, boolean worldGen) {
-        int treeHeight = getTreeHeight(world, rootPos, configuration.get(MAX_HEIGHT));
+    private boolean placeShroomlightsInValidPlace(GenFeatureConfiguration configuration, LevelAccessor level, BlockPos rootPos, boolean worldGen) {
+        int treeHeight = getTreeHeight(level, rootPos, configuration.get(MAX_HEIGHT));
         Block shroomlightBlock = configuration.get(SHROOMLIGHT_BLOCK);
 
-        List<BlockPos> validSpaces = findBranchPits(configuration, world, rootPos, treeHeight);
+        List<BlockPos> validSpaces = findBranchPits(configuration, level, rootPos, treeHeight);
         if (validSpaces == null) {
             return false;
         }
@@ -75,8 +75,8 @@ public class ShroomlightGenFeature extends GenFeature {
             if (worldGen) {
                 int placed = 0;
                 for (BlockPos chosenSpace : validSpaces) {
-                    if (world.getRandom().nextFloat() <= configuration.get(PLACE_CHANCE)) {
-                        world.setBlock(chosenSpace, shroomlightBlock.defaultBlockState(), 2);
+                    if (level.getRandom().nextFloat() <= configuration.get(PLACE_CHANCE)) {
+                        level.setBlock(chosenSpace, shroomlightBlock.defaultBlockState(), 2);
                         placed++;
                         if (placed > configuration.get(MAX_COUNT)) {
                             break;
@@ -84,17 +84,17 @@ public class ShroomlightGenFeature extends GenFeature {
                     }
                 }
             } else {
-                BlockPos chosenSpace = validSpaces.get(world.getRandom().nextInt(validSpaces.size()));
-                world.setBlock(chosenSpace, shroomlightBlock.defaultBlockState(), 2);
+                BlockPos chosenSpace = validSpaces.get(level.getRandom().nextInt(validSpaces.size()));
+                level.setBlock(chosenSpace, shroomlightBlock.defaultBlockState(), 2);
             }
             return true;
         }
         return false;
     }
 
-    private int getTreeHeight(LevelAccessor world, BlockPos rootPos, int maxHeight) {
+    private int getTreeHeight(LevelAccessor level, BlockPos rootPos, int maxHeight) {
         for (int i = 1; i < maxHeight; i++) {
-            if (!TreeHelper.isBranch(world.getBlockState(rootPos.above(i)))) {
+            if (!TreeHelper.isBranch(level.getBlockState(rootPos.above(i)))) {
                 return i - 1;
             }
         }
@@ -103,16 +103,16 @@ public class ShroomlightGenFeature extends GenFeature {
 
     //Like the BeeNestGenFeature, the valid places are empty blocks under branches next to the trunk.
     @Nullable
-    private List<BlockPos> findBranchPits(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, int maxHeight) {
+    private List<BlockPos> findBranchPits(GenFeatureConfiguration configuration, LevelAccessor level, BlockPos rootPos, int maxHeight) {
         int existingBlocks = 0;
         List<BlockPos> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++) {
             BlockPos trunkPos = rootPos.above(y);
             for (Direction dir : HORIZONTALS) {
                 BlockPos sidePos = trunkPos.relative(dir);
-                if ((world.isEmptyBlock(sidePos) || world.getBlockState(sidePos).getBlock() instanceof DynamicLeavesBlock) && TreeHelper.isBranch(world.getBlockState(sidePos.above()))) {
+                if ((level.isEmptyBlock(sidePos) || level.getBlockState(sidePos).getBlock() instanceof DynamicLeavesBlock) && TreeHelper.isBranch(level.getBlockState(sidePos.above()))) {
                     validSpaces.add(sidePos);
-                } else if (world.getBlockState(sidePos).getBlock() == configuration.get(SHROOMLIGHT_BLOCK)) {
+                } else if (level.getBlockState(sidePos).getBlock() == configuration.get(SHROOMLIGHT_BLOCK)) {
                     existingBlocks++;
                     if (existingBlocks > configuration.get(MAX_COUNT)) {
                         return null;

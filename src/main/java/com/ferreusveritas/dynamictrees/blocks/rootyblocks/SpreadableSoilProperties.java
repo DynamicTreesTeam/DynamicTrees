@@ -76,35 +76,35 @@ public class SpreadableSoilProperties extends SoilProperties {
         }
 
         @Override
-        public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+        public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
             SpreadableSoilProperties properties = getSoilProperties();
             if (properties.spread_item != null) {
-                ItemStack handStack = player.getItemInHand(handIn);
+                ItemStack handStack = player.getItemInHand(hand);
                 if (handStack.getItem().equals(properties.spread_item)) {
                     List<Block> foundBlocks = new LinkedList<>();
 
                     for (BlockPos blockpos : BlockPos.betweenClosed(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))) {
-                        Block block = worldIn.getBlockState(blockpos).getBlock();
+                        Block block = level.getBlockState(blockpos).getBlock();
                         if (properties.spreadable_soils.stream().anyMatch(prop -> prop.getPrimitiveSoilBlock() == block)) {
                             foundBlocks.add(block);
                         }
                     }
                     if (foundBlocks.size() > 0) {
-                        if (!worldIn.isClientSide()) {
-                            int blockInt = worldIn.random.nextInt(foundBlocks.size());
+                        if (!level.isClientSide()) {
+                            int blockInt = level.random.nextInt(foundBlocks.size());
                             this.getRootyBlock(foundBlocks.get(blockInt)).ifPresent(rootyBlock ->
-                                    worldIn.setBlock(pos, rootyBlock.defaultBlockState(), 3)
+                                    level.setBlock(pos, rootyBlock.defaultBlockState(), 3)
                             );
                         }
                         if (!player.isCreative()) {
                             handStack.shrink(1);
                         }
-                        DTClient.spawnParticles(worldIn, ParticleTypes.HAPPY_VILLAGER, pos.above(), 2 + worldIn.random.nextInt(5), worldIn.random);
+                        DTClient.spawnParticles(level, ParticleTypes.HAPPY_VILLAGER, pos.above(), 2 + level.random.nextInt(5), level.random);
                         return InteractionResult.SUCCESS;
                     }
                 }
             }
-            return super.use(state, worldIn, pos, player, handIn, hit);
+            return super.use(state, level, pos, player, hand, hitResult);
         }
 
         @Override

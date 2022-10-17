@@ -60,8 +60,8 @@ public class NormalSeasonManager implements SeasonManager {
         isTropical = predicate;
     }
 
-    public boolean isTropical(Level world, BlockPos rootPos) {
-        return isTropical.test(world, rootPos);
+    public boolean isTropical(Level level, BlockPos rootPos) {
+        return isTropical.test(level, rootPos);
     }
 
 
@@ -69,37 +69,44 @@ public class NormalSeasonManager implements SeasonManager {
     // ISeasonManager Interface
     ////////////////////////////////////////////////////////////////
 
-    public void updateTick(Level world, long worldTicks) {
-        getContext(world).updateTick(world, worldTicks);
+    public void updateTick(Level level, long worldTicks) {
+        getContext(level).updateTick(level, worldTicks);
     }
 
-    public float getGrowthFactor(Level world, BlockPos rootPos, float offset) {
-        SeasonContext context = getContext(world);
-        return isTropical(world, rootPos) ? context.getTropicalGrowthFactor(offset) : context.getTemperateGrowthFactor(offset);
+    public float getGrowthFactor(Level level, BlockPos rootPos, float offset) {
+        SeasonContext context = getContext(level);
+        return isTropical(level, rootPos) ? context.getTropicalGrowthFactor(offset) : context.getTemperateGrowthFactor(offset);
     }
 
-    public float getSeedDropFactor(Level world, BlockPos rootPos, float offset) {
-        SeasonContext context = getContext(world);
-        return isTropical(world, rootPos) ? context.getTropicalSeedDropFactor(offset) : context.getTemperateSeedDropFactor(offset);
+    public float getSeedDropFactor(Level level, BlockPos rootPos, float offset) {
+        SeasonContext context = getContext(level);
+        return isTropical(level, rootPos) ? context.getTropicalSeedDropFactor(offset) : context.getTemperateSeedDropFactor(offset);
     }
 
     @Override
-    public float getFruitProductionFactor(Level world, BlockPos rootPos, float offset, boolean getAsScan) {
+    public float getFruitProductionFactor(Level level, BlockPos rootPos, float offset, boolean getAsScan) {
         if (getAsScan) {
-            return getFruitProductionFactorAsScan(world.dimension().location(), rootPos, offset);
+            return getFruitProductionFactorAsScan(level.dimension().location(), rootPos, offset);
         }
 
-        SeasonContext context = getContext(world);
-        return isTropical(world, rootPos) ? context.getTropicalFruitProductionFactor(offset) : context.getTemperateFruitProductionFactor(offset);
-    }
-
-    public Float getSeasonValue(Level world, BlockPos pos) {
-        return getContext(world).getSeasonProvider().getSeasonValue(world, pos);
+        SeasonContext context = getContext(level);
+        return isTropical(level, rootPos) ? context.getTropicalFruitProductionFactor(offset) : context.getTemperateFruitProductionFactor(offset);
     }
 
     @Override
-    public boolean shouldSnowMelt(Level world, BlockPos pos) {
-        return getContext(world).getSeasonProvider().shouldSnowMelt(world, pos);
+    public Float getSeasonValue(Level level, BlockPos pos) {
+        return getContext(level).getSeasonProvider().getSeasonValue(level, pos);
+    }
+
+    @Override
+    public Float getPeakFruitProductionSeasonValue(Level level, BlockPos rootPos, float offset) {
+        SeasonContext context = getContext(level);
+        return isTropical(level, rootPos) ? context.getTropicalPeakFruitProductionSeasonValue(offset) : context.getTemperatePeakFruitProductionSeasonValue(offset);
+    }
+
+    @Override
+    public boolean shouldSnowMelt(Level level, BlockPos pos) {
+        return getContext(level).getSeasonProvider().shouldSnowMelt(level, pos);
     }
 
     public float getFruitProductionFactorAsScan(ResourceLocation dimLoc, BlockPos rootPos, float offset) {

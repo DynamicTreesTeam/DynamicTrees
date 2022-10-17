@@ -11,10 +11,13 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
+import mcp.mobius.waila.api.BlockAccessor;
 import mcp.mobius.waila.api.IComponentProvider;
 import mcp.mobius.waila.api.IDataAccessor;
 import mcp.mobius.waila.api.IPluginConfig;
+import mcp.mobius.waila.api.ITooltip;
 import mcp.mobius.waila.api.RenderableTextComponent;
+import mcp.mobius.waila.api.config.IPluginConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -38,9 +41,8 @@ public class WailaBranchHandler implements IComponentProvider {
     private NetVolumeNode.Volume lastVolume = new NetVolumeNode.Volume();
 
 
-
     @Override
-    public void appendBody(List<TextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
+    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         if (WailaOther.invalid) {
             lastPos = BlockPos.ZERO;
             lastSpecies = Species.NULL_SPECIES;
@@ -65,7 +67,7 @@ public class WailaBranchHandler implements IComponentProvider {
 
         //Attempt to get species from the world as a last resort as the operation can be rather expensive
         if (species == Species.NULL_SPECIES) {
-            species = getWailaSpecies(accessor.getWorld(), pos);
+            species = getWailaSpecies(accessor.getLevel(), pos);
         }
 
         if (!species.useDefaultWailaBody()) {
@@ -73,7 +75,7 @@ public class WailaBranchHandler implements IComponentProvider {
         }
 
         if (!lastPos.equals(pos)) {
-            lastVolume = getTreeVolume(accessor.getWorld(), pos);
+            lastVolume = getTreeVolume(accessor.getLevel(), pos);
         }
 
         //Update the cached species and position

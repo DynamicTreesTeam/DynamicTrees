@@ -54,7 +54,7 @@ public interface MappedResult<T, I> extends Result<T, I> {
      * @return the mapped result
      */
     default <V> MappedResult<T, I> elseMapIfContains(String key, Class<V> type, SimpleMapper<V, T> mapper) {
-        return this.mapIfContains(key, type, mapper.fullMapper());
+        return this.elseMapIfContains(key, type, mapper.fullMapper());
     }
 
     /**

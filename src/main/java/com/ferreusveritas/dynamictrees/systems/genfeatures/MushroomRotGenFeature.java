@@ -43,22 +43,22 @@ public class MushroomRotGenFeature extends GenFeature {
 
     @Override
     protected boolean postRot(GenFeatureConfiguration configuration, PostRotContext context) {
-        final LevelAccessor world = context.world();
+        final LevelAccessor level = context.level();
         final BlockPos pos = context.pos();
         final Block mushroom = configuration.get(ALTERNATE_MUSHROOM_CHANCE) > context.random().nextFloat() ?
                 configuration.get(MUSHROOM) : configuration.get(ALTERNATE_MUSHROOM);
 
-        if (context.radius() <= 4 || !this.canSustainMushroom(world, pos, mushroom) ||
-                world.getBrightness(LightLayer.SKY, pos) >= 4) {
+        if (context.radius() <= 4 || !this.canSustainMushroom(level, pos, mushroom) ||
+                level.getBrightness(LightLayer.SKY, pos) >= 4) {
             return false;
         }
 
-        world.setBlock(pos, mushroom.defaultBlockState(), 3);
+        level.setBlock(pos, mushroom.defaultBlockState(), 3);
         return true;
     }
 
-    private boolean canSustainMushroom(final LevelAccessor world, final BlockPos pos, final Block block) {
-        return block instanceof IPlantable && world.getBlockState(pos).canSustainPlant(world, pos, Direction.UP, (IPlantable) block);
+    private boolean canSustainMushroom(final LevelAccessor level, final BlockPos pos, final Block block) {
+        return block instanceof IPlantable && level.getBlockState(pos).canSustainPlant(level, pos, Direction.UP, (IPlantable) block);
     }
 
 }

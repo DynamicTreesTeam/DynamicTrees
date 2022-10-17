@@ -300,8 +300,13 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-        return getFamily(state, worldIn, pos).onTreeActivated(worldIn, pos, state, player, handIn, player.getItemInHand(handIn), hit) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        final ItemStack heldItem = player.getItemInHand(hand);
+        return getFamily(state, level, pos).onTreeActivated(
+                new Family.TreeActivationContext(
+                        level, TreeHelper.findRootNode(level, pos), pos, state, player, hand, heldItem, hitResult
+                )
+        ) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
 
     public void destroyTree(Level world, BlockPos rootPos) {

@@ -100,7 +100,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
      * @param <R>           the return type of the action
      * @return the return of the executed action
      */
-    public <C extends GenerationContext<?>, R> R generate(GenFeatureConfiguration configuration, Type<C, R> type,
+    public <C extends GenerationContext, R> R generate(GenFeatureConfiguration configuration, Type<C, R> type,
                                                           C context) {
         return type.generate(configuration, context);
     }
@@ -179,7 +179,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     // GENERATION TYPE                       //
     ///////////////////////////////////////////
 
-    public static final class Type<C extends GenerationContext<?>, R> {
+    public static final class Type<C extends GenerationContext, R> {
         public static final Type<PreGenerationContext, BlockPos> PRE_GENERATION = new Type<>(GenFeature::preGenerate);
         public static final Type<PostGenerationContext, Boolean> POST_GENERATION = new Type<>(GenFeature::postGenerate);
         public static final Type<PostGrowContext, Boolean> POST_GROW = new Type<>(GenFeature::postGrow);

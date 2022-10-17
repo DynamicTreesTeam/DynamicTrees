@@ -36,7 +36,7 @@ public class ConiferTopperGenFeature extends GenFeature {
             return false;
         }
 
-        final LevelAccessor world = context.world();
+        final LevelAccessor level = context.level();
 
         // Find the highest end point.
         final BlockPos highest = Collections.max(context.endPoints(), Comparator.comparingInt(Vec3i::getY));
@@ -45,9 +45,9 @@ public class ConiferTopperGenFeature extends GenFeature {
                 .elseIfInvalid(context.species().getLeavesProperties());
 
         // Manually place the highest few blocks of the conifer since the LeafCluster voxmap won't handle it.
-        world.setBlock(highest.above(1), leavesProperties.getDynamicLeavesState(4), 3);
-        world.setBlock(highest.above(2), leavesProperties.getDynamicLeavesState(3), 3);
-        world.setBlock(highest.above(3), leavesProperties.getDynamicLeavesState(1), 3);
+        level.setBlock(highest.above(1), leavesProperties.getDynamicLeavesState(4), 3);
+        level.setBlock(highest.above(2), leavesProperties.getDynamicLeavesState(3), 3);
+        level.setBlock(highest.above(3), leavesProperties.getDynamicLeavesState(1), 3);
 
         return true;
     }

@@ -21,7 +21,6 @@ import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import com.ferreusveritas.dynamictrees.entities.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entities.animation.AnimationHandler;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
@@ -41,15 +40,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -60,9 +56,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryModifiable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
@@ -104,7 +97,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         }
 
         @Override
-        public boolean onTreeActivated(Level world, BlockPos hitPos, BlockState state, Player player, InteractionHand hand, ItemStack heldItem, BlockHitResult hit) {
+        public boolean onTreeActivated(TreeActivationContext context) {
             return false;
         }
 
@@ -184,10 +177,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * The stick that is returned when a whole log can't be dropped
      */
     private Item stick = Items.STICK;
-    /**
-     * Weather the branch can support cocoa pods on it's surface [default = false]
-     */
-    public boolean canSupportCocoa = false;
 
     @OnlyIn(Dist.CLIENT)
     public int woodRingColor; // For rooty blocks
@@ -273,68 +262,66 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // INTERACTION
     ///////////////////////////////////////////
 
-    public boolean onTreeActivated(Level world, BlockPos hitPos, BlockState state, Player player, InteractionHand hand, @Nullable ItemStack heldItem, BlockHitResult hit) {
+    public static class TreeActivationContext {
+        public final Level level;
+        public final BlockPos rootPos;
+        public final BlockPos hitPos;
+        public final BlockState hitState;
+        public final Player player;
+        public final InteractionHand hand;
+        @Nullable
+        public final ItemStack heldItem;
+        public final BlockHitResult hitResult;
 
-        if (this.canSupportCocoa) {
-            BlockPos pos = hit.getBlockPos();
-            if (heldItem != null) {
-                if (heldItem.getItem() == Items.COCOA_BEANS) {
-                    BranchBlock branch = TreeHelper.getBranch(state);
-                    if (branch != null && branch.getRadius(state) == 8) {
-                        if (hit.getDirection() != Direction.UP && hit.getDirection() != Direction.DOWN) {
-                            pos = pos.relative(hit.getDirection());
-                        }
-                        if (world.isEmptyBlock(pos)) {
-                            BlockState cocoaState = DTRegistries.COCOA_FRUIT.get().getStateForPlacement(new BlockPlaceContext(new UseOnContext(player, hand, hit)));
-                            assert cocoaState != null;
-                            Direction facing = cocoaState.getValue(HorizontalDirectionalBlock.FACING);
-                            world.setBlock(pos, DTRegistries.COCOA_FRUIT.get().defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing), 2);
-                            if (!player.isCreative()) {
-                                heldItem.shrink(1);
-                            }
-                            return true;
-                        }
-                    }
-                }
-            }
+        public TreeActivationContext(Level level, BlockPos rootPos, BlockPos hitPos, BlockState hitState,
+                                     Player player, InteractionHand hand, @Nullable ItemStack heldItem,
+                                     BlockHitResult hitResult) {
+            this.level = level;
+            this.rootPos = rootPos;
+            this.hitPos = hitPos;
+            this.hitState = hitState;
+            this.player = player;
+            this.hand = hand;
+            this.heldItem = heldItem;
+            this.hitResult = hitResult;
         }
 
-        BlockPos rootPos = TreeHelper.findRootNode(world, hitPos);
+    }
 
-        if (canStripBranch(state, world, hitPos, player, heldItem)) {
-            return stripBranch(state, world, hitPos, player, heldItem);
+    public boolean onTreeActivated(TreeActivationContext context) {
+        if (canStripBranch(context.hitState, context.level, context.hitPos, context.player, context.heldItem)) {
+            return stripBranch(context.hitState, context.level, context.hitPos, context.player, context.heldItem);
         }
 
-        if (rootPos != BlockPos.ZERO) {
-            return TreeHelper.getExactSpecies(world, hitPos).onTreeActivated(world, rootPos, hitPos, state, player, hand, heldItem, hit);
+        if (context.rootPos != BlockPos.ZERO) {
+            return TreeHelper.getExactSpecies(context.level, context.hitPos).onTreeActivated(context);
         }
 
         return false;
     }
 
-    public boolean canStripBranch(BlockState state, Level world, BlockPos pos, Player player, ItemStack heldItem) {
+    public boolean canStripBranch(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
         BranchBlock branchBlock = TreeHelper.getBranch(state);
-		if (branchBlock == null) {
-			return false;
-		}
-        return branchBlock.canBeStripped(state, world, pos, player, heldItem);
+        if (branchBlock == null) {
+            return false;
+        }
+        return branchBlock.canBeStripped(state, level, pos, player, heldItem);
     }
 
-    public boolean stripBranch(BlockState state, Level world, BlockPos pos, Player player, ItemStack heldItem) {
+    public boolean stripBranch(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
         if (this.hasStrippedBranch()) {
             this.getBranch().ifPresent(branch -> {
-                branch.stripBranch(state, world, pos, player, heldItem);
-                if (world.isClientSide) {
-                    world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
+                branch.stripBranch(state, level, pos, player, heldItem);
+                if (level.isClientSide) {
+                    level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
                     WailaOther.invalidateWailaPosition();
                 }
             });
-			return this.getBranch().isPresent();
-		} else {
-			return false;
-		}
+            return this.getBranch().isPresent();
+        } else {
+            return false;
+        }
     }
-
 
     ///////////////////////////////////////////
     // TREE PROPERTIES
@@ -487,10 +474,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      */
     public ItemStack getStick(int qty) {
         return this.stick == Items.AIR ? ItemStack.EMPTY : new ItemStack(this.stick, Mth.clamp(qty, 0, 64));
-    }
-
-    public void setCanSupportCocoa(boolean canSupportCocoa) {
-        this.canSupportCocoa = canSupportCocoa;
     }
 
     /**
@@ -833,16 +816,25 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     @Override
     public String toLoadDataString() {
-        return this.getString(Pair.of("commonLeaves", this.commonLeaves), Pair.of("maxBranchRadius", this.maxBranchRadius),
-                Pair.of("hasSurfaceRoot", this.hasSurfaceRoot), Pair.of("hasStrippedBranch", this.hasStrippedBranch));
+        return this.getString(
+                Pair.of("commonLeaves", this.commonLeaves),
+                Pair.of("maxBranchRadius", this.maxBranchRadius),
+                Pair.of("hasSurfaceRoot", this.hasSurfaceRoot),
+                Pair.of("hasStrippedBranch", this.hasStrippedBranch)
+        );
     }
 
     @Override
     public String toReloadDataString() {
-        return this.getString(Pair.of("commonLeaves", this.commonLeaves), Pair.of("maxBranchRadius", this.maxBranchRadius),
-                Pair.of("commonSpecies", this.commonSpecies), Pair.of("primitiveLog", this.primitiveLog),
-                Pair.of("primitiveStrippedLog", this.primitiveStrippedLog), Pair.of("stick", this.stick),
-                Pair.of("hasConiferVariants", this.hasConiferVariants), Pair.of("canSupportCocoa", this.canSupportCocoa));
+        return this.getString(
+                Pair.of("commonLeaves", this.commonLeaves),
+                Pair.of("maxBranchRadius", this.maxBranchRadius),
+                Pair.of("commonSpecies", this.commonSpecies),
+                Pair.of("primitiveLog", this.primitiveLog),
+                Pair.of("primitiveStrippedLog", this.primitiveStrippedLog),
+                Pair.of("stick", this.stick),
+                Pair.of("hasConiferVariants", this.hasConiferVariants)
+        );
     }
 
 }

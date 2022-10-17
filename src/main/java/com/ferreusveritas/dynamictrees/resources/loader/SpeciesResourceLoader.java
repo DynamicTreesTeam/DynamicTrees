@@ -14,7 +14,9 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.items.Seed;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
@@ -109,6 +111,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (Applier<Species, String>) this::addAcceptableSoil)
+                .registerListApplier("fruits", Fruit.class, Species::addFruits)
+                .registerListApplier("pods", Pod.class, Species::addPods)
                 .registerArrayApplier("features", GenFeatureConfiguration.class, Species::addGenFeature)
                 .registerArrayApplier("drop_creators", DropCreatorConfiguration.class, Species::addDropCreators)
                 .register("does_rot", Boolean.class, Species::setDoesRot);

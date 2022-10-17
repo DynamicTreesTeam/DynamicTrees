@@ -34,6 +34,8 @@ repositories {
     maven("https://squiddev.cc/maven/")
 }
 
+apply(from = "https://moddingtutorials.org/applesilicon.gradle")
+
 val modName = property("modName")
 val modId = property("modId")
 val modVersion = property("modVersion")
@@ -48,13 +50,7 @@ minecraft {
 
     runs {
         create("client") {
-            workingDirectory = file("run").absolutePath
-
-            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
-            property("forge.logging.console.level", "debug")
-
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
+            applyDefaultConfiguration()
 
             if (project.hasProperty("mcUuid")) {
                 args("--uuid", property("mcUuid"))
@@ -65,54 +61,21 @@ minecraft {
             if (project.hasProperty("mcAccessToken")) {
                 args("--accessToken", property("mcAccessToken"))
             }
-
-            mods {
-                create(modId) {
-                    source(sourceSets.main.get())
-                }
-            }
         }
 
         create("server") {
-            workingDirectory = file("run").absolutePath
-
-            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
-            property("forge.logging.console.level", "debug")
-
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
-
-            mods {
-                create(modId) {
-                    source(sourceSets.main.get())
-                }
-            }
+            applyDefaultConfiguration()
         }
 
         create("data") {
-            workingDirectory = file("run").absolutePath
-
-            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
-            property("forge.logging.console.level", "debug")
-
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
+            applyDefaultConfiguration()
 
             args(
-                "--mod",
-                modId,
+                "--mod", modId,
                 "--all",
-                "--output",
-                file("src/generated/resources/"),
-                "--existing",
-                file("src/main/resources")
+                "--output", file("src/generated/resources/"),
+                "--existing", file("src/main/resources")
             )
-
-            mods {
-                create(modId) {
-                    source(sourceSets.main.get())
-                }
-            }
         }
     }
 }
@@ -122,44 +85,18 @@ sourceSets.main.get().resources {
 }
 
 dependencies {
-    // Not sure if we need this one, what is a "forge" anyway?
     minecraft("net.minecraftforge:forge:$mcVersion-${property("forgeVersion")}")
 
-    // Compile JEI API, but don"t include in runtime.
+    implementation(fg.deobf("curse.maven:jade-324717:3970956"))
+
     compileOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}:api"))
-    // At runtime, use the full JEI mod.
     runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}"))
 
-    // At runtime, use Patchouli mod (for the guide book, which is Json so we don"t need the API).
+    implementation(fg.deobf("curse.maven:SereneSeasons-291874:3693807"))
+
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
-
-    // At runtime use, CC for creating growth chambers.
-    //runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
-    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3770724"))
-
-    // Compile Serene Seasons.
-    compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3693807"))
-
-    // Compile Better Weather API.
-//    compileOnly(fg.deobf("curse.maven:BetterWeatherAPI-400714:3403615"))
-
-//    useSereneSeasons(this)
-//    useBetterWeather(this)
-
-    // At runtime, use suggestion provider fix mod.
-//    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:$mcVersion-${property("suggestionProviderFixVersion")}"))
-
-    compileOnly(fg.deobf("curse.maven:suggestion-provider-fix-469647:3623382"))
-}
-
-fun useSereneSeasons(depHandler: DependencyHandlerScope) {
-    // At runtime, use full Serene Seasons mod.
-    depHandler.runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:3510900"))
-}
-
-fun useBetterWeather(depHandler: DependencyHandlerScope) {
-    // At runtime, use the full Better Weather mod.
-    depHandler.runtimeOnly(fg.deobf("curse.maven:BetterWeather-400714:3420517"))
+    runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
+    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.18.1:${property("suggestionProviderFixVersion")}"))
 }
 
 translationSheet {
@@ -312,7 +249,21 @@ tasks.register("publishToAllPlatforms") {
     this.dependsOn("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
 }
 
-// Extensions to make CurseGradle extension slightly neater.
+fun net.minecraftforge.gradle.common.util.RunConfig.applyDefaultConfiguration(runDirectory: String = "run") {
+    workingDirectory = file(runDirectory).absolutePath
+
+    property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
+    property("forge.logging.console.level", "debug")
+
+    property("mixin.env.remapRefMap", "true")
+    property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
+
+    mods {
+        create(modId) {
+            source(sourceSets.main.get())
+        }
+    }
+}
 
 fun com.matthewprenger.cursegradle.CurseExtension.project(action: CurseProject.() -> Unit) {
     this.project(closureOf(action))

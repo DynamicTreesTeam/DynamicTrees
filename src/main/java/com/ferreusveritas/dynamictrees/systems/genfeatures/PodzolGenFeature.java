@@ -12,7 +12,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.*;
 
@@ -35,9 +35,9 @@ public class PodzolGenFeature extends GenFeature {
             return false;
         }
 
-        final Level world = context.world();
+        final LevelAccessor level = context.level();
         final FindEndsNode endFinder = new FindEndsNode();
-        TreeHelper.startAnalysisFromRoot(world, context.pos(), new MapSignal(endFinder));
+        TreeHelper.startAnalysisFromRoot(level, context.pos(), new MapSignal(endFinder));
         final List<BlockPos> endPoints = endFinder.getEnds();
 
         if (endPoints.isEmpty()) {
@@ -55,24 +55,24 @@ public class PodzolGenFeature extends GenFeature {
         for (int i = 0; i < 32; i++) {
             final BlockPos offPos = new BlockPos(x, pos.getY() - 1 - i, z);
 
-            if (!world.isEmptyBlock(offPos)) {
-                final Block block = world.getBlockState(offPos).getBlock();
+            if (!level.isEmptyBlock(offPos)) {
+                final Block block = level.getBlockState(offPos).getBlock();
 
                 // Skip past Mushrooms and branches on the way down.
                 if (block instanceof BranchBlock || block instanceof MushroomBlock || block instanceof LeavesBlock) {
                     continue;
                 } else if (block instanceof FlowerBlock || block instanceof TallGrassBlock || block instanceof DoublePlantBlock) {
                     // Kill plants.
-                    if (world.getBrightness(LightLayer.SKY, offPos) <= darkThreshold) {
-                        world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                    if (level.getBrightness(LightLayer.SKY, offPos) <= darkThreshold) {
+                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
                     }
                     continue;
                 } else if (block == Blocks.DIRT || block == Blocks.GRASS) {
                     // Convert grass or dirt to podzol.
-                    if (world.getBrightness(LightLayer.SKY, offPos.above()) <= darkThreshold) {
-                        world.setBlockAndUpdate(offPos, BlockStates.PODZOL);
+                    if (level.getBrightness(LightLayer.SKY, offPos.above()) <= darkThreshold) {
+                        level.setBlock(offPos, BlockStates.PODZOL, Block.UPDATE_ALL);
                     } else {
-                        spreadPodzol(world, pos);
+                        spreadPodzol(level, pos);
                     }
                 }
                 break;
@@ -81,16 +81,16 @@ public class PodzolGenFeature extends GenFeature {
         return true;
     }
 
-    public static void spreadPodzol(Level world, BlockPos pos) {
+    public static void spreadPodzol(LevelAccessor level, BlockPos pos) {
         int podzolish = 0;
 
         for (Direction dir : CoordUtils.HORIZONTALS) {
             BlockPos deltaPos = pos.relative(dir);
-            Block testBlock = world.getBlockState(deltaPos).getBlock();
+            Block testBlock = level.getBlockState(deltaPos).getBlock();
             podzolish += (testBlock == Blocks.PODZOL) ? 1 : 0;
             podzolish += testBlock instanceof RootyBlock ? 1 : 0;
             if (podzolish >= 3) {
-                world.setBlockAndUpdate(pos, BlockStates.PODZOL);
+                level.setBlock(pos, BlockStates.PODZOL, Block.UPDATE_ALL);
                 break;
             }
         }

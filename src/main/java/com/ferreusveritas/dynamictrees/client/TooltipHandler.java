@@ -28,14 +28,15 @@ public class TooltipHandler {
 
         Seed seed = (Seed) item;
         Player player = event.getPlayer();
-        LevelContext levelContext = LevelContext.create(player.level);
 
-        if (player == null || player.level == null || SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null) {
+        if (player == null || player.level == null) {
             return;
         }
 
+        LevelContext levelContext = LevelContext.create(player.level);
         Species species = seed.getSpecies();
-        if (species == null || !species.isValid()) {
+
+        if (SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null || species == null || !species.isValid()) {
             return;
         }
 

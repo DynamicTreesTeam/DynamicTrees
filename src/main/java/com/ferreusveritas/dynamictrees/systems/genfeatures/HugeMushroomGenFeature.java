@@ -177,20 +177,20 @@ public class HugeMushroomGenFeature extends GenFeature {
     }
 
     //Override this for custom mushroom heights
-    protected int getMushroomHeight(LevelAccessor world, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+    protected int getMushroomHeight(LevelAccessor level, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
         return this.height > 0 ? this.height : random.nextInt(9) + 2;
     }
 
     @Override
     protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
-        final LevelAccessor world = context.world();
+        final LevelAccessor level = context.level();
         final BlockPos rootPos = context.pos();
 
         final BlockPos genPos = rootPos.above();
-        final int height = this.getMushroomHeight(world, rootPos, context.biome(), context.random(), context.radius(), context.bounds());
-        final BlockState soilState = world.getBlockState(rootPos);
+        final int height = this.getMushroomHeight(level, rootPos, context.biome(), context.random(), context.radius(), context.bounds());
+        final BlockState soilState = level.getBlockState(rootPos);
 
-        if (context.species().isAcceptableSoilForWorldgen(world, rootPos, soilState)) {
+        if (context.species().isAcceptableSoilForWorldgen(level, rootPos, soilState)) {
             Block mushroomBlock = configuration.get(MUSHROOM_BLOCK);
 
             if (mushroomBlock == null) {
@@ -207,7 +207,7 @@ public class HugeMushroomGenFeature extends GenFeature {
                 // Check there's room for a mushroom cap and stem.
                 for (BlockPos mutPos : Iterables.concat(BlockPos.betweenClosed(BlockPos.ZERO.below(capMap.getLenY()), BlockPos.ZERO.below(height - 1)), capMap.getAllNonZero())) {
                     final BlockPos dPos = mutPos.offset(capPos);
-                    final BlockState state = world.getBlockState(dPos);
+                    final BlockState state = level.getBlockState(dPos);
                     if (!state.getMaterial().isReplaceable()) {
                         return true;
                     }
@@ -217,13 +217,13 @@ public class HugeMushroomGenFeature extends GenFeature {
 
                 // Construct the mushroom cap from the voxel map.
                 for (SimpleVoxmap.Cell cell : capMap.getAllNonZeroCells()) {
-                    world.setBlock(capPos.offset(cell.getPos()), this.getMushroomStateForValue(mushroomBlock, stemState, cell.getValue(), cell.getPos().getY()), 2);
+                    level.setBlock(capPos.offset(cell.getPos()), this.getMushroomStateForValue(mushroomBlock, stemState, cell.getValue(), cell.getPos().getY()), 2);
                 }
 
                 // Construct the stem.
                 final int stemLen = height - capMap.getLenY();
                 for (int y = 0; y < stemLen; y++) {
-                    world.setBlock(genPos.above(y), stemState, 2);
+                    level.setBlock(genPos.above(y), stemState, 2);
                 }
 
                 return true;

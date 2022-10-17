@@ -9,14 +9,14 @@ import net.minecraft.world.level.biome.Biome;
 /**
  * @author Harley O'Connor
  */
-public final class FullGenerationContext extends GenerationContext<LevelAccessor> {
+public final class FullGenerationContext extends GenerationContext {
 
     private final Biome biome;
     private final int radius;
     private final SafeChunkBounds bounds;
 
-    public FullGenerationContext(LevelAccessor world, BlockPos rootPos, Species species, Biome biome, int radius, SafeChunkBounds bounds) {
-        super(world, rootPos, species);
+    public FullGenerationContext(LevelAccessor level, BlockPos rootPos, Species species, Biome biome, int radius, SafeChunkBounds bounds) {
+        super(level, rootPos, species);
         this.biome = biome;
         this.radius = radius;
         this.bounds = bounds;

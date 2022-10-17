@@ -80,7 +80,7 @@ public class PalmSpecies extends Species {
 
     @Override
     public void postGeneration(PostGenerationContext context) {
-        final LevelAccessor world = context.world();
+        final LevelAccessor world = context.level();
 
         if (!context.endPoints().isEmpty()) {
             BlockPos tip = context.endPoints().get(0).above(2);

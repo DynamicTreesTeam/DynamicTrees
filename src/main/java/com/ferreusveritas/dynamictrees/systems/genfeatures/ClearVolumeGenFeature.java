@@ -34,7 +34,7 @@ public class ClearVolumeGenFeature extends GenFeature {
                 rootPos.offset(new Vec3i(-1, 1, -1)),
                 rootPos.offset(new Vec3i(1, configuration.get(HEIGHT), 1))
         )) {
-            context.world().removeBlock(pos, false);
+            context.level().removeBlock(pos, false);
         }
 
         return rootPos;

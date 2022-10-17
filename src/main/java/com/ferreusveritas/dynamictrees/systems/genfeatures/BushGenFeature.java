@@ -66,7 +66,7 @@ public class BushGenFeature extends GenFeature {
 
     @Override
     protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
-        this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(),
+        this.commonGen(configuration, context.level(), context.pos(), context.species(), context.random(),
                 context.radius(), context.bounds());
         return true;
     }
@@ -74,14 +74,14 @@ public class BushGenFeature extends GenFeature {
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (context.bounds() != SafeChunkBounds.ANY && configuration.get(BIOME_PREDICATE).test(context.biome())) {
-            this.commonGen(configuration, context.world(), context.pos(), context.species(), context.random(),
+            this.commonGen(configuration, context.level(), context.pos(), context.species(), context.random(),
                     context.radius(), context.bounds());
             return true;
         }
         return false;
     }
 
-    protected void commonGen(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, Species species,
+    protected void commonGen(GenFeatureConfiguration configuration, LevelAccessor level, BlockPos rootPos, Species species,
                              Random random, int radius, SafeChunkBounds safeBounds) {
         if (radius <= 2) {
             return;
@@ -100,32 +100,32 @@ public class BushGenFeature extends GenFeature {
                 continue;
             }
 
-            final BlockPos groundPos = CoordUtils.findWorldSurface(world, vPos, worldGen);
-            final BlockState soilBlockState = world.getBlockState(groundPos);
+            final BlockPos groundPos = CoordUtils.findWorldSurface(level, vPos, worldGen);
+            final BlockState soilBlockState = level.getBlockState(groundPos);
 
             final BlockPos pos = groundPos.above();
-            if (!world.getBlockState(groundPos).getMaterial().isLiquid() &&
-                    species.isAcceptableSoil(world, groundPos, soilBlockState)) {
-                world.setBlock(pos, configuration.get(LOG).defaultBlockState(), 3);
+            if (!level.getBlockState(groundPos).getMaterial().isLiquid() &&
+                    species.isAcceptableSoil(level, groundPos, soilBlockState)) {
+                level.setBlock(pos, configuration.get(LOG).defaultBlockState(), 3);
 
                 SimpleVoxmap leafMap = LeafClusters.BUSH;
                 BlockPos.MutableBlockPos leafPos = new BlockPos.MutableBlockPos();
                 for (BlockPos.MutableBlockPos dPos : leafMap.getAllNonZero()) {
                     leafPos.set(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ());
                     if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 &&
-                            world.getBlockState(leafPos).getMaterial().isReplaceable()) {
-                        placeLeaves(configuration, world, random, leafPos);
+                            level.getBlockState(leafPos).getMaterial().isReplaceable()) {
+                        placeLeaves(configuration, level, random, leafPos);
                     }
                 }
             }
         }
     }
 
-    private void placeLeaves(GenFeatureConfiguration configuration, LevelAccessor world, Random random,
+    private void placeLeaves(GenFeatureConfiguration configuration, LevelAccessor level, Random random,
                              BlockPos leafPos) {
         final Block leavesBlock = selectLeavesBlock(random, configuration.get(SECONDARY_LEAVES_CHANCE),
                 configuration.get(LEAVES), configuration.getAsOptional(SECONDARY_LEAVES).orElse(null));
-        placeLeavesBlock(world, leafPos, leavesBlock);
+        placeLeavesBlock(level, leafPos, leavesBlock);
     }
 
     private Block selectLeavesBlock(Random random, int secondaryLeavesChance, Block leavesBlock,
@@ -134,12 +134,12 @@ public class BushGenFeature extends GenFeature {
                 secondaryLeavesBlock;
     }
 
-    private void placeLeavesBlock(LevelAccessor world, BlockPos leafPos, Block leavesBlock) {
+    private void placeLeavesBlock(LevelAccessor level, BlockPos leafPos, Block leavesBlock) {
         BlockState leafState = leavesBlock.defaultBlockState();
         if (leavesBlock instanceof LeavesBlock) {
             leafState = leafState.setValue(LeavesBlock.PERSISTENT, true);
         }
-        world.setBlock(leafPos, leafState, 3);
+        level.setBlock(leafPos, leafState, 3);
     }
 
     public static int coordHashCode(BlockPos pos) {
