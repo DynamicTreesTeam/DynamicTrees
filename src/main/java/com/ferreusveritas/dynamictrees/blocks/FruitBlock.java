@@ -214,6 +214,10 @@ public class FruitBlock extends Block implements BonemealableBlock, GrowableBloc
         return state.getValue(fruit.getAgeProperty());
     }
 
+    public float getAgeAsPercentage(BlockState state) {
+        return getAge(state) * 100F / getMaxAge();
+    }
+
     public int getMaxAge() {
         return fruit.getMaxAge();
     }

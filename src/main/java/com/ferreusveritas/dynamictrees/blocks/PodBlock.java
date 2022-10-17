@@ -227,6 +227,10 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
         return state.getValue(pod.getAgeProperty());
     }
 
+    public float getAgeAsPercentage(BlockState state) {
+        return getAge(state) * 100F / getMaxAge();
+    }
+
     public int getMaxAge() {
         return pod.getMaxAge();
     }

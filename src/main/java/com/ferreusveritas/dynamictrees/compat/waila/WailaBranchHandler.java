@@ -1,4 +1,3 @@
-/*
 package com.ferreusveritas.dynamictrees.compat.waila;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -13,16 +12,16 @@ import com.ferreusveritas.dynamictrees.trees.Species;
 import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
 import mcp.mobius.waila.api.BlockAccessor;
 import mcp.mobius.waila.api.IComponentProvider;
-import mcp.mobius.waila.api.IDataAccessor;
-import mcp.mobius.waila.api.IPluginConfig;
 import mcp.mobius.waila.api.ITooltip;
-import mcp.mobius.waila.api.RenderableTextComponent;
 import mcp.mobius.waila.api.config.IPluginConfig;
+import mcp.mobius.waila.api.ui.IElement;
+import mcp.mobius.waila.impl.ui.ElementHelper;
+import mcp.mobius.waila.impl.ui.ItemStackElement;
+import mcp.mobius.waila.impl.ui.SpacerElement;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -30,6 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec2;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +39,6 @@ public class WailaBranchHandler implements IComponentProvider {
     private BlockPos lastPos = BlockPos.ZERO;
     private Species lastSpecies = Species.NULL_SPECIES;
     private NetVolumeNode.Volume lastVolume = new NetVolumeNode.Volume();
-
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -93,28 +92,28 @@ public class WailaBranchHandler implements IComponentProvider {
 
             ItemStack seedStack = species.getSeedStack(1);
 
-            List<RenderableTextComponent> renderers = new LinkedList<>();
-            renderers.add(getRenderable(seedStack)); //adds seed;
+            List<IElement> elements = new LinkedList<>();
+            elements.add(getElement(seedStack)); //adds seed;
 
             if (lastVolume.getVolume() > 0) {
                 LogsAndSticks las = species.getLogsAndSticks(lastVolume);
                 List<ItemStack> logStacks = las.logs;
                 if (!logStacks.isEmpty()) {
                     for (ItemStack logStack : logStacks) {
-                        renderers.add(getRenderable(logStack));
+                        elements.add(getElement(logStack));
                     }
                 }
                 if (las.sticks > 0) {
                     ItemStack stickStack = species.getFamily().getStick(las.sticks);
                     if (!stickStack.isEmpty()) {
-                        renderers.add(getRenderable(stickStack));
+                        elements.add(getElement(stickStack));
                     }
                 }
             }
 
-            RenderableTextComponent renderables = new RenderableTextComponent(renderers.toArray(new RenderableTextComponent[]{}));
-
-            tooltip.add(renderables);
+            tooltip.add(elements.remove(0));
+            elements.forEach(tooltip::append);
+            tooltip.add(ElementHelper.INSTANCE.spacer(0, 2));
         }
     }
 
@@ -148,28 +147,15 @@ public class WailaBranchHandler implements IComponentProvider {
         return new NetVolumeNode.Volume();
     }
 
-//	@Override
-//	public void appendServerData(CompoundNBT compoundNBT, ServerPlayerEntity serverPlayerEntity, World world, String string) {
-//		compoundNBT.putString("species", string);
-//	}
-
     private Species getWailaSpecies(Level world, BlockPos pos) {
         return TreeHelper.getBestGuessSpecies(world, pos);
     }
 
-    private static RenderableTextComponent getRenderable(ItemStack stack) {
-        CompoundTag tag = new CompoundTag();
+    private static IElement getElement(ItemStack stack) {
         if (!stack.isEmpty()) {
-            tag.putString("id", stack.getItem().getRegistryName().toString());
-            tag.putInt("count", stack.getCount());
-            if (stack.hasTag()) {
-                tag.putString("nbt", stack.getTag().toString());
-            }
-            return new RenderableTextComponent(new ResourceLocation("item"), tag);
+            return ElementHelper.INSTANCE.item(stack);
         } else {
-            tag.putInt("width", 0);
-            return new RenderableTextComponent(new ResourceLocation("spacer"), tag);
+            return ElementHelper.INSTANCE.spacer(0, 0);
         }
     }
 }
-*/
