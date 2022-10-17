@@ -11,6 +11,7 @@ fun property(key: String) = project.findProperty(key).toString()
 fun optionalProperty(key: String) = project.findProperty(key)?.toString()
 
 apply(from = "https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle")
+apply(from = "https://gist.githubusercontent.com/Harleyoc1/4d23d4e991e868d98d548ac55832381e/raw/applesiliconfg.gradle")
 
 plugins {
     id("java")
@@ -33,8 +34,6 @@ repositories {
     maven("https://harleyoconnor.com/maven")
     maven("https://squiddev.cc/maven/")
 }
-
-apply(from = "https://moddingtutorials.org/applesilicon.gradle")
 
 val modName = property("modName")
 val modId = property("modId")
