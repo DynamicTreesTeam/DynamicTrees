@@ -223,6 +223,10 @@ public class PodBlock extends HorizontalBlock implements GrowableBlock, IGrowabl
         return state.getValue(pod.getAgeProperty());
     }
 
+    public float getAgeAsPercentage(BlockState state) {
+        return getAge(state) * 100F / getMaxAge();
+    }
+
     public int getMaxAge() { return pod.getMaxAge(); }
 
     private void setAge(World world, BlockPos pos, BlockState state, int newAge) {
@@ -252,5 +256,4 @@ public class PodBlock extends HorizontalBlock implements GrowableBlock, IGrowabl
     public boolean isPathfindable(BlockState pState, IBlockReader pLevel, BlockPos pPos, PathType pType) {
         return false;
     }
-
 }

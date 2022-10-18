@@ -217,6 +217,10 @@ public class FruitBlock extends Block implements IGrowable, GrowableBlock {
         return state.getValue(fruit.getAgeProperty());
     }
 
+    public float getAgeAsPercentage(BlockState state) {
+        return getAge(state) * 100F / getMaxAge();
+    }
+
     public int getMaxAge() {
         return fruit.getMaxAge();
     }
