@@ -16,7 +16,6 @@ import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
-import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
 import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
 import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
@@ -62,6 +61,7 @@ import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
@@ -88,7 +88,6 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.BiomeDictionary;
@@ -173,6 +172,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(Species::new);
 
+    public static final Codec<Species> CODEC = ResourceLocation.CODEC.comapFlatMap(Species::read, Species::getRegistryName);
+
     public static TypedRegistry.EntryType<Species> createDefaultType(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
         return TypedRegistry.newType(createDefaultCodec(constructor));
     }
@@ -185,6 +186,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                         LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
                                 LeavesProperties.NULL_PROPERTIES).forGetter(Species::getLeavesProperties))
                 .apply(instance, constructor));
+    }
+
+    private static DataResult<Species> read(ResourceLocation name) {
+        final Species species = Species.REGISTRY.get(name);
+        return species == null ? DataResult.error("Species not found: " + name) : DataResult.success(species);
     }
 
     /**
@@ -386,7 +392,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     *
      * @return The default chance for the compostable {@link Seed} to be successfully composted.
      */
     public float defaultSeedComposterChance() {
@@ -1059,7 +1064,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             placeRootyDirtBlock(world, pos.below(), 15);
 
             if (doesRequireTileEntity(world, pos)) {
-                SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create(pos.below(),world.getBlockState(pos));
+                SpeciesTileEntity speciesTE = DTRegistries.speciesTE.create(pos.below(), world.getBlockState(pos));
                 world.setBlockEntity(speciesTE);
                 if (speciesTE != null) {
                     speciesTE.setSpecies(this);
@@ -1694,7 +1699,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Pulls data from the {@link NormalSeasonManager} to determine the rate of
      * tree growth for the current season.
      *
-     * @param rootPos      the {@link BlockPos} of the {@link RootyBlock}.
+     * @param rootPos the {@link BlockPos} of the {@link RootyBlock}.
      * @return Factor from 0.0 (no growth) to 1.0 (full growth).
      */
     public float seasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos) {

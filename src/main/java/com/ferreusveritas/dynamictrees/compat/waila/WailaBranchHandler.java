@@ -16,8 +16,6 @@ import mcp.mobius.waila.api.ITooltip;
 import mcp.mobius.waila.api.config.IPluginConfig;
 import mcp.mobius.waila.api.ui.IElement;
 import mcp.mobius.waila.impl.ui.ElementHelper;
-import mcp.mobius.waila.impl.ui.ItemStackElement;
-import mcp.mobius.waila.impl.ui.SpacerElement;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -29,7 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec2;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -117,13 +114,13 @@ public class WailaBranchHandler implements IComponentProvider {
         }
     }
 
-    private NetVolumeNode.Volume getTreeVolume(Level world, BlockPos pos) {
-        BlockState state = world.getBlockState(pos);
+    private NetVolumeNode.Volume getTreeVolume(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
 
         //Dereference proxy trunk shell block
         if (block instanceof TrunkShellBlock) {
-            ShellMuse muse = ((TrunkShellBlock) block).getMuse(world, pos);
+            ShellMuse muse = ((TrunkShellBlock) block).getMuse(level, pos);
             if (muse != null) {
                 state = muse.state;
                 block = state.getBlock();
@@ -136,7 +133,7 @@ public class WailaBranchHandler implements IComponentProvider {
 
             // Analyze only part of the tree beyond the break point and calculate it's volume
             NetVolumeNode volumeSum = new NetVolumeNode();
-            branch.analyse(state, world, pos, null, new MapSignal(volumeSum));
+            branch.analyse(state, level, pos, null, new MapSignal(volumeSum));
 
             NetVolumeNode.Volume volume = volumeSum.getVolume();
             volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get());
@@ -147,8 +144,8 @@ public class WailaBranchHandler implements IComponentProvider {
         return new NetVolumeNode.Volume();
     }
 
-    private Species getWailaSpecies(Level world, BlockPos pos) {
-        return TreeHelper.getBestGuessSpecies(world, pos);
+    private Species getWailaSpecies(Level level, BlockPos pos) {
+        return TreeHelper.getBestGuessSpecies(level, pos);
     }
 
     private static IElement getElement(ItemStack stack) {

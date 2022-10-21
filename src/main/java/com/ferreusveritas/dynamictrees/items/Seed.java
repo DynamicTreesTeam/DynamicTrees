@@ -5,18 +5,22 @@ import com.ferreusveritas.dynamictrees.event.SeedVoluntaryPlantEvent;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.util.LazyValue;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.stats.Stats;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -35,9 +39,24 @@ import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 // TODO: Make compostable via ComposterBlock#registerCompostable
 public class Seed extends Item implements IPlantable {
+
+    private static final LazyValue<Random> BACKUP_RANDOM = LazyValue.supplied(Random::new);
+
+    /**
+     * If set to {@code true} in the item stack tag, forces the tree to be planted before despawning.
+     */
+    public static final String FORCE_PLANT_KEY = "ForcePlant";
+    public static final String LIFESPAN_KEY = "Lifespan";
+    /**
+     * If set in the item stack tag, generates the tree with the corresponding {@link JoCode} if the seed is planted.
+     * If set as an integer, selects a random code of the corresponding radius to generate the tree with if the seed is
+     * planted.
+     */
+    public static final String CODE_KEY = "Code";
 
     private final Species species;//The tree this seed creates
 
@@ -86,7 +105,7 @@ public class Seed extends Item implements IPlantable {
     public boolean doPlanting(Level level, BlockPos pos, @Nullable Player planter, ItemStack seedStack) {
         final Species species = this.getSpecies().selfOrLocationOverride(level, pos);
         if (species.plantSapling(level, pos, this.getSpecies() != species)) { // Do the planting
-            String joCode = getCode(seedStack);
+            String joCode = getCode(seedStack, level.random);
             if (!joCode.isEmpty()) {
                 level.removeBlock(pos, false); // Remove the newly created dynamic sapling
                 species.getJoCode(joCode).setCareful(true).generate(LevelContext.create(level), species, pos.below(), level.getBiome(pos).value(), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY, false);
@@ -128,7 +147,7 @@ public class Seed extends Item implements IPlantable {
         if (seedStack.hasTag()) {
             CompoundTag nbtData = seedStack.getTag();
             assert nbtData != null;
-            forcePlant = nbtData.getBoolean("forceplant");
+            forcePlant = nbtData.getBoolean(FORCE_PLANT_KEY);
         }
         return forcePlant;
     }
@@ -138,21 +157,34 @@ public class Seed extends Item implements IPlantable {
         if (seedStack.hasTag()) {
             CompoundTag nbtData = seedStack.getTag();
             assert nbtData != null;
-            if (nbtData.contains("lifespan")) {
-                lifespan = nbtData.getInt("lifespan");
+            if (nbtData.contains(LIFESPAN_KEY)) {
+                lifespan = nbtData.getInt(LIFESPAN_KEY);
             }
         }
         return lifespan;
     }
 
-    public String getCode(ItemStack seedStack) {
+    public String getCode(ItemStack seedStack, Random random) {
         String joCode = "";
         if (seedStack.hasTag()) {
-            CompoundTag nbtData = seedStack.getTag();
-            assert nbtData != null;
-            joCode = nbtData.getString("code");
-        }
+            CompoundTag tag = seedStack.getTag();
+            assert tag != null;
+            if (tag.contains(CODE_KEY)) {
+                if (tag.getTagType(CODE_KEY) == Tag.TAG_STRING) {
+                    joCode = tag.getString(CODE_KEY);
+                } else if (tag.getTagType(CODE_KEY) == Tag.TAG_INT) {
+                    final JoCode code = getJoCodeForRadius(random, tag.getInt(CODE_KEY));
+                    if (code != null) {
+                        joCode = code.toString();
+                    }
+                }
+            }        }
         return joCode;
+    }
+
+    @Nullable
+    private JoCode getJoCodeForRadius(Random random, int radius) {
+        return JoCodeRegistry.getRandomCode(species.getRegistryName(), Mth.clamp(radius, 2, 8), random);
     }
 
     public InteractionResult onItemUseFlowerPot(UseOnContext context) {
@@ -227,14 +259,12 @@ public class Seed extends Item implements IPlantable {
         return InteractionResult.PASS;
     }
 
-    public static final String LIFESPAN_TAG = "lifespan";
-
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flagIn) {
-        super.appendHoverText(stack, world, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
 
         if (stack.hasTag()) {
-            final String joCode = this.getCode(stack);
+            final String joCode = this.getCode(stack, level == null ? BACKUP_RANDOM.get() : level.random);
             if (!joCode.isEmpty()) {
                 tooltip.add(new TranslatableComponent("tooltip.dynamictrees.jo_code", new JoCode(joCode).getTextComponent()));
             }
@@ -247,9 +277,9 @@ public class Seed extends Item implements IPlantable {
             final CompoundTag nbtData = stack.getTag();
             assert nbtData != null;
 
-            if (nbtData.contains(LIFESPAN_TAG)) {
+            if (nbtData.contains(LIFESPAN_KEY)) {
                 tooltip.add(new TranslatableComponent("tooltip.dynamictrees.seed_life_span" +
-                        new TextComponent(String.valueOf(nbtData.getInt(LIFESPAN_TAG)))
+                        new TextComponent(String.valueOf(nbtData.getInt(LIFESPAN_KEY)))
                                 .withStyle(style -> style.withColor(ChatFormatting.DARK_AQUA)))
                 );
             }

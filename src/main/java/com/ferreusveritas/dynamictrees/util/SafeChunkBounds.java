@@ -8,6 +8,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkStatus;
 
+@Deprecated(forRemoval = true)
 public class SafeChunkBounds {
 
     public static final SafeChunkBounds ANY = new SafeChunkBounds() {
