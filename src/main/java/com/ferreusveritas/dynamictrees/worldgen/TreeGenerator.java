@@ -6,7 +6,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Speci
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -85,38 +85,38 @@ public class TreeGenerator {
         return circleProvider;
     }
 
-    public void makeConcreteCircle(LevelAccessor world, PoissonDisc circle, int h, GeneratorResult resultType, SafeChunkBounds safeBounds) {
-        makeConcreteCircle(world, circle, h, resultType, safeBounds, 0);
+    public void makeConcreteCircle(LevelAccessor level, PoissonDisc circle, int h, GeneratorResult resultType, SafeChunkBounds safeBounds) {
+        makeConcreteCircle(level, circle, h, resultType, safeBounds, 0);
     }
 
-    public void makeConcreteCircle(LevelAccessor world, PoissonDisc circle, int h, GeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
+    public void makeConcreteCircle(LevelAccessor level, PoissonDisc circle, int h, GeneratorResult resultType, SafeChunkBounds safeBounds, int flags) {
         for (int ix = -circle.radius; ix <= circle.radius; ix++) {
             for (int iz = -circle.radius; iz <= circle.radius; iz++) {
                 if (circle.isEdge(circle.x + ix, circle.z + iz)) {
-                    safeBounds.setBlockState(world, new BlockPos(circle.x + ix, h, circle.z + iz), concreteBlocks[(circle.x ^ circle.z) & 0xF].defaultBlockState(), flags, true);
+                    safeBounds.setBlockState(level, new BlockPos(circle.x + ix, h, circle.z + iz), concreteBlocks[(circle.x ^ circle.z) & 0xF].defaultBlockState(), flags, true);
                 }
             }
         }
 
         if (resultType != GeneratorResult.GENERATED) {
             final BlockPos pos = new BlockPos(circle.x, h, circle.z);
-            safeBounds.setBlockState(world, pos, resultType.getColoredBlock(), true);
-            safeBounds.setBlockState(world, pos.above(), resultType.getColoredBlock(), true);
+            safeBounds.setBlockState(level, pos, resultType.getColoredBlock(), true);
+            safeBounds.setBlockState(level, pos.above(), resultType.getColoredBlock(), true);
         }
     }
 
     public void makeTrees(LevelContext levelContext, BiomeDatabase biomeDataBase, PoissonDisc circle, SafeChunkBounds safeBounds) {
         // TODO: De-couple ground finder from biomes, now that they can vary based on height.
-        BlockPos pos = new BlockPos(circle.x, levelContext.access().getMaxBuildHeight(), circle.z);
-        final Entry entry = biomeDataBase.getEntry(levelContext.access().getBiome(pos).value());
-        for (BlockPos groundPos : entry.getGroundFinder().findGround(levelContext.access(), pos)) {
+        BlockPos pos = new BlockPos(circle.x, levelContext.accessor().getMaxBuildHeight(), circle.z);
+        final Entry entry = biomeDataBase.getEntry(levelContext.accessor().getBiome(pos).value());
+        for (BlockPos groundPos : entry.getGroundFinder().findGround(levelContext.accessor(), pos)) {
             makeTree(levelContext, entry, circle, groundPos, safeBounds);
         }
     }
 
     public GeneratorResult makeTree(LevelContext levelContext, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {
 
-        final Biome biome = levelContext.access().getBiome(groundPos).value();
+        final Biome biome = levelContext.accessor().getBiome(groundPos).value();
 
         if (biomeEntry.isBlacklisted()) {
             return GeneratorResult.UNHANDLED_BIOME;
@@ -128,7 +128,7 @@ public class TreeGenerator {
 
         random.setXOR(groundPos);
 
-        BlockState dirtState = levelContext.access().getBlockState(groundPos);
+        BlockState dirtState = levelContext.accessor().getBlockState(groundPos);
 
         GeneratorResult result = GeneratorResult.GENERATED;
 
@@ -138,7 +138,7 @@ public class TreeGenerator {
         if (speciesSelection.isHandled()) {
             final Species species = speciesSelection.getSpecies();
             if (species.isValid()) {
-                if (species.isAcceptableSoilForWorldgen(levelContext.access(), groundPos, dirtState)) {
+                if (species.isAcceptableSoilForWorldgen(levelContext.accessor(), groundPos, dirtState)) {
                     if (biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == Chance.OK) {
                         if (!species.generate(levelContext, groundPos, biome, random, circle.radius, safeBounds)) {
                             result = GeneratorResult.FAIL_GENERATION;
@@ -158,7 +158,7 @@ public class TreeGenerator {
 
         // Display concrete circles for testing the circle growing algorithm.
         if (DTConfigs.WORLD_GEN_DEBUG.get()) {
-            this.makeConcreteCircle(levelContext.access(), circle, groundPos.getY(), result, safeBounds);
+            this.makeConcreteCircle(levelContext.accessor(), circle, groundPos.getY(), result, safeBounds);
         }
 
         return result;

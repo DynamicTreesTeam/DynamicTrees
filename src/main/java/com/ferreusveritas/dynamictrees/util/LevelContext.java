@@ -19,14 +19,14 @@ public final class LevelContext {
     private final ResourceLocation dimensionName;
     @Nullable
     private final Long seed;
-    private final LevelAccessor access;
+    private final LevelAccessor accessor;
     private final Level level;
 
-    public LevelContext(ResourceKey<Level> dimensionKey, @Nullable Long seed, LevelAccessor acess, Level level) {
+    public LevelContext(ResourceKey<Level> dimensionKey, @Nullable Long seed, LevelAccessor accessor, Level level) {
         this.dimensionKey = dimensionKey;
         this.dimensionName = dimensionKey.location();
         this.seed = seed;
-        this.access = acess;
+        this.accessor = accessor;
         this.level = level;
     }
 
@@ -43,37 +43,37 @@ public final class LevelContext {
         return seed;
     }
 
-    public LevelAccessor access() {
-        return access;
+    public LevelAccessor accessor() {
+        return accessor;
     }
 
     /**
      * Returns the level's {@link Level} object. Consumers should be warned that this is not always appropriate for use.
      * In some cases, such as world gen, alternate world objects are used and should be accessed instead using {@link
-     * #access()} .
+     * #accessor()} .
      */
     public Level level() {
         return level;
     }
 
-    public static LevelContext create(LevelAccessor access) {
+    public static LevelContext create(LevelAccessor accessor) {
         Level level = null;
         Long seed = null;
-        if (access instanceof Level) {
-            level = ((Level) access);
-        } else if (access instanceof ServerLevelAccessor) {
-            level = ((ServerLevelAccessor) access).getLevel();
+        if (accessor instanceof Level) {
+            level = ((Level) accessor);
+        } else if (accessor instanceof ServerLevelAccessor) {
+            level = ((ServerLevelAccessor) accessor).getLevel();
         }
         if (level == null) {
-            throw new RuntimeException("Could not handle custom LevelAccessor object: " + access.getClass());
+            throw new RuntimeException("Could not handle custom LevelAccessor object: " + accessor.getClass());
         }
-        if (access instanceof WorldGenLevel) {
-            seed = ((WorldGenLevel) access).getSeed();
+        if (accessor instanceof WorldGenLevel) {
+            seed = ((WorldGenLevel) accessor).getSeed();
         }
-        return new LevelContext(level.dimension(), seed, access, level);
+        return new LevelContext(level.dimension(), seed, accessor, level);
     }
 
-    public static ServerLevel getServerWorldOrThrow(LevelAccessor access) {
+    public static ServerLevel getServerLevelOrThrow(LevelAccessor access) {
         if (access instanceof ServerLevel) {
             return ((ServerLevel) access);
         } else if (access instanceof ServerLevelAccessor) {

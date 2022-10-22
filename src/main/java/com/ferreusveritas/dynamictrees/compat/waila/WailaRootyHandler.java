@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.compat.waila;
 
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import mcp.mobius.waila.api.BlockAccessor;
 import mcp.mobius.waila.api.IComponentProvider;
 import mcp.mobius.waila.api.ITooltip;

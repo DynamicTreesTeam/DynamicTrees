@@ -4,19 +4,19 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.cells.LeafClusters;
-import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
+import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.cell.LeafClusters;
+import com.ferreusveritas.dynamictrees.compat.season.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.context.PostGenerationContext;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.CoderNode;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.FindEndsNode;
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.CoderNode;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.CollectorNode;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.FindEndsNode;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -60,17 +60,17 @@ public class JoCode {
     protected boolean careful = false;//If true the code checks for surrounding branches while building to avoid making frankentrees.  Safer but slower.
 
     /**
-     * @param world   The world
+     * @param level   The level
      * @param rootPos Block position of rootyDirt block
      * @param facing  A final rotation applied to the code after creation
      */
-    public JoCode(Level world, BlockPos rootPos, Direction facing) {
-        Optional<BranchBlock> branch = TreeHelper.getBranchOpt(world.getBlockState(rootPos.above()));
+    public JoCode(Level level, BlockPos rootPos, Direction facing) {
+        Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
 
         if (branch.isPresent()) {
             CoderNode coder = new CoderNode();
             //Warning!  This sends a RootyBlock BlockState into a branch for the kickstart of the analysis.
-            branch.get().analyse(world.getBlockState(rootPos), world, rootPos, Direction.DOWN, new MapSignal(coder));
+            branch.get().analyse(level.getBlockState(rootPos), level, rootPos, Direction.DOWN, new MapSignal(coder));
             instructions = coder.compile(this);
             rotate(facing);
         }
@@ -79,11 +79,11 @@ public class JoCode {
     /**
      * Build a JoCode instruction set from the tree found at pos.
      *
-     * @param world The world
+     * @param level The level
      * @param pos   Position of the rooty dirt block
      */
-    public JoCode(Level world, BlockPos pos) {
-        this(world, pos, Direction.SOUTH);
+    public JoCode(Level level, BlockPos pos) {
+        this(level, pos, Direction.SOUTH);
     }
 
     public JoCode(String code) {
@@ -153,14 +153,14 @@ public class JoCode {
     /**
      * Generate a tree from this {@link JoCode} instruction list.
      *
-     * @param rootPosIn         The position of what will become the {@link com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock}.
+     * @param rootPosIn         The position of what will become the {@link com.ferreusveritas.dynamictrees.block.rooty.RootyBlock}.
      * @param biome             The {@link Biome} at {@code rootPosIn}.
      * @param facing            The {@link Direction} of the tree.
      * @param radius            The radius constraint.
      * @param secondChanceRegen Ensures second chance regen doesn't recurse too far.
      */
     public void generate(LevelContext levelContext, Species species, BlockPos rootPosIn, Biome biome, Direction facing, int radius, SafeChunkBounds safeBounds, boolean secondChanceRegen) {
-        final LevelAccessor level = levelContext.access();
+        final LevelAccessor level = levelContext.accessor();
         final boolean worldGen = safeBounds != SafeChunkBounds.ANY;
 
         // A Tree generation boundary radius is at least 2 and at most 8.
@@ -267,7 +267,7 @@ public class JoCode {
         }
 
         // Completely blow away any improperly defined network nodes.
-        this.cleanupFrankentree(levelContext.access(), treePos, treeState, endFinder.getEnds(), safeBounds);
+        this.cleanupFrankentree(levelContext.accessor(), treePos, treeState, endFinder.getEnds(), safeBounds);
 
         // Now that everything is clear we may as well regenerate the tree that screwed everything up.
         if (!secondChanceRegen) {
@@ -278,7 +278,7 @@ public class JoCode {
     /**
      * Attempt to clean up fused trees that have multiple root blocks by simply destroying them both messily
      */
-    protected void cleanupFrankentree(LevelAccessor world, BlockPos treePos, BlockState treeState, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
+    protected void cleanupFrankentree(LevelAccessor level, BlockPos treePos, BlockState treeState, List<BlockPos> endPoints, SafeChunkBounds safeBounds) {
         final Set<BlockPos> blocksToDestroy = new HashSet<>();
         final BranchBlock branch = TreeHelper.getBranch(treeState);
         final MapSignal signal = new MapSignal(new CollectorNode(blocksToDestroy));
@@ -288,12 +288,12 @@ public class JoCode {
 
         assert branch != null;
 
-        branch.analyse(treeState, world, treePos, null, signal);
+        branch.analyse(treeState, level, treePos, null, signal);
         BranchBlock.destroyMode = DynamicTrees.DestroyMode.IGNORE;
 
         for (BlockPos pos : blocksToDestroy) {
             if (safeBounds.inBounds(pos, false)) {
-                final BlockState branchState = world.getBlockState(pos);
+                final BlockState branchState = level.getBlockState(pos);
                 final Optional<BranchBlock> branchBlock = TreeHelper.getBranchOpt(branchState);
 
                 if (!branchBlock.isPresent()) {
@@ -312,11 +312,11 @@ public class JoCode {
                             for (Cell cell : leafCluster.getAllNonZeroCells()) {
                                 final BlockPos delPos = pos.offset(cell.getPos());
                                 if (safeBounds.inBounds(delPos, false)) {
-                                    final BlockState leavesState = world.getBlockState(delPos);
+                                    final BlockState leavesState = level.getBlockState(delPos);
                                     if (TreeHelper.isLeaves(leavesState)) {
                                         final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
                                         if (leavesProperties.getFamily() == leavesBlock.getProperties(leavesState).getFamily()) {
-                                            world.setBlock(delPos, BlockStates.AIR, 2);
+                                            level.setBlock(delPos, BlockStates.AIR, 2);
                                         }
                                     }
                                 }
@@ -325,7 +325,7 @@ public class JoCode {
                     });
                 }
 
-                world.setBlock(pos, BlockStates.AIR, 2);
+                level.setBlock(pos, BlockStates.AIR, 2);
             }
         }
 
@@ -336,8 +336,8 @@ public class JoCode {
  			final BlockBounds bounds = new BlockBounds(endPoints).expand(3);
 
  			for (BlockPos pos : bounds) {
- 				if (safeBounds.inBounds(pos, false) && TreeHelper.isLeaves(world.getBlockState(pos))) {
-					world.setBlock(pos, DTRegistries.BLOCK_STATES.AIR, 2);
+ 				if (safeBounds.inBounds(pos, false) && TreeHelper.isLeaves(level.getBlockState(pos))) {
+					level.setBlock(pos, DTRegistries.BLOCK_STATES.AIR, 2);
 				}
  			}
  		}*/
@@ -345,21 +345,14 @@ public class JoCode {
 
     /**
      * Recursive function that "draws" a branch of a tree
-     *
-     * @param world
-     * @param species
-     * @param codePos
-     * @param pos
-     * @param disabled
-     * @return
      */
-    protected int generateFork(LevelAccessor world, Species species, int codePos, BlockPos pos, boolean disabled) {
+    protected int generateFork(LevelAccessor level, Species species, int codePos, BlockPos pos, boolean disabled) {
         while (codePos < instructions.length) {
             final int code = this.getCode(codePos);
 
             switch (code) {
                 case FORK_CODE:
-                    codePos = this.generateFork(world, species, codePos + 1, pos, disabled);
+                    codePos = this.generateFork(level, species, codePos + 1, pos, disabled);
                     break;
                 case RETURN_CODE:
                     return codePos + 1;
@@ -367,7 +360,7 @@ public class JoCode {
                     final Direction dir = Direction.from3DDataValue(code);
                     pos = pos.relative(dir);
                     if (!disabled) {
-                        disabled = this.setBlockForGeneration(world, species, pos, dir, careful, codePos + 1 == instructions.length);
+                        disabled = this.setBlockForGeneration(level, species, pos, dir, careful, codePos + 1 == instructions.length);
                     }
                     codePos++;
                     break;
@@ -377,10 +370,10 @@ public class JoCode {
         return codePos;
     }
 
-    protected boolean setBlockForGeneration(LevelAccessor world, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
-        if (isFreeToSetBlock(world, pos) && (!careful || this.isClearOfNearbyBranches(world, pos, dir.getOpposite()))) {
-            species.getFamily().getBranchForPlacement(world,species,pos).ifPresent(branch ->
-                    branch.setRadius(world, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)
+    protected boolean setBlockForGeneration(LevelAccessor level, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
+        if (isFreeToSetBlock(level, pos) && (!careful || this.isClearOfNearbyBranches(level, pos, dir.getOpposite()))) {
+            species.getFamily().getBranchForPlacement(level, species, pos).ifPresent(branch ->
+                    branch.setRadius(level, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)
             );
             return false;
         }
@@ -397,9 +390,6 @@ public class JoCode {
 
     /**
      * Precompute leaf smothering before applying to the world.
-     *
-     * @param leafMap
-     * @param leavesProperties
      */
     protected void smother(SimpleVoxmap leafMap, LeavesProperties leavesProperties) {
         final int smotherMax = leavesProperties.getSmotherLeavesMax();
@@ -445,9 +435,9 @@ public class JoCode {
         leafMap.setCenter(saveCenter);
     }
 
-    protected boolean isClearOfNearbyBranches(LevelAccessor world, BlockPos pos, Direction except) {
+    protected boolean isClearOfNearbyBranches(LevelAccessor level, BlockPos pos, Direction except) {
         for (Direction dir : Direction.values()) {
-            if (dir != except && TreeHelper.getBranch(world.getBlockState(pos.relative(dir))) != null) {
+            if (dir != except && TreeHelper.getBranch(level.getBlockState(pos.relative(dir))) != null) {
                 return false;
             }
         }
@@ -455,20 +445,20 @@ public class JoCode {
         return true;
     }
 
-    protected void addSnow(SimpleVoxmap leafMap, LevelAccessor world, BlockPos rootPos, Biome biome) {
+    protected void addSnow(SimpleVoxmap leafMap, LevelAccessor level, BlockPos rootPos, Biome biome) {
         if (biome.getBaseTemperature() >= 0.4f) {
             return;
         }
 
         for (BlockPos.MutableBlockPos top : leafMap.getTops()) {
-            if (world.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value().shouldSnow(world, rootPos)) {
+            if (level.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value().shouldSnow(level, rootPos)) {
                 final BlockPos.MutableBlockPos iPos = new BlockPos.MutableBlockPos(top.getX(), top.getY(), top.getZ());
                 int yOffset = 0;
 
                 do {
-                    final BlockState state = world.getBlockState(iPos);
+                    final BlockState state = level.getBlockState(iPos);
                     if (state.getMaterial() == Material.AIR) {
-                        world.setBlock(iPos, Blocks.SNOW.defaultBlockState(), 2);
+                        level.setBlock(iPos, Blocks.SNOW.defaultBlockState(), 2);
                         break;
                     } else if (state.getBlock() == Blocks.SNOW) {
                         break;

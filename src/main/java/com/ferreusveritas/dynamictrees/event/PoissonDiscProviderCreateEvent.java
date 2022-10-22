@@ -8,8 +8,8 @@ public class PoissonDiscProviderCreateEvent extends WorldEvent {
 
     private PoissonDiscProvider poissonDiscProvider;
 
-    public PoissonDiscProviderCreateEvent(LevelAccessor world, PoissonDiscProvider poissonDiscProvider) {
-        super(world);
+    public PoissonDiscProviderCreateEvent(LevelAccessor level, PoissonDiscProvider poissonDiscProvider) {
+        super(level);
         this.poissonDiscProvider = poissonDiscProvider;
     }
 

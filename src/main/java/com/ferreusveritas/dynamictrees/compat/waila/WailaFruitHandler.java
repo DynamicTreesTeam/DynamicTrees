@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.compat.waila;
 
-import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
+import com.ferreusveritas.dynamictrees.block.FruitBlock;
 import mcp.mobius.waila.api.BlockAccessor;
 import mcp.mobius.waila.api.IComponentProvider;
 import mcp.mobius.waila.api.ITooltip;

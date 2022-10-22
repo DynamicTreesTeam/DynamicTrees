@@ -25,7 +25,7 @@ public class DarkOakLogic extends GrowthLogicKit {
         }
 
         //Amplify cardinal directions to encourage spread the higher we get
-        float energyRatio = context.signal().delta.getY() / context.species().getEnergy(context.world(), context.pos());
+        float energyRatio = context.signal().delta.getY() / context.species().getEnergy(context.level(), context.pos());
         float spreadPush = energyRatio * 2;
         spreadPush = Math.max(spreadPush, 1.0f);
         for (Direction dir : CoordUtils.HORIZONTALS) {
@@ -60,12 +60,12 @@ public class DarkOakLogic extends GrowthLogicKit {
     @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return super.getEnergy(configuration, context) *
-                context.species().biomeSuitability(context.world(), context.pos());
+                context.species().biomeSuitability(context.level(), context.pos());
     }
 
     @Override
     public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return (int) (super.getLowestBranchHeight(configuration, context) *
-                context.species().biomeSuitability(context.world(), context.pos()));
+                context.species().biomeSuitability(context.level(), context.pos()));
     }
 }

@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.fruit;
 
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
+import com.ferreusveritas.dynamictrees.block.GrowableBlock;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.network;
 
-import com.ferreusveritas.dynamictrees.systems.nodemappers.CollectorNode;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.CollectorNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
@@ -37,16 +37,16 @@ public class MapSignal {
         nodeInspectors.addAll(Arrays.asList(nis));
     }
 
-    public boolean run(BlockState blockState, LevelAccessor world, BlockPos pos, @Nullable Direction fromDir) {
+    public boolean run(BlockState blockState, LevelAccessor level, BlockPos pos, @Nullable Direction fromDir) {
         for (NodeInspector inspector : nodeInspectors) {
-            inspector.run(blockState, world, pos, fromDir);
+            inspector.run(blockState, level, pos, fromDir);
         }
         return false;
     }
 
-    public boolean returnRun(BlockState blockState, LevelAccessor world, BlockPos pos, Direction fromDir) {
+    public boolean returnRun(BlockState blockState, LevelAccessor level, BlockPos pos, Direction fromDir) {
         for (NodeInspector inspector : nodeInspectors) {
-            inspector.returnRun(blockState, world, pos, fromDir);
+            inspector.returnRun(blockState, level, pos, fromDir);
         }
         return false;
     }

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.growthlogic.context;
 
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
@@ -8,18 +8,18 @@ import net.minecraft.world.level.Level;
  * @author Harley O'Connor
  */
 public class PositionalSpeciesContext {
-    private final Level world;
+    private final Level level;
     private final BlockPos pos;
     private final Species species;
 
-    public PositionalSpeciesContext(Level world, BlockPos pos, Species species) {
-        this.world = world;
+    public PositionalSpeciesContext(Level level, BlockPos pos, Species species) {
+        this.level = level;
         this.pos = pos;
         this.species = species;
     }
 
-    public Level world() {
-        return world;
+    public Level level() {
+        return level;
     }
 
     public BlockPos pos() {

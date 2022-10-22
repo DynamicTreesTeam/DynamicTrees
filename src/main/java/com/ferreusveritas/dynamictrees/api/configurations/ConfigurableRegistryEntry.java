@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.configurations;
 
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
 import com.google.common.collect.Sets;
 import net.minecraft.resources.ResourceLocation;
 

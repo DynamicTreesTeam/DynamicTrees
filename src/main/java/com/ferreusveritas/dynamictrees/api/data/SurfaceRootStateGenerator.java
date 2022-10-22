@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.api.data;
 
-import com.ferreusveritas.dynamictrees.blocks.branches.SurfaceRootBlock;
+import com.ferreusveritas.dynamictrees.block.branch.SurfaceRootBlock;
 import com.ferreusveritas.dynamictrees.data.provider.BranchLoaderBuilder;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
-import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Objects;

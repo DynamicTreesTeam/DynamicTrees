@@ -2,10 +2,10 @@ package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.compat.waila.WailaOther;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.TransformNode;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.TransformNode;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -41,9 +41,9 @@ public final class TransformCommand extends SubCommand {
     }
 
     private void transformSpecies(final CommandSourceStack source, final BlockPos rootPos, final Species toSpecies) throws CommandSyntaxException {
-        final Level world = source.getLevel();
+        final Level level = source.getLevel();
 
-        final Species fromSpecies = TreeHelper.getExactSpecies(world, rootPos);
+        final Species fromSpecies = TreeHelper.getExactSpecies(level, rootPos);
 
         if (toSpecies == fromSpecies) {
             throw SPECIES_EQUAL.create(toSpecies.getTextComponent(), fromSpecies.getTextComponent());
@@ -53,15 +53,15 @@ public final class TransformCommand extends SubCommand {
             throw SPECIES_NOT_TRANSFORMABLE.create(!toSpecies.isTransformable() ? toSpecies.getTextComponent() : fromSpecies.getTextComponent());
         }
 
-        final BlockState rootyState = world.getBlockState(rootPos);
+        final BlockState rootyState = level.getBlockState(rootPos);
         final RootyBlock rootyBlock = ((RootyBlock) rootyState.getBlock());
 
         // Transform tree.
-        rootyBlock.startAnalysis(world, rootPos, new MapSignal(new TransformNode(fromSpecies, toSpecies)));
+        rootyBlock.startAnalysis(level, rootPos, new MapSignal(new TransformNode(fromSpecies, toSpecies)));
 
-        if (rootyBlock.getSpecies(rootyState, world, rootPos) != toSpecies) {
+        if (rootyBlock.getSpecies(rootyState, level, rootPos) != toSpecies) {
             // Place new rooty dirt block if transforming to species that requires tile entity.
-            toSpecies.placeRootyDirtBlock(world, rootPos, rootyBlock.getFertility(rootyState, world, rootPos));
+            toSpecies.placeRootyDirtBlock(level, rootPos, rootyBlock.getFertility(rootyState, level, rootPos));
         }
 
         sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.transform",

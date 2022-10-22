@@ -1,7 +1,7 @@
 
 package com.ferreusveritas.dynamictrees.api.data;
 
-import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
 
 /**
  * @author Harley O'Connor

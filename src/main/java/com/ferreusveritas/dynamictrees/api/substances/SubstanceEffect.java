@@ -13,18 +13,13 @@ public interface SubstanceEffect {
     /**
      * For an instant effect.
      *
-     * @param world
-     * @param rootPos
      * @return true for success.  false otherwise
      */
-    boolean apply(Level world, BlockPos rootPos);
+    boolean apply(Level level, BlockPos rootPos);
 
     /**
      * For a continuously updating effect.
      *
-     * @param level
-     * @param rootPos
-     * @param deltaTicks
      * @return true to stay alive. false to kill effector
      */
     default boolean update(Level level, BlockPos rootPos, int deltaTicks, int fertility) {

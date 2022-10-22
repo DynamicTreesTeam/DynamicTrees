@@ -72,7 +72,7 @@ public class JungleLogic extends GrowthLogicKit {
     @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return super.getEnergy(configuration, context) *
-                context.species().biomeSuitability(context.world(), context.pos());
+                context.species().biomeSuitability(context.level(), context.pos());
     }
 
 }

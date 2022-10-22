@@ -1,12 +1,12 @@
 package com.ferreusveritas.dynamictrees.compat;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.compat.seasons.ActiveSeasonGrowthCalculator;
-import com.ferreusveritas.dynamictrees.compat.seasons.NormalSeasonManager;
-import com.ferreusveritas.dynamictrees.compat.seasons.NullSeasonGrowthCalculator;
-import com.ferreusveritas.dynamictrees.compat.seasons.NullSeasonProvider;
-import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
-import com.ferreusveritas.dynamictrees.compat.seasons.SereneSeasonsSeasonProvider;
+import com.ferreusveritas.dynamictrees.compat.season.ActiveSeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.compat.season.NormalSeasonManager;
+import com.ferreusveritas.dynamictrees.compat.season.NullSeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.compat.season.NullSeasonProvider;
+import com.ferreusveritas.dynamictrees.compat.season.SeasonHelper;
+import com.ferreusveritas.dynamictrees.compat.season.SereneSeasonsSeasonProvider;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
 import net.minecraft.util.Tuple;

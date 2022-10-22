@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.event;
 
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -10,22 +10,22 @@ import net.minecraftforge.eventbus.api.Event;
 @Cancelable
 public class BiomeSuitabilityEvent extends Event {
 
-    protected Level world;
+    protected Level level;
     protected Biome biome;
     protected Species species;
     protected BlockPos pos;
     protected float suitability = 1.0f;
     protected boolean handled = false;
 
-    public BiomeSuitabilityEvent(Level world, Biome biome, Species species, BlockPos pos) {
-        this.world = world;
+    public BiomeSuitabilityEvent(Level level, Biome biome, Species species, BlockPos pos) {
+        this.level = level;
         this.biome = biome;
         this.species = species;
         this.pos = pos;
     }
 
-    public Level getWorld() {
-        return world;
+    public Level getLevel() {
+        return level;
     }
 
     public Biome getBiome() {

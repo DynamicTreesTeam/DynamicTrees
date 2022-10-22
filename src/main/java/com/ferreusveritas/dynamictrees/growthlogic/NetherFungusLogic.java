@@ -46,13 +46,13 @@ public class NetherFungusLogic extends GrowthLogicKit {
         final int[] probMap = super.populateDirectionProbabilityMap(configuration, context);
 
         if (context.signal().isInTrunk()) {
-            if (TreeHelper.isBranch(context.world().getBlockState(context.pos().above())) &&
-                    !TreeHelper.isBranch(context.world().getBlockState(context.pos().above(3)))) {
+            if (TreeHelper.isBranch(context.level().getBlockState(context.pos().above())) &&
+                    !TreeHelper.isBranch(context.level().getBlockState(context.pos().above(3)))) {
                 context.probMap(new int[]{0, 0, 0, 0, 0, 0});
             } else if (!context.species().isMegaSpecies()) {
                 for (Direction direction : CoordUtils.HORIZONTALS) {
                     if (TreeHelper.isBranch(
-                            context.world().getBlockState(context.pos().offset(direction.getOpposite().getNormal())))) {
+                            context.level().getBlockState(context.pos().offset(direction.getOpposite().getNormal())))) {
                         probMap[direction.get3DDataValue()] = 0;
                     }
                 }
@@ -64,8 +64,8 @@ public class NetherFungusLogic extends GrowthLogicKit {
         return probMap;
     }
 
-    private float getHashedVariation(GrowthLogicKitConfiguration configuration, Level world, BlockPos pos) {
-        long day = world.getGameTime() / 24000L;
+    private float getHashedVariation(GrowthLogicKitConfiguration configuration, Level level, BlockPos pos) {
+        long day = level.getGameTime() / 24000L;
         int month = (int) day / 30;//Change the hashs every in-game month
         return (CoordUtils.coordHashCode(pos.above(month), 2) %
                 configuration.get(HEIGHT_VARIATION));//Vary the height energy by a psuedorandom hash function
@@ -74,9 +74,9 @@ public class NetherFungusLogic extends GrowthLogicKit {
     @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return Math.min(configuration.getLowestBranchHeight(
-                        new PositionalSpeciesContext(context.world(), context.pos(), context.species())) +
+                        new PositionalSpeciesContext(context.level(), context.pos(), context.species())) +
                         configuration.get(MIN_CAP_HEIGHT) +
-                        getHashedVariation(configuration, context.world(), context.pos()) / 1.5f,
+                        getHashedVariation(configuration, context.level(), context.pos()) / 1.5f,
                 super.getEnergy(configuration, context));
     }
 
@@ -84,8 +84,8 @@ public class NetherFungusLogic extends GrowthLogicKit {
     public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         // Vary the lowest branch height by a psuedorandom hash function
         return (int) (super.getLowestBranchHeight(configuration, context) *
-                context.species().biomeSuitability(context.world(), context.pos()) +
-                getHashedVariation(configuration, context.world(), context.pos()));
+                context.species().biomeSuitability(context.level(), context.pos()) +
+                getHashedVariation(configuration, context.level(), context.pos()));
     }
 
 }

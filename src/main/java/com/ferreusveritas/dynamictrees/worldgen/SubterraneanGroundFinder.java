@@ -1,11 +1,10 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
-import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
+import com.ferreusveritas.dynamictrees.block.DynamicSaplingBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.ArrayList;

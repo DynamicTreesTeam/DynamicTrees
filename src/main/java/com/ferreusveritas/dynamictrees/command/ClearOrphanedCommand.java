@@ -22,9 +22,9 @@ public final class ClearOrphanedCommand extends ChunkBasedCommand {
     }
 
     @Override
-    protected void processChunk(CommandSourceStack source, Level world, ChunkPos chunkPos, int radius) {
+    protected void processChunk(CommandSourceStack source, Level level, ChunkPos chunkPos, int radius) {
         sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.clear_orphaned",
-                aqua(ChunkTreeHelper.removeOrphanedBranchNodes(world, chunkPos, radius))));
+                aqua(ChunkTreeHelper.removeOrphanedBranchNodes(level, chunkPos, radius))));
     }
 
 }

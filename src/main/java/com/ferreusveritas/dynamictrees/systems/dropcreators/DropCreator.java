@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
-import com.ferreusveritas.dynamictrees.trees.Resettable;
+import com.ferreusveritas.dynamictrees.tree.Resettable;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.util.TriConsumer;
 
@@ -66,13 +66,13 @@ public abstract class DropCreator extends ConfigurableRegistryEntry<DropCreator,
         public static final Class<Type<DropContext>> TYPE = (Class<Type<DropContext>>) NULL.getClass();
         public static final SimpleRegistry<Type<DropContext>> REGISTRY = new SimpleRegistry<>(TYPE, NULL);
 
-        public static final Type<DropContext> HARVEST = register(new Type<>(DynamicTrees.resLoc("harvest"),
+        public static final Type<DropContext> HARVEST = register(new Type<>(DynamicTrees.location("harvest"),
                 DropCreator::appendHarvestDrops));
-        public static final Type<DropContext> VOLUNTARY = register(new Type<>(DynamicTrees.resLoc("voluntary"),
+        public static final Type<DropContext> VOLUNTARY = register(new Type<>(DynamicTrees.location("voluntary"),
                 DropCreator::appendVoluntaryDrops));
-        public static final Type<DropContext> LEAVES = register(new Type<>(DynamicTrees.resLoc("leaves"),
+        public static final Type<DropContext> LEAVES = register(new Type<>(DynamicTrees.location("leaves"),
                 DropCreator::appendLeavesDrops));
-        public static final Type<LogDropContext> LOGS = register(new Type<>(DynamicTrees.resLoc("logs"),
+        public static final Type<LogDropContext> LOGS = register(new Type<>(DynamicTrees.location("logs"),
                 DropCreator::appendLogDrops));
         private final TriConsumer<DropCreator, DropCreatorConfiguration, C> appendDropConsumer;
 

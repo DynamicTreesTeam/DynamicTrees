@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.data;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 
 /**
@@ -15,7 +15,7 @@ public final class DTLootParameters {
     public static final LootContextParam<Species.LogsAndSticks> LOGS_AND_STICKS = create("logs_and_sticks");
 
     private static <T> LootContextParam<T> create(String path) {
-        return new LootContextParam<>(DynamicTrees.resLoc(path));
+        return new LootContextParam<>(DynamicTrees.location(path));
     }
 
 }

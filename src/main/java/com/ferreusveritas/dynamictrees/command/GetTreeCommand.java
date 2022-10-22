@@ -35,10 +35,10 @@ public final class GetTreeCommand extends SubCommand {
     }
 
     private int getTree(final CommandSourceStack source, final BlockPos pos, final boolean codeRaw) {
-        final Level world = source.getLevel();
+        final Level level = source.getLevel();
 
-        return TreeHelper.getBestGuessSpecies(world, pos).ifValidElse(species -> {
-                    final Optional<JoCode> joCode = TreeHelper.getJoCode(world, pos);
+        return TreeHelper.getBestGuessSpecies(level, pos).ifValidElse(species -> {
+                    final Optional<JoCode> joCode = TreeHelper.getJoCode(level, pos);
 
                     if (codeRaw) {
                         sendSuccess(source, new TextComponent(joCode.map(JoCode::toString).orElse("?")));

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.compat.waila;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.blocks.PodBlock;
+import com.ferreusveritas.dynamictrees.block.PodBlock;
 import mcp.mobius.waila.api.BlockAccessor;
 import mcp.mobius.waila.api.IComponentProvider;
 import mcp.mobius.waila.api.ITooltip;
@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 public class WailaPodHandler implements IComponentProvider {
 
     /* Used to switch off component for cocoa, since Jade already supports this. */
-    public static final ResourceLocation COCOA = DynamicTrees.resLoc("cocoa");
+    public static final ResourceLocation COCOA = DynamicTrees.location("cocoa");
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen.structure;
 
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.worldgen.ProcessorLists;

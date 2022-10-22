@@ -36,6 +36,6 @@ public abstract class ChunkBasedCommand extends SubCommand {
                                 context.getSource().getLevel(), new ChunkPos(blockPosArgument(context)), intArgument(context, RADIUS)))));
     }
 
-    protected abstract void processChunk(CommandSourceStack source, Level world, ChunkPos chunkPos, int radius);
+    protected abstract void processChunk(CommandSourceStack source, Level level, ChunkPos chunkPos, int radius);
 
 }

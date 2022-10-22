@@ -44,7 +44,7 @@ public final class DTLootParameterSets {
         builderConsumer.accept(builder);
 
         final LootContextParamSet paramSet = builder.build();
-        LootContextParamSets.REGISTRY.put(DynamicTrees.resLoc(path), paramSet);
+        LootContextParamSets.REGISTRY.put(DynamicTrees.location(path), paramSet);
 
         return paramSet;
     }

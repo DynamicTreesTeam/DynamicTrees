@@ -5,11 +5,11 @@ import com.ferreusveritas.dynamictrees.api.cells.CellKit;
 import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.items.DendroPotion;
-import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.item.DendroPotion;
+import com.ferreusveritas.dynamictrees.item.Seed;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.GlobalDropCreators;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -118,7 +118,7 @@ public final class TreeRegistry {
     // DROP HANDLING
     //////////////////////////////
 
-    public static final ResourceLocation GLOBAL = DynamicTrees.resLoc("global");
+    public static final ResourceLocation GLOBAL = DynamicTrees.location("global");
 
     /**
      * This exists so that mods not interested in making Dynamic Trees can still add drops to all trees.
@@ -196,7 +196,7 @@ public final class TreeRegistry {
      */
     public static ResourceLocation processResLoc(final ResourceLocation resourceLocation) {
         return DynamicTrees.MINECRAFT.equals(resourceLocation.getNamespace()) ?
-                DynamicTrees.resLoc(resourceLocation.getPath()) : resourceLocation;
+                DynamicTrees.location(resourceLocation.getPath()) : resourceLocation;
     }
 
 }

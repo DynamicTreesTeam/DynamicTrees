@@ -9,7 +9,7 @@ import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionCon
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.MathHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -68,15 +68,15 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
     public Direction selectNewDirection(GrowthLogicKitConfiguration configuration, DirectionSelectionContext context) {
         // Prevent branches growing on the ground.
         if (context.signal().numSteps + 1 <= configuration.getLowestBranchHeight(
-                new PositionalSpeciesContext(context.world(), context.signal().rootPos, context.species())
+                new PositionalSpeciesContext(context.level(), context.signal().rootPos, context.species())
         ) && !context.signal().getSpecies().getLeavesProperties().canGrowOnGround()) {
             return Direction.UP;
         }
 
         // Populate the direction probability map.
         final int[] probMap = configuration.populateDirectionProbabilityMap(
-                new DirectionManipulationContext(context.world(), context.pos(), context.species(), context.branch(),
-                        context.signal(), context.branch().getRadius(context.world().getBlockState(context.pos())),
+                new DirectionManipulationContext(context.level(), context.pos(), context.species(), context.branch(),
+                        context.signal(), context.branch().getRadius(context.level().getBlockState(context.pos())),
                         new int[6])
         );
 
@@ -114,9 +114,9 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
                 final BlockPos deltaPos = context.pos().relative(dir);
                 // Check probability for surrounding blocks.
                 // Typically, Air: 1, Leaves: 2, Branches: 2 + radius
-                final BlockState deltaBlockState = context.world().getBlockState(deltaPos);
+                final BlockState deltaBlockState = context.level().getBlockState(deltaPos);
                 probMap[dir.get3DDataValue()] += TreeHelper.getTreePart(deltaBlockState)
-                        .probabilityForBlock(deltaBlockState, context.world(), deltaPos, context.branch());
+                        .probabilityForBlock(deltaBlockState, context.level(), deltaPos, context.branch());
             }
         }
 

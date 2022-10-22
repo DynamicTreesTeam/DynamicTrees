@@ -10,7 +10,7 @@ import net.minecraft.world.level.Level;
  */
 public interface SeasonManager {
 
-    void updateTick(Level level, long worldTicks);
+    void updateTick(Level level, long dayTime);
 
     void flushMappings();
 

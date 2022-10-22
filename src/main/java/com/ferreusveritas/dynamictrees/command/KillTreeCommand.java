@@ -29,9 +29,9 @@ public final class KillTreeCommand extends SubCommand {
     }
 
     private void killTree(final CommandSourceStack source, final BlockPos rootPos) {
-        final Level world = source.getLevel();
+        final Level level = source.getLevel();
 
-        Objects.requireNonNull(TreeHelper.getRooty(world.getBlockState(rootPos))).destroyTree(world, rootPos);
+        Objects.requireNonNull(TreeHelper.getRooty(level.getBlockState(rootPos))).destroyTree(level, rootPos);
         sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.kill_tree",
                 CommandHelper.posComponent(rootPos, ChatFormatting.AQUA)));
     }

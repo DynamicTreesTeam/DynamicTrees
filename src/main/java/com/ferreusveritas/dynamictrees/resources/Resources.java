@@ -12,8 +12,8 @@ import com.ferreusveritas.dynamictrees.resources.loader.*;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
 import com.ferreusveritas.dynamictrees.systems.fruit.FruitResourceLoader;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
+import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.pod.PodResourceLoader;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.resources.ResourceLocation;
@@ -27,7 +27,6 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
 import org.apache.logging.log4j.LogManager;
@@ -47,7 +46,7 @@ import java.util.concurrent.Executor;
 @Mod.EventBusSubscriber(modid = DynamicTrees.MOD_ID)
 public final class Resources {
 
-    public static final ResourceLocation RESOURCE_LOCATION = DynamicTrees.resLoc("registry_name");
+    public static final ResourceLocation RESOURCE_LOCATION = DynamicTrees.location("registry_name");
 
     public static final String TREES = "trees";
 

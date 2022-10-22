@@ -3,9 +3,9 @@ package com.ferreusveritas.dynamictrees.systems.dropcreators;
 import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
-import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.Species.LogsAndSticks;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species.LogsAndSticks;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 

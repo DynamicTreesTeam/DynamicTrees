@@ -3,12 +3,12 @@ package com.ferreusveritas.dynamictrees.systems.pod;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
-import com.ferreusveritas.dynamictrees.blocks.PodBlock;
-import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
+import com.ferreusveritas.dynamictrees.block.GrowableBlock;
+import com.ferreusveritas.dynamictrees.block.PodBlock;
+import com.ferreusveritas.dynamictrees.compat.season.SeasonHelper;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.trees.Resettable;
+import com.ferreusveritas.dynamictrees.tree.Resettable;
 import com.ferreusveritas.dynamictrees.util.AgeProperties;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.google.common.collect.Maps;
@@ -35,7 +35,7 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper.isSeasonBetween;
+import static com.ferreusveritas.dynamictrees.compat.season.SeasonHelper.isSeasonBetween;
 
 /**
  * Stores properties and implements functionality of pods which grow from the branches of a tree.
