@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.block;
 
-import com.ferreusveritas.dynamictrees.api.cells.Cell;
-import com.ferreusveritas.dynamictrees.api.cells.CellNull;
+import com.ferreusveritas.dynamictrees.api.cell.Cell;
+import com.ferreusveritas.dynamictrees.api.cell.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;

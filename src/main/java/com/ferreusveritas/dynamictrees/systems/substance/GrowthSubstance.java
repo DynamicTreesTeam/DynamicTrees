@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.substance;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substance.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.entity.LingeringEffectorEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

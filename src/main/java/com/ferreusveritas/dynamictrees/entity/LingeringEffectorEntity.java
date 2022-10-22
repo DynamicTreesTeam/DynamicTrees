@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.entity;
 
-import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substance.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.substance.LingeringSubstances;

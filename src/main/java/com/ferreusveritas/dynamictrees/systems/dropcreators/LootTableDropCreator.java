@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.data.DTLootParameterSets;
 import com.ferreusveritas.dynamictrees.data.DTLootParameters;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.substance;
 
-import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substance.SubstanceEffect;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

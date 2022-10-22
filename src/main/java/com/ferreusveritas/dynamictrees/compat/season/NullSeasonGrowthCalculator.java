@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.compat.season;
 
-import com.ferreusveritas.dynamictrees.api.seasons.ClimateZoneType;
-import com.ferreusveritas.dynamictrees.api.seasons.SeasonGrowthCalculator;
+import com.ferreusveritas.dynamictrees.api.season.ClimateZoneType;
+import com.ferreusveritas.dynamictrees.api.season.SeasonGrowthCalculator;
 
 /**
  * {@link SeasonGrowthCalculator} that returns {@code 1.0f} for all values so there's no seasonal change.

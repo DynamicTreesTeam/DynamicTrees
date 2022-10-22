@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.cell;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.cells.Cell;
-import com.ferreusveritas.dynamictrees.api.cells.CellKit;
-import com.ferreusveritas.dynamictrees.api.cells.CellNull;
-import com.ferreusveritas.dynamictrees.api.cells.CellSolver;
+import com.ferreusveritas.dynamictrees.api.cell.Cell;
+import com.ferreusveritas.dynamictrees.api.cell.CellKit;
+import com.ferreusveritas.dynamictrees.api.cell.CellNull;
+import com.ferreusveritas.dynamictrees.api.cell.CellSolver;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.core.Direction;

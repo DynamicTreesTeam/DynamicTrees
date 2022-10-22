@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
-import com.ferreusveritas.dynamictrees.api.treepacks.VoidApplier;
+import com.ferreusveritas.dynamictrees.api.applier.VoidApplier;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.BiomeList;

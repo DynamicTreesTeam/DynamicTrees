@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.compat.season;
 
-import com.ferreusveritas.dynamictrees.api.seasons.SeasonManager;
+import com.ferreusveritas.dynamictrees.api.season.SeasonManager;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
@@ -68,7 +68,6 @@ public class SeasonHelper {
     }
 
     /**
-     * @param levelContext The world
      * @return season value 0.0(Early Spring, Inclusive) -> 4.0(Later Winter, Exclusive) or null if there's no seasons
      * in the world.
      */
@@ -77,14 +76,10 @@ public class SeasonHelper {
     }
 
     /**
-     * Tests if the position in world is considered tropical and thus follows tropical season rules.
-     *
-     * @param world
-     * @param pos
-     * @return
+     * Tests if the position in level is considered tropical and thus follows tropical season rules.
      */
-    static public boolean isTropical(Level world, BlockPos pos) {
-        return seasonManager.isTropical(world, pos);
+    static public boolean isTropical(Level level, BlockPos pos) {
+        return seasonManager.isTropical(level, pos);
     }
 
     /**
@@ -110,8 +105,8 @@ public class SeasonHelper {
 
     }
 
-    static public boolean shouldSnowMelt(Level world, BlockPos pos) {
-        return seasonManager.shouldSnowMelt(world, pos);
+    static public boolean shouldSnowMelt(Level level, BlockPos pos) {
+        return seasonManager.shouldSnowMelt(level, pos);
     }
 
 }

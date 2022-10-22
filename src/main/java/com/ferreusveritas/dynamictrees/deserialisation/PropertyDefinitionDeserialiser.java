@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
-import com.ferreusveritas.dynamictrees.api.configurations.PropertyDefinition;
+import com.ferreusveritas.dynamictrees.api.configuration.PropertyDefinition;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

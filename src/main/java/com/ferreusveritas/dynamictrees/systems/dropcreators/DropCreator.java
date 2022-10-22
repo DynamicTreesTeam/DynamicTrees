@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistry;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurableRegistryEntry;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurableRegistry;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurableRegistryEntry;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.init.DTTrees;

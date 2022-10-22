@@ -2,10 +2,10 @@ package com.ferreusveritas.dynamictrees.resources.loader;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
-import com.ferreusveritas.dynamictrees.api.treepacks.Applier;
-import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.treepacks.JsonPropertyApplier;
-import com.ferreusveritas.dynamictrees.api.treepacks.PropertyApplierResult;
+import com.ferreusveritas.dynamictrees.api.applier.Applier;
+import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.applier.JsonPropertyApplier;
+import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;

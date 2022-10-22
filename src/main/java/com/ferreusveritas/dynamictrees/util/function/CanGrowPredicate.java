@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util.function;
 
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 

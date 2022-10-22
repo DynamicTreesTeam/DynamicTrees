@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationTemplateResourceLoader;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationTemplateResourceLoader;
 import com.ferreusveritas.dynamictrees.api.event.Hooks;
 import com.ferreusveritas.dynamictrees.api.resource.TreeResourceManager;
 import com.ferreusveritas.dynamictrees.data.DTRecipes;

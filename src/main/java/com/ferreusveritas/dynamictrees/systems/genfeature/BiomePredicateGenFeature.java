@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeature;
 
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import net.minecraft.resources.ResourceLocation;

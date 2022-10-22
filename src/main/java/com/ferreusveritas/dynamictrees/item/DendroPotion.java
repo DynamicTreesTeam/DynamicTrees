@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.item;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.substances.Emptiable;
-import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffect;
-import com.ferreusveritas.dynamictrees.api.substances.SubstanceEffectProvider;
+import com.ferreusveritas.dynamictrees.api.substance.Emptiable;
+import com.ferreusveritas.dynamictrees.api.substance.SubstanceEffect;
+import com.ferreusveritas.dynamictrees.api.substance.SubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.substance.*;
 import com.ferreusveritas.dynamictrees.tree.species.Species;

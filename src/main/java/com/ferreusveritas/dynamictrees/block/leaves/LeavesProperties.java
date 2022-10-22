@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.block.leaves;
 
-import com.ferreusveritas.dynamictrees.api.cells.CellKit;
+import com.ferreusveritas.dynamictrees.api.cell.CellKit;
 import com.ferreusveritas.dynamictrees.api.data.Generator;
 import com.ferreusveritas.dynamictrees.api.data.LeavesStateGenerator;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;

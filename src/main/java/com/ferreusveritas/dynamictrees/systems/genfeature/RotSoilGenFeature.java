@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.genfeature;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostRotContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;

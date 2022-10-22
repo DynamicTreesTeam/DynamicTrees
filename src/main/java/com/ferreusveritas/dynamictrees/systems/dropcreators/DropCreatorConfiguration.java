@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.systems.dropcreators;
 
-import com.ferreusveritas.dynamictrees.api.configurations.Configuration;
-import com.ferreusveritas.dynamictrees.api.configurations.TemplateRegistry;
+import com.ferreusveritas.dynamictrees.api.configuration.Configuration;
+import com.ferreusveritas.dynamictrees.api.configuration.TemplateRegistry;
 import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 
 /**

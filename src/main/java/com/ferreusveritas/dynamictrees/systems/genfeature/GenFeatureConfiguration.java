@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.systems.genfeature;
 
-import com.ferreusveritas.dynamictrees.api.configurations.Configuration;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
-import com.ferreusveritas.dynamictrees.api.configurations.TemplateRegistry;
+import com.ferreusveritas.dynamictrees.api.configuration.Configuration;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configuration.TemplateRegistry;
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.GenerationContext;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 

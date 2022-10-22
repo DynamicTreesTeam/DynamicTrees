@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems.genfeature;
 
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.PreGenerationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
