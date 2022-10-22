@@ -1,12 +1,11 @@
 package com.ferreusveritas.dynamictrees.resources.loader;
 
-import com.ferreusveritas.dynamictrees.api.event.Hooks;
+import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.MultiJsonResourcePreparer;
-import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
@@ -164,7 +163,6 @@ public final class BiomeDatabaseResourceLoader
             return;
         }
 
-        Hooks.onAddFeatureCancellers();
         this.readCancellers(
                 resourceAccessor.filtered(this::isDefaultPopulator).map(this::toLinkedList)
         );
@@ -319,7 +317,6 @@ public final class BiomeDatabaseResourceLoader
     }
 
     private void readPopulators(ResourceAccessor<Deque<JsonElement>> resourceAccessor) {
-        Hooks.onPopulateDefaultDatabase();
         this.readModPopulators(BiomeDatabases.getDefault(), resourceAccessor);
         this.readTreePackPopulators(BiomeDatabases.getDefault(), resourceAccessor);
     }
@@ -338,7 +335,6 @@ public final class BiomeDatabaseResourceLoader
     }
 
     private void readDimensionalPopulators(ResourceAccessor<Deque<JsonElement>> resourceAccessor) {
-        Hooks.onPopulateDimensionalDatabases();
         this.readDimensionalModPopulators(resourceAccessor);
         this.readDimensionalTreePackPopulators(resourceAccessor);
     }
