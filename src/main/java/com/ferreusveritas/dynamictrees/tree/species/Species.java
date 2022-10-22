@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.data.Generator;
 import com.ferreusveritas.dynamictrees.api.data.SaplingStateGenerator;
 import com.ferreusveritas.dynamictrees.api.data.SeedItemModelGenerator;
+import com.ferreusveritas.dynamictrees.api.event.Hooks;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
@@ -18,6 +19,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.block.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
 import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
@@ -54,9 +56,8 @@ import com.ferreusveritas.dynamictrees.systems.nodemapper.*;
 import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.systems.substance.FertilizeSubstance;
 import com.ferreusveritas.dynamictrees.systems.substance.GrowthSubstance;
-import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
-import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.Resettable;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
@@ -1051,30 +1052,30 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return 0;
     }
 
-    public boolean transitionToTree(Level level, BlockPos pos) {
+    public final boolean transitionToTree(Level level, BlockPos pos) {
+        return !Hooks.onTransitionSaplingToTree(this, level, pos) && shouldTransitionToTree(level, pos) &&
+                transitionToTree(level, pos, getFamily());
+    }
 
-        //Ensure planting conditions are right
-        Family family = getFamily();
-        if (level.isEmptyBlock(pos.above()) && isAcceptableSoil(level, pos.below(), level.getBlockState(pos.below()))) {
-            // Set to a single branch with 1 radius.
-            family.getBranch().ifPresent(branch -> branch.setRadius(level, pos, family.getPrimaryThickness(), null));
-            // Place a single leaf block on top.
-            level.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState());
-            // Set to fully fertilized rooty dirt underneath.
-            placeRootyDirtBlock(level, pos.below(), 15);
+    protected boolean shouldTransitionToTree(Level level, BlockPos pos) {
+        return level.isEmptyBlock(pos.above()) && isAcceptableSoil(level, pos.below(), level.getBlockState(pos.below()));
+    }
 
-            if (doesRequireTileEntity(level, pos)) {
-                SpeciesBlockEntity speciesTE = DTRegistries.speciesTE.create(pos.below(), level.getBlockState(pos));
-                level.setBlockEntity(speciesTE);
-                if (speciesTE != null) {
-                    speciesTE.setSpecies(this);
-                }
-            }
+    protected boolean transitionToTree(Level level, BlockPos pos, Family family) {
+        // Set to a single branch with 1 radius.
+        family.getBranch().ifPresent(branch -> branch.setRadius(level, pos, family.getPrimaryThickness(), null));
+        // Place a single leaf block on top.
+        level.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState());
+        // Set to fully fertilized rooty dirt underneath.
+        placeRootyDirtBlock(level, pos.below(), 15);
 
-            return true;
+        if (doesRequireTileEntity(level, pos)) {
+            SpeciesBlockEntity speciesBlockEntity = DTRegistries.SPECIES_BLOCK_ENTITY.create(pos.below(), level.getBlockState(pos.below()));
+            level.setBlockEntity(speciesBlockEntity);
+            speciesBlockEntity.setSpecies(this);
         }
 
-        return false;
+        return true;
     }
 
     private VoxelShape saplingShape = CommonVoxelShapes.SAPLING;

@@ -24,7 +24,7 @@ public class SpeciesBlockEntity extends BlockEntity {
     private Species species = Species.NULL_SPECIES;
 
     public SpeciesBlockEntity(BlockPos pos, BlockState state) {
-        super(DTRegistries.speciesTE, pos, state);
+        super(DTRegistries.SPECIES_BLOCK_ENTITY, pos, state);
     }
 
     public Species getSpecies() {

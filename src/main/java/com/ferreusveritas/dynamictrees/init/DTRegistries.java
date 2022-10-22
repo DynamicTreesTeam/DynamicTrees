@@ -180,8 +180,8 @@ public class DTRegistries {
     // TILE ENTITIES
     ///////////////////////////////////////////
 
-    public static BlockEntityType<SpeciesBlockEntity> speciesTE;
-    public static BlockEntityType<PottedSaplingBlockEntity> bonsaiTE;
+    public static BlockEntityType<SpeciesBlockEntity> SPECIES_BLOCK_ENTITY;
+    public static BlockEntityType<PottedSaplingBlockEntity> POTTED_SAPLING_BLOCK_ENTITY;
 
     public static void setupTileEntities() {
         RootyBlock[] rootyBlocks = SoilProperties.REGISTRY.getAll().stream()
@@ -191,16 +191,16 @@ public class DTRegistries {
                 .distinct()
                 .toArray(RootyBlock[]::new);
 
-        speciesTE = BlockEntityType.Builder.of(SpeciesBlockEntity::new, rootyBlocks).build(null);
-        bonsaiTE = BlockEntityType.Builder.of(PottedSaplingBlockEntity::new, POTTED_SAPLING.get()).build(null);
+        SPECIES_BLOCK_ENTITY = BlockEntityType.Builder.of(SpeciesBlockEntity::new, rootyBlocks).build(null);
+        POTTED_SAPLING_BLOCK_ENTITY = BlockEntityType.Builder.of(PottedSaplingBlockEntity::new, POTTED_SAPLING.get()).build(null);
     }
 
     @SubscribeEvent
     public static void onTileEntitiesRegistry(final RegistryEvent.Register<BlockEntityType<?>> tileEntityRegistryEvent) {
         setupTileEntities();
 
-        tileEntityRegistryEvent.getRegistry().register(bonsaiTE.setRegistryName(PottedSaplingBlock.REG_NAME));
-        tileEntityRegistryEvent.getRegistry().register(speciesTE.setRegistryName(DynamicTrees.location("tile_entity_species")));
+        tileEntityRegistryEvent.getRegistry().register(POTTED_SAPLING_BLOCK_ENTITY.setRegistryName(PottedSaplingBlock.REG_NAME));
+        tileEntityRegistryEvent.getRegistry().register(SPECIES_BLOCK_ENTITY.setRegistryName(DynamicTrees.location("tile_entity_species")));
     }
 
     ///////////////////////////////////////////

@@ -61,20 +61,13 @@ public class PalmSpecies extends Species {
         return super.postGrow(level, rootPos, treePos, fertility, natural);
     }
 
-    public boolean transitionToTree(Level level, BlockPos pos) {
-        //Ensure planting conditions are right
-        Family family = getFamily();
-        if (level.isEmptyBlock(pos.above()) && isAcceptableSoil(level, pos.below(), level.getBlockState(pos.below()))) {
-            family.getBranch().ifPresent(branch ->
-                    // Set to a single branch with 1 radius.
-                    branch.setRadius(level, pos, family.getPrimaryThickness(), null)
-            );
-            level.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 4));//Place 2 leaf blocks on top
-            level.setBlockAndUpdate(pos.above(2), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 3));
-            placeRootyDirtBlock(level, pos.below(), 15);//Set to fully fertilized rooty dirt underneath
-            return true;
-        }
-        return false;
+    @Override
+    protected boolean transitionToTree(Level level, BlockPos pos, Family family) {
+        family.getBranch().ifPresent(branch -> branch.setRadius(level, pos, family.getPrimaryThickness(), null));
+        level.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 4));//Place 2 leaf blocks on top
+        level.setBlockAndUpdate(pos.above(2), getLeavesProperties().getDynamicLeavesState().setValue(DynamicLeavesBlock.DISTANCE, 3));
+        placeRootyDirtBlock(level, pos.below(), 15);//Set to fully fertilized rooty dirt underneath
+        return true;
     }
 
     @Override
