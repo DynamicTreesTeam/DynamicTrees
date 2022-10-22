@@ -28,16 +28,16 @@ import javax.annotation.Nullable;
 
 public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
-    public static final int MAX_RADIUS_TICK = 24;
+    public static final int MAX_RADIUS_THICK = 24;
 
-    protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, MAX_RADIUS_TICK); //39 ?
+    protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, MAX_RADIUS_THICK); //39 ?
 
     public ThickBranchBlock(Material material) {
         this(Properties.of(material));
     }
 
     public ThickBranchBlock(Properties properties) {
-        super(properties, RADIUS_DOUBLE, MAX_RADIUS_TICK);
+        super(properties, RADIUS_DOUBLE, MAX_RADIUS_THICK);
     }
 
     public TrunkShellBlock getTrunkShell() {
@@ -184,7 +184,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     @Override
     public int getMaxRadius() {
-        return MAX_RADIUS_TICK;
+        return MAX_RADIUS_THICK;
     }
 
 
