@@ -131,47 +131,35 @@ java {
     }
 }
 
-fun readChangelog(): String? {
-    val versionInfoFile = file(
-        (optionalProperty("dynamictrees.version_info_repo.directory") ?: return null)
-                + File.separatorChar + "DynamicTrees.json"
-    )
-    val jsonObject = Gson().fromJson(InputStreamReader(versionInfoFile.inputStream()), JsonObject::class.java)
-    return jsonObject
-        .get(mcVersion)?.asJsonObject
-        ?.get(project.version.toString())?.asString
-}
+curseforge {
+    if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
+        apiKey = property("curseApiKey")
 
-//curseforge {
-//    if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
-//        apiKey = property("curseApiKey")
-//
-//        project {
-//            id = "252818"
-//
-//            addGameVersion("1.18.1")
-//            addGameVersion(mcVersion)
-//
-//            changelog = readChangelog() ?: "No changelog provided."
-//            changelogType = "markdown"
-//            releaseType = property("curseFileType")
-//
-//            addArtifact(tasks.findByName("sourcesJar"))
-//
-//            mainArtifact(tasks.findByName("jar")) {
-//                relations {
-//                    optionalDependency("dynamictreesplus")
-//                    optionalDependency("chunk-saving-fix")
-//                }
-//            }
-//        }
-//    } else {
-//        project.logger.log(
-//            LogLevel.WARN,
-//            "API Key and file type for CurseForge not detected; uploading will be disabled."
-//        )
-//    }
-//}
+        project {
+            id = "252818"
+
+            addGameVersion(mcVersion)
+
+            changelog = "Changelog will be added shortly..."
+            changelogType = "markdown"
+            releaseType = property("curseFileType")
+
+            addArtifact(tasks.findByName("sourcesJar"))
+
+            mainArtifact(tasks.findByName("jar")) {
+                relations {
+                    optionalDependency("dynamictreesplus")
+                    optionalDependency("chunk-saving-fix")
+                }
+            }
+        }
+    } else {
+        project.logger.log(
+            LogLevel.WARN,
+            "API Key and file type for CurseForge not detected; uploading will be disabled."
+        )
+    }
+}
 
 tasks.withType<GenerateModuleMetadata> {
     enabled = false
