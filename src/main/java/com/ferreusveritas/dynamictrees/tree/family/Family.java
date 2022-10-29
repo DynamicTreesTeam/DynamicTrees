@@ -37,11 +37,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -126,7 +122,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     protected Species commonSpecies;
 
-    protected LeavesProperties commonLeaves = LeavesProperties.NULL_PROPERTIES;
+    protected LeavesProperties commonLeaves = LeavesProperties.NULL;
 
     //Branches
     /**
@@ -205,11 +201,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public void setupBlocks() {
-        this.setBranch(this.createBranch());
-        this.setBranchItem(this.createBranchItem(this.getBranchRegName(""), this.branch));
+        this.setBranch(this.createBranch(this.getBranchName()));
+        this.setBranchItem(this.createBranchItem(this.getBranchName(), this.branch));
 
         if (this.hasStrippedBranch()) {
-            this.setStrippedBranch(this.createBranch(this.getBranchRegName("stripped_")));
+            this.setStrippedBranch(this.createBranch(this.getBranchName("stripped_")));
         }
 
         if (this.hasSurfaceRoot()) {
@@ -244,7 +240,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // SPECIES LOCATION OVERRIDES
     ///////////////////////////////////////////
 
-//
+    //
     public Species getSpeciesForLocation(LevelAccessor level, BlockPos trunkPos) {
         return this.getSpeciesForLocation(level, trunkPos, this.commonSpecies);
     }
@@ -333,24 +329,16 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return true;
     }
 
-    /**
-     * Creates the branch block. Can be overridden by sub-classes who want full control over registry and instantiation
-     * of the branch.
-     *
-     * @return A supplier for the {@link BranchBlock}.
-     */
-    public Supplier<BranchBlock> createBranch() {
-        return this.createBranch(this.getBranchRegName(""));
+    protected ResourceLocation getBranchName() {
+        return getBranchName("");
     }
 
-    /**
-     * Gets a branch name with the given prefix and <tt>_branch</tt> as the suffix.
-     *
-     * @param prefix The prefix.
-     * @return The {@link ResourceLocation} registry name for the branch.
-     */
-    protected ResourceLocation getBranchRegName(final String prefix) {
-        return suffix(prefix(this.getRegistryName(), prefix), "_branch");
+    protected ResourceLocation getBranchName(final String prefix) {
+        return prefix(this.getRegistryName(), prefix);
+    }
+
+    protected String getBranchNameSuffix() {
+        return BranchBlock.NAME_SUFFIX;
     }
 
     /**
@@ -359,22 +347,23 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      *
      * @return The instantiated {@link BranchBlock}.
      */
-    protected BranchBlock createBranchBlock() {
-        final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(this.getProperties()) : new BasicBranchBlock(this.getProperties());
-		if (this.isFireProof()) {
-			branch.setFireSpreadSpeed(0).setFlammability(0);
-		}
+    protected BranchBlock createBranchBlock(ResourceLocation name) {
+        final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(name, this.getProperties()) :
+                new BasicBranchBlock(name, this.getProperties());
+        if (this.isFireProof()) {
+            branch.setFireSpreadSpeed(0).setFlammability(0);
+        }
         return branch;
     }
 
     /**
      * Creates branch block and adds it to the relevant {@link RegistryHandler}.
      *
-     * @param registryName The {@link ResourceLocation} registry name.
-     * @return A supplier for the {@link BranchBlock}.
+     * @param name The {@link ResourceLocation} registry name.
+     * @return The created {@link BranchBlock}.
      */
-    protected Supplier<BranchBlock> createBranch(final ResourceLocation registryName) {
-        return RegistryHandler.addBlock(registryName, this::createBranchBlock);
+    protected Supplier<BranchBlock> createBranch(final ResourceLocation name) {
+        return RegistryHandler.addBlock(suffix(name, getBranchNameSuffix()), () -> createBranchBlock(name));
     }
 
     /**
@@ -415,13 +404,15 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public Optional<BranchBlock> getBranch() {
         return Optionals.ofBlock(this.branch);
     }
+
     /**
      * Version of getBranch() used by jocodes to generate the tree.
      * By default it acts just like getBranch() but it can be overriden
      * by addons to customize the branch selected by the jocode
-     * @param level     The level the tree is generating in
-     * @param species   The species of the tree generated
-     * @param pos       The position of the branch block
+     *
+     * @param level   The level the tree is generating in
+     * @param species The species of the tree generated
+     * @param pos     The position of the branch block
      * @return branch block picked
      */
     public Optional<BranchBlock> getBranchForPlacement(LevelAccessor level, Species species, BlockPos pos) {
@@ -489,9 +480,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public Family setPrimitiveLog(Block primitiveLog) {
         this.primitiveLog = primitiveLog;
 
-		if (this.branch != null) {
-			this.branch.get().setPrimitiveLogDrops(new ItemStack(primitiveLog));
-		}
+        if (this.branch != null) {
+            this.branch.get().setPrimitiveLogDrops(new ItemStack(primitiveLog));
+        }
 
         return this;
     }
@@ -499,9 +490,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public Family setPrimitiveStrippedLog(Block primitiveStrippedLog) {
         this.primitiveStrippedLog = primitiveStrippedLog;
 
-		if (this.strippedBranch != null) {
-			this.strippedBranch.get().setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
-		}
+        if (this.strippedBranch != null) {
+            this.strippedBranch.get().setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
+        }
 
         return this;
     }
@@ -662,9 +653,12 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         }
     }
 
-    //Useful for addons
-    public boolean isValidBranchBlock (BranchBlock block){
+    public boolean isValidBranchBlock(BranchBlock block) {
         return this.validBranches.contains(block);
+    }
+
+    public int getNumberOfValidBranchBlocks() {
+        return validBranches.size();
     }
 
     private boolean branchIsLadder = true;

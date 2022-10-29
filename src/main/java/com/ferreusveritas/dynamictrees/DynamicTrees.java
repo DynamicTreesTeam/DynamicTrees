@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.loot.DTLoot;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
@@ -95,6 +96,7 @@ public final class DynamicTrees {
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {
+        DTLoot.load();
         TreeGenerator.setup();
 
         // Clears and locks registry handlers to free them from memory.

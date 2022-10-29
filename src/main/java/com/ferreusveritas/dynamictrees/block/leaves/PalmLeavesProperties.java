@@ -2,6 +2,8 @@ package com.ferreusveritas.dynamictrees.block.leaves;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
+import com.ferreusveritas.dynamictrees.loot.DTLootParameterSets;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.core.BlockPos;
@@ -16,6 +18,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -114,6 +118,19 @@ public class PalmLeavesProperties extends LeavesProperties {
             return Shapes.create(base);
         }
 
+    }
+
+    @Override
+    public LootTable.Builder createBlockDrops() {
+        if (primitiveLeaves != null && getPrimitiveLeavesBlock().isPresent()) {
+            return DTLootTableProvider.createPalmLeavesBlockDrops(primitiveLeaves.getBlock(), seedDropChances);
+        }
+        return DTLootTableProvider.createPalmLeavesDrops(seedDropChances, LootContextParamSets.BLOCK);
+    }
+
+    @Override
+    public LootTable.Builder createDrops() {
+        return DTLootTableProvider.createPalmLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES);
     }
 
 }

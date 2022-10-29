@@ -1,10 +1,7 @@
 package com.ferreusveritas.dynamictrees.api;
 
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
-import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
-import com.ferreusveritas.dynamictrees.data.provider.DTBlockTagsProvider;
-import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
-import com.ferreusveritas.dynamictrees.data.provider.DTItemTagsProvider;
+import com.ferreusveritas.dynamictrees.data.provider.*;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
@@ -19,6 +16,7 @@ public final class GatherDataHelper {
         gatherTagData(modId, event);
         gatherBlockStateAndModelData(modId, event, registries);
         gatherItemModelData(modId, event, registries);
+        gatherLootData(modId, event);
     }
 
     public static void gatherTagData(final String modId, final GatherDataEvent event) {
@@ -39,6 +37,12 @@ public final class GatherDataHelper {
     public static void gatherItemModelData(final String modId, final GatherDataEvent event, Registry<?>... registries) {
         event.getGenerator().addProvider(new DTItemModelProvider(event.getGenerator(), modId,
                 event.getExistingFileHelper(), Arrays.asList(registries)));
+    }
+
+    public static void gatherLootData(final String modId, final GatherDataEvent event) {
+        event.getGenerator().addProvider(new DTLootTableProvider(
+                event.getGenerator(), modId, event.getExistingFileHelper()
+        ));
     }
 
 }

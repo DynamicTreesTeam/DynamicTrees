@@ -6,7 +6,6 @@ import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatures;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
@@ -56,7 +55,6 @@ public class NetherFungusSpecies extends Species {
                 .setSaplingShape(CommonVoxelShapes.FLAT_MUSHROOM)
                 .setSaplingSound(SoundType.FUNGUS)
                 .setCanSaplingGrowNaturally(false)
-                .addDropCreators(DropCreators.LOG)
                 .envFactor(BiomeDictionary.Type.COLD, 0.25f)
                 .envFactor(BiomeDictionary.Type.WET, 0.75f);
     }

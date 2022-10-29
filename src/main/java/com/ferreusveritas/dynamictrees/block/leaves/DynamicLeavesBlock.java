@@ -11,11 +11,11 @@ import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.item.Seed;
+import com.ferreusveritas.dynamictrees.loot.DTLootContextParams;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.RayTraceCollision;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.core.BlockPos;
@@ -29,12 +29,8 @@ import net.minecraft.world.entity.animal.Bee;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -44,7 +40,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
@@ -53,18 +52,19 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable, RayTraceCollision {
 
-    public LeavesProperties properties = LeavesProperties.NULL_PROPERTIES;
+    public LeavesProperties properties = LeavesProperties.NULL;
 
     public DynamicLeavesBlock(final LeavesProperties leavesProperties, final Properties properties) {
         this(properties);
@@ -273,7 +273,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     public boolean isEntityPassable(CollisionContext context) {
-        if(context instanceof EntityCollisionContext entityCollisionContext) {
+        if (context instanceof EntityCollisionContext entityCollisionContext) {
             return isEntityPassable(entityCollisionContext.getEntity());
         }
         return false;
@@ -296,9 +296,8 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
 
-
     @Override
-    public void fallOn(Level level,BlockState blockState, BlockPos pos, Entity entity, float fallDistance) {
+    public void fallOn(Level level, BlockState blockState, BlockPos pos, Entity entity, float fallDistance) {
         // We are only interested in Living things crashing through the canopy.
         if (!DTConfigs.CANOPY_CRASH.get() || !(entity instanceof LivingEntity)) {
             return;
@@ -418,7 +417,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     /**
      * Checks that the {@link DynamicLeavesBlock} at the given {@link BlockPos} has enough light to exist.
      *
-     * @param state       The {@link BlockState} of the {@link DynamicLeavesBlock} to check.
+     * @param state            The {@link BlockState} of the {@link DynamicLeavesBlock} to check.
      * @param level            The {@link LevelAccessor} instance.
      * @param leavesProperties The {@link LeavesProperties} instance.
      * @param pos              The {@link BlockPos} of the {@link DynamicLeavesBlock}.
@@ -602,7 +601,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      *
      * @param player  The {@link Player} who destroyed the {@link DynamicLeavesBlock}.
      * @param item    The {@link ItemStack} used to destroy the {@link DynamicLeavesBlock}.
-     * @param level   The {@link Level} instance.
      * @param pos     The {@link BlockPos} of the {@link DynamicLeavesBlock}.
      * @param fortune The {@code fortune} on the tool used.
      * @return The {@link List} of {@link ItemStack}s to drop.
@@ -611,51 +609,34 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return new ArrayList<>(Collections.singletonList(this.getProperties(level.getBlockState(pos)).getPrimitiveLeavesItemStack()));
     }
 
-    public boolean shouldDrop(BlockState state, BlockGetter level, BlockPos pos, Player player) {
-        final ItemStack stack = player.getMainHandItem();
-        final Item item = stack.getItem();
-
-        // If the tool has silktouch, drop the block
-        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, stack) > 0) {
-            return true;
-        }
-
-        // Since shears don't have a ToolType, requireShears acts as an override for shears not extending ShearsItem.
-        if (this.getProperties(state).doRequireShears()) {
-            return item instanceof ShearsItem || stack.is(Tags.Items.SHEARS);
-        }
-
-//        final ToolType harvestTool = this.getHarvestTool(state);
-        return ForgeHooks.isCorrectToolForDrops(this.defaultBlockState(),player);
-    }
-
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        // If a loot table has been added load those drops instead (until drop creators).
-        if (builder.getLevel().getServer().getLootTables().getIds().contains(this.getLootTable())) {
-            return super.getDrops(state, builder);
+        final Vec3 originPos = builder.getOptionalParameter(LootContextParams.ORIGIN);
+        final LootTable lootTable;
+        Species species = Species.NULL_SPECIES;
+        BlockPos pos = BlockPos.ZERO;
+        ServerLevel level = builder.getLevel();
+
+        if (originPos == null) {
+            lootTable = level.getServer().getLootTables().get(getLootTable());
+        } else {
+            pos = new BlockPos(originPos.x, originPos.y, originPos.z);
+            LeavesProperties leavesProperties = getProperties(state);
+            species = getExactSpecies(level, pos, leavesProperties);
+            lootTable = leavesProperties.getBlockLootTable(level.getServer().getLootTables(), species);
         }
 
-        final List<ItemStack> ret = new ArrayList<>();
-        final Entity entity = builder.getOptionalParameter(LootContextParams.THIS_ENTITY);
-        final Player player = entity instanceof Player ? (Player) entity : null;
-        final Vec3 builderPos = builder.getOptionalParameter(LootContextParams.ORIGIN);
-        final BlockPos builderBlockPos = new BlockPos(builderPos.x(), builderPos.y(), builderPos.z());
-
-        int fortuneLevel = 0;
-
-        if (player != null && this.shouldDrop(state, builder.getLevel(), builderBlockPos, player)) {
-            return this.getDrops(player, player.getMainHandItem(), builder.getLevel(), builderBlockPos,
-                    EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, player.getMainHandItem()));
+        if (lootTable.getLootTableId() == BuiltInLootTables.EMPTY) {
+            return Collections.emptyList();
+        } else {
+            LootContext context = builder
+                    .withParameter(LootContextParams.BLOCK_STATE, state)
+                    .withParameter(DTLootContextParams.SPECIES, species)
+                    .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR,
+                            species.seasonalSeedDropFactor(LevelContext.create(level), pos))
+                    .create(LootContextParamSets.BLOCK);
+            return lootTable.getRandomItems(context);
         }
-
-        final Species species = this.getExactSpecies(builder.getLevel(), builderBlockPos, getProperties(state));
-        return species.getDrops(
-                DropCreator.Type.LEAVES,
-                new DropContext(builder.getLevel(), builderBlockPos, species, ret,
-                        Optional.ofNullable(builder.getOptionalParameter(LootContextParams.TOOL)).orElse(ItemStack.EMPTY),
-                        -1, fortuneLevel)
-        );
     }
 
     /**

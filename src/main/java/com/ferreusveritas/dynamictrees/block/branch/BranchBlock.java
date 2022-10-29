@@ -7,13 +7,12 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity.DestroyType;
 import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.context.LogDropContext;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.DestroyerNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.SpeciesNode;
@@ -24,6 +23,7 @@ import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -41,6 +41,8 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -56,6 +58,8 @@ import java.util.stream.Collectors;
 public abstract class BranchBlock extends BlockWithDynamicHardness implements TreePart, FutureBreakable {
 
     public static final int MAX_RADIUS = 8;
+    public static final String NAME_SUFFIX = "_branch";
+
     public static DynamicTrees.DestroyMode destroyMode = DynamicTrees.DestroyMode.SLOPPY;
 
     /**
@@ -65,12 +69,19 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     private ItemStack[] primitiveLogDrops = new ItemStack[]{};
     private boolean canBeStripped;
 
-    public BranchBlock(Material material) {
-        this(Properties.of(material));
+    /**
+     * @param name name of branch, without a {@code _branch} suffix
+     */
+    public BranchBlock(ResourceLocation name, Material material) {
+        this(name, Properties.of(material));
     }
 
-    public BranchBlock(Properties properties) {
+    /**
+     * @param name name of branch, without a {@code _branch} suffix
+     */
+    public BranchBlock(ResourceLocation name, Properties properties) {
         super(properties); //removes drops from block
+        lootTableSupplier = new LootTableSupplier("trees/branches/", name);
     }
 
     public BranchBlock setCanBeStripped(boolean truth) {
@@ -323,7 +334,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         List<BlockPos> endPoints = destroyer.getEnds();
         final Map<BlockPos, BlockState> destroyedLeaves = new HashMap<>();
         final List<ItemStackPos> leavesDropsList = new ArrayList<>();
-        this.destroyLeaves(level, cutPos, species, endPoints, destroyedLeaves, leavesDropsList);
+        this.destroyLeaves(level, cutPos, species, entity == null ? ItemStack.EMPTY : entity.getMainHandItem(), endPoints, destroyedLeaves, leavesDropsList);
         endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
 
         // Calculate main trunk height.
@@ -365,7 +376,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      * @param drops           A {@link List} for collecting the {@link ItemStack}s and their {@link BlockPos} relative
      *                        to the cut {@link BlockPos}.
      */
-    public void destroyLeaves(final Level level, final BlockPos cutPos, final Species species, final List<BlockPos> endPoints, final Map<BlockPos, BlockState> destroyedLeaves, final List<ItemStackPos> drops) {
+    public void destroyLeaves(final Level level, final BlockPos cutPos, final Species species, final ItemStack tool, final List<BlockPos> endPoints, final Map<BlockPos, BlockState> destroyedLeaves, final List<ItemStackPos> drops) {
         if (level.isClientSide || endPoints.isEmpty()) {
             return;
         }
@@ -404,17 +415,17 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         // Destroy all family compatible leaves.
         for (final Cell cell : leafMap.getAllNonZeroCells()) {
             final BlockPos.MutableBlockPos pos = cell.getPos();
-            final BlockState blockState = level.getBlockState(pos);
-            if (family.isCompatibleGenericLeaves(species, blockState, level, pos)) {
+            final BlockState state = level.getBlockState(pos);
+            if (family.isCompatibleGenericLeaves(species, state, level, pos)) {
                 dropList.clear();
-                species.getDrops(
-                        DropCreator.Type.HARVEST,
-                        new DropContext(level, pos, species, dropList)
-                );
+                LeavesProperties leaves = Optional.ofNullable(TreeHelper.getLeaves(state))
+                        .map(block -> block.getProperties(state))
+                        .orElse(LeavesProperties.NULL);
+                dropList.addAll(leaves.getDrops(level, pos, tool, species));
                 final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
                 final BlockPos relPos = imPos.subtract(cutPos);
                 level.setBlock(imPos, BlockStates.AIR, 3);
-                destroyedLeaves.put(relPos, blockState);
+                destroyedLeaves.put(relPos, state);
                 dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)));
             }
         }
@@ -428,16 +439,22 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     // DROPS AND HARVESTING
     ///////////////////////////////////////////
 
-    public List<ItemStack> getLogDrops(Level level, BlockPos pos, Species species, NetVolumeNode.Volume volume) {
-        return this.getLogDrops(level, pos, species, volume, ItemStack.EMPTY);
+    private final LootTableSupplier lootTableSupplier;
+
+    public boolean shouldGenerateBranchDrops() {
+        return getPrimitiveLog().isPresent();
     }
 
-    public List<ItemStack> getLogDrops(Level level, BlockPos pos, Species species, NetVolumeNode.Volume volume, ItemStack handStack) {
-        volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
-        return species.getDrops(
-                DropCreator.Type.LOGS,
-                new LogDropContext(level, pos, species, new ArrayList<>(), volume, handStack)
-        );
+    public ResourceLocation getLootTableName() {
+        return lootTableSupplier.getName();
+    }
+
+    public LootTable getLootTable(LootTables lootTables, Species species) {
+        return lootTableSupplier.get(lootTables, species);
+    }
+
+    public LootTable.Builder createBranchDrops() {
+        return DTLootTableProvider.createBranchDrops(getPrimitiveLog().get(), family.getStick(1).getItem());
     }
 
     public float getPrimitiveLogs(float volumeIn, List<ItemStack> drops) {
@@ -478,7 +495,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final float fortuneFactor = 1.0f + 0.25f * fortune;
         final NetVolumeNode.Volume woodVolume = destroyData.woodVolume; // The amount of wood calculated from the body of the tree network.
         woodVolume.multiplyVolume(fortuneFactor);
-        final List<ItemStack> woodItems = getLogDrops(level, cutPos, destroyData.species, woodVolume, heldItem);
+        final List<ItemStack> woodItems = destroyData.species.getBranchesDrops(level, woodVolume, heldItem);
 
         final float chance = 1.0f;
 
@@ -491,7 +508,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         // Damage the axe by a prescribed amount.
         this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);
     }
-
 
 
     @Override
@@ -509,7 +525,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final BranchDestructionData destroyData = this.destroyBranchFromNode(level, cutPos, Direction.DOWN, false, null);
 
         // Get all of the wood drops.
-        final List<ItemStack> woodDropList = this.getLogDrops(level, cutPos, destroyData.species, destroyData.woodVolume);
+        final List<ItemStack> woodDropList = destroyData.species.getBranchesDrops(level, destroyData.woodVolume);
 
         // If sloppy break drops are off clear all drops.
         if (!DTConfigs.SLOPPY_BREAK_DROPS.get()) {
@@ -527,7 +543,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      *
      * @param entity             The {@link LivingEntity} to ray trace from.
      * @param blockReachDistance The {@code reachDistance} of the entity.
-     * @param partialTick       The partial ticks.
+     * @param partialTick        The partial ticks.
      * @return The {@link BlockHitResult} created.
      */
     @Nullable
@@ -674,7 +690,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final Species species = TreeHelper.getExactSpecies(level, pos);
         final BranchDestructionData destroyData = destroyBranchFromNode(level, pos, Direction.DOWN, false, null);
         final NetVolumeNode.Volume woodVolume = destroyData.woodVolume;
-        final List<ItemStack> woodDropList = getLogDrops(level, pos, species, woodVolume);
+        final List<ItemStack> woodDropList = species.getBranchesDrops(level, woodVolume, ItemStack.EMPTY, explosion.radius);
         final FallingTreeEntity treeEntity = FallingTreeEntity.dropTree(level, destroyData, woodDropList, DestroyType.BLAST);
 
         if (treeEntity != null) {

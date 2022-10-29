@@ -9,6 +9,8 @@ import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.block.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock;
+import com.ferreusveritas.dynamictrees.block.entity.PottedSaplingBlockEntity;
+import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.cell.CellKits;
@@ -20,12 +22,8 @@ import com.ferreusveritas.dynamictrees.item.DendroPotion;
 import com.ferreusveritas.dynamictrees.item.DirtBucket;
 import com.ferreusveritas.dynamictrees.item.Staff;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreators;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatures;
-import com.ferreusveritas.dynamictrees.block.entity.PottedSaplingBlockEntity;
-import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import com.ferreusveritas.dynamictrees.worldgen.featurecancellation.FungusFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.featurecancellation.MushroomFeatureCanceller;
@@ -248,11 +246,6 @@ public class DTRegistries {
     @SubscribeEvent
     public static void onGenFeatureRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GenFeature> event) {
         GenFeatures.register(event.getRegistry());
-    }
-
-    @SubscribeEvent
-    public static void onDropCreatorRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<DropCreator> event) {
-        DropCreators.register(event.getRegistry());
     }
 
 }

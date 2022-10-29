@@ -26,7 +26,6 @@ public class ApplierRegistryEvent<O, I> extends GenericEvent<O> implements IModB
     public static final String SPECIES = "species";
     public static final String FAMILY = "family";
     public static final String LEAVES_PROPERTIES = "leaves_properties";
-    public static final String GLOBAL_DROP_CREATORS = "global_drop_creators";
     public static final String SOIL_PROPERTIES = "soil_properties";
 
     public final PropertyAppliers<O, I> appliers;

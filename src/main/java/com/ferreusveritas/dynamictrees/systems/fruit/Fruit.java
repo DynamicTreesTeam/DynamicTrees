@@ -6,11 +6,14 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.FruitBlock;
 import com.ferreusveritas.dynamictrees.block.GrowableBlock;
 import com.ferreusveritas.dynamictrees.compat.season.SeasonHelper;
+import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.tree.Resettable;
 import com.ferreusveritas.dynamictrees.util.AgeProperties;
+import com.ferreusveritas.dynamictrees.util.LazyValue;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +27,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -288,6 +292,21 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
 
     public void setMatureAction(GrowableBlock.MatureAction matureAction) {
         this.matureAction = matureAction;
+    }
+
+    public boolean shouldGenerateBlockDrops() {
+        return true;
+    }
+
+    private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
+            ResourceLocationUtils.prefix(block.get().getRegistryName(), "blocks/"));
+
+    public ResourceLocation getBlockDropsPath() {
+        return blockDropsPath.get();
+    }
+
+    public LootTable.Builder createBlockDrops() {
+        return DTLootTableProvider.createFruitDrops(block.get(), itemStack.getItem(), ageProperty, maxAge);
     }
 
     @Nonnull

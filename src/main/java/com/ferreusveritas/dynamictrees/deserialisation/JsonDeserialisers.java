@@ -14,10 +14,6 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.item.Seed;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatureConfiguration;
@@ -219,15 +215,13 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<VoxelShape> VOXEL_SHAPE =
             register(VoxelShape.class, new VoxelShapeDeserialiser());
 
-    public static final JsonDeserialiser<DropCreator.Type<DropContext>> DROP_TYPE =
-            register(DropCreator.Type.getGenericClass(), new RegistryEntryDeserialiser<>(DropCreator.Type.REGISTRY));
-
     public static final JsonDeserialiser<CellKit> CELL_KIT =
             register(CellKit.class, new RegistryEntryDeserialiser<>(CellKit.REGISTRY));
     public static final JsonDeserialiser<LeavesProperties> LEAVES_PROPERTIES =
             register(LeavesProperties.class, new RegistryEntryDeserialiser<>(LeavesProperties.REGISTRY));
     public static final JsonDeserialiser<GrowthLogicKit> GROWTH_LOGIC_KIT =
             register(GrowthLogicKit.class, new RegistryEntryDeserialiser<>(GrowthLogicKit.REGISTRY));
+
     public static final JsonDeserialiser<GenFeature> GEN_FEATURE =
             register(GenFeature.class, new RegistryEntryDeserialiser<>(GenFeature.REGISTRY));
     public static final JsonDeserialiser<Family> FAMILY =
@@ -236,8 +230,6 @@ public final class JsonDeserialisers {
             register(Fruit.class, new RegistryEntryDeserialiser<>(Fruit.REGISTRY));
     public static final JsonDeserialiser<Pod> POD =
             register(Pod.class, new RegistryEntryDeserialiser<>(Pod.REGISTRY));
-    public static final JsonDeserialiser<DropCreator> DROP_CREATOR =
-            register(DropCreator.class, new RegistryEntryDeserialiser<>(DropCreator.REGISTRY));
     public static final JsonDeserialiser<Species> SPECIES =
             register(Species.class, new RegistryEntryDeserialiser<>(Species.REGISTRY));
     public static final JsonDeserialiser<FeatureCanceller> FEATURE_CANCELLER =
@@ -251,16 +243,10 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<GenFeatureConfiguration> CONFIGURED_GEN_FEATURE =
             register(GenFeatureConfiguration.class,
                     new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class, GenFeatureConfiguration.TEMPLATES));
-    public static final JsonDeserialiser<DropCreatorConfiguration> CONFIGURED_DROP_CREATOR =
-            register(DropCreatorConfiguration.class,
-                    new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class,
-                            DropCreatorConfiguration.TEMPLATES));
     public static final JsonDeserialiser<GrowthLogicKitConfiguration> CONFIGURED_GROWTH_LOGIC_KIT =
             register(GrowthLogicKitConfiguration.class,
                     new ConfiguredDeserialiser<>("Growth Logic Kit", GrowthLogicKit.class,
                             GrowthLogicKitConfiguration.TEMPLATES));
-
-    public static final JsonDeserialiser<Drops> DROPS = register(Drops.class, new DropsDeserialiser());
 
     public static final JsonDeserialiser<Seed> SEED = register(Seed.class, jsonElement -> ITEM.deserialise(jsonElement)
             .mapIfValid(item -> item instanceof Seed, "Item \"{}\" is not a seed.", item -> (Seed) item));

@@ -22,15 +22,6 @@
     "perfect_biomes": { "name": "minecraft:crimson_forest" },
     "acceptable_soils": ["nether_soil_like", "fungus_like", "dirt_like"],
     "acceptable_growth_blocks": ["crimson_nylium"],
-    "drop_creators": [
-        "log",
-        {
-            "name": "wart_block",
-            "properties": {
-                "block": "nether_wart_block"
-            }
-        }
-    ],
     "features": [
         {
             "name": "vines",

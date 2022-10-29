@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -65,17 +66,26 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     private final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
 
-    public BasicBranchBlock(Material material) {
-        this(BlockBehaviour.Properties.of(material).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
+    /**
+     * @param name name of branch, without a {@code _branch} suffix
+     */
+    public BasicBranchBlock(ResourceLocation name, Material material) {
+        this(name, BlockBehaviour.Properties.of(material).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
     }
 
-    public BasicBranchBlock(Properties properties) {
-        this(properties, RADIUS, MAX_RADIUS);
+    /**
+     * @param name name of branch, without a {@code _branch} suffix
+     */
+    public BasicBranchBlock(ResourceLocation name, Properties properties) {
+        this(name, properties, RADIUS, MAX_RADIUS);
     }
 
-    // Useful for more unique subclasses
-    public BasicBranchBlock(BlockBehaviour.Properties properties, final IntegerProperty radiusProperty, final int maxRadius) {
-        super(properties);
+    /**
+     * @param name name of branch, without a {@code _branch} suffix
+     */
+    public BasicBranchBlock(ResourceLocation name, BlockBehaviour.Properties properties, IntegerProperty radiusProperty,
+                            int maxRadius) {
+        super(name, properties);
 
         // Create branch state cache.
         this.branchStates = this.createBranchStates(radiusProperty, maxRadius);

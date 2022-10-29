@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -32,12 +33,12 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, MAX_RADIUS_THICK); //39 ?
 
-    public ThickBranchBlock(Material material) {
-        this(Properties.of(material));
+    public ThickBranchBlock(ResourceLocation name, Material material) {
+        this(name, Properties.of(material));
     }
 
-    public ThickBranchBlock(Properties properties) {
-        super(properties, RADIUS_DOUBLE, MAX_RADIUS_THICK);
+    public ThickBranchBlock(ResourceLocation name, Properties properties) {
+        super(name, properties, RADIUS_DOUBLE, MAX_RADIUS_THICK);
     }
 
     public TrunkShellBlock getTrunkShell() {
