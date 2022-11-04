@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "dynamictrees:warped",
-    "dynamictrees:crimson"
+    "dynamictrees:warped_branch",
+    "dynamictrees:crimson_branch"
   ]
 }

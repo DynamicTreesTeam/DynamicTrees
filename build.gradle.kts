@@ -1,9 +1,6 @@
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.matthewprenger.cursegradle.CurseArtifact
 import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.CurseRelation
-import java.io.InputStreamReader
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 

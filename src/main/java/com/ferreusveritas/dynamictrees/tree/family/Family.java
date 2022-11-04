@@ -374,7 +374,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @return A supplier for the {@link BlockItem}.
      */
     public Supplier<BlockItem> createBranchItem(final ResourceLocation registryName, final Supplier<BranchBlock> branchSup) {
-        return RegistryHandler.addItem(registryName, () -> new BlockItem(branchSup.get(), new Item.Properties()));
+        return RegistryHandler.addItem(suffix(registryName, getBranchNameSuffix()), () -> new BlockItem(branchSup.get(), new Item.Properties()));
     }
 
     protected Family setBranch(final Supplier<BranchBlock> branchSup) {
