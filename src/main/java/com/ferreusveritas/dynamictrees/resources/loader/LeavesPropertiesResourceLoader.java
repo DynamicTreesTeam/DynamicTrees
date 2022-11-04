@@ -1,10 +1,10 @@
 package com.ferreusveritas.dynamictrees.resources.loader;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.cell.CellKit;
-import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
+import com.ferreusveritas.dynamictrees.api.cell.CellKit;
+import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
@@ -32,7 +32,9 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 .register("color", Integer.class, LeavesProperties::setColorNumber);
 
         // Primitive leaves are needed before gathering data.
-        this.gatherDataAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves);
+        this.gatherDataAppliers
+                .register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
+                .registerListApplier("seed_drop_chances", Float.class, LeavesProperties::setSeedDropChances);
 
         // Primitive leaves are needed both client and server (so cannot be done on load).
         this.setupAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
