@@ -9,6 +9,8 @@ import java.time.format.DateTimeFormatter
 fun property(key: String) = project.findProperty(key).toString()
 fun optionalProperty(key: String) = project.findProperty(key)?.toString()
 
+apply(from = "https://gist.githubusercontent.com/Harleyoc1/4d23d4e991e868d98d548ac55832381e/raw/applesiliconfg.gradle")
+
 plugins {
     id("java")
     id("net.minecraftforge.gradle")
@@ -77,6 +79,7 @@ minecraft {
 
 sourceSets.main.get().resources {
     srcDir("src/generated/resources")
+    srcDir("src/localization/resources")
 }
 
 dependencies {
@@ -111,7 +114,7 @@ translationSheet {
     this.sheetId.set("1xjxEh2NdbeV_tQc6fDHPgcRmtchqCZJKt--6oifq1qc")
     this.sectionColour.set(0xF9CB9C)
     this.sectionPattern.set("Dynamic Trees")
-    this.outputDir("src/generated/resources/assets/dynamictrees/lang/")
+    this.outputDir("src/localization/resources/assets/dynamictrees/lang/")
 
     this.useJson()
 }
