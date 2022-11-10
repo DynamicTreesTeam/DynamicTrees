@@ -32,13 +32,11 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
         this.commonAppliers
                 .registerListApplier("block_shapes", VoxelShape.class, (fruit, list) ->
                         fruit.setBlockShapes(list.toArray(new VoxelShape[0]))
-                );
-
-        this.gatherDataAppliers.register("item_stack", ItemStack.class, Fruit::setItemStack);
+                )
+                .register("item_stack", ItemStack.class, Fruit::setItemStack);
 
         this.reloadAppliers
                 .register("can_bone_meal", Boolean.class, Fruit::setCanBoneMeal)
-                .register("item_stack", ItemStack.class, Fruit::setItemStack)
                 .register("growth_chance", Float.class, Fruit::setGrowthChance)
                 .register("flower_hold_period_length", Float.class, Fruit::setFlowerHoldPeriodLength)
                 .register("season_offset", Float.class, Fruit::setSeasonOffset)
