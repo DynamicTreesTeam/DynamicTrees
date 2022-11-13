@@ -36,13 +36,13 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
                 .register("max_age", Integer.class, Pod::setMaxAge);
 
         this.commonAppliers
-                .register("block_shapes", JsonObject.class, this::readBlockShapes);
+                .register("block_shapes", JsonObject.class, this::readBlockShapes)
+                .register("item_stack", ItemStack.class, Pod::setItemStack);
 
         this.gatherDataAppliers.register("item_stack", ItemStack.class, Pod::setItemStack);
 
         this.reloadAppliers
                 .register("can_bone_meal", Boolean.class, Pod::setCanBoneMeal)
-                .register("item_stack", ItemStack.class, Pod::setItemStack)
                 .register("growth_chance", Float.class, Pod::setGrowthChance)
                 .register("season_offset", Float.class, Pod::setSeasonOffset)
                 .register("flower_hold_period_length", Float.class, Pod::setFlowerHoldPeriodLength)
