@@ -78,7 +78,6 @@ public final class BiomeDatabaseResourceLoader
                 .register("multipass", JsonObject.class, BiomeDatabase.Entry::setCustomMultipass)
                 .register("blacklist", Boolean.class, BiomeDatabase.Entry::setBlacklisted)
                 .register("forestness", Float.class, BiomeDatabase.Entry::setForestness)
-                .register("subterranean", Boolean.class, BiomeDatabase.Entry::setSubterranean)
                 .registerIfTrueApplier("reset", BiomeDatabase.Entry::reset);
 
         this.cancellationAppliers

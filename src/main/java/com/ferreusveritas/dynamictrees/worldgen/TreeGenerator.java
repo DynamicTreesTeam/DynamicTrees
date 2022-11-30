@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Chance;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
+import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
@@ -106,10 +107,9 @@ public class TreeGenerator {
     }
 
     public void makeTrees(LevelContext levelContext, BiomeDatabase biomeDataBase, PoissonDisc circle, SafeChunkBounds safeBounds) {
-        // TODO: De-couple ground finder from biomes, now that they can vary based on height.
-        BlockPos pos = new BlockPos(circle.x, levelContext.accessor().getMaxBuildHeight(), circle.z);
-        final Entry entry = biomeDataBase.getEntry(levelContext.accessor().getBiome(pos).value());
-        for (BlockPos groundPos : entry.getGroundFinder().findGround(levelContext.accessor(), pos)) {
+        BlockPos pos = new BlockPos(circle.x, 0, circle.z);
+        for (BlockPos groundPos : GroundFinder.getGroundFinder(levelContext.level()).findGround(levelContext.accessor(), pos)) {
+            Entry entry = biomeDataBase.getEntry(levelContext.accessor().getBiome(groundPos).value());
             makeTree(levelContext, entry, circle, groundPos, safeBounds);
         }
     }

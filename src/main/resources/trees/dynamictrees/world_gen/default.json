@@ -224,15 +224,6 @@
     }
   },
   {
-    "__comment": "Flag nether as being subterranean.",
-    "select": { "name": "minecraft:.*", "type": "nether" },
-    "apply": {
-      "subterranean": true,
-      "chance": 0.4
-    }
-  },
-
-  {
     "__comment" : "Wooded Mesas have a chance of generating oak on the dirt patches.",
     "select": { "name": "minecraft:.*wooded_badlands" },
     "apply": {
@@ -241,12 +232,22 @@
       "chance": 0.5
     }
   },
+
   {
-    "__comment": "Cancel huge fungus features from namespace 'minecraft' in the nether forests.",
+    "select": { "name": "minecraft:.*", "type": "nether" },
+    "apply": {
+      "chance": 0.4
+    }
+  },
+  {
+    "__comment": "Cancel huge fungus features from namespace 'minecraft' in the nether forests, and set chance.",
     "select": { "name": "minecraft:.*forest", "type": "nether" },
     "cancellers": {
       "type": "fungus",
       "namespace": "minecraft"
+    },
+    "apply": {
+      "chance": 1.0
     }
   },
   {

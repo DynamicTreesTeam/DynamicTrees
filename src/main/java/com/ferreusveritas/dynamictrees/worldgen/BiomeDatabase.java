@@ -33,10 +33,6 @@ public class BiomeDatabase {
         @Override
         public void setSpeciesSelector(SpeciesSelector speciesSelector) {
         }
-
-        @Override
-        public void setSubterranean(boolean is) {
-        }
     };
 
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
@@ -95,11 +91,9 @@ public class BiomeDatabase {
         private SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
         private final FeatureCancellations featureCancellations = new FeatureCancellations();
         private boolean blacklisted = false;
-        private boolean subterranean = false;
         private float forestness = 0.0f;
         private final static Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
         private Function<Integer, Integer> multipass = defaultMultipass;
-        private GroundFinder groundFinder = GroundFinder.OVERWORLD;
 
         public Entry() {
             this.database = null;
@@ -151,17 +145,8 @@ public class BiomeDatabase {
             this.blacklisted = blacklisted;
         }
 
-        public void setSubterranean(boolean is) {
-            this.subterranean = is;
-            this.groundFinder = is ? GroundFinder.SUBTERRANEAN : GroundFinder.OVERWORLD;
-        }
-
         public boolean isBlacklisted() {
             return blacklisted;
-        }
-
-        public boolean isSubterranean() {
-            return subterranean;
         }
 
         public void setForestness(float forestness) {
@@ -178,14 +163,6 @@ public class BiomeDatabase {
 
         public Function<Integer, Integer> getMultipass() {
             return multipass;
-        }
-
-        public GroundFinder getGroundFinder() {
-            return groundFinder;
-        }
-
-        public void setGroundFinder(GroundFinder groundFinder) {
-            this.groundFinder = groundFinder;
         }
 
         public void enableDefaultMultipass() {
@@ -235,7 +212,6 @@ public class BiomeDatabase {
             this.chanceSelector = (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
             this.forestness = 0.0F;
             this.blacklisted = false;
-            this.subterranean = false;
             this.multipass = defaultMultipass;
         }
 
@@ -345,11 +321,6 @@ public class BiomeDatabase {
                 break;
         }
 
-        return this;
-    }
-
-    public BiomeDatabase setIsSubterranean(Biome biome, boolean is) {
-        getEntry(biome).setSubterranean(is);
         return this;
     }
 
