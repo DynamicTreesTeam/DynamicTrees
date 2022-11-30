@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.data.provider;
 
-import com.ferreusveritas.dynamictrees.event.handlers.BakedModelEventHandler;
+import com.ferreusveritas.dynamictrees.event.handler.BakedModelEventHandler;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.resources.ResourceLocation;

@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationTemplateResourceLoader;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationTemplateResourceLoader;
 import com.ferreusveritas.dynamictrees.api.event.Hooks;
 import com.ferreusveritas.dynamictrees.api.resource.TreeResourceManager;
 import com.ferreusveritas.dynamictrees.data.DTRecipes;
@@ -9,10 +9,10 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.resources.loader.*;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
+import com.ferreusveritas.dynamictrees.systems.fruit.FruitResourceLoader;
+import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatureConfiguration;
+import com.ferreusveritas.dynamictrees.systems.pod.PodResourceLoader;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ReloadableServerResources;
@@ -25,7 +25,6 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
 import org.apache.logging.log4j.LogManager;
@@ -39,13 +38,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 /**
- *
  * @author Harley O'Connor
  */
 @Mod.EventBusSubscriber(modid = DynamicTrees.MOD_ID)
 public final class Resources {
 
-    public static final ResourceLocation RESOURCE_LOCATION = DynamicTrees.resLoc("registry_name");
+    public static final ResourceLocation RESOURCE_LOCATION = DynamicTrees.location("registry_name");
 
     public static final String TREES = "trees";
 
@@ -54,13 +52,6 @@ public final class Resources {
     public static final LeavesPropertiesResourceLoader LEAVES_PROPERTIES_LOADER = new LeavesPropertiesResourceLoader();
     public static final SoilPropertiesResourceLoader SOIL_PROPERTIES_LOADER = new SoilPropertiesResourceLoader();
     public static final FamilyResourceLoader FAMILY_LOADER = new FamilyResourceLoader();
-
-    public static final ConfigurationTemplateResourceLoader<DropCreatorConfiguration, DropCreator>
-            DROP_CREATOR_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
-            "drop_creators/configurations",
-            DropCreator.REGISTRY,
-            DropCreatorConfiguration.TEMPLATES
-    );
 
     public static final ConfigurationTemplateResourceLoader<GenFeatureConfiguration, GenFeature>
             GEN_FEATURE_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
@@ -76,13 +67,14 @@ public final class Resources {
             GrowthLogicKitConfiguration.TEMPLATES
     );
 
+    public static final FruitResourceLoader FRUIT_LOADER = new FruitResourceLoader();
+    public static final PodResourceLoader POD_LOADER = new PodResourceLoader();
+
     public static final SpeciesResourceLoader SPECIES_LOADER = new SpeciesResourceLoader();
 
 
     public static final JoCodeResourceLoader JO_CODE_LOADER = new JoCodeResourceLoader();
     public static final BiomeDatabaseResourceLoader BIOME_DATABASE_LOADER = new BiomeDatabaseResourceLoader();
-    public static final GlobalDropCreatorResourceLoader GLOBAL_DROP_CREATOR_LOADER =
-            new GlobalDropCreatorResourceLoader();
 
     public static void setupTreesResourceManager() {
         addDefaultLoaders();
@@ -100,13 +92,13 @@ public final class Resources {
                 LEAVES_PROPERTIES_LOADER,
                 SOIL_PROPERTIES_LOADER,
                 FAMILY_LOADER,
-                DROP_CREATOR_TEMPLATE_LOADER,
                 GEN_FEATURE_TEMPLATE_LOADER,
                 GROWTH_LOGIC_KIT_TEMPLATE_LOADER,
+                FRUIT_LOADER,
+                POD_LOADER,
                 SPECIES_LOADER,
                 JO_CODE_LOADER,
-                BIOME_DATABASE_LOADER,
-                GLOBAL_DROP_CREATOR_LOADER
+                BIOME_DATABASE_LOADER
         );
     }
 
@@ -115,8 +107,6 @@ public final class Resources {
         // This means that add-ons will take priority over DT.
         ModList.get().getMods().forEach(Resources::addModResourcePack);
     }
-
-
 
 
     private static void addModResourcePack(IModInfo modInfo) {

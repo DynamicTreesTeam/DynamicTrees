@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.api.event;
 
 import com.ferreusveritas.dynamictrees.api.resource.TreeResourceManager;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoader;
-
-import static com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases.getDefault;
-import static com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases.getDimensionalDatabases;
 
 /**
  * @author Harley O'Connor
@@ -16,16 +16,8 @@ public final class Hooks {
         ModLoader.get().postEvent(new AddResourceLoadersEvent(resourceManager));
     }
 
-    public static void onAddFeatureCancellers() {
-        ModLoader.get().postEvent(new AddFeatureCancellersEvent(getDefault()));
-    }
-
-    public static void onPopulateDefaultDatabase() {
-        MinecraftForge.EVENT_BUS.post(new PopulateDefaultDatabaseEvent(getDefault()));
-    }
-
-    public static void onPopulateDimensionalDatabases() {
-        MinecraftForge.EVENT_BUS.post(new PopulateDimensionalDatabaseEvent(getDimensionalDatabases(), getDefault()));
+    public static boolean onTransitionSaplingToTree(Species species, Level level, BlockPos pos) {
+        return MinecraftForge.EVENT_BUS.post(new TransitionSaplingToTreeEvent(species, level, pos));
     }
 
 }

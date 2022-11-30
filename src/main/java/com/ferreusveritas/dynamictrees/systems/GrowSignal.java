@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.systems;
 
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 

@@ -8,7 +8,7 @@ import com.ferreusveritas.dynamictrees.api.resource.loading.ApplicationException
 import com.ferreusveritas.dynamictrees.api.resource.loading.StagedApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
-import com.ferreusveritas.dynamictrees.trees.Resettable;
+import com.ferreusveritas.dynamictrees.tree.Resettable;
 import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.JsonElement;

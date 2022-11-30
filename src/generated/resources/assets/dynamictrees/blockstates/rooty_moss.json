@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/rooted_dirt"
+        "model": "minecraft:block/moss_block"
       }
     },
     {

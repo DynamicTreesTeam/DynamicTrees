@@ -29,10 +29,10 @@ public class PalmGrowthLogic extends GrowthLogicKit {
 
     @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
-        long day = context.world().getGameTime() / 24000L;
+        long day = context.level().getGameTime() / 24000L;
         int month = (int) day / 30; // Change the hashs every in-game month
         return super.getEnergy(configuration, context) *
-                context.species().biomeSuitability(context.world(), context.pos()) +
+                context.species().biomeSuitability(context.level(), context.pos()) +
                 (CoordUtils.coordHashCode(context.pos().above(month), 3) %
                         3); // Vary the height energy by a psuedorandom hash function
 

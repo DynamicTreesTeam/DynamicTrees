@@ -1,22 +1,19 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.material.FluidState;
@@ -81,10 +78,10 @@ public final class CoordUtils {
         }
     }
 
-    public static boolean isSurroundedByLoadedChunks(Level world, BlockPos pos) {
+    public static boolean isSurroundedByLoadedChunks(Level level, BlockPos pos) {
         for (Surround surr : CoordUtils.Surround.values()) {
             Vec3i dir = surr.getOffset();
-            if (!((ServerLevel)world).isPositionEntityTicking(pos.offset(dir))) {
+            if (!((ServerLevel) level).isPositionEntityTicking(pos.offset(dir))) {
                 return false;
             }
         }
@@ -93,11 +90,11 @@ public final class CoordUtils {
     }
 
     @SuppressWarnings("deprecation")
-    public static boolean canAccessStateSafely(BlockGetter blockReader, BlockPos pos) {
-        if (blockReader instanceof LevelReader) { // Handles most cases.
-            return ((LevelReader) blockReader).hasChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
-        } else if (blockReader instanceof PathNavigationRegion) { // Handles Region.
-            return !(((PathNavigationRegion) blockReader).getChunk(pos) instanceof EmptyLevelChunk);
+    public static boolean canAccessStateSafely(BlockGetter level, BlockPos pos) {
+        if (level instanceof LevelReader) { // Handles most cases.
+            return ((LevelReader) level).hasChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
+        } else if (level instanceof PathNavigationRegion) { // Handles Region.
+            return !(((PathNavigationRegion) level).getChunk(pos) instanceof EmptyLevelChunk);
         }
         // Otherwise assume we can access state safely. In most cases this is true, and if not we know it is a
         // mod compatibility issue and a crash or logging will be more helpful in solving the problem.
@@ -108,12 +105,12 @@ public final class CoordUtils {
      * Gets the {@link BlockState} object at the given position, or null if the block wasn't loaded. This is safer
      * because calling getBlockState on an unloaded block can cause a crash.
      *
-     * @param blockReader The {@link BlockGetter} object.
+     * @param level The {@link BlockGetter} object.
      * @return The {@link BlockState} object, or null if it's not loaded.
      */
     @Nullable
-    public static BlockState getStateSafe(BlockGetter blockReader, BlockPos blockPos) {
-        return canAccessStateSafely(blockReader, blockPos) ? blockReader.getBlockState(blockPos) : null;
+    public static BlockState getStateSafe(BlockGetter level, BlockPos blockPos) {
+        return canAccessStateSafely(level, blockPos) ? level.getBlockState(blockPos) : null;
     }
 
     public static Direction getRandomDir(Random rand) {
@@ -123,23 +120,23 @@ public final class CoordUtils {
     /**
      * Find a suitable position for seed drops or fruit placement using ray tracing.
      *
-     * @param world     The world
+     * @param level     The level
      * @param treePos   The block position of the {@link Family} trunk base.
      * @param branchPos The {@link BlockPos} of a {@link BranchBlock} selected as a fruit target
      * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is
      * BlockPos.ZERO
      */
-    public static BlockPos getRayTraceFruitPos(LevelAccessor world, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
-        final HitResult result = branchRayTrace(world, species, treePos, branchPos, 45, 60, 4 + world.getRandom().nextInt(3), safeBounds);
+    public static BlockPos getRayTraceFruitPos(LevelAccessor level, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
+        final HitResult result = branchRayTrace(level, species, treePos, branchPos, 45, 60, 4 + level.getRandom().nextInt(3), safeBounds);
 
         if (result != null) {
             BlockPos hitPos = new BlockPos(result.getLocation());
             if (hitPos != BlockPos.ZERO) {
                 do { // Run straight down until we hit a block that's non compatible leaves.
                     hitPos = hitPos.below();
-                } while (species.getFamily().isCompatibleGenericLeaves(species, world.getBlockState(hitPos), world, hitPos));
+                } while (species.getFamily().isCompatibleGenericLeaves(species, level.getBlockState(hitPos), level, hitPos));
 
-                if (world.isEmptyBlock(hitPos)) { // If that block is air then we have a winner.
+                if (level.isEmptyBlock(hitPos)) { // If that block is air then we have a winner.
                     return hitPos;
                 }
             }
@@ -149,7 +146,7 @@ public final class CoordUtils {
     }
 
     @Nullable
-    public static BlockHitResult branchRayTrace(LevelAccessor world, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance, SafeChunkBounds safeBounds) {
+    public static BlockHitResult branchRayTrace(LevelAccessor level, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance, SafeChunkBounds safeBounds) {
         treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ()); // Make the tree pos level with the branch pos.
 
         Vec3 vOut = new Vec3(branchPos.getX() - treePos.getX(), 0, branchPos.getZ() - treePos.getZ());
@@ -159,8 +156,8 @@ public final class CoordUtils {
             spreadHor = 180;
         }
 
-        final float deltaYaw = (world.getRandom().nextFloat() * spreadHor * 2) - spreadHor;
-        final float deltaPitch = (world.getRandom().nextFloat() * -spreadVer); // Must be greater than -90 degrees(and less than 90) for the tangent function.
+        final float deltaYaw = (level.getRandom().nextFloat() * spreadHor * 2) - spreadHor;
+        final float deltaPitch = (level.getRandom().nextFloat() * -spreadVer); // Must be greater than -90 degrees(and less than 90) for the tangent function.
         vOut = vOut.normalize(). // Normalize to unit vector.
                 add(0, Math.tan(Math.toRadians(deltaPitch)), 0). // Pitch the angle downward by 0 to spreadVer degrees.
                 normalize(). // Re-normalize to unit vector.
@@ -171,12 +168,12 @@ public final class CoordUtils {
         final Vec3 vantageVec = branchVec.add(vOut); // Make a vantage point to look at the branch.
         final BlockPos vantagePos = new BlockPos(vantageVec); // Convert Vector to BlockPos for testing.
 
-        if (!safeBounds.inBounds(vantagePos, false) || world.isEmptyBlock(vantagePos)) { // The observing block must be in free space.
-            final BlockHitResult result = rayTraceBlocks(world, new CustomRayTraceContext(vantageVec, branchVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE), safeBounds);
+        if (!safeBounds.inBounds(vantagePos, false) || level.isEmptyBlock(vantagePos)) { // The observing block must be in free space.
+            final BlockHitResult result = rayTraceBlocks(level, new CustomRayTraceContext(vantageVec, branchVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE), safeBounds);
             // Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks.
             final BlockPos hitPos = new BlockPos(result.getLocation());
             if (result.getType() == HitResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) { // We found a block.
-                if (species.getFamily().isCompatibleGenericLeaves(species, world.getBlockState(hitPos), world, hitPos)) { // Test if it's the right kind of leaves for the species.
+                if (species.getFamily().isCompatibleGenericLeaves(species, level.getBlockState(hitPos), level, hitPos)) { // Test if it's the right kind of leaves for the species.
                     return result;
                 }
             }
@@ -191,20 +188,16 @@ public final class CoordUtils {
      * <p>
      * If an attempt is made to read a block in an unloaded chunk it will simply return AIR or the properties of AIR
      * where applicable.
-     *
-     * @param world
-     * @param context
-     * @return
      */
-    public static BlockHitResult rayTraceBlocks(LevelAccessor world, CustomRayTraceContext context, SafeChunkBounds safeBounds) {
+    public static BlockHitResult rayTraceBlocks(LevelAccessor level, CustomRayTraceContext context, SafeChunkBounds safeBounds) {
         return getRayTraceVector(context, (fromContext, blockPos) -> {
-            BlockState blockstate = safeBounds.inBounds(blockPos, false) ? world.getBlockState(blockPos) : Blocks.AIR.defaultBlockState();
-            FluidState fluidState = safeBounds.inBounds(blockPos, false) ? world.getFluidState(blockPos) : Fluids.EMPTY.defaultFluidState();
+            BlockState blockstate = safeBounds.inBounds(blockPos, false) ? level.getBlockState(blockPos) : Blocks.AIR.defaultBlockState();
+            FluidState fluidState = safeBounds.inBounds(blockPos, false) ? level.getFluidState(blockPos) : Fluids.EMPTY.defaultFluidState();
             Vec3 startVec = fromContext.getStartVector();
             Vec3 endVec = fromContext.getEndVector();
-            VoxelShape voxelshape = safeBounds.inBounds(blockPos, false) ? fromContext.getBlockShape(blockstate, world, blockPos) : Shapes.empty();
-            BlockHitResult blockraytraceresult = world.clipWithInteractionOverride(startVec, endVec, blockPos, voxelshape, blockstate);
-            VoxelShape voxelshape1 = safeBounds.inBounds(blockPos, false) ? fromContext.getFluidShape(fluidState, world, blockPos) : Shapes.empty();
+            VoxelShape voxelshape = safeBounds.inBounds(blockPos, false) ? fromContext.getBlockShape(blockstate, level, blockPos) : Shapes.empty();
+            BlockHitResult blockraytraceresult = level.clipWithInteractionOverride(startVec, endVec, blockPos, voxelshape, blockstate);
+            VoxelShape voxelshape1 = safeBounds.inBounds(blockPos, false) ? fromContext.getFluidShape(fluidState, level, blockPos) : Shapes.empty();
             BlockHitResult blockraytraceresult1 = voxelshape1.clip(startVec, endVec, blockPos);
             double d0 = blockraytraceresult == null ? Double.MAX_VALUE : fromContext.getStartVector().distanceToSqr(blockraytraceresult.getLocation());
             double d1 = blockraytraceresult1 == null ? Double.MAX_VALUE : fromContext.getStartVector().distanceToSqr(blockraytraceresult1.getLocation());
@@ -300,39 +293,27 @@ public final class CoordUtils {
             return this.startVec;
         }
 
-        public VoxelShape getBlockShape(BlockState state, BlockGetter world, BlockPos pos) {
-            return this.blockMode.get(state, world, pos, CollisionContext.empty());
+        public VoxelShape getBlockShape(BlockState state, BlockGetter level, BlockPos pos) {
+            return this.blockMode.get(state, level, pos, CollisionContext.empty());
         }
 
-        public VoxelShape getFluidShape(FluidState state, BlockGetter world, BlockPos pos) {
-            return this.fluidMode.canPick(state) ? state.getShape(world, pos) : Shapes.empty();
+        public VoxelShape getFluidShape(FluidState state, BlockGetter level, BlockPos pos) {
+            return this.fluidMode.canPick(state) ? state.getShape(level, pos) : Shapes.empty();
         }
     }
 
     /**
-     * @param world    The world
+     * @param level    The level
      * @param startPos The starting position
      * @return The position of the top solid block
      */
-    public static BlockPos findWorldSurface(LevelAccessor world, BlockPos startPos, boolean worldGen) {
+    public static BlockPos findWorldSurface(LevelAccessor level, BlockPos startPos, boolean worldGen) {
         return new BlockPos(
                 startPos.getX(),
-                world.getHeight(worldGen ? Heightmap.Types.WORLD_SURFACE_WG : Heightmap.Types.WORLD_SURFACE,
+                level.getHeight(worldGen ? Heightmap.Types.WORLD_SURFACE_WG : Heightmap.Types.WORLD_SURFACE,
                         startPos.getX(), startPos.getZ()) - 1,
                 startPos.getZ()
         );
-
-//		BlockPos.Mutable pos = new BlockPos.Mutable(startPos.getX(), startPos.getY(), startPos.getZ());
-//
-//		//Rise up until we are no longer in a solid block
-//		while(world.getBlockState(pos).canOcclude()) {
-//			pos.set(pos.getX(), pos.getY() + 1, pos.getZ());
-//		}
-//		//Dive down until we are again
-//		while(!world.getBlockState(pos).canOcclude() && pos.getY() > 50) {
-//			pos.set(pos.getX(), pos.getY() - 1, pos.getZ());
-//		}
-//		return pos;
     }
 
     //Some ready made not terrible prime hash factors

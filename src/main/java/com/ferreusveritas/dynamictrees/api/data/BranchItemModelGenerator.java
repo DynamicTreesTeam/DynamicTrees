@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.data;
 
 import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
-import com.ferreusveritas.dynamictrees.trees.Family;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;

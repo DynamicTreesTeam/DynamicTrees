@@ -4,19 +4,20 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.client.ModelHelper;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
-import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
-import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
-import com.ferreusveritas.dynamictrees.blocks.PottedSaplingBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilHelper;
+import com.ferreusveritas.dynamictrees.block.DynamicSaplingBlock;
+import com.ferreusveritas.dynamictrees.block.FruitBlock;
+import com.ferreusveritas.dynamictrees.block.PodBlock;
+import com.ferreusveritas.dynamictrees.block.PottedSaplingBlock;
+import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
 import com.ferreusveritas.dynamictrees.client.BlockColorMultipliers;
 import com.ferreusveritas.dynamictrees.client.TextureUtils;
-import com.ferreusveritas.dynamictrees.entities.render.FallingTreeRenderer;
-import com.ferreusveritas.dynamictrees.entities.render.LingeringEffectorRenderer;
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.entity.render.FallingTreeRenderer;
+import com.ferreusveritas.dynamictrees.entity.render.LingeringEffectorRenderer;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.particle.Particle;
@@ -126,14 +127,14 @@ public class DTClient {
         BlockColorMultipliers.cleanUp();
     }
 
-    private static boolean isValid(BlockGetter access, BlockPos pos) {
-        return access != null && pos != null;
+    private static boolean isValid(BlockGetter level, BlockPos pos) {
+        return level != null && pos != null;
     }
 
     private static void registerRenderLayers() {
         ItemBlockRenderTypes.setRenderLayer(DTRegistries.POTTED_SAPLING.get(), RenderType.cutoutMipped());
 
-        ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block == DTRegistries.COCOA_FRUIT.get() || block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof FruitBlock)
+        ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof DynamicSaplingBlock || block instanceof RootyBlock || block instanceof FruitBlock || block instanceof PodBlock)
                 .forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped()));
 
 //		ForgeRegistries.BLOCKS.getValues().stream().filter(block -> block instanceof ThickBranchBlock)
@@ -150,12 +151,12 @@ public class DTClient {
 
         // Register Rooty Colorizers
         for (RootyBlock roots : SoilHelper.getRootyBlocksList()) {
-            blockColors.register((state, world, pos, tintIndex) -> roots.colorMultiplier(blockColors, state, world, pos, tintIndex), roots);
+            blockColors.register((state, level, pos, tintIndex) -> roots.colorMultiplier(blockColors, state, level, pos, tintIndex), roots);
         }
 
         // Register Bonsai Pot Colorizer
-        ModelHelper.regColorHandler(DTRegistries.POTTED_SAPLING.get(), (state, access, pos, tintIndex) -> isValid(access, pos) && (state.getBlock() instanceof PottedSaplingBlock)
-                ? DTRegistries.POTTED_SAPLING.get().getSpecies(access, pos).saplingColorMultiplier(state, access, pos, tintIndex) : white);
+        ModelHelper.regColorHandler(DTRegistries.POTTED_SAPLING.get(), (state, level, pos, tintIndex) -> isValid(level, pos) && (state.getBlock() instanceof PottedSaplingBlock)
+                ? DTRegistries.POTTED_SAPLING.get().getSpecies(level, pos).saplingColorMultiplier(state, level, pos, tintIndex) : white);
 
         // ITEMS
 
@@ -170,16 +171,16 @@ public class DTClient {
         // Register Sapling Colorizer
         for (Species species : Species.REGISTRY) {
             if (species.getSapling().isPresent()) {
-                ModelHelper.regColorHandler(species.getSapling().get(), (state, access, pos, tintIndex) ->
-                        isValid(access, pos) ? species.saplingColorMultiplier(state, access, pos, tintIndex) : white);
+                ModelHelper.regColorHandler(species.getSapling().get(), (state, level, pos, tintIndex) ->
+                        isValid(level, pos) ? species.saplingColorMultiplier(state, level, pos, tintIndex) : white);
             }
         }
 
         // Register Leaves Colorizers
         for (DynamicLeavesBlock leaves : LeavesProperties.REGISTRY.getAll().stream().filter(lp -> lp.getDynamicLeavesBlock().isPresent()).map(lp -> lp.getDynamicLeavesBlock().get()).collect(Collectors.toSet())) {
-            ModelHelper.regColorHandler(leaves, (state, worldIn, pos, tintIndex) -> {
+            ModelHelper.regColorHandler(leaves, (state, level, pos, tintIndex) -> {
                         final LeavesProperties properties = ((DynamicLeavesBlock) state.getBlock()).getProperties(state);
-                        return TreeHelper.isLeaves(state.getBlock()) ? properties.foliageColorMultiplier(state, worldIn, pos) : magenta;
+                        return TreeHelper.isLeaves(state.getBlock()) ? properties.foliageColorMultiplier(state, level, pos) : magenta;
                     }
             );
         }
@@ -188,8 +189,8 @@ public class DTClient {
 
     private static void registerJsonColorMultipliers() {
         // Register programmable custom block color providers for LeavesPropertiesJson
-        BlockColorMultipliers.register("birch", (state, worldIn, pos, tintIndex) -> FoliageColor.getBirchColor());
-        BlockColorMultipliers.register("spruce", (state, worldIn, pos, tintIndex) -> FoliageColor.getEvergreenColor());
+        BlockColorMultipliers.register("birch", (state, level, pos, tintIndex) -> FoliageColor.getBirchColor());
+        BlockColorMultipliers.register("spruce", (state, level, pos, tintIndex) -> FoliageColor.getEvergreenColor());
     }
 
     public static void registerClientEventHandlers() {
@@ -203,52 +204,52 @@ public class DTClient {
         event.registerEntityRenderer(DTRegistries.LINGERING_EFFECTOR.get(), LingeringEffectorRenderer::new);
     }
 
-    private static int getFoliageColor(LeavesProperties leavesProperties, Level world, BlockState blockState, BlockPos pos) {
-        return leavesProperties.foliageColorMultiplier(blockState, world, pos);
+    private static int getFoliageColor(LeavesProperties leavesProperties, Level level, BlockState blockState, BlockPos pos) {
+        return leavesProperties.foliageColorMultiplier(blockState, level, pos);
     }
 
     ///////////////////////////////////////////
     // PARTICLES
     ///////////////////////////////////////////
 
-    private static void addDustParticle(Level world, double fx, double fy, double fz, double mx, double my, double mz, BlockState blockState, float r, float g, float b) {
-        if (world.isClientSide) {
+    private static void addDustParticle(Level level, double fx, double fy, double fz, double mx, double my, double mz, BlockState blockState, float r, float g, float b) {
+        if (level.isClientSide) {
             Particle particle = Minecraft.getInstance().particleEngine.createParticle(new BlockParticleOption(ParticleTypes.BLOCK, blockState), fx, fy, fz, mx, my, mz);
             assert particle != null;
             particle.setColor(r, g, b);
         }
     }
 
-    public static void spawnParticles(Level world, SimpleParticleType particleType, BlockPos pos, int numParticles, Random random) {
-        spawnParticles(world, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, random);
+    public static void spawnParticles(Level level, SimpleParticleType particleType, BlockPos pos, int numParticles, Random random) {
+        spawnParticles(level, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, random);
     }
 
-    public static void spawnParticles(LevelAccessor world, SimpleParticleType particleType, int x, int y, int z, int numParticles, Random random) {
+    public static void spawnParticles(LevelAccessor level, SimpleParticleType particleType, int x, int y, int z, int numParticles, Random random) {
         for (int i1 = 0; i1 < numParticles; ++i1) {
             double mx = random.nextGaussian() * 0.02D;
             double my = random.nextGaussian() * 0.02D;
             double mz = random.nextGaussian() * 0.02D;
-            DTClient.spawnParticle(world, particleType, x + random.nextFloat(), (double) y + (double) random.nextFloat(), (double) z + random.nextFloat(), mx, my, mz);
+            DTClient.spawnParticle(level, particleType, x + random.nextFloat(), (double) y + (double) random.nextFloat(), (double) z + random.nextFloat(), mx, my, mz);
         }
     }
 
     /**
      * Not strictly necessary. But adds a little more isolation to the server for particle effects
      */
-    public static void spawnParticle(LevelAccessor world, SimpleParticleType particleType, double x, double y, double z, double mx, double my, double mz) {
-        if (world.isClientSide()) {
-            world.addParticle(particleType, x, y, z, mx, my, mz);
+    public static void spawnParticle(LevelAccessor level, SimpleParticleType particleType, double x, double y, double z, double mx, double my, double mz) {
+        if (level.isClientSide()) {
+            level.addParticle(particleType, x, y, z, mx, my, mz);
         }
     }
 
-    public static void crushLeavesBlock(Level world, BlockPos pos, BlockState blockState, Entity entity) {
-        if (world.isClientSide) {
-            Random random = world.random;
+    public static void crushLeavesBlock(Level level, BlockPos pos, BlockState blockState, Entity entity) {
+        if (level.isClientSide) {
+            Random random = level.random;
             TreePart treePart = TreeHelper.getTreePart(blockState);
             if (treePart instanceof DynamicLeavesBlock) {
                 DynamicLeavesBlock leaves = (DynamicLeavesBlock) treePart;
                 LeavesProperties leavesProperties = leaves.getProperties(blockState);
-                int color = getFoliageColor(leavesProperties, world, blockState, pos);
+                int color = getFoliageColor(leavesProperties, level, blockState, pos);
                 float r = (color >> 16 & 255) / 255.0F;
                 float g = (color >> 8 & 255) / 255.0F;
                 float b = (color & 255) / 255.0F;
@@ -259,7 +260,7 @@ public class DTClient {
                                 double fx = pos.getX() + dx / 8.0;
                                 double fy = pos.getY() + dy / 8.0;
                                 double fz = pos.getZ() + dz / 8.0;
-                                addDustParticle(world, fx, fy, fz, 0, random.nextFloat() * entity.getDeltaMovement().y, 0, blockState, r, g, b);
+                                addDustParticle(level, fx, fy, fz, 0, random.nextFloat() * entity.getDeltaMovement().y, 0, blockState, r, g, b);
                             }
                         }
                     }

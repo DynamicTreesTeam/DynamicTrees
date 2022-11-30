@@ -3,7 +3,7 @@ package com.ferreusveritas.dynamictrees.resources.loader;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import net.minecraft.core.Direction;

@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.api.data;
 
-import com.ferreusveritas.dynamictrees.blocks.DynamicSaplingBlock;
+import com.ferreusveritas.dynamictrees.block.DynamicSaplingBlock;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;

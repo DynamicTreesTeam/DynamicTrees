@@ -1,8 +1,9 @@
 package com.ferreusveritas.dynamictrees.command;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CommandHelper;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.Null;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
@@ -49,17 +50,17 @@ public final class SetTreeCommand extends SubCommand {
     }
 
     private int setTree(final CommandSourceStack source, final BlockPos rootPos, final Species species, final String codeString, final int turns, final int fertility) {
-        final ServerLevel world = source.getLevel();
+        final ServerLevel level = source.getLevel();
         final JoCode joCode = species.getJoCode(codeString).rotate(Direction.from2DDataValue((3 - (turns % 4)) + 3)).setCareful(true);
 
         sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.set_tree", CommandHelper.posComponent(rootPos),
                 species.getTextComponent(), joCode.getTextComponent()));
-        joCode.generate(world, world, species, rootPos, source.getLevel().getBiome(rootPos).value(),
+        joCode.generate(LevelContext.create(level), species, rootPos, source.getLevel().getBiome(rootPos).value(),
                 Direction.SOUTH, 8, SafeChunkBounds.ANY, false);
 
         // Try to set the fertility.
-        Null.consumeIfNonnull(TreeHelper.getRooty(world.getBlockState(rootPos)),
-                rootyBlock -> rootyBlock.setFertility(world, rootPos, fertility));
+        Null.consumeIfNonnull(TreeHelper.getRooty(level.getBlockState(rootPos)),
+                rootyBlock -> rootyBlock.setFertility(level, rootPos, fertility));
 
         return 1;
     }

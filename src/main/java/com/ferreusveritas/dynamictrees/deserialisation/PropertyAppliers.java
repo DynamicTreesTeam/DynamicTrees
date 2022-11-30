@@ -1,9 +1,10 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
-import com.ferreusveritas.dynamictrees.api.treepacks.*;
+import com.ferreusveritas.dynamictrees.api.applier.*;
 import com.google.gson.JsonElement;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -25,6 +26,10 @@ public interface PropertyAppliers<O, I> {
 
     <V> PropertyAppliers<O, I> registerArrayApplier(String key, Class<V> valueClass, VoidApplier<O, V> applier);
 
+    <V> PropertyAppliers<O, I> registerListApplier(String key, Class<V> valueClass, Applier<O, List<V>> applier);
+
+    <V> PropertyAppliers<O, I> registerListApplier(String key, Class<V> valueClass, VoidApplier<O, List<V>> applier);
+
     PropertyAppliers<O, I> registerIfTrueApplier(String key, IfTrueApplier<O> applier);
 
     <E extends O, V> PropertyAppliers<O, I> register(String key, Class<E> subClass, Class<V> valueClass,
@@ -41,6 +46,12 @@ public interface PropertyAppliers<O, I> {
 
     <E extends O, V> PropertyAppliers<O, I> registerArrayApplier(String key, Class<E> subClass, Class<V> valueClass,
                                                                      VoidApplier<E, V> applier);
+
+    <E extends O, V> PropertyAppliers<O, I> registerListApplier(String key, Class<E> subClass, Class<V> valueClass,
+                                                                Applier<E, List<V>> applier);
+
+    <E extends O, V> PropertyAppliers<O, I> registerListApplier(String key, Class<E> subClass, Class<V> valueClass,
+                                                                VoidApplier<E, List<V>> applier);
 
     Class<O> getObjectType();
 

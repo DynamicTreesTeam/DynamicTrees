@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.data;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 
 /**
@@ -14,7 +14,7 @@ public final class WaterRootGenerator extends SoilStateGenerator {
         // TODO: Smart model for water roots.
         provider.simpleBlock(
                 dependencies.get(SOIL),
-                provider.models().getExistingFile(DynamicTrees.resLoc("block/roots_water"))
+                provider.models().getExistingFile(DynamicTrees.location("block/roots_water"))
         );
     }
 

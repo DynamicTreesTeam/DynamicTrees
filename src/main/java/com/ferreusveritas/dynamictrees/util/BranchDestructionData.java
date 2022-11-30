@@ -1,11 +1,11 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.systems.nodemappers.NetVolumeNode;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
+import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

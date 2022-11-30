@@ -22,9 +22,9 @@ public final class PurgeTreesCommand extends ChunkBasedCommand {
     }
 
     @Override
-    protected void processChunk(CommandSourceStack source, Level world, ChunkPos chunkPos, int radius) {
+    protected void processChunk(CommandSourceStack source, Level level, ChunkPos chunkPos, int radius) {
         sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.purge_trees",
-                aqua(ChunkTreeHelper.removeAllBranchesFromChunk(world, chunkPos, radius))));
+                aqua(ChunkTreeHelper.removeAllBranchesFromChunk(level, chunkPos, radius))));
     }
 
 }

@@ -14,32 +14,32 @@ public class FutureBreak {
     public static final List<FutureBreak> FUTURE_BREAKS = new LinkedList<>();
 
     public final BlockState state;
-    public final Level world;
+    public final Level level;
     public final BlockPos pos;
     public final LivingEntity entity;
     public int ticks;
 
-    public FutureBreak(BlockState state, Level world, BlockPos pos, LivingEntity entity, int ticks) {
+    public FutureBreak(BlockState state, Level level, BlockPos pos, LivingEntity entity, int ticks) {
         this.state = state;
-        this.world = world;
+        this.level = level;
         this.pos = pos;
         this.entity = entity;
         this.ticks = ticks;
     }
 
     public static void add(FutureBreak fb) {
-        if (!fb.world.isClientSide) {
+        if (!fb.level.isClientSide) {
             FUTURE_BREAKS.add(fb);
         }
     }
 
-    public static void process(Level world) {
+    public static void process(Level level) {
         if (FUTURE_BREAKS.isEmpty()) {
             return;
         }
 
         for (final FutureBreak futureBreak : new LinkedList<>(FUTURE_BREAKS)) {
-            if (world != futureBreak.world) {
+            if (level != futureBreak.level) {
                 continue;
             }
 
@@ -53,7 +53,7 @@ public class FutureBreak {
             }
 
             final FutureBreakable futureBreakable = (FutureBreakable) futureBreak.state.getBlock();
-            futureBreakable.futureBreak(futureBreak.state, world, futureBreak.pos, futureBreak.entity);
+            futureBreakable.futureBreak(futureBreak.state, level, futureBreak.pos, futureBreak.entity);
             FUTURE_BREAKS.remove(futureBreak);
         }
     }

@@ -1,9 +1,6 @@
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.matthewprenger.cursegradle.CurseArtifact
 import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.CurseRelation
-import java.io.InputStreamReader
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
@@ -11,6 +8,7 @@ fun property(key: String) = project.findProperty(key).toString()
 fun optionalProperty(key: String) = project.findProperty(key)?.toString()
 
 apply(from = "https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle")
+apply(from = "https://gist.githubusercontent.com/Harleyoc1/4d23d4e991e868d98d548ac55832381e/raw/applesiliconfg.gradle")
 
 plugins {
     id("java")
@@ -48,13 +46,7 @@ minecraft {
 
     runs {
         create("client") {
-            workingDirectory = file("run").absolutePath
-
-            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
-            property("forge.logging.console.level", "debug")
-
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
+            applyDefaultConfiguration()
 
             if (project.hasProperty("mcUuid")) {
                 args("--uuid", property("mcUuid"))
@@ -65,108 +57,50 @@ minecraft {
             if (project.hasProperty("mcAccessToken")) {
                 args("--accessToken", property("mcAccessToken"))
             }
-
-            mods {
-                create(modId) {
-                    source(sourceSets.main.get())
-                }
-            }
         }
 
         create("server") {
-            workingDirectory = file("run").absolutePath
-
-            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
-            property("forge.logging.console.level", "debug")
-
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
-
-            mods {
-                create(modId) {
-                    source(sourceSets.main.get())
-                }
-            }
+            applyDefaultConfiguration()
         }
 
         create("data") {
-            workingDirectory = file("run").absolutePath
-
-            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
-            property("forge.logging.console.level", "debug")
-
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
+            applyDefaultConfiguration()
 
             args(
-                "--mod",
-                modId,
+                "--mod", modId,
                 "--all",
-                "--output",
-                file("src/generated/resources/"),
-                "--existing",
-                file("src/main/resources")
+                "--output", file("src/generated/resources/"),
+                "--existing", file("src/main/resources")
             )
-
-            mods {
-                create(modId) {
-                    source(sourceSets.main.get())
-                }
-            }
         }
     }
 }
 
 sourceSets.main.get().resources {
     srcDir("src/generated/resources")
+    srcDir("src/localization/resources")
 }
 
 dependencies {
-    // Not sure if we need this one, what is a "forge" anyway?
     minecraft("net.minecraftforge:forge:$mcVersion-${property("forgeVersion")}")
 
-    // Compile JEI API, but don"t include in runtime.
+    implementation(fg.deobf("curse.maven:jade-324717:3970956"))
+
     compileOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}:api"))
-    // At runtime, use the full JEI mod.
     runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion:${property("jeiVersion")}"))
 
-    // At runtime, use Patchouli mod (for the guide book, which is Json so we don"t need the API).
+    implementation(fg.deobf("curse.maven:SereneSeasons-291874:3693807"))
+
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
-
-    // At runtime use, CC for creating growth chambers.
-    //runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
-    runtimeOnly(fg.deobf("curse.maven:cc-tweaked-282001:3770724"))
-
-    // Compile Serene Seasons.
-    compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:3693807"))
-
-    // Compile Better Weather API.
-//    compileOnly(fg.deobf("curse.maven:BetterWeatherAPI-400714:3403615"))
-
-//    useSereneSeasons(this)
-//    useBetterWeather(this)
-
-    // At runtime, use suggestion provider fix mod.
-//    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix:$mcVersion-${property("suggestionProviderFixVersion")}"))
-
-    compileOnly(fg.deobf("curse.maven:suggestion-provider-fix-469647:3623382"))
-}
-
-fun useSereneSeasons(depHandler: DependencyHandlerScope) {
-    // At runtime, use full Serene Seasons mod.
-    depHandler.runtimeOnly(fg.deobf("curse.maven:SereneSeasons-291874:3510900"))
-}
-
-fun useBetterWeather(depHandler: DependencyHandlerScope) {
-    // At runtime, use the full Better Weather mod.
-    depHandler.runtimeOnly(fg.deobf("curse.maven:BetterWeather-400714:3420517"))
+    runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
+    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.18.1:${property("suggestionProviderFixVersion")}"))
 }
 
 translationSheet {
     this.sheetId.set("1xjxEh2NdbeV_tQc6fDHPgcRmtchqCZJKt--6oifq1qc")
     this.sectionColour.set(0xF9CB9C)
     this.sectionPattern.set("Dynamic Trees")
-    this.outputDir("src/generated/resources/assets/dynamictrees/lang/")
+    this.outputDir("src/localization/resources/assets/dynamictrees/lang/")
 
     this.useJson()
 }
@@ -194,47 +128,35 @@ java {
     }
 }
 
-fun readChangelog(): String? {
-    val versionInfoFile = file(
-        (optionalProperty("dynamictrees.version_info_repo.directory") ?: return null)
-                + File.separatorChar + "DynamicTrees.json"
-    )
-    val jsonObject = Gson().fromJson(InputStreamReader(versionInfoFile.inputStream()), JsonObject::class.java)
-    return jsonObject
-        .get(mcVersion)?.asJsonObject
-        ?.get(project.version.toString())?.asString
-}
+curseforge {
+    if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
+        apiKey = property("curseApiKey")
 
-//curseforge {
-//    if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
-//        apiKey = property("curseApiKey")
-//
-//        project {
-//            id = "252818"
-//
-//            addGameVersion("1.18.1")
-//            addGameVersion(mcVersion)
-//
-//            changelog = readChangelog() ?: "No changelog provided."
-//            changelogType = "markdown"
-//            releaseType = property("curseFileType")
-//
-//            addArtifact(tasks.findByName("sourcesJar"))
-//
-//            mainArtifact(tasks.findByName("jar")) {
-//                relations {
-//                    optionalDependency("dynamictreesplus")
-//                    optionalDependency("chunk-saving-fix")
-//                }
-//            }
-//        }
-//    } else {
-//        project.logger.log(
-//            LogLevel.WARN,
-//            "API Key and file type for CurseForge not detected; uploading will be disabled."
-//        )
-//    }
-//}
+        project {
+            id = "252818"
+
+            addGameVersion(mcVersion)
+
+            changelog = "Changelog will be added shortly..."
+            changelogType = "markdown"
+            releaseType = property("curseFileType")
+
+            addArtifact(tasks.findByName("sourcesJar"))
+
+            mainArtifact(tasks.findByName("jar")) {
+                relations {
+                    optionalDependency("dynamictreesplus")
+                    optionalDependency("chunk-saving-fix")
+                }
+            }
+        }
+    } else {
+        project.logger.log(
+            LogLevel.WARN,
+            "API Key and file type for CurseForge not detected; uploading will be disabled."
+        )
+    }
+}
 
 tasks.withType<GenerateModuleMetadata> {
     enabled = false
@@ -312,7 +234,21 @@ tasks.register("publishToAllPlatforms") {
     this.dependsOn("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
 }
 
-// Extensions to make CurseGradle extension slightly neater.
+fun net.minecraftforge.gradle.common.util.RunConfig.applyDefaultConfiguration(runDirectory: String = "run") {
+    workingDirectory = file(runDirectory).absolutePath
+
+    property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
+    property("forge.logging.console.level", "debug")
+
+    property("mixin.env.remapRefMap", "true")
+    property("mixin.env.refMapRemappingFile", "${buildDir}/createSrgToMcp/output.srg")
+
+    mods {
+        create(modId) {
+            source(sourceSets.main.get())
+        }
+    }
+}
 
 fun com.matthewprenger.cursegradle.CurseExtension.project(action: CurseProject.() -> Unit) {
     this.project(closureOf(action))

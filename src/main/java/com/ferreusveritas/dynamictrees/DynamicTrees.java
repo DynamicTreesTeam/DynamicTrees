@@ -2,24 +2,24 @@ package com.ferreusveritas.dynamictrees;
 
 import com.ferreusveritas.dynamictrees.api.GatherDataHelper;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
+import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.command.DTArgumentTypes;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
-import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
+import com.ferreusveritas.dynamictrees.event.handler.EventHandlers;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
+import com.ferreusveritas.dynamictrees.loot.DTLoot;
 import com.ferreusveritas.dynamictrees.resources.Resources;
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
+import com.ferreusveritas.dynamictrees.worldgen.structure.VillageTreeReplacement;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -76,7 +76,7 @@ public final class DynamicTrees {
 
 //        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DTClient::clientStart);
 
-        TreeGenerator.setup();
+        TreeGenerator.initialise();
 
         RegistryHandler.setup(MOD_ID);
 
@@ -96,6 +96,9 @@ public final class DynamicTrees {
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {
+        DTLoot.load();
+        TreeGenerator.setup();
+
         // Clears and locks registry handlers to free them from memory.
         RegistryHandler.REGISTRY.clear();
 
@@ -105,6 +108,9 @@ public final class DynamicTrees {
 
         if (DTConfigs.REPLACE_NYLIUM_FUNGI.get()) {
             DTTrees.replaceNyliumFungiFeatures();
+        }
+        if (DTConfigs.CANCEL_VANILLA_VILLAGE_TREES.get()) {
+            VillageTreeReplacement.replaceTreesFromVanillaVillages();
         }
     }
 
@@ -120,7 +126,7 @@ public final class DynamicTrees {
         );
     }
 
-    public static ResourceLocation resLoc(final String path) {
+    public static ResourceLocation location(final String path) {
         return new ResourceLocation(MOD_ID, path);
     }
 

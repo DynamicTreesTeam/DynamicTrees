@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.models.bakedmodels.BasicBranchBlockBakedModel;
-import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
+import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.model.baked.BasicBranchBlockBakedModel;
+import com.ferreusveritas.dynamictrees.model.data.ModelConnections;
 import net.minecraft.core.Direction;
 
 /**

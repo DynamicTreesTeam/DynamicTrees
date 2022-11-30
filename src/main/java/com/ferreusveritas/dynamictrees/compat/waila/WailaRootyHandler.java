@@ -1,31 +1,21 @@
-/*
 package com.ferreusveritas.dynamictrees.compat.waila;
 
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.RootyBlock;
+import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
+import mcp.mobius.waila.api.BlockAccessor;
 import mcp.mobius.waila.api.IComponentProvider;
-import mcp.mobius.waila.api.IDataAccessor;
-import mcp.mobius.waila.api.IPluginConfig;
-import net.minecraft.network.chat.Component;
+import mcp.mobius.waila.api.ITooltip;
+import mcp.mobius.waila.api.config.IPluginConfig;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.List;
 
 public class WailaRootyHandler implements IComponentProvider {
 
     @Override
-    public void appendBody(List<Component> tooltip, IDataAccessor accessor, IPluginConfig config) {
-        final BlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
-
-        if (!(state.getBlock() instanceof RootyBlock)) {
-            return;
+    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+        if (accessor.getBlock() instanceof final RootyBlock rooty) {
+            final int fertility = rooty.getFertility(accessor.getBlockState(), accessor.getLevel(), accessor.getPosition());
+            tooltip.add(new TranslatableComponent("tooltip.dynamictrees.fertility", Mth.floor(fertility * 100 / 15f) + "%"));
         }
-
-        final RootyBlock rooty = (RootyBlock) state.getBlock();
-        final int fertility = rooty.getFertility(state, accessor.getWorld(), accessor.getPosition());
-        tooltip.add(new TranslatableComponent("tooltip.dynamictrees.fertility",
-                Mth.floor(fertility * 100 / 15f) + "%"));
     }
+
 }
-*/

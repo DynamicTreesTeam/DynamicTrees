@@ -1,14 +1,13 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.blocks.branches.ThickBranchBlock;
+import com.ferreusveritas.dynamictrees.block.branch.ThickBranchBlock;
 import com.ferreusveritas.dynamictrees.compat.CompatHandler;
-import com.ferreusveritas.dynamictrees.event.handlers.EventHandlers;
+import com.ferreusveritas.dynamictrees.event.handler.EventHandlers;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 
@@ -26,6 +25,7 @@ public class DTConfigs {
     public static final ForgeConfigSpec CLIENT_CONFIG;
 
     public static final ForgeConfigSpec.DoubleValue SEED_DROP_RATE;
+    public static final ForgeConfigSpec.DoubleValue VOLUNTARY_SEED_DROP_RATE;
     public static final ForgeConfigSpec.DoubleValue SEED_PLANT_RATE;
     public static final ForgeConfigSpec.IntValue SEED_TIME_TO_LIVE;
     public static final ForgeConfigSpec.BooleanValue SEED_ONLY_FOREST;
@@ -55,11 +55,13 @@ public class DTConfigs {
     public static final ForgeConfigSpec.BooleanValue SLOPPY_BREAK_DROPS;
     public static final ForgeConfigSpec.IntValue MIN_RADIUS_FOR_STRIP;
     public static final ForgeConfigSpec.BooleanValue ENABLE_STRIP_RADIUS_REDUCTION;
-    public static final ForgeConfigSpec.BooleanValue CAN_BONE_MEAL_APPLE;
+    public static final ForgeConfigSpec.BooleanValue CAN_BONE_MEAL_FRUIT;
+    public static final ForgeConfigSpec.BooleanValue CAN_BONE_MEAL_PODS;
     public static final ForgeConfigSpec.BooleanValue DYNAMIC_SAPLING_DROPS;
 
     public static final ForgeConfigSpec.BooleanValue REPLACE_VANILLA_SAPLING;
     public static final ForgeConfigSpec.BooleanValue REPLACE_NYLIUM_FUNGI;
+    public static final ForgeConfigSpec.BooleanValue CANCEL_VANILLA_VILLAGE_TREES;
 
     public static final ForgeConfigSpec.BooleanValue PODZOL_GEN;
 
@@ -85,8 +87,10 @@ public class DTConfigs {
         final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
 
         SERVER_BUILDER.comment("Seed Settings").push("seeds");
-        SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
-                defineInRange("seedDropRate", 0.01, 0.0, 1.0);
+        SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds drop from leaves.").
+                defineInRange("leavesSeedDropRate", 1.0, 0.0, 64.0);
+        VOLUNTARY_SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
+                defineInRange("voluntarySeedDropRate", 0.01, 0.0, 1.0);
         SEED_PLANT_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
                 defineInRange("seedPlantRate", 1f / 6f, 0.0, 1.0);
         SEED_TIME_TO_LIVE = SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
@@ -113,7 +117,7 @@ public class DTConfigs {
         DISEASE_CHANCE = SERVER_BUILDER.comment("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days").
                 defineInRange("diseaseChance", 0.0f, 0.0f, 1.0f);
         MAX_BRANCH_ROT_RADIUS = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. 24 = Full 3x3 thick size. Set to 0 to prevent rotting").
-                defineInRange("maxBranchRotRadius", 7, 0, ThickBranchBlock.MAX_RADIUS_TICK);
+                defineInRange("maxBranchRotRadius", 7, 0, ThickBranchBlock.MAX_RADIUS_THICK);
         ROOTY_BLOCK_HARDNESS_MULTIPLIER = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
                 defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
         SWAMP_OAKS_IN_WATER = SERVER_BUILDER.comment("Options for how oak trees generate in swamps. ROOTED: Swamp oak trees will generate on shallow water with mangrove-like roots. SUNK: Swamp oak trees will generate on shallow water one block under the surface. DISABLED: Swamp oaks will not generate on water.").
@@ -147,8 +151,10 @@ public class DTConfigs {
                 defineInRange("minRadiusForStrip", 6, 0, 24);
         ENABLE_STRIP_RADIUS_REDUCTION = SERVER_BUILDER.comment("If enabled, stripping a branch will decrease its radius by one").
                 define("enableStripRadiusReduction", true);
-        CAN_BONE_MEAL_APPLE = SERVER_BUILDER.comment("If enabled, an apple fruit can be bone mealed.").
-                define("canBoneMealApple", false);
+        CAN_BONE_MEAL_FRUIT = SERVER_BUILDER.comment("Sets the default for whether or not fruit growing from dynamic trees can be bone-mealed. Note that this is a default; it can be overridden by the individual fruit.").
+                define("canBoneMealFruit", false);
+        CAN_BONE_MEAL_PODS = SERVER_BUILDER.comment("Sets the default for whether or not pods growing from dynamic trees can be bone-mealed. Note that this is a default; it can be overridden by the individual pod.").
+                define("canBoneMealPods", true);
         DYNAMIC_SAPLING_DROPS = SERVER_BUILDER.comment("If enabled, dynamic sapling blocks will drop their seed when broken.").
                 define("dynamicSaplingDrops", true);
         SERVER_BUILDER.pop();
@@ -158,6 +164,8 @@ public class DTConfigs {
                 define("replaceVanillaSapling", false);
         REPLACE_NYLIUM_FUNGI = COMMON_BUILDER.comment("Crimson Fungus and Warped Fungus that sprout from nylium will be dynamic instead.").
                 define("replaceNyliumFungi", true);
+        CANCEL_VANILLA_VILLAGE_TREES = COMMON_BUILDER.comment("If enabled, cancels the non-dynamic trees that spawn with vanilla villages.").
+                define("cancelVanillaVillageTrees", true);
         COMMON_BUILDER.pop();
 
         SERVER_BUILDER.comment("World Generation Settings").push("world");
@@ -182,7 +190,7 @@ public class DTConfigs {
                 .define("preferredSeasonMod", CompatHandler.ANY);
         ENABLE_SEASONAL_SEED_DROP_FACTOR = COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalSeedDropFactor", true);
-		ENABLE_SEASONAL_GROWTH_FACTOR = COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
+        ENABLE_SEASONAL_GROWTH_FACTOR = COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalGrowthFactor", true);
         ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR = COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalFruitProductionFactor", true);

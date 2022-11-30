@@ -7,22 +7,22 @@ import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.leaves.PalmLeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.leaves.SolidLeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.leaves.WartProperties;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SpreadableSoilProperties;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.WaterSoilProperties;
+import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.block.leaves.PalmLeavesProperties;
+import com.ferreusveritas.dynamictrees.block.leaves.SolidLeavesProperties;
+import com.ferreusveritas.dynamictrees.block.leaves.WartProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.SpreadableSoilProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.WaterSoilProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.resources.Resources;
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.Mushroom;
-import com.ferreusveritas.dynamictrees.trees.Species;
-import com.ferreusveritas.dynamictrees.trees.families.NetherFungusFamily;
-import com.ferreusveritas.dynamictrees.trees.species.NetherFungusSpecies;
-import com.ferreusveritas.dynamictrees.trees.species.PalmSpecies;
-import com.ferreusveritas.dynamictrees.trees.species.SwampOakSpecies;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.species.Mushroom;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
+import com.ferreusveritas.dynamictrees.tree.family.NetherFungusFamily;
+import com.ferreusveritas.dynamictrees.tree.species.NetherFungusSpecies;
+import com.ferreusveritas.dynamictrees.tree.species.PalmSpecies;
+import com.ferreusveritas.dynamictrees.tree.species.SwampOakSpecies;
 import net.minecraft.data.worldgen.features.NetherFeatures;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.random.WeightedEntry;
@@ -42,16 +42,16 @@ import java.util.stream.Collectors;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DTTrees {
 
-    public static final ResourceLocation NULL = DynamicTrees.resLoc("null");
+    public static final ResourceLocation NULL = DynamicTrees.location("null");
 
-    public static final ResourceLocation OAK = DynamicTrees.resLoc("oak");
-    public static final ResourceLocation BIRCH = DynamicTrees.resLoc("birch");
-    public static final ResourceLocation SPRUCE = DynamicTrees.resLoc("spruce");
-    public static final ResourceLocation JUNGLE = DynamicTrees.resLoc("jungle");
-    public static final ResourceLocation DARK_OAK = DynamicTrees.resLoc("dark_oak");
-    public static final ResourceLocation ACACIA = DynamicTrees.resLoc("acacia");
-    public static final ResourceLocation CRIMSON = DynamicTrees.resLoc("crimson");
-    public static final ResourceLocation WARPED = DynamicTrees.resLoc("warped");
+    public static final ResourceLocation OAK = DynamicTrees.location("oak");
+    public static final ResourceLocation BIRCH = DynamicTrees.location("birch");
+    public static final ResourceLocation SPRUCE = DynamicTrees.location("spruce");
+    public static final ResourceLocation JUNGLE = DynamicTrees.location("jungle");
+    public static final ResourceLocation DARK_OAK = DynamicTrees.location("dark_oak");
+    public static final ResourceLocation ACACIA = DynamicTrees.location("acacia");
+    public static final ResourceLocation CRIMSON = DynamicTrees.location("crimson");
+    public static final ResourceLocation WARPED = DynamicTrees.location("warped");
 
     @SubscribeEvent
     public static void registerSpecies(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<Species> event) {
@@ -69,27 +69,27 @@ public class DTTrees {
 
     @SubscribeEvent
     public static void registerLeavesPropertiesTypes(final TypeRegistryEvent<LeavesProperties> event) {
-        event.registerType(DynamicTrees.resLoc("solid"), SolidLeavesProperties.TYPE);
-        event.registerType(DynamicTrees.resLoc("wart"), WartProperties.TYPE);
-        event.registerType(DynamicTrees.resLoc("palm"), PalmLeavesProperties.TYPE);
+        event.registerType(DynamicTrees.location("solid"), SolidLeavesProperties.TYPE);
+        event.registerType(DynamicTrees.location("wart"), WartProperties.TYPE);
+        event.registerType(DynamicTrees.location("palm"), PalmLeavesProperties.TYPE);
     }
 
     @SubscribeEvent
     public static void registerFamilyTypes(final TypeRegistryEvent<Family> event) {
-        event.registerType(DynamicTrees.resLoc("nether_fungus"), NetherFungusFamily.TYPE);
+        event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
     }
 
     @SubscribeEvent
     public static void registerSpeciesTypes(final TypeRegistryEvent<Species> event) {
-        event.registerType(DynamicTrees.resLoc("nether_fungus"), NetherFungusSpecies.TYPE);
-        event.registerType(DynamicTrees.resLoc("swamp_oak"), SwampOakSpecies.TYPE);
-        event.registerType(DynamicTrees.resLoc("palm"), PalmSpecies.TYPE);
+        event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusSpecies.TYPE);
+        event.registerType(DynamicTrees.location("swamp_oak"), SwampOakSpecies.TYPE);
+        event.registerType(DynamicTrees.location("palm"), PalmSpecies.TYPE);
     }
 
     @SubscribeEvent
     public static void registerSoilPropertiesTypes(final TypeRegistryEvent<SoilProperties> event) {
-        event.registerType(DynamicTrees.resLoc("water"), WaterSoilProperties.TYPE);
-        event.registerType(DynamicTrees.resLoc("spreadable"), SpreadableSoilProperties.TYPE);
+        event.registerType(DynamicTrees.location("water"), WaterSoilProperties.TYPE);
+        event.registerType(DynamicTrees.location("spreadable"), SpreadableSoilProperties.TYPE);
     }
 
     @SubscribeEvent

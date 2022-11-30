@@ -1,29 +1,26 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.cells.CellKit;
-import com.ferreusveritas.dynamictrees.api.configurations.PropertyDefinition;
+import com.ferreusveritas.dynamictrees.api.cell.CellKit;
+import com.ferreusveritas.dynamictrees.api.configuration.PropertyDefinition;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.blocks.FruitBlock;
-import com.ferreusveritas.dynamictrees.blocks.branches.BranchBlock;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
-import com.ferreusveritas.dynamictrees.blocks.rootyblocks.SoilProperties;
+import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
-import com.ferreusveritas.dynamictrees.items.Seed;
+import com.ferreusveritas.dynamictrees.item.Seed;
 import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreator;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.DropCreatorConfiguration;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.context.DropContext;
-import com.ferreusveritas.dynamictrees.systems.dropcreators.drops.Drops;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeature;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.GenFeatureConfiguration;
-import com.ferreusveritas.dynamictrees.systems.genfeatures.VinesGenFeature;
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
+import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
+import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatureConfiguration;
+import com.ferreusveritas.dynamictrees.systems.genfeature.VinesGenFeature;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
@@ -47,6 +44,7 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
@@ -212,13 +210,10 @@ public final class JsonDeserialisers {
     public static JsonDeserialiser<ItemStack> ITEM_STACK = register(ItemStack.class,
             input -> ITEM.deserialise(input).map((Result.SimpleMapper<Item, ItemStack>) ItemStack::new));
 
-    public static final JsonDeserialiser<AABB> AXIS_ALIGNED_BB =
+    public static final JsonDeserialiser<AABB> AABB =
             register(AABB.class, new AxisAlignedBBDeserialiser());
     public static final JsonDeserialiser<VoxelShape> VOXEL_SHAPE =
             register(VoxelShape.class, new VoxelShapeDeserialiser());
-
-    public static final JsonDeserialiser<DropCreator.Type<DropContext>> DROP_TYPE =
-            register(DropCreator.Type.getGenericClass(), new RegistryEntryDeserialiser<>(DropCreator.Type.REGISTRY));
 
     public static final JsonDeserialiser<CellKit> CELL_KIT =
             register(CellKit.class, new RegistryEntryDeserialiser<>(CellKit.REGISTRY));
@@ -226,12 +221,15 @@ public final class JsonDeserialisers {
             register(LeavesProperties.class, new RegistryEntryDeserialiser<>(LeavesProperties.REGISTRY));
     public static final JsonDeserialiser<GrowthLogicKit> GROWTH_LOGIC_KIT =
             register(GrowthLogicKit.class, new RegistryEntryDeserialiser<>(GrowthLogicKit.REGISTRY));
+
     public static final JsonDeserialiser<GenFeature> GEN_FEATURE =
             register(GenFeature.class, new RegistryEntryDeserialiser<>(GenFeature.REGISTRY));
     public static final JsonDeserialiser<Family> FAMILY =
             register(Family.class, new RegistryEntryDeserialiser<>(Family.REGISTRY));
-    public static final JsonDeserialiser<DropCreator> DROP_CREATOR =
-            register(DropCreator.class, new RegistryEntryDeserialiser<>(DropCreator.REGISTRY));
+    public static final JsonDeserialiser<Fruit> FRUIT =
+            register(Fruit.class, new RegistryEntryDeserialiser<>(Fruit.REGISTRY));
+    public static final JsonDeserialiser<Pod> POD =
+            register(Pod.class, new RegistryEntryDeserialiser<>(Pod.REGISTRY));
     public static final JsonDeserialiser<Species> SPECIES =
             register(Species.class, new RegistryEntryDeserialiser<>(Species.REGISTRY));
     public static final JsonDeserialiser<FeatureCanceller> FEATURE_CANCELLER =
@@ -245,16 +243,10 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<GenFeatureConfiguration> CONFIGURED_GEN_FEATURE =
             register(GenFeatureConfiguration.class,
                     new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class, GenFeatureConfiguration.TEMPLATES));
-    public static final JsonDeserialiser<DropCreatorConfiguration> CONFIGURED_DROP_CREATOR =
-            register(DropCreatorConfiguration.class,
-                    new ConfiguredDeserialiser<>("Drop Creator", DropCreator.class,
-                            DropCreatorConfiguration.TEMPLATES));
     public static final JsonDeserialiser<GrowthLogicKitConfiguration> CONFIGURED_GROWTH_LOGIC_KIT =
             register(GrowthLogicKitConfiguration.class,
                     new ConfiguredDeserialiser<>("Growth Logic Kit", GrowthLogicKit.class,
                             GrowthLogicKitConfiguration.TEMPLATES));
-
-    public static final JsonDeserialiser<Drops> DROPS = register(Drops.class, new DropsDeserialiser());
 
     public static final JsonDeserialiser<Seed> SEED = register(Seed.class, jsonElement -> ITEM.deserialise(jsonElement)
             .mapIfValid(item -> item instanceof Seed, "Item \"{}\" is not a seed.", item -> (Seed) item));
@@ -263,10 +255,6 @@ public final class JsonDeserialisers {
             register(BranchBlock.class, jsonElement -> BLOCK.deserialise(jsonElement)
                     .mapIfValid(block -> block instanceof BranchBlock, "Block \"{}\" is not a branch.",
                             block -> (BranchBlock) block));
-    public static final JsonDeserialiser<FruitBlock> FRUIT =
-            register(FruitBlock.class, jsonElement -> BLOCK.deserialise(jsonElement)
-                    .mapIfValid(block -> block instanceof FruitBlock, "Block \"{}\" is not a fruit.",
-                            block -> (FruitBlock) block));
 
     public static final JsonDeserialiser<VinesGenFeature.VineType> VINE_TYPE =
             register(VinesGenFeature.VineType.class, new EnumDeserialiser<>(VinesGenFeature.VineType.class));
@@ -301,6 +289,10 @@ public final class JsonDeserialisers {
             register(MaterialColor.class, new MaterialColorDeserialiser());
     public static final JsonDeserialiser<SoundType> SOUND_TYPE =
             register(SoundType.class, new SoundTypeDeserialiser());
+
+    public static final JsonDeserialiser<BooleanOp> BOOLEAN_FUNCTION = register(
+            BooleanOp.class, new BooleanOpDeserialiser()
+    );
 
 //    private static final Map<String, ToolType> TOOL_TYPES =
 //            ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");

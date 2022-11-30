@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.api.resource.loading;
 
-import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
 import net.minecraftforge.fml.ModLoader;
 
 /**

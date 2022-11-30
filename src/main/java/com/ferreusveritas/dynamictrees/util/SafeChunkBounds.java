@@ -8,9 +8,23 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkStatus;
 
+@Deprecated(forRemoval = true)
 public class SafeChunkBounds {
 
     public static final SafeChunkBounds ANY = new SafeChunkBounds() {
+        @Override
+        public boolean inBounds(BlockPos pos, boolean gap) {
+            return true;
+        }
+    };
+
+
+    /**
+     * Used to disable safe chunk bounds during world gen. This must be separate from {@link #ANY} so the
+     * {@code safeChunkBounds == SafeChunkBounds.ANY} comparison can still be used to determine if we are currently in
+     * world gen.
+     */
+    public static final SafeChunkBounds ANY_WG = new SafeChunkBounds() {
         @Override
         public boolean inBounds(BlockPos pos, boolean gap) {
             return true;
@@ -53,7 +67,7 @@ public class SafeChunkBounds {
         for (final Tile tile : TILES) {
             ChunkPos cp = new ChunkPos(pos.x + tile.pos.x, pos.z + tile.pos.z);
             final boolean loaded = world.getChunkSource().getChunk(cp.x, cp.z, ChunkStatus.EMPTY, false) != null;
-            this.chunkBounds[tile.index] = loaded ? new BlockBounds(cp) : BlockBounds.INVALID;
+            this.chunkBounds[tile.index] = loaded ? new BlockBounds(world, cp) : BlockBounds.INVALID;
         }
 
         for (Tile tile : TILES) {

@@ -1,8 +1,9 @@
 package com.ferreusveritas.dynamictrees.client;
 
-import com.ferreusveritas.dynamictrees.compat.seasons.SeasonHelper;
-import com.ferreusveritas.dynamictrees.items.Seed;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.compat.season.SeasonHelper;
+import com.ferreusveritas.dynamictrees.item.Seed;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -26,18 +27,20 @@ public class TooltipHandler {
         }
 
         Seed seed = (Seed) item;
-
         Player player = event.getPlayer();
-        if (player == null || player.level == null || SeasonHelper.getSeasonValue(player.level, BlockPos.ZERO) == null) {
+
+        if (player == null || player.level == null) {
             return;
         }
 
+        LevelContext levelContext = LevelContext.create(player.level);
         Species species = seed.getSpecies();
-        if (species == null || !species.isValid()) {
+
+        if (SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null || species == null || !species.isValid()) {
             return;
         }
 
-        int flags = seed.getSpecies().getSeasonalTooltipFlags(player.level);
+        int flags = seed.getSpecies().getSeasonalTooltipFlags(levelContext);
         applySeasonalTooltips(event.getToolTip(), flags);
     }
 

@@ -2,11 +2,11 @@ package com.ferreusveritas.dynamictrees.resources.loader;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
-import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
-import com.ferreusveritas.dynamictrees.blocks.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
-import com.ferreusveritas.dynamictrees.trees.Family;
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -53,7 +53,6 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
 
         this.reloadAppliers
                 .register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
-                .register("can_support_cocoa", Boolean.class, Family::setCanSupportCocoa)
                 .register("primary_thickness", Integer.class, Family::setPrimaryThickness)
                 .register("secondary_thickness", Integer.class, Family::setSecondaryThickness)
                 .register("branch_is_ladder", Boolean.class, Family::setBranchIsLadder)

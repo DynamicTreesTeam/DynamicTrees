@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.growthlogic;
 
-import com.ferreusveritas.dynamictrees.api.configurations.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionManipulationContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
@@ -71,10 +71,10 @@ public class ConiferLogic extends GrowthLogicKit {
     //so we feed the hash function the in-game month
     @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
-        long day = context.world().getGameTime() / 24000L;
+        long day = context.level().getGameTime() / 24000L;
         int month = (int) day / 30;//Change the hashs every in-game month
 
-        return super.getEnergy(configuration, context) * context.species().biomeSuitability(context.world(), context.pos()) +
+        return super.getEnergy(configuration, context) * context.species().biomeSuitability(context.level(), context.pos()) +
                 (CoordUtils.coordHashCode(context.pos().above(month), 2) % configuration.get(HEIGHT_VARIATION)); // Vary the height energy by a psuedorandom hash function
     }
 

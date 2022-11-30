@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
-import com.ferreusveritas.dynamictrees.trees.Species;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;

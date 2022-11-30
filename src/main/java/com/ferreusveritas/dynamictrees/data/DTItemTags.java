@@ -23,7 +23,7 @@ public final class DTItemTags {
      */
     public static final TagKey<Item> FERTILIZER = bind("fertilizer");
     /**
-     * Items that apply the {@link com.ferreusveritas.dynamictrees.systems.substances.GrowthSubstance growth substance}
+     * Items that apply the {@link com.ferreusveritas.dynamictrees.systems.substance.GrowthSubstance growth substance}
      * to trees.
      */
     public static final TagKey<Item> ENHANCED_FERTILIZER = bind("enhanced_fertilizer");
