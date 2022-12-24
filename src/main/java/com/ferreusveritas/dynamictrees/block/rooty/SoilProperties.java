@@ -124,7 +124,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
      * primitiveSoilState should always be this soil's primitive block, but if used on, verify anyways.
      * @return the BlockState of the rooty soil.
      */
-    public BlockState getSoilState (BlockState primitiveSoilState, int fertility, boolean requireTileEntity){
+    public BlockState getSoilState(BlockState primitiveSoilState, int fertility, boolean requireTileEntity){
         return block.get().defaultBlockState().setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, requireTileEntity);
     }
 
@@ -167,7 +167,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     }
 
     public Optional<RootyBlock> getBlock() {
-        return Optionals.ofBlock(this.block);
+        return Optionals.ofBlock(block);
     }
 
     public void generateBlock(BlockBehaviour.Properties blockProperties) {
