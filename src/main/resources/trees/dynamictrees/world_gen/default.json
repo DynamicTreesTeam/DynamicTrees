@@ -45,8 +45,8 @@
     }
   },
   {
-    "__comment" : "Anything cold will have spruce trees",
-    "select": { "type": "cold",	"name": "minecraft:.*" },
+    "__comment" : "Anything cold will have spruce trees except oceans, peaks, and ice spikes",
+    "select": { "types": [ "cold", "!ocean", "!peak" ],	"names": [ "minecraft:.*", "!minecraft:ice_spikes" ] },
     "apply": {
       "species" : "spruce"
     }
