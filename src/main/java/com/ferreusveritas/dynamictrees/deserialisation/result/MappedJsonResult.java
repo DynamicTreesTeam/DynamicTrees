@@ -77,8 +77,7 @@ public class MappedJsonResult<T> extends JsonResult<T> implements MappedResult<T
      */
     @Override
     public MappedResult<T, JsonElement> elseError(Predicate<T> validator, String invalidError) {
-        return validator.test(this.value) ? this :
-                errorneousMap(invalidError.replace("{}", String.valueOf(this.value)), this);
+        return validator.test(this.value) ? this : errorneousMap(invalidError.replace("{}", String.valueOf(this.input)), this);
     }
 
     /**
