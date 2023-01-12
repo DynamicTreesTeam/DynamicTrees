@@ -2,16 +2,18 @@
   "name": "Apple Trees",
   "icon": "dynamictrees:apple_oak_seed",
   "category": "dynamictrees:trees",
-  "sortnum": "3",
+  "sortnum": 3,
   "pages": [
-	{
+    {
       "type": "text",
       "title": "Apple Trees",
       "text": "Apple trees are a fruit tree, and a variant of oak. They spawn in plains biomes by default. These trees will, over time and after maturing, grow apples from the leaves that can be harvested."
     },
     {
       "type": "image",
-      "images": ["dynamictrees:textures/patchouli/images/apple_oak_1.png"],
+      "images": [
+        "dynamictrees:textures/patchouli/images/apple_oak_1.png"
+      ],
       "text": "A mature apple tree",
       "border": true
     },

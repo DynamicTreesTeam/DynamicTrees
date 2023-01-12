@@ -10,7 +10,7 @@
   },
   {
     "__comment": "Cancel standard tree features from the overworld.",
-    "select": { "name": "minecraft.*", "type": "overworld" },
+    "select": { "name": "minecraft.*", "tag": "forge:is_overworld" },
     "cancellers": {
       "type": "tree",
       "namespace": "minecraft"
@@ -18,14 +18,14 @@
   },
   {
     "__comment" : "Rivers have no chance of having trees",
-    "select": { "type": "river" },
+    "select": { "tag": "minecraft:is_river" },
     "apply": {
       "chance": 0.0
     }
   },
   {
     "__comment" : "Default for a Forest which generates a Birch Tree 1/5 of the time.",
-    "select": { "type": "forest", "name": "minecraft:.*" },
+    "select": { "tag": "minecraft:is_forest", "name": "minecraft:.*" },
     "apply": {
       "species" : {
         "random" : {
@@ -46,21 +46,21 @@
   },
   {
     "__comment" : "Anything cold will have spruce trees except oceans, peaks, and ice spikes",
-    "select": { "types": [ "cold", "!ocean", "!peak" ],	"names": [ "minecraft:.*", "!minecraft:ice_spikes" ] },
+    "select": { "tags": [ "forge:is_cold", "!forge:is_ocean", "!forge:is_peak" ], "names": [ "minecraft:.*", "!minecraft:ice_spikes" ] },
     "apply": {
       "species" : "spruce"
     }
   },
   {
     "__comment" : "Any wasteland will be treeless",
-    "select": { "type": "wasteland", "name": "minecraft:.*" },
+    "select": { "tag": "forge:is_wasteland", "name": "minecraft:.*" },
     "apply": {
       "species" : "..."
     }
   },
   {
     "__comment" : "Generates an alternative oak style in swamps",
-    "select": { "type": "swamp", "name": "minecraft:.*" },
+    "select": { "tag": "forge:is_swamp", "name": "minecraft:.*" },
     "apply": {
       "species" : "swamp_oak",
       "density": [ 0.2 ],
@@ -68,7 +68,7 @@
     }
   },
   {
-    "select": { "type": "savanna", "name": "minecraft:.*" },
+    "select": { "tag": "forge:is_savanna", "name": "minecraft:.*" },
     "apply": {
       "species" : "acacia",
       "density": [ 0.1 ]
@@ -81,7 +81,7 @@
     }
   },
   {
-    "select": { "type": "jungle", "name": "minecraft:.*" },
+    "select": { "tag": "minecraft:is_jungle", "name": "minecraft:.*" },
     "apply": {
       "species" : {
         "random" : {
@@ -102,7 +102,7 @@
   },
   {
     "__comment" : "Mushroom Islands",
-    "select": { "type": "mushroom",	"name": "minecraft:.*" },
+    "select": { "tag": "forge:is_mushroom",	"name": "minecraft:.*" },
     "apply": {
       "species" : {
         "random" : {
@@ -118,7 +118,7 @@
     }
   },
   {
-    "select": { "type": "coniferous", "name": "minecraft:.*" },
+    "select": { "tag": "forge:is_coniferous", "name": "minecraft:.*" },
     "apply": {
       "species" : "spruce",
       "density": [ 1 ],
@@ -127,7 +127,7 @@
   },
   {
     "__comment" : "Roofed forests are handled specially. Multipass tries to close canopy as much as possible",
-    "select": { "type": "spooky", "name": "minecraft:.*" },
+    "select": { "tag": "forge:is_spooky", "name": "minecraft:.*" },
     "apply": {
       "species" : "dark_oak",
       "density" : { "math": { "div" : [ "noise", 3.0 ] } },
@@ -148,8 +148,8 @@
     }
   },
   {
-    "__comment": "Any biome with 'tall_birch' in the name is 100% tall birch",
-    "select": { "name": "minecraft:.*old_growth_birch_forest.*" },
+    "__comment": "Old growth birch forest has tall birch trees",
+    "select": { "name": "minecraft:old_growth_birch_forest" },
     "apply": {
       "species" : "tall_birch"
     }
@@ -169,8 +169,8 @@
     }
   },
   {
-    "__comment": "All meadow biomes rarely generate an oak or birch tree",
-    "select": { "name": "minecraft:.*meadow.*" },
+    "__comment": "All meadow biomes rarely generate an oak or tall birch tree",
+    "select": { "name": "minecraft:meadow" },
     "apply": {
       "species": {
         "random": {
@@ -206,14 +206,14 @@
   },
   {
     "__comment": "Mega taiga has giant spruce trees.",
-    "select": { "name": "minecraft:.*old_growth_spruce_taiga.*" },
+    "select": { "name": "minecraft:old_growth_spruce_taiga" },
     "apply": {
       "species" : "mega_spruce"
     }
   },
   {
     "__comment": "Giant tree taiga has giant spruce trees, but also is less leaf-dense than giant spruce taiga.",
-    "select": { "name": "minecraft:.*old_growth_pine_taiga.*" },
+    "select": { "name": "minecraft:old_growth_pine_taiga" },
     "apply": {
       "species" : {
         "random" : {
@@ -225,7 +225,7 @@
   },
   {
     "__comment" : "Wooded Mesas have a chance of generating oak on the dirt patches.",
-    "select": { "name": "minecraft:.*wooded_badlands" },
+    "select": { "name": "minecraft:wooded_badlands" },
     "apply": {
       "species" : "oak",
       "density": [ 0.5 ],
@@ -234,14 +234,14 @@
   },
 
   {
-    "select": { "name": "minecraft:.*", "type": "nether" },
+    "select": { "name": "minecraft:.*", "tag": "minecraft:is_nether" },
     "apply": {
       "chance": 0.4
     }
   },
   {
     "__comment": "Cancel huge fungus features from namespace 'minecraft' in the nether forests, and set chance.",
-    "select": { "name": "minecraft:.*forest", "type": "nether" },
+    "select": { "name": "minecraft:.*forest", "tag": "minecraft:is_nether" },
     "cancellers": {
       "type": "fungus",
       "namespace": "minecraft"
