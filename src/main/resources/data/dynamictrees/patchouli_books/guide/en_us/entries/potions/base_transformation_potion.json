@@ -1,10 +1,10 @@
 {
-    "name": "Base Potion of Transformation",
-    "icon": "dynamictrees:dendro_potion{potion_index:6}",
-    "category": "dynamictrees:potions",
-	"sortnum": "4",
+  "name": "Base Potion of Transformation",
+  "icon": "dynamictrees:dendro_potion{potion_index:6}",
+  "category": "dynamictrees:potions",
+  "sortnum": 4,
   "pages": [
-	{
+    {
       "type": "brewing",
       "title": "Base Potion of Transformation",
       "ingredient": "minecraft:prismarine_crystals",
@@ -12,18 +12,18 @@
       "output": "dynamictrees:dendro_potion{potion_index:6}",
       "text": "This is the brewing recipe for the base transformation potion.$(br2)All other transformation potions use this."
     },
-	{
+    {
       "type": "relations",
       "title": "Relations",
-        "entries": [
-          "potions/base_potion",
-          "potions/burgeoning_potion",
-          "potions/depletion_potion",
-          "potions/fertility_potion",
-          "potions/gigas_potion",
-          "potions/persistance_potion",
-          "potions/transformation_potion"
-        ]
+      "entries": [
+        "potions/base_potion",
+        "potions/burgeoning_potion",
+        "potions/depletion_potion",
+        "potions/fertility_potion",
+        "potions/gigas_potion",
+        "potions/persistance_potion",
+        "potions/transformation_potion"
+      ]
     }
   ]
 } 
