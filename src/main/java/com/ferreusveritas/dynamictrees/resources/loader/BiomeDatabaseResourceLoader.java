@@ -8,12 +8,14 @@ import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoade
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.MultiJsonResourcePreparer;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
+import com.ferreusveritas.dynamictrees.deserialisation.BiomeListDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
@@ -22,8 +24,11 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.tags.Tag;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import org.apache.logging.log4j.LogManager;
@@ -32,6 +37,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
@@ -217,6 +223,10 @@ public final class BiomeDatabaseResourceLoader
 
         throwIfShouldNotLoad(json);
 
+        if (!json.has("cancellers")) {
+            return;
+        }
+
         final BiomeList biomes = this.collectBiomes(json, warningConsumer);
 
         if (biomes.isEmpty()) {
@@ -303,12 +313,32 @@ public final class BiomeDatabaseResourceLoader
             return;
         }
 
+        this.waitForTagLoading();
+
         this.readPopulators(
                 resourceAccessor.filtered(this::isDefaultPopulator).map(this::toLinkedList)
         );
         this.readDimensionalPopulators(
                 resourceAccessor.filtered(resource -> !this.isDefaultPopulator(resource)).map(this::toLinkedList)
         );
+    }
+
+    /**
+     * Some appliers require the use of biome tags to select biomes. This will make the thread wait to ensure they
+     * are registered and cache them with the biome list deserialiser when they are.
+     */
+    private void waitForTagLoading() {
+        while (true) {
+            try {
+                Map<ResourceLocation, Tag<Holder<Biome>>> tags = Resources.getConditionContext().getAllTags(Registry.BIOME_REGISTRY);
+                BiomeListDeserialiser.cacheNewTags(tags);
+                break;
+            } catch (IllegalStateException ignored) {
+                try {
+                    Thread.sleep(100); // Wait for 1/10 of a second before trying again.
+                } catch (InterruptedException _ignored) {}
+            }
+        }
     }
 
     private boolean isWorldGenDisabled() {

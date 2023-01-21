@@ -5,24 +5,41 @@ import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Harley O'Connor
  */
 public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> {
+
+    private static final Map<ResourceLocation, List<ResourceLocation>> TAGS = Maps.newHashMap();
+
+    /**
+     * Required for filtering by biome tags.
+     */
+    public static void cacheNewTags(Map<ResourceLocation, Tag<Holder<Biome>>> biomeTags) {
+        TAGS.clear();
+        biomeTags.forEach((key, tag) ->
+                tag.getValues().forEach(biome ->
+                        TAGS.computeIfAbsent(biome.unwrapKey().orElseThrow().location(), k -> Lists.newLinkedList()).add(key)
+                )
+        );
+    }
 
     private static final VoidApplier<BiomeList, String> TYPE_APPLIER = (biomeList, typeRegex) -> {
         final boolean notOperator = usingNotOperator(typeRegex);
@@ -36,13 +53,11 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
     };
 
     private static void removeBiomesWithMatchingType(BiomeList biomeList, String typeRegex) {
-        biomeList.removeIf(biome -> getBiomeTypes(biome).stream()
-                .anyMatch(type -> typeMatches(typeRegex, type)));
+        biomeList.removeIf(biome -> getBiomeTypes(biome).stream().anyMatch(type -> typeMatches(typeRegex, type)));
     }
 
     private static void removeBiomesWithoutMatchingType(BiomeList biomeList, String typeRegex) {
-        biomeList.removeIf(biome -> getBiomeTypes(biome).stream()
-                .noneMatch(type -> typeMatches(typeRegex, type)));
+        biomeList.removeIf(biome -> getBiomeTypes(biome).stream().noneMatch(type -> typeMatches(typeRegex, type)));
     }
 
     private static boolean typeMatches(String typeRegex, BiomeDictionary.Type type) {
@@ -55,6 +70,25 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
         );
     }
 
+    private static final VoidApplier<BiomeList, String> TAG_APPLIER = (biomeList, tagRegex) -> {
+        final boolean notOperator = usingNotOperator(tagRegex);
+        tagRegex = tagRegex.toLowerCase();
+        if (notOperator) {
+            tagRegex = tagRegex.substring(1);
+            removeBiomesWithMatchingTag(biomeList, tagRegex);
+        } else {
+            removeBiomesWithoutMatchingTag(biomeList, tagRegex);
+        }
+    };
+
+
+    private static void removeBiomesWithMatchingTag(BiomeList biomeList, String tagRegex) {
+        biomeList.removeIf(biome -> TAGS.get(biome.getRegistryName()).stream().anyMatch(tag -> tag.toString().matches(tagRegex)));
+    }
+
+    private static void removeBiomesWithoutMatchingTag(BiomeList biomeList, String tagRegex) {
+        biomeList.removeIf(biome -> TAGS.get(biome.getRegistryName()).stream().noneMatch(tag -> tag.toString().matches(tagRegex)));
+    }
 
     private static final VoidApplier<BiomeList, String> CATEGORY_APPLIER = (biomeList, categoryRegex) -> {
         final boolean notOperator = usingNotOperator(categoryRegex);
@@ -178,6 +212,8 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
         this.appliers
                 .register("type", String.class, TYPE_APPLIER)
                 .registerArrayApplier("types", String.class, TYPE_APPLIER)
+                .register("tag", String.class, TAG_APPLIER)
+                .registerArrayApplier("tags", String.class, TAG_APPLIER)
                 .register("category", String.class, CATEGORY_APPLIER)
                 .register("name", String.class, NAME_APPLIER)
                 .registerArrayApplier("names", String.class, NAME_APPLIER)
