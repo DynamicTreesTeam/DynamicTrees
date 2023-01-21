@@ -21,6 +21,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -140,9 +141,16 @@ public final class Resources {
         return mainTreeFolder;
     }
 
+    private static ICondition.IContext conditionContext;
+
     @SubscribeEvent
     public static void addReloadListeners(final AddReloadListenerEvent event) {
         event.addListener(new ReloadListener(event.getServerResources()));
+        conditionContext = event.getConditionContext();
+    }
+
+    public static ICondition.IContext getConditionContext() {
+        return conditionContext;
     }
 
     /**

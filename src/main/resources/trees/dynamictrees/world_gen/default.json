@@ -10,7 +10,7 @@
   },
   {
     "__comment": "Cancel standard tree features from the overworld.",
-    "select": { "name": "minecraft.*", "tag": "forge:is_overworld" },
+    "select": { "name": "minecraft.*", "type": "overworld" },
     "cancellers": {
       "type": "tree",
       "namespace": "minecraft"
@@ -42,13 +42,6 @@
     "select": "minecraft:flower_forest",
     "apply": {
       "density": [ 0.6 ]
-    }
-  },
-  {
-    "__comment" : "Anything cold will have spruce trees except oceans, peaks, and ice spikes",
-    "select": { "tags": [ "forge:is_cold", "!forge:is_ocean", "!forge:is_peak" ], "names": [ "minecraft:.*", "!minecraft:ice_spikes" ] },
-    "apply": {
-      "species" : "spruce"
     }
   },
   {
@@ -102,7 +95,7 @@
   },
   {
     "__comment" : "Mushroom Islands",
-    "select": { "tag": "forge:is_mushroom",	"name": "minecraft:.*" },
+    "select": { "name": "minecraft:mushroom_fields" },
     "apply": {
       "species" : {
         "random" : {
@@ -122,7 +115,8 @@
     "apply": {
       "species" : "spruce",
       "density": [ 1 ],
-      "chance": 1
+      "chance": 1,
+      "forestness": 1
     }
   },
   {
@@ -166,6 +160,14 @@
       },
       "density": 0,
       "chance": 0.03
+    }
+  },
+  {
+    "__comment": "Spawn spruce trees in snowy plains, and with slightly higher chance.",
+    "select": { "name": "minecraft:snowy_plains" },
+    "apply": {
+      "species": "spruce",
+      "chance": 0.06
     }
   },
   {
@@ -241,13 +243,14 @@
   },
   {
     "__comment": "Cancel huge fungus features from namespace 'minecraft' in the nether forests, and set chance.",
-    "select": { "name": "minecraft:.*forest", "tag": "minecraft:is_nether" },
+    "select": { "name": "minecraft:((warped)|(crimson))_forest" },
     "cancellers": {
       "type": "fungus",
       "namespace": "minecraft"
     },
     "apply": {
-      "chance": 1.0
+      "chance": 1.0,
+      "density": [ 2.0, 0.3 ]
     }
   },
   {
@@ -258,8 +261,7 @@
           "crimson" : 4,
           "mega_crimson" : 1
         }
-      },
-      "density": [ 2.0, 0.3 ]
+      }
     }
   },
   {
@@ -270,8 +272,7 @@
           "warped" : 4,
           "mega_warped" : 1
         }
-      },
-      "density": [ 2.0, 0.3 ]
+      }
     }
   }
 ]
