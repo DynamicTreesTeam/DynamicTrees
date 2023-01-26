@@ -75,7 +75,8 @@ public final class Resources {
 
 
     public static final JoCodeResourceLoader JO_CODE_LOADER = new JoCodeResourceLoader();
-    public static final BiomeDatabaseResourceLoader BIOME_DATABASE_LOADER = new BiomeDatabaseResourceLoader();
+    public static final FeatureCancellationResourceLoader FEATURE_CANCELLATION_LOADER = new FeatureCancellationResourceLoader();
+    public static final BiomePopulatorsResourceLoader BIOME_POPULATORS_LOADER = new BiomePopulatorsResourceLoader();
 
     public static void setupTreesResourceManager() {
         addDefaultLoaders();
@@ -99,7 +100,8 @@ public final class Resources {
                 POD_LOADER,
                 SPECIES_LOADER,
                 JO_CODE_LOADER,
-                BIOME_DATABASE_LOADER
+                FEATURE_CANCELLATION_LOADER,
+                BIOME_POPULATORS_LOADER
         );
     }
 

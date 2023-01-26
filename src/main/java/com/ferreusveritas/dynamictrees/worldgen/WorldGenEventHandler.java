@@ -20,8 +20,7 @@ public final class WorldGenEventHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void addDynamicTrees(final BiomeLoadingEvent event) {
-        event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                DTRegistries.DYNAMIC_TREE_PLACED_FEATURE.getHolder().get());
+        event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_PLACED_FEATURE.getHolder().get());
     }
 
     /**
@@ -37,27 +36,11 @@ public final class WorldGenEventHandler {
         // way of removing features to rectify this.
 
         final ResourceLocation biomeName = event.getName();
-
         if (biomeName == null) {
             return;
         }
 
-        final BiomePropertySelectors.FeatureCancellations featureCancellations = BiomeDatabases.getDefault()
-                .getEntry(biomeName).getFeatureCancellations();
-
-        featureCancellations.getStages().forEach(stage -> event.getGeneration().getFeatures(stage).removeIf(placedFeatureHolder -> {
-            PlacedFeature placedFeature = placedFeatureHolder.value();
-
-            return placedFeature.getFeatures().anyMatch(configuredFeature -> {
-                for (FeatureCanceller featureCanceller : featureCancellations.getFeatureCancellers()) {
-                    if (featureCanceller.shouldCancel(configuredFeature, featureCancellations)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            });
-        }));
+        BiomeDatabases.getDefault().getEntry(biomeName).getFeatureCancellation().cancelFeatures(event.getGeneration());
     }
 
 }

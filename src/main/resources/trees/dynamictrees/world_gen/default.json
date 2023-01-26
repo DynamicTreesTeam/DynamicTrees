@@ -9,14 +9,6 @@
     }
   },
   {
-    "__comment": "Cancel standard tree features from the overworld.",
-    "select": { "name": "minecraft.*", "type": "overworld" },
-    "cancellers": {
-      "type": "tree",
-      "namespace": "minecraft"
-    }
-  },
-  {
     "__comment" : "Rivers have no chance of having trees",
     "select": { "tag": "minecraft:is_river" },
     "apply": {
@@ -104,10 +96,6 @@
         }
       },
       "chance": 0.66
-    },
-    "cancellers": {
-      "type": "mushroom",
-      "namespace": "minecraft"
     }
   },
   {
@@ -242,12 +230,7 @@
     }
   },
   {
-    "__comment": "Cancel huge fungus features from namespace 'minecraft' in the nether forests, and set chance.",
     "select": { "name": "minecraft:((warped)|(crimson))_forest" },
-    "cancellers": {
-      "type": "fungus",
-      "namespace": "minecraft"
-    },
     "apply": {
       "chance": 1.0,
       "density": [ 2.0, 0.3 ]

@@ -18,7 +18,12 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.worldgen.TreeGenerator;
 import com.ferreusveritas.dynamictrees.worldgen.structure.VillageTreeReplacement;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -85,10 +90,16 @@ public final class DynamicTrees {
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::onCommonSetup);
         modEventBus.addListener(this::gatherData);
+        MinecraftForge.EVENT_BUS.addListener(this::serverStart);
+
         modEventBus.addListener(CommonSetup::onCommonSetup);
 
         EventHandlers.registerCommon();
         CompatHandler.registerBuiltInSeasonManagers();
+    }
+
+    private void serverStart(final ServerAboutToStartEvent event) {
+        System.out.println("Server about to start.");
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
