@@ -151,55 +151,6 @@ public class BiomePropertySelectors {
         }
     }
 
-    public static final class FeatureCancellations {
-        private final Collection<String> namespaces = Sets.newHashSet();
-        private final Collection<FeatureCanceller> featureCancellers = Sets.newHashSet();
-        private final Collection<GenerationStep.Decoration> stages = Sets.newHashSet();
-
-        public void putNamespace(final String namespace) {
-            this.namespaces.add(namespace);
-        }
-
-        public boolean shouldCancelNamespace(final String namespace) {
-            return this.namespaces.contains(namespace);
-        }
-
-        public void putCanceller(final FeatureCanceller featureCanceller) {
-            this.featureCancellers.add(featureCanceller);
-        }
-
-        public void putStage(final GenerationStep.Decoration stage) {
-            this.stages.add(stage);
-        }
-
-        public void putDefaultStagesIfEmpty() {
-            if (this.stages.size() < 1) {
-                this.stages.add(GenerationStep.Decoration.VEGETAL_DECORATION);
-            }
-        }
-
-        public void addAllFrom(final FeatureCancellations featureCancellations) {
-            this.namespaces.addAll(featureCancellations.namespaces);
-            this.featureCancellers.addAll(featureCancellations.featureCancellers);
-            this.stages.addAll(featureCancellations.stages);
-        }
-
-        public void reset() {
-            this.namespaces.clear();
-            this.featureCancellers.clear();
-            this.stages.clear();
-        }
-
-        public Collection<FeatureCanceller> getFeatureCancellers() {
-            return this.featureCancellers;
-        }
-
-        public Collection<GenerationStep.Decoration> getStages() {
-            return this.stages;
-        }
-
-    }
-
     /**
      * This is the data that represents a species selection. This class was necessary to have an unhandled state.
      */
