@@ -166,8 +166,7 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
         cancellation.cancelDuringDefaultIfNoneSpecified();
 
         final BiomeDatabase.Operation operation = JsonResult.forInput(json)
-                .mapIfContains(BiomePopulatorsResourceLoader.METHOD, BiomeDatabase.Operation.class, op -> op,
-                        BiomeDatabase.Operation.REPLACE)
+                .mapIfContains(BiomePopulatorsResourceLoader.METHOD, BiomeDatabase.Operation.class, op -> op, BiomeDatabase.Operation.SPLICE_AFTER)
                 .forEachWarning(warningConsumer)
                 .orElse(BiomeDatabase.Operation.SPLICE_AFTER, errorConsumer, warningConsumer);
 
