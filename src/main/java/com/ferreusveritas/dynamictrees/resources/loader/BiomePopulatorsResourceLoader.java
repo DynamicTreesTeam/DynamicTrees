@@ -6,8 +6,6 @@ import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.MultiJsonResourcePreparer;
-import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.ResourcePreparer;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.deserialisation.BiomeListDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
@@ -37,8 +35,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
-
-import static com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader.postApplierEvent;
 
 /**
  * @author Harley O'Connor
@@ -90,8 +86,6 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
     private final JsonPropertyAppliers<BiomeDatabase.Entry> entryAppliers =
             new JsonPropertyAppliers<>(BiomeDatabase.Entry.class);
-    private final JsonPropertyAppliers<BiomePropertySelectors.FeatureCancellations> cancellationAppliers =
-            new JsonPropertyAppliers<>(BiomePropertySelectors.FeatureCancellations.class);
 
     public BiomePopulatorsResourceLoader() {
         super(RESOURCE_PREPARER);
