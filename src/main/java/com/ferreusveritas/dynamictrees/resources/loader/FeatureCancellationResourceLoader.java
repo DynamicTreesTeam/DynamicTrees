@@ -169,7 +169,7 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
                 .mapIfContains(BiomePopulatorsResourceLoader.METHOD, BiomeDatabase.Operation.class, op -> op,
                         BiomeDatabase.Operation.REPLACE)
                 .forEachWarning(warningConsumer)
-                .orElse(BiomeDatabase.Operation.REPLACE, errorConsumer, warningConsumer);
+                .orElse(BiomeDatabase.Operation.SPLICE_AFTER, errorConsumer, warningConsumer);
 
         if (operation == BiomeDatabase.Operation.REPLACE) {
             this.replaceCancellationsWith(cancellation, biomes);
