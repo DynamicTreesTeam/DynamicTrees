@@ -1,0 +1,30 @@
+[
+  {
+    "_note": "These cancellers are only read on game load, so the game must be restarted for changes to take effect.",
+    "__note": "Biome tags cannot be used for selectors here because at the point these are loaded they do not exist (nor when the features are removed from biomes)."
+  },
+  {
+    "_comment": "Cancel standard tree features from all overworld biomes.",
+    "select": { "name": "minecraft:.*", "category": "!(nether)|(end)" },
+    "cancellers": {
+      "type": "tree",
+      "namespace": "minecraft"
+    }
+  },
+  {
+    "_comment": "Cancel regular mushroom generation from the mushroom fields biome.",
+    "select": { "name": "minecraft:mushroom_fields" },
+    "cancellers": {
+      "type": "mushroom",
+      "namespace": "minecraft"
+    }
+  },
+  {
+    "_comment": "Cancel huge fungus features from nether forests.",
+    "select": { "name": "minecraft:((warped)|(crimson))_forest" },
+    "cancellers": {
+      "type": "fungus",
+      "namespace": "minecraft"
+    }
+  }
+]

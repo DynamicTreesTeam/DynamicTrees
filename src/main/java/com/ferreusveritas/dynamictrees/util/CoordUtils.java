@@ -302,16 +302,19 @@ public final class CoordUtils {
         }
     }
 
+    public static BlockPos findWorldSurface(LevelAccessor level, BlockPos startPos, boolean worldGen) {
+        return findWorldSurface(level, startPos, worldGen ? Heightmap.Types.WORLD_SURFACE_WG : Heightmap.Types.WORLD_SURFACE);
+    }
+
     /**
      * @param level    The level
      * @param startPos The starting position
      * @return The position of the top solid block
      */
-    public static BlockPos findWorldSurface(LevelAccessor level, BlockPos startPos, boolean worldGen) {
+    public static BlockPos findWorldSurface(LevelAccessor level, BlockPos startPos, Heightmap.Types heightmap) {
         return new BlockPos(
                 startPos.getX(),
-                level.getHeight(worldGen ? Heightmap.Types.WORLD_SURFACE_WG : Heightmap.Types.WORLD_SURFACE,
-                        startPos.getX(), startPos.getZ()) - 1,
+                level.getHeight(heightmap, startPos.getX(), startPos.getZ()) - 1,
                 startPos.getZ()
         );
     }

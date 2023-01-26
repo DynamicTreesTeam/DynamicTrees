@@ -6,8 +6,8 @@ import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.MultiJsonResourcePreparer;
+import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.ResourcePreparer;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.deserialisation.BiomeListDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
@@ -18,7 +18,6 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.CommonCollectors;
-import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
@@ -30,48 +29,72 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.GenerationStep;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
 import static com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader.postApplierEvent;
-import static com.ferreusveritas.dynamictrees.deserialisation.JsonHelper.throwIfShouldNotLoad;
 
 /**
  * @author Harley O'Connor
  */
-public final class BiomeDatabaseResourceLoader
-        extends AbstractResourceLoader<Iterable<JsonElement>>
+public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<Iterable<JsonElement>>
         implements ApplierResourceLoader<Iterable<JsonElement>> {
+
+    static final MultiJsonResourcePreparer RESOURCE_PREPARER = new MultiJsonResourcePreparer("world_gen");
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String DEFAULT_POPULATOR = "default";
 
     public static final String SELECT = "select";
-    public static final String APPLY = "apply";
-    public static final String WHITE = "white";
-    public static final String CANCELLERS = "cancellers";
+    public static final String METHOD = "method";
 
-    private static final String METHOD = "method";
+    private static final String APPLY = "apply";
+    private static final String WHITE = "white";
 
     public static final String ENTRY_APPLIERS = "entries";
-    public static final String CANCELLATION_APPLIERS = "cancellations";
+
+    static boolean isWorldGenDisabled() {
+        return !DTConfigs.WORLD_GEN.get();
+    }
+
+    static LinkedList<JsonElement> toLinkedList(Iterable<JsonElement> elements) {
+        return StreamSupport.stream(elements.spliterator(), false)
+                .collect(CommonCollectors.toLinkedList());
+    }
+
+    static BiomeList collectBiomes(JsonObject json, Consumer<String> warningConsumer) throws DeserialisationException {
+        return JsonResult.forInput(json)
+                .mapIfContains(SELECT, BiomeList.class, list -> list)
+                .forEachWarning(warningConsumer)
+                .orElseThrow();
+    }
+
+    static void warnNoBiomesSelected(JsonObject json) {
+        if (noBiomesSelectedWarningNotSuppressed(json)) {
+            LOGGER.warn("Could not get any biomes from selector:\n" + json.get(SELECT));
+        }
+    }
+
+    private static boolean noBiomesSelectedWarningNotSuppressed(JsonObject json) {
+        final JsonElement suppress = json.get("suppress_none_selected");
+        return suppress == null || !suppress.isJsonPrimitive() || !suppress.getAsJsonPrimitive().isBoolean() ||
+                !suppress.getAsJsonPrimitive().getAsBoolean();
+    }
 
     private final JsonPropertyAppliers<BiomeDatabase.Entry> entryAppliers =
             new JsonPropertyAppliers<>(BiomeDatabase.Entry.class);
     private final JsonPropertyAppliers<BiomePropertySelectors.FeatureCancellations> cancellationAppliers =
             new JsonPropertyAppliers<>(BiomePropertySelectors.FeatureCancellations.class);
 
-    public BiomeDatabaseResourceLoader() {
-        super(new MultiJsonResourcePreparer("world_gen"));
+    public BiomePopulatorsResourceLoader() {
+        super(RESOURCE_PREPARER);
     }
 
     @Override
@@ -86,31 +109,11 @@ public final class BiomeDatabaseResourceLoader
                 .register("forestness", Float.class, BiomeDatabase.Entry::setForestness)
                 .registerIfTrueApplier("reset", BiomeDatabase.Entry::reset);
 
-        this.cancellationAppliers
-                .register("namespace", String.class, BiomePropertySelectors.FeatureCancellations::putNamespace)
-                .registerArrayApplier("namespaces", String.class,
-                        BiomePropertySelectors.FeatureCancellations::putNamespace)
-                .register("type", FeatureCanceller.class, BiomePropertySelectors.FeatureCancellations::putCanceller)
-                .registerArrayApplier("types", FeatureCanceller.class,
-                        BiomePropertySelectors.FeatureCancellations::putCanceller)
-                .register("stage", GenerationStep.Decoration.class,
-                        BiomePropertySelectors.FeatureCancellations::putStage)
-                .registerArrayApplier("stages", GenerationStep.Decoration.class,
-                        BiomePropertySelectors.FeatureCancellations::putStage);
-
-        postApplierEvent(new EntryApplierRegistryEvent<>(this.entryAppliers, ENTRY_APPLIERS));
-        postApplierEvent(new CancellationApplierRegistryEvent<>(this.cancellationAppliers,
-                CANCELLATION_APPLIERS));
+        ApplierResourceLoader.postApplierEvent(new EntryApplierRegistryEvent<>(this.entryAppliers, ENTRY_APPLIERS));
     }
 
     public static final class EntryApplierRegistryEvent<O> extends ApplierRegistryEvent<O, JsonElement> {
         public EntryApplierRegistryEvent(JsonPropertyAppliers<O> appliers, String identifier) {
-            super(appliers, identifier);
-        }
-    }
-
-    public static final class CancellationApplierRegistryEvent<O> extends ApplierRegistryEvent<O, JsonElement> {
-        public CancellationApplierRegistryEvent(JsonPropertyAppliers<O> appliers, String identifier) {
             super(appliers, identifier);
         }
     }
@@ -161,151 +164,6 @@ public final class BiomeDatabaseResourceLoader
     }
 
     @Override
-    public void applyOnSetup(ResourceAccessor<Iterable<JsonElement>> resourceAccessor,
-                             ResourceManager resourceManager) {
-        BiomeDatabases.reset();
-        if (this.isWorldGenDisabled()) {
-            return;
-        }
-
-        this.readCancellers(
-                resourceAccessor.filtered(this::isDefaultPopulator).map(this::toLinkedList)
-        );
-    }
-
-    private void readCancellers(ResourceAccessor<Deque<JsonElement>> defaultPopulators) {
-        this.readModCancellers(defaultPopulators);
-        this.readTreePackCancellers(defaultPopulators);
-    }
-
-    private void readModCancellers(ResourceAccessor<Deque<JsonElement>> defaultPopulators) {
-        defaultPopulators.getAllResources().forEach(defaultPopulator ->
-                this.readCancellers(defaultPopulator.getLocation(), defaultPopulator.getResource().pollFirst())
-        );
-    }
-
-    private void readTreePackCancellers(ResourceAccessor<Deque<JsonElement>> defaultPopulators) {
-        defaultPopulators.getAllResources().forEach(defaultPopulator ->
-                defaultPopulator.getResource().forEach(json ->
-                        this.readCancellers(defaultPopulator.getLocation(), json)
-                )
-        );
-    }
-
-    private void readCancellers(final ResourceLocation location, final JsonElement json) {
-        LOGGER.debug("Reading cancellers from Json biome populator \"{}\".", location);
-
-        try {
-            JsonResult.forInput(json)
-                    .mapEachIfArray(JsonObject.class, object -> {
-                        try {
-                            this.readCancellersInSection(location, object);
-                        } catch (IgnoreThrowable ignored) {
-                        }
-                        return PropertyApplierResult.success();
-                    }).forEachWarning(warning ->
-                            LOGGER.warn("Warning whilst loading cancellers from populator \"{}\": {}",
-                                    location, warning)
-                    ).orElseThrow();
-        } catch (DeserialisationException e) {
-            LOGGER.error("Error whilst loading cancellers from populator \"{}\": {}", location,
-                    e.getMessage());
-        }
-    }
-
-    private void readCancellersInSection(final ResourceLocation location, final JsonObject json)
-            throws DeserialisationException, IgnoreThrowable {
-
-        final Consumer<String> errorConsumer = error -> LOGGER.error("Error loading populator \"{}\": {}",
-                location, error);
-        final Consumer<String> warningConsumer = warning -> LOGGER.warn("Warning whilst loading populator " +
-                "\"{}\": {}", location, warning);
-
-        throwIfShouldNotLoad(json);
-
-        if (!json.has("cancellers")) {
-            return;
-        }
-
-        final BiomeList biomes = this.collectBiomes(json, warningConsumer);
-
-        if (biomes.isEmpty()) {
-            warnNoBiomesSelected(json);
-            return;
-        }
-
-        JsonResult.forInput(json)
-                .mapIfContains(CANCELLERS, JsonObject.class, cancellerObject ->
-                                this.applyCanceller(location, errorConsumer, warningConsumer,
-                                        biomes, cancellerObject),
-                        PropertyApplierResult.success()
-                )
-                .forEachWarning(warningConsumer)
-                .orElseThrow();
-    }
-
-    private BiomeList collectBiomes(JsonObject json, Consumer<String> warningConsumer) throws DeserialisationException {
-        return JsonResult.forInput(json)
-                .mapIfContains(SELECT, BiomeList.class, list -> list)
-                .forEachWarning(warningConsumer)
-                .orElseThrow();
-    }
-
-    private PropertyApplierResult applyCanceller(ResourceLocation location,
-                                                 Consumer<String> errorConsumer,
-                                                 Consumer<String> warningConsumer, BiomeList biomes,
-                                                 JsonObject json) {
-        final BiomePropertySelectors.FeatureCancellations cancellations =
-                new BiomePropertySelectors.FeatureCancellations();
-        this.applyCancellationAppliers(location, json, cancellations);
-
-        cancellations.putDefaultStagesIfEmpty();
-
-        final BiomeDatabase.Operation operation = JsonResult.forInput(json)
-                .mapIfContains(METHOD, BiomeDatabase.Operation.class, op -> op,
-                        BiomeDatabase.Operation.REPLACE)
-                .forEachWarning(warningConsumer)
-                .orElse(BiomeDatabase.Operation.REPLACE, errorConsumer, warningConsumer);
-
-        if (operation == BiomeDatabase.Operation.REPLACE) {
-            this.replaceCancellationsWith(cancellations, biomes);
-        } else {
-            this.addCancellationsTo(cancellations, biomes);
-        }
-        return PropertyApplierResult.success();
-    }
-
-    private void applyCancellationAppliers(ResourceLocation location, JsonObject json,
-                                           BiomePropertySelectors.FeatureCancellations cancellations) {
-        this.cancellationAppliers.applyAll(new JsonMapWrapper(json), cancellations)
-                .forEachErrorWarning(
-                        error -> LOGGER.error("Error whilst applying feature cancellations " +
-                                "in \"{}\" " + "populator: {}", location, error),
-                        warning -> LOGGER.warn("Warning whilst applying feature " +
-                                "cancellations in \"{}\" populator: {}", location, warning)
-                );
-    }
-
-    private void replaceCancellationsWith(BiomePropertySelectors.FeatureCancellations cancellations,
-                                          List<Biome> biomes) {
-        biomes.forEach(biome -> {
-            final BiomePropertySelectors.FeatureCancellations currentCancellations =
-                    BiomeDatabases.getDefault().getEntry(biome).getFeatureCancellations();
-            currentCancellations.reset();
-            currentCancellations.addAllFrom(cancellations);
-        });
-    }
-
-    private void addCancellationsTo(BiomePropertySelectors.FeatureCancellations cancellations,
-                                    List<Biome> biomes) {
-        biomes.forEach(biome -> {
-            final BiomePropertySelectors.FeatureCancellations currentCancellations =
-                    BiomeDatabases.getDefault().getEntry(biome).getFeatureCancellations();
-            currentCancellations.addAllFrom(cancellations);
-        });
-    }
-
-    @Override
     public void applyOnReload(ResourceAccessor<Iterable<JsonElement>> resourceAccessor,
                               ResourceManager resourceManager) {
         BiomeDatabases.reset();
@@ -316,10 +174,12 @@ public final class BiomeDatabaseResourceLoader
         this.waitForTagLoading();
 
         this.readPopulators(
-                resourceAccessor.filtered(this::isDefaultPopulator).map(this::toLinkedList)
+                resourceAccessor.filtered(this::isDefaultPopulator).map(BiomePopulatorsResourceLoader::toLinkedList)
         );
         this.readDimensionalPopulators(
-                resourceAccessor.filtered(resource -> !this.isDefaultPopulator(resource)).map(this::toLinkedList)
+                resourceAccessor
+                        .filtered(resource -> !this.isDefaultPopulator(resource) && !FeatureCancellationResourceLoader.isCancellationFile(resource))
+                        .map(BiomePopulatorsResourceLoader::toLinkedList)
         );
     }
 
@@ -339,10 +199,6 @@ public final class BiomeDatabaseResourceLoader
                 } catch (InterruptedException _ignored) {}
             }
         }
-    }
-
-    private boolean isWorldGenDisabled() {
-        return !DTConfigs.WORLD_GEN.get();
     }
 
     private void readPopulators(ResourceAccessor<Deque<JsonElement>> resourceAccessor) {
@@ -429,18 +285,6 @@ public final class BiomeDatabaseResourceLoader
                 .orElseThrow();
     }
 
-    private void warnNoBiomesSelected(JsonObject json) {
-        if (noBiomesSelectedWarningNotSuppressed(json)) {
-            LogManager.getLogger().warn("Could not get any biomes from selector:\n" + json.get(SELECT));
-        }
-    }
-
-    private boolean noBiomesSelectedWarningNotSuppressed(JsonObject json) {
-        final JsonElement suppress = json.get("suppress_none_selected");
-        return suppress == null || !suppress.isJsonPrimitive() || !suppress.getAsJsonPrimitive().isBoolean() ||
-                !suppress.getAsJsonPrimitive().getAsBoolean();
-    }
-
     private void applyWhite(BiomeDatabase database, ResourceLocation location, BiomeList biomes, String type)
             throws DeserialisationException {
         if (type.equalsIgnoreCase("all")) {
@@ -455,11 +299,6 @@ public final class BiomeDatabaseResourceLoader
 
     private boolean isDefaultPopulator(final ResourceLocation key) {
         return key.getPath().equals(DEFAULT_POPULATOR);
-    }
-
-    private LinkedList<JsonElement> toLinkedList(Iterable<JsonElement> elements) {
-        return StreamSupport.stream(elements.spliterator(), false)
-                .collect(CommonCollectors.toLinkedList());
     }
 
 }

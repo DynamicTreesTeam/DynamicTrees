@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.*;
-import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
@@ -89,7 +88,7 @@ public class BiomeDatabase {
         private ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
         private DensitySelector densitySelector = (rnd, nd) -> -1;
         private SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
-        private final FeatureCancellations featureCancellations = new FeatureCancellations();
+        private FeatureCancellation featureCancellation = NoFeatureCancellation.INSTANCE;
         private boolean blacklisted = false;
         private float forestness = 0.0f;
         private final static Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
@@ -137,8 +136,19 @@ public class BiomeDatabase {
             this.speciesSelector = speciesSelector;
         }
 
-        public FeatureCancellations getFeatureCancellations() {
-            return featureCancellations;
+        public FeatureCancellation getFeatureCancellation() {
+            return featureCancellation;
+        }
+
+        /**
+         * Gets current feature cancellations or creates a new normal feature cancellation object to store new
+         * cancellations on. This should only be used when loading feature cancellation.
+         */
+        public NormalFeatureCancellation getOrCreateFeatureCancellation() {
+            if (featureCancellation == NoFeatureCancellation.INSTANCE) {
+                featureCancellation = new NormalFeatureCancellation();
+            }
+            return ((NormalFeatureCancellation) featureCancellation);
         }
 
         public void setBlacklisted(boolean blacklisted) {

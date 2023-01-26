@@ -6,11 +6,14 @@ import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Provides the forest density for a given biome. Mods should implement this interface and register it via the {@link
@@ -33,6 +36,119 @@ public class BiomePropertySelectors {
     @FunctionalInterface
     public interface SpeciesSelector {
         SpeciesSelection getSpecies(BlockPos pos, BlockState dirt, Random random);
+    }
+
+    public interface FeatureCancellation {
+
+        /**
+         * Removes features from the generation builder that match the cancellation criteria.
+         */
+        void cancelFeatures(BiomeGenerationSettingsBuilder generationSettingsBuilder);
+
+        /**
+         * Tells the canceller to cancel features using the given canceller.
+         */
+        void cancelUsing(FeatureCanceller featureCanceller);
+
+        /**
+         * Tells the canceller to cancel features whose names contain the given namespace.
+         */
+        void cancelWithNamespace(String namespace);
+
+        /**
+         * Tells the canceller to cancel features registered to the given step of feature generation.
+         */
+        void cancelDuring(GenerationStep.Decoration generationStep);
+
+    }
+
+    public static final class NoFeatureCancellation implements FeatureCancellation {
+
+        public static final NoFeatureCancellation INSTANCE = new NoFeatureCancellation();
+
+        private NoFeatureCancellation() {
+        }
+
+        @Override
+        public void cancelFeatures(BiomeGenerationSettingsBuilder generationSettingsBuilder) {
+        }
+
+        @Override
+        public void cancelUsing(FeatureCanceller featureCanceller) {
+        }
+
+        @Override
+        public void cancelWithNamespace(String namespace) {
+        }
+
+        @Override
+        public void cancelDuring(GenerationStep.Decoration generationStep) {
+        }
+
+    }
+
+    public static final class NormalFeatureCancellation implements FeatureCancellation {
+
+        private final Set<FeatureCanceller> cancellers;
+        private final Set<String> namespaces;
+        private final Collection<GenerationStep.Decoration> decorationSteps;
+
+        public NormalFeatureCancellation() {
+            this(Sets.newHashSet(), Sets.newHashSet(), Sets.newHashSet());
+        }
+
+        public NormalFeatureCancellation(Set<FeatureCanceller> cancellers, Set<String> namespaces, Set<GenerationStep.Decoration> decorationSteps) {
+            this.cancellers = cancellers;
+            this.namespaces = namespaces;
+            this.decorationSteps = decorationSteps;
+        }
+
+        @Override
+        public void cancelFeatures(BiomeGenerationSettingsBuilder generationSettingsBuilder) {
+            decorationSteps.stream().map(generationSettingsBuilder::getFeatures).forEach(features ->
+                    features.removeIf(placedFeatureHolder -> shouldRemovePlacedFeature(placedFeatureHolder.value()))
+            );
+        }
+
+        private boolean shouldRemovePlacedFeature(PlacedFeature placedFeature) {
+            return placedFeature.getFeatures().anyMatch(configuredFeature ->
+                    cancellers.stream().anyMatch(canceller -> canceller.shouldCancel(configuredFeature, namespaces))
+            );
+        }
+
+        @Override
+        public void cancelUsing(FeatureCanceller featureCanceller) {
+            cancellers.add(featureCanceller);
+        }
+
+        @Override
+        public void cancelWithNamespace(String namespace) {
+            namespaces.add(namespace);
+        }
+
+        @Override
+        public void cancelDuring(GenerationStep.Decoration generationStep) {
+            decorationSteps.add(generationStep);
+        }
+
+        public void cancelDuringDefaultIfNoneSpecified() {
+            if (decorationSteps.isEmpty()) {
+                decorationSteps.add(GenerationStep.Decoration.VEGETAL_DECORATION);
+            }
+        }
+
+        public void addFrom(NormalFeatureCancellation other) {
+            this.cancellers.addAll(other.cancellers);
+            this.namespaces.addAll(other.namespaces);
+            this.decorationSteps.addAll(other.decorationSteps);
+        }
+
+        public void replaceFrom(NormalFeatureCancellation other) {
+            this.cancellers.clear();
+            this.namespaces.clear();
+            this.decorationSteps.clear();
+            this.addFrom(other);
+        }
     }
 
     public static final class FeatureCancellations {
