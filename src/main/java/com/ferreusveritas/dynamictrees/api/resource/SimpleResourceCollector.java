@@ -35,10 +35,9 @@ final class SimpleResourceCollector<R> implements ResourceCollector<R> {
         return new SimpleResourceAccessor<>(this.resources, this::newMap);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void clear() {
-        this.resources = (Map<ResourceLocation, DTResource<R>>) mapSupplier.get();
+        this.resources = newMap();
     }
 
     @SuppressWarnings("unchecked")

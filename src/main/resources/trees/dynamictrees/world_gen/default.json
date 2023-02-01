@@ -205,7 +205,7 @@
     "apply": {
       "species" : "oak",
       "density": [ 0.5 ],
-      "chance": 0.5
+      "chance": 0.7
     }
   },
 

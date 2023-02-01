@@ -42,7 +42,7 @@ import java.util.stream.StreamSupport;
 public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<Iterable<JsonElement>>
         implements ApplierResourceLoader<Iterable<JsonElement>> {
 
-    static final MultiJsonResourcePreparer RESOURCE_PREPARER = new MultiJsonResourcePreparer("world_gen");
+    private static final MultiJsonResourcePreparer RESOURCE_PREPARER = new MultiJsonResourcePreparer("world_gen");
 
     private static final Logger LOGGER = LogManager.getLogger();
 
