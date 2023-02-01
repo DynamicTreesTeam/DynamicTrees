@@ -116,8 +116,6 @@ public class TreeGenerator {
 
     public GeneratorResult makeTree(LevelContext levelContext, BiomeDatabase.Entry biomeEntry, PoissonDisc circle, BlockPos groundPos, SafeChunkBounds safeBounds) {
 
-        final Biome biome = levelContext.accessor().getBiome(groundPos).value();
-
         if (biomeEntry.isBlacklisted()) {
             return GeneratorResult.UNHANDLED_BIOME;
         }
@@ -140,6 +138,7 @@ public class TreeGenerator {
             if (species.isValid()) {
                 if (species.isAcceptableSoilForWorldgen(levelContext.accessor(), groundPos, dirtState)) {
                     if (biomeEntry.getChanceSelector().getChance(random, species, circle.radius) == Chance.OK) {
+                        final Biome biome = levelContext.accessor().getBiome(groundPos).value();
                         if (!species.generate(levelContext, groundPos, biome, random, circle.radius, safeBounds)) {
                             result = GeneratorResult.FAIL_GENERATION;
                         }

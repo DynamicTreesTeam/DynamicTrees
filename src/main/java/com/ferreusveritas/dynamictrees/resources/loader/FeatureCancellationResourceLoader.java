@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
+import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.MultiJsonResourcePreparer;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
@@ -36,6 +37,8 @@ import static com.ferreusveritas.dynamictrees.deserialisation.JsonHelper.throwIf
 public class FeatureCancellationResourceLoader extends AbstractResourceLoader<Iterable<JsonElement>>
         implements ApplierResourceLoader<Iterable<JsonElement>> {
 
+    private static final MultiJsonResourcePreparer RESOURCE_PREPARER = new MultiJsonResourcePreparer("world_gen");
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String CANCELLATION_FILE = "feature_cancellers";
@@ -50,7 +53,7 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
     private final JsonPropertyAppliers<BiomePropertySelectors.FeatureCancellation> cancellationAppliers = new JsonPropertyAppliers<>(BiomePropertySelectors.FeatureCancellation.class);
 
     public FeatureCancellationResourceLoader() {
-        super(BiomePopulatorsResourceLoader.RESOURCE_PREPARER);
+        super(RESOURCE_PREPARER);
     }
 
     @Override
