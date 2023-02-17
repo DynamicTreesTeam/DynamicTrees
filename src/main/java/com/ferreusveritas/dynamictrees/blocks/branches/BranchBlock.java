@@ -508,6 +508,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return lootTableSupplier.get(lootTableManager, species);
     }
 
+    /**
+     * @deprecated will be removed in 1.18, use {@link Species#getBranchesDrops(World, NetVolumeNode.Volume)}
+     */
+    @Deprecated
+    public List<ItemStack> getLogDrops(World world, BlockPos pos, Species species, NetVolumeNode.Volume volume) {
+        return species.getBranchesDrops(world, volume);
+    }
+
     public LootTable.Builder createBranchDrops() {
         return DTLootTableProvider.createBranchDrops(getPrimitiveLog().get(), family.getStick(1).getItem());
     }
