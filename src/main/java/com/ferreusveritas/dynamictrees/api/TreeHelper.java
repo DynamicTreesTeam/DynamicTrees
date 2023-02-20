@@ -10,12 +10,15 @@ import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTClient;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.TwinkleNode;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -24,6 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public class TreeHelper {
 
@@ -273,6 +277,32 @@ public class TreeHelper {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Destroys a part of the tree from the specified {@code cutPos}. Destruction is handled fully by this method,
+     * except for drops which are returned to be handled by the caller using the {@code dropConsumer} parameter.
+     * <p>
+     * This may be used for mod compatibility with machines that cut down trees automatically, for example the Create
+     * saw. This method was based on how the compatibility with Create worked, making it easier for them and others
+     * to provide integration.
+     *
+     * @param dropConsumer called for all drops with the block position at which they should drop and the stack.
+     *                     For logs and sticks this will be the cut position, while for leaves this will be the
+     *                     position of the respective leave block that created this drop.
+     */
+    public static void destroyTree(Level level, BlockPos cutPos, @Nullable Player player, BiConsumer<BlockPos, ItemStack> dropConsumer) {
+        BlockPos startPos = dereferenceTrunkShell(level, cutPos);
+        BranchBlock cutBlock = getBranch(level.getBlockState(cutPos));
+
+        // Fire event for break sound and particles
+        level.levelEvent(null, 2001, cutPos, Block.getId(level.getBlockState(cutPos)));
+
+        BranchDestructionData destructionData = cutBlock.destroyBranchFromNode(level, startPos, Direction.DOWN, false, player);
+
+        // Allow drop consumer callback to handle drops
+        destructionData.leavesDrops.forEach(stackData -> dropConsumer.accept(stackData.pos, stackData.stack));
+        destructionData.species.getBranchesDrops(level, destructionData.woodVolume).forEach(stack -> dropConsumer.accept(startPos, stack));
     }
 
     //Treeparts
