@@ -293,12 +293,12 @@ public class TreeHelper {
      */
     public static void destroyTree(Level level, BlockPos cutPos, @Nullable Player player, BiConsumer<BlockPos, ItemStack> dropConsumer) {
         BlockPos startPos = dereferenceTrunkShell(level, cutPos);
-        BranchBlock cutBlock = getBranch(level.getBlockState(cutPos));
+        BranchBlock cutBlock = getBranch(level.getBlockState(startPos));
 
         // Fire event for break sound and particles
         level.levelEvent(null, 2001, cutPos, Block.getId(level.getBlockState(cutPos)));
 
-        BranchDestructionData destructionData = cutBlock.destroyBranchFromNode(level, startPos, Direction.DOWN, false, player);
+        BranchDestructionData destructionData = cutBlock.destroyBranchFromNode(level, cutPos, Direction.DOWN, false, player);
 
         // Allow drop consumer callback to handle drops
         destructionData.leavesDrops.forEach(stackData -> dropConsumer.accept(stackData.pos, stackData.stack));
