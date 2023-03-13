@@ -5,7 +5,9 @@
     "dynamictrees:jungle_leaves",
     "dynamictrees:dark_oak_leaves",
     "dynamictrees:spruce_leaves",
+    "dynamictrees:azalea_leaves",
     "dynamictrees:acacia_leaves",
-    "dynamictrees:birch_leaves"
+    "dynamictrees:birch_leaves",
+    "dynamictrees:flowering_azalea_leaves"
   ]
 }

@@ -35,7 +35,7 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
         if (featureConfig instanceof RandomFeatureConfiguration) {
             // Removes configuredFeature if it contains trees.
             return this.doesContainTrees((RandomFeatureConfiguration) featureConfig, namespaces);
-        } else if (featureConfig instanceof TreeConfiguration) {
+        } else if (treeFeatureConfigClass.isInstance(featureConfig)) {
             String namespace = "";
             final ConfiguredFeature<?, ?> nextConfiguredFeature = configuredFeature.getFeatures().findFirst().get();
             final FeatureConfiguration nextFeatureConfig = nextConfiguredFeature.config();
@@ -50,9 +50,6 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
                 // Removes configuredFeature if it contains trees.
                 return this.doesContainTrees((RandomFeatureConfiguration) nextFeatureConfig, namespaces);
             }
-        }
-        if (configuredFeature == DTRegistries.DYNAMIC_TREE_CONFIGURED_FEATURE.get()) {
-            return false;
         }
 
         return configuredFeature.getFeatures().filter(abc -> abc.feature() instanceof TreeFeature).count() > 0;

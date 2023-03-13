@@ -45,6 +45,8 @@ public final class GenFeatures {
 
     public static final GenFeature ALTERNATIVE_LEAVES = new AlternativeLeavesGenFeature(regName("alt_leaves"));
 
+    public static final GenFeature ROOT_SYSTEM = new RootSystemGenFeature(regName("root_system"));
+
     private static ResourceLocation regName(String name) {
         return new ResourceLocation(DynamicTrees.MOD_ID, name);
     }
@@ -52,7 +54,8 @@ public final class GenFeatures {
     public static void register(final Registry<GenFeature> registry) {
         registry.registerAll(FRUIT, POD, VINES, BEE_NEST, SHROOMLIGHT, CONIFER_TOPPER, MOUND,
                 ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH, PODZOL, BUSH, HUGE_MUSHROOM,
-                HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE, RANDOM_PREDICATE, ALTERNATIVE_LEAVES);
+                HUGE_MUSHROOMS, MUSHROOM_ROT, ROT_SOIL, BIOME_PREDICATE, RANDOM_PREDICATE,
+                ALTERNATIVE_LEAVES, ROOT_SYSTEM);
     }
 
 }

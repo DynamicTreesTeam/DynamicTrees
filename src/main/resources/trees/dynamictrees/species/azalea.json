@@ -28,6 +28,7 @@
                 "place_chance": 0.25
             }
         },
-        "mushroom_rot"
+        "mushroom_rot",
+        "root_system"
     ]
 }

@@ -15,17 +15,15 @@ import java.util.function.Function;
 public class BiomeRadiusCoordinator implements RadiusCoordinator {
 
     public PerlinSimplexNoise noiseGenerator;
-    protected final TreeGenerator treeGenerator;
     protected final LevelAccessor level;
     protected final ResourceLocation dimensionName;
     protected int pass;
     protected Function<Integer, Integer> chunkMultipass;
 
-    public BiomeRadiusCoordinator(TreeGenerator treeGenerator, ResourceLocation dimensionName, LevelAccessor level) {
+    public BiomeRadiusCoordinator(ResourceLocation dimensionName, LevelAccessor level) {
         this.noiseGenerator = new PerlinSimplexNoise(new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(96)), new ArrayList<>(Collections.singletonList(1)));
         this.level = level;
         this.dimensionName = dimensionName;
-        this.treeGenerator = treeGenerator;
     }
 
     @Override

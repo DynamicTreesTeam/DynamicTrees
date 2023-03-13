@@ -4,13 +4,9 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
-import com.ferreusveritas.dynamictrees.util.LevelContext;
-import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
-import net.minecraft.core.BlockPos;
+import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.biome.Biome;
-
-import java.util.Random;
 
 public class SwampOakSpecies extends Species {
 
@@ -23,12 +19,13 @@ public class SwampOakSpecies extends Species {
     private static final int minRadiusForSunkGeneration = 5;
 
     @Override
-    public boolean generate(LevelContext levelContext, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
-        if (isWater(levelContext.accessor().getBlockState(rootPos))) {
+    public boolean generate(GenerationContext context) {
+        if (isWater(context.level().getBlockState(context.rootPos()))) {
             switch (DTConfigs.SWAMP_OAKS_IN_WATER.get()) {
                 case SUNK: //generate 1 block down
-                    if (radius >= minRadiusForSunkGeneration) {
-                        return super.generate(levelContext, rootPos.below(), biome, random, radius, safeBounds);
+                    if (context.radius() >= minRadiusForSunkGeneration) {
+                        context.rootPos().move(Direction.DOWN);
+                        break;
                     } else {
                         return false;
                     }
@@ -37,7 +34,7 @@ public class SwampOakSpecies extends Species {
                 case ROOTED: //just generate normally
             }
         }
-        return super.generate(levelContext, rootPos, biome, random, radius, safeBounds);
+        return super.generate(context);
     }
 
 }

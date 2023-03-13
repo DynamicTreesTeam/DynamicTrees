@@ -61,6 +61,7 @@ import com.ferreusveritas.dynamictrees.systems.substance.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tree.Resettable;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.util.*;
+import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
@@ -107,7 +108,6 @@ import org.apache.logging.log4j.LogManager;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -140,7 +140,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public boolean generate(LevelContext levelContext, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+        public boolean generate(GenerationContext context) {
             return false;
         }
 
@@ -1945,31 +1945,27 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Default worldgen spawn mechanism. This method uses JoCodes to generate tree models. Override to use other
      * methods.
      *
-     * @param rootPos The position of {@link RootyBlock} this tree is planted in
-     * @param biome   The biome this tree is generating in
-     * @param radius  The radius of the tree generation boundary
      * @return true if tree was generated. false otherwise.
      */
-    public boolean generate(LevelContext levelContext, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+    public boolean generate(GenerationContext context) {
         final AtomicBoolean fullGen = new AtomicBoolean(false);
-        final FullGenerationContext context = new FullGenerationContext(levelContext.accessor(), rootPos, this, biome, radius, safeBounds);
+        final FullGenerationContext fullGenContext = new FullGenerationContext(context.level(), context.rootPos(), this, context.biome(), context.radius(), context.safeBounds());
 
         this.genFeatures.forEach(configuration ->
-                fullGen.set(fullGen.get() || configuration.generate(GenFeature.Type.FULL, context))
+                fullGen.set(fullGen.get() || configuration.generate(GenFeature.Type.FULL, fullGenContext))
         );
 
         if (fullGen.get()) {
             return true;
         }
-        if (!shouldGenerate(levelContext, rootPos)) {
+        if (!shouldGenerate(context.levelContext(), context.rootPos())) {
             return false;
         }
 
-        final Direction facing = CoordUtils.getRandomDir(random);
         if (!JoCodeRegistry.getCodes(this.getRegistryName()).isEmpty()) {
-            final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), radius, random);
+            final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), context.radius(), context.random());
             if (code != null) {
-                code.generate(levelContext, this, rootPos, biome, facing, radius, safeBounds, false);
+                code.generate(context);
                 return true;
             }
         }
@@ -2040,25 +2036,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Allows the tree to prepare the area for planting.  For thick tree this may include removing blocks around the
      * trunk that could be in the way.
      *
-     * @param level        The level
-     * @param rootPosition The position of {@link RootyBlock} this tree will be planted in
-     * @param radius       The radius of the generation area
-     * @param facing       The direction the joCode will build the tree
-     * @param safeBounds   An object that helps prevent accessing blocks in unloaded chunks
-     * @param joCode       The joCode that will be used to grow the tree
+     * @param level      The level
+     * @param rootPos    The position of {@link RootyBlock} this tree will be planted in
+     * @param radius     The radius of the generation area
+     * @param facing     The direction the joCode will build the tree
+     * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
+     * @param joCode     The joCode that will be used to grow the tree
      * @return new blockposition of root block.  BlockPos.ZERO to cancel generation
      */
-    public BlockPos preGeneration(LevelAccessor level, BlockPos rootPosition, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
-        final AtomicReference<BlockPos> rootPos = new AtomicReference<>(rootPosition);
-
+    public BlockPos preGeneration(LevelAccessor level, BlockPos.MutableBlockPos rootPos, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
         this.genFeatures.forEach(configuration -> rootPos.set(
                 configuration.generate(
                         GenFeature.Type.PRE_GENERATION,
-                        new PreGenerationContext(level, rootPos.get(), this, radius, facing, safeBounds, joCode)
+                        new PreGenerationContext(level, rootPos, this, radius, facing, safeBounds, joCode)
                 )
         ));
-
-        return rootPos.get();
+        return rootPos.immutable();
     }
 
     /**

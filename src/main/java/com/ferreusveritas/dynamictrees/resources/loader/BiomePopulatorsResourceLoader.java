@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.MultiJsonResourcePreparer;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.deserialisation.BiomeListDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
@@ -13,7 +14,9 @@ import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.Resources;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
@@ -27,11 +30,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
@@ -53,6 +58,8 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
     private static final String APPLY = "apply";
     private static final String WHITE = "white";
+
+    private static final String CAVE_ROOTED = "cave_rooted";
 
     public static final String ENTRY_APPLIERS = "entries";
 
@@ -84,8 +91,8 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                 !suppress.getAsJsonPrimitive().getAsBoolean();
     }
 
-    private final JsonPropertyAppliers<BiomeDatabase.Entry> entryAppliers =
-            new JsonPropertyAppliers<>(BiomeDatabase.Entry.class);
+    private final JsonPropertyAppliers<BiomeDatabase.BaseEntry> entryAppliers = new JsonPropertyAppliers<>(BiomeDatabase.BaseEntry.class);
+    private final JsonPropertyAppliers<BiomeDatabase.CaveRootedEntry> caveRootedEntryAppliers = new JsonPropertyAppliers<>(BiomeDatabase.CaveRootedEntry.class);
 
     public BiomePopulatorsResourceLoader() {
         super(RESOURCE_PREPARER);
@@ -98,10 +105,14 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                 .register("density", JsonElement.class, this::applyDensity)
                 .register("chance", JsonElement.class, this::applyChance)
                 .register("multipass", Boolean.class, this::applyMultipass)
-                .register("multipass", JsonObject.class, BiomeDatabase.Entry::setCustomMultipass)
-                .register("blacklist", Boolean.class, BiomeDatabase.Entry::setBlacklisted)
-                .register("forestness", Float.class, BiomeDatabase.Entry::setForestness)
-                .registerIfTrueApplier("reset", BiomeDatabase.Entry::reset);
+                .register("multipass", JsonObject.class, BiomeDatabase.BaseEntry::setCustomMultipass)
+                .register("blacklist", Boolean.class, BiomeDatabase.BaseEntry::setBlacklisted)
+                .register("forestness", Float.class, BiomeDatabase.BaseEntry::setForestness)
+                .registerIfTrueApplier("reset", BiomeDatabase.BaseEntry::reset);
+
+        this.caveRootedEntryAppliers
+                .register("generate_on_surface", Boolean.class, BiomeDatabase.CaveRootedEntry::setGenerateOnSurface)
+                .register("max_dist_to_surface", Integer.class, BiomeDatabase.CaveRootedEntry::setMaxDistToSurface);
 
         ApplierResourceLoader.postApplierEvent(new EntryApplierRegistryEvent<>(this.entryAppliers, ENTRY_APPLIERS));
     }
@@ -112,31 +123,28 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
         }
     }
 
-    private PropertyApplierResult applySpecies(BiomeDatabase.Entry entry, JsonElement jsonElement) {
+    private PropertyApplierResult applySpecies(BiomeDatabase.BaseEntry entry, JsonElement jsonElement) {
         return PropertyApplierResult.from(JsonDeserialisers.SPECIES_SELECTOR.deserialise(jsonElement)
                 .ifSuccess(speciesSelector ->
-                        entry.getDatabase().setSpeciesSelector(
-                                entry.getBiome(), speciesSelector, getOperationOrWarn(jsonElement))
+                        entry.setSpeciesSelector(speciesSelector, getOperationOrWarn(jsonElement))
                 ));
     }
 
-    private PropertyApplierResult applyDensity(BiomeDatabase.Entry entry, JsonElement jsonElement) {
+    private PropertyApplierResult applyDensity(BiomeDatabase.BaseEntry entry, JsonElement jsonElement) {
         return PropertyApplierResult.from(JsonDeserialisers.DENSITY_SELECTOR.deserialise(jsonElement)
                 .ifSuccess(densitySelector ->
-                        entry.getDatabase().setDensitySelector(
-                                entry.getBiome(), densitySelector, getOperationOrWarn(jsonElement))
+                        entry.setDensitySelector(densitySelector, getOperationOrWarn(jsonElement))
                 ));
     }
 
-    private PropertyApplierResult applyChance(BiomeDatabase.Entry entry, JsonElement jsonElement) {
+    private PropertyApplierResult applyChance(BiomeDatabase.BaseEntry entry, JsonElement jsonElement) {
         return PropertyApplierResult.from(JsonDeserialisers.CHANCE_SELECTOR.deserialise(jsonElement)
                 .ifSuccess(chanceSelector ->
-                        entry.getDatabase().setChanceSelector(
-                                entry.getBiome(), chanceSelector, getOperationOrWarn(jsonElement))
+                        entry.setChanceSelector(chanceSelector, getOperationOrWarn(jsonElement))
                 ));
     }
 
-    private void applyMultipass(BiomeDatabase.Entry entry, Boolean multipass) {
+    private void applyMultipass(BiomeDatabase.BaseEntry entry, Boolean multipass) {
         if (!multipass) {
             return;
         }
@@ -158,10 +166,50 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
     }
 
     @Override
-    public void applyOnReload(ResourceAccessor<Iterable<JsonElement>> resourceAccessor,
-                              ResourceManager resourceManager) {
+    public void applyOnSetup(ResourceAccessor<Iterable<JsonElement>> resourceAccessor, ResourceManager resourceManager) {
+        if (isWorldGenDisabled()) {
+            return;
+        }
+        this.readCaveRootedPopulators(
+                resourceAccessor.filtered(this::isDefaultPopulator).map(BiomePopulatorsResourceLoader::toLinkedList)
+        );
+    }
+
+    private void readCaveRootedPopulators(ResourceAccessor<LinkedList<JsonElement>> resourceAccessor) {
+        resourceAccessor.getAllResources().forEach(defaultPopulator -> {
+            readCaveRootedPopulator(BiomeDatabases.getDefault(), defaultPopulator.getLocation(), defaultPopulator.getResource().pollFirst());
+        });
+    }
+
+    private void readCaveRootedPopulator(BiomeDatabase database, ResourceLocation location, JsonElement json) {
+        LOGGER.debug("Loading cave rooted appliers from Json biome populator \"{}\".", location);
+
+        try {
+            JsonResult.forInput(json)
+                    .mapEachIfArray(JsonObject.class, object -> {
+                        if (object.has(APPLY) && object.get(APPLY).isJsonObject() && object.get(APPLY).getAsJsonObject().has(CAVE_ROOTED)) {
+                            this.readCaveRootedPopulatorSection(database, location, object);
+                        }
+                        return PropertyApplierResult.success();
+                    }).forEachWarning(warning ->
+                            LOGGER.warn("Warning whilst loading cave rooted appliers from populator \"{}\": {}", location, warning)
+                    ).orElseThrow();
+        } catch (DeserialisationException e) {
+            LOGGER.error("Error loading cave rooted appliers from populator \"{}\": {}", location, e.getMessage());
+        }
+    }
+
+    private void readCaveRootedPopulatorSection(BiomeDatabase database, ResourceLocation location, JsonObject json) throws DeserialisationException {
+        final BiomeList biomes = collectBiomes(json, warning -> {});
+        if (!biomes.isEmpty()) {
+            applyCaveRootedPopulatorSection(database, json.getAsJsonObject(APPLY), biomes);
+        }
+    }
+
+    @Override
+    public void applyOnReload(ResourceAccessor<Iterable<JsonElement>> resourceAccessor, ResourceManager resourceManager) {
         BiomeDatabases.reset();
-        if (this.isWorldGenDisabled()) {
+        if (isWorldGenDisabled()) {
             return;
         }
 
@@ -220,21 +268,18 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
     private void readDimensionalModPopulators(ResourceAccessor<Deque<JsonElement>> resourceAccessor) {
         resourceAccessor.getAllResources().forEach(dimensionalPopulator ->
-                this.readDimensionalPopulator(dimensionalPopulator.getLocation(),
-                        dimensionalPopulator.getResource().pollFirst())
+                this.readDimensionalPopulator(dimensionalPopulator.getLocation(), dimensionalPopulator.getResource().pollFirst())
         );
     }
 
     private void readDimensionalTreePackPopulators(ResourceAccessor<Deque<JsonElement>> resourceAccessor) {
         resourceAccessor.getAllResources().forEach(dimensionalPopulator ->
-                dimensionalPopulator.getResource().forEach(json ->
-                        this.readDimensionalPopulator(dimensionalPopulator.getLocation(), json))
+                dimensionalPopulator.getResource().forEach(json -> this.readDimensionalPopulator(dimensionalPopulator.getLocation(), json))
         );
     }
 
     private void readDimensionalPopulator(ResourceLocation dimensionLocation, JsonElement dimensionalPopulator) {
-        this.readPopulator(BiomeDatabases.getOrCreateDimensional(dimensionLocation), dimensionLocation,
-                dimensionalPopulator);
+        this.readPopulator(BiomeDatabases.getOrCreateDimensional(dimensionLocation), dimensionLocation, dimensionalPopulator);
     }
 
     private void readPopulator(BiomeDatabase database, ResourceLocation location, JsonElement json) {
@@ -256,7 +301,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
     private void readPopulatorSection(BiomeDatabase database, ResourceLocation location, JsonObject json)
             throws DeserialisationException {
 
-        final BiomeList biomes = this.collectBiomes(json, warning ->
+        final BiomeList biomes = collectBiomes(json, warning ->
                 LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning));
 
         if (biomes.isEmpty()) {
@@ -266,8 +311,10 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
         JsonResult.forInput(json)
                 .mapIfContains(APPLY, JsonObject.class, applyObject -> {
-                    biomes.forEach(biome -> this.entryAppliers.applyAll(new JsonMapWrapper(applyObject),
-                            database.getEntry(biome)));
+                    if (BiomeDatabases.getDefault() == database) {
+                        applyCaveRootedPopulatorSection(database, applyObject, biomes);
+                    }
+                    biomes.forEach(biome -> this.entryAppliers.applyAll(new JsonMapWrapper(applyObject), database.getEntry(biome)));
                     return PropertyApplierResult.success();
                 }, PropertyApplierResult.success())
                 .elseMapIfContains(WHITE, String.class, type -> {
@@ -277,6 +324,17 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                 .forEachWarning(warning ->
                         LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning))
                 .orElseThrow();
+    }
+
+    private void applyCaveRootedPopulatorSection(BiomeDatabase database, JsonObject json, BiomeList biomes) {
+        if (json.has(CAVE_ROOTED) && json.get(CAVE_ROOTED).isJsonObject()) {
+            JsonObject caveRootedJson = json.getAsJsonObject(CAVE_ROOTED);
+            JsonMapWrapper applyData = new JsonMapWrapper(caveRootedJson);
+            biomes.stream().map(biome -> database.getEntry(biome).getOrCreateCaveRootedEntry()).forEach(entry -> {
+                entryAppliers.applyAll(applyData, entry);
+                caveRootedEntryAppliers.applyAll(applyData, entry);
+            });
+        }
     }
 
     private void applyWhite(BiomeDatabase database, ResourceLocation location, BiomeList biomes, String type)

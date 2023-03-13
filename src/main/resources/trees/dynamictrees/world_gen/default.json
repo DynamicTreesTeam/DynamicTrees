@@ -173,17 +173,14 @@
     }
   },
   {
-    "__comment" : "All lush caves can generate subterranean azalea trees",
+    "__comment" : "Generate azaleas or flowering azaleas above lush caves",
+    "_note": "Application of cave rooted trees requires the selector NOT to use tag filters and it CANNOT be used in dimensional databases.",
     "select": { "name": "minecraft:lush_caves" },
     "apply": {
-      "subterranean": true,
-      "species" : {
-        "random" : {
-          "azalea" : 1,
-          "flowering_azalea" : 1
-        }
-      },
-      "chance": 0.66
+      "cave_rooted": {
+        "species" : "azalea",
+        "chance": 0.66
+      }
     }
   },
   {
