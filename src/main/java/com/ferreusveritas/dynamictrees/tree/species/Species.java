@@ -231,6 +231,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     protected float growthRate = 1.0f;
     /**
+     * If set, the soil beneath this tree will always be changed to the set soil on worldgen and when growing from seeds.
+     */
+    protected SoilProperties forceSoil;
+    /**
      * Ideal soil longevity [default = 8]
      */
     protected int soilLongevity = 8;
@@ -1156,15 +1160,25 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     private void placeRootyDirtBlock(LevelAccessor level, BlockPos rootPos, BlockState primitiveDirtState, int fertility) {
-        final SoilProperties soilProperties = SoilHelper.getProperties(primitiveDirtState.getBlock());
+        final SoilProperties soilProperties = forceSoil != null ? forceSoil : SoilHelper.getProperties(primitiveDirtState.getBlock());
         soilProperties.getBlock().ifPresent(block ->
                 level.setBlock(rootPos, soilProperties.getSoilState(primitiveDirtState, fertility, this.doesRequireTileEntity(level, rootPos)), 3)
         );
     }
 
     private void updateRootyDirtBlock(LevelAccessor level, BlockPos rootPos, BlockState soilState, int fertility) {
-        if (soilState.getBlock() instanceof RootyBlock)
+        if (soilState.getBlock() instanceof RootyBlock) {
             level.setBlock(rootPos, soilState.setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(level, rootPos)), 3);
+        }
+    }
+
+    public SoilProperties getForceSoil() {
+        return forceSoil;
+    }
+
+    public Species setForceSoil(SoilProperties soil) {
+        forceSoil = soil;
+        return this;
     }
 
     public Species setSoilLongevity(int longevity) {

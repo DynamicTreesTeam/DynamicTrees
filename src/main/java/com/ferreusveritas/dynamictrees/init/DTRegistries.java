@@ -224,7 +224,7 @@ public class DTRegistries {
      * Placement for trees that generate on the surface above the target biome. This is used for trees like the azalea.
      */
     public static final RegistryObject<PlacedFeature> SURFACE_DYNAMIC_TREE_PLACED_FEATURE = PLACED_FEATURES.register("cave_rooted_tree",
-            () -> PlacementUtils.inlinePlaced(CAVE_SURFACE_TREE_CONFIGURED_FEATURE.getHolder().get(), CaveRootedTreePlacement.INSTANCE, EnvironmentScanPlacement.scanningFor(Direction.UP, BlockPredicate.solid(), BlockPredicate.ONLY_IN_AIR_PREDICATE, 12), RandomOffsetPlacement.vertical(ConstantInt.of(-1)), BiomeFilter.biome()).value());
+            () -> PlacementUtils.inlinePlaced(CAVE_SURFACE_TREE_CONFIGURED_FEATURE.getHolder().get(), CaveRootedTreePlacement.INSTANCE, PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT, EnvironmentScanPlacement.scanningFor(Direction.UP, BlockPredicate.solid(), BlockPredicate.ONLY_IN_AIR_PREDICATE, 12), RandomOffsetPlacement.vertical(ConstantInt.of(-1)), BiomeFilter.biome()).value());
 
     public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.location("tree"), TreeConfiguration.class);
 

@@ -44,7 +44,7 @@ public class CaveRootedTreeFeature extends DynamicTreeFeature {
         BiomeDatabase.CaveRootedEntry entry = BiomeDatabases.getDefault().getEntry(level.getLevel().getBiome(originPos).value()).getCaveRootedEntry();
         BlockPos groundPos = entry.shouldGenerateOnSurface() ? groundPositions.get(groundPositions.size() - 1)
                 : getNextGroundPos(originPos, groundPositions).orElse(null);
-        if (groundPos == null) {
+        if (groundPos == null || groundPos.getY() - originPos.getY() > entry.getMaxDistToSurface()) {
             return false;
         }
 

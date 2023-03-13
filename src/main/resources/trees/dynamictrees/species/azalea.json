@@ -1,7 +1,7 @@
 {
     "family": "azalea",
     "tapering": 0.3,
-    "signal_energy": 12.0,
+    "signal_energy": 8.0,
     "growth_rate": 0.8,
     "leaves_properties": "azalea",
     "generate_seed": true,
@@ -14,6 +14,8 @@
     },
     "perfect_biomes": { "name": "minecraft:lush_caves" },
     "primitive_saplings": ["azalea", "flowering_azalea"],
+    "force_soil": "rooted_dirt",
+    "acceptable_soils": ["dirt_like", "sand_like", "snow_like", "terracotta_like"],
     "features": [
         {
             "name": "rot_soil",
@@ -25,7 +27,7 @@
             "name": "alt_leaves",
             "properties": {
                 "alternative_leaves": "flowering_azalea",
-                "place_chance": 0.25
+                "place_chance": 0.35
             }
         },
         "mushroom_rot",

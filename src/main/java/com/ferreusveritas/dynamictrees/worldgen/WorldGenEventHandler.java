@@ -21,7 +21,6 @@ public final class WorldGenEventHandler {
     public void addDynamicTrees(final BiomeLoadingEvent event) {
         final ResourceLocation biomeName = event.getName();
         if (biomeName != null && BiomeDatabases.getDefault().getEntry(biomeName).hasCaveRootedEntry()) {
-            LogManager.getLogger().info("Adding rooted tree feature for {}", biomeName);
             event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, DTRegistries.SURFACE_DYNAMIC_TREE_PLACED_FEATURE.getHolder().get());
         }
         event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_PLACED_FEATURE.getHolder().get());
