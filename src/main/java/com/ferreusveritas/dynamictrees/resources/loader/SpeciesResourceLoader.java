@@ -113,7 +113,14 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .registerListApplier("pods", Pod.class, Species::addPods)
                 .registerArrayApplier("features", GenFeatureConfiguration.class, Species::addGenFeature)
                 .register("does_rot", Boolean.class, Species::setDoesRot)
-                .register("drop_seeds", Boolean.class, Species::setDropSeeds);
+                .register("drop_seeds", Boolean.class, Species::setDropSeeds)
+                .register("seasonal_seed_drop_offset", Float.class, Species::setSeasonalSeedDropOffset)
+                .register("seasonal_growth_offset", Float.class, Species::setSeasonalGrowthOffset)
+                .register("seasonal_fruiting_offset", Float.class, Species::setSeasonalFruitingOffset)
+                .register("inherit_fruiting_offset_to_fruits", Boolean.class, (species, doInherit)->{
+                    if (doInherit) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingOffsetToFruits); })
+                .register("inherit_fruiting_offset_to_pods", Boolean.class, (species, doInherit)->{
+                    if (doInherit) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingOffsetToPods); });
 
         super.registerAppliers();
     }

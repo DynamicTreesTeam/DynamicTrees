@@ -17,10 +17,20 @@
     }
   },
   {
-    "__comment" : "Rivers have no chance of having trees",
-    "select": { "type": "river" },
+    "__comment" : "Rivers and oceans have no trees",
+    "select": {"OR": [{ "type": "river" },{ "type": "ocean" }]},
+    "species" : "...",
     "apply": {
-      "chance": 0.0
+      "chance": 0
+    }
+  },
+  {
+    "__comment" : "beaches have no trees but we give a chance and density for addons to use",
+    "select": { "type": "beach" },
+    "species" : "...",
+    "apply": {
+      "density": [ 0.2 ],
+      "chance": 0.2
     }
   },
   {
@@ -134,12 +144,6 @@
     }
   },
   {
-    "select": { "name": "minecraft:.*beach.*" },
-    "apply": {
-      "chance": 0.0
-    }
-  },
-  {
     "__comment": "Any biome with 'birch' in the name is 100% birch",
     "select": { "name": "minecraft:.*birch.*" },
     "apply": {
@@ -223,7 +227,7 @@
     "apply": {
       "species" : "oak",
       "density": [ 0.5 ],
-      "chance": 0.5
+      "chance": 0.75
     }
   },
   {

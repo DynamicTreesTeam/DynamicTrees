@@ -31,10 +31,7 @@ import com.ferreusveritas.dynamictrees.worldgen.deserialisation.ChanceSelectorDe
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.DensitySelectorDeserialiser;
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.SpeciesSelectorDeserialiser;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
@@ -138,6 +135,11 @@ public final class JsonDeserialisers {
 
     public static final JsonDeserialiser<JsonElement> JSON_ELEMENT = register(JsonElement.class, input ->
             JsonResult.success(input, input)
+    );
+
+    public static final JsonDeserialiser<JsonNull> JSON_NULL = register(JsonNull.class, input ->
+            input.isJsonNull() ? JsonResult.success(input, JsonNull.INSTANCE) :
+                    JsonResult.failure(input, "Json element was not a json null.")
     );
 
     public static final JsonDeserialiser<JsonPrimitive> JSON_PRIMITIVE = register(JsonPrimitive.class, input ->
