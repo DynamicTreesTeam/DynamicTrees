@@ -74,20 +74,19 @@ public class PalmSpecies extends Species {
     public void postGeneration(PostGenerationContext context) {
         final LevelAccessor level = context.level();
 
-        if (!context.endPoints().isEmpty()) {
-            BlockPos tip = context.endPoints().get(0).above(2);
-            if (context.bounds().inBounds(tip, true)) {
+        for (BlockPos endPoint : context.endPoints()) {
+            BlockPos tip = endPoint.above(2);
+            //if (context.bounds().inBounds(tip, true)) {
                 if (level.getBlockState(tip).getBlock() instanceof DynamicLeavesBlock) {
                     for (CoordUtils.Surround surr : CoordUtils.Surround.values()) {
                         BlockPos leafPos = tip.offset(surr.getOffset());
                         BlockState leafState = level.getBlockState(leafPos);
-                        if (leafState.getBlock() instanceof DynamicLeavesBlock) {
-                            DynamicLeavesBlock block = (DynamicLeavesBlock) leafState.getBlock();
+                        if (leafState.getBlock() instanceof DynamicLeavesBlock block) {
                             level.setBlock(leafPos, block.getLeavesBlockStateForPlacement(level, leafPos, leafState, leafState.getValue(LeavesBlock.DISTANCE), true), 2);
                         }
                     }
                 }
-            }
+            //}
         }
         super.postGeneration(context);
     }
