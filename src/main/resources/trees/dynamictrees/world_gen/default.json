@@ -117,7 +117,7 @@
     }
   },
   {
-    "select": { "name": "minecraft:.*beach.*" },
+    "select": { "name": "minecraft:.*", "tag": "forge:is_beach" },
     "apply": {
       "chance": 0.0
     }
