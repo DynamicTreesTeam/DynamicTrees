@@ -1,3 +1,4 @@
 {
-  "primitive_leaves": "minecraft:flowering_azalea_leaves"
+  "primitive_leaves": "minecraft:flowering_azalea_leaves",
+  "sound": "azalea_leaves"
 }
