@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.block.rooty.SpreadableSoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.WaterSoilProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.resources.Resources;
+import com.ferreusveritas.dynamictrees.systems.leavesproperties.ScruffyLeavesProperties;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Mushroom;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
@@ -78,6 +79,7 @@ public class DTTrees {
         event.registerType(DynamicTrees.location("solid"), SolidLeavesProperties.TYPE);
         event.registerType(DynamicTrees.location("wart"), WartProperties.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmLeavesProperties.TYPE);
+        event.registerType(DynamicTrees.location("scruffy"), ScruffyLeavesProperties.TYPE);
     }
 
     @SubscribeEvent

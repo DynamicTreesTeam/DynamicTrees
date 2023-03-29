@@ -1,6 +1,8 @@
 {
   "itemGroup.dynamictrees": "Dynamic Trees",
 
+  "entity.dynamictrees.falling_tree": "Falling Tree",
+
   "block.dynamictrees.oak_branch": "Oak Tree",
   "block.dynamictrees.azalea_branch": "Azalea Tree",
   "block.dynamictrees.spruce_branch": "Spruce Tree",
