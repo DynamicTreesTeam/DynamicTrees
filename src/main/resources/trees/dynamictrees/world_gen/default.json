@@ -1,4 +1,5 @@
-[{
+[
+  {
     "__comment" : "Rivers and oceans have no trees but we can still set density and chance for addons to use",
     "select": {"OR": [{ "tag": "minecraft:is_river" },{ "tag": "minecraft:is_ocean" }]},
     "apply": {
@@ -93,7 +94,7 @@
     }
   },
   {
-    "select": { "tag": "forge:is_coniferous", "name": "minecraft:.*" },
+    "select": { "OR": [ { "tag": "forge:is_coniferous", "name": "minecraft:.*" }, { "name": "minecraft:old_growth_spruce_taiga" } ] },
     "apply": {
       "species" : "spruce",
       "density": [ 1 ],
@@ -108,14 +109,6 @@
       "species" : "dark_oak",
       "density" : { "math": { "div" : [ "noise", 3.0 ] } },
       "multipass" : true
-    }
-  },
-  {
-    "select": { "name": "minecraft:.*", "tag": "forge:is_beach" },
-    "apply": {
-      "chance": 0.0
-      "multipass" : true,
-      "chance" : "standard"
     }
   },
   {
@@ -188,15 +181,8 @@
     }
   },
   {
-    "__comment": "Mega taiga has giant spruce trees.",
-    "select": { "name": "minecraft:old_growth_spruce_taiga" },
-    "apply": {
-      "species" : "mega_spruce"
-    }
-  },
-  {
     "__comment": "Giant tree taiga has giant spruce trees, but also is less leaf-dense than giant spruce taiga.",
-    "select": { "name": "minecraft:old_growth_pine_taiga" },
+    "select": { "name": "minecraft:old_growth_(pine|spruce)_taiga" },
     "apply": {
       "species" : {
         "random" : {
