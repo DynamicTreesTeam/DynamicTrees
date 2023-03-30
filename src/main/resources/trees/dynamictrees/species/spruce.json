@@ -14,7 +14,8 @@
     },
     "perfect_biomes": { "type": "coniferous" },
     "primitive_sapling": "spruce_sapling",
-    "acceptable_soils": ["dirt_like", "snow_like"],
+    "acceptable_soils": ["dirt_like"],
+    "world_gen_acceptable_soils": ["snow_like"],
     "mega_species": "mega_spruce",
     "features" : [
         "conifer_topper",

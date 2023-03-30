@@ -7,6 +7,8 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -58,7 +60,7 @@ public class BiomeDatabase {
      * @implNote does not reset cancellers, since they are only applied once on initial load
      */
     public void reset() {
-        this.entries.values().forEach(Entry::reset);
+        this.entries.values().forEach(BaseEntry::reset);
     }
 
     public void clear() {
@@ -67,7 +69,7 @@ public class BiomeDatabase {
 
     public boolean isValid() {
         for (Biome biome : ForgeRegistries.BIOMES) {
-            final Entry entry = this.getEntry(biome);
+            final BaseEntry entry = this.getEntry(biome);
             final ResourceLocation biomeRegistryName = entry.getBiome().getRegistryName();
 
             if (biomeRegistryName != null && !biomeRegistryName.equals(biome.getRegistryName())) {
@@ -82,7 +84,36 @@ public class BiomeDatabase {
         return this.entries.size() > 0;
     }
 
-    public static class Entry {
+    public interface EntryReader {
+        Codec<EntryReader> CODEC = ResourceLocation.CODEC.comapFlatMap(EntryReader::read, entry -> entry.getBiome().getRegistryName());
+
+        static DataResult<EntryReader> read(ResourceLocation biomeName) {
+            EntryReader entry = BiomeDatabases.getDefault().getEntry(biomeName);
+            if (entry == BAD_ENTRY) {
+                return DataResult.error("Could not get entry from name: " + biomeName);
+            }
+            return DataResult.success(entry);
+        }
+
+        Biome getBiome();
+
+        ChanceSelector getChanceSelector();
+
+        DensitySelector getDensitySelector();
+
+        SpeciesSelector getSpeciesSelector();
+
+        FeatureCancellation getFeatureCancellation();
+
+        boolean isBlacklisted();
+
+        float getForestness();
+
+        Function<Integer, Integer> getMultipass();
+
+    }
+
+    public static abstract class BaseEntry implements EntryReader {
         private final BiomeDatabase database;
         private final Biome biome;
         private ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
@@ -94,12 +125,12 @@ public class BiomeDatabase {
         private final static Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
         private Function<Integer, Integer> multipass = defaultMultipass;
 
-        public Entry() {
+        public BaseEntry() {
             this.database = null;
             this.biome = ForgeRegistries.BIOMES.getValue(Biomes.OCEAN.getRegistryName());
         }
 
-        public Entry(final BiomeDatabase database, final Biome biome) {
+        public BaseEntry(final BiomeDatabase database, final Biome biome) {
             this.database = database;
             this.biome = biome;
         }
@@ -108,18 +139,22 @@ public class BiomeDatabase {
             return database;
         }
 
+        @Override
         public Biome getBiome() {
             return biome;
         }
 
+        @Override
         public ChanceSelector getChanceSelector() {
             return chanceSelector;
         }
 
+        @Override
         public DensitySelector getDensitySelector() {
             return densitySelector;
         }
 
+        @Override
         public SpeciesSelector getSpeciesSelector() {
             return speciesSelector;
         }
@@ -128,14 +163,60 @@ public class BiomeDatabase {
             this.chanceSelector = chanceSelector;
         }
 
+        public void setChanceSelector(ChanceSelector selector, Operation op) {
+            ChanceSelector existing = chanceSelector;
+            switch (op) {
+                case REPLACE -> chanceSelector = selector;
+                case SPLICE_BEFORE -> chanceSelector = (rnd, spc, rad) -> {
+                    Chance c = selector.getChance(rnd, spc, rad);
+                    return c != Chance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
+                };
+                case SPLICE_AFTER -> chanceSelector = (rnd, spc, rad) -> {
+                    Chance c = existing.getChance(rnd, spc, rad);
+                    return c != Chance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
+                };
+            }
+        }
+
         public void setDensitySelector(DensitySelector densitySelector) {
             this.densitySelector = densitySelector;
+        }
+
+        public void setDensitySelector(DensitySelector selector, Operation op) {
+            DensitySelector existing = densitySelector;
+            switch (op) {
+                case REPLACE -> densitySelector = selector;
+                case SPLICE_BEFORE -> densitySelector = (rnd, nd) -> {
+                    double d = selector.getDensity(rnd, nd);
+                    return d >= 0 ? d : existing.getDensity(rnd, nd);
+                };
+                case SPLICE_AFTER -> densitySelector = (rnd, nd) -> {
+                    double d = existing.getDensity(rnd, nd);
+                    return d >= 0 ? d : selector.getDensity(rnd, nd);
+                };
+            }
         }
 
         public void setSpeciesSelector(SpeciesSelector speciesSelector) {
             this.speciesSelector = speciesSelector;
         }
 
+        public void setSpeciesSelector(SpeciesSelector selector, Operation op) {
+            SpeciesSelector existing = speciesSelector;
+            switch (op) {
+                case REPLACE -> speciesSelector = selector;
+                case SPLICE_BEFORE -> speciesSelector = (pos, dirt, rnd) -> {
+                    SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
+                    return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
+                };
+                case SPLICE_AFTER -> speciesSelector = (pos, dirt, rnd) -> {
+                    SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
+                    return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
+                };
+            }
+        }
+
+        @Override
         public FeatureCancellation getFeatureCancellation() {
             return featureCancellation;
         }
@@ -155,6 +236,7 @@ public class BiomeDatabase {
             this.blacklisted = blacklisted;
         }
 
+        @Override
         public boolean isBlacklisted() {
             return blacklisted;
         }
@@ -163,6 +245,7 @@ public class BiomeDatabase {
             this.forestness = forestness;
         }
 
+        @Override
         public float getForestness() {
             return forestness;
         }
@@ -171,6 +254,7 @@ public class BiomeDatabase {
             this.multipass = multipass;
         }
 
+        @Override
         public Function<Integer, Integer> getMultipass() {
             return multipass;
         }
@@ -227,16 +311,86 @@ public class BiomeDatabase {
 
     }
 
+    public static class Entry extends BaseEntry {
+
+        private CaveRootedEntry caveRootedEntry;
+
+        public Entry() {
+            super();
+        }
+
+        public Entry(BiomeDatabase database, Biome biome) {
+            super(database, biome);
+        }
+
+        public CaveRootedEntry getCaveRootedEntry() {
+            return caveRootedEntry;
+        }
+
+        public boolean hasCaveRootedEntry() {
+            return caveRootedEntry != null;
+        }
+
+        public CaveRootedEntry getOrCreateCaveRootedEntry() {
+            if (!hasCaveRootedEntry()) {
+                caveRootedEntry = new CaveRootedEntry();
+            }
+            return caveRootedEntry;
+        }
+
+        public void setCaveRootedEntry(CaveRootedEntry entry) {
+            this.caveRootedEntry = entry;
+        }
+
+        @Override
+        public void reset() {
+            super.reset();
+            caveRootedEntry = null;
+        }
+    }
+
+    public static class CaveRootedEntry extends BaseEntry {
+
+        /**
+         * If {@code true}, the tree will always be generated on the surface. Otherwise it will be
+         * generated on the next available ground position.
+         */
+        private boolean generateOnSurface = true;
+
+        /**
+         * The maximum vertical distance from the cave a tree can generate. Note that this is only
+         * checked if {@link #generateOnSurface} is enabled.
+         */
+        private int maxDistToSurface = 100;
+
+        public boolean shouldGenerateOnSurface() {
+            return generateOnSurface;
+        }
+
+        public void setGenerateOnSurface(boolean generateOnSurface) {
+            this.generateOnSurface = generateOnSurface;
+        }
+
+        public int getMaxDistToSurface() {
+            return maxDistToSurface;
+        }
+
+        public void setMaxDistToSurface(int maxDistToSurface) {
+            this.maxDistToSurface = maxDistToSurface;
+        }
+
+    }
+
     public SpeciesSelector getSpecies(Biome biome) {
-        return getEntry(biome).speciesSelector;
+        return getEntry(biome).getSpeciesSelector();
     }
 
     public ChanceSelector getChance(Biome biome) {
-        return getEntry(biome).chanceSelector;
+        return getEntry(biome).getChanceSelector();
     }
 
     public DensitySelector getDensitySelector(Biome biome) {
-        return getEntry(biome).densitySelector;
+        return getEntry(biome).getDensitySelector();
     }
 
     public float getForestness(Biome biome) {
@@ -245,93 +399,6 @@ public class BiomeDatabase {
 
     public Function<Integer, Integer> getMultipass(Biome biome) {
         return getEntry(biome).getMultipass();
-    }
-
-    public BiomeDatabase setSpeciesSelector(final Biome biome, @Nullable final SpeciesSelector selector, final Operation op) {
-		if (selector == null) {
-			return this;
-		}
-
-        final Entry entry = getEntry(biome);
-        final SpeciesSelector existing = entry.getSpeciesSelector();
-
-        switch (op) {
-            case REPLACE:
-                entry.setSpeciesSelector(selector);
-                break;
-            case SPLICE_BEFORE:
-                entry.setSpeciesSelector((pos, dirt, rnd) -> {
-                    SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
-                    return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
-                });
-                break;
-            case SPLICE_AFTER:
-                entry.setSpeciesSelector((pos, dirt, rnd) -> {
-                    SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
-                    return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
-                });
-                break;
-        }
-
-        return this;
-    }
-
-    public BiomeDatabase setChanceSelector(final Biome biome, @Nullable final ChanceSelector selector, final Operation op) {
-		if (selector == null) {
-			return this;
-		}
-
-        final Entry entry = getEntry(biome);
-        final ChanceSelector existing = entry.getChanceSelector();
-
-        switch (op) {
-            case REPLACE:
-                entry.setChanceSelector(selector);
-                break;
-            case SPLICE_BEFORE:
-                entry.setChanceSelector((rnd, spc, rad) -> {
-                    Chance c = selector.getChance(rnd, spc, rad);
-                    return c != Chance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
-                });
-                break;
-            case SPLICE_AFTER:
-                entry.setChanceSelector((rnd, spc, rad) -> {
-                    Chance c = existing.getChance(rnd, spc, rad);
-                    return c != Chance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
-                });
-                break;
-        }
-
-        return this;
-    }
-
-    public BiomeDatabase setDensitySelector(final Biome biome, @Nullable final DensitySelector selector, final Operation op) {
-		if (selector == null) {
-			return this;
-		}
-
-        final Entry entry = getEntry(biome);
-        final DensitySelector existing = entry.getDensitySelector();
-
-        switch (op) {
-            case REPLACE:
-                entry.setDensitySelector(selector);
-                break;
-            case SPLICE_BEFORE:
-                entry.setDensitySelector((rnd, nd) -> {
-                    double d = selector.getDensity(rnd, nd);
-                    return d >= 0 ? d : existing.getDensity(rnd, nd);
-                });
-                break;
-            case SPLICE_AFTER:
-                entry.setDensitySelector((rnd, nd) -> {
-                    double d = existing.getDensity(rnd, nd);
-                    return d >= 0 ? d : selector.getDensity(rnd, nd);
-                });
-                break;
-        }
-
-        return this;
     }
 
     public BiomeDatabase setForestness(Biome biome, float forestness) {

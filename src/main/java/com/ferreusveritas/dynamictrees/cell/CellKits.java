@@ -308,7 +308,7 @@ public class CellKits {
                 new NetherFungusLeafCell(7)
         };
 
-        /** Typical branch with hydration 5 */
+        /** Typical branch with hydration 8 */
         private final Cell branchCell = new NormalCell(8);
 
         private final Cell sideBranchCell = new NormalCell(2);
@@ -347,8 +347,53 @@ public class CellKits {
 
     };
 
+    public static final CellKit AZALEA = new CellKit(DynamicTrees.location("azalea")) {
+
+        private final Cell[] normalCells = {
+                CellNull.NULL_CELL,
+                new NormalCell(1),
+                new NormalCell(2),
+                new NormalCell(3),
+                new NormalCell(4),
+                new NormalCell(5),
+                new NormalCell(6),
+                new NormalCell(7)
+        };
+
+        /** Typical branch with hydration 5 */
+        private final Cell branchCell = new NormalCell(5);
+
+        private final BasicSolver deciduousSolver = new BasicSolver(new short[]{0x0513, 0x0322, 0x0311, 0x0211});
+
+        @Override
+        public Cell getCellForLeaves(int hydro) {
+            return normalCells[hydro];
+        }
+
+        @Override
+        public Cell getCellForBranch(int radius, int meta) {
+            return radius == 1 ? branchCell : CellNull.NULL_CELL;
+        }
+
+        @Override
+        public SimpleVoxmap getLeafCluster() {
+            return LeafClusters.AZALEA;
+        }
+
+        @Override
+        public CellSolver getCellSolver() {
+            return deciduousSolver;
+        }
+
+        @Override
+        public int getDefaultHydration() {
+            return 3;
+        }
+
+    };
+
     public static void register(final Registry<CellKit> registry) {
-        registry.registerAll(DECIDUOUS, CONIFER, ACACIA, DARK_OAK, BARE, PALM, NETHER_FUNGUS);
+        registry.registerAll(DECIDUOUS, CONIFER, ACACIA, DARK_OAK, BARE, PALM, NETHER_FUNGUS, AZALEA);
     }
 
     /**

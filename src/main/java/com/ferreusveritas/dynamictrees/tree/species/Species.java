@@ -61,6 +61,7 @@ import com.ferreusveritas.dynamictrees.systems.substance.GrowthSubstance;
 import com.ferreusveritas.dynamictrees.tree.Resettable;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.util.*;
+import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import com.google.common.collect.Lists;
@@ -107,7 +108,6 @@ import org.apache.logging.log4j.LogManager;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -140,7 +140,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public boolean generate(LevelContext levelContext, BlockPos pos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+        public boolean generate(GenerationContext context) {
             return false;
         }
 
@@ -231,6 +231,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     protected float growthRate = 1.0f;
     /**
+     * If set, the soil beneath this tree will always be changed to the set soil on worldgen and when growing from seeds.
+     */
+    protected SoilProperties forceSoil;
+    /**
      * Ideal soil longevity [default = 8]
      */
     protected int soilLongevity = 8;
@@ -238,6 +242,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * The tags for the types of soil the tree can be planted on
      */
     protected int soilTypeFlags = 0;
+    /**
+     * The tags for the types of soil the tree can be planted on during world gen, or {@code 0} to use
+     * {@link #soilTypeFlags}.
+     */
+    protected int worldGenSoilTypeFlags = 0;
 
     // TODO: Make sure this is implemented properly.
     protected int maxBranchRadius = 8;
@@ -1156,15 +1165,25 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     private void placeRootyDirtBlock(LevelAccessor level, BlockPos rootPos, BlockState primitiveDirtState, int fertility) {
-        final SoilProperties soilProperties = SoilHelper.getProperties(primitiveDirtState.getBlock());
+        final SoilProperties soilProperties = forceSoil != null ? forceSoil : SoilHelper.getProperties(primitiveDirtState.getBlock());
         soilProperties.getBlock().ifPresent(block ->
                 level.setBlock(rootPos, soilProperties.getSoilState(primitiveDirtState, fertility, this.doesRequireTileEntity(level, rootPos)), 3)
         );
     }
 
     private void updateRootyDirtBlock(LevelAccessor level, BlockPos rootPos, BlockState soilState, int fertility) {
-        if (soilState.getBlock() instanceof RootyBlock)
+        if (soilState.getBlock() instanceof RootyBlock) {
             level.setBlock(rootPos, soilState.setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(level, rootPos)), 3);
+        }
+    }
+
+    public SoilProperties getForceSoil() {
+        return forceSoil;
+    }
+
+    public Species setForceSoil(SoilProperties soil) {
+        forceSoil = soil;
+        return this;
     }
 
     public Species setSoilLongevity(int longevity) {
@@ -1193,11 +1212,17 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
+    public Species addAcceptableSoilsForWorldGen(String... soilTypes) {
+        worldGenSoilTypeFlags |= SoilHelper.getSoilFlags(soilTypes);
+        return this;
+    }
+
     /**
      * Will clear the acceptable soils list.  Useful for making trees that can only be planted in abnormal substrates.
      */
     public Species clearAcceptableSoils() {
         soilTypeFlags = 0;
+        worldGenSoilTypeFlags = 0;
         return this;
     }
 
@@ -1232,8 +1257,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Soil acceptability tester.  Mostly to test if the block is dirt but could be overridden to allow gravel, sand, or
      * whatever makes sense for the tree species.
      */
-    public boolean isAcceptableSoil(BlockState soilBlockState, boolean worldgen) {
-        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags, worldgen);
+    public boolean isAcceptableSoil(BlockState soilBlockState) {
+        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags);
     }
 
     /**
@@ -1241,11 +1266,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * allow gravel, sand, or whatever makes sense for the tree species.
      */
     public boolean isAcceptableSoil(LevelReader level, BlockPos pos, BlockState soilBlockState) {
-        return isAcceptableSoil(level, pos, soilBlockState, false);
-    }
-
-    public boolean isAcceptableSoil(LevelReader level, BlockPos pos, BlockState soilBlockState, boolean worldgen) {
-        return isAcceptableSoil(soilBlockState, worldgen);
+        return isAcceptableSoil(soilBlockState);
     }
 
     /**
@@ -1257,21 +1278,24 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return
      */
     public boolean isAcceptableSoilForWorldgen(LevelAccessor level, BlockPos pos, BlockState soilBlockState) {
-        final boolean isAcceptableSoil = isAcceptableSoil(level, pos, soilBlockState, true);
+        final boolean isAcceptableSoil = isAcceptableSoilForWorldgen(soilBlockState);
 
         // If the block is water, check the block below it is valid soil (and not water).
         if (isAcceptableSoil && isWater(soilBlockState)) {
-            final BlockPos down = pos.below();
             final BlockState downState = level.getBlockState(pos.below());
-
-            return !isWater(downState) && this.isAcceptableSoil(level, down, downState, true);
+            return !isWater(downState) && this.isAcceptableSoilForWorldgen(downState);
         }
 
         return isAcceptableSoil;
     }
 
+    public boolean isAcceptableSoilForWorldgen(BlockState soilBlockState) {
+        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags) ||
+                SoilHelper.isSoilAcceptable(soilBlockState, worldGenSoilTypeFlags);
+    }
+
     protected boolean isWater(BlockState soilBlockState) {
-        return SoilHelper.isSoilAcceptable(soilBlockState, SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE), true);
+        return SoilHelper.isSoilAcceptable(soilBlockState, SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE));
     }
 
 
@@ -1953,31 +1977,27 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Default worldgen spawn mechanism. This method uses JoCodes to generate tree models. Override to use other
      * methods.
      *
-     * @param rootPos The position of {@link RootyBlock} this tree is planted in
-     * @param biome   The biome this tree is generating in
-     * @param radius  The radius of the tree generation boundary
      * @return true if tree was generated. false otherwise.
      */
-    public boolean generate(LevelContext levelContext, BlockPos rootPos, Biome biome, Random random, int radius, SafeChunkBounds safeBounds) {
+    public boolean generate(GenerationContext context) {
         final AtomicBoolean fullGen = new AtomicBoolean(false);
-        final FullGenerationContext context = new FullGenerationContext(levelContext.accessor(), rootPos, this, biome, radius, safeBounds);
+        final FullGenerationContext fullGenContext = new FullGenerationContext(context.level(), context.rootPos(), this, context.biome(), context.radius(), context.safeBounds());
 
         this.genFeatures.forEach(configuration ->
-                fullGen.set(fullGen.get() || configuration.generate(GenFeature.Type.FULL, context))
+                fullGen.set(fullGen.get() || configuration.generate(GenFeature.Type.FULL, fullGenContext))
         );
 
         if (fullGen.get()) {
             return true;
         }
-        if (!shouldGenerate(levelContext, rootPos)) {
+        if (!shouldGenerate(context.levelContext(), context.rootPos())) {
             return false;
         }
 
-        final Direction facing = CoordUtils.getRandomDir(random);
         if (!JoCodeRegistry.getCodes(this.getRegistryName()).isEmpty()) {
-            final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), radius, random);
+            final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), context.radius(), context.random());
             if (code != null) {
-                code.generate(levelContext, this, rootPos, biome, facing, radius, safeBounds, false);
+                code.generate(context);
                 return true;
             }
         }
@@ -2048,25 +2068,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Allows the tree to prepare the area for planting.  For thick tree this may include removing blocks around the
      * trunk that could be in the way.
      *
-     * @param level        The level
-     * @param rootPosition The position of {@link RootyBlock} this tree will be planted in
-     * @param radius       The radius of the generation area
-     * @param facing       The direction the joCode will build the tree
-     * @param safeBounds   An object that helps prevent accessing blocks in unloaded chunks
-     * @param joCode       The joCode that will be used to grow the tree
+     * @param level      The level
+     * @param rootPos    The position of {@link RootyBlock} this tree will be planted in
+     * @param radius     The radius of the generation area
+     * @param facing     The direction the joCode will build the tree
+     * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
+     * @param joCode     The joCode that will be used to grow the tree
      * @return new blockposition of root block.  BlockPos.ZERO to cancel generation
      */
-    public BlockPos preGeneration(LevelAccessor level, BlockPos rootPosition, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
-        final AtomicReference<BlockPos> rootPos = new AtomicReference<>(rootPosition);
-
+    public BlockPos preGeneration(LevelAccessor level, BlockPos.MutableBlockPos rootPos, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
         this.genFeatures.forEach(configuration -> rootPos.set(
                 configuration.generate(
                         GenFeature.Type.PRE_GENERATION,
-                        new PreGenerationContext(level, rootPos.get(), this, radius, facing, safeBounds, joCode)
+                        new PreGenerationContext(level, rootPos, this, radius, facing, safeBounds, joCode)
                 )
         ));
-
-        return rootPos.get();
+        return rootPos.immutable();
     }
 
     /**

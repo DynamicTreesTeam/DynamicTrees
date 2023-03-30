@@ -204,4 +204,36 @@ public class LeafClusters {
             5, 6, 5
 
     }).setCenter(new BlockPos(1, 4, 1));
+
+    public static final SimpleVoxmap AZALEA = new SimpleVoxmap(5, 4, 5, new byte[]{
+            //Layer 0 (Bottom)
+            0, 0, 0, 0, 0,
+            0, 1, 1, 1, 0,
+            0, 1, 1, 1, 0,
+            0, 1, 1, 1, 0,
+            0, 0, 0, 0, 0,
+
+            //Layer 1
+            0, 1, 1, 1, 0,
+            1, 2, 3, 2, 1,
+            1, 3, 0, 3, 1,
+            1, 2, 3, 2, 1,
+            0, 1, 1, 1, 0,
+
+            //Layer 2
+            0, 0, 1, 0, 0,
+            0, 1, 2, 1, 0,
+            1, 2, 3, 2, 1,
+            0, 1, 2, 1, 0,
+            0, 0, 1, 0, 0,
+
+            //Layer 3(Top)
+            0, 0, 0, 0, 0,
+            0, 0, 1, 0, 0,
+            0, 1, 1, 1, 0,
+            0, 0, 1, 0, 0,
+            0, 0, 0, 0, 0,
+
+    }).setCenter(new BlockPos(2, 1, 2));
+
 }

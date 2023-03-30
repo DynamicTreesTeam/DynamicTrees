@@ -16,8 +16,9 @@ plugins {
     id("org.parchmentmc.librarian.forgegradle")
     id("idea")
     id("maven-publish")
-    id("com.matthewprenger.cursegradle") version "1.4.0"
     id("com.harleyoconnor.translationsheet") version "0.1.1"
+    id("com.matthewprenger.cursegradle") version "1.4.0"
+    id("com.harleyoconnor.autoupdatetool") version "1.0.0"
 }
 
 repositories {
@@ -137,7 +138,7 @@ curseforge {
 
             addGameVersion(mcVersion)
 
-            changelog = "Changelog will be added shortly..."
+            changelog = file("changelog.txt")
             changelogType = "markdown"
             releaseType = property("curseFileType")
 
@@ -232,6 +233,17 @@ publishing {
 
 tasks.register("publishToAllPlatforms") {
     this.dependsOn("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
+}
+
+autoUpdateTool {
+    this.mcVersion.set(mcVersion)
+    this.version.set(modVersion)
+    this.versionRecommended.set(property("versionRecommended") == "true")
+    this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + "/" + property("updateCheckerPath")))
+}
+
+tasks.autoUpdate {
+    finalizedBy("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
 }
 
 fun net.minecraftforge.gradle.common.util.RunConfig.applyDefaultConfiguration(runDirectory: String = "run") {

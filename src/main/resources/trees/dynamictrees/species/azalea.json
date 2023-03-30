@@ -1,0 +1,40 @@
+{
+    "family": "oak",
+    "tapering": 0,
+    "up_probability": 2,
+    "lowest_branch_height": 0,
+    "signal_energy": 7.0,
+    "growth_rate": 0.7,
+    "soil_longevity": 2,
+    "leaves_properties": "azalea",
+    "generate_seed": true,
+    "generate_sapling": true,
+    "environment_factors": {
+        "sparse": 1.1,
+        "hot": 0.5,
+        "wet": 0.75
+    },
+    "growth_logic_kit": "azalea",
+    "perfect_biomes": { "name": "minecraft:lush_caves" },
+    "primitive_saplings": ["azalea", "flowering_azalea"],
+    "force_soil": "rooted_dirt",
+    "acceptable_soils": ["dirt_like"],
+    "world_gen_acceptable_soils": ["sand_like", "snow_like", "terracotta_like"],
+    "features": [
+        {
+            "name": "rot_soil",
+            "properties": {
+                "rotten_soil": "podzol"
+            }
+        },
+        {
+            "name": "alt_leaves",
+            "properties": {
+                "alternative_leaves": "flowering_azalea",
+                "place_chance": 0.35
+            }
+        },
+        "mushroom_rot",
+        "root_system"
+    ]
+}

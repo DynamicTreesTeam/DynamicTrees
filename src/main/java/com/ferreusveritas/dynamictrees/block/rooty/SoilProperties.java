@@ -70,7 +70,6 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     protected Integer soilFlags = 0;
     private ResourceLocation blockRegistryName;
     protected boolean hasSubstitute;
-    protected boolean worldGenOnly;
 
     //used for null soil properties
     protected SoilProperties() {
@@ -133,14 +132,6 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
      */
     public BlockState getPrimitiveSoilState (BlockState currentSoilState){
         return primitiveSoilBlock.defaultBlockState();
-    }
-
-    public void setWorldGenOnly(boolean worldGenOnly) {
-        this.worldGenOnly = worldGenOnly;
-    }
-
-    public boolean isWorldGenOnly() {
-        return worldGenOnly;
     }
 
     ///////////////////////////////////////////

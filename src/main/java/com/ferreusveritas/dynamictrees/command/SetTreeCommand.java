@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.util.CommandHelper;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.Null;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
@@ -55,8 +56,8 @@ public final class SetTreeCommand extends SubCommand {
 
         sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.set_tree", CommandHelper.posComponent(rootPos),
                 species.getTextComponent(), joCode.getTextComponent()));
-        joCode.generate(LevelContext.create(level), species, rootPos, source.getLevel().getBiome(rootPos).value(),
-                Direction.SOUTH, 8, SafeChunkBounds.ANY, false);
+        GenerationContext context = new GenerationContext(LevelContext.create(level), species, rootPos, rootPos.mutable(), source.getLevel().getBiome(rootPos).value(), Direction.SOUTH, 8, SafeChunkBounds.ANY);
+        joCode.generate(context);
 
         // Try to set the fertility.
         Null.consumeIfNonnull(TreeHelper.getRooty(level.getBlockState(rootPos)),

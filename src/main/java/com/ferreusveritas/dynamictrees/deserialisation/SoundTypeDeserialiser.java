@@ -63,6 +63,34 @@ public final class SoundTypeDeserialiser implements JsonDeserialiser<SoundType> 
                 soundTypes.put(new ResourceLocation("chain"), SoundType.CHAIN);
                 soundTypes.put(new ResourceLocation("nether_gold_ore"), SoundType.NETHER_GOLD_ORE);
                 soundTypes.put(new ResourceLocation("gilded_blackstone"), SoundType.GILDED_BLACKSTONE);
+                soundTypes.put(new ResourceLocation("candle"), SoundType.CANDLE);
+                soundTypes.put(new ResourceLocation("amethyst"), SoundType.AMETHYST);
+                soundTypes.put(new ResourceLocation("amethyst_cluster"), SoundType.AMETHYST_CLUSTER);
+                soundTypes.put(new ResourceLocation("small_amethyst_bud"), SoundType.SMALL_AMETHYST_BUD);
+                soundTypes.put(new ResourceLocation("medium_amethyst_bud"), SoundType.MEDIUM_AMETHYST_BUD);
+                soundTypes.put(new ResourceLocation("large_amethyst_bud"), SoundType.LARGE_AMETHYST_BUD);
+                soundTypes.put(new ResourceLocation("tuff"), SoundType.TUFF);
+                soundTypes.put(new ResourceLocation("calcite"), SoundType.CALCITE);
+                soundTypes.put(new ResourceLocation("dripstone_block"), SoundType.DRIPSTONE_BLOCK);
+                soundTypes.put(new ResourceLocation("pointed_dripstone"), SoundType.POINTED_DRIPSTONE);
+                soundTypes.put(new ResourceLocation("copper"), SoundType.COPPER);
+                soundTypes.put(new ResourceLocation("cave_vines"), SoundType.CAVE_VINES);
+                soundTypes.put(new ResourceLocation("spore_blossom"), SoundType.SPORE_BLOSSOM);
+                soundTypes.put(new ResourceLocation("azalea"), SoundType.AZALEA);
+                soundTypes.put(new ResourceLocation("flowering_azalea"), SoundType.FLOWERING_AZALEA);
+                soundTypes.put(new ResourceLocation("moss_carpet"), SoundType.MOSS_CARPET);
+                soundTypes.put(new ResourceLocation("moss"), SoundType.MOSS);
+                soundTypes.put(new ResourceLocation("big_dripleaf"), SoundType.BIG_DRIPLEAF);
+                soundTypes.put(new ResourceLocation("small_dripleaf"), SoundType.SMALL_DRIPLEAF);
+                soundTypes.put(new ResourceLocation("rooted_dirt"), SoundType.ROOTED_DIRT);
+                soundTypes.put(new ResourceLocation("hanging_roots"), SoundType.HANGING_ROOTS);
+                soundTypes.put(new ResourceLocation("azalea_leaves"), SoundType.AZALEA_LEAVES);
+                soundTypes.put(new ResourceLocation("sculk_sensor"), SoundType.SCULK_SENSOR);
+                soundTypes.put(new ResourceLocation("glow_lichen"), SoundType.GLOW_LICHEN);
+                soundTypes.put(new ResourceLocation("deepslate"), SoundType.DEEPSLATE);
+                soundTypes.put(new ResourceLocation("deepslate_bricks"), SoundType.DEEPSLATE_BRICKS);
+                soundTypes.put(new ResourceLocation("deepslate_tiles"), SoundType.DEEPSLATE_TILES);
+                soundTypes.put(new ResourceLocation("polished_deepslate"), SoundType.POLISHED_DEEPSLATE);
             });
 
     /**

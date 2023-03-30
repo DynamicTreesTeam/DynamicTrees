@@ -1,7 +1,10 @@
 {
   "itemGroup.dynamictrees": "Dynamic Trees",
 
+  "entity.dynamictrees.falling_tree": "Falling Tree",
+
   "block.dynamictrees.oak_branch": "Oak Tree",
+  "block.dynamictrees.azalea_branch": "Azalea Tree",
   "block.dynamictrees.spruce_branch": "Spruce Tree",
   "block.dynamictrees.birch_branch": "Birch Tree",
   "block.dynamictrees.jungle_branch": "Jungle Tree",
@@ -11,6 +14,7 @@
   "block.dynamictrees.warped_branch": "Warped Fungus",
 
   "species.dynamictrees.oak": "Oak",
+  "species.dynamictrees.azalea": "Azalea",
   "species.dynamictrees.swamp_oak": "Swamp Oak",
   "species.dynamictrees.spruce": "Spruce",
   "species.dynamictrees.mega_spruce": "Mega Spruce",
@@ -29,6 +33,7 @@
   "species.dynamictrees.brown_mushroom": "Brown Mushroom",
 
   "item.dynamictrees.oak_seed": "Oak Acorn",
+  "item.dynamictrees.azalea_seed": "Azalea Seed",
   "item.dynamictrees.spruce_seed": "Spruce Cone",
   "item.dynamictrees.birch_seed": "Birch Catkin",
   "item.dynamictrees.jungle_seed": "Jungle Pod",

@@ -93,14 +93,12 @@ public class SoilHelper {
         return dirtMap.compute(soilBlock, (bl, prop) -> (prop == null) ? new SoilProperties(soilBlock, name, adjFlag, true) : prop.addSoilFlags(adjFlag));
     }
 
-    public static boolean isSoilAcceptable(BlockState soilState, int soilFlags, boolean worldgen) {
+    public static boolean isSoilAcceptable(BlockState soilState, int soilFlags) {
         Block soilBlock = soilState.getBlock();
         if (soilBlock instanceof RootyBlock) {
             soilBlock = ((RootyBlock) soilBlock).getPrimitiveSoilBlock();
         }
         SoilProperties properties = dirtMap.getOrDefault(soilBlock, SoilProperties.NULL_SOIL_PROPERTIES);
-        boolean worldgenOnly = properties.isWorldGenOnly();
-        if (worldgenOnly && !worldgen) return false;
         return (properties.getSoilFlags() & soilFlags) != 0 && properties.isValidState(soilState);
     }
 

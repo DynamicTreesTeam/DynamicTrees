@@ -153,7 +153,10 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     }
 
     /**
-
+     * Performs a full generation action of a tree. This is invoked before the {@link JoCode#generate(Level, LevelAccessor,
+     * Species, BlockPos, Biome, Direction, int, SafeChunkBounds, boolean)} and acts as a replacement for it. The
+     * implementor should therefore note that other methods in this class will not be invoked by default.
+     *
      * @param configuration the configuration
      * @param context       the context
      * @return {@code true} if this {@link GenFeature} handles full generation and so generation from a {@link JoCode}

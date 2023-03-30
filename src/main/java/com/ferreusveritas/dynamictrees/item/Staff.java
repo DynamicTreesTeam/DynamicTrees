@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
+import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -115,7 +116,8 @@ public class Staff extends Item {
         //Create a tree from right clicking on soil
         Species species = getSpecies(heldStack);
         if (species.isValid() && species.isAcceptableSoil(level, pos, state)) {
-            species.getJoCode(getCode(heldStack)).setCareful(true).generate(LevelContext.create(level), species, pos, level.getBiome(pos).value(), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY, false);
+            GenerationContext generationContext = new GenerationContext(LevelContext.create(level), species, pos, pos.mutable(), level.getBiome(pos).value(), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY);
+            species.getJoCode(getCode(heldStack)).setCareful(true).generate(generationContext);
             if (hasMaxUses(heldStack)) {
                 if (decUses(heldStack)) {
                     heldStack.shrink(1);//If the player is in creative this will have no effect.

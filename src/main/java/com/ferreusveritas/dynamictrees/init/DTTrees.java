@@ -16,6 +16,7 @@ import com.ferreusveritas.dynamictrees.block.rooty.SpreadableSoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.WaterSoilProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.resources.Resources;
+import com.ferreusveritas.dynamictrees.systems.leavesproperties.ScruffyLeavesProperties;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Mushroom;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
@@ -23,7 +24,11 @@ import com.ferreusveritas.dynamictrees.tree.family.NetherFungusFamily;
 import com.ferreusveritas.dynamictrees.tree.species.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.tree.species.PalmSpecies;
 import com.ferreusveritas.dynamictrees.tree.species.SwampOakSpecies;
+import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
+import net.minecraft.core.Holder;
+import net.minecraft.data.worldgen.features.CaveFeatures;
 import net.minecraft.data.worldgen.features.NetherFeatures;
+import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.level.block.Block;
@@ -31,6 +36,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.NetherForestVegetationConfig;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -50,6 +56,7 @@ public class DTTrees {
     public static final ResourceLocation JUNGLE = DynamicTrees.location("jungle");
     public static final ResourceLocation DARK_OAK = DynamicTrees.location("dark_oak");
     public static final ResourceLocation ACACIA = DynamicTrees.location("acacia");
+    public static final ResourceLocation AZALEA = DynamicTrees.location("azalea");
     public static final ResourceLocation CRIMSON = DynamicTrees.location("crimson");
     public static final ResourceLocation WARPED = DynamicTrees.location("warped");
 
@@ -72,6 +79,7 @@ public class DTTrees {
         event.registerType(DynamicTrees.location("solid"), SolidLeavesProperties.TYPE);
         event.registerType(DynamicTrees.location("wart"), WartProperties.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmLeavesProperties.TYPE);
+        event.registerType(DynamicTrees.location("scruffy"), ScruffyLeavesProperties.TYPE);
     }
 
     @SubscribeEvent

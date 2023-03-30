@@ -1,0 +1,9 @@
+{
+  "type": "scruffy",
+  "primitive_leaves": "minecraft:azalea_leaves",
+  "cell_kit": "dynamictrees:azalea",
+  "sound": "azalea_leaves",
+
+  "scruffy_leaf_chance": 0.66,
+  "scruffy_max_hydro": 1
+}

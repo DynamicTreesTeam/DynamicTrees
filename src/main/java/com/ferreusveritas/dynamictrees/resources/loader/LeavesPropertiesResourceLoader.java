@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.resources.loader;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.applier.Applier;
 import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.api.cell.CellKit;
@@ -9,6 +10,7 @@ import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
+import com.ferreusveritas.dynamictrees.systems.leavesproperties.ScruffyLeavesProperties;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -56,11 +58,11 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 .register("fire_spread", Integer.class, LeavesProperties::setFireSpreadSpeed)
                 .register("flammability", Integer.class, LeavesProperties::setFlammability)
                 .register("connect_any_radius", Boolean.class, LeavesProperties::setConnectAnyRadius)
-                .register("does_age", String.class, (leavesProperties, configurationName) -> {
-                    return readDoesAge(leavesProperties, configurationName);
-                })
+                .register("does_age", String.class, (Applier<LeavesProperties, String>) this::readDoesAge)
                 .register("ageing_configuration", LeavesProperties.AgeingConfiguration.class, LeavesProperties::setAgeingConfiguration)
-                .register("can_grow_on_ground", Boolean.class, LeavesProperties::setCanGrowOnGround);
+                .register("can_grow_on_ground", Boolean.class, LeavesProperties::setCanGrowOnGround)
+                .register("scruffy_leaf_chance", ScruffyLeavesProperties.class, Float.class, ScruffyLeavesProperties::setLeafChance)
+                .register("scruffy_max_hydro", ScruffyLeavesProperties.class, Integer.class, ScruffyLeavesProperties::setMaxHydro);
 
         super.registerAppliers();
     }
