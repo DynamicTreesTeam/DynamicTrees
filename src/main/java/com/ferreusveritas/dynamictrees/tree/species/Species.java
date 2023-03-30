@@ -1733,6 +1733,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return seasonalFruitingOffset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -seasonalFruitingOffset, false) : 1.0f;
     }
 
+    public void inheritSeasonalFruitingOffsetToFruits(){
+        this.fruits.forEach((fruit)->fruit.setSeasonOffset(this.seasonalFruitingOffset));
+    }
+
+    public void inheritSeasonalFruitingOffsetToPods(){
+        this.pods.forEach((pod)->pod.setSeasonOffset(this.seasonalFruitingOffset));
+    }
+
     /**
      * 1 = Spring 2 = Summer 4 = Autumn 8 = Winter Values are OR'ed together for the return
      */
@@ -1741,7 +1749,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         final float seasonEnd = 1 - 1f / 6;
         final float threshold = 0.75f;
 
-        if (this.hasFruits()) {
+        if (this.hasFruits() || this.hasPods()) {
             int seasonFlags = 0;
             for (int i = 0; i < 4; i++) {
                 boolean isValidSeason = false;

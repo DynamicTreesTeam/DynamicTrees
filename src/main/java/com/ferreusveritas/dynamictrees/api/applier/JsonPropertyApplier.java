@@ -28,6 +28,14 @@ public final class JsonPropertyApplier<O, V> extends PropertyApplier<O, V, JsonE
     @Override
     protected PropertyApplierResult applyIfShould(O object, JsonElement input,
                                                   Applier<O, V> applier) {
+        if (JsonDeserialisers.JSON_NULL.deserialise(input).success())
+            return JsonDeserialisers.JSON_NULL.deserialise(input)
+                    .map(value -> this.applier.apply(object, null))
+                    .orElseApply(
+                            PropertyApplierResult::failure,
+                            PropertyApplierResult::addWarnings,
+                            null
+                    );
         return deserialiser.get().deserialise(input)
                 .map(value -> this.applier.apply(object, value))
                 .orElseApply(

@@ -61,6 +61,7 @@ public class Seed extends Item implements IPlantable {
 
     private final Species species;//The tree this seed creates
 
+    //This constructor is only used for the null registration
     public Seed() {
         super(new Item.Properties());
         this.setRegistryName("null");
@@ -68,7 +69,11 @@ public class Seed extends Item implements IPlantable {
     }
 
     public Seed(Species species) {
-        super(new Item.Properties().tab(DTRegistries.ITEM_GROUP));
+        this(species, new Item.Properties());
+    }
+
+    public Seed(Species species, Item.Properties properties) {
+        super(properties.tab(DTRegistries.ITEM_GROUP));
         this.species = species;
     }
 

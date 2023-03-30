@@ -1,18 +1,17 @@
-[
-  {
-    "__comment" : "Start by making any vanilla minecraft biome default to oak",
-    "select": { "name": "minecraft:.*" },
+[{
+    "__comment" : "Rivers and oceans have no trees but we can still set density and chance for addons to use",
+    "select": {"OR": [{ "tag": "minecraft:is_river" },{ "tag": "minecraft:is_ocean" }]},
     "apply": {
-      "species" : "oak",
-      "density": 0,
-      "chance" : "standard"
+      "density": [ 1.0 ],
+      "chance": 0.02
     }
   },
   {
-    "__comment" : "Rivers have no chance of having trees",
-    "select": { "tag": "minecraft:is_river" },
+    "__comment" : "Rivers and oceans have no trees but we can still set density and chance for addons to use",
+    "select": { "tag": "minecraft:is_beach" },
     "apply": {
-      "chance": 0.0
+      "density": [ 1.0 ],
+      "chance": 0.02
     }
   },
   {
@@ -37,13 +36,6 @@
     }
   },
   {
-    "__comment" : "Any wasteland will be treeless",
-    "select": { "tag": "forge:is_wasteland", "name": "minecraft:.*" },
-    "apply": {
-      "species" : "..."
-    }
-  },
-  {
     "__comment" : "Generates an alternative oak style in swamps",
     "select": { "tag": "forge:is_swamp", "name": "minecraft:.*" },
     "apply": {
@@ -56,7 +48,8 @@
     "select": { "tag": "forge:is_savanna", "name": "minecraft:.*" },
     "apply": {
       "species" : "acacia",
-      "density": [ 0.1 ]
+      "density": [ 0.1 ],
+      "chance" : "standard"
     }
   },
   {
@@ -75,7 +68,8 @@
         }
       },
       "density": [ 2 ],
-      "forestness" : 1.0
+      "forestness" : 1.0,
+      "chance" : "standard"
     }
   },
   {
@@ -120,6 +114,8 @@
     "select": { "name": "minecraft:.*", "tag": "forge:is_beach" },
     "apply": {
       "chance": 0.0
+      "multipass" : true,
+      "chance" : "standard"
     }
   },
   {
@@ -241,7 +237,8 @@
           "crimson" : 4,
           "mega_crimson" : 1
         }
-      }
+      },
+      "chance" : "standard"
     }
   },
   {
@@ -252,7 +249,16 @@
           "warped" : 4,
           "mega_warped" : 1
         }
-      }
+      },
+      "chance" : "standard"
+    }
+  },
+  {
+    "__comment" : "Any wasteland will be treeless",
+    "select": { "tag": "forge:is_wasteland", "name": "minecraft:.*" },
+    "apply": {
+      "species" : "...",
+      "chance" : 0
     }
   }
 ]
