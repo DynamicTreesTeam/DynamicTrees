@@ -95,6 +95,9 @@ dependencies {
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
     runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
     runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.18.1:${property("suggestionProviderFixVersion")}"))
+
+    //Small lib that allows changing the blocks snow can be on
+    runtimeOnly(fg.deobf("curse.maven:snow-coated-843893:4465018"))
 }
 
 translationSheet {

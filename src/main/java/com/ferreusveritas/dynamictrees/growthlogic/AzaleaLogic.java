@@ -49,8 +49,8 @@ public class AzaleaLogic extends GrowthLogicKit {
             if (originDir != Direction.UP) {
                 probMap[Direction.UP.get3DDataValue()] += distFromTrunk * 2;
             }
-            // Increase chance of going down
-            probMap[Direction.DOWN.get3DDataValue()] *= 2;
+            // No chance of going down
+            probMap[Direction.DOWN.get3DDataValue()] = 0;
         } else {
             probMap[Direction.UP.get3DDataValue()] *= 2;
         }
@@ -60,7 +60,7 @@ public class AzaleaLogic extends GrowthLogicKit {
             probMap[i] *= 0.5;
         }
         // Scale up direction with bias
-        probMap[getDirectionBias(signal.rootPos).get3DDataValue()] *= 5;
+        probMap[getDirectionBias(signal.rootPos).get3DDataValue()] *= 8;
 
         return probMap;
     }
