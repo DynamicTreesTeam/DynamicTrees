@@ -109,6 +109,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (Applier<Species, String>) this::addAcceptableSoil)
+                .registerArrayApplier("world_gen_acceptable_soils", String.class, (Applier<Species, String>) this::addAcceptableSoilForWorldGen)
                 .register("force_soil", SoilProperties.class, Species::setForceSoil)
                 .registerListApplier("fruits", Fruit.class, Species::addFruits)
                 .registerListApplier("pods", Pod.class, Species::addPods)
@@ -152,8 +153,15 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
             return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
         }
-
         species.addAcceptableSoils(acceptableSoil);
+        return PropertyApplierResult.success();
+    }
+
+    private PropertyApplierResult addAcceptableSoilForWorldGen(Species species, String acceptableSoil) {
+        if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
+            return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
+        }
+        species.addAcceptableSoilsForWorldGen(acceptableSoil);
         return PropertyApplierResult.success();
     }
 

@@ -242,6 +242,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * The tags for the types of soil the tree can be planted on
      */
     protected int soilTypeFlags = 0;
+    /**
+     * The tags for the types of soil the tree can be planted on during world gen, or {@code 0} to use
+     * {@link #soilTypeFlags}.
+     */
+    protected int worldGenSoilTypeFlags = 0;
 
     // TODO: Make sure this is implemented properly.
     protected int maxBranchRadius = 8;
@@ -1207,11 +1212,17 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
+    public Species addAcceptableSoilsForWorldGen(String... soilTypes) {
+        worldGenSoilTypeFlags |= SoilHelper.getSoilFlags(soilTypes);
+        return this;
+    }
+
     /**
      * Will clear the acceptable soils list.  Useful for making trees that can only be planted in abnormal substrates.
      */
     public Species clearAcceptableSoils() {
         soilTypeFlags = 0;
+        worldGenSoilTypeFlags = 0;
         return this;
     }
 
@@ -1246,8 +1257,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Soil acceptability tester.  Mostly to test if the block is dirt but could be overridden to allow gravel, sand, or
      * whatever makes sense for the tree species.
      */
-    public boolean isAcceptableSoil(BlockState soilBlockState, boolean worldgen) {
-        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags, worldgen);
+    public boolean isAcceptableSoil(BlockState soilBlockState) {
+        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags);
     }
 
     /**
@@ -1255,11 +1266,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * allow gravel, sand, or whatever makes sense for the tree species.
      */
     public boolean isAcceptableSoil(LevelReader level, BlockPos pos, BlockState soilBlockState) {
-        return isAcceptableSoil(level, pos, soilBlockState, false);
-    }
-
-    public boolean isAcceptableSoil(LevelReader level, BlockPos pos, BlockState soilBlockState, boolean worldgen) {
-        return isAcceptableSoil(soilBlockState, worldgen);
+        return isAcceptableSoil(soilBlockState);
     }
 
     /**
@@ -1271,21 +1278,24 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return
      */
     public boolean isAcceptableSoilForWorldgen(LevelAccessor level, BlockPos pos, BlockState soilBlockState) {
-        final boolean isAcceptableSoil = isAcceptableSoil(level, pos, soilBlockState, true);
+        final boolean isAcceptableSoil = isAcceptableSoilForWorldgen(soilBlockState);
 
         // If the block is water, check the block below it is valid soil (and not water).
         if (isAcceptableSoil && isWater(soilBlockState)) {
-            final BlockPos down = pos.below();
             final BlockState downState = level.getBlockState(pos.below());
-
-            return !isWater(downState) && this.isAcceptableSoil(level, down, downState, true);
+            return !isWater(downState) && this.isAcceptableSoilForWorldgen(downState);
         }
 
         return isAcceptableSoil;
     }
 
+    public boolean isAcceptableSoilForWorldgen(BlockState soilBlockState) {
+        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags) ||
+                SoilHelper.isSoilAcceptable(soilBlockState, worldGenSoilTypeFlags);
+    }
+
     protected boolean isWater(BlockState soilBlockState) {
-        return SoilHelper.isSoilAcceptable(soilBlockState, SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE), true);
+        return SoilHelper.isSoilAcceptable(soilBlockState, SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE));
     }
 
 

@@ -4,8 +4,7 @@
     "up_probability": 2,
     "lowest_branch_height": 0,
     "signal_energy": 7.0,
-    "growth_rate": 1.2,
-    "_growth_rate": 0.7,
+    "growth_rate": 0.7,
     "soil_longevity": 2,
     "leaves_properties": "azalea",
     "generate_seed": true,
@@ -19,7 +18,8 @@
     "perfect_biomes": { "name": "minecraft:lush_caves" },
     "primitive_saplings": ["azalea", "flowering_azalea"],
     "force_soil": "rooted_dirt",
-    "acceptable_soils": ["dirt_like", "sand_like", "snow_like", "terracotta_like"],
+    "acceptable_soils": ["dirt_like"],
+    "world_gen_acceptable_soils": ["sand_like", "snow_like", "terracotta_like"],
     "features": [
         {
             "name": "rot_soil",
