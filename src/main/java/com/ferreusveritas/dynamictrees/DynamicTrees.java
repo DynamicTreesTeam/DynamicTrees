@@ -107,9 +107,6 @@ public final class DynamicTrees {
 
         Resources.MANAGER.setup();
 
-        if (DTConfigs.REPLACE_AZALEA_TREES.get()) {
-            DTTrees.replaceAzaleaTrees();
-        }
         if (DTConfigs.REPLACE_NYLIUM_FUNGI.get()) {
             DTTrees.replaceNyliumFungiFeatures();
         }

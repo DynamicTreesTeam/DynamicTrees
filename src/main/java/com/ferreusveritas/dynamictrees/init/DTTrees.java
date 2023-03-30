@@ -132,10 +132,6 @@ public class DTTrees {
                 .forEach(Registry::lock);
     }
 
-    public static void replaceAzaleaTrees() {
-//        CaveFeatures.ROOTED_AZALEA_TREE.value().config().treeFeature = PlacementUtils.inlinePlaced(Holder.direct(DTRegistries.DYNAMIC_AZALEA_TREE.get()));
-    }
-
     public static void replaceNyliumFungiFeatures() {
         TreeRegistry.findSpecies(CRIMSON).getSapling().ifPresent(crimsonSapling ->
                 TreeRegistry.findSpecies(WARPED).getSapling().ifPresent(warpedSapling -> {

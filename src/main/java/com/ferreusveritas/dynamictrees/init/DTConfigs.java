@@ -60,7 +60,6 @@ public class DTConfigs {
     public static final ForgeConfigSpec.BooleanValue DYNAMIC_SAPLING_DROPS;
 
     public static final ForgeConfigSpec.BooleanValue REPLACE_VANILLA_SAPLING;
-    public static final ForgeConfigSpec.BooleanValue REPLACE_AZALEA_TREES;
     public static final ForgeConfigSpec.BooleanValue REPLACE_NYLIUM_FUNGI;
     public static final ForgeConfigSpec.BooleanValue CANCEL_VANILLA_VILLAGE_TREES;
 
@@ -163,8 +162,6 @@ public class DTConfigs {
         COMMON_BUILDER.comment("Vanilla Trees Settings").push("vanilla");
         REPLACE_VANILLA_SAPLING = COMMON_BUILDER.comment("Right clicking with a vanilla sapling places a dynamic sapling instead.").
                 define("replaceVanillaSapling", false);
-        REPLACE_AZALEA_TREES = COMMON_BUILDER.comment("If enabled, rooted azalea features will generate with dynamic azalea trees.").
-                define("replaceAzaleaTrees", true);
         REPLACE_NYLIUM_FUNGI = COMMON_BUILDER.comment("Crimson Fungus and Warped Fungus that sprout from nylium will be dynamic instead.").
                 define("replaceNyliumFungi", true);
         CANCEL_VANILLA_VILLAGE_TREES = COMMON_BUILDER.comment("If enabled, cancels the non-dynamic trees that spawn with vanilla villages.").
