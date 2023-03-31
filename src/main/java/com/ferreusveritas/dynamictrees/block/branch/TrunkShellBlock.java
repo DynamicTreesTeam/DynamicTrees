@@ -68,7 +68,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     }
 
     public TrunkShellBlock() {
-        super(Block.Properties.of(Material.WOOD).dynamicShape());
+        super(Block.Properties.of(Material.WOOD));
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
     }
 
