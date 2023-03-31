@@ -1,5 +1,5 @@
 {
-  "item_stack": "cocoa_beans",
+  "item_stack": "dynamictrees:cocoa_seed",
   "block_shapes": {
     "east": [
       { "function": "pod", "parameters": { "radius": 2, "height": 5, "stem_length": 4, "side_offset": 5, "side": "east" } },

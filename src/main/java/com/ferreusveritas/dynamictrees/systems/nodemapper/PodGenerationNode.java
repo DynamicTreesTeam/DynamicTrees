@@ -20,10 +20,12 @@ public class PodGenerationNode implements NodeInspector {
     private final PodPlacer podPlacer;
     @Nullable
     private final Float seasonValue;
+    private final int blocksPerPlacedPod;
 
-    public PodGenerationNode(PodPlacer podPlacer, @Nullable Float seasonValue) {
+    public PodGenerationNode(PodPlacer podPlacer, @Nullable Float seasonValue, int blocksPerPlacedPods) {
         this.podPlacer = podPlacer;
         this.seasonValue = seasonValue;
+        this.blocksPerPlacedPod = blocksPerPlacedPods;
     }
 
     private boolean finished = false;
@@ -32,23 +34,28 @@ public class PodGenerationNode implements NodeInspector {
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
 
         if (!finished) {
-            int hashCode = CoordUtils.coordHashCode(pos, 1);
-            if ((hashCode % 97) % 29 == 0) {
+            //int hashCode = CoordUtils.coordHashCode(pos, 1);
+            //if ((hashCode % 97) % blocksPerPlacedPod == 0) {
                 BranchBlock branch = TreeHelper.getBranch(state);
                 if (branch != null && branch.getRadius(state) == 8) {
-                    int side = (hashCode % 4) + 2;
-                    Direction dir = Direction.from3DDataValue(side);
-                    BlockPos deltaPos = pos.relative(dir);
-                    if (level.isEmptyBlock(deltaPos)) {
-                        if (!dir.getAxis().isHorizontal()) {
-                            dir = Direction.NORTH;
+                    //int side = (hashCode % 4) + 2;
+                    //Direction dir = Direction.from3DDataValue(side);
+                    for (Direction dir : Direction.Plane.HORIZONTAL){
+                        int hashCode = CoordUtils.coordHashCode(pos.offset(dir.getNormal()), 1);
+                        if ((hashCode % 97) % blocksPerPlacedPod == 0) {
+                            BlockPos deltaPos = pos.relative(dir);
+                            if (level.isEmptyBlock(deltaPos)) {
+                                if (!dir.getAxis().isHorizontal()) {
+                                    dir = Direction.NORTH;
+                                }
+                                podPlacer.place(level, deltaPos, seasonValue, dir.getOpposite());
+                                finished = true;
+                            }
                         }
-                        podPlacer.place(level, deltaPos, seasonValue, dir.getOpposite());
+
                     }
-                } else {
-                    finished = true;
                 }
-            }
+            //}
         }
         return false;
     }

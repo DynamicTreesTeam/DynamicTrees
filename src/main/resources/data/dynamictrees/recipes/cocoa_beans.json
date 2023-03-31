@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "dynamictrees:cocoa_seed"
+    }
+  ],
+  "result": {
+    "item": "cocoa_beans",
+    "count": 3
+  }
+}

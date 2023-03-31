@@ -1,0 +1,10 @@
+{
+    "family": "oak",
+    "up_probability": 0,
+    "lowest_branch_height": 0,
+    "signal_energy": 3.0,
+    "soil_longevity": 1,
+    "leaves_properties": "oak",
+    "perfect_biomes": { "name": "minecraft:jungle" },
+    "acceptable_soils": ["dirt_like"]
+}

@@ -242,7 +242,7 @@ autoUpdateTool {
     this.mcVersion.set(mcVersion)
     this.version.set(modVersion)
     this.versionRecommended.set(property("versionRecommended") == "true")
-    this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + "/" + property("updateCheckerPath")))
+    this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
 }
 
 tasks.autoUpdate {
