@@ -57,7 +57,8 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
 //                .harvestTool(ToolType.AXE)
 //                .harvestLevel(0)
                 .strength(2.5f, 1.0F)
-                .sound(SoundType.WOOD));
+                .sound(SoundType.WOOD)
+                .dynamicShape());
 
         this.family = family;
     }

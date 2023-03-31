@@ -80,7 +80,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      * @param name name of branch, without a {@code _branch} suffix
      */
     public BranchBlock(ResourceLocation name, Properties properties) {
-        super(properties); //removes drops from block
+        super(properties.dynamicShape()); //removes drops from block
         lootTableSupplier = new LootTableSupplier("trees/branches/", name);
     }
 
