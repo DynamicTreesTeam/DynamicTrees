@@ -45,7 +45,7 @@ import java.util.Random;
 @SuppressWarnings("deprecation")
 public class PodBlock extends HorizontalDirectionalBlock implements BonemealableBlock, GrowableBlock {
 
-    private final Pod pod;
+    protected final Pod pod;
 
     public PodBlock(BlockBehaviour.Properties properties, Pod pod) {
         super(properties);
@@ -61,9 +61,8 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
-        if (pod != null) {
+        if (pod != null)
             builder.add(pod.getAgeProperty());
-        }
     }
 
     @SuppressWarnings("deprecation")
@@ -160,7 +159,7 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
     @Override
     public boolean isSupported(LevelReader level, BlockPos pos, BlockState state) {
         final BlockState branchState = level.getBlockState(pos.relative(state.getValue(FACING)));
-        return TreeHelper.getBranchOpt(branchState).map(branch -> branch.getRadius(branchState) == 8).orElse(false);
+        return TreeHelper.getBranchOpt(branchState).map(branch -> pod.isValidRadius(branch.getRadius(branchState))).orElse(false);
     }
 
     @SuppressWarnings("deprecation")

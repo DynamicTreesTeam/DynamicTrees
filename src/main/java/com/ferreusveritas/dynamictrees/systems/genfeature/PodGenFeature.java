@@ -50,7 +50,8 @@ public class PodGenFeature extends GenFeature {
         final BranchBlock branch = TreeHelper.getBranch(blockState);
         if (context.natural() && branch != null && branch.getRadius(blockState) >= configuration.get(FRUITING_RADIUS)
                 && shouldGrow(configuration, context.species(), context.levelContext(), context.treePos(), context.random())) {
-            this.place(configuration.get(POD)::place, level, context.pos(),
+            Pod pod = configuration.get(POD);
+            this.place(pod, pod::place, level, context.pos(),
                     SeasonHelper.getSeasonValue(context.levelContext(), context.pos()), configuration.get(BLOCKS_PER_POD));
         }
         return false;
@@ -65,7 +66,8 @@ public class PodGenFeature extends GenFeature {
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (shouldGenerate(configuration, context.random())) {
-            this.place(configuration.get(POD)::placeDuringWorldGen, context.level(), context.pos(),
+            Pod pod = configuration.get(POD);
+            this.place(pod, pod::placeDuringWorldGen, context.level(), context.pos(),
                     context.seasonValue(), configuration.get(BLOCKS_PER_POD));
             return true;
         }
@@ -76,10 +78,10 @@ public class PodGenFeature extends GenFeature {
         return random.nextFloat() <= configuration.get(PLACE_CHANCE);
     }
 
-    private void place(PodGenerationNode.PodPlacer podPlacer, LevelAccessor level, BlockPos rootPos,
+    private void place(Pod pod, PodGenerationNode.PodPlacer podPlacer, LevelAccessor level, BlockPos rootPos,
                        @Nullable Float seasonValue, int blocksPerPod) {
         TreeHelper.startAnalysisFromRoot(level, rootPos,
-                new MapSignal(new PodGenerationNode(podPlacer, seasonValue, blocksPerPod)));
+                new MapSignal(new PodGenerationNode(pod, podPlacer, seasonValue, blocksPerPod)));
     }
 
 }

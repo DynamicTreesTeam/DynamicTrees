@@ -1,0 +1,8 @@
+{
+  "type": "scruffy",
+  "primitive_leaves": "minecraft:jungle_leaves",
+  "light_requirement": 4,
+
+  "scruffy_leaf_chance": 0.66,
+  "scruffy_max_hydro": 1
+}

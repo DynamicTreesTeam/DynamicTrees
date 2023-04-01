@@ -22,5 +22,6 @@
       { "function": "pod", "parameters": { "radius": 4, "height": 9, "stem_length": 4, "side_offset": 3, "side": "south" } }
     ]
   },
-  "flower_hold_period_length": 0
+  "flower_hold_period_length": 0,
+  "minimum_radius": 4
 }

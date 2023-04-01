@@ -2,9 +2,9 @@
     "family": "jungle",
     "up_probability": 0,
     "lowest_branch_height": 0,
-    "signal_energy": 3.0,
+    "signal_energy": 2.0,
     "soil_longevity": 1,
-    "leaves_properties": "jungle",
+    "leaves_properties": "jungle_undergrowth",
     "perfect_biomes": { "name": "minecraft:jungle" },
     "acceptable_soils": ["dirt_like"]
 }

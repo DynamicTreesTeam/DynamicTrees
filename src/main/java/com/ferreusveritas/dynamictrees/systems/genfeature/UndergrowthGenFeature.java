@@ -71,11 +71,6 @@ public class UndergrowthGenFeature extends GenFeature {
     }
 
     private boolean areTreesAround(LevelAccessor world, BlockPos rootPos) {
-        // - - X - -
-        // - X X X -
-        // X X 0 X X
-        // - X X X -
-        // - - X - -
         for (int i = -1; i <= 1; i++) {
             // - - - - -
             // - X X X -
@@ -84,16 +79,6 @@ public class UndergrowthGenFeature extends GenFeature {
             // - - - - -
             for (CoordUtils.Surround dir : CoordUtils.Surround.values()) {
                 BlockPos offsetPos = rootPos.offset(dir.getOffset()).above(i);
-                if (TreeHelper.isBranch(world.getBlockState(offsetPos)))
-                    return true;
-            }
-            // - - X - -
-            // - - - - -
-            // X - 0 - X
-            // - - - - -
-            // - - X - -
-            for (Direction dir : Direction.Plane.HORIZONTAL){
-                BlockPos offsetPos = rootPos.offset(dir.getNormal().multiply(2)).above(i);
                 if (TreeHelper.isBranch(world.getBlockState(offsetPos)))
                     return true;
             }

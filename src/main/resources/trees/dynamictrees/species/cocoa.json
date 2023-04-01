@@ -1,6 +1,6 @@
 {
     "family": "jungle",
-    "tapering": 0.7,
+    "tapering": 0.2,
     "signal_energy": 10.0,
     "up_probability": 1,
     "lowest_branch_height": 3,
@@ -26,6 +26,7 @@
             "name": "pod",
             "properties": {
                 "pod": "cocoa",
+                "fruiting_radius": 4,
                 "blocks_per_pod": 8
             }
         }

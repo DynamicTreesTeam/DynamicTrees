@@ -33,7 +33,9 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
     @Override
     public void registerAppliers() {
         this.loadAppliers
-                .register("max_age", Integer.class, Pod::setMaxAge);
+                .register("max_age", Integer.class, Pod::setMaxAge)
+                .register("minimum_radius", Integer.class, Pod::setMinRadius)
+                .register("maximum_radius", Integer.class, Pod::setMaxRadius);
 
         this.commonAppliers
                 .register("block_shapes", JsonObject.class, this::readBlockShapes)
