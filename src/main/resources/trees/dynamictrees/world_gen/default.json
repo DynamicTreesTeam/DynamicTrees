@@ -79,7 +79,8 @@
     "apply": {
       "species" : {
         "random" : {
-          "jungle" : 10,
+          "jungle" : 6,
+          "jungle_undergrowth" : 4,
           "cocoa" : 1
         }
       },

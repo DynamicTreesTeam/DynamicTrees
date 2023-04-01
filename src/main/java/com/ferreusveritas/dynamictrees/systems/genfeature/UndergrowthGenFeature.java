@@ -70,8 +70,10 @@ public class UndergrowthGenFeature extends GenFeature {
         return placedBushes > 0;
     }
 
+    int checkDown = -1;
+    int checkUp = 4;
     private boolean areTreesAround(LevelAccessor world, BlockPos rootPos) {
-        for (int i = -1; i <= 1; i++) {
+        for (int i = checkDown; i <= checkUp; i++) {
             // - - - - -
             // - X X X -
             // - X 0 X -

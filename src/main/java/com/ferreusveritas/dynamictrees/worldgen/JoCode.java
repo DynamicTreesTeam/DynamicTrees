@@ -8,7 +8,6 @@ import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cell.LeafClusters;
-import com.ferreusveritas.dynamictrees.compat.season.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostGenerationContext;
@@ -209,7 +208,7 @@ public class JoCode {
 
             if (context.safeBounds().inBounds(cellPos, false)) {
                 final BlockState testBlockState = level.getBlockState(cellPos);
-                if (testBlockState.isAir() || testBlockState.is(BlockTags.LEAVES)) {
+                if (isReplaceable(testBlockState, true) || testBlockState.is(BlockTags.LEAVES)) {
                     level.setBlock(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2); // Flag 16 to prevent observers from causing cascading lag.
                 }
             } else {
@@ -286,7 +285,7 @@ public class JoCode {
                 final BlockState branchState = level.getBlockState(pos);
                 final Optional<BranchBlock> branchBlock = TreeHelper.getBranchOpt(branchState);
 
-                if (!branchBlock.isPresent()) {
+                if (branchBlock.isEmpty()) {
                     continue;
                 }
 
@@ -375,7 +374,12 @@ public class JoCode {
             return true;
 
         BlockState blockState = level.getBlockState(pos);
-        return blockState.getMaterial().isReplaceable() && blockState.getMaterial().isLiquid() || blockState.is(DTBlockTags.FOLIAGE) || blockState.is(BlockTags.FLOWERS);
+        return blockState.getMaterial().isLiquid() || isReplaceable(blockState, false);
+    }
+
+    protected boolean isReplaceable(BlockState state, boolean airOnly){
+        boolean isEmpty = airOnly ? state.isAir() : state.getMaterial().isReplaceable();
+        return isEmpty || state.is(DTBlockTags.FOLIAGE) || state.is(BlockTags.FLOWERS);
     }
 
     /**
