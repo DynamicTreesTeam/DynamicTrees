@@ -38,7 +38,7 @@ import java.util.Random;
 @SuppressWarnings({"deprecation", "unused"})
 public class FruitBlock extends Block implements BonemealableBlock, GrowableBlock {
 
-    private final Fruit fruit;
+    protected final Fruit fruit;
 
     public FruitBlock(Properties properties, Fruit fruit) {
         super(properties);

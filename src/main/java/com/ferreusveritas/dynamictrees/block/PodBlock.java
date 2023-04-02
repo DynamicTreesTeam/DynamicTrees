@@ -45,7 +45,7 @@ import java.util.Random;
 @SuppressWarnings("deprecation")
 public class PodBlock extends HorizontalDirectionalBlock implements BonemealableBlock, GrowableBlock {
 
-    private final Pod pod;
+    protected final Pod pod;
 
     public PodBlock(BlockBehaviour.Properties properties, Pod pod) {
         super(properties);
