@@ -179,6 +179,9 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      * @return a copy of this fruit's item stack
      */
     public final ItemStack getItemStack() {
+        if (itemStack == null) {
+            throw new IllegalStateException("Invoked too early or item was not set on \"" + getRegistryName() + "\".");
+        }
         return itemStack.copy();
     }
 
