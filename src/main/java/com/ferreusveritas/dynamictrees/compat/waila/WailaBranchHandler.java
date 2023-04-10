@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock.ShellMuse;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.tree.species.Species.LogsAndSticks;
 import mcp.mobius.waila.api.BlockAccessor;
@@ -71,7 +72,7 @@ public class WailaBranchHandler implements IComponentProvider {
         }
 
         if (!lastPos.equals(pos)) {
-            lastVolume = getTreeVolume(accessor.getLevel(), pos);
+            lastVolume = getTreeVolume(accessor.getLevel(), pos, species);
         }
 
         //Update the cached species and position
@@ -114,7 +115,7 @@ public class WailaBranchHandler implements IComponentProvider {
         }
     }
 
-    private NetVolumeNode.Volume getTreeVolume(Level level, BlockPos pos) {
+    private NetVolumeNode.Volume getTreeVolume(Level level, BlockPos pos, Species species) {
         BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
 
@@ -130,13 +131,12 @@ public class WailaBranchHandler implements IComponentProvider {
 
         if (block instanceof BranchBlock) {
             BranchBlock branch = (BranchBlock) block;
-
             // Analyze only part of the tree beyond the break point and calculate it's volume
             NetVolumeNode volumeSum = new NetVolumeNode();
             branch.analyse(state, level, pos, null, new MapSignal(volumeSum));
 
             NetVolumeNode.Volume volume = volumeSum.getVolume();
-            volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get());
+            species.processVolume(volume);
 
             return volume;
         }

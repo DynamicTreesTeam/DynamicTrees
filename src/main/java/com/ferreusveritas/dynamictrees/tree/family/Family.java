@@ -133,6 +133,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * The stripped variant of the branch used by this tree family
      */
     private Supplier<BranchBlock> strippedBranch;
+    protected boolean hasStrippedBranch = true;
     /**
      * The dynamic branch's block item
      */
@@ -141,6 +142,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * The surface root used by this tree family
      */
     private Supplier<SurfaceRootBlock> surfaceRoot;
+    protected boolean hasSurfaceRoot = false;
     /**
      * The primitive (vanilla) log to base the texture, drops, and other behavior from
      */
@@ -167,14 +169,13 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      */
     protected boolean hasConiferVariants = false;
 
-    protected boolean hasSurfaceRoot = false;
-    protected boolean hasStrippedBranch = true;
-
     //Misc
     /**
      * The stick that is returned when a whole log can't be dropped
      */
     private Item stick = Items.STICK;
+
+    protected float lootVolumeMultiplier = 1.0f;
 
     @OnlyIn(Dist.CLIENT)
     public int woodRingColor; // For rooty blocks
@@ -240,7 +241,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // SPECIES LOCATION OVERRIDES
     ///////////////////////////////////////////
 
-    //
     public Species getSpeciesForLocation(LevelAccessor level, BlockPos trunkPos) {
         return this.getSpeciesForLocation(level, trunkPos, this.commonSpecies);
     }
@@ -579,6 +579,14 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public Family setProperties(BlockBehaviour.Properties properties) {
         this.properties = properties;
         return this;
+    }
+
+    public float getLootVolumeMultiplier() {
+        return lootVolumeMultiplier;
+    }
+
+    public void setLootVolumeMultiplier(float lootVolumeMultiplier) {
+        this.lootVolumeMultiplier = lootVolumeMultiplier;
     }
 
     ///////////////////////////////////////////

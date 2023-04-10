@@ -777,8 +777,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return drops;
     }
 
-    protected void processVolume(NetVolumeNode.Volume volume) {
+    public void processVolume(NetVolumeNode.Volume volume) {
         volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
+        volume.multiplyVolume(getFamily().getLootVolumeMultiplier()); //the family can have a multiplier too
     }
 
     private List<ItemStack> getDropsForBranchType(Level level, ItemStack tool, @Nullable Float explosionRadius,

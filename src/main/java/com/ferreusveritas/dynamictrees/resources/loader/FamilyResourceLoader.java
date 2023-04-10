@@ -56,7 +56,8 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("primary_thickness", Integer.class, Family::setPrimaryThickness)
                 .register("secondary_thickness", Integer.class, Family::setSecondaryThickness)
                 .register("branch_is_ladder", Boolean.class, Family::setBranchIsLadder)
-                .register("max_signal_depth", Integer.class, Family::setMaxSignalDepth);
+                .register("max_signal_depth", Integer.class, Family::setMaxSignalDepth)
+                .register("loot_volume_multiplier", Float.class, Family::setLootVolumeMultiplier);
 
         super.registerAppliers();
     }
