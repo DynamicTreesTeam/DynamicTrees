@@ -1,7 +1,7 @@
 [
   {
     "__comment" : "Rivers and oceans have no trees but we can still set density and chance for addons to use",
-    "select": {"OR": [{ "tag": "minecraft:is_river" },{ "tag": "minecraft:is_ocean" }]},
+    "select": {"OR": [{ "category": "river" },{ "category": "ocean" }]},
     "apply": {
       "density": [ 1.0 ],
       "chance": 0.02
@@ -9,7 +9,7 @@
   },
   {
     "__comment" : "Rivers and oceans have no trees but we can still set density and chance for addons to use",
-    "select": { "tag": "minecraft:is_beach" },
+    "select": { "category": "beach" },
     "apply": {
       "density": [ 1.0 ],
       "chance": 0.02
@@ -17,7 +17,7 @@
   },
   {
     "__comment" : "Default for a Forest which generates a Birch Tree 1/5 of the time.",
-    "select": { "tag": "minecraft:is_forest", "name": "minecraft:.*" },
+    "select": { "category": "forest", "name": "minecraft:.*" },
     "apply": {
       "species" : {
         "random" : {
@@ -38,7 +38,7 @@
   },
   {
     "__comment" : "Generates an alternative oak style in swamps",
-    "select": { "tag": "forge:is_swamp", "name": "minecraft:.*" },
+    "select": { "category": "swamp", "name": "minecraft:.*" },
     "apply": {
       "species" : "swamp_oak",
       "density": [ 0.2 ],
@@ -46,7 +46,7 @@
     }
   },
   {
-    "select": { "tag": "forge:is_savanna", "name": "minecraft:.*" },
+    "select": { "category": "savanna", "name": "minecraft:.*" },
     "apply": {
       "species" : "acacia",
       "density": [ 0.1 ],
@@ -60,7 +60,7 @@
     }
   },
   {
-    "select": { "tag": "minecraft:is_jungle", "name": "minecraft:.*" },
+    "select": { "category": "jungle", "name": "minecraft:.*" },
     "apply": {
       "species" : {
         "random" : {
@@ -94,7 +94,7 @@
     }
   },
   {
-    "select": { "OR": [ { "tag": "forge:is_coniferous", "name": "minecraft:.*" }, { "name": "minecraft:old_growth_spruce_taiga" } ] },
+    "select": { "OR": [ { "type": "coniferous", "name": "minecraft:.*" }, { "name": "minecraft:old_growth_spruce_taiga" } ] },
     "apply": {
       "species" : "spruce",
       "density": [ 1 ],
@@ -104,7 +104,7 @@
   },
   {
     "__comment" : "Roofed forests are handled specially. Multipass tries to close canopy as much as possible",
-    "select": { "tag": "forge:is_spooky", "name": "minecraft:.*" },
+    "select": { "type": "spooky", "name": "minecraft:.*" },
     "apply": {
       "species" : "dark_oak",
       "density" : { "math": { "div" : [ "noise", 3.0 ] } },
@@ -203,7 +203,7 @@
   },
 
   {
-    "select": { "name": "minecraft:.*", "tag": "minecraft:is_nether" },
+    "select": { "name": "minecraft:.*", "category": "nether" },
     "apply": {
       "chance": 0.4
     }
@@ -241,7 +241,7 @@
   },
   {
     "__comment" : "Any wasteland will be treeless",
-    "select": { "tag": "forge:is_wasteland", "name": "minecraft:.*" },
+    "select": { "type": "wasteland", "name": "minecraft:.*" },
     "apply": {
       "species" : "...",
       "chance" : 0
