@@ -52,7 +52,6 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("fire_proof", Boolean.class, Family::setIsFireProof);
 
         this.reloadAppliers
-                .register("conifer_variants", Boolean.class, Family::setHasConiferVariants)
                 .register("primary_thickness", Integer.class, Family::setPrimaryThickness)
                 .register("secondary_thickness", Integer.class, Family::setSecondaryThickness)
                 .register("branch_is_ladder", Boolean.class, Family::setBranchIsLadder)

@@ -81,7 +81,7 @@ public class CellKits {
 
         @Override
         public Cell getCellForBranch(int radius, int meta) {
-            if (meta == MetadataCell.CONIFERTOP) {
+            if (meta == MetadataCell.TOP_BRANCH) {
                 return coniferTopBranch;
             } else if (radius == 1) {
                 return coniferBranch;

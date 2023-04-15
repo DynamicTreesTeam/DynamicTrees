@@ -4,7 +4,7 @@ public class MetadataCell {
 
     //Cell Kit Metadata values
     public static final int NONE = 0;
-    public static final int CONIFERTOP = 1;
+    public static final int TOP_BRANCH = 1;
 
     /**
      * @param radius Radius value to be encoded in the lower 8 bits

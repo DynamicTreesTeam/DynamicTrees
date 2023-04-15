@@ -163,12 +163,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      */
     private int maxBranchRadius = BranchBlock.MAX_RADIUS;
 
-    //Leaves
-    /**
-     * Used to modify the getRadiusForCellKit call to create a special case
-     */
-    protected boolean hasConiferVariants = false;
-
     //Misc
     /**
      * The stick that is returned when a whole log can't be dropped
@@ -444,8 +438,10 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return getBark ? woodBarkColor : woodRingColor;
     }
 
+    //Theres no conifer variants now. Metadata is now always sent
+    @Deprecated(forRemoval = true)
     public void setHasConiferVariants(boolean hasConiferVariants) {
-        this.hasConiferVariants = hasConiferVariants;
+        //this.hasConiferVariants = hasConiferVariants;
     }
 
     /**
@@ -596,9 +592,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public int getRadiusForCellKit(BlockGetter blockAccess, BlockPos pos, BlockState blockState, Direction dir, BranchBlock branch) {
         int radius = branch.getRadius(blockState);
         int meta = MetadataCell.NONE;
-        if (hasConiferVariants && radius == getPrimaryThickness()) {
+        if (radius == getPrimaryThickness()) {
             if (blockAccess.getBlockState(pos.below()).getBlock() == branch) {
-                meta = MetadataCell.CONIFERTOP;
+                meta = MetadataCell.TOP_BRANCH;
             }
         }
 
@@ -836,8 +832,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
                 Pair.of("commonSpecies", this.commonSpecies),
                 Pair.of("primitiveLog", this.primitiveLog),
                 Pair.of("primitiveStrippedLog", this.primitiveStrippedLog),
-                Pair.of("stick", this.stick),
-                Pair.of("hasConiferVariants", this.hasConiferVariants)
+                Pair.of("stick", this.stick)
         );
     }
 
