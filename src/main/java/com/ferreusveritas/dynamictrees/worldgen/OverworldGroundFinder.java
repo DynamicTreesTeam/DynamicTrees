@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,8 +15,12 @@ import java.util.List;
 public final class OverworldGroundFinder implements GroundFinder {
 
     @Override
-    public List<BlockPos> findGround(LevelAccessor level, BlockPos start) {
-        return Collections.singletonList(CoordUtils.findWorldSurface(level, start, true));
+    public List<BlockPos> findGround(LevelAccessor level, BlockPos start, Heightmap.Types heightmap) {
+    	if (heightmap == null) {
+    		return Collections.singletonList(CoordUtils.findWorldSurface(level, start, true));
+    	} else {
+    		return Collections.singletonList(CoordUtils.findWorldSurface(level, start, heightmap));    		
+    	}
     }
 
 }

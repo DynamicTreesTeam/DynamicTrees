@@ -12,6 +12,7 @@ import com.mojang.serialization.DataResult;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -109,6 +110,8 @@ public class BiomeDatabase {
 
         float getForestness();
 
+        String getHeightmap();
+
         Function<Integer, Integer> getMultipass();
 
     }
@@ -122,6 +125,7 @@ public class BiomeDatabase {
         private FeatureCancellation featureCancellation = NoFeatureCancellation.INSTANCE;
         private boolean blacklisted = false;
         private float forestness = 0.0f;
+        private String heightmap = "WORLD_SURFACE_WG";
         private final static Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
         private Function<Integer, Integer> multipass = defaultMultipass;
 
@@ -245,9 +249,18 @@ public class BiomeDatabase {
             this.forestness = forestness;
         }
 
+        public void setHeightmap(String heightmap) {
+            this.heightmap = heightmap;
+        }
+
         @Override
         public float getForestness() {
             return forestness;
+        }
+
+        @Override
+        public String getHeightmap() {
+            return heightmap;
         }
 
         public void setMultipass(Function<Integer, Integer> multipass) {
@@ -305,6 +318,7 @@ public class BiomeDatabase {
             this.densitySelector = (rnd, nd) -> -1;
             this.chanceSelector = (rnd, spc, rad) -> BiomePropertySelectors.Chance.UNHANDLED;
             this.forestness = 0.0F;
+            this.heightmap = "WORLD_SURFACE_WG";
             this.blacklisted = false;
             this.multipass = defaultMultipass;
         }
@@ -397,12 +411,21 @@ public class BiomeDatabase {
         return getEntry(biome).getForestness();
     }
 
+    public String getHeightmap(Biome biome) {
+        return getEntry(biome).getHeightmap();
+    }
+
     public Function<Integer, Integer> getMultipass(Biome biome) {
         return getEntry(biome).getMultipass();
     }
 
     public BiomeDatabase setForestness(Biome biome, float forestness) {
         getEntry(biome).setForestness((float) Math.max(forestness, DTConfigs.SEED_MIN_FORESTNESS.get()));
+        return this;
+    }
+
+    public BiomeDatabase setHeightmap(Biome biome, String heightmap) {
+        getEntry(biome).setHeightmap(heightmap);
         return this;
     }
 

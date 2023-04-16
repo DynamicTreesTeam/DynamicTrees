@@ -35,7 +35,7 @@ public class CaveRootedTreeFeature extends DynamicTreeFeature {
             return false;
         }
 
-        List<BlockPos> groundPositions = GroundFinder.getGroundFinder(level.getLevel()).findGround(level, originPos);
+        List<BlockPos> groundPositions = GroundFinder.getGroundFinder(level.getLevel()).findGround(level, originPos, null);
         if (groundPositions.isEmpty()) {
             return false;
         }

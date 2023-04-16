@@ -62,7 +62,7 @@ public class SubterraneanGroundFinder implements GroundFinder {
     }
 
     @Override
-    public List<BlockPos> findGround(LevelAccessor level, BlockPos start) {
+    public List<BlockPos> findGround(LevelAccessor level, BlockPos start, Heightmap.Types heightmap) {
         final ArrayList<Integer> layers = findSubterraneanLayerHeights(level, start);
         if (layers.size() < 1) {
             return NO_LAYERS;
