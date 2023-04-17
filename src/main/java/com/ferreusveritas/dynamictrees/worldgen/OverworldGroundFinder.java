@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.levelgen.Heightmap;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 public final class OverworldGroundFinder implements GroundFinder {
 
     @Override
-    public List<BlockPos> findGround(LevelAccessor level, BlockPos start, Heightmap.Types heightmap) {
+    public List<BlockPos> findGround(LevelAccessor level, BlockPos start, @Nullable Heightmap.Types heightmap) {
     	if (heightmap == null) {
     		return Collections.singletonList(CoordUtils.findWorldSurface(level, start, true));
     	} else {

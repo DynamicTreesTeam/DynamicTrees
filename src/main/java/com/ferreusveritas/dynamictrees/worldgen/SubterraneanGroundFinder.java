@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.levelgen.Heightmap;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -62,7 +63,7 @@ public class SubterraneanGroundFinder implements GroundFinder {
     }
 
     @Override
-    public List<BlockPos> findGround(LevelAccessor level, BlockPos start, Heightmap.Types heightmap) {
+    public List<BlockPos> findGround(LevelAccessor level, BlockPos start, @Nullable Heightmap.Types heightmap) {
         final ArrayList<Integer> layers = findSubterraneanLayerHeights(level, start);
         if (layers.size() < 1) {
             return NO_LAYERS;

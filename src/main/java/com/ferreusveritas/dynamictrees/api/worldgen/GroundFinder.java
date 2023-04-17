@@ -11,6 +11,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.Heightmap;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ public interface GroundFinder {
      * @param start the {@link BlockPos} to start from
      * @return the {@link BlockPos} of the first ground block
      */
-    List<BlockPos> findGround(LevelAccessor level, BlockPos start, Heightmap.Types heightmap);
+    List<BlockPos> findGround(LevelAccessor level, BlockPos start, @Nullable Heightmap.Types heightmap);
 
     static void registerGroundFinder(ResourceKey<Level> dimension, GroundFinder groundFinder) {
         GROUND_FINDERS.put(dimension, groundFinder);

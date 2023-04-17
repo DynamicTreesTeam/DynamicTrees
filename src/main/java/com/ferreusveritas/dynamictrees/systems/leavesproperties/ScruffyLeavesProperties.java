@@ -17,8 +17,8 @@ public class ScruffyLeavesProperties extends LeavesProperties {
         super(registryName);
     }
 
-    private float leafChance = 0.5f;
-    private int maxHydro = LeavesProperties.maxHydro;
+    private float leafChance = 0.66f;
+    private int maxHydro = 1;
 
     public void setLeafChance (float leafChance){
         this.leafChance = leafChance;

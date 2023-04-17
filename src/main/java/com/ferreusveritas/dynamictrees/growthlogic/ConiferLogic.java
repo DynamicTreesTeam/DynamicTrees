@@ -76,12 +76,13 @@ public class ConiferLogic extends GrowthLogicKit {
     //so we feed the hash function the in-game month
     @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
-        return super.getEnergy(configuration, context) * getHashVariation(configuration, context); // Vary the height energy by a psuedorandom hash function
+        return super.getEnergy(configuration, context) * context.species().biomeSuitability(context.level(), context.pos())
+                + getHashVariation(configuration, context); // Vary the height energy by a psuedorandom hash function
     }
 
     @Override
     public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
-        return (int)(super.getLowestBranchHeight(configuration, context) *
+        return (int)(super.getLowestBranchHeight(configuration, context) +
                 (configuration.get(VARIATE_LOWEST_BRANCH) ? getHashVariation(configuration, context) : 1f));
     }
 
@@ -89,7 +90,6 @@ public class ConiferLogic extends GrowthLogicKit {
         long day = context.level().getGameTime() / 24000L;
         int month = (int) day / 30;//Change the hashs every in-game month
 
-        return context.species().biomeSuitability(context.level(), context.pos()) +
-                (CoordUtils.coordHashCode(context.pos().above(month), 2) % configuration.get(HEIGHT_VARIATION));
+        return  (CoordUtils.coordHashCode(context.pos().above(month), 2) % configuration.get(HEIGHT_VARIATION));
     }
 }
