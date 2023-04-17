@@ -19,6 +19,10 @@ public class ConiferLogic extends GrowthLogicKit {
      * cylindrical shape.
      */
     public static final ConfigurationProperty<Float> HORIZONTAL_LIMITER = ConfigurationProperty.floatProperty("horizontal_limiter");
+    /**
+     * Whether the lowest branch height variates with the height variation. By default, it doesn't.
+     */
+    public static final ConfigurationProperty<Boolean> VARIATE_LOWEST_BRANCH = ConfigurationProperty.bool("variate_lowest_branch");
 
     public ConiferLogic(final ResourceLocation registryName) {
         super(registryName);
@@ -29,12 +33,13 @@ public class ConiferLogic extends GrowthLogicKit {
         return super.createDefaultConfiguration()
                 .with(ENERGY_DIVISOR, 3F)
                 .with(HORIZONTAL_LIMITER, 16F)
-                .with(HEIGHT_VARIATION, 5);
+                .with(HEIGHT_VARIATION, 5)
+                .with(VARIATE_LOWEST_BRANCH, false);
     }
 
     @Override
     protected void registerProperties() {
-        this.register(ENERGY_DIVISOR, HORIZONTAL_LIMITER, HEIGHT_VARIATION);
+        this.register(ENERGY_DIVISOR, HORIZONTAL_LIMITER, HEIGHT_VARIATION, VARIATE_LOWEST_BRANCH);
     }
 
     @Override
@@ -71,11 +76,20 @@ public class ConiferLogic extends GrowthLogicKit {
     //so we feed the hash function the in-game month
     @Override
     public float getEnergy(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
+        return super.getEnergy(configuration, context) * getHashVariation(configuration, context); // Vary the height energy by a psuedorandom hash function
+    }
+
+    @Override
+    public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
+        return (int)(super.getLowestBranchHeight(configuration, context) *
+                (configuration.get(VARIATE_LOWEST_BRANCH) ? getHashVariation(configuration, context) : 1f));
+    }
+
+    protected float getHashVariation (GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context){
         long day = context.level().getGameTime() / 24000L;
         int month = (int) day / 30;//Change the hashs every in-game month
 
-        return super.getEnergy(configuration, context) * context.species().biomeSuitability(context.level(), context.pos()) +
-                (CoordUtils.coordHashCode(context.pos().above(month), 2) % configuration.get(HEIGHT_VARIATION)); // Vary the height energy by a psuedorandom hash function
+        return context.species().biomeSuitability(context.level(), context.pos()) +
+                (CoordUtils.coordHashCode(context.pos().above(month), 2) % configuration.get(HEIGHT_VARIATION));
     }
-
 }

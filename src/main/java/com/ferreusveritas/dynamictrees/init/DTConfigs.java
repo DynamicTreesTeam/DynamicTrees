@@ -181,7 +181,7 @@ public class DTConfigs {
         COMMON_BUILDER.comment("World Generation Settings").push("world");
         WORLD_GEN = COMMON_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
                 define("worldGen", true);
-        DIMENSION_BLACKLIST = COMMON_BUILDER.comment("Blacklist of dimension registry names for disabling Dynamic Tree worldgen (tree cancellers need to be configured individually for biomes in dynamictrees/tree_canceller.json)").
+        DIMENSION_BLACKLIST = COMMON_BUILDER.comment("Blacklist of dimension registry names for disabling Dynamic Tree worldgen").
                 define("dimensionsBlacklist", new ArrayList<>());
         COMMON_BUILDER.pop();
 
