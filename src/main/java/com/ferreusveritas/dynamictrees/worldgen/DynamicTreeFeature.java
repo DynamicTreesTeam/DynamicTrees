@@ -20,6 +20,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
@@ -68,12 +69,14 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
     protected void generateTrees(LevelContext levelContext, BiomeDatabase biomeDatabase, PoissonDisc disc, BlockPos originPos, SafeChunkBounds safeBounds) {
         BlockPos basePos = new BlockPos(disc.x, 0, disc.z);
-        for (BlockPos groundPos : GroundFinder.getGroundFinder(levelContext.level()).findGround(levelContext.accessor(), basePos)) {
+        Biome biome = levelContext.accessor().getBiome(originPos).value();
+        Heightmap.Types heightmap = Heightmap.Types.valueOf(biomeDatabase.getHeightmap(biome));
+        for (BlockPos groundPos : GroundFinder.getGroundFinder(levelContext.level()).findGround(levelContext.accessor(), basePos, heightmap)) {
             BiomeDatabase.EntryReader entry = biomeDatabase.getEntry(levelContext.accessor().getBiome(groundPos).value());
             generateTree(levelContext, entry, disc, originPos, groundPos, safeBounds);
         }
     }
-
+    
     protected GeneratorResult generateTree(LevelContext levelContext, BiomeDatabase.EntryReader biomeEntry, PoissonDisc circle, BlockPos originPos, BlockPos groundPos, SafeChunkBounds safeBounds) {
         if (groundPos == BlockPos.ZERO) {
             return GeneratorResult.NO_GROUND;

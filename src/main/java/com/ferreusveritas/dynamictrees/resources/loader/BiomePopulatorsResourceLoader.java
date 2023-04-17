@@ -108,6 +108,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                 .register("multipass", JsonObject.class, BiomeDatabase.BaseEntry::setCustomMultipass)
                 .register("blacklist", Boolean.class, BiomeDatabase.BaseEntry::setBlacklisted)
                 .register("forestness", Float.class, BiomeDatabase.BaseEntry::setForestness)
+                .register("heightmap", String.class, BiomeDatabase.BaseEntry::setHeightmap)
                 .registerIfTrueApplier("reset", BiomeDatabase.BaseEntry::reset);
 
         this.caveRootedEntryAppliers
