@@ -26,14 +26,12 @@ public class NetherFungusFamily extends Family {
         super(name);
     }
 
-    @Override
-    public int getPrimaryThickness() {
-        return 3;
-    }
 
     @Override
-    public int getSecondaryThickness() {
-        return 4;
+    public Family setPreReloadDefaults() {
+        this.setPrimaryThickness(3);
+        this.setSecondaryThickness(4);
+        return this;
     }
 
     @Override

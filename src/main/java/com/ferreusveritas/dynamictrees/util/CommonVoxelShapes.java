@@ -17,6 +17,8 @@ public final class CommonVoxelShapes {
      */
     public static final Map<String, VoxelShape> SHAPES = new HashMap<>();
 
+    public static final VoxelShape SLAB = Shapes.create(0,0,0,1,0.5,1);
+
     public static final VoxelShape SAPLING_TRUNK = Block.box(7D, 0D, 7D, 9D, 5D, 9D);
     public static final VoxelShape SAPLING_LEAVES = Block.box(4D, 4D, 4D, 12D, 12D, 12D);
     public static final VoxelShape SLIM_SAPLING_LEAVES = Block.box(5D, 4D, 5D, 11D, 14D, 11D);
@@ -37,6 +39,7 @@ public final class CommonVoxelShapes {
     static {
         SHAPES.put("empty", Shapes.empty());
         SHAPES.put("block", Shapes.block());
+        SHAPES.put("slab", SLAB);
         SHAPES.put("sapling", SAPLING);
         SHAPES.put("slim_sapling", SLIM_SAPLING);
         SHAPES.put("flat_mushroom", FLAT_MUSHROOM);

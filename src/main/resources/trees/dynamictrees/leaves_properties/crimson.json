@@ -6,5 +6,5 @@
   "light_requirement": 0,
   "fire_spread": 0,
   "flammability": 0,
-  "material_color": "RED"
+  "material_color": "COLOR_RED"
 }

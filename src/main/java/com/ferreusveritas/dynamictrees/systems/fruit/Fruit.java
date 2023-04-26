@@ -309,7 +309,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     }
 
     public LootTable.Builder createBlockDrops() {
-        return DTLootTableProvider.createFruitDrops(block.get(), itemStack.getItem(), ageProperty, maxAge);
+        return DTLootTableProvider.createFruitDrops(block.get(), getItemStack().getItem(), ageProperty, maxAge);
     }
 
     @Nonnull

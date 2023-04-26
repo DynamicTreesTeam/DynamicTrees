@@ -9,8 +9,8 @@ public class PoissonDisc extends Vec2i {
     public int arc;
     public boolean real;
 
-    private static final SimpleBitmap[] cbm = new SimpleBitmap[9];//Bitmaps of whole circles
-    private static final SimpleBitmap[] icbm = new SimpleBitmap[9];//Bitmaps of the interiors of circles(Non-edge)
+    protected static final SimpleBitmap[] cbm = new SimpleBitmap[9];//Bitmaps of whole circles
+    protected static final SimpleBitmap[] icbm = new SimpleBitmap[9];//Bitmaps of the interiors of circles(Non-edge)
 
     static {
         int[] circledata = {0x48, 0x488, 0x36D1, 0x248D1, 0x16D919, 0xDB5B19, 0x7FF6B19};//Packed circle data.  3 bits per slice length. 1 element per circle.
@@ -36,7 +36,7 @@ public class PoissonDisc extends Vec2i {
         icbm[0] = icbm[1] = icbm[2];
     }
 
-    private static SimpleBitmap circleBitmapGen(int radius, int points) {
+    protected static SimpleBitmap circleBitmapGen(int radius, int points) {
         int dim = radius * 2 + 1;
         int top = 0;
         int bot = dim - 1;
@@ -63,19 +63,19 @@ public class PoissonDisc extends Vec2i {
         }
     }
 
-    private static SimpleBitmap getCircleBitmap(int radius) {
+    protected static SimpleBitmap getCircleBitmap(int radius) {
         return cbm[radius];
     }
 
-    private SimpleBitmap getCircleBitmap() {
+    protected SimpleBitmap getCircleBitmap() {
         return getCircleBitmap(radius);
     }
 
-    private static SimpleBitmap getCircleInteriorBitmap(int radius) {
+    protected static SimpleBitmap getCircleInteriorBitmap(int radius) {
         return icbm[radius];
     }
 
-    private SimpleBitmap getCircleInteriorBitmap() {
+    protected SimpleBitmap getCircleInteriorBitmap() {
         return getCircleInteriorBitmap(radius);
     }
 

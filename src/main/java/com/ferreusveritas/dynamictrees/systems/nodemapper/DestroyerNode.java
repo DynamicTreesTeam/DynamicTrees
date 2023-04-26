@@ -25,14 +25,13 @@ import java.util.List;
  *
  * @author ferreusveritas
  */
-public class DestroyerNode implements NodeInspector {
+public class DestroyerNode extends FindEndsNode {
 
     Species species;//Destroy any node that's made of the same kind of wood
-    private final List<BlockPos> endPoints;//We always need to track endpoints during destruction
     private Player player = null;
 
     public DestroyerNode(Species species) {
-        this.endPoints = new ArrayList<>(32);
+        super();
         this.species = species;
     }
 
@@ -40,11 +39,6 @@ public class DestroyerNode implements NodeInspector {
         this.player = player;
         return this;
     }
-
-    public List<BlockPos> getEnds() {
-        return endPoints;
-    }
-
     @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, @Nullable Direction fromDir) {
         if (BranchConnectables.getConnectionRadiusForBlock(state, level, pos, fromDir == null ? null : fromDir.getOpposite()) > 0) {
@@ -55,24 +49,21 @@ public class DestroyerNode implements NodeInspector {
             } else {
                 level.setBlock(pos, BlockStates.AIR, 0);
             }
-            return true;
         }
 
         BranchBlock branch = TreeHelper.getBranch(state);
 
         if (branch != null && species.getFamily() == branch.getFamily()) {
             boolean waterlogged = state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED);
-            if (branch.getRadius(state) == species.getFamily().getPrimaryThickness()) {
-                endPoints.add(pos);
-            }
+
             level.setBlock(pos, waterlogged ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState(), 3);//Destroy the branch and notify the client
         }
 
-        return true;
+        return super.run(state, level, pos, fromDir);
     }
 
     @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
-        return false;
+        return super.returnRun(state, level, pos, fromDir);
     }
 }
