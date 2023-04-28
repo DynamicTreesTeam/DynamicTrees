@@ -238,6 +238,11 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         for (BlockPos relPos : destroyData.getPositions(BranchDestructionData.PosType.BRANCHES, false)) {
             normalBB = normalBB.minmax(new AABB(relPos));
         }
+        if (destroyData.species.leavesAreSolid()){
+            for (BlockPos relPos : destroyData.getPositions(BranchDestructionData.PosType.LEAVES, false)) {
+                normalBB = normalBB.minmax(new AABB(relPos));
+            }
+        }
 
         //Adjust the bounding box to account for the tree falling over
         double height = normalBB.maxY - normalBB.minY;

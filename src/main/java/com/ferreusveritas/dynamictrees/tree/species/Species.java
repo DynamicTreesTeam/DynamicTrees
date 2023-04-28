@@ -1955,6 +1955,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return null;
     }
 
+    public boolean canEncodeLeavesBlocks (BlockPos pos, BlockState state, Block block, BranchDestructionData data){
+        return block instanceof DynamicLeavesBlock;
+    }
+
+    public int encodeLeavesPos(BlockPos pos, BlockState state, Block block, BranchDestructionData data) {
+        return (state.getValue(DynamicLeavesBlock.DISTANCE) << 24) | BranchDestructionData.encodeRelBlockPos(pos);
+    }
+
+    public int encodeLeavesBlocks(BlockPos pos, BlockState state, Block block, BranchDestructionData data) {
+        return getLeafBlockIndex((DynamicLeavesBlock) block);
+    }
+
+    public boolean leavesAreSolid (){
+        return getLeavesProperties().getPrimitiveLeaves().getMaterial().isSolidBlocking();
+    }
+
     //////////////////////////////
     // BONSAI POT
     //////////////////////////////

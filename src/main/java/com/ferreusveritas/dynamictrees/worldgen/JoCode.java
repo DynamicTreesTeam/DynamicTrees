@@ -185,7 +185,6 @@ public class JoCode {
 
         // If a branch exists then the growth was successful.
 
-        final LeavesProperties leavesProperties = species.getLeavesProperties();
         final SimpleVoxmap leafMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(treePos, new BlockPos(radius, 0, radius));
         final NodeInspector inflator = species.getNodeInflator(leafMap); // This is responsible for thickening the branches.
         final FindEndsNode endFinder = new FindEndsNode(); // This is responsible for gathering a list of branch end points.
@@ -199,8 +198,28 @@ public class JoCode {
             return;
         }
 
+        //The leaves are generated and aged
+        generateAndAgeLeaves(context, leafMap, worldGen);
+
         final List<BlockPos> endPoints = endFinder.getEnds();
 
+        // Rot the unsupported branches.
+        if (species.handleRot(level, endPoints, rootPos, treePos, 0, context.safeBounds())) {
+            return; // The entire tree rotted away before it had a chance.
+        }
+
+        // Allow for special decorations by the tree itself.
+        species.postGeneration(new PostGenerationContext(context, endPoints, initialDirtState));
+        MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(level, species, rootPos, endPoints, context.safeBounds(), initialDirtState));
+
+        // Add snow to parts of the tree in chunks where snow was already placed.
+        this.addSnow(leafMap, level, rootPos, context.biome());
+    }
+
+    protected void generateAndAgeLeaves(GenerationContext context, SimpleVoxmap leafMap, boolean worldGen){
+        LevelAccessor level = context.level();
+        Species species = context.species();
+        final LeavesProperties leavesProperties = species.getLeavesProperties();
         this.smother(leafMap, leavesProperties); // Use the voxmap to precompute leaf smothering so we don't have to age it as many times.
 
         // Place Growing Leaves Blocks from voxmap.
@@ -228,20 +247,9 @@ public class JoCode {
         // Age volume for 3 cycles using a leafmap.
         TreeHelper.ageVolume(level, leafMap, species.getWorldGenAgeIterations(), context.safeBounds());
 
-        // Rot the unsupported branches.
-        if (species.handleRot(level, endPoints, rootPos, treePos, 0, context.safeBounds())) {
-            return; // The entire tree rotted away before it had a chance.
-        }
-
-        // Allow for special decorations by the tree itself.
-        species.postGeneration(new PostGenerationContext(context, endPoints, initialDirtState));
-        MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(level, species, rootPos, endPoints, context.safeBounds(), initialDirtState));
-
-        // Add snow to parts of the tree in chunks where snow was already placed.
-        this.addSnow(leafMap, level, rootPos, context.biome());
     }
 
-    private void tryGenerateAgain(GenerationContext context, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder) {
+    protected void tryGenerateAgain(GenerationContext context, boolean worldGen, BlockPos treePos, BlockState treeState, FindEndsNode endFinder) {
         // Don't log the error if it didn't happen during world gen (so we don't fill the logs if players spam the staff in cramped positions).
         if (worldGen) {
             if (!context.secondChanceRegen()) {

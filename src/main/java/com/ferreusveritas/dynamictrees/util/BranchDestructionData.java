@@ -120,12 +120,10 @@ public class BranchDestructionData {
         BranchConnectionData origConnData = branchList.get(BlockPos.ZERO);
         if (origConnData != null) {
             BlockState origState = origConnData.getBlockState();
-            if (origState != null) {
-                radPosData[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock) origState.getBlock(), origState);
-                connectionData[index] = encodeBranchesConnections(origConnData.getConnections());
-                blockIndexData[index++] = encodeBranchBlocks((BranchBlock) origState.getBlock());
-                branchList.remove(BlockPos.ZERO);
-            }
+            radPosData[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock) origState.getBlock(), origState);
+            connectionData[index] = encodeBranchesConnections(origConnData.getConnections());
+            blockIndexData[index++] = encodeBranchBlocks((BranchBlock) origState.getBlock());
+            branchList.remove(BlockPos.ZERO);
         }
 
         //Encode the remaining blocks
@@ -241,23 +239,15 @@ public class BranchDestructionData {
             BlockState state = set.getValue();
             Block block = state.getBlock();
 
-            if (block instanceof DynamicLeavesBlock && bounds.inBounds(relPos)) { //Place comfortable limits on the system
-                posData[index] = encodeLeavesPos(relPos, (DynamicLeavesBlock) block, state);
-                blockIndexData[index++] = encodeLeavesBlocks((DynamicLeavesBlock) block, species);
+            if (species.canEncodeLeavesBlocks(relPos, state, block, this) && bounds.inBounds(relPos)) { //Place comfortable limits on the system
+                posData[index] = species.encodeLeavesPos(relPos, state, block, this);
+                blockIndexData[index++] = species.encodeLeavesBlocks(relPos, state, block, this);
             }
         }
         posData = Arrays.copyOf(posData, index); //Shrink down the array
         blockIndexData = Arrays.copyOf(blockIndexData, index);
 
         return new int[][]{posData, blockIndexData};
-    }
-
-    private int encodeLeavesPos(BlockPos relPos, DynamicLeavesBlock block, BlockState state) {
-        return (state.getValue(DynamicLeavesBlock.DISTANCE) << 24) | encodeRelBlockPos(relPos);
-    }
-
-    private int encodeLeavesBlocks(DynamicLeavesBlock block, Species species) {
-        return species.getLeafBlockIndex(block);
     }
 
     public int getNumLeaves() {
@@ -284,6 +274,7 @@ public class BranchDestructionData {
         return this.species.getValidLeavesProperties(this.destroyedLeavesBlockIndex[index]);
     }
 
+    @Nullable
     public BlockState getLeavesBlockState(int index) {
         DynamicLeavesBlock leaves = species.getValidLeafBlock(destroyedLeavesBlockIndex[index]);
         if (leaves != null) {
