@@ -1,0 +1,29 @@
+{
+  "falling_tree_big": {
+    "subtitle": "sounds.dynamictrees.falling_tree.big",
+    "sounds": [
+      "dynamictrees:falling_tree/big1",
+      "dynamictrees:falling_tree/big2",
+      "dynamictrees:falling_tree/big3",
+      "dynamictrees:falling_tree/big4"
+    ]
+  },
+  "falling_tree_medium": {
+    "subtitle": "sounds.dynamictrees.falling_tree.medium",
+    "sounds": [
+      "dynamictrees:falling_tree/medium1",
+      "dynamictrees:falling_tree/medium2",
+      "dynamictrees:falling_tree/medium3",
+      "dynamictrees:falling_tree/medium4"
+    ]
+  },
+  "falling_tree_small": {
+    "subtitle": "sounds.dynamictrees.falling_tree.small",
+    "sounds": [
+      "dynamictrees:falling_tree/small1",
+      "dynamictrees:falling_tree/small2",
+      "dynamictrees:falling_tree/small3",
+      "dynamictrees:falling_tree/small4"
+    ]
+  }
+}

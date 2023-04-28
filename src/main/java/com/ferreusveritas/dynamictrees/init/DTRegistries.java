@@ -33,6 +33,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -83,6 +84,7 @@ public class DTRegistries {
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, DynamicTrees.MOD_ID);
     public static final DeferredRegister<ConfiguredFeature<?, ?>> CONFIGURED_FEATURES = DeferredRegister.create(Registry.CONFIGURED_FEATURE_REGISTRY, DynamicTrees.MOD_ID);
     public static final DeferredRegister<PlacedFeature> PLACED_FEATURES = DeferredRegister.create(Registry.PLACED_FEATURE_REGISTRY, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, DynamicTrees.MOD_ID);
 
     ///////////////////////////////////////////
     // BLOCKS
@@ -104,6 +106,7 @@ public class DTRegistries {
         FEATURES.register(modBus);
         CONFIGURED_FEATURES.register(modBus);
         PLACED_FEATURES.register(modBus);
+        SOUND_EVENTS.register(modBus);
 
         setupBlocks();
         setupConnectables();
@@ -256,6 +259,18 @@ public class DTRegistries {
     @SubscribeEvent
     public static void onGenFeatureRegistry(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<GenFeature> event) {
         GenFeatures.register(event.getRegistry());
+    }
+
+    ///////////////////////////////////////////
+    // SOUNDS
+    ///////////////////////////////////////////
+
+    public static final RegistryObject<SoundEvent> FALLING_TREE_BIG = registerSoundEvent("falling_tree_big");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_MEDIUM = registerSoundEvent("falling_tree_medium");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL = registerSoundEvent("falling_tree_small");
+
+    private static RegistryObject<SoundEvent> registerSoundEvent (String name){
+        return SOUND_EVENTS.register(name, ()-> new SoundEvent(DynamicTrees.location(name)));
     }
 
 }

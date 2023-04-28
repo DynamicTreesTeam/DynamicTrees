@@ -4,15 +4,18 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -31,9 +34,12 @@ public class FalloverAnimationHandler implements AnimationHandler {
         return "fallover";
     }
 
-    class HandlerData extends DataAnimationHandler {
+    static class HandlerData extends DataAnimationHandler {
         float fallSpeed = 0;
         int bounces = 0;
+        boolean startSoundPlayed = false;
+        boolean fallThroughWaterSoundPlayed = false;
+        boolean endSoundPlayed = false;
         HashSet<LivingEntity> entitiesHit = new HashSet<>();//A record of the entities that have taken damage to ensure they are only damaged a single time
     }
 
@@ -41,15 +47,42 @@ public class FalloverAnimationHandler implements AnimationHandler {
         return entity.dataAnimationHandler != null ? (HandlerData) entity.dataAnimationHandler : new HandlerData();
     }
 
+    protected void playStartSound(FallingTreeEntity entity){
+        if (!getData(entity).startSoundPlayed){
+            if (entity.getVolume() > 20)
+                entity.playSound(DTRegistries.FALLING_TREE_BIG.get(), 1, 1);
+            else
+                entity.playSound(DTRegistries.FALLING_TREE_MEDIUM.get(), 1, 1);
+            getData(entity).startSoundPlayed = true;
+        }
+    }
+    protected void playEndSound(FallingTreeEntity entity){
+        if (!getData(entity).endSoundPlayed){
+            if (entity.getVolume() > 20)
+                entity.playSound(SoundEvents.GENERIC_EXPLODE, 1, 1);
+            else
+                entity.playSound(SoundEvents.ANVIL_LAND, 1, 1);
+            getData(entity).endSoundPlayed = true;
+        }
+    }
+
+    protected void playFallThroughWaterSound(FallingTreeEntity entity){
+        if (!getData(entity).fallThroughWaterSoundPlayed){
+            entity.playSound(SoundEvents.PLAYER_SPLASH_HIGH_SPEED, 1, 1);
+            getData(entity).fallThroughWaterSoundPlayed = true;
+        }
+    }
+
     @Override
     public void initMotion(FallingTreeEntity entity) {
         entity.dataAnimationHandler = new HandlerData();
         FallingTreeEntity.standardDropLeavesPayLoad(entity);//Seeds and stuff fall out of the tree before it falls over
 
+        playStartSound(entity);
+
         BlockPos belowBlock = entity.getDestroyData().cutPos.below();
         if (entity.level.getBlockState(belowBlock).isFaceSturdy(entity.level, belowBlock, Direction.UP)) {
             entity.setOnGround(true);
-            return;
         }
     }
 
@@ -94,6 +127,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
         }
 
         if (fallSpeed > 0 && testCollision(entity)) {
+            playEndSound(entity);
             addRotation(entity, -fallSpeed);//pull back to before the collision
             getData(entity).bounces++;
             fallSpeed *= -AnimationConstants.TREE_ELASTICITY;//bounce with elasticity
@@ -130,7 +164,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
      * This tests a bounding box cube for each block of the trunk. Processing is approximately equivalent to the same
      * number of {@link net.minecraft.world.entity.item.ItemEntity}s in the world.
      *
-     * @param entity
+     * @param entity the falling tree entity
      * @return true if collision is detected
      */
     private boolean testCollision(FallingTreeEntity entity) {
@@ -158,6 +192,10 @@ public class FalloverAnimationHandler implements AnimationHandler {
             float tex = 0.0625f;
             float half = Mth.clamp(tex * (segment + 1) * 2, tex, maxRadius);
             AABB testBB = new AABB(segX - half, segY - half, segZ - half, segX + half, segY + half, segZ + half);
+
+            if (entity.level.containsAnyLiquid(testBB)){
+                playFallThroughWaterSound(entity);
+            }
 
             if (!entity.level.noCollision(entity, testBB)) {
                 return true;
