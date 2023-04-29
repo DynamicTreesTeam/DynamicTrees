@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
@@ -55,8 +56,9 @@ public class FalloverAnimationHandler implements AnimationHandler {
     protected void playStartSound(FallingTreeEntity entity){
         //TO-DO sound has infinite range? why?
         if (!getData(entity).startSoundPlayed){
-            SoundEvent sound = entity.getSpecies().getFallingTreeStartSound(entity.getVolume(), entity.hasLeaves());
-            SoundInstance fallingInstance = entity.getSpecies().getSoundInstance(sound, 1, entity.position());
+            Species species = entity.getSpecies();
+            SoundEvent sound = species.getFallingTreeStartSound(entity.getVolume(), entity.hasLeaves());
+            SoundInstance fallingInstance = species.getSoundInstance(sound, species.getFallingTreePitch(entity.getVolume()), entity.position());
             Minecraft.getInstance().getSoundManager().play(fallingInstance);
             getData(entity).fallingSoundInstance = fallingInstance;
             getData(entity).startSoundPlayed = true;
@@ -64,18 +66,19 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
     protected void playEndSound(FallingTreeEntity entity){
         if (!getData(entity).endSoundPlayed){
+            Species species = entity.getSpecies();
             SoundInstance fallingInstance = getData(entity).fallingSoundInstance;
             if (fallingInstance != null)
                 Minecraft.getInstance().getSoundManager().stop(fallingInstance);
-            SoundEvent sound = entity.getSpecies().getFallingTreeEndSound(entity.getVolume(), entity.hasLeaves());
-            entity.playSound(sound, 1, 1);
+            SoundEvent sound = species.getFallingTreeEndSound(entity.getVolume(), entity.hasLeaves());
+            entity.playSound(sound, 2, species.getFallingTreePitch(entity.getVolume()));
             getData(entity).endSoundPlayed = true;
         }
     }
 
     protected void playFallThroughWaterSound(FallingTreeEntity entity){
         if (!getData(entity).fallThroughWaterSoundPlayed){
-            entity.playSound(entity.getSpecies().getFallingTreeHitWaterSound(entity.getVolume(), entity.hasLeaves()), 1, 1);
+            entity.playSound(entity.getSpecies().getFallingTreeHitWaterSound(entity.getVolume(), entity.hasLeaves()), 2, 1);
             getData(entity).fallThroughWaterSoundPlayed = true;
         }
     }
