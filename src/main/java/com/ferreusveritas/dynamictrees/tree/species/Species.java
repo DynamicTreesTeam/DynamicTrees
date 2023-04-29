@@ -1980,7 +1980,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     // SOUND EFFECTS
     ///////////////////////////////////////////
 
-    private float bigTreeSoundThreshold = 20;
+    protected float bigTreeSoundThreshold = 20;
 
     public SoundInstance getSoundInstance (SoundEvent sound, float pitch, Vec3 pos){
         return getSoundInstance(sound, 1f, pitch, pos);
@@ -2018,6 +2018,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public SoundEvent getFallingBranchEndSound (float treeVolume, boolean hasLeaves, boolean fellOnWater){
         return  fellOnWater ? (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_HIT_WATER.get() : SoundEvents.PLAYER_SPLASH) :
                 (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_END.get() : DTRegistries.FALLING_TREE_SMALL_END_BARE.get());
+    }
+
+    public void setBigTreeSoundThreshold(float bigTreeSoundThreshold) {
+        this.bigTreeSoundThreshold = bigTreeSoundThreshold;
     }
 
     //////////////////////////////
