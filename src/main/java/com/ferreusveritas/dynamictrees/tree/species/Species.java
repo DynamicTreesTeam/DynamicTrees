@@ -1980,8 +1980,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     ///////////////////////////////////////////
 
     private float bigTreeSoundThreshold = 20;
-    private float minimumFallingSoundPitch = 0.6f;
-    private float centerPitchOffset = 10;
 
     public SoundInstance getSoundInstance (SoundEvent sound, float pitch, Vec3 pos){
         return new SimpleSoundInstance(sound, SoundSource.NEUTRAL, 0.8F, pitch, pos.x, pos.y, pos.z);
@@ -2001,8 +1999,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public float getFallingTreePitch (float treeVolume){
         return treeVolume > bigTreeSoundThreshold ?
-                (Math.max(30/(5+treeVolume), minimumFallingSoundPitch)) :
-                (Math.max(10/(5+treeVolume), minimumFallingSoundPitch));
+                (25/treeVolume) :
+                (10/(5+treeVolume*0.6f));
     }
 
     public SoundEvent getFallingTreeHitWaterSound (float treeVolume, boolean hasLeaves){
