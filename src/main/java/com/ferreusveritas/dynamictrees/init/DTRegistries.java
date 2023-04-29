@@ -270,7 +270,6 @@ public class DTRegistries {
     public static final RegistryObject<SoundEvent> FALLING_TREE_BIG_END = registerSoundEvent("falling_tree_big_end");
     public static final RegistryObject<SoundEvent> FALLING_TREE_MEDIUM_START = registerSoundEvent("falling_tree_medium_start");
     public static final RegistryObject<SoundEvent> FALLING_TREE_MEDIUM_END = registerSoundEvent("falling_tree_medium_end");
-    public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_START = registerSoundEvent("falling_tree_small_start");
     public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_HIT_WATER = registerSoundEvent("falling_tree_small_hit_water");
     public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_END = registerSoundEvent("falling_tree_small_end");
     public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_END_BARE = registerSoundEvent("falling_tree_small_end_bare");

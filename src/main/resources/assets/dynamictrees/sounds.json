@@ -21,14 +21,6 @@
         "attenuation_distance": 32}
     ]
   },
-  "falling_tree_small_start": {
-    "subtitle": "sounds.dynamictrees.falling_tree.small.start",
-    "sounds": [
-      "dynamictrees:falling_tree/small/start1",
-      "dynamictrees:falling_tree/small/start2",
-      "dynamictrees:falling_tree/small/start3"
-    ]
-  },
 
 
   "falling_tree_big_end": {
@@ -57,16 +49,14 @@
     "subtitle": "sounds.dynamictrees.falling_tree.small.end",
     "sounds": [
       "dynamictrees:falling_tree/small/end1",
-      "dynamictrees:falling_tree/small/end2",
-      "dynamictrees:falling_tree/small/end3"
+      "dynamictrees:falling_tree/small/end2"
     ]
   },
   "falling_tree_small_end_bare": {
     "subtitle": "sounds.dynamictrees.falling_tree.small.end",
     "sounds": [
       "dynamictrees:falling_tree/small/end_bare1",
-      "dynamictrees:falling_tree/small/end_bare2",
-      "dynamictrees:falling_tree/small/end_bare3"
+      "dynamictrees:falling_tree/small/end_bare2"
     ]
   },
 
@@ -85,9 +75,8 @@
   "falling_tree_small_hit_water": {
     "subtitle": "sounds.dynamictrees.falling_tree.small.hit_water",
     "sounds": [
-      "dynamictrees:falling_tree/small/hit_water1",
-      "dynamictrees:falling_tree/small/hit_water2",
-      "dynamictrees:falling_tree/small/hit_water3"
+      "dynamictrees:falling_tree/small/end_water1",
+      "dynamictrees:falling_tree/small/end_water2"
     ]
   }
 }

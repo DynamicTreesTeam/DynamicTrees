@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
@@ -44,22 +45,14 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         return entity.dataAnimationHandler instanceof HandlerData ? (HandlerData) entity.dataAnimationHandler : new HandlerData();
     }
 
-    protected void playStartSound(FallingTreeEntity entity){
-        if (!getData(entity).startSoundPlayed){
-            SoundEvent sound = entity.getSpecies().getFallingBranchStartSound(entity.getVolume(), entity.hasLeaves());
-            SoundInstance fallingInstance = entity.getSpecies().getSoundInstance(sound, 1, entity.position());
-            Minecraft.getInstance().getSoundManager().play(fallingInstance);
-            getData(entity).fallingSoundInstance = fallingInstance;
-            getData(entity).startSoundPlayed = true;
-        }
-    }
     protected void playEndSound(FallingTreeEntity entity, boolean onWater){
         if (!getData(entity).endSoundPlayed){
             SoundInstance fallingInstance = getData(entity).fallingSoundInstance;
             if (fallingInstance != null)
                 Minecraft.getInstance().getSoundManager().stop(fallingInstance);
-            SoundEvent sound = entity.getSpecies().getFallingBranchEndSound(entity.getVolume(), entity.hasLeaves(), onWater);
-            entity.playSound(sound, 1, 1);
+            Species species = entity.getSpecies();
+            SoundEvent sound = species.getFallingBranchEndSound(entity.getVolume(), entity.hasLeaves(), onWater);
+            entity.playSound(sound, species.getFallingBranchPitch(entity.getVolume()), 1);
             getData(entity).endSoundPlayed = true;
         }
     }
@@ -69,7 +62,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         entity.dataAnimationHandler = new HandlerData();
         final BlockPos cutPos = entity.getDestroyData().cutPos;
 
-        playStartSound(entity);
+        //playStartSound(entity);
 
         final long seed = entity.level.random.nextLong();
         final Random random = new Random(seed ^ (((long) cutPos.getX()) << 32 | ((long) cutPos.getZ())));

@@ -81,6 +81,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -2003,16 +2004,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 (10/(5+treeVolume*0.6f));
     }
 
+    public float getFallingBranchPitch (float treeVolume){
+        return 1/treeVolume;
+    }
+
     public SoundEvent getFallingTreeHitWaterSound (float treeVolume, boolean hasLeaves){
         return DTRegistries.FALLING_TREE_HIT_WATER.get();
     }
 
-    public SoundEvent getFallingBranchStartSound (float treeVolume, boolean hasLeaves){
-        return DTRegistries.FALLING_TREE_SMALL_START.get();
-    }
-
     public SoundEvent getFallingBranchEndSound (float treeVolume, boolean hasLeaves, boolean fellOnWater){
-        return  fellOnWater ? DTRegistries.FALLING_TREE_SMALL_HIT_WATER.get() :
+        return  fellOnWater ? (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_HIT_WATER.get() : SoundEvents.PLAYER_SPLASH) :
                 (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_END.get() : DTRegistries.FALLING_TREE_SMALL_END_BARE.get());
     }
 
