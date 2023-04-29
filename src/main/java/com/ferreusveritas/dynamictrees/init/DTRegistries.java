@@ -265,9 +265,15 @@ public class DTRegistries {
     // SOUNDS
     ///////////////////////////////////////////
 
-    public static final RegistryObject<SoundEvent> FALLING_TREE_BIG = registerSoundEvent("falling_tree_big");
-    public static final RegistryObject<SoundEvent> FALLING_TREE_MEDIUM = registerSoundEvent("falling_tree_medium");
-    public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL = registerSoundEvent("falling_tree_small");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_HIT_WATER = registerSoundEvent("falling_tree_hit_water");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_BIG_START = registerSoundEvent("falling_tree_big_start");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_BIG_END = registerSoundEvent("falling_tree_big_end");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_MEDIUM_START = registerSoundEvent("falling_tree_medium_start");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_MEDIUM_END = registerSoundEvent("falling_tree_medium_end");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_START = registerSoundEvent("falling_tree_small_start");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_HIT_WATER = registerSoundEvent("falling_tree_small_hit_water");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_END = registerSoundEvent("falling_tree_small_end");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_END_BARE = registerSoundEvent("falling_tree_small_end_bare");
 
     private static RegistryObject<SoundEvent> registerSoundEvent (String name){
         return SOUND_EVENTS.register(name, ()-> new SoundEvent(DynamicTrees.location(name)));

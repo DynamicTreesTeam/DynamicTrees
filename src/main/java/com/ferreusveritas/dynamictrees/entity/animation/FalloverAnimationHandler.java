@@ -8,14 +8,18 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -40,6 +44,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
         boolean startSoundPlayed = false;
         boolean fallThroughWaterSoundPlayed = false;
         boolean endSoundPlayed = false;
+        SoundInstance fallingSoundInstance;
         HashSet<LivingEntity> entitiesHit = new HashSet<>();//A record of the entities that have taken damage to ensure they are only damaged a single time
     }
 
@@ -48,27 +53,29 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     protected void playStartSound(FallingTreeEntity entity){
+        //TO-DO sound has infinite range? why?
         if (!getData(entity).startSoundPlayed){
-            if (entity.getVolume() > 20)
-                entity.playSound(DTRegistries.FALLING_TREE_BIG.get(), 1, 1);
-            else
-                entity.playSound(DTRegistries.FALLING_TREE_MEDIUM.get(), 1, 1);
+            SoundEvent sound = entity.getSpecies().getFallingTreeStartSound(entity.getVolume(), entity.hasLeaves());
+            SoundInstance fallingInstance = entity.getSpecies().getSoundInstance(sound, 1, entity.position());
+            Minecraft.getInstance().getSoundManager().play(fallingInstance);
+            getData(entity).fallingSoundInstance = fallingInstance;
             getData(entity).startSoundPlayed = true;
         }
     }
     protected void playEndSound(FallingTreeEntity entity){
         if (!getData(entity).endSoundPlayed){
-            if (entity.getVolume() > 20)
-                entity.playSound(SoundEvents.GENERIC_EXPLODE, 1, 1);
-            else
-                entity.playSound(SoundEvents.ANVIL_LAND, 1, 1);
+            SoundInstance fallingInstance = getData(entity).fallingSoundInstance;
+            if (fallingInstance != null)
+                Minecraft.getInstance().getSoundManager().stop(fallingInstance);
+            SoundEvent sound = entity.getSpecies().getFallingTreeEndSound(entity.getVolume(), entity.hasLeaves());
+            entity.playSound(sound, 1, 1);
             getData(entity).endSoundPlayed = true;
         }
     }
 
     protected void playFallThroughWaterSound(FallingTreeEntity entity){
         if (!getData(entity).fallThroughWaterSoundPlayed){
-            entity.playSound(SoundEvents.PLAYER_SPLASH_HIGH_SPEED, 1, 1);
+            entity.playSound(entity.getSpecies().getFallingTreeHitWaterSound(entity.getVolume(), entity.hasLeaves()), 1, 1);
             getData(entity).fallThroughWaterSoundPlayed = true;
         }
     }

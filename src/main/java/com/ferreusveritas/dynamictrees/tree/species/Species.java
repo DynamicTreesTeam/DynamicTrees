@@ -71,6 +71,8 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -78,6 +80,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -1969,6 +1973,35 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public boolean leavesAreSolid (){
         return getLeavesProperties().getPrimitiveLeaves().getMaterial().isSolidBlocking();
+    }
+
+    ///////////////////////////////////////////
+    // SOUND EFFECTS
+    ///////////////////////////////////////////
+
+    public SoundInstance getSoundInstance (SoundEvent sound, float pitch, Vec3 pos){
+        return new SimpleSoundInstance(sound, SoundSource.NEUTRAL, 1.0F, pitch, pos.x, pos.y, pos.z);
+    }
+
+    public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){
+        return treeVolume > 20 ? DTRegistries.FALLING_TREE_BIG_START.get() : DTRegistries.FALLING_TREE_MEDIUM_START.get();
+    }
+
+    public SoundEvent getFallingTreeEndSound (float treeVolume, boolean hasLeaves){
+        return treeVolume > 20 ? DTRegistries.FALLING_TREE_BIG_END.get() : DTRegistries.FALLING_TREE_MEDIUM_END.get();
+    }
+
+    public SoundEvent getFallingTreeHitWaterSound (float treeVolume, boolean hasLeaves){
+        return DTRegistries.FALLING_TREE_HIT_WATER.get();
+    }
+
+    public SoundEvent getFallingBranchStartSound (float treeVolume, boolean hasLeaves){
+        return DTRegistries.FALLING_TREE_SMALL_START.get();
+    }
+
+    public SoundEvent getFallingBranchEndSound (float treeVolume, boolean hasLeaves, boolean fellOnWater){
+        return  fellOnWater ? DTRegistries.FALLING_TREE_SMALL_HIT_WATER.get() :
+                (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_END.get() : DTRegistries.FALLING_TREE_SMALL_END_BARE.get());
     }
 
     //////////////////////////////

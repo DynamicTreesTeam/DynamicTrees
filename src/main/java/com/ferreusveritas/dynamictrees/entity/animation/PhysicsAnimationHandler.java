@@ -8,8 +8,10 @@ import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -35,6 +37,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         float rotPit = 0;
         boolean startSoundPlayed = false;
         boolean endSoundPlayed = false;
+        SoundInstance fallingSoundInstance;
     }
 
     HandlerData getData(FallingTreeEntity entity) {
@@ -43,23 +46,20 @@ public class PhysicsAnimationHandler implements AnimationHandler {
 
     protected void playStartSound(FallingTreeEntity entity){
         if (!getData(entity).startSoundPlayed){
-            entity.playSound(DTRegistries.FALLING_TREE_SMALL.get(), 1, 1);
+            SoundEvent sound = entity.getSpecies().getFallingBranchStartSound(entity.getVolume(), entity.hasLeaves());
+            SoundInstance fallingInstance = entity.getSpecies().getSoundInstance(sound, 1, entity.position());
+            Minecraft.getInstance().getSoundManager().play(fallingInstance);
+            getData(entity).fallingSoundInstance = fallingInstance;
             getData(entity).startSoundPlayed = true;
         }
     }
-    protected void playEndSound(FallingTreeEntity entity){
+    protected void playEndSound(FallingTreeEntity entity, boolean onWater){
         if (!getData(entity).endSoundPlayed){
-            if (entity.hasLeaves())
-                entity.playSound(SoundEvents.GRASS_BREAK, 1, 1);
-            else
-                entity.playSound(SoundEvents.WOOD_BREAK, 1, 1);
-            getData(entity).endSoundPlayed = true;
-        }
-    }
-    protected void playWaterEndSound(FallingTreeEntity entity){
-        if (!getData(entity).endSoundPlayed){
-            entity.playSound(SoundEvents.WET_GRASS_FALL, 1, 1);
-            entity.playSound(SoundEvents.PLAYER_SPLASH_HIGH_SPEED, 1, 1);
+            SoundInstance fallingInstance = getData(entity).fallingSoundInstance;
+            if (fallingInstance != null)
+                Minecraft.getInstance().getSoundManager().stop(fallingInstance);
+            SoundEvent sound = entity.getSpecies().getFallingBranchEndSound(entity.getVolume(), entity.hasLeaves(), onWater);
+            entity.playSound(sound, 1, 1);
             getData(entity).endSoundPlayed = true;
         }
     }
@@ -124,7 +124,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         if (!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState) && !(collState.getBlock() instanceof TrunkShellBlock)) {
             if (collState.getBlock() instanceof LiquidBlock) {
                 // Play the water version of the sound
-                playWaterEndSound(entity);
+                playEndSound(entity, true);
                 // Undo the gravity.
                 entity.setDeltaMovement(entity.getDeltaMovement().add(0, AnimationConstants.TREE_GRAVITY, 0));
                 // Create drag in liquid.
@@ -143,7 +143,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
 
                 collBox = collBox.move(pos);
                 if (fallBox.intersects(collBox)) {
-                    playEndSound(entity);
+                    playEndSound(entity, false);
                     entity.setDeltaMovement(entity.getDeltaMovement().x, 0, entity.getDeltaMovement().z);
                     entity.setPos(entity.getX(), collBox.maxY, entity.getZ());
                     entity.yo = entity.getY();

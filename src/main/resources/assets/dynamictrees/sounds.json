@@ -1,29 +1,100 @@
 {
-  "falling_tree_big": {
-    "subtitle": "sounds.dynamictrees.falling_tree.big",
+  "falling_tree_big_start": {
+    "subtitle": "sounds.dynamictrees.falling_tree.start",
     "sounds": [
-      "dynamictrees:falling_tree/big1",
-      "dynamictrees:falling_tree/big2",
-      "dynamictrees:falling_tree/big3",
-      "dynamictrees:falling_tree/big4"
+      {
+        "name": "dynamictrees:falling_tree/big/start1",
+        "attenuation_distance": 16
+
+      },
+      {
+        "name": "dynamictrees:falling_tree/big/start2",
+        "attenuation_distance": 16
+
+      },
+      {
+        "name": "dynamictrees:falling_tree/big/start3",
+        "attenuation_distance": 16
+      }
     ]
   },
-  "falling_tree_medium": {
-    "subtitle": "sounds.dynamictrees.falling_tree.medium",
+  "falling_tree_medium_start": {
+    "subtitle": "sounds.dynamictrees.falling_tree.start",
     "sounds": [
-      "dynamictrees:falling_tree/medium1",
-      "dynamictrees:falling_tree/medium2",
-      "dynamictrees:falling_tree/medium3",
-      "dynamictrees:falling_tree/medium4"
+      {
+        "name": "dynamictrees:falling_tree/medium/start1",
+        "attenuation_distance": 16
+
+      },
+      {
+        "name": "dynamictrees:falling_tree/medium/start2",
+        "attenuation_distance": 16
+
+      },
+      {
+        "name": "dynamictrees:falling_tree/medium/start3",
+        "attenuation_distance": 16
+      }
     ]
   },
-  "falling_tree_small": {
-    "subtitle": "sounds.dynamictrees.falling_tree.small",
+  "falling_tree_small_start": {
+    "subtitle": "sounds.dynamictrees.falling_tree.small.start",
     "sounds": [
-      "dynamictrees:falling_tree/small1",
-      "dynamictrees:falling_tree/small2",
-      "dynamictrees:falling_tree/small3",
-      "dynamictrees:falling_tree/small4"
+      "dynamictrees:falling_tree/small/start1",
+      "dynamictrees:falling_tree/small/start2",
+      "dynamictrees:falling_tree/small/start3"
+    ]
+  },
+
+
+  "falling_tree_big_end": {
+    "subtitle": "sounds.dynamictrees.falling_tree.end",
+    "sounds": [
+      "dynamictrees:falling_tree/big/end1",
+      "dynamictrees:falling_tree/big/end2",
+      "dynamictrees:falling_tree/big/end3"
+    ]
+  },
+  "falling_tree_medium_end": {
+    "subtitle": "sounds.dynamictrees.falling_tree.end",
+    "sounds": [
+      "dynamictrees:falling_tree/medium/end1",
+      "dynamictrees:falling_tree/medium/end2",
+      "dynamictrees:falling_tree/medium/end3"
+    ]
+  },
+  "falling_tree_small_end": {
+    "subtitle": "sounds.dynamictrees.falling_tree.small.end",
+    "sounds": [
+      "dynamictrees:falling_tree/small/end1",
+      "dynamictrees:falling_tree/small/end2",
+      "dynamictrees:falling_tree/small/end3"
+    ]
+  },
+  "falling_tree_small_end_bare": {
+    "subtitle": "sounds.dynamictrees.falling_tree.small.end",
+    "sounds": [
+      "dynamictrees:falling_tree/small/end_bare1",
+      "dynamictrees:falling_tree/small/end_bare2",
+      "dynamictrees:falling_tree/small/end_bare3"
+    ]
+  },
+
+
+  "falling_tree_hit_water": {
+    "subtitle": "sounds.dynamictrees.falling_tree.hit_water",
+    "sounds": [
+      "dynamictrees:falling_tree/water/fall1",
+      "dynamictrees:falling_tree/water/fall2",
+      "dynamictrees:falling_tree/water/fall3"
+    ]
+  },
+  "falling_tree_small_hit_water": {
+    "subtitle": "sounds.dynamictrees.falling_tree.small.hit_water",
+    "sounds": [
+      "dynamictrees:falling_tree/small/hit_water1",
+      "dynamictrees:falling_tree/small/hit_water2",
+      "dynamictrees:falling_tree/small/hit_water3"
     ]
   }
 }
