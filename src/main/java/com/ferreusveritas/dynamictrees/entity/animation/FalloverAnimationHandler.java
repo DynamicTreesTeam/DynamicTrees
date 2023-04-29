@@ -54,8 +54,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     protected void playStartSound(FallingTreeEntity entity){
-        //TO-DO sound has infinite range? why?
-        if (!getData(entity).startSoundPlayed){
+        //we play on the server side so everyone can hear it
+        if (!getData(entity).startSoundPlayed && !entity.level.isClientSide()){
             Species species = entity.getSpecies();
             SoundEvent sound = species.getFallingTreeStartSound(entity.getVolume(), entity.hasLeaves());
             SoundInstance fallingInstance = species.getSoundInstance(sound, species.getFallingTreePitch(entity.getVolume()), entity.position());
@@ -65,19 +65,19 @@ public class FalloverAnimationHandler implements AnimationHandler {
         }
     }
     protected void playEndSound(FallingTreeEntity entity){
-        if (!getData(entity).endSoundPlayed){
+        if (!getData(entity).endSoundPlayed && !entity.level.isClientSide()){
             Species species = entity.getSpecies();
             SoundInstance fallingInstance = getData(entity).fallingSoundInstance;
             if (fallingInstance != null)
                 Minecraft.getInstance().getSoundManager().stop(fallingInstance);
             SoundEvent sound = species.getFallingTreeEndSound(entity.getVolume(), entity.hasLeaves());
-            entity.playSound(sound, 2, species.getFallingTreePitch(entity.getVolume()));
+            entity.playSound(sound, 3, species.getFallingTreePitch(entity.getVolume()));
             getData(entity).endSoundPlayed = true;
         }
     }
 
     protected void playFallThroughWaterSound(FallingTreeEntity entity){
-        if (!getData(entity).fallThroughWaterSoundPlayed){
+        if (!getData(entity).fallThroughWaterSoundPlayed && !entity.level.isClientSide()){
             entity.playSound(entity.getSpecies().getFallingTreeHitWaterSound(entity.getVolume(), entity.hasLeaves()), 2, 1);
             getData(entity).fallThroughWaterSoundPlayed = true;
         }

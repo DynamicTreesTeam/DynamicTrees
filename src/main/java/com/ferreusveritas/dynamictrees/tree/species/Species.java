@@ -1983,7 +1983,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     private float bigTreeSoundThreshold = 20;
 
     public SoundInstance getSoundInstance (SoundEvent sound, float pitch, Vec3 pos){
-        return new SimpleSoundInstance(sound, SoundSource.NEUTRAL, 0.8F, pitch, pos.x, pos.y, pos.z);
+        return getSoundInstance(sound, 1f, pitch, pos);
+    }
+    public SoundInstance getSoundInstance (SoundEvent sound, float volume, float pitch, Vec3 pos){
+        return new SimpleSoundInstance(sound, SoundSource.NEUTRAL, volume, pitch, pos.x, pos.y, pos.z);
     }
 
     public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){

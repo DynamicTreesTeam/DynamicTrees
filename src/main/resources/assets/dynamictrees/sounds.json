@@ -27,22 +27,22 @@
     "subtitle": "sounds.dynamictrees.falling_tree.end",
     "sounds": [
       {"name": "dynamictrees:falling_tree/big/end1",
-        "attenuation_distance": 32},
+        "attenuation_distance": 48},
       {"name": "dynamictrees:falling_tree/big/end2",
-        "attenuation_distance": 32},
+        "attenuation_distance": 48},
       {"name": "dynamictrees:falling_tree/big/end3",
-        "attenuation_distance": 32}
+        "attenuation_distance": 48}
     ]
   },
   "falling_tree_medium_end": {
     "subtitle": "sounds.dynamictrees.falling_tree.end",
     "sounds": [
       {"name": "dynamictrees:falling_tree/medium/end1",
-        "attenuation_distance": 32},
+        "attenuation_distance": 48},
       {"name": "dynamictrees:falling_tree/medium/end2",
-        "attenuation_distance": 32},
+        "attenuation_distance": 48},
       {"name": "dynamictrees:falling_tree/medium/end3",
-        "attenuation_distance": 32}
+        "attenuation_distance": 48}
     ]
   },
   "falling_tree_small_end": {

@@ -46,7 +46,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
     }
 
     protected void playEndSound(FallingTreeEntity entity, boolean onWater){
-        if (!getData(entity).endSoundPlayed){
+        if (!getData(entity).endSoundPlayed && !entity.level.isClientSide()){
             SoundInstance fallingInstance = getData(entity).fallingSoundInstance;
             if (fallingInstance != null)
                 Minecraft.getInstance().getSoundManager().stop(fallingInstance);
