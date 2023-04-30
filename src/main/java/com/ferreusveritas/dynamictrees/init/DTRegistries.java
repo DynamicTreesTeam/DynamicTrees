@@ -275,6 +275,7 @@ public class DTRegistries {
     public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_END_BARE = registerSoundEvent("falling_tree_small_end_bare");
     public static final RegistryObject<SoundEvent> FALLING_TREE_FUNGUS_START = registerSoundEvent("falling_tree_fungus_start");
     public static final RegistryObject<SoundEvent> FALLING_TREE_FUNGUS_END = registerSoundEvent("falling_tree_fungus_end");
+    public static final RegistryObject<SoundEvent> FALLING_TREE_FUNGUS_SMALL_END = registerSoundEvent("falling_tree_fungus_small_end");
 
     private static RegistryObject<SoundEvent> registerSoundEvent (String name){
         return SOUND_EVENTS.register(name, ()-> new SoundEvent(DynamicTrees.location(name)));

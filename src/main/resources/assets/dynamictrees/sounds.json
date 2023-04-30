@@ -78,5 +78,37 @@
       "dynamictrees:falling_tree/small/end_water1",
       "dynamictrees:falling_tree/small/end_water2"
     ]
+  },
+
+
+  "falling_tree_fungus_start": {
+    "subtitle": "sounds.dynamictrees.falling_tree.start",
+    "sounds": [
+      {"name": "dynamictrees:falling_tree/fungus/start1",
+        "attenuation_distance": 32},
+      {"name": "dynamictrees:falling_tree/fungus/start2",
+        "attenuation_distance": 32},
+      {"name": "dynamictrees:falling_tree/fungus/start3",
+        "attenuation_distance": 32},
+      {"name": "dynamictrees:falling_tree/fungus/start4",
+        "attenuation_distance": 32}
+    ]
+  },
+  "falling_tree_fungus_end": {
+    "subtitle": "sounds.dynamictrees.falling_tree.end",
+    "sounds": [
+      {"name": "dynamictrees:falling_tree/fungus/end1",
+        "attenuation_distance": 48},
+      {"name": "dynamictrees:falling_tree/fungus/end2",
+        "attenuation_distance": 48},
+      {"name": "dynamictrees:falling_tree/fungus/end3",
+        "attenuation_distance": 48}
+    ]
+  },
+  "falling_tree_fungus_small_end": {
+    "subtitle": "sounds.dynamictrees.falling_tree.small.end",
+    "sounds": [
+      "dynamictrees:falling_tree/fungus/small_end1"
+    ]
   }
 }
