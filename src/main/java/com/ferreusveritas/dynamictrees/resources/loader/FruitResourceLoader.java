@@ -7,12 +7,14 @@ import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.Null;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
@@ -34,7 +36,10 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
                 .registerListApplier("block_shapes", VoxelShape.class, (fruit, list) ->
                         fruit.setBlockShapes(list.toArray(new VoxelShape[0]))
                 )
-                .register("item_stack", ItemStack.class, Fruit::setItemStack);
+                .register("item_stack", ResourceLocation.class, (fruit, resourceLocation) ->
+                        Species.REGISTRY.runOnNextLock(
+                                ()-> fruit.setItemStack(new ItemStack(ForgeRegistries.ITEMS.getValue(resourceLocation)))
+                        ));
 
         this.reloadAppliers
                 .register("can_bone_meal", Boolean.class, Fruit::setCanBoneMeal)

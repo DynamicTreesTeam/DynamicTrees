@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "tag": "dynamictrees:cocoa_seed"
+      "item": "dynamictrees:cocoa_seed"
     }
   ],
   "result": {

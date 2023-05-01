@@ -313,7 +313,8 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
             );
         }
         BlockState state = this.block.get().defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing).setValue(ageProperty, age);
-        if (hasVariableOffset() && state.hasProperty(getOffsetProperty())) state.setValue(getOffsetProperty(), radius);
+        if (hasVariableOffset() && state.hasProperty(getOffsetProperty()))
+            state = state.setValue(getOffsetProperty(), radius);
         return state;
     }
 

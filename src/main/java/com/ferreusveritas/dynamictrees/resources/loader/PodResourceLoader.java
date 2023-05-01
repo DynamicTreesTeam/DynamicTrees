@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.resources.loader;
 
+import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.block.GrowableBlock;
@@ -7,6 +8,8 @@ import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
 import com.ferreusveritas.dynamictrees.systems.pod.Pod;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.Null;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,6 +18,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.LinkedList;
@@ -39,7 +45,10 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
 
         this.commonAppliers
                 .register("block_shapes", JsonObject.class, this::readBlockShapes)
-                .register("item_stack", ItemStack.class, Pod::setItemStack);
+                .register("item_stack", ResourceLocation.class, (pod, resourceLocation) ->
+                        Species.REGISTRY.runOnNextLock(
+                                ()-> pod.setItemStack(new ItemStack(ForgeRegistries.ITEMS.getValue(resourceLocation)))
+                        ));
 
         this.reloadAppliers
                 .register("can_bone_meal", Boolean.class, Pod::setCanBoneMeal)

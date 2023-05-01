@@ -1,6 +1,7 @@
 {
   "type": "scruffy",
   "primitive_leaves": "minecraft:oak_leaves",
+  "cell_kit": "dynamictrees:acacia",
   "light_requirement": 4,
   "can_grow_on_ground": true,
   "scruffy_leaf_chance": 0.66,
