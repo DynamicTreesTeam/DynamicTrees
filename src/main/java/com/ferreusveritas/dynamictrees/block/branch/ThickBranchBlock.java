@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.block.branch;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
@@ -153,7 +154,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
             return pos.offset(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;
         }
 
-        if (state.getMaterial().isReplaceable() || block instanceof BushBlock) {
+        if (state.getMaterial().isReplaceable() || state.is(DTBlockTags.FOLIAGE)) {
             return ReplaceableState.REPLACEABLE;
         }
 
@@ -169,7 +170,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
             return ReplaceableState.TREEPART;
         }
 
-        if (this.getFamily().getCommonSpecies().isAcceptableSoil(level, pos, state)) {
+        if (this.getFamily().getCommonSpecies().isAcceptableSoilForWorldgen(level, pos, state)) {
             return ReplaceableState.REPLACEABLE;
         }
 
