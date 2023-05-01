@@ -99,10 +99,12 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         }
 
         if (setable) {
+            BlockState trunkState = level.getBlockState(pos);
+            boolean isWaterlogged = trunkState.hasProperty(WATERLOGGED) && trunkState.getValue(WATERLOGGED);
             for (Surround dir : Surround.values()) {
                 final BlockPos dPos = pos.offset(dir.getOffset());
                 final ReplaceableState rep = repStates[dir.ordinal()];
-                final boolean replacingWater = level.getBlockState(dPos).getFluidState() == Fluids.WATER.getSource(false);
+                final boolean replacingWater = isWaterlogged || level.getBlockState(dPos).getFluidState() == Fluids.WATER.getSource(false);
 
                 if (rep == ReplaceableState.REPLACEABLE) {
                     level.setBlock(dPos, getTrunkShell().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, dir.getOpposite()).setValue(TrunkShellBlock.WATERLOGGED, replacingWater), flags);
@@ -131,14 +133,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         }
 
         final int connectionRadius = TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, level, deltaPos, this, side, radius);
-
-//			if (radius > 8) {
-//				if (side == Direction.DOWN) {
-//					return connectionRadius >= radius ? 1 : 0;
-//				} else if (side == Direction.UP) {
-//					return connectionRadius >= radius ? 2 : connectionRadius > 0 ? 1 : 0;
-//				}
-//			}
 
         return Math.min(MAX_RADIUS, connectionRadius);
     }
@@ -193,7 +187,6 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     ///////////////////////////////////////////
     // PHYSICAL BOUNDS
     ///////////////////////////////////////////
-
 
     @Nonnull
     @Override
