@@ -10,6 +10,7 @@ import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.model.FallingTreeEntityModelTrackerCache;
 import com.ferreusveritas.dynamictrees.model.ModelTracker;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BlockBounds;
 import com.ferreusveritas.dynamictrees.util.BlockStates;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
@@ -56,6 +57,8 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     //Not needed in client
     protected List<ItemStack> payload = new ArrayList<>(0);
+    protected float volume = 0;
+    protected boolean hasLeaves = false;
 
     //Needed in client and server
     protected BranchDestructionData destroyData = new BranchDestructionData();
@@ -69,6 +72,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public DestroyType destroyType = DestroyType.HARVEST;
     public boolean onFire = false;
     protected AABB cullingBB;
+    protected Species species;
 
     public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
     public static AnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
@@ -121,6 +125,12 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         this.destroyType = destroyType;
         this.onFire = destroyType == DestroyType.FIRE;
 
+        //these variables are used for the falling tree sound
+        this.volume = destroyData.woodVolume.getVolume();
+        this.hasLeaves = destroyData.getNumLeaves() > 0;
+
+        this.species = destroyData.species;
+
         this.setPosRaw(cutPos.getX() + 0.5, cutPos.getY(), cutPos.getZ() + 0.5);
 
         int numBlocks = destroyData.getNumBranches();
@@ -160,6 +170,9 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         tag.putDouble("massz", massCenter.z);
         tag.putInt("destroytype", destroyType.ordinal());
         tag.putBoolean("onfire", onFire);
+        tag.putFloat("volume", volume);
+        tag.putBoolean("hasleaves", hasLeaves);
+        tag.putString("species", species.getRegistryName().toString());
 
         return tag;
     }
@@ -175,6 +188,10 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
         this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
         this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
+
+        volume = tag.getFloat("volume");
+        hasLeaves = tag.getBoolean("hasleaves");
+        species = Species.REGISTRY.get(tag.getString("species"));
 
         onFire = tag.getBoolean("onfire");
     }
@@ -272,6 +289,18 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     public Vec3 getMassCenter() {
         return massCenter;
+    }
+
+    public float getVolume() {
+        return volume;
+    }
+
+    public boolean hasLeaves() {
+        return hasLeaves;
+    }
+
+    public Species getSpecies() {
+        return species;
     }
 
     @Override

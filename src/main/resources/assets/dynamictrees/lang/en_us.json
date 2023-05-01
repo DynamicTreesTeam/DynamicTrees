@@ -12,6 +12,7 @@
   "block.dynamictrees.acacia_branch": "Acacia Tree",
   "block.dynamictrees.crimson_branch": "Crimson Fungus",
   "block.dynamictrees.warped_branch": "Warped Fungus",
+  "block.dynamictrees.rooty_water": "Water Roots",
 
   "species.dynamictrees.oak": "Oak",
   "species.dynamictrees.azalea": "Azalea",
@@ -109,5 +110,10 @@
 
   "death.attack.falling_tree": "%1$s was crushed by a falling tree",
 
-  "block.dynamictrees.rooty_water": "Water Roots"
+  "sounds.dynamictrees.falling_tree.start": "Timber!",
+  "sounds.dynamictrees.falling_tree.small.start": "Branch is chopped",
+  "sounds.dynamictrees.falling_tree.end": "Tree hits the ground",
+  "sounds.dynamictrees.falling_tree.small.end": "Branch hits the ground",
+  "sounds.dynamictrees.falling_tree.hit_water": "Tree goes through water",
+  "sounds.dynamictrees.falling_tree.small.hit_water": "Branch falls in water"
 }

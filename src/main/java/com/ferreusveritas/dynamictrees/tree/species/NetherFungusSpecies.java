@@ -6,11 +6,14 @@ import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.DTItemTags;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatures;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.LevelAccessor;
@@ -102,6 +105,22 @@ public class NetherFungusSpecies extends Species {
         textureConsumer.accept("particle", capLocation);
         textureConsumer.accept("stem", barkTextureLocation);
         textureConsumer.accept("cap", capLocation);
+    }
+
+    public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){
+        return DTRegistries.FALLING_TREE_FUNGUS_START.get();
+    }
+
+    public SoundEvent getFallingTreeEndSound (float treeVolume, boolean hasLeaves){
+        return DTRegistries.FALLING_TREE_FUNGUS_END.get();
+    }
+
+    public SoundEvent getFallingBranchEndSound (float treeVolume, boolean hasLeaves, boolean fellOnWater){
+        return  hasLeaves ? DTRegistries.FALLING_TREE_FUNGUS_SMALL_END.get() : DTRegistries.FALLING_TREE_SMALL_END_BARE.get();
+    }
+
+    public float getFallingTreePitch (float treeVolume){
+        return 1.5f/(1+treeVolume*0.04f);
     }
 
 }
