@@ -46,22 +46,22 @@ public class TooltipHandler {
 
     public static void applySeasonalTooltips(List<Component> tipList, int flags) {
         if (flags != 0) {
-            tipList.add(new TranslatableComponent("desc.sereneseasons.fertile_seasons").append(":"));
+            tipList.add(new TranslatableComponent("desc.dynamictrees.seasonal.fertile_seasons").append(":"));
 
             if ((flags & 15) == 15) {
-                tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.sereneseasons.year_round").withStyle(ChatFormatting.LIGHT_PURPLE)));
+                tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.dynamictrees.seasonal.year_round").withStyle(ChatFormatting.LIGHT_PURPLE)));
             } else {
                 if ((flags & 1) != 0) {
-                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.sereneseasons.spring").withStyle(ChatFormatting.GREEN)));
+                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.dynamictrees.seasonal.spring").withStyle(ChatFormatting.GREEN)));
                 }
                 if ((flags & 2) != 0) {
-                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.sereneseasons.summer").withStyle(ChatFormatting.YELLOW)));
+                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.dynamictrees.seasonal.summer").withStyle(ChatFormatting.YELLOW)));
                 }
                 if ((flags & 4) != 0) {
-                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.sereneseasons.autumn").withStyle(ChatFormatting.GOLD)));
+                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.dynamictrees.seasonal.autumn").withStyle(ChatFormatting.GOLD)));
                 }
                 if ((flags & 8) != 0) {
-                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.sereneseasons.winter").withStyle(ChatFormatting.AQUA)));
+                    tipList.add(new TextComponent(" ").append(new TranslatableComponent("desc.dynamictrees.seasonal.winter").withStyle(ChatFormatting.AQUA)));
                 }
             }
         }

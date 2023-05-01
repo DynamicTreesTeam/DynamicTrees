@@ -7,7 +7,9 @@ import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock.ShellMuse;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.tree.species.Species.LogsAndSticks;
@@ -92,6 +94,21 @@ public class WailaBranchHandler implements IComponentProvider {
 
             List<IElement> elements = new LinkedList<>();
             elements.add(getElement(seedStack)); //adds seed;
+
+            if (species.hasFruits()){
+                for (Fruit fruit : species.getFruits()){
+                    ItemStack fruitStack = fruit.getItemStack();
+                    if (fruitStack.getItem() != seedStack.getItem())
+                        elements.add(getElement(fruitStack));
+                }
+            }
+            if (species.hasPods()){
+                for (Pod pod : species.getPods()){
+                    ItemStack podStack = pod.getItemStack();
+                    if (podStack.getItem() != seedStack.getItem())
+                        elements.add(getElement(podStack));
+                }
+            }
 
             if (lastVolume.getVolume() > 0) {
                 LogsAndSticks las = species.getLogsAndSticks(lastVolume);

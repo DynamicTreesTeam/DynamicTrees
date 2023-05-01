@@ -100,6 +100,13 @@
   "potion.harvest.description": "Speeds up fruit production",
   "potion.denuding.description": "Removes all bark and leaves from a tree",
 
+  "desc.dynamictrees.seasonal.fertile_seasons": "Fertile Seasons",
+  "desc.dynamictrees.seasonal.year_round": "Year-Round",
+  "desc.dynamictrees.seasonal.spring": "Spring",
+  "desc.dynamictrees.seasonal.summer": "Summer",
+  "desc.dynamictrees.seasonal.autumn": "Autumn",
+  "desc.dynamictrees.seasonal.winter": "Winter",
+
   "death.attack.falling_tree": "%1$s was crushed by a falling tree",
 
   "block.dynamictrees.rooty_water": "Water Roots"

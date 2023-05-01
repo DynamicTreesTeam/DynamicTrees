@@ -10,7 +10,7 @@ import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
-import com.ferreusveritas.dynamictrees.systems.leavesproperties.ScruffyLeavesProperties;
+import com.ferreusveritas.dynamictrees.block.leaves.ScruffyLeavesProperties;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

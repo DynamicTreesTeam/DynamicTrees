@@ -1,8 +1,6 @@
-package com.ferreusveritas.dynamictrees.systems.leavesproperties;
+package com.ferreusveritas.dynamictrees.block.leaves;
 
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
-import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
-import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;

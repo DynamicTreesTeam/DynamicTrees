@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
@@ -19,18 +20,24 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -53,6 +60,8 @@ public class Staff extends Item {
     public final static String CODE = "code";
     public final static String USES = "uses";
     public final static String MAX_USES = "max_uses";
+
+    public final static float REACH_DISTANCE = 256;
 
     private final Multimap<Attribute, AttributeModifier> attributeModifiers;
 
@@ -87,12 +96,29 @@ public class Staff extends Item {
     }
 
     @Override
+    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+        ItemStack handItem = pPlayer.getItemInHand(pUsedHand).copy();
+        Entity entity = Minecraft.getInstance().getCameraEntity();
+        assert entity != null;
+        HitResult hitResult = entity.pick(REACH_DISTANCE, 0.0F, false);
+        if (hitResult.getType() == HitResult.Type.BLOCK)
+            if (useOn(new UseOnContext(pPlayer, pUsedHand, (BlockHitResult) hitResult)) == InteractionResult.SUCCESS){
+                return InteractionResultHolder.success(handItem);
+            }
+        return InteractionResultHolder.pass(handItem);
+    }
+
+    @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         ItemStack heldStack = context.getPlayer().getItemInHand(context.getHand());
 
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
+        if (state.getMaterial().isReplaceable() || state.is(DTBlockTags.FOLIAGE)){
+            pos = pos.below();
+            state = level.getBlockState(pos);
+        }
 
         BlockPos rootPos = TreeHelper.findRootNode(level, pos);
         TreePart treePart = TreeHelper.getTreePart(level.getBlockState(rootPos));
