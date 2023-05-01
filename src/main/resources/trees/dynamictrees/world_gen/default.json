@@ -64,8 +64,9 @@
     "apply": {
       "species" : {
         "random" : {
-          "jungle" : 5,
-          "mega_jungle" : 1
+          "jungle" : 15,
+          "mega_jungle" : 3,
+          "cocoa" : 1
         }
       },
       "density": [ 2 ],
@@ -76,6 +77,13 @@
   {
     "select": { "name": "minecraft:.*sparse_jungle" },
     "apply": {
+      "species" : {
+        "random" : {
+          "jungle" : 6,
+          "jungle_undergrowth" : 4,
+          "cocoa" : 1
+        }
+      },
       "density": [ 0.2 ],
       "chance": 0.5
     }

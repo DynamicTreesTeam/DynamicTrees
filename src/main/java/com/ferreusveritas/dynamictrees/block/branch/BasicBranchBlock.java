@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.cell.Cell;
 import com.ferreusveritas.dynamictrees.api.cell.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
+import com.ferreusveritas.dynamictrees.block.OffsetablePodBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.cell.MetadataCell;
@@ -339,6 +340,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
         // Calculate Branch Thickness based on neighboring branches
         float areaAccum = signal.radius * signal.radius;// Start by accumulating the branch we just came from
 
+        boolean theresPods = false;
         for (Direction dir : Direction.values()) {
             if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
                 BlockPos deltaPos = pos.relative(dir);
@@ -353,6 +355,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
                     int branchRadius = treepart.getRadius(blockState);
                     areaAccum += branchRadius * branchRadius;
                 }
+                if (blockState.getBlock() instanceof OffsetablePodBlock) theresPods = true;
             }
         }
 
@@ -365,7 +368,9 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
             // But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
             signal.radius = Mth.clamp((float) Math.sqrt(areaAccum) + species.getTapering(), getRadius(currBlockState), maxRadius);// WOW!
             int targetRadius = (int) Math.floor(signal.radius);
-            int setRad = setRadius(level, pos, targetRadius, originDir);
+            //if the tree has pods then growth needs to cause updates, otherwise don't bother (for performance)
+            int flags = theresPods ? 3 : 2;
+            int setRad = setRadius(level, pos, targetRadius, originDir, flags);
             if (setRad < targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
                 signal.choked = true; //If something is in the way then it means that the tree growth is choked
             }

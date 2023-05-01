@@ -4,16 +4,14 @@ import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.GrowableBlock;
+import com.ferreusveritas.dynamictrees.block.OffsetablePodBlock;
 import com.ferreusveritas.dynamictrees.block.PodBlock;
 import com.ferreusveritas.dynamictrees.compat.season.SeasonHelper;
 import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.tree.Resettable;
-import com.ferreusveritas.dynamictrees.util.AgeProperties;
-import com.ferreusveritas.dynamictrees.util.LazyValue;
-import com.ferreusveritas.dynamictrees.util.LevelContext;
-import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
+import com.ferreusveritas.dynamictrees.util.*;
 import com.google.common.collect.Maps;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -96,6 +94,8 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
      */
     private IntegerProperty ageProperty = BlockStateProperties.AGE_2;
 
+    private IntegerProperty offsetProperty;
+
     private final BlockShapeData blockShapeData = new BlockShapeData();
 
     /**
@@ -117,6 +117,9 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     private float flowerHoldPeriodLength = 0.5F;
 
     private float minProductionFactor = 0.3F;
+
+    private int minRadius = 8;
+    private int maxRadius = 8;
 
     private GrowableBlock.MatureAction matureAction = GrowableBlock.MatureAction.DEFAULT;
 
@@ -146,7 +149,9 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     }
 
     protected PodBlock createBlock(Block.Properties properties) {
-        return new PodBlock(properties, this);
+        if (hasVariableOffset())
+            return new OffsetablePodBlock(properties, this);
+        else return new PodBlock(properties, this);
     }
 
     public Material getDefaultMaterial() {
@@ -287,17 +292,17 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         return seasonalProductionFactor(levelContext, pos) < minProductionFactor;
     }
 
-    public void place(LevelAccessor level, BlockPos pos, @Nullable Float seasonValue, Direction facing) {
-        BlockState state = getStateFor(facing, 0);
+    public void place(LevelAccessor level, BlockPos pos, @Nullable Float seasonValue, Direction facing, int radius) {
+        BlockState state = getStateFor(facing, 0, radius);
         level.setBlock(pos, state, Block.UPDATE_CLIENTS);
     }
 
-    public void placeDuringWorldGen(LevelAccessor level, BlockPos pos, @Nullable Float seasonValue, Direction facing) {
-        BlockState state = getStateFor(facing, getAgeForWorldGen(level, pos, seasonValue));
+    public void placeDuringWorldGen(LevelAccessor level, BlockPos pos, @Nullable Float seasonValue, Direction facing, int radius) {
+        BlockState state = getStateFor(facing, getAgeForWorldGen(level, pos, seasonValue), radius);
         level.setBlock(pos, state, Block.UPDATE_CLIENTS);
     }
 
-    protected BlockState getStateFor(Direction facing, int age) {
+    protected BlockState getStateFor(Direction facing, int age, int radius) {
         if (age < 0) {
             throw new IllegalArgumentException("Cannot get state for negative pod age.");
         }
@@ -307,7 +312,10 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
                             + getRegistryName() + "\"."
             );
         }
-        return this.block.get().defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing).setValue(ageProperty, age);
+        BlockState state = this.block.get().defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing).setValue(ageProperty, age);
+        if (hasVariableOffset() && state.hasProperty(getOffsetProperty()))
+            state = state.setValue(getOffsetProperty(), radius);
+        return state;
     }
 
     protected int getAgeForWorldGen(LevelAccessor level, BlockPos pos, @Nullable Float seasonValue) {
@@ -340,6 +348,28 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
     public LootTable.Builder createBlockDrops() {
         return DTLootTableProvider.createPodDrops(block.get(), itemStack.getItem(), ageProperty, maxAge);
+    }
+
+    public void setMaxRadius(int maxRadius) {
+        this.maxRadius = maxRadius;
+    }
+
+    public void setMinRadius(int minRadius) {
+        this.minRadius = minRadius;
+    }
+
+    public boolean hasVariableOffset(){
+        return minRadius!=maxRadius;
+    }
+
+    public boolean isValidRadius (int radius){
+        return radius >= minRadius && radius <= maxRadius;
+    }
+
+    public IntegerProperty getOffsetProperty (){
+        if (offsetProperty == null)
+            offsetProperty = OffsetProperties.getOrCreate(minRadius, maxRadius);
+        return offsetProperty;
     }
 
     @Nonnull

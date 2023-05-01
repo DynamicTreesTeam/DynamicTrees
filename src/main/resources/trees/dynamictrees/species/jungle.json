@@ -16,9 +16,6 @@
     "perfect_biomes": { "type": "jungle" },
     "primitive_sapling": "jungle_sapling",
     "mega_species": "mega_jungle",
-    "pods": [
-        "cocoa"
-    ],
     "features" : [
         {
             "name": "vines",
@@ -28,11 +25,11 @@
             }
         },
         {
-            "name": "pod",
+            "name": "undergrowth",
             "properties": {
-                "pod": "cocoa"
+                "undergrowth_species": "dynamictrees:oak_undergrowth",
+                "secondary_undergrowth_species": "dynamictrees:jungle_undergrowth"
             }
-        },
-        "undergrowth"
+        }
     ]
 }

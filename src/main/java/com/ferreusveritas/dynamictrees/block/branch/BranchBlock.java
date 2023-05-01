@@ -213,7 +213,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
                         level,
                         pos,
                         Math.max(1, radius - (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get() ? 1 : 0)),
-                        null
+                        null, 3
                 )
         );
     }
