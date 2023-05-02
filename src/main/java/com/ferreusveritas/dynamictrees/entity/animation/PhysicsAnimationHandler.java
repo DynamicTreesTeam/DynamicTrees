@@ -36,7 +36,6 @@ public class PhysicsAnimationHandler implements AnimationHandler {
     static class HandlerData extends DataAnimationHandler {
         float rotYaw = 0;
         float rotPit = 0;
-        boolean startSoundPlayed = false;
         boolean endSoundPlayed = false;
         SoundInstance fallingSoundInstance;
     }

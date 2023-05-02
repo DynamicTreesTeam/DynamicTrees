@@ -2,21 +2,16 @@ package com.ferreusveritas.dynamictrees.entity.animation;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.client.SoundInstanceHandler;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -45,7 +40,6 @@ public class FalloverAnimationHandler implements AnimationHandler {
         boolean startSoundPlayed = false;
         boolean fallThroughWaterSoundPlayed = false;
         boolean endSoundPlayed = false;
-        SoundInstance fallingSoundInstance;
         HashSet<LivingEntity> entitiesHit = new HashSet<>();//A record of the entities that have taken damage to ensure they are only damaged a single time
     }
 
@@ -54,25 +48,24 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     protected void playStartSound(FallingTreeEntity entity){
-        //we play on the server side so everyone can hear it
-        if (!getData(entity).startSoundPlayed && !entity.level.isClientSide()){
+
+        if (!getData(entity).startSoundPlayed && entity.level.isClientSide()){
             Species species = entity.getSpecies();
             SoundEvent sound = species.getFallingTreeStartSound(entity.getVolume(), entity.hasLeaves());
-            SoundInstance fallingInstance = species.getSoundInstance(sound, species.getFallingTreePitch(entity.getVolume()), entity.position());
-            Minecraft.getInstance().getSoundManager().play(fallingInstance);
-            getData(entity).fallingSoundInstance = fallingInstance;
-            getData(entity).startSoundPlayed = true;
+            SoundInstanceHandler.playSoundInstance(sound, species.getFallingTreePitch(entity.getVolume()), entity.position(), entity);
         }
     }
     protected void playEndSound(FallingTreeEntity entity){
-        if (!getData(entity).endSoundPlayed && !entity.level.isClientSide()){
-            Species species = entity.getSpecies();
-            SoundInstance fallingInstance = getData(entity).fallingSoundInstance;
-            if (fallingInstance != null)
-                Minecraft.getInstance().getSoundManager().stop(fallingInstance);
-            SoundEvent sound = species.getFallingTreeEndSound(entity.getVolume(), entity.hasLeaves());
-            entity.playSound(sound, 3, species.getFallingTreePitch(entity.getVolume()));
-            getData(entity).endSoundPlayed = true;
+        if (!getData(entity).endSoundPlayed){
+            if (entity.level.isClientSide){
+                SoundInstanceHandler.stopSoundInstance(entity);
+            } else {
+                Species species = entity.getSpecies();
+                SoundEvent sound = species.getFallingTreeEndSound(entity.getVolume(), entity.hasLeaves());
+                entity.playSound(sound, 3, species.getFallingTreePitch(entity.getVolume()));
+                getData(entity).endSoundPlayed = true;
+            }
+
         }
     }
 
@@ -301,6 +294,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
         //Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
         if (dead) {
             entity.cleanupRootyDirt();
+            if (entity.level.isClientSide)
+                SoundInstanceHandler.stopSoundInstance(entity);
         }
 
         return dead;

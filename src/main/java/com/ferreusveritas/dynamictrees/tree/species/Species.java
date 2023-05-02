@@ -71,8 +71,6 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -82,7 +80,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -1981,13 +1978,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     ///////////////////////////////////////////
 
     protected float bigTreeSoundThreshold = 20;
-
-    public SoundInstance getSoundInstance (SoundEvent sound, float pitch, Vec3 pos){
-        return getSoundInstance(sound, 1f, pitch, pos);
-    }
-    public SoundInstance getSoundInstance (SoundEvent sound, float volume, float pitch, Vec3 pos){
-        return new SimpleSoundInstance(sound, SoundSource.NEUTRAL, volume, pitch, pos.x, pos.y, pos.z);
-    }
 
     public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){
         return treeVolume > bigTreeSoundThreshold ?
