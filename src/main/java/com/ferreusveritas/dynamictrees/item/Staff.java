@@ -95,8 +95,10 @@ public class Staff extends Item {
         return false;
     }
 
+    // This extends the reach of the wand if the player is creative
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+        if (!pPlayer.isCreative()) return super.use(pLevel,pPlayer,pUsedHand);
         ItemStack handItem = pPlayer.getItemInHand(pUsedHand).copy();
         Entity entity = Minecraft.getInstance().getCameraEntity();
         assert entity != null;
