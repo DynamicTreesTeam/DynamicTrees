@@ -75,18 +75,18 @@ public class BiomeDatabase {
         this.entries.clear();
     }
 
-    public boolean isValid() {
-        for (Biome biome : ForgeRegistries.BIOMES) {
-            final BaseEntry entry = this.getEntry(Holder.direct(biome));
-            final ResourceLocation biomeRegistryName = ForgeRegistries.BIOMES.getKey(entry.getBiome().get());
-
-            if (biomeRegistryName != null && !biomeRegistryName.equals(ForgeRegistries.BIOMES.getKey(biome))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
+//    public boolean isValid() {
+//        for (Biome biome : ForgeRegistries.BIOMES) {
+//            final BaseEntry entry = this.getEntry(Holder.direct(biome));
+//            final ResourceLocation biomeRegistryName = ForgeRegistries.BIOMES.getKey(entry.getBiome().get());
+//
+//            if (biomeRegistryName != null && !biomeRegistryName.equals(ForgeRegistries.BIOMES.getKey(biome))) {
+//                return false;
+//            }
+//        }
+//
+//        return true;
+//    }
 
     public boolean isPopulated() {
         return this.entries.size() > 0;

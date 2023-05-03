@@ -23,6 +23,7 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -219,7 +220,7 @@ public class JoCode {
         MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(level, species, rootPos, endPoints, context.safeBounds(), initialDirtState));
 
         // Add snow to parts of the tree in chunks where snow was already placed.
-        this.addSnow(leafMap, level, rootPos, context.biome().get());
+        this.addSnow(leafMap, level, rootPos, context.biome());
     }
 
     protected void generateAndAgeLeaves(GenerationContext context, SimpleVoxmap leafMap, boolean worldGen) {
@@ -454,8 +455,8 @@ public class JoCode {
         return true;
     }
 
-    protected void addSnow(SimpleVoxmap leafMap, LevelAccessor level, BlockPos rootPos, Biome biome) {
-        if (biome.getBaseTemperature() >= 0.4f) {
+    protected void addSnow(SimpleVoxmap leafMap, LevelAccessor level, BlockPos rootPos, Holder<Biome> biome) {
+        if (biome.value().getBaseTemperature() >= 0.4f) {
             return;
         }
 
