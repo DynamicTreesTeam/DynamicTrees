@@ -18,9 +18,9 @@ import net.minecraft.advancements.critereon.EnchantmentPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
 import net.minecraft.data.loot.BlockLoot;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -38,7 +38,11 @@ import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraft.world.level.storage.loot.predicates.*;
+import net.minecraft.world.level.storage.loot.predicates.BonusLevelTableCondition;
+import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -80,9 +84,9 @@ public class DTLootTableProvider extends LootTableProvider {
     }
 
     @Override
-    public void run(HashCache cache) {
+    public void run(CachedOutput pOutput) {
         addTables();
-        writeTables(cache);
+        writeTables(pOutput);
     }
 
     private void addTables() {
@@ -91,7 +95,7 @@ public class DTLootTableProvider extends LootTableProvider {
         ForgeRegistries.BLOCKS.getValues().stream()
                 .filter(block -> block instanceof BranchBlock)
                 .map(block -> (BranchBlock) block)
-                .filter(block -> block.getRegistryName().getNamespace().equals(modId))
+                .filter(block -> ForgeRegistries.BLOCKS.getKey(block).getNamespace().equals(modId))
                 .forEach(this::addBranchTable);
 
         LeavesProperties.REGISTRY.dataGenerationStream(modId).forEach(leavesProperties -> {
@@ -301,12 +305,12 @@ public class DTLootTableProvider extends LootTableProvider {
         ).setParamSet(LootContextParamSets.BLOCK);
     }
 
-    private void writeTables(HashCache cache) {
+    private void writeTables(CachedOutput cache) {
         Path outputFolder = this.generator.getOutputFolder();
         lootTables.forEach((key, lootTable) -> {
             Path path = outputFolder.resolve("data/" + key.getNamespace() + "/" + key.getPath());
             try {
-                DataProvider.save(GSON, cache, LootTables.serialize(lootTable.build()), path);
+                DataProvider.saveStable(cache, LootTables.serialize(lootTable.build()), path);
             } catch (IOException e) {
                 LOGGER.error("Couldn't write loot table {}", path, e);
             }

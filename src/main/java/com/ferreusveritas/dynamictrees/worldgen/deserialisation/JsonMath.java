@@ -4,12 +4,12 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.util.RandomSource;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Map.Entry;
-import java.util.Random;
 
 public class JsonMath {
 
@@ -113,21 +113,21 @@ public class JsonMath {
 
     }
 
-    public float apply(Random random, float noise) {
+    public float apply(RandomSource random, float noise) {
         MathContext mc = new MathContext(noise, random);
         return rootOp.apply(mc);
     }
 
-    public float apply(Random random, Species species, float radius) {
+    public float apply(RandomSource random, Species species, float radius) {
         MathContext mc = new MathSpeciesContext(random, species, radius);
         return rootOp.apply(mc);
     }
 
     public static class MathContext {
         public float noise;
-        public Random rand;
+        public RandomSource rand;
 
-        public MathContext(float noise, Random random) {
+        public MathContext(float noise, RandomSource random) {
             this.noise = noise;
             this.rand = random;
         }
@@ -137,7 +137,7 @@ public class JsonMath {
         public float radius;
         public Species species;
 
-        public MathSpeciesContext(Random random, Species species, float radius) {
+        public MathSpeciesContext(RandomSource random, Species species, float radius) {
             super(0.0f, random);
             this.radius = radius;
             this.species = species;

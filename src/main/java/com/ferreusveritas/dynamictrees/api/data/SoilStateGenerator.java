@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
 
@@ -19,7 +20,7 @@ public class SoilStateGenerator implements Generator<DTBlockStateProvider, SoilP
     public void generate(DTBlockStateProvider provider, SoilProperties input, Dependencies dependencies) {
         provider.getMultipartBuilder(dependencies.get(SOIL))
                 .part().modelFile(provider.models().getExistingFile(
-                        provider.block(Objects.requireNonNull(dependencies.get(PRIMITIVE_SOIL).getRegistryName()))
+                        provider.block(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_SOIL))))
                 )).addModel().end()
                 .part().modelFile(provider.models().getExistingFile(input.getRootsOverlayLocation())).addModel().end();
     }

@@ -8,9 +8,9 @@
     "growth_logic_kit": "conifer",
     "leaves_properties": "spruce",
     "environment_factors" : {
-        "hot": 0.50,
-        "dry": 0.25,
-        "wet": 0.75
+        "#forge:is_hot": 0.50,
+        "#forge:is_dry": 0.25,
+        "#forge:is_wet": 0.75
     },
     "perfect_biomes": { "type": "coniferous" },
     "primitive_sapling": "spruce_sapling",

@@ -1,16 +1,15 @@
 package com.ferreusveritas.dynamictrees.util;
 
 import net.minecraft.core.BlockPos;
-
-import java.util.Random;
-
-public class RandomXOR extends Random {
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
+public class RandomXOR extends LegacyRandomSource {
 
     private static final long serialVersionUID = -3477272122511092632L;
 
     private int xor = 0;
 
     public RandomXOR() {
+        super(0);
     }
 
     public RandomXOR(long seed) {
@@ -26,7 +25,7 @@ public class RandomXOR extends Random {
     }
 
     @Override
-    protected int next(int bits) {
+    public int next(int bits) {
         return super.next(bits) ^ (xor & ((1 << bits) - 1));
     }
 

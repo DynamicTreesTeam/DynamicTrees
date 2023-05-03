@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
-import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
@@ -13,6 +12,7 @@ import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
@@ -25,7 +25,6 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.Arrays;
 
@@ -69,10 +68,10 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
     protected void generateTrees(LevelContext levelContext, BiomeDatabase biomeDatabase, PoissonDisc disc, BlockPos originPos, SafeChunkBounds safeBounds) {
         BlockPos basePos = new BlockPos(disc.x, 0, disc.z);
-        Biome biome = levelContext.accessor().getBiome(originPos).value();
+        Holder<Biome> biome = levelContext.accessor().getBiome(originPos);
         Heightmap.Types heightmap = Heightmap.Types.valueOf(biomeDatabase.getHeightmap(biome).toUpperCase());
         for (BlockPos groundPos : GroundFinder.getGroundFinder(levelContext.level()).findGround(levelContext.accessor(), basePos, heightmap)) {
-            BiomeDatabase.EntryReader entry = biomeDatabase.getEntry(levelContext.accessor().getBiome(groundPos).value());
+            BiomeDatabase.EntryReader entry = biomeDatabase.getEntry(levelContext.accessor().getBiome(groundPos));
             generateTree(levelContext, entry, disc, originPos, groundPos, safeBounds);
         }
     }
@@ -101,7 +100,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
             if (species.isValid()) {
                 if (species.isAcceptableSoilForWorldgen(levelContext.accessor(), groundPos, dirtState)) {
                     if (biomeEntry.getChanceSelector().getChance(RANDOM, species, circle.radius) == BiomePropertySelectors.Chance.OK) {
-                        Biome biome = levelContext.level().getBiome(groundPos).value();
+                        Holder<Biome> biome = levelContext.level().getBiome(groundPos);
                         if (!species.generate(new GenerationContext(levelContext, species, originPos, groundPos.mutable(), biome, CoordUtils.getRandomDir(RANDOM), circle.radius, safeBounds))) {
                             result = GeneratorResult.FAIL_GENERATION;
                         }

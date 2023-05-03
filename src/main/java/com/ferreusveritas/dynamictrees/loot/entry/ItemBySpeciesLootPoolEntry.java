@@ -3,7 +3,11 @@ package com.ferreusveritas.dynamictrees.loot.entry;
 import com.ferreusveritas.dynamictrees.loot.DTLootContextParams;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.google.common.collect.Maps;
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
@@ -14,6 +18,7 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -55,7 +60,7 @@ public final class ItemBySpeciesLootPoolEntry extends LootPoolSingletonContainer
             super.serialize(json, value, context);
             final JsonObject itemsJson = new JsonObject();
             for (Map.Entry<ResourceLocation, Item> itemEntry : value.items.entrySet()) {
-                itemsJson.add(itemEntry.getKey().toString(), new JsonPrimitive(itemEntry.getValue().getRegistryName().toString()));
+                itemsJson.add(itemEntry.getKey().toString(), new JsonPrimitive(ForgeRegistries.ITEMS.getKey(itemEntry.getValue()).toString()));
             }
             json.add("name_by_species", itemsJson);
         }

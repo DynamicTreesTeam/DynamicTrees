@@ -1,7 +1,8 @@
 package com.ferreusveritas.dynamictrees.resources.loader;
 
-import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
+import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SpreadableSoilProperties;
@@ -12,6 +13,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ObjectHolderRegistry;
 
 /**
  * @author Max Hyper and Harley O'Connor
@@ -96,7 +99,13 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
     }
 
     private void useSubstituteSoilBlock(SoilProperties soilProperties, SoilProperties substitute) {
-        substitute.getBlock().ifPresent(soilProperties::setBlock);
+        ObjectHolderRegistry.addHandler(registryNameFilter -> {
+            if (registryNameFilter.test(ForgeRegistries.Keys.BLOCKS.location())) {
+                if (ForgeRegistries.BLOCKS.getValue(substitute.getBlockRegistryName()) instanceof RootyBlock rootyBlock) {
+                    soilProperties.setBlock(rootyBlock);
+                }
+            }
+        });
     }
 
     private void generateSoilBlock(SoilProperties soilProperties, JsonObject json) {

@@ -7,8 +7,6 @@ import net.minecraft.server.packs.resources.Resource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,10 +31,7 @@ public class TextResourcePreparer extends AbstractResourcePreparer<List<String>>
     }
 
     private List<String> readResource(Resource resource) throws IOException {
-        final BufferedReader reader = new BufferedReader(
-                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)
-        );
-        return this.readLines(reader, new ArrayList<>());
+        return this.readLines(resource.openAsReader(), new ArrayList<>());
     }
 
     private List<String> readLines(BufferedReader reader, List<String> lines) throws IOException {

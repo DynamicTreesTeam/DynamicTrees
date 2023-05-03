@@ -9,7 +9,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -42,7 +42,7 @@ public final class GrowPulseCommand extends SubCommand {
             TreeHelper.growPulse(source.getLevel(), rootPos);
         }
 
-        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.grow_pulse",
+        sendSuccessAndLog(source, Component.translatable("commands.dynamictrees.success.grow_pulse",
                 CommandHelper.colour(String.valueOf(number), ChatFormatting.AQUA),
                 CommandHelper.posComponent(rootPos, ChatFormatting.AQUA)));
     }

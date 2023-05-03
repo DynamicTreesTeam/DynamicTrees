@@ -5,15 +5,25 @@ import com.ferreusveritas.dynamictrees.api.substance.Emptiable;
 import com.ferreusveritas.dynamictrees.api.substance.SubstanceEffect;
 import com.ferreusveritas.dynamictrees.api.substance.SubstanceEffectProvider;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
-import com.ferreusveritas.dynamictrees.systems.substance.*;
+import com.ferreusveritas.dynamictrees.systems.substance.DenudeSubstance;
+import com.ferreusveritas.dynamictrees.systems.substance.DepleteSubstance;
+import com.ferreusveritas.dynamictrees.systems.substance.FertilizeSubstance;
+import com.ferreusveritas.dynamictrees.systems.substance.FreezeSubstance;
+import com.ferreusveritas.dynamictrees.systems.substance.GrowthSubstance;
+import com.ferreusveritas.dynamictrees.systems.substance.HarvestSubstance;
+import com.ferreusveritas.dynamictrees.systems.substance.MegaSubstance;
+import com.ferreusveritas.dynamictrees.systems.substance.TransformSubstance;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.DendroBrewingRecipe;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
@@ -83,7 +93,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
         }
 
         public Component getDescription() {
-            return new TranslatableComponent("potion." + this.name +
+            return Component.translatable("potion." + this.name +
                     ".description" + (this == TRANSFORM ? ".empty" : ""))
                     .withStyle(style -> style.withColor(ChatFormatting.GRAY));
         }
@@ -104,7 +114,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
 
     @Override
     public void fillItemCategory(final CreativeModeTab group, final NonNullList<ItemStack> items) {
-        if (this.allowdedIn(group)) {
+        if (this.allowedIn(group)) {
             for (final DendroPotionType potion : DendroPotionType.values()) {
                 if (potion.isActive()) {
                     items.add(this.applyIndexTag(new ItemStack(this, 1), potion.getIndex()));
@@ -218,7 +228,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
         }
 
         final Species species = this.getTargetSpecies(stack);
-        tooltip.add(new TranslatableComponent("potion.transform.description", species.getTextComponent())
+        tooltip.add(Component.translatable("potion.transform.description", species.getTextComponent())
                 .withStyle(style -> style.withColor(ChatFormatting.GRAY)));
     }
 

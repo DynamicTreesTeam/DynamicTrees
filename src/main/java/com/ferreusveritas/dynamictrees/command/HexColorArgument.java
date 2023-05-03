@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 import java.awt.*;
 import java.util.Collections;
@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 public final class HexColorArgument implements ArgumentType<Integer> {
 
-    public static final DynamicCommandExceptionType COLOR_INVALID = new DynamicCommandExceptionType(colourString -> new TranslatableComponent("argument.color.invalid", colourString));
+    public static final DynamicCommandExceptionType COLOR_INVALID = new DynamicCommandExceptionType(colourString -> Component.translatable("argument.color.invalid", colourString));
 
     public static HexColorArgument hex() {
         return new HexColorArgument();

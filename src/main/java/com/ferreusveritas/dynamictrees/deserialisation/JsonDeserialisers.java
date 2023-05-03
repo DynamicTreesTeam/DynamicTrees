@@ -21,14 +21,18 @@ import com.ferreusveritas.dynamictrees.systems.genfeature.VinesGenFeature;
 import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
-import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.ChanceSelectorDeserialiser;
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.DensitySelectorDeserialiser;
 import com.ferreusveritas.dynamictrees.worldgen.deserialisation.SpeciesSelectorDeserialiser;
 import com.google.common.collect.Maps;
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -50,7 +54,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -265,13 +268,10 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<GenerationStep.Decoration> DECORATION_STAGE =
             register(GenerationStep.Decoration.class, new EnumDeserialiser<>(GenerationStep.Decoration.class));
 
-    public static final JsonDeserialiser<BiomeList> BIOME_LIST = register(BiomeList.class, new BiomeListDeserialiser());
+    public static final JsonDeserialiser<DTBiomeHolderSet> BIOME_LIST = register(DTBiomeHolderSet.class, new BiomeListDeserialiser());
     public static final JsonDeserialiser<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
             BIOME_LIST.deserialise(jsonElement).map(biomeList ->
-                    biome -> biomeList.stream().anyMatch(currentBiome -> Objects.equals(
-                            currentBiome.getRegistryName(),
-                            biome.getRegistryName()
-                    ))
+                    biome -> biomeList.stream().anyMatch(currentBiomeHolder -> currentBiomeHolder.equals(biome) || biome.unwrapKey().map(currentBiomeHolder::is).orElse(false))
             ));
 
     public static final JsonDeserialiser<BiomePropertySelectors.SpeciesSelector> SPECIES_SELECTOR = register(

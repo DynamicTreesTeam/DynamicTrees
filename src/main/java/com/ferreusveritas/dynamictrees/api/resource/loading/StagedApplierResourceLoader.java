@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.api.resource.loading;
 
-import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.ResourcePreparer;
 import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.ResourcePreparer;
 import com.ferreusveritas.dynamictrees.deserialisation.PropertyAppliers;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 

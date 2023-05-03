@@ -2,8 +2,6 @@ package com.ferreusveritas.dynamictrees.api.worldgen;
 
 import com.ferreusveritas.dynamictrees.worldgen.OverworldGroundFinder;
 import com.ferreusveritas.dynamictrees.worldgen.SubterraneanGroundFinder;
-import com.google.common.collect.Maps;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;

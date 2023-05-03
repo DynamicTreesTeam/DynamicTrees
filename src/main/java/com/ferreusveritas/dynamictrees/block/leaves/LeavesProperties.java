@@ -19,7 +19,12 @@ import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.tree.Resettable;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
-import com.ferreusveritas.dynamictrees.util.*;
+import com.ferreusveritas.dynamictrees.util.BlockStates;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
+import com.ferreusveritas.dynamictrees.util.LootTableSupplier;
+import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
+import com.ferreusveritas.dynamictrees.util.Optionals;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
@@ -29,6 +34,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -55,8 +61,11 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.*;
+import java.util.Optional;
 
 /**
  * This class provides a means of holding individual properties for leaves.  This is necessary since leaves can contain
@@ -132,7 +141,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         }
 
         @Override
-        public boolean updateTick(Level level, BlockPos pos, BlockState state, Random rand) {
+        public boolean updateTick(Level level, BlockPos pos, BlockState state, RandomSource rand) {
             return false;
         }
     }.setRegistryName(DTTrees.NULL).setBlockRegistryName(DTTrees.NULL);
@@ -465,13 +474,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         }
     }
 
-    /**
-     * @deprecated use {@link #shouldAge(boolean, BlockState)}
-     */
-    @Deprecated
-    public boolean getDoesAge(boolean worldGen, BlockState state) {
-        return shouldAge(worldGen, state);
-    }
 
     /**
      * If the leaves block should tick and age. May return {@code false} to allow for dead leaves.
@@ -551,8 +553,8 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     ///////////////////////////////////////////
 
 
-    public boolean updateTick(Level level, BlockPos pos, BlockState state, Random rand) {
-        return getDoesAge(false, state);
+    public boolean updateTick(Level level, BlockPos pos, BlockState state, RandomSource rand) {
+        return shouldAge(false, state);
     }
 
     public int getRadiusForConnection(BlockState state, BlockGetter blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {

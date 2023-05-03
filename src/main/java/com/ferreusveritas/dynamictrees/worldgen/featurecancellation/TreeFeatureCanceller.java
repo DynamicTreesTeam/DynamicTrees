@@ -1,15 +1,14 @@
 package com.ferreusveritas.dynamictrees.worldgen.featurecancellation;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import net.minecraft.world.level.levelgen.feature.WeightedPlacedFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Set;
 
@@ -39,7 +38,7 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
             String namespace = "";
             final ConfiguredFeature<?, ?> nextConfiguredFeature = configuredFeature.getFeatures().findFirst().get();
             final FeatureConfiguration nextFeatureConfig = nextConfiguredFeature.config();
-            final ResourceLocation featureRegistryName = nextConfiguredFeature.feature().getRegistryName();
+            final ResourceLocation featureRegistryName = ForgeRegistries.FEATURES.getKey(nextFeatureConfig.getFeatures().findFirst().get().feature());
             if(featureRegistryName != null) {
                 namespace = featureRegistryName.getNamespace();
             }
@@ -59,7 +58,7 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
     private boolean doesContainTrees(RandomFeatureConfiguration featureConfig, Set<String> namespaces) {
         for (WeightedPlacedFeature feature : featureConfig.features) {
             final PlacedFeature currentConfiguredFeature = feature.feature.value();
-            final ResourceLocation featureRegistryName = currentConfiguredFeature.getFeatures().findFirst().get().feature().getRegistryName();
+            final ResourceLocation featureRegistryName = ForgeRegistries.FEATURES.getKey(currentConfiguredFeature.getFeatures().findFirst().get().feature());;
 
             if (this.treeFeatureConfigClass.isInstance(currentConfiguredFeature.placement()) && featureRegistryName != null &&
                     namespaces.contains(featureRegistryName.getNamespace())) {

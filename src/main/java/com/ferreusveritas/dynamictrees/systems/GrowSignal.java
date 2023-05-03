@@ -3,8 +3,7 @@ package com.ferreusveritas.dynamictrees.systems;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-
-import java.util.Random;
+import net.minecraft.util.RandomSource;
 
 public class GrowSignal {
 
@@ -28,9 +27,9 @@ public class GrowSignal {
      */
     public boolean choked;
 
-    public Random rand;
+    public RandomSource rand;
 
-    public GrowSignal(Species species, BlockPos rootPos, float energy, Random random) {
+    public GrowSignal(Species species, BlockPos rootPos, float energy, RandomSource random) {
         this.species = species;
         this.energy = energy;
         dir = Direction.UP;

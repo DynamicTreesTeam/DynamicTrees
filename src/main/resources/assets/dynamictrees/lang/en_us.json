@@ -115,5 +115,10 @@
   "sounds.dynamictrees.falling_tree.end": "Tree hits the ground",
   "sounds.dynamictrees.falling_tree.small.end": "Branch hits the ground",
   "sounds.dynamictrees.falling_tree.hit_water": "Tree goes through water",
-  "sounds.dynamictrees.falling_tree.small.hit_water": "Branch falls in water"
+  "sounds.dynamictrees.falling_tree.small.hit_water": "Branch falls in water",
+  "config.jade.plugin_dynamictrees.rooty_water": "Rooty Water",
+  "config.jade.plugin_dynamictrees.fruit": "Fruit",
+  "config.jade.plugin_dynamictrees.rooty": "Rooty Soil",
+  "config.jade.plugin_dynamictrees.pod": "Pod",
+  "config.jade.plugin_dynamictrees.branch": "Branch"
 }

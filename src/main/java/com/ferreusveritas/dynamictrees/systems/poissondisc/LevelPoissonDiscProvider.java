@@ -8,10 +8,15 @@ import com.ferreusveritas.dynamictrees.util.RandomXOR;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * Manages and creates all the Poisson discs in a single level (world).
@@ -64,7 +69,7 @@ public class LevelPoissonDiscProvider implements PoissonDiscProvider {
     private final List<PoissonDisc> discCache1 = new ArrayList<>(64); // 64 is above the typical range to expect for 9 chunks.
     private final List<PoissonDisc> discCache2 = new ArrayList<>(64);
 
-    public List<PoissonDisc> generatePoissonDiscs(Random random, int chunkX, int chunkZ) {
+    public List<PoissonDisc> generatePoissonDiscs(RandomSource random, int chunkX, int chunkZ) {
         final List<PoissonDisc> allDiscs = discCache1;
         final List<PoissonDisc> unsolvedDiscs = discCache2;
 

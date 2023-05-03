@@ -11,9 +11,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.FrontAndTop;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.JigsawBlock;
@@ -24,12 +25,11 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Harley O'Connor
@@ -75,24 +75,27 @@ public final class TreePoolElement extends StructurePoolElement {
     }
 
     @Override
-    public List<StructureTemplate.StructureBlockInfo> getShuffledJigsawBlocks(StructureManager structureManager, BlockPos pos, Rotation rotation, Random random) {
+    public List<StructureTemplate.StructureBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager structureManager, BlockPos pos, Rotation rotation, RandomSource random) {
         return Lists.newArrayList(
                 new StructureTemplate.StructureBlockInfo(pos, Blocks.JIGSAW.defaultBlockState().setValue(JigsawBlock.ORIENTATION, FrontAndTop.fromFrontAndTop(Direction.DOWN, Direction.SOUTH)), this.defaultJigsawNBT)
         );
     }
 
+
     @Override
-    public BoundingBox getBoundingBox(StructureManager structureManager, BlockPos pos, Rotation rotation) {
+    public BoundingBox getBoundingBox(StructureTemplateManager structureManager, BlockPos pos, Rotation rotation) {
         return new BoundingBox(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
-    public Vec3i getSize(StructureManager pStructureManager, Rotation pRotation) {
+    public Vec3i getSize(StructureTemplateManager pStructureManager, Rotation pRotation) {
         return Vec3i.ZERO;
     }
 
+
+
     @Override
-    public boolean place(StructureManager structureManager, WorldGenLevel level, StructureFeatureManager structureFeatureManager, ChunkGenerator chunkGenerator, BlockPos pos, BlockPos p_210488_, Rotation rotation, BoundingBox box, Random random, boolean keepJigsaws) {
+    public boolean place(StructureTemplateManager structureManager, WorldGenLevel level, StructureManager structureFeatureManager, ChunkGenerator chunkGenerator, BlockPos pos, BlockPos p_210488_, Rotation rotation, BoundingBox box, RandomSource random, boolean keepJigsaws) {
         final Seed seed = species.getSeed().orElse(null);
         if (seed == null) {
             return false;

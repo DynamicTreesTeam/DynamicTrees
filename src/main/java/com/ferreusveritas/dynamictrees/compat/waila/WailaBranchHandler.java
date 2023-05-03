@@ -1,40 +1,39 @@
 package com.ferreusveritas.dynamictrees.compat.waila;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock.ShellMuse;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.pod.Pod;
-import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.tree.species.Species.LogsAndSticks;
-import mcp.mobius.waila.api.BlockAccessor;
-import mcp.mobius.waila.api.IComponentProvider;
-import mcp.mobius.waila.api.ITooltip;
-import mcp.mobius.waila.api.config.IPluginConfig;
-import mcp.mobius.waila.api.ui.IElement;
-import mcp.mobius.waila.impl.ui.ElementHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IBlockComponentProvider;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.ui.IElement;
+import snownee.jade.impl.ui.ElementHelper;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class WailaBranchHandler implements IComponentProvider {
+public class WailaBranchHandler implements IBlockComponentProvider {
+    public static final ResourceLocation ID = new ResourceLocation(DynamicTrees.MOD_ID, "branch");
 
     private BlockPos lastPos = BlockPos.ZERO;
     private Species lastSpecies = Species.NULL_SPECIES;
@@ -83,11 +82,11 @@ public class WailaBranchHandler implements IComponentProvider {
 
         if (species != Species.NULL_SPECIES) {
             if (species.showSpeciesOnWaila()) {
-                tooltip.add(new TranslatableComponent("tooltip.dynamictrees.species", species.getTextComponent()));
+                tooltip.add(Component.translatable("tooltip.dynamictrees.species", species.getTextComponent()));
             }
 
             if (Minecraft.getInstance().options.advancedItemTooltips) {
-                tooltip.add(new TextComponent(ChatFormatting.DARK_GRAY + species.getRegistryName().toString()));
+                tooltip.add(Component.literal(ChatFormatting.DARK_GRAY + species.getRegistryName().toString()));
             }
 
             ItemStack seedStack = species.getSeedStack(1);
@@ -171,5 +170,10 @@ public class WailaBranchHandler implements IComponentProvider {
         } else {
             return ElementHelper.INSTANCE.spacer(0, 0);
         }
+    }
+
+    @Override
+    public ResourceLocation getUid() {
+        return ID;
     }
 }

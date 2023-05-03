@@ -13,7 +13,6 @@ import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.LevelAccessor;
@@ -21,7 +20,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.Tags;
 
 import java.util.Collections;
 import java.util.List;
@@ -58,8 +57,8 @@ public class NetherFungusSpecies extends Species {
                 .setSaplingShape(CommonVoxelShapes.FLAT_MUSHROOM)
                 .setSaplingSound(SoundType.FUNGUS)
                 .setCanSaplingGrowNaturally(false)
-                .envFactor(BiomeDictionary.Type.COLD, 0.25f)
-                .envFactor(BiomeDictionary.Type.WET, 0.75f);
+                .envFactor(Tags.Biomes.IS_COLD, 0.25f)
+                .envFactor(Tags.Biomes.IS_WET, 0.75f);
     }
 
     @Override

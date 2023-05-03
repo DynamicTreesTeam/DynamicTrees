@@ -97,7 +97,7 @@ public class UndergrowthGenFeature extends GenFeature {
                 if (level instanceof WorldGenRegion)
                     species.generate(new GenerationContext(
                             levelContext, species, offsetRootPos, offsetRootPos.mutable(),
-                            level.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()).value(),
+                            level.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()),
                             Direction.Plane.HORIZONTAL.getRandomDirection(level.getRandom()), 2, SafeChunkBounds.ANY_WG
                     ));
                 return true;

@@ -11,7 +11,11 @@ import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.tree.Resettable;
-import com.ferreusveritas.dynamictrees.util.*;
+import com.ferreusveritas.dynamictrees.util.AgeProperties;
+import com.ferreusveritas.dynamictrees.util.LazyValue;
+import com.ferreusveritas.dynamictrees.util.LevelContext;
+import com.ferreusveritas.dynamictrees.util.OffsetProperties;
+import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.google.common.collect.Maps;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -31,6 +35,7 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -340,7 +345,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     }
 
     private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
-            ResourceLocationUtils.prefix(block.get().getRegistryName(), "blocks/"));
+            ResourceLocationUtils.prefix(ForgeRegistries.BLOCKS.getKey(block.get()), "blocks/"));
 
     public ResourceLocation getBlockDropsPath() {
         return blockDropsPath.get();
@@ -375,7 +380,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     @Nonnull
     @Override
     public Pod reset() {
-        canBoneMeal = DTConfigs.CAN_BONE_MEAL_PODS.get();
+        canBoneMeal =  DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.CAN_BONE_MEAL_PODS.get();
         seasonOffset = 0.0F;
         flowerHoldPeriodLength = 0.5F;
         minProductionFactor = 0.3F;

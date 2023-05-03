@@ -32,6 +32,7 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockGetter;
@@ -42,14 +43,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
-import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -102,10 +102,10 @@ public class DTClient {
     @OnlyIn(Dist.CLIENT)
     private static int getFaceColor(BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
         final BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-        List<BakedQuad> quads = model.getQuads(state, face, new Random(), EmptyModelData.INSTANCE);
+        List<BakedQuad> quads = model.getQuads(state, face, RandomSource.create(), ModelData.EMPTY, null);
         if (quads.isEmpty()) // If the quad list is empty, means there is no face on that side, so we try with null.
         {
-            quads = model.getQuads(state, null, new Random(), EmptyModelData.INSTANCE);
+            quads = model.getQuads(state, null, RandomSource.create(), ModelData.EMPTY, null);
         }
         if (quads.isEmpty()) { // If null still returns empty, there is nothing we can do so we just warn and exit.
             LogManager.getLogger().warn("Could not get color of " + face + " side for " + state.getBlock() + "! Branch needs to be handled manually!");
@@ -131,6 +131,7 @@ public class DTClient {
         return level != null && pos != null;
     }
 
+    //todo: come back to this
     private static void registerRenderLayers() {
         ItemBlockRenderTypes.setRenderLayer(DTRegistries.POTTED_SAPLING.get(), RenderType.cutoutMipped());
 
@@ -220,11 +221,11 @@ public class DTClient {
         }
     }
 
-    public static void spawnParticles(Level level, SimpleParticleType particleType, BlockPos pos, int numParticles, Random random) {
+    public static void spawnParticles(Level level, SimpleParticleType particleType, BlockPos pos, int numParticles, RandomSource random) {
         spawnParticles(level, particleType, pos.getX(), pos.getY(), pos.getZ(), numParticles, random);
     }
 
-    public static void spawnParticles(LevelAccessor level, SimpleParticleType particleType, int x, int y, int z, int numParticles, Random random) {
+    public static void spawnParticles(LevelAccessor level, SimpleParticleType particleType, int x, int y, int z, int numParticles, RandomSource random) {
         for (int i1 = 0; i1 < numParticles; ++i1) {
             double mx = random.nextGaussian() * 0.02D;
             double my = random.nextGaussian() * 0.02D;
@@ -244,7 +245,7 @@ public class DTClient {
 
     public static void crushLeavesBlock(Level level, BlockPos pos, BlockState blockState, Entity entity) {
         if (level.isClientSide) {
-            Random random = level.random;
+            RandomSource random = level.random;
             TreePart treePart = TreeHelper.getTreePart(blockState);
             if (treePart instanceof DynamicLeavesBlock) {
                 DynamicLeavesBlock leaves = (DynamicLeavesBlock) treePart;

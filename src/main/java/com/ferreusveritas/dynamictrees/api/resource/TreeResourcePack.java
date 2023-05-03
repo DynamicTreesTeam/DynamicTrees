@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * A {@link net.minecraft.resources.IResourcePack} that reads from the {@code trees} folder.
+ * A {@linkplain PackResources resource pack} that reads from the {@code trees} folder.
  *
  * @author Harley O'Connor
  */
@@ -24,9 +24,9 @@ public interface TreeResourcePack extends PackResources {
     }
 
     @SuppressWarnings("ConstantConditions")
-    default Collection<ResourceLocation> getResources(String namespace, String path, int maxDepth,
-                                                      Predicate<String> filter) {
-        return this.getResources(null, namespace, path, maxDepth, filter);
+    default Collection<ResourceLocation> getResources(String namespace, String path,
+                                                      Predicate<ResourceLocation> filter) {
+        return this.getResources(null, namespace, path, filter);
     }
 
     @SuppressWarnings("ConstantConditions")

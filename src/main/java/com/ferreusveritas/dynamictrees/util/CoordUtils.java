@@ -10,8 +10,14 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.PathNavigationRegion;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
@@ -28,7 +34,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -113,7 +118,7 @@ public final class CoordUtils {
         return canAccessStateSafely(level, blockPos) ? level.getBlockState(blockPos) : null;
     }
 
-    public static Direction getRandomDir(Random rand) {
+    public static Direction getRandomDir(RandomSource rand) {
         return Direction.values()[2 + rand.nextInt(4)];//Return NSWE
     }
 

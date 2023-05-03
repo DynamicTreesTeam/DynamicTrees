@@ -1,7 +1,13 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.configuration.*;
+import com.ferreusveritas.dynamictrees.api.configuration.Configurable;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurableRegistryEntry;
+import com.ferreusveritas.dynamictrees.api.configuration.Configuration;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
+import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationTemplate;
+import com.ferreusveritas.dynamictrees.api.configuration.Properties;
+import com.ferreusveritas.dynamictrees.api.configuration.TemplateRegistry;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;

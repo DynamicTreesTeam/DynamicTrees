@@ -16,8 +16,8 @@
     },
     "leaves_properties": "warped",
     "environment_factors" : {
-        "cold": 0.25,
-        "wet": 0.75
+        "#forge:is_cold": 0.25,
+        "#forge:is_wet": 0.75
     },
     "perfect_biomes": { "name": "minecraft:warped_forest" },
     "acceptable_soils": ["nether_soil_like", "fungus_like", "dirt_like"],

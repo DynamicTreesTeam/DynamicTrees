@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -37,7 +38,6 @@ import net.minecraftforge.common.ForgeHooks;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Harley O'Connor
@@ -73,11 +73,11 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
 
     @SuppressWarnings("deprecation")
     @Override
-    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         doTick(state, level, pos, random);
     }
 
-    public void doTick(BlockState state, Level level, BlockPos pos, Random random) {
+    public void doTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (!this.isSupported(level, pos, state)) {
             drop(level, pos, state);
             return;
@@ -107,7 +107,7 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
         level.destroyBlock(pos, false);
     }
 
-    private void tryGrow(BlockState state, Level level, BlockPos pos, Random random, int age,
+    private void tryGrow(BlockState state, Level level, BlockPos pos, RandomSource random, int age,
                          @Nullable Float season) {
         final boolean doGrow = random.nextFloat() < getGrowthChance(level, pos);
         final boolean eventGrow = ForgeHooks.onCropsGrowPre(level, pos, state, doGrow);
@@ -203,12 +203,12 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
     }
 
     @Override
-    public boolean isBonemealSuccess(Level level, Random random, BlockPos pos, BlockState state) {
+    public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void performBonemeal(ServerLevel level, Random random, BlockPos pos, BlockState state) {
+    public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
         final int age = getAge(state);
         final int newAge = Math.min(age + 1, pod.getMaxAge());
         if (newAge != age) {

@@ -18,10 +18,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -40,12 +39,11 @@ import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Random;
 
 // TODO: Make compostable via ComposterBlock#registerCompostable
 public class Seed extends Item implements IPlantable {
 
-    private static final LazyValue<Random> BACKUP_RANDOM = LazyValue.supplied(Random::new);
+    private static final LazyValue<RandomSource> BACKUP_RANDOM = LazyValue.supplied(RandomSource::create);
 
     /**
      * If set to {@code true} in the item stack tag, forces the tree to be planted before despawning.
@@ -64,7 +62,8 @@ public class Seed extends Item implements IPlantable {
     //This constructor is only used for the null registration
     public Seed() {
         super(new Item.Properties());
-        this.setRegistryName("null");
+        // TODO: Set null name? Is this still used? -SizableShrimp
+        // this.setRegistryName("null");
         this.species = Species.NULL_SPECIES;
     }
 
@@ -115,7 +114,7 @@ public class Seed extends Item implements IPlantable {
             if (!joCode.isEmpty()) {
                 level.removeBlock(pos, false); // Remove the newly created dynamic sapling
                 BlockPos rootPos = pos.below();
-                GenerationContext context = new GenerationContext(LevelContext.create(level), species, rootPos, rootPos.mutable(), level.getBiome(pos).value(), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY);
+                GenerationContext context = new GenerationContext(LevelContext.create(level), species, rootPos, rootPos.mutable(), level.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY);
                 species.getJoCode(joCode).setCareful(true).generate(context);
             }
             return true;
@@ -137,7 +136,7 @@ public class Seed extends Item implements IPlantable {
 
         if (DTConfigs.SEED_ONLY_FOREST.get()) {
             plantChance *= BiomeDatabases.getDimensionalOrDefault(level.dimension().location())
-                    .getForestness(level.getBiome(pos).value());
+                    .getForestness(level.getBiome(pos));
         }
 
         float accum = 1.0f;
@@ -172,7 +171,7 @@ public class Seed extends Item implements IPlantable {
         return lifespan;
     }
 
-    public String getCode(ItemStack seedStack, Random random) {
+    public String getCode(ItemStack seedStack, RandomSource random) {
         String joCode = "";
         if (seedStack.hasTag()) {
             CompoundTag tag = seedStack.getTag();
@@ -191,7 +190,7 @@ public class Seed extends Item implements IPlantable {
     }
 
     @Nullable
-    private JoCode getJoCodeForRadius(Random random, int radius) {
+    private JoCode getJoCodeForRadius(RandomSource random, int radius) {
         return JoCodeRegistry.getRandomCode(species.getRegistryName(), Mth.clamp(radius, 2, 8), random);
     }
 
@@ -274,11 +273,11 @@ public class Seed extends Item implements IPlantable {
         if (stack.hasTag()) {
             final String joCode = this.getCode(stack, level == null ? BACKUP_RANDOM.get() : level.random);
             if (!joCode.isEmpty()) {
-                tooltip.add(new TranslatableComponent("tooltip.dynamictrees.jo_code", new JoCode(joCode).getTextComponent()));
+                tooltip.add(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(joCode).getTextComponent()));
             }
             if (this.hasForcePlant(stack)) {
-                tooltip.add(new TranslatableComponent("tooltip.dynamictrees.force_planting",
-                        new TranslatableComponent("tooltip.dynamictrees.enabled")
+                tooltip.add(Component.translatable("tooltip.dynamictrees.force_planting",
+                        Component.translatable("tooltip.dynamictrees.enabled")
                                 .withStyle(style -> style.withColor(ChatFormatting.DARK_AQUA)))
                 );
             }
@@ -286,8 +285,8 @@ public class Seed extends Item implements IPlantable {
             assert nbtData != null;
 
             if (nbtData.contains(LIFESPAN_KEY)) {
-                tooltip.add(new TranslatableComponent("tooltip.dynamictrees.seed_life_span" +
-                        new TextComponent(String.valueOf(nbtData.getInt(LIFESPAN_KEY)))
+                tooltip.add(Component.translatable("tooltip.dynamictrees.seed_life_span" +
+                        Component.literal(String.valueOf(nbtData.getInt(LIFESPAN_KEY)))
                                 .withStyle(style -> style.withColor(ChatFormatting.DARK_AQUA)))
                 );
             }

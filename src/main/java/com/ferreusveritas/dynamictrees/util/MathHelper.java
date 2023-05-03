@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import java.util.Random;
+import net.minecraft.util.RandomSource;
 
 /**
  * Just a few math helper functions.
@@ -12,11 +12,11 @@ public class MathHelper {
     /**
      * Selects a random direction weighted from the given probability map.
      *
-     * @param random  An instance of {@link Random}.
+     * @param random  An instance of {@link RandomSource}.
      * @param distMap The probability map.
      * @return A random direction.
      */
-    public static int selectRandomFromDistribution(final Random random, final int[] distMap) {
+    public static int selectRandomFromDistribution(final RandomSource random, final int[] distMap) {
         int distSize = 0;
 
         for (int j : distMap) {
@@ -51,7 +51,7 @@ public class MathHelper {
         return ang1 + shortDegreesDist(ang1, ang2) * t;
     }
 
-    public static int randomBetween(Random random, int min, int max) {
+    public static int randomBetween(RandomSource random, int min, int max) {
         if (min == max) {
             return min;
         }

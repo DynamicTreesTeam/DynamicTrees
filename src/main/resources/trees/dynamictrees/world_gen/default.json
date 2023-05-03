@@ -170,17 +170,6 @@
     }
   },
   {
-    "__comment" : "Generate azaleas or flowering azaleas above lush caves",
-    "_note": "Application of cave rooted trees requires the selector NOT to use tag filters and it CANNOT be used in dimensional databases.",
-    "select": { "name": "minecraft:lush_caves" },
-    "apply": {
-      "cave_rooted": {
-        "species" : "azalea",
-        "chance": 0.66
-      }
-    }
-  },
-  {
     "_comment": "Windswept Forests are denser and spawn more trees.",
     "select": "minecraft:windswept_forest",
     "apply": {

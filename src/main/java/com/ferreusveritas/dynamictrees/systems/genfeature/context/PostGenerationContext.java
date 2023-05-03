@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.systems.genfeature.context;
 import com.ferreusveritas.dynamictrees.compat.season.SeasonHelper;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public class PostGenerationContext extends GenerationContext {
 
     private final BlockPos originPos;
-    private final Biome biome;
+    private final Holder<Biome> biome;
     private final int radius;
     private final List<BlockPos> endPoints;
     private final SafeChunkBounds bounds;
@@ -42,7 +43,7 @@ public class PostGenerationContext extends GenerationContext {
         return originPos;
     }
 
-    public Biome biome() {
+    public Holder<Biome> biome() {
         return biome;
     }
 

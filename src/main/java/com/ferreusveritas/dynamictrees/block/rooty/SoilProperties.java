@@ -158,7 +158,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     }
 
     public Optional<RootyBlock> getBlock() {
-        return Optionals.ofBlock(block);
+        return Optionals.ofBlock(block.get());
     }
 
     public void generateBlock(BlockBehaviour.Properties blockProperties) {

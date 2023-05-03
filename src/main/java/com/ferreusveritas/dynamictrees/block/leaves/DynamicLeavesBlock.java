@@ -23,6 +23,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Bee;
@@ -35,9 +36,13 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
@@ -59,7 +64,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable, RayTraceCollision {
@@ -74,7 +78,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
     public DynamicLeavesBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(DISTANCE, LeavesProperties.maxHydro).setValue(PERSISTENT, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(DISTANCE, LeavesProperties.maxHydro).setValue(PERSISTENT, false).setValue(WATERLOGGED, false));
     }
 
     @Override
@@ -82,10 +86,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return !state.getValue(PERSISTENT);
     }
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(DISTANCE, PERSISTENT);
-    }
+
 
     public void setProperties(LeavesProperties properties) {
         this.properties = properties;
@@ -127,7 +128,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random rand) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
         if (rand.nextInt(DTConfigs.TREE_GROWTH_FOLDING.get()) != 0) {
             return;
         }
@@ -155,10 +156,10 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random rand) {
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
     }
 
-    protected void doTick(Level level, BlockPos pos, BlockState state, Random rand) {
+    protected void doTick(Level level, BlockPos pos, BlockState state, RandomSource rand) {
         if (canTickAt(level, pos) && getProperties(state).updateTick(level, pos, state, rand)) {
             age(level, pos, state, rand, SafeChunkBounds.ANY);
         }
@@ -179,7 +180,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public int age(LevelAccessor level, BlockPos pos, BlockState state, Random rand, SafeChunkBounds safeBounds) {
+    public int age(LevelAccessor level, BlockPos pos, BlockState state, RandomSource rand, SafeChunkBounds safeBounds) {
         final LeavesProperties leavesProperties = getProperties(state);
         final int oldHydro = state.getValue(DynamicLeavesBlock.DISTANCE);
 
@@ -261,7 +262,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
         if (isLeavesPassable() || this.isEntityPassable(context)) {
             return Shapes.empty();
-        } else if (DTConfigs.VANILLA_LEAVES_COLLISION.get()) {
+        } else if (DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.VANILLA_LEAVES_COLLISION.get()) {
             return Shapes.block();
         } else {
             return Shapes.create(new AABB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
@@ -269,7 +270,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     protected boolean isLeavesPassable() {
-        return DTConfigs.IS_LEAVES_PASSABLE.get() || ModList.get().isLoaded(DynamicTrees.PASSABLE_FOLIAGE);
+        return (DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.IS_LEAVES_PASSABLE.get()) || ModList.get().isLoaded(DynamicTrees.PASSABLE_FOLIAGE);
     }
 
     public boolean isEntityPassable(CollisionContext context) {

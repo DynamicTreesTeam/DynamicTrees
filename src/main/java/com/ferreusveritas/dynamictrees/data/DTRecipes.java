@@ -10,6 +10,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.Arrays;
@@ -37,14 +38,14 @@ public final class DTRecipes {
 
             species.getPrimitiveSaplingRecipes().forEach(saplingRecipe -> {
                 final Item saplingItem = saplingRecipe.getSaplingItem().orElse(null);
-                if (saplingItem == null || saplingItem.getRegistryName() == null) {
+                if (saplingItem == null || ForgeRegistries.ITEMS.getKey(saplingItem) == null) {
                     LogManager.getLogger().error("Error creating seed-sapling recipe for species \"" + species.getRegistryName() + "\" as sapling item does not exist.");
                     return;
                 }
 
                 if (saplingRecipe.canCraftSaplingToSeed()) {
                     final ResourceLocation saplingToSeed = new ResourceLocation(registryName.getNamespace(),
-                            separate(saplingItem.getRegistryName()) + "_to_" + registryName.getPath() + "_seed");
+                            separate(ForgeRegistries.ITEMS.getKey(saplingItem)) + "_to_" + registryName.getPath() + "_seed");
 
                     List<Item> ingredients = saplingRecipe.getIngredientsForSaplingToSeed();
                     ingredients.add(DTRegistries.DIRT_BUCKET.get());
@@ -56,7 +57,7 @@ public final class DTRecipes {
 
                 if (saplingRecipe.canCraftSeedToSapling()) {
                     final ResourceLocation seedToSapling = new ResourceLocation(registryName.getNamespace(),
-                            registryName.getPath() + "_seed_to_" + separate(saplingItem.getRegistryName()));
+                            registryName.getPath() + "_seed_to_" + separate(ForgeRegistries.ITEMS.getKey(saplingItem)));
 
                     List<Item> ingredients = saplingRecipe.getIngredientsForSeedToSapling();
                     ingredients.add(DTRegistries.DIRT_BUCKET.get());

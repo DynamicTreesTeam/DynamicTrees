@@ -6,20 +6,16 @@ import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.MultiJsonResourcePreparer;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.deserialisation.BiomeListDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.resources.Resources;
-import com.ferreusveritas.dynamictrees.tree.species.Species;
-import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.google.gson.JsonElement;
@@ -28,15 +24,13 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
@@ -72,9 +66,9 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                 .collect(CommonCollectors.toLinkedList());
     }
 
-    static BiomeList collectBiomes(JsonObject json, Consumer<String> warningConsumer) throws DeserialisationException {
+    static DTBiomeHolderSet collectBiomes(JsonObject json, Consumer<String> warningConsumer) throws DeserialisationException {
         return JsonResult.forInput(json)
-                .mapIfContains(SELECT, BiomeList.class, list -> list)
+                .mapIfContains(SELECT, DTBiomeHolderSet.class, list -> list)
                 .forEachWarning(warningConsumer)
                 .orElseThrow();
     }
@@ -201,8 +195,9 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
     }
 
     private void readCaveRootedPopulatorSection(BiomeDatabase database, ResourceLocation location, JsonObject json) throws DeserialisationException {
-        final BiomeList biomes = collectBiomes(json, warning -> {});
-        if (!biomes.isEmpty()) {
+        final DTBiomeHolderSet biomes = collectBiomes(json, warning -> {
+        });
+        if (biomes != null && biomes.size() > 0) {
             applyCaveRootedPopulatorSection(database, json.getAsJsonObject(APPLY), biomes);
         }
     }
@@ -233,13 +228,15 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
     private void waitForTagLoading() {
         while (true) {
             try {
-                Map<ResourceLocation, Tag<Holder<Biome>>> tags = Resources.getConditionContext().getAllTags(Registry.BIOME_REGISTRY);
-                BiomeListDeserialiser.cacheNewTags(tags);
+                Map<ResourceLocation, Collection<Holder<Biome>>> tags = Resources.getConditionContext().getAllTags(Registry.BIOME_REGISTRY);
+                //todo: figure out if needed
+//                BiomeListDeserialiser.cacheNewTags(tags);
                 break;
             } catch (IllegalStateException ignored) {
                 try {
                     Thread.sleep(100); // Wait for 1/10 of a second before trying again.
-                } catch (InterruptedException _ignored) {}
+                } catch (InterruptedException _ignored) {
+                }
             }
         }
     }
@@ -302,10 +299,10 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
     private void readPopulatorSection(BiomeDatabase database, ResourceLocation location, JsonObject json)
             throws DeserialisationException {
 
-        final BiomeList biomes = collectBiomes(json, warning ->
+        final DTBiomeHolderSet biomes = collectBiomes(json, warning ->
                 LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning));
 
-        if (biomes.isEmpty()) {
+        if (biomes == null || biomes.size() == 0) {
             warnNoBiomesSelected(json);
             return;
         }
@@ -327,7 +324,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                 .orElseThrow();
     }
 
-    private void applyCaveRootedPopulatorSection(BiomeDatabase database, JsonObject json, BiomeList biomes) {
+    private void applyCaveRootedPopulatorSection(BiomeDatabase database, JsonObject json, DTBiomeHolderSet biomes) {
         if (json.has(CAVE_ROOTED) && json.get(CAVE_ROOTED).isJsonObject()) {
             JsonObject caveRootedJson = json.getAsJsonObject(CAVE_ROOTED);
             JsonMapWrapper applyData = new JsonMapWrapper(caveRootedJson);
@@ -338,7 +335,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
         }
     }
 
-    private void applyWhite(BiomeDatabase database, ResourceLocation location, BiomeList biomes, String type)
+    private void applyWhite(BiomeDatabase database, ResourceLocation location, DTBiomeHolderSet biomes, String type)
             throws DeserialisationException {
         if (type.equalsIgnoreCase("all")) {
             database.getAllEntries().forEach(entry -> entry.setBlacklisted(false));

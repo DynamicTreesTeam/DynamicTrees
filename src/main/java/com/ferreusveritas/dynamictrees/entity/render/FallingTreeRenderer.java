@@ -1,8 +1,8 @@
 package com.ferreusveritas.dynamictrees.entity.render;
 
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
-import com.ferreusveritas.dynamictrees.model.FallingTreeEntityModel;
-import com.ferreusveritas.dynamictrees.model.FallingTreeEntityModelTrackerCache;
+import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModel;
+import com.ferreusveritas.dynamictrees.models.FallingTreeEntityModelTrackerCache;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

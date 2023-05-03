@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * @author Harley O'Connor
@@ -16,7 +17,7 @@ public class LeavesStateGenerator implements Generator<DTBlockStateProvider, Lea
     @Override
     public void generate(DTBlockStateProvider provider, LeavesProperties input, Dependencies dependencies) {
         provider.simpleBlock(dependencies.get(LEAVES), provider.models().getExistingFile(
-                provider.block(dependencies.get(PRIMITIVE_LEAVES).getRegistryName())
+                provider.block(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LEAVES)))
         ));
     }
 

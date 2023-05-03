@@ -11,10 +11,8 @@ import net.minecraft.util.GsonHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author Harley O'Connor
@@ -34,24 +32,20 @@ public final class JsonResourcePreparer extends AbstractResourcePreparer<JsonEle
 
 
     @Override
-    protected void readAndPutResource(Resource resource, ResourceLocation resourceName) throws PreparationException {
+    protected void readAndPutResource(Resource resource, ResourceLocation resourceName) throws PreparationException, IOException {
         final JsonElement jsonElement = readResource(resource);
         this.resourceCollector.put(new DTResource<>(resourceName, jsonElement));
     }
 
     @Nonnull
-    static JsonElement readResource(Resource resource) throws PreparationException {
-        final Reader reader = getReader(resource);
+    static JsonElement readResource(Resource resource) throws PreparationException, IOException {
+        final Reader reader = resource.openAsReader();
         final JsonElement json = tryParseJson(reader);
 
         if (json == null) {
             throw new PreparationException("Couldn't load file as it's null or empty");
         }
         return json;
-    }
-
-    private static BufferedReader getReader(Resource resource) {
-        return new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
     }
 
     @Nullable

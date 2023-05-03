@@ -25,7 +25,6 @@ import net.minecraft.commands.arguments.coordinates.Coordinates;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
@@ -38,9 +37,9 @@ import java.util.function.Supplier;
  */
 public abstract class SubCommand {
 
-    protected static final DynamicCommandExceptionType NO_TREE_FOUND = new DynamicCommandExceptionType(pos -> new TranslatableComponent("commands.dynamictrees.error.get_tree", new TranslatableComponent("chat.coordinates", getVector3i(pos).getX(), getVector3i(pos).getY(), getVector3i(pos).getZ()).withStyle(style -> style.withColor(ChatFormatting.DARK_RED))));
-    protected static final DynamicCommandExceptionType SPECIES_UNKNOWN = new DynamicCommandExceptionType(resLocStr -> new TranslatableComponent("commands.dynamictrees.error.unknown_species", darkRed(resLocStr)));
-    protected static final DynamicCommandExceptionType SPECIES_NOT_TRANSFORMABLE = new DynamicCommandExceptionType(nonTransformableSpecies -> new TranslatableComponent("commands.dynamictrees.error.not_transformable", darkRed(nonTransformableSpecies)));
+    protected static final DynamicCommandExceptionType NO_TREE_FOUND = new DynamicCommandExceptionType(pos -> Component.translatable("commands.dynamictrees.error.get_tree", Component.translatable("chat.coordinates", getVector3i(pos).getX(), getVector3i(pos).getY(), getVector3i(pos).getZ()).withStyle(style -> style.withColor(ChatFormatting.DARK_RED))));
+    protected static final DynamicCommandExceptionType SPECIES_UNKNOWN = new DynamicCommandExceptionType(resLocStr -> Component.translatable("commands.dynamictrees.error.unknown_species", darkRed(resLocStr)));
+    protected static final DynamicCommandExceptionType SPECIES_NOT_TRANSFORMABLE = new DynamicCommandExceptionType(nonTransformableSpecies -> Component.translatable("commands.dynamictrees.error.not_transformable", darkRed(nonTransformableSpecies)));
 
     private static Vec3i getVector3i(final Object vecObj) {
         if (vecObj instanceof Vec3i) {

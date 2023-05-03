@@ -11,7 +11,6 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +29,8 @@ public class TextureStitchEventHandler {
             for (Map.Entry<ResourceLocation, ResourceLocation> reslocs : ThickRingTextureManager.getThickRingEntrySet()) {
                 ResourceLocation thickLogResLoc = reslocs.getValue();
 
-                try {
-                    manager.getResource(new ResourceLocation(thickLogResLoc.getNamespace(), String.format("textures/%s%s", thickLogResLoc.getPath(), ".png")));
-                    textureNotFound = false;
-                } catch (IOException ignored) {
-                }
+                textureNotFound = manager.getResource(new ResourceLocation(thickLogResLoc.getNamespace(), String.format("textures/%s%s", thickLogResLoc.getPath(), ".png"))).isEmpty();
+
 
                 if (textureNotFound) {
                     ringLocationsToGenerate.add(thickLogResLoc);

@@ -10,9 +10,9 @@
     "growth_logic_kit": "dark_oak",
     "leaves_properties": "dark_oak",
     "environment_factors" : {
-        "cold": 0.75,
-        "hot": 0.5,
-        "dry": 0.25,
+        "#forge:is_cold": 0.75,
+        "#forge:is_hot": 0.5,
+        "#forge:is_dry": 0.25,
         "mushroom": 1.25
     },
     "perfect_biomes": { "type": "spooky", "name": "minecraft:.*" },

@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -19,7 +20,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class BushGenFeature extends GenFeature {
 
@@ -82,7 +82,7 @@ public class BushGenFeature extends GenFeature {
     }
 
     protected void commonGen(GenFeatureConfiguration configuration, LevelAccessor level, BlockPos rootPos, Species species,
-                             Random random, int radius, SafeChunkBounds safeBounds) {
+                             RandomSource random, int radius, SafeChunkBounds safeBounds) {
         if (radius <= 2) {
             return;
         }
@@ -121,14 +121,14 @@ public class BushGenFeature extends GenFeature {
         }
     }
 
-    private void placeLeaves(GenFeatureConfiguration configuration, LevelAccessor level, Random random,
+    private void placeLeaves(GenFeatureConfiguration configuration, LevelAccessor level, RandomSource random,
                              BlockPos leafPos) {
         final Block leavesBlock = selectLeavesBlock(random, configuration.get(SECONDARY_LEAVES_CHANCE),
                 configuration.get(LEAVES), configuration.getAsOptional(SECONDARY_LEAVES).orElse(null));
         placeLeavesBlock(level, leafPos, leavesBlock);
     }
 
-    private Block selectLeavesBlock(Random random, int secondaryLeavesChance, Block leavesBlock,
+    private Block selectLeavesBlock(RandomSource random, int secondaryLeavesChance, Block leavesBlock,
                                     @Nullable Block secondaryLeavesBlock) {
         return secondaryLeavesBlock == null || random.nextInt(secondaryLeavesChance) != 0 ? leavesBlock :
                 secondaryLeavesBlock;

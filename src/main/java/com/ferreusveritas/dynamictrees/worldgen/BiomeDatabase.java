@@ -1,7 +1,14 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
-import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.*;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Chance;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.ChanceSelector;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.DensitySelector;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.FeatureCancellation;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.NoFeatureCancellation;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.NormalFeatureCancellation;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelection;
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelector;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.google.common.collect.Maps;
@@ -9,10 +16,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -39,16 +46,16 @@ public class BiomeDatabase {
 
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
 
-    public Entry getEntry(@Nullable Biome biome) {
+    public Entry getEntry(@Nullable Holder<Biome> biome) {
 		if (biome == null) {
 			return BAD_ENTRY;
 		}
 
-        return this.entries.computeIfAbsent(biome.getRegistryName(), k -> new Entry(this, biome));
+        return this.entries.computeIfAbsent(ForgeRegistries.BIOMES.getKey(biome.get()), k -> new Entry(this, biome));
     }
 
     public Entry getEntry(ResourceLocation biomeResLoc) {
-        return this.getEntry(ForgeRegistries.BIOMES.getValue(biomeResLoc));
+        return this.getEntry(ForgeRegistries.BIOMES.getHolder(biomeResLoc).get());
     }
 
     public Collection<Entry> getAllEntries() {
@@ -70,10 +77,10 @@ public class BiomeDatabase {
 
     public boolean isValid() {
         for (Biome biome : ForgeRegistries.BIOMES) {
-            final BaseEntry entry = this.getEntry(biome);
-            final ResourceLocation biomeRegistryName = entry.getBiome().getRegistryName();
+            final BaseEntry entry = this.getEntry(Holder.direct(biome));
+            final ResourceLocation biomeRegistryName = ForgeRegistries.BIOMES.getKey(entry.getBiome().get());
 
-            if (biomeRegistryName != null && !biomeRegistryName.equals(biome.getRegistryName())) {
+            if (biomeRegistryName != null && !biomeRegistryName.equals(ForgeRegistries.BIOMES.getKey(biome))) {
                 return false;
             }
         }
@@ -86,7 +93,7 @@ public class BiomeDatabase {
     }
 
     public interface EntryReader {
-        Codec<EntryReader> CODEC = ResourceLocation.CODEC.comapFlatMap(EntryReader::read, entry -> entry.getBiome().getRegistryName());
+        Codec<EntryReader> CODEC = ResourceLocation.CODEC.comapFlatMap(EntryReader::read, entry -> ForgeRegistries.BIOMES.getKey(entry.getBiome().get()));
 
         static DataResult<EntryReader> read(ResourceLocation biomeName) {
             EntryReader entry = BiomeDatabases.getDefault().getEntry(biomeName);
@@ -96,7 +103,7 @@ public class BiomeDatabase {
             return DataResult.success(entry);
         }
 
-        Biome getBiome();
+        Holder<Biome> getBiome();
 
         ChanceSelector getChanceSelector();
 
@@ -118,7 +125,7 @@ public class BiomeDatabase {
 
     public static abstract class BaseEntry implements EntryReader {
         private final BiomeDatabase database;
-        private final Biome biome;
+        private final Holder<Biome> biome;
         private ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
         private DensitySelector densitySelector = (rnd, nd) -> -1;
         private SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
@@ -131,10 +138,10 @@ public class BiomeDatabase {
 
         public BaseEntry() {
             this.database = null;
-            this.biome = ForgeRegistries.BIOMES.getValue(Biomes.OCEAN.getRegistryName());
+            this.biome = ForgeRegistries.BIOMES.getHolder(Biomes.OCEAN).get();
         }
 
-        public BaseEntry(final BiomeDatabase database, final Biome biome) {
+        public BaseEntry(final BiomeDatabase database, final Holder<Biome> biome) {
             this.database = database;
             this.biome = biome;
         }
@@ -144,7 +151,7 @@ public class BiomeDatabase {
         }
 
         @Override
-        public Biome getBiome() {
+        public Holder<Biome> getBiome() {
             return biome;
         }
 
@@ -333,7 +340,7 @@ public class BiomeDatabase {
             super();
         }
 
-        public Entry(BiomeDatabase database, Biome biome) {
+        public Entry(BiomeDatabase database, Holder<Biome> biome) {
             super(database, biome);
         }
 
@@ -395,41 +402,41 @@ public class BiomeDatabase {
 
     }
 
-    public SpeciesSelector getSpecies(Biome biome) {
+    public SpeciesSelector getSpecies(Holder<Biome> biome) {
         return getEntry(biome).getSpeciesSelector();
     }
 
-    public ChanceSelector getChance(Biome biome) {
+    public ChanceSelector getChance(Holder<Biome> biome) {
         return getEntry(biome).getChanceSelector();
     }
 
-    public DensitySelector getDensitySelector(Biome biome) {
+    public DensitySelector getDensitySelector(Holder<Biome> biome) {
         return getEntry(biome).getDensitySelector();
     }
 
-    public float getForestness(Biome biome) {
+    public float getForestness(Holder<Biome> biome) {
         return getEntry(biome).getForestness();
     }
 
-    public String getHeightmap(Biome biome) {
+    public String getHeightmap(Holder<Biome> biome) {
         return getEntry(biome).getHeightmap();
     }
 
-    public Function<Integer, Integer> getMultipass(Biome biome) {
+    public Function<Integer, Integer> getMultipass(Holder<Biome> biome) {
         return getEntry(biome).getMultipass();
     }
 
-    public BiomeDatabase setForestness(Biome biome, float forestness) {
+    public BiomeDatabase setForestness(Holder<Biome> biome, float forestness) {
         getEntry(biome).setForestness((float) Math.max(forestness, DTConfigs.SEED_MIN_FORESTNESS.get()));
         return this;
     }
 
-    public BiomeDatabase setHeightmap(Biome biome, String heightmap) {
+    public BiomeDatabase setHeightmap(Holder<Biome> biome, String heightmap) {
         getEntry(biome).setHeightmap(heightmap);
         return this;
     }
 
-    public BiomeDatabase setMultipass(Biome biome, Function<Integer, Integer> multipass) {
+    public BiomeDatabase setMultipass(Holder<Biome> biome, Function<Integer, Integer> multipass) {
         getEntry(biome).setMultipass(multipass);
         return this;
     }

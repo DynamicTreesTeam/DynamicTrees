@@ -4,13 +4,11 @@ import com.ferreusveritas.dynamictrees.api.worldgen.PoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.event.PoissonDiscProviderCreateEvent;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeRadiusCoordinator;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraftforge.common.MinecraftForge;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -9,6 +9,7 @@ import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.PalmLeavesProperties;
+import com.ferreusveritas.dynamictrees.block.leaves.ScruffyLeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.SolidLeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.WartProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
@@ -16,13 +17,12 @@ import com.ferreusveritas.dynamictrees.block.rooty.SpreadableSoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.WaterSoilProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.resources.Resources;
-import com.ferreusveritas.dynamictrees.block.leaves.ScruffyLeavesProperties;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
-import com.ferreusveritas.dynamictrees.tree.species.Mushroom;
-import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.tree.family.NetherFungusFamily;
+import com.ferreusveritas.dynamictrees.tree.species.Mushroom;
 import com.ferreusveritas.dynamictrees.tree.species.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.tree.species.PalmSpecies;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.tree.species.SwampOakSpecies;
 import net.minecraft.data.worldgen.features.NetherFeatures;
 import net.minecraft.resources.ResourceLocation;
@@ -32,10 +32,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.NetherForestVegetationConfig;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.NewRegistryEvent;
+import net.minecraftforge.registries.RegisterEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -117,7 +118,8 @@ public class DTTrees {
     }
 
     @SubscribeEvent
-    public static void onRegisterBlocks(RegistryEvent.Register<Block> event) {
+    public static void onRegisterBlocks(RegisterEvent event) {
+        if(event.getRegistryKey() != ForgeRegistries.BLOCKS.getRegistryKey()) return;
         // Register any registry entries from Json files.
         Resources.MANAGER.load();
 

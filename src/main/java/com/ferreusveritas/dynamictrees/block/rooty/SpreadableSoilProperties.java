@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -17,7 +18,10 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Max Hyper
@@ -108,7 +112,7 @@ public class SpreadableSoilProperties extends SoilProperties {
         }
 
         @Override
-        public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+        public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
             super.randomTick(state, level, pos, random);
             SpreadableSoilProperties properties = getSoilProperties();
             //this is a similar behaviour to vanilla grass spreading but inverted to be handled by the dirt block

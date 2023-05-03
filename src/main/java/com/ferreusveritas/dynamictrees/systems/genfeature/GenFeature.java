@@ -6,7 +6,12 @@ import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.event.SpeciesPostGenerationEvent;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
-import com.ferreusveritas.dynamictrees.systems.genfeature.context.*;
+import com.ferreusveritas.dynamictrees.systems.genfeature.context.FullGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeature.context.GenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostGenerationContext;
+import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostGrowContext;
+import com.ferreusveritas.dynamictrees.systems.genfeature.context.PostRotContext;
+import com.ferreusveritas.dynamictrees.systems.genfeature.context.PreGenerationContext;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.function.BiomePredicate;
 import com.ferreusveritas.dynamictrees.util.function.CanGrowPredicate;
@@ -142,7 +147,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     }
 
     /**
-     * int, int, int, Random, boolean, boolean) rot action} has occurred.
+     * int, int, int, RandomSource, boolean, boolean) rot action} has occurred.
      *
      * @param configuration the configuration
      * @param context       the context

@@ -11,8 +11,8 @@
     "generate_sapling": true,
     "environment_factors": {
         "sparse": 1.1,
-        "hot": 0.5,
-        "wet": 0.75
+        "#forge:is_hot": 0.5,
+        "#forge:is_wet": 0.75
     },
     "growth_logic_kit": "azalea",
     "perfect_biomes": { "name": "minecraft:lush_caves" },

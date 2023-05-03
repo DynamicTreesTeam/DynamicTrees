@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.deserialisation;
 
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.google.gson.JsonElement;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
@@ -11,12 +10,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 /**
- * Implementation of {@link JsonDeserialiser} that attempts to get a {@link ForgeRegistryEntry} object from a {@link
- * JsonElement}.
+ * Implementation of {@link JsonDeserialiser} that attempts to
+ * get a forge registry entry object from a {@link JsonElement}.
  *
  * @author Harley O'Connor
  */
-public final class ForgeRegistryEntryDeserialiser<T extends ForgeRegistryEntry<T>> implements JsonDeserialiser<T> {
+public final class ForgeRegistryEntryDeserialiser<T> implements JsonDeserialiser<T> {
 
     private final IForgeRegistry<T> registry;
     private final String registryDisplayName;
@@ -41,7 +40,7 @@ public final class ForgeRegistryEntryDeserialiser<T extends ForgeRegistryEntry<T
         final AtomicBoolean intentionallyNull = new AtomicBoolean();
         return JsonDeserialisers.RESOURCE_LOCATION.deserialise(jsonElement).map(registryName -> {
                     // If registry name is the null value's registry name then it was intentionally the null value, so don't warn.
-                    if (this.nullValue != null && Objects.equals(registryName, this.nullValue.getRegistryName())) {
+                    if (this.nullValue != null && Objects.equals(registryName, this.registry.getKey(this.nullValue))) {
                         intentionallyNull.set(true);
                         return this.nullValue;
                     }

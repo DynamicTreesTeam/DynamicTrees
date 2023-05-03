@@ -6,10 +6,9 @@ import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.WaterSoilProperties;
-import mcp.mobius.waila.api.IWailaClientRegistration;
-import mcp.mobius.waila.api.IWailaPlugin;
-import mcp.mobius.waila.api.TooltipPosition;
-import mcp.mobius.waila.api.WailaPlugin;
+import snownee.jade.api.IWailaClientRegistration;
+import snownee.jade.api.IWailaPlugin;
+import snownee.jade.api.WailaPlugin;
 
 @WailaPlugin
 public class WailaCompat implements IWailaPlugin {
@@ -17,13 +16,13 @@ public class WailaCompat implements IWailaPlugin {
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         WailaBranchHandler branchHandler = new WailaBranchHandler();
-        registration.registerComponentProvider(branchHandler, TooltipPosition.BODY, BranchBlock.class);
-        registration.registerComponentProvider(branchHandler, TooltipPosition.BODY, TrunkShellBlock.class);
+        registration.registerBlockComponent(branchHandler, BranchBlock.class);
+        registration.registerBlockComponent(branchHandler, TrunkShellBlock.class);
 
-        registration.registerComponentProvider(new WailaFruitHandler(), TooltipPosition.BODY, FruitBlock.class);
-        registration.registerComponentProvider(new WailaPodHandler(), TooltipPosition.BODY, PodBlock.class);
-        registration.registerComponentProvider(new WailaRootyHandler(), TooltipPosition.BODY, RootyBlock.class);
-        registration.registerComponentProvider(new WailaRootyWaterHandler(), TooltipPosition.HEAD, WaterSoilProperties.RootyWaterBlock.class);
+        registration.registerBlockComponent(new WailaFruitHandler(), FruitBlock.class);
+        registration.registerBlockComponent(new WailaPodHandler(), PodBlock.class);
+        registration.registerBlockComponent(new WailaRootyHandler(), RootyBlock.class);
+        registration.registerBlockComponent(new WailaRootyWaterHandler(), WaterSoilProperties.RootyWaterBlock.class);
     }
 
 }

@@ -1,6 +1,10 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
-import com.ferreusveritas.dynamictrees.api.applier.*;
+import com.ferreusveritas.dynamictrees.api.applier.Applier;
+import com.ferreusveritas.dynamictrees.api.applier.IfTrueApplier;
+import com.ferreusveritas.dynamictrees.api.applier.PropertyApplier;
+import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
+import com.ferreusveritas.dynamictrees.api.applier.VoidApplier;
 import com.google.gson.JsonElement;
 
 import java.util.LinkedList;

@@ -15,9 +15,9 @@
     },
     "leaves_properties": "spruce",
     "environment_factors" : {
-        "hot": 0.50,
-        "dry": 0.25,
-        "wet": 0.75
+        "#forge:is_hot": 0.50,
+        "#forge:is_dry": 0.25,
+        "#forge:is_wet": 0.75
     },
     "common_override": { "name": "minecraft:.*giant_tree_taiga.*" },
     "perfect_biomes": { "name": "minecraft:.*giant_tree_taiga.*" },

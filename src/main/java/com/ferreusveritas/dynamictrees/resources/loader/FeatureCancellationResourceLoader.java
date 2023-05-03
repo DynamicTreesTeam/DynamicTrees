@@ -11,13 +11,15 @@ import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
-import com.ferreusveritas.dynamictrees.util.BiomeList;
 import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
+import com.ferreusveritas.dynamictrees.worldgen.FeatureCancellationRegistry;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.biome.Biome;
@@ -142,9 +144,9 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
             return;
         }
 
-        final BiomeList biomes = BiomePopulatorsResourceLoader.collectBiomes(json, warningConsumer);
+        final DTBiomeHolderSet biomes = BiomePopulatorsResourceLoader.collectBiomes(json, warningConsumer);
 
-        if (biomes.isEmpty()) {
+        if (biomes.getList().isEmpty()) {
             BiomePopulatorsResourceLoader.warnNoBiomesSelected(json);
             return;
         }
@@ -162,7 +164,7 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
 
     private PropertyApplierResult applyCanceller(ResourceLocation location,
                                                  Consumer<String> errorConsumer,
-                                                 Consumer<String> warningConsumer, BiomeList biomes,
+                                                 Consumer<String> warningConsumer, DTBiomeHolderSet biomes,
                                                  JsonObject json) {
         var cancellation = new BiomePropertySelectors.NormalFeatureCancellation();
         this.applyCancellationAppliers(location, json, cancellation);
@@ -174,10 +176,11 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
                 .orElse(BiomeDatabase.Operation.SPLICE_AFTER, errorConsumer, warningConsumer);
 
         if (operation == BiomeDatabase.Operation.REPLACE) {
-            this.replaceCancellationsWith(cancellation, biomes);
+            this.replaceCancellationsWith(cancellation, biomes.getList());
         } else {
-            this.addCancellationsTo(cancellation, biomes);
+            this.addCancellationsTo(cancellation, biomes.getList());
         }
+        FeatureCancellationRegistry.addCancellations(biomes, operation, cancellation);
         return PropertyApplierResult.success();
     }
 
@@ -191,14 +194,14 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
                 );
     }
 
-    private void replaceCancellationsWith(BiomePropertySelectors.NormalFeatureCancellation cancellation, List<Biome> biomes) {
+    private void replaceCancellationsWith(BiomePropertySelectors.NormalFeatureCancellation cancellation, List<Holder<Biome>> biomes) {
         biomes.forEach(biome -> {
             var currentCancellations = BiomeDatabases.getDefault().getEntry(biome).getOrCreateFeatureCancellation();
             currentCancellations.replaceFrom(cancellation);
         });
     }
 
-    private void addCancellationsTo(BiomePropertySelectors.NormalFeatureCancellation cancellation, List<Biome> biomes) {
+    private void addCancellationsTo(BiomePropertySelectors.NormalFeatureCancellation cancellation, List<Holder<Biome>> biomes) {
         biomes.forEach(biome -> {
             var currentCancellation = BiomeDatabases.getDefault().getEntry(biome).getOrCreateFeatureCancellation();
             currentCancellation.addFrom(cancellation);

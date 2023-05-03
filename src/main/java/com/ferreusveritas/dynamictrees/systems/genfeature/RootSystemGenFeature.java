@@ -7,12 +7,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Random;
 import java.util.function.Predicate;
 
 /**
@@ -72,7 +72,7 @@ public class RootSystemGenFeature extends GenFeature {
         return true;
     }
 
-    private static void placeRootedDirt(LevelAccessor level, GenFeatureConfiguration configuration, Random random, int x, int z, BlockPos.MutableBlockPos pos) {
+    private static void placeRootedDirt(LevelAccessor level, GenFeatureConfiguration configuration, RandomSource random, int x, int z, BlockPos.MutableBlockPos pos) {
         int radius = configuration.get(ROOT_RADIUS);
         TagKey<Block> rootReplaceableTag = BlockTags.create(configuration.get(ROOT_REPLACEABLE_TAG));
         Predicate<BlockState> stateReplaceable = (state) -> state.is(rootReplaceableTag);
@@ -89,7 +89,7 @@ public class RootSystemGenFeature extends GenFeature {
         }
     }
 
-    private static void placeHangingRoots(LevelAccessor level, GenFeatureConfiguration configuration, Random random, BlockPos originPos, BlockPos.MutableBlockPos pos) {
+    private static void placeHangingRoots(LevelAccessor level, GenFeatureConfiguration configuration, RandomSource random, BlockPos originPos, BlockPos.MutableBlockPos pos) {
         int radius = configuration.get(HANGING_ROOT_RADIUS);
         int verticalSpan = configuration.get(HANGING_ROOT_VERTICAL_SPAN);
 

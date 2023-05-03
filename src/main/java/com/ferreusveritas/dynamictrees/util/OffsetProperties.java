@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.util;
 
 import com.google.common.collect.Maps;
 import net.minecraft.Util;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import oshi.util.tuples.Pair;
 

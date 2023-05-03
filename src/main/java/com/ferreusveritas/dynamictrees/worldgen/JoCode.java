@@ -23,7 +23,9 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -36,7 +38,12 @@ import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * So named because the base64 codes it generates almost always start with "JO"
@@ -212,10 +219,10 @@ public class JoCode {
         MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(level, species, rootPos, endPoints, context.safeBounds(), initialDirtState));
 
         // Add snow to parts of the tree in chunks where snow was already placed.
-        this.addSnow(leafMap, level, rootPos, context.biome());
+        this.addSnow(leafMap, level, rootPos, context.biome().get());
     }
 
-    protected void generateAndAgeLeaves(GenerationContext context, SimpleVoxmap leafMap, boolean worldGen){
+    protected void generateAndAgeLeaves(GenerationContext context, SimpleVoxmap leafMap, boolean worldGen) {
         LevelAccessor level = context.level();
         Species species = context.species();
         final LeavesProperties leavesProperties = species.getLeavesProperties();
@@ -378,14 +385,14 @@ public class JoCode {
     }
 
     protected boolean isFreeToSetBlock(LevelAccessor level, BlockPos pos) {
-        if (TreeFeature.isFree(level, pos))
+        if (TreeFeature.validTreePos(level, pos) || level.isStateAtPosition(pos, (blockState) -> blockState.is(BlockTags.LOGS)))
             return true;
 
         BlockState blockState = level.getBlockState(pos);
         return blockState.getMaterial().isLiquid() || isReplaceable(blockState, false);
     }
 
-    protected boolean isReplaceable(BlockState state, boolean airOnly){
+    protected boolean isReplaceable(BlockState state, boolean airOnly) {
         boolean isEmpty = airOnly ? state.isAir() : state.getMaterial().isReplaceable();
         return isEmpty || state.is(DTBlockTags.FOLIAGE) || state.is(BlockTags.FLOWERS);
     }
@@ -502,9 +509,9 @@ public class JoCode {
     }
 
     public Component getTextComponent() {
-        return new TextComponent(this.toString()).withStyle(style ->
+        return Component.literal(this.toString()).withStyle(style ->
                 style.withColor(ChatFormatting.AQUA).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, this.toString()))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("chat.copy.click")))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click")))
         );
     }
 

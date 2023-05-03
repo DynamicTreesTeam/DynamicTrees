@@ -1,6 +1,10 @@
 package com.ferreusveritas.dynamictrees.util;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Set;
 import java.util.stream.Collector;
 
 import static java.util.stream.Collector.Characteristics.IDENTITY_FINISH;

@@ -12,12 +12,18 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.FlowerBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.MushroomBlock;
+import net.minecraft.world.level.block.TallGrassBlock;
 
 import java.util.List;
-import java.util.Random;
 
 public class PodzolGenFeature extends GenFeature {
 
@@ -44,7 +50,7 @@ public class PodzolGenFeature extends GenFeature {
             return false;
         }
 
-        final Random random = context.random();
+        final RandomSource random = context.random();
         final BlockPos pos = endPoints.get(random.nextInt(endPoints.size()));
 
         final int x = pos.getX() + random.nextInt(5) - 2;

@@ -13,7 +13,7 @@ import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public final class TransformCommand extends SubCommand {
 
-    private static final Dynamic2CommandExceptionType SPECIES_EQUAL = new Dynamic2CommandExceptionType((toSpecies, fromSpecies) -> new TranslatableComponent("commands.dynamictrees.error.species_equal", darkRed(toSpecies), darkRed(fromSpecies)));
+    private static final Dynamic2CommandExceptionType SPECIES_EQUAL = new Dynamic2CommandExceptionType((toSpecies, fromSpecies) -> Component.translatable("commands.dynamictrees.error.species_equal", darkRed(toSpecies), darkRed(fromSpecies)));
 
     @Override
     protected String getName() {
@@ -64,7 +64,7 @@ public final class TransformCommand extends SubCommand {
             toSpecies.placeRootyDirtBlock(level, rootPos, rootyBlock.getFertility(rootyState, level, rootPos));
         }
 
-        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.transform",
+        sendSuccessAndLog(source, Component.translatable("commands.dynamictrees.success.transform",
                 fromSpecies.getTextComponent(), CommandHelper.posComponent(rootPos, ChatFormatting.AQUA),
                 toSpecies.getTextComponent()));
 

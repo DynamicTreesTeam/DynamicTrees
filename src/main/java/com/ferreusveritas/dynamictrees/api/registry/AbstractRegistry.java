@@ -5,15 +5,20 @@ import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.util.LogMessageAdapter;
 import net.minecraftforge.fml.ModLoader;
-import net.minecraftforge.fml.loading.AdvancedLogMessageAdapter;
 import net.minecraftforge.registries.ForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -278,7 +283,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
      */
     @Override
     public final void dump() {
-        LogManager.getLogger().debug(REGISTRY_DUMP, () -> new AdvancedLogMessageAdapter(builder -> {
+        LogManager.getLogger().debug(REGISTRY_DUMP, () -> new LogMessageAdapter(builder -> {
             builder.append("Name: ").append(this.name).append('\n');
             this.getAll().stream().sorted(this.comparator).forEach(entry -> builder.append("\tEntry: ")
                     .append(entry.getRegistryName()).append(", ").append(entry).append('\n'));

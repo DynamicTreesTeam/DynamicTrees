@@ -8,11 +8,17 @@ import com.ferreusveritas.dynamictrees.data.DTRecipes;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.resources.loader.*;
+import com.ferreusveritas.dynamictrees.resources.loader.BiomePopulatorsResourceLoader;
+import com.ferreusveritas.dynamictrees.resources.loader.FamilyResourceLoader;
+import com.ferreusveritas.dynamictrees.resources.loader.FeatureCancellationResourceLoader;
 import com.ferreusveritas.dynamictrees.resources.loader.FruitResourceLoader;
+import com.ferreusveritas.dynamictrees.resources.loader.JoCodeResourceLoader;
+import com.ferreusveritas.dynamictrees.resources.loader.LeavesPropertiesResourceLoader;
+import com.ferreusveritas.dynamictrees.resources.loader.PodResourceLoader;
+import com.ferreusveritas.dynamictrees.resources.loader.SoilPropertiesResourceLoader;
+import com.ferreusveritas.dynamictrees.resources.loader.SpeciesResourceLoader;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatureConfiguration;
-import com.ferreusveritas.dynamictrees.resources.loader.PodResourceLoader;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ReloadableServerResources;
@@ -114,7 +120,7 @@ public final class Resources {
 
     private static void addModResourcePack(IModInfo modInfo) {
         final IModFile modFile = ModList.get().getModFileById(modInfo.getModId()).getFile();
-        if (modFile.getLocator().isValid(modFile)) {
+        if (modFile.getProvider().isValid(modFile)) {
             addModResourcePack(modFile);
         }
     }

@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomBooleanFeatureConfiguration;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Set;
 import java.util.stream.Stream;
@@ -20,7 +21,7 @@ public class MushroomFeatureCanceller<T extends FeatureConfiguration> extends Fe
 
     @Override
     public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, Set<String> namespaces) {
-        final ResourceLocation featureName = configuredFeature.feature().getRegistryName();
+        final ResourceLocation featureName = ForgeRegistries.FEATURES.getKey(configuredFeature.feature());
 
         if (featureName == null) {
             return false;

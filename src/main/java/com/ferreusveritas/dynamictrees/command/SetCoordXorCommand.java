@@ -4,7 +4,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 import java.util.Collections;
 
@@ -30,7 +30,7 @@ public final class SetCoordXorCommand extends SubCommand {
 
     private void setXor(final CommandSourceStack source, final int xor) {
         CoordUtils.coordXor = xor;
-        sendSuccessAndLog(source, new TranslatableComponent("commands.dynamictrees.success.set_xor", aqua(xor)));
+        sendSuccessAndLog(source, Component.translatable("commands.dynamictrees.success.set_xor", aqua(xor)));
     }
 
 }

@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +30,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class DynamicSaplingBlock extends Block implements BonemealableBlock, IPlantable {
@@ -56,7 +56,7 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock, IPl
     }
 
     @Override
-    public boolean isBonemealSuccess(@Nonnull Level level, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+    public boolean isBonemealSuccess(@Nonnull Level level, @Nonnull RandomSource rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
         return this.getSpecies().canSaplingGrowAfterBoneMeal(level, rand, pos);
     }
 
@@ -75,7 +75,7 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock, IPl
     }
 
     @Override
-    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random rand) {
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
         if (this.getSpecies().canSaplingGrowNaturally(level, pos)) {
             this.performBonemeal(level, rand, pos, state);
         }
@@ -101,7 +101,7 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock, IPl
     }
 
     @Override
-    public void performBonemeal(@Nonnull ServerLevel level, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
+    public void performBonemeal(@Nonnull ServerLevel level, @Nonnull RandomSource rand, @Nonnull BlockPos pos, @Nonnull BlockState state) {
         if (this.canSurvive(state, level, pos)) {
             final Species species = this.getSpecies();
             if (species.canSaplingGrow(level, pos)) {

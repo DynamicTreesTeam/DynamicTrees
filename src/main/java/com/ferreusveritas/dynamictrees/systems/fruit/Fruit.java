@@ -30,10 +30,10 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.function.Supplier;
 
 import static com.ferreusveritas.dynamictrees.compat.season.SeasonHelper.isSeasonBetween;
@@ -302,7 +302,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     }
 
     private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
-            ResourceLocationUtils.prefix(block.get().getRegistryName(), "blocks/"));
+            ResourceLocationUtils.prefix(ForgeRegistries.BLOCKS.getKey(block.get()),"blocks/"));
 
     public ResourceLocation getBlockDropsPath() {
         return blockDropsPath.get();
@@ -315,7 +315,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     @Nonnull
     @Override
     public Fruit reset() {
-        canBoneMeal = DTConfigs.CAN_BONE_MEAL_FRUIT.get();
+        canBoneMeal = DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.CAN_BONE_MEAL_FRUIT.get();
         seasonOffset = 0.0F;
         flowerHoldPeriodLength = 0.5F;
         minProductionFactor = 0.3F;

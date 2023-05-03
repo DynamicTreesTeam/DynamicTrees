@@ -20,6 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -48,7 +49,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBlock {
@@ -147,7 +147,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     ///////////////////////////////////////////
 
     @Override
-    public boolean checkForRot(LevelAccessor level, BlockPos pos, Species species, int fertility, int radius, Random rand, float chance, boolean rapid) {
+    public boolean checkForRot(LevelAccessor level, BlockPos pos, Species species, int fertility, int radius, RandomSource rand, float chance, boolean rapid) {
 
         if (!rapid && (chance == 0.0f || rand.nextFloat() > chance)) {
             return false;//Bail out if not in rapid mode and the postRot chance fails

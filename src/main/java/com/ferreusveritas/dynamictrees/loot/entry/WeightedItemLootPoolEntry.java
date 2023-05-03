@@ -1,6 +1,10 @@
 package com.ferreusveritas.dynamictrees.loot.entry;
 
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSyntaxException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.random.SimpleWeightedRandomList;
@@ -52,7 +56,7 @@ public final class WeightedItemLootPoolEntry extends LootPoolSingletonContainer 
             super.serializeCustom(json, value, conditions);
             JsonObject weightedItemsJson = new JsonObject();
             value.items.items.forEach(entry ->
-                    weightedItemsJson.addProperty(String.valueOf(entry.data.getRegistryName()), entry.getWeight().asInt())
+                    weightedItemsJson.addProperty(String.valueOf(ForgeRegistries.ITEMS.getKey(entry.data)), entry.getWeight().asInt())
             );
             json.add("items", weightedItemsJson);
         }

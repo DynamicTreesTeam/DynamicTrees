@@ -13,11 +13,11 @@ import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class PodGenFeature extends GenFeature {
 
@@ -58,7 +58,7 @@ public class PodGenFeature extends GenFeature {
     }
 
     private boolean shouldGrow(GenFeatureConfiguration configuration, Species species, LevelContext levelContext, BlockPos treePos,
-                               Random random) {
+                               RandomSource random) {
         return species.seasonalFruitProductionFactor(levelContext, treePos) >
                 random.nextFloat() && random.nextFloat() <= configuration.get(PLACE_CHANCE);
     }
@@ -74,7 +74,7 @@ public class PodGenFeature extends GenFeature {
         return false;
     }
 
-    private boolean shouldGenerate(GenFeatureConfiguration configuration, Random random) {
+    private boolean shouldGenerate(GenFeatureConfiguration configuration, RandomSource random) {
         return random.nextFloat() <= configuration.get(PLACE_CHANCE);
     }
 

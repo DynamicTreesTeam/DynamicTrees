@@ -1,6 +1,7 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
 import com.ferreusveritas.dynamictrees.api.worldgen.RadiusCoordinator;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
@@ -34,14 +35,14 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
         }
 
         final double scale = 128; // Effectively scales up the noisemap
-        final Biome biome = this.level.getUncachedNoiseBiome((x + 8) >> 2, level.getMaxBuildHeight() >> 2, (z + 8) >> 2).value(); // Placement is offset by +8,+8
+        final Holder<Biome> biome = this.level.getUncachedNoiseBiome((x + 8) >> 2, level.getMaxBuildHeight() >> 2, (z + 8) >> 2); // Placement is offset by +8,+8
 
         final double noiseDensity = (this.noiseGenerator.getValue(x / scale, z / scale, false) + 1D) / 2.0D; // Gives 0.0 to 1.0
         final double density = BiomeDatabases.getDimensionalOrDefault(this.dimensionName)
                 .getDensitySelector(biome).getDensity(this.level.getRandom(), noiseDensity);
         final double size = ((1.0 - density) * 9); // Size is the inverse of density (gives 0 to 9)
 
-        // Oh Joy. Random can potentially start with the same number for each chunk. Let's just
+        // Oh Joy. RandomSource can potentially start with the same number for each chunk. Let's just
         // throw this large prime xor hack in there to get it to at least look like it's random.
         int kindaRandom = ((x * 674365771) ^ (z * 254326997)) >> 4;
         int shakelow = (kindaRandom & 0x3) % 3; // Produces 0,0,1 or 2
@@ -55,7 +56,7 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
         this.pass = pass;
 
         if (pass == 0) {
-            final Biome biome = this.level.getUncachedNoiseBiome(((chunkX << 4) + 8) >> 2, level.getMaxBuildHeight() >> 2, ((chunkZ << 4) + 8) >> 2).value(); // Aim at center of chunk
+            final Holder<Biome> biome = this.level.getUncachedNoiseBiome(((chunkX << 4) + 8) >> 2, level.getMaxBuildHeight() >> 2, ((chunkZ << 4) + 8) >> 2); // Aim at center of chunk
             this.chunkMultipass = BiomeDatabases.getDimensionalOrDefault(this.dimensionName).getMultipass(biome);
         }
 

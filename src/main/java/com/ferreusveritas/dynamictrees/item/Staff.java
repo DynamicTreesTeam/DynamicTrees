@@ -19,7 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -144,7 +143,7 @@ public class Staff extends Item {
         //Create a tree from right clicking on soil
         Species species = getSpecies(heldStack);
         if (species.isValid() && species.isAcceptableSoil(level, pos, state)) {
-            GenerationContext generationContext = new GenerationContext(LevelContext.create(level), species, pos, pos.mutable(), level.getBiome(pos).value(), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY);
+            GenerationContext generationContext = new GenerationContext(LevelContext.create(level), species, pos, pos.mutable(), level.getBiome(pos), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY);
             species.getJoCode(getCode(heldStack)).setCareful(true).generate(generationContext);
             if (hasMaxUses(heldStack)) {
                 if (decUses(heldStack)) {
@@ -327,8 +326,8 @@ public class Staff extends Item {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip.add(new TranslatableComponent("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
-        tooltip.add(new TranslatableComponent("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
+        tooltip.add(Component.translatable("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
+        tooltip.add(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
     }
 
     /**
