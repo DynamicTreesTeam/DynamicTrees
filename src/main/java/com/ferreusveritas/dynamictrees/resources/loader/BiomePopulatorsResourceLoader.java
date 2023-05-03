@@ -302,17 +302,30 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
         final DTBiomeHolderSet biomes = collectBiomes(json, warning ->
                 LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning));
 
-        if (biomes == null || biomes.size() == 0) {
-            warnNoBiomesSelected(json);
-            return;
-        }
+//        if (biomes == null || biomes.size() == 0) {
+//            warnNoBiomesSelected(json);
+//            return;
+//        }
 
+//        JsonResult.forInput(json)
+//                .mapIfContains(APPLY, JsonObject.class, applyObject -> {
+//                    if (BiomeDatabases.getDefault() == database) {
+//                        applyCaveRootedPopulatorSection(database, applyObject, biomes);
+//                    }
+//                    biomes.forEach(biome -> this.entryAppliers.applyAll(new JsonMapWrapper(applyObject), database.getEntry(biome)));
+//                    return PropertyApplierResult.success();
+//                }, PropertyApplierResult.success())
+//                .elseMapIfContains(WHITE, String.class, type -> {
+//                    this.applyWhite(database, location, biomes, type);
+//                    return PropertyApplierResult.success();
+//                }, PropertyApplierResult.success())
+//                .forEachWarning(warning ->
+//                        LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning))
+//                .orElseThrow();
         JsonResult.forInput(json)
                 .mapIfContains(APPLY, JsonObject.class, applyObject -> {
-                    if (BiomeDatabases.getDefault() == database) {
-                        applyCaveRootedPopulatorSection(database, applyObject, biomes);
-                    }
-                    biomes.forEach(biome -> this.entryAppliers.applyAll(new JsonMapWrapper(applyObject), database.getEntry(biome)));
+                    BiomeDatabase.Entry entry = database.getJsonEntry(biomes);
+                    this.entryAppliers.applyAll(new JsonMapWrapper(applyObject), entry);
                     return PropertyApplierResult.success();
                 }, PropertyApplierResult.success())
                 .elseMapIfContains(WHITE, String.class, type -> {

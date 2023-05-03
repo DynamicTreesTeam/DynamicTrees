@@ -11,20 +11,22 @@ import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.Speci
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors.SpeciesSelector;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -44,18 +46,38 @@ public class BiomeDatabase {
         }
     };
 
+    private final Map<DTBiomeHolderSet, Entry> jsonEntries = new LinkedHashMap<>();
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
 
-    public Entry getEntry(@Nullable Holder<Biome> biome) {
-		if (biome == null) {
-			return BAD_ENTRY;
-		}
+    public Entry getJsonEntry(DTBiomeHolderSet biomes) {
+        return this.jsonEntries.computeIfAbsent(biomes, k -> new Entry(this, null, null));
+    }
 
-        return this.entries.computeIfAbsent(ForgeRegistries.BIOMES.getKey(biome.get()), k -> new Entry(this, biome));
+    public Entry getEntry(Holder<Biome> biomeHolder) {
+        ResourceKey<Biome> biomeKey = biomeHolder.unwrapKey().orElseThrow();
+        ResourceLocation biomeRegistryName = biomeKey.location();
+
+        if (this.entries.containsKey(biomeRegistryName))
+            return this.entries.get(biomeRegistryName);
+
+        Entry entry = new Entry(this, biomeKey, biomeHolder.value());
+        this.entries.put(biomeRegistryName, entry);
+
+        for (Map.Entry<DTBiomeHolderSet, Entry> jsonEntry : this.jsonEntries.entrySet()) {
+            if (jsonEntry.getKey().contains(biomeHolder)) {
+                // Copy any data explicitly set from json
+                entry.copyFrom(jsonEntry.getValue());
+            }
+        }
+
+        // Finally, initialize any defaults that were not already set
+        entry.initializeDefaults();
+
+        return entry;
     }
 
     public Entry getEntry(ResourceLocation biomeResLoc) {
-        return this.getEntry(ForgeRegistries.BIOMES.getHolder(biomeResLoc).get());
+        return this.entries.get(biomeResLoc);
     }
 
     public Collection<Entry> getAllEntries() {
@@ -93,7 +115,7 @@ public class BiomeDatabase {
     }
 
     public interface EntryReader {
-        Codec<EntryReader> CODEC = ResourceLocation.CODEC.comapFlatMap(EntryReader::read, entry -> ForgeRegistries.BIOMES.getKey(entry.getBiome().get()));
+        Codec<EntryReader> CODEC = ResourceLocation.CODEC.comapFlatMap(EntryReader::read, entry -> ForgeRegistries.BIOMES.getKey(entry.getBiome()));
 
         static DataResult<EntryReader> read(ResourceLocation biomeName) {
             EntryReader entry = BiomeDatabases.getDefault().getEntry(biomeName);
@@ -103,7 +125,7 @@ public class BiomeDatabase {
             return DataResult.success(entry);
         }
 
-        Holder<Biome> getBiome();
+        Biome getBiome();
 
         ChanceSelector getChanceSelector();
 
@@ -125,7 +147,7 @@ public class BiomeDatabase {
 
     public static abstract class BaseEntry implements EntryReader {
         private final BiomeDatabase database;
-        private final Holder<Biome> biome;
+        private final Biome biome;
         private ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
         private DensitySelector densitySelector = (rnd, nd) -> -1;
         private SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
@@ -138,10 +160,10 @@ public class BiomeDatabase {
 
         public BaseEntry() {
             this.database = null;
-            this.biome = ForgeRegistries.BIOMES.getHolder(Biomes.OCEAN).get();
+            this.biome = ForgeRegistries.BIOMES.getValue(Biomes.OCEAN.registry());
         }
 
-        public BaseEntry(final BiomeDatabase database, final Holder<Biome> biome) {
+        public BaseEntry(final BiomeDatabase database, final ResourceKey<Biome> biomeKey, final Biome biome) {
             this.database = database;
             this.biome = biome;
         }
@@ -151,7 +173,7 @@ public class BiomeDatabase {
         }
 
         @Override
-        public Holder<Biome> getBiome() {
+        public Biome getBiome() {
             return biome;
         }
 
@@ -187,6 +209,19 @@ public class BiomeDatabase {
                     return c != Chance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
                 };
             }
+        }
+
+        public void initializeDefaults() {
+            if (this.chanceSelector == null)
+                this.chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
+            if (this.densitySelector == null)
+                this.densitySelector = (rnd, nd) -> -1;
+            if (this.speciesSelector == null)
+                this.speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
+            this.blacklisted = false;
+            this.forestness = 0.0f;
+            if (this.multipass == null)
+                this.multipass = defaultMultipass;
         }
 
         public void setDensitySelector(DensitySelector densitySelector) {
@@ -245,6 +280,19 @@ public class BiomeDatabase {
 
         public void setBlacklisted(boolean blacklisted) {
             this.blacklisted = blacklisted;
+        }
+
+        public void copyFrom(BaseEntry entry) {
+            if (entry.chanceSelector != null)
+                this.chanceSelector = entry.chanceSelector;
+            if (entry.densitySelector != null)
+                this.densitySelector = entry.densitySelector;
+            if (entry.speciesSelector != null)
+                this.speciesSelector = entry.speciesSelector;
+            this.blacklisted = entry.blacklisted;
+            this.forestness = entry.forestness;
+            if (entry.multipass != null)
+                this.multipass = entry.multipass;
         }
 
         @Override
@@ -340,8 +388,8 @@ public class BiomeDatabase {
             super();
         }
 
-        public Entry(BiomeDatabase database, Holder<Biome> biome) {
-            super(database, biome);
+        public Entry(BiomeDatabase database, final ResourceKey<Biome> biomeKey, final Biome biome) {
+            super(database, biomeKey, biome);
         }
 
         public CaveRootedEntry getCaveRootedEntry() {
@@ -368,6 +416,7 @@ public class BiomeDatabase {
             super.reset();
             caveRootedEntry = null;
         }
+
     }
 
     public static class CaveRootedEntry extends BaseEntry {
