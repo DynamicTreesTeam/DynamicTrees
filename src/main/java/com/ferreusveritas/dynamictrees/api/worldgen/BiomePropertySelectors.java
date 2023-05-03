@@ -112,7 +112,7 @@ public class BiomePropertySelectors {
 
         private boolean shouldRemovePlacedFeature(PlacedFeature placedFeature) {
             return placedFeature.getFeatures().anyMatch(configuredFeature ->
-                    cancellers.stream().anyMatch(canceller -> canceller.shouldCancel(configuredFeature, namespaces))
+                    cancellers.stream().anyMatch(canceller -> canceller.shouldCancel(configuredFeature, this))
             );
         }
 

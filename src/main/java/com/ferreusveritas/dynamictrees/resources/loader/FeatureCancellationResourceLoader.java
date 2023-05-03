@@ -84,7 +84,6 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
         if (BiomePopulatorsResourceLoader.isWorldGenDisabled()) {
             return;
         }
-
         this.readCancellers(
                 resourceAccessor.filtered(FeatureCancellationResourceLoader::isCancellationFile).map(BiomePopulatorsResourceLoader::toLinkedList)
         );
@@ -146,10 +145,10 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
 
         final DTBiomeHolderSet biomes = BiomePopulatorsResourceLoader.collectBiomes(json, warningConsumer);
 
-        if (biomes.getList().isEmpty()) {
-            BiomePopulatorsResourceLoader.warnNoBiomesSelected(json);
-            return;
-        }
+//        if (biomes.getList().isEmpty()) {
+//            BiomePopulatorsResourceLoader.warnNoBiomesSelected(json);
+//            return;
+//        }
 
         JsonResult.forInput(json)
                 .mapIfContains(CANCELLERS, JsonObject.class, cancellerObject ->
@@ -175,11 +174,12 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
                 .forEachWarning(warningConsumer)
                 .orElse(BiomeDatabase.Operation.SPLICE_AFTER, errorConsumer, warningConsumer);
 
-        if (operation == BiomeDatabase.Operation.REPLACE) {
-            this.replaceCancellationsWith(cancellation, biomes.getList());
-        } else {
-            this.addCancellationsTo(cancellation, biomes.getList());
-        }
+//        if (operation == BiomeDatabase.Operation.REPLACE) {
+//            this.replaceCancellationsWith(cancellation, biomes.getList());
+//        } else {
+//            var list = biomes.getList();
+//            this.addCancellationsTo(cancellation, list);
+//        }
         FeatureCancellationRegistry.addCancellations(biomes, operation, cancellation);
         return PropertyApplierResult.success();
     }

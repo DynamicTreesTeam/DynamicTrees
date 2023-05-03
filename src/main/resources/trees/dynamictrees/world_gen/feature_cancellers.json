@@ -4,15 +4,15 @@
     "__note": "Biome tags cannot be used for selectors here because at the point these are loaded they do not exist (nor when the features are removed from biomes)."
   },
   {
-    "_comment": "Cancel standard tree features from all overworld biomes.",
-    "select": { "name": "minecraft:.*", "category": "!(nether)|(end)" },
+    "__comment": "Cancel standard tree features from the overworld.",
+    "select": { "name": "minecraft:.*", "tag": "#minecraft:is_overworld" },
     "cancellers": {
       "type": "tree",
       "namespace": "minecraft"
     }
   },
   {
-    "select": { "name": "minecraft:lush_caves" },
+    "select": { "name": "minecraft:.*", "tag": "#forge:is_lush" },
     "cancellers": {
       "type": "rooted_tree",
       "namespace": "minecraft"
@@ -20,15 +20,15 @@
   },
   {
     "_comment": "Cancel regular mushroom generation from the mushroom fields biome.",
-    "select": { "name": "minecraft:mushroom_fields" },
+    "select": { "name": "minecraft:.*", "tag": "#forge:is_mushroom" },
     "cancellers": {
       "type": "mushroom",
       "namespace": "minecraft"
     }
   },
   {
-    "_comment": "Cancel huge fungus features from nether forests.",
-    "select": { "name": "minecraft:((warped)|(crimson))_forest" },
+    "__comment": "Cancel huge fungus features from namespace 'minecraft' in the nether forests.",
+    "select": { "name": "minecraft:.*forest", "tag": "#minecraft:is_nether" },
     "cancellers": {
       "type": "fungus",
       "namespace": "minecraft"

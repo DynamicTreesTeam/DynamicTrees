@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen.featurecancellation;
 
+import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -7,7 +8,6 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 import net.minecraft.world.level.levelgen.feature.configurations.RandomBooleanFeatureConfiguration;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.Set;
 import java.util.stream.Stream;
 
 
@@ -20,10 +20,10 @@ public class MushroomFeatureCanceller<T extends FeatureConfiguration> extends Fe
     }
 
     @Override
-    public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, Set<String> namespaces) {
-        final ResourceLocation featureName = ForgeRegistries.FEATURES.getKey(configuredFeature.feature());
+    public boolean shouldCancel(final ConfiguredFeature<?, ?> configuredFeature, final BiomePropertySelectors.NormalFeatureCancellation featureCancellations) {
+        final ResourceLocation featureRegistryName = ForgeRegistries.FEATURES.getKey(configuredFeature.feature());
 
-        if (featureName == null) {
+        if (featureRegistryName == null) {
             return false;
         }
 
@@ -33,7 +33,7 @@ public class MushroomFeatureCanceller<T extends FeatureConfiguration> extends Fe
         }
 
         return getConfigs(randomBooleanFeatureConfiguration).anyMatch(this.mushroomFeatureConfigClass::isInstance) &&
-                namespaces.contains(featureName.getNamespace());
+                featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
     }
 
     private Stream<FeatureConfiguration> getConfigs(final RandomBooleanFeatureConfiguration twoFeatureConfig) {

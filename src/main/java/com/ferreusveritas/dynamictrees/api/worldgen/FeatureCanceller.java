@@ -6,8 +6,6 @@ import com.ferreusveritas.dynamictrees.init.DTTrees;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 
-import java.util.Set;
-
 /**
  * @author Harley O'Connor
  */
@@ -15,7 +13,7 @@ public abstract class FeatureCanceller extends RegistryEntry<FeatureCanceller> {
 
     public static final FeatureCanceller NULL_CANCELLER = new FeatureCanceller(DTTrees.NULL) {
         @Override
-        public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, Set<String> namespaces) {
+        public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.NormalFeatureCancellation featureCancellations) {
             return false;
         }
     };
@@ -29,10 +27,10 @@ public abstract class FeatureCanceller extends RegistryEntry<FeatureCanceller> {
     /**
      * Works out if the configured feature in the given biome should be cancelled or not.
      *
-     * @param configuredFeature the feature to check
-     * @param namespaces        the namespaces of features that should be cancelled
+     * @param configuredFeature    The configured feature.
+     * @param featureCancellations The tree canceller object.
      * @return True if feature should be cancelled, false if not.
      */
-    public abstract boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, Set<String> namespaces);
+    public abstract boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.NormalFeatureCancellation featureCancellations);
 
 }

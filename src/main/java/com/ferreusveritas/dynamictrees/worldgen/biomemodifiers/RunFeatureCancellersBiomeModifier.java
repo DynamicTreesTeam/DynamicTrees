@@ -55,7 +55,7 @@ public class RunFeatureCancellersBiomeModifier implements BiomeModifier {
 
                 return placedFeature.getFeatures().anyMatch(configuredFeature -> {
                     for (FeatureCanceller featureCanceller : featureCancellations.getCancellers()) {
-                        if (featureCanceller.shouldCancel(configuredFeature, featureCancellations.getNamespaces())) {
+                        if (featureCanceller.shouldCancel(configuredFeature, featureCancellations)) {
                             return true;
                         }
                     }
