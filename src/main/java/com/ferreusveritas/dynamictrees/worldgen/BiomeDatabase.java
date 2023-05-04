@@ -70,9 +70,6 @@ public class BiomeDatabase {
             }
         }
 
-        // Finally, initialize any defaults that were not already set
-        entry.initializeDefaults();
-
         return entry;
     }
 
@@ -211,18 +208,6 @@ public class BiomeDatabase {
             }
         }
 
-        public void initializeDefaults() {
-            if (this.chanceSelector == null)
-                this.chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
-            if (this.densitySelector == null)
-                this.densitySelector = (rnd, nd) -> -1;
-            if (this.speciesSelector == null)
-                this.speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
-            this.blacklisted = false;
-            this.forestness = 0.0f;
-            if (this.multipass == null)
-                this.multipass = defaultMultipass;
-        }
 
         public void setDensitySelector(DensitySelector densitySelector) {
             this.densitySelector = densitySelector;
