@@ -334,7 +334,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         List<BlockPos> endPoints = destroyer.getEnds();
         final Map<BlockPos, BlockState> destroyedLeaves = new HashMap<>();
         final List<ItemStackPos> leavesDropsList = new ArrayList<>();
-        this.destroyLeaves(level, cutPos, species, entity == null ? ItemStack.EMPTY : entity.getMainHandItem(), endPoints, destroyedLeaves, leavesDropsList);
+        if (species != Species.NULL_SPECIES) this.destroyLeaves(level, cutPos, species, entity == null ? ItemStack.EMPTY : entity.getMainHandItem(), endPoints, destroyedLeaves, leavesDropsList);
         endPoints = endPoints.stream().map(p -> p.subtract(cutPos)).collect(Collectors.toList());
 
         // Calculate main trunk height.
