@@ -19,6 +19,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -31,6 +34,8 @@ import snownee.jade.impl.ui.ElementHelper;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class WailaBranchHandler implements IBlockComponentProvider {
     public static final ResourceLocation ID = new ResourceLocation(DynamicTrees.MOD_ID, "branch");
@@ -109,8 +114,11 @@ public class WailaBranchHandler implements IBlockComponentProvider {
                 }
             }
 
+            Map<Enchantment, Integer> handEnchantments = EnchantmentHelper.getEnchantments(accessor.getPlayer().getMainHandItem());
+            int silkTouch = Optional.ofNullable(handEnchantments.get(Enchantments.SILK_TOUCH)).orElse(0);
+            int fortune = Optional.ofNullable(handEnchantments.get(Enchantments.BLOCK_FORTUNE)).orElse(0);
             if (lastVolume.getVolume() > 0) {
-                LogsAndSticks las = species.getLogsAndSticks(lastVolume);
+                LogsAndSticks las = species.getLogsAndSticks(lastVolume, silkTouch > 0, fortune);
                 List<ItemStack> logStacks = las.logs;
                 if (!logStacks.isEmpty()) {
                     for (ItemStack logStack : logStacks) {
@@ -145,8 +153,7 @@ public class WailaBranchHandler implements IBlockComponentProvider {
             }
         }
 
-        if (block instanceof BranchBlock) {
-            BranchBlock branch = (BranchBlock) block;
+        if (block instanceof BranchBlock branch) {
             // Analyze only part of the tree beyond the break point and calculate it's volume
             NetVolumeNode volumeSum = new NetVolumeNode();
             branch.analyse(state, level, pos, null, new MapSignal(volumeSum));

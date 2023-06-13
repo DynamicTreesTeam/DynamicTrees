@@ -178,12 +178,12 @@ public class DTConfigs {
                 .define("generateDirtBucketRecipes", true);
         COMMON_BUILDER.pop();
 
-        COMMON_BUILDER.comment("World Generation Settings").push("world");
+        SERVER_BUILDER.comment("World Generation Settings").push("world");
         WORLD_GEN = COMMON_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
                 define("worldGen", true);
         DIMENSION_BLACKLIST = COMMON_BUILDER.comment("Blacklist of dimension registry names for disabling Dynamic Tree worldgen").
                 define("dimensionsBlacklist", new ArrayList<>());
-        COMMON_BUILDER.pop();
+        SERVER_BUILDER.pop();
 
         COMMON_BUILDER.comment("Mod Integration Settings").push("integration");
         PREFERRED_SEASON_MOD = COMMON_BUILDER.comment("The mod ID of preferred season mod. If a season provider for this mod ID is present, it will be used for integration with seasons. Set this to \"!\" to disable integration or \"*\" to accept the any integration (the first available).")

@@ -866,6 +866,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume) {
+        return getLogsAndSticks(volume, false, 0);
+    }
+
+    public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume, boolean silkTouch, int fortuneLevel) {
         List<ItemStack> logsList = new LinkedList<>();
         int[] volArray = volume.getRawVolumesArray();
         float stickVol = 0;
@@ -2282,9 +2286,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
                                    ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-        textureConsumer.accept("particle", leavesTextureLocation);
+        ResourceLocation leavesLoc = getLeavesProperties().getTexturePath().orElse(leavesTextureLocation);
+        textureConsumer.accept("particle", leavesLoc);
         textureConsumer.accept("log", barkTextureLocation);
-        textureConsumer.accept("leaves", leavesTextureLocation);
+        textureConsumer.accept("leaves", leavesLoc);
     }
 
     @Override
