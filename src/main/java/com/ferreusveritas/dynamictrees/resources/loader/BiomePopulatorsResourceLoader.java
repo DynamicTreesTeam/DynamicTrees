@@ -162,9 +162,9 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
     @Override
     public void applyOnSetup(ResourceAccessor<Iterable<JsonElement>> resourceAccessor, ResourceManager resourceManager) {
-        if (isWorldGenDisabled()) {
-            return;
-        }
+//        if (isWorldGenDisabled()) {
+//            return;
+//        }
         this.readCaveRootedPopulators(
                 resourceAccessor.filtered(this::isDefaultPopulator).map(BiomePopulatorsResourceLoader::toLinkedList)
         );
@@ -205,9 +205,9 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
     @Override
     public void applyOnReload(ResourceAccessor<Iterable<JsonElement>> resourceAccessor, ResourceManager resourceManager) {
         BiomeDatabases.reset();
-        if (isWorldGenDisabled()) {
-            return;
-        }
+//        if (isWorldGenDisabled()) {
+//            return;
+//        }
 
         this.waitForTagLoading();
 

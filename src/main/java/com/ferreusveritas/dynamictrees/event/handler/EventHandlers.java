@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.event.handler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
 
 /**
@@ -18,19 +19,22 @@ public final class EventHandlers {
     public static final LeafUpdateEventHandler LEAF_UPDATE_EVENT_HANDLER = new LeafUpdateEventHandler();
 
     public static final VanillaSaplingEventHandler VANILLA_SAPLING_EVENT_HANDLER = new VanillaSaplingEventHandler();
-//    public static final WorldGenEventHandler WORLD_GEN_EVENT_HANDLER = new WorldGenEventHandler();
-    public static final PoissonDiscEventHandler POISSON_DISC_EVENT_HANDLER = new PoissonDiscEventHandler();
+
+    public static final WorldGenEventHandler WORLD_GEN_EVENT_HANDLER = new WorldGenEventHandler();
 
     /**
      * Registers common events, called in {@link DynamicTrees#DynamicTrees()}.
      */
     public static void registerCommon() {
-        MinecraftForge.EVENT_BUS.register(COMMON_EVENT_HANDLER);
-        MinecraftForge.EVENT_BUS.register(SERVER_EVENT_HANDLER);
+        IEventBus bus = MinecraftForge.EVENT_BUS;
+        bus.register(COMMON_EVENT_HANDLER);
+        bus.register(SERVER_EVENT_HANDLER);
 
         if (ModList.get().isLoaded(DynamicTrees.FAST_LEAF_DECAY)) {
-            MinecraftForge.EVENT_BUS.register(LEAF_UPDATE_EVENT_HANDLER);
+            bus.register(LEAF_UPDATE_EVENT_HANDLER);
         }
+
+        bus.register(WORLD_GEN_EVENT_HANDLER);
     }
 
     /**
@@ -39,8 +43,6 @@ public final class EventHandlers {
      */
     public static void configReload() {
         registerOrUnregister(VANILLA_SAPLING_EVENT_HANDLER, DTConfigs.REPLACE_VANILLA_SAPLING.get());
-//        registerOrUnregister(WORLD_GEN_EVENT_HANDLER, DTConfigs.WORLD_GEN.get());
-        registerOrUnregister(POISSON_DISC_EVENT_HANDLER, DTConfigs.WORLD_GEN.get());
     }
 
     /**

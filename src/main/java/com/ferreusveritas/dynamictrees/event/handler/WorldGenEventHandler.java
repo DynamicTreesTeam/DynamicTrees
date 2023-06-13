@@ -1,7 +1,9 @@
 package com.ferreusveritas.dynamictrees.event.handler;
 
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
+import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -12,15 +14,14 @@ import net.minecraftforge.event.level.ChunkDataEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class PoissonDiscEventHandler {
-
-    // TODO: Check ServerWorld casts work in all dimensions and with modded dimensions.
+public class WorldGenEventHandler {
 
     public static final String CIRCLE_DATA_ID = "GTCD"; // ID for "Growing Trees Circle Data" NBT tag.
 
-    /** This piece of crap event will not fire until after PLENTY of chunks have already generated when creating a new world.  WHY!? */
-	/*@SubscribeEvent
-	public void onWorldLoad(WorldEvent.Load event) {}*/
+	@SubscribeEvent
+	public void onWorldLoad(LevelEvent.Load event) {
+        BiomeDatabases.populateBlacklistFromConfig();
+    }
 
     /**
      * We'll use this instead because at least new chunks aren't created after the world is unloaded. I hope. >:(
@@ -35,6 +36,8 @@ public class PoissonDiscEventHandler {
 
     @SubscribeEvent
     public void onChunkDataLoad(ChunkDataEvent.Load event) {
+        if (!DTConfigs.WORLD_GEN.get()) return;
+
         final LevelAccessor level = event.getLevel();
 
 		if (level == null || level.isClientSide()) {
@@ -50,6 +53,8 @@ public class PoissonDiscEventHandler {
 
     @SubscribeEvent
     public void onChunkDataSave(ChunkDataEvent.Save event) {
+        if (!DTConfigs.WORLD_GEN.get()) return;
+
         final LevelContext levelContext = LevelContext.create(event.getLevel());
         final UniversalPoissonDiscProvider discProvider = DynamicTreeFeature.DISC_PROVIDER;
         final ChunkAccess chunk = event.getChunk();

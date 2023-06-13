@@ -25,20 +25,6 @@
             }
         },
         {
-            "name": "biome_predicate",
-            "properties": {
-                "only_world_gen": true,
-                "gen_feature": {
-                    "name": "huge_mushrooms",
-                    "properties": {
-                        "max_mushrooms": 1,
-                        "max_attempts": 3
-                    }
-                },
-                "biome_predicate": { "type": "spooky", "name": "minecraft:.*" }
-            }
-        },
-        {
             "name": "rot_soil",
             "properties": {
                 "rotten_soil": "podzol"

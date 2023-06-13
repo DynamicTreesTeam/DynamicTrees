@@ -81,9 +81,9 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
     public void applyOnSetup(ResourceAccessor<Iterable<JsonElement>> resourceAccessor,
                              ResourceManager resourceManager) {
         BiomeDatabases.reset();
-        if (BiomePopulatorsResourceLoader.isWorldGenDisabled()) {
-            return;
-        }
+//        if (BiomePopulatorsResourceLoader.isWorldGenDisabled()) {
+//            return;
+//        }
         this.readCancellers(
                 resourceAccessor.filtered(FeatureCancellationResourceLoader::isCancellationFile).map(BiomePopulatorsResourceLoader::toLinkedList)
         );

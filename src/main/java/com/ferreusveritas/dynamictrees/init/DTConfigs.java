@@ -171,19 +171,16 @@ public class DTConfigs {
         SERVER_BUILDER.comment("World Generation Settings").push("world");
         PODZOL_GEN = SERVER_BUILDER.comment("Randomly generate podzol under select trees like spruce.").
                 define("podzolGen", true);
+        WORLD_GEN = SERVER_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
+                define("worldGen", true);
+        DIMENSION_BLACKLIST = SERVER_BUILDER.comment("Blacklist of dimension registry names for disabling Dynamic Tree worldgen").
+                define("dimensionsBlacklist", new ArrayList<>());
         SERVER_BUILDER.pop();
 
         COMMON_BUILDER.comment("Miscellaneous Settings").push("misc");
         GENERATE_DIRT_BUCKET_RECIPES = COMMON_BUILDER.comment("If enabled, dirt bucket recipes will be automatically generated.")
                 .define("generateDirtBucketRecipes", true);
         COMMON_BUILDER.pop();
-
-        SERVER_BUILDER.comment("World Generation Settings").push("world");
-        WORLD_GEN = COMMON_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
-                define("worldGen", true);
-        DIMENSION_BLACKLIST = COMMON_BUILDER.comment("Blacklist of dimension registry names for disabling Dynamic Tree worldgen").
-                define("dimensionsBlacklist", new ArrayList<>());
-        SERVER_BUILDER.pop();
 
         COMMON_BUILDER.comment("Mod Integration Settings").push("integration");
         PREFERRED_SEASON_MOD = COMMON_BUILDER.comment("The mod ID of preferred season mod. If a season provider for this mod ID is present, it will be used for integration with seasons. Set this to \"!\" to disable integration or \"*\" to accept the any integration (the first available).")
@@ -216,14 +213,12 @@ public class DTConfigs {
     public static void onLoad(final ModConfigEvent.Loading event) {
         EventHandlers.configReload();
         CompatHandler.reloadSeasonManager();
-        BiomeDatabases.populateBlacklistFromConfig();
     }
 
     @SubscribeEvent
     public static void onReload(final ModConfigEvent.Reloading event) {
         EventHandlers.configReload();
         CompatHandler.reloadSeasonManager();
-        BiomeDatabases.populateBlacklistFromConfig();
     }
 
 }

@@ -128,7 +128,13 @@
     "__comment" : "Roofed forests are handled specially. Multipass tries to close canopy as much as possible",
     "select": { "name": "minecraft:.*", "tags": [ "#forge:is_spooky", "#minecraft:is_forest" ] },
     "apply": {
-      "species" : "dark_oak",
+      "species": {
+        "random": {
+          "dark_oak": 24,
+          "red_mushroom": 2,
+          "brown_mushroom": 1
+        }
+      },
       "density" : { "math": { "div" : [ "noise", 3.0 ] } },
       "multipass" : true
     }
@@ -148,7 +154,7 @@
   },
   {
     "__comment": "Any biome with 'old_growth_birch_forest' (previously named 'tall_birch') in the name is 100% tall birch",
-    "select": { "name": "minecraft:.*old_growth_birch_forest.*" },
+    "select": { "name": "minecraft:old_growth_birch_forest" },
     "apply": {
       "species" : "tall_birch"
     }
