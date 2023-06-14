@@ -12,7 +12,7 @@
     }
   },
   {
-    "select": { "name": "minecraft:.*", "tag": "#minecraft:is_overworld" },
+    "select": { "name": "minecraft:.*", "tag": "#forge:is_lush" },
     "cancellers": {
       "type": "rooted_tree",
       "namespace": "minecraft"

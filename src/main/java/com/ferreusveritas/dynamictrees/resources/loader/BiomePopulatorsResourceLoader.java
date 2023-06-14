@@ -161,40 +161,6 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                         JsonResult.success(input, BiomeDatabase.Operation.REPLACE));
     }
 
-    @Override
-    public void applyOnSetup(ResourceAccessor<Iterable<JsonElement>> resourceAccessor, ResourceManager resourceManager) {
-//        if (isWorldGenDisabled()) {
-//            return;
-//        }
-        this.readCaveRootedPopulators(
-                resourceAccessor.filtered(this::isDefaultPopulator).map(BiomePopulatorsResourceLoader::toLinkedList)
-        );
-    }
-
-    private void readCaveRootedPopulators(ResourceAccessor<LinkedList<JsonElement>> resourceAccessor) {
-        resourceAccessor.getAllResources().forEach(defaultPopulator -> {
-            readCaveRootedPopulator(BiomeDatabases.getDefault(), defaultPopulator.getLocation(), defaultPopulator.getResource().pollFirst());
-        });
-    }
-
-    private void readCaveRootedPopulator(BiomeDatabase database, ResourceLocation location, JsonElement json) {
-        LOGGER.debug("Loading cave rooted appliers from Json biome populator \"{}\".", location);
-
-        try {
-            JsonResult.forInput(json)
-                    .mapEachIfArray(JsonObject.class, object -> {
-                        if (object.has(APPLY) && object.get(APPLY).isJsonObject() && object.get(APPLY).getAsJsonObject().has(CAVE_ROOTED)) {
-                            this.readCaveRootedPopulatorSection(database, location, object);
-                        }
-                        return PropertyApplierResult.success();
-                    }).forEachWarning(warning ->
-                            LOGGER.warn("Warning whilst loading cave rooted appliers from populator \"{}\": {}", location, warning)
-                    ).orElseThrow();
-        } catch (DeserialisationException e) {
-            LOGGER.error("Error loading cave rooted appliers from populator \"{}\": {}", location, e.getMessage());
-        }
-    }
-
     private void readCaveRootedPopulatorSection(BiomeDatabase database, ResourceLocation location, JsonObject json) throws DeserialisationException {
         final DTBiomeHolderSet biomes = collectBiomes(json, warning -> LOGGER.warn("Warning whilst loading cave rooted populator \"{}\": {}", location, warning));
         if (biomes != null)
@@ -208,8 +174,6 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 //            return;
 //        }
 
-        this.waitForTagLoading();
-
         this.readPopulators(
                 resourceAccessor.filtered(this::isDefaultPopulator).map(BiomePopulatorsResourceLoader::toLinkedList)
         );
@@ -218,26 +182,6 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                         .filtered(resource -> !this.isDefaultPopulator(resource) && !FeatureCancellationResourceLoader.isCancellationFile(resource))
                         .map(BiomePopulatorsResourceLoader::toLinkedList)
         );
-    }
-
-    /**
-     * Some appliers require the use of biome tags to select biomes. This will make the thread wait to ensure they
-     * are registered and cache them with the biome list deserialiser when they are.
-     */
-    private void waitForTagLoading() {
-        while (true) {
-            try {
-                Map<ResourceLocation, Collection<Holder<Biome>>> tags = Resources.getConditionContext().getAllTags(Registry.BIOME_REGISTRY);
-//                todo: figure out if needed
-                BiomeListDeserialiser.cacheNewTags(tags);
-                break;
-            } catch (IllegalStateException ignored) {
-                try {
-                    Thread.sleep(100); // Wait for 1/10 of a second before trying again.
-                } catch (InterruptedException _ignored) {
-                }
-            }
-        }
     }
 
     private void readPopulators(ResourceAccessor<Deque<JsonElement>> resourceAccessor) {
@@ -286,6 +230,9 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
             JsonResult.forInput(json)
                     .mapEachIfArray(JsonObject.class, object -> {
                         this.readPopulatorSection(database, location, object);
+                        if (object.has(APPLY) && object.get(APPLY).isJsonObject() && object.get(APPLY).getAsJsonObject().has(CAVE_ROOTED)) {
+                            this.readCaveRootedPopulatorSection(database, location, object);
+                        }
                         return PropertyApplierResult.success();
                     }).forEachWarning(warning ->
                             LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning)
