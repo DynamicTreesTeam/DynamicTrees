@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.MultiJsonResourcePreparer;
+import com.ferreusveritas.dynamictrees.deserialisation.BiomeListDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
@@ -229,8 +230,8 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
         while (true) {
             try {
                 Map<ResourceLocation, Collection<Holder<Biome>>> tags = Resources.getConditionContext().getAllTags(Registry.BIOME_REGISTRY);
-                //todo: figure out if needed
-//                BiomeListDeserialiser.cacheNewTags(tags);
+//                todo: figure out if needed
+                BiomeListDeserialiser.cacheNewTags(tags);
                 break;
             } catch (IllegalStateException ignored) {
                 try {
@@ -301,7 +302,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
         final DTBiomeHolderSet biomes = collectBiomes(json, warning ->
                 LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning));
-
+        var biomeList = biomes.getList();
 //        if (biomes == null || biomes.size() == 0) {
 //            warnNoBiomesSelected(json);
 //            return;
@@ -312,7 +313,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 //                    if (BiomeDatabases.getDefault() == database) {
 //                        applyCaveRootedPopulatorSection(database, applyObject, biomes);
 //                    }
-//                    biomes.forEach(biome -> this.entryAppliers.applyAll(new JsonMapWrapper(applyObject), database.getEntry(biome)));
+//                    biomes.getList().forEach(biome -> this.entryAppliers.applyAll(new JsonMapWrapper(applyObject), database.getJsonEntry(biomes)));
 //                    return PropertyApplierResult.success();
 //                }, PropertyApplierResult.success())
 //                .elseMapIfContains(WHITE, String.class, type -> {
