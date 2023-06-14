@@ -16,6 +16,7 @@ public class AddDynamicTreesBiomeModifier implements BiomeModifier {
         if (phase == Phase.ADD && DTConfigs.WORLD_GEN.get()) {
             BiomeGenerationSettingsBuilder generationSettings = builder.getGenerationSettings();
             generationSettings.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, DTRegistries.DYNAMIC_TREE_PLACED_FEATURE.getHolder().orElseThrow());
+            generationSettings.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, DTRegistries.SURFACE_DYNAMIC_TREE_PLACED_FEATURE.getHolder().orElseThrow());
         }
     }
 

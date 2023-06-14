@@ -15,14 +15,12 @@ import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,26 +29,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class BiomeDatabase {
-
-    public static final Entry BAD_ENTRY = new Entry() {
-        @Override
-        public void setChanceSelector(ChanceSelector chanceSelector) {
-        }
-
-        @Override
-        public void setDensitySelector(DensitySelector densitySelector) {
-        }
-
-        @Override
-        public void setSpeciesSelector(SpeciesSelector speciesSelector) {
-        }
-    };
-
-    private final Map<DTBiomeHolderSet, Entry> jsonEntries = new LinkedHashMap<>();
+    private final Map<DTBiomeHolderSet, JsonEntry> jsonEntries = new LinkedHashMap<>();
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
 
     public Entry getJsonEntry(DTBiomeHolderSet biomes) {
-        return this.jsonEntries.computeIfAbsent(biomes, k -> new Entry(this, null));
+        return this.jsonEntries.computeIfAbsent(biomes, k -> new JsonEntry(this));
     }
 
     public Entry getEntry(Holder<Biome> biomeHolder) {
@@ -66,12 +49,12 @@ public class BiomeDatabase {
         Entry entry = new Entry(this, biomeKey);
         this.entries.put(biomeRegistryName, entry);
 
-        for (Map.Entry<DTBiomeHolderSet, Entry> jsonEntry : this.jsonEntries.entrySet()) {
-            if (jsonEntry.getKey().containsKey(biomeKey)) {
+        this.jsonEntries.forEach((biomes, jsonEntry) -> {
+            if (biomes.containsKey(biomeKey)) {
                 // Copy any data explicitly set from json
-                entry.copyFrom(jsonEntry.getValue());
+                jsonEntry.copyTo(entry);
             }
-        }
+        });
 
         return entry;
     }
@@ -104,12 +87,10 @@ public class BiomeDatabase {
     public interface EntryReader {
         static DataResult<EntryReader> read(ResourceLocation biomeName) {
             EntryReader entry = BiomeDatabases.getDefault().getEntry(biomeName);
-            if (entry == BAD_ENTRY) {
-                return DataResult.error("Could not get entry from name: " + biomeName);
-            }
             return DataResult.success(entry);
         }
 
+        @Nullable
         ResourceKey<Biome> getBiomeKey();
 
         ChanceSelector getChanceSelector();
@@ -130,25 +111,21 @@ public class BiomeDatabase {
 
     }
 
-    public static abstract class BaseEntry implements EntryReader {
+    public abstract static class BaseEntry implements EntryReader {
         private final BiomeDatabase database;
+        @Nullable
         private final ResourceKey<Biome> biomeKey;
-        private ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
-        private DensitySelector densitySelector = (rnd, nd) -> -1;
-        private SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
-        private FeatureCancellation featureCancellation = NoFeatureCancellation.INSTANCE;
-        private boolean blacklisted = false;
-        private float forestness = 0.0f;
-        private String heightmap = "WORLD_SURFACE_WG";
-        private final static Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
-        private Function<Integer, Integer> multipass = defaultMultipass;
+        ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
+        DensitySelector densitySelector = (rnd, nd) -> -1;
+        SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
+        FeatureCancellation featureCancellation = NoFeatureCancellation.INSTANCE;
+        Boolean blacklisted = false;
+        Float forestness = 0.0f;
+        String heightmap = "WORLD_SURFACE_WG";
+        private static final Function<Integer, Integer> defaultMultipass = pass -> (pass == 0 ? 0 : -1);
+        Function<Integer, Integer> multipass = defaultMultipass;
 
-        public BaseEntry() {
-            this.database = null;
-            this.biomeKey = Biomes.OCEAN;
-        }
-
-        public BaseEntry(final BiomeDatabase database, final ResourceKey<Biome> biomeKey) {
+        public BaseEntry(final BiomeDatabase database, @Nullable final ResourceKey<Biome> biomeKey) {
             this.database = database;
             this.biomeKey = biomeKey;
         }
@@ -157,6 +134,7 @@ public class BiomeDatabase {
             return database;
         }
 
+        @Nullable
         @Override
         public ResourceKey<Biome> getBiomeKey() {
             return this.biomeKey;
@@ -195,7 +173,6 @@ public class BiomeDatabase {
                 };
             }
         }
-
 
         public void setDensitySelector(DensitySelector densitySelector) {
             this.densitySelector = densitySelector;
@@ -253,19 +230,6 @@ public class BiomeDatabase {
 
         public void setBlacklisted(boolean blacklisted) {
             this.blacklisted = blacklisted;
-        }
-
-        public void copyFrom(BaseEntry entry) {
-            if (entry.chanceSelector != null)
-                this.chanceSelector = entry.chanceSelector;
-            if (entry.densitySelector != null)
-                this.densitySelector = entry.densitySelector;
-            if (entry.speciesSelector != null)
-                this.speciesSelector = entry.speciesSelector;
-            this.blacklisted = entry.blacklisted;
-            this.forestness = entry.forestness;
-            if (entry.multipass != null)
-                this.multipass = entry.multipass;
         }
 
         @Override
@@ -354,48 +318,42 @@ public class BiomeDatabase {
     }
 
     public static class Entry extends BaseEntry {
+        CaveRootedData caveRootedData;
 
-        private CaveRootedEntry caveRootedEntry;
-
-        public Entry() {
-            super();
-        }
-
-        public Entry(BiomeDatabase database, final ResourceKey<Biome> biomeKey) {
+        public Entry(BiomeDatabase database, @Nullable final ResourceKey<Biome> biomeKey) {
             super(database, biomeKey);
         }
 
-        public CaveRootedEntry getCaveRootedEntry() {
-            return caveRootedEntry;
+        @Nullable
+        public CaveRootedData getCaveRootedData() {
+            return this.caveRootedData;
         }
 
-        public boolean hasCaveRootedEntry() {
-            return caveRootedEntry != null;
+        public boolean hasCaveRootedData() {
+            return this.caveRootedData != null;
         }
 
-        public CaveRootedEntry getOrCreateCaveRootedEntry() {
-            if (!hasCaveRootedEntry()) {
-                caveRootedEntry = new CaveRootedEntry();
-            }
-            return caveRootedEntry;
+        public CaveRootedData getOrCreateCaveRootedData() {
+            if (!this.hasCaveRootedData())
+                this.caveRootedData = new CaveRootedData();
+
+            return this.caveRootedData;
         }
 
-        public void setCaveRootedEntry(CaveRootedEntry entry) {
-            this.caveRootedEntry = entry;
+        public void setCaveRootedData(CaveRootedData data) {
+            this.caveRootedData = data;
         }
 
         @Override
         public void reset() {
             super.reset();
-            caveRootedEntry = null;
+            this.caveRootedData = null;
         }
-
     }
 
-    public static class CaveRootedEntry extends BaseEntry {
-
+    public static class CaveRootedData {
         /**
-         * If {@code true}, the tree will always be generated on the surface. Otherwise it will be
+         * If {@code true}, the tree will always be generated on the surface. Otherwise, it will be
          * generated on the next available ground position.
          */
         private boolean generateOnSurface = true;
@@ -421,7 +379,115 @@ public class BiomeDatabase {
         public void setMaxDistToSurface(int maxDistToSurface) {
             this.maxDistToSurface = maxDistToSurface;
         }
+    }
 
+    /**
+     * Holds a biome entry read from treepack JSON that is not tied to a specific biome and is instead
+     * deferred and applied later to a set of biome-specific entries.
+     */
+    public static class JsonEntry extends Entry {
+        private boolean changedChanceSelector = false;
+        private boolean changedDensitySelector = false;
+        private boolean changedSpeciesSelector = false;
+        private boolean changedBlacklisted = false;
+        private boolean changedForestness = false;
+        private boolean changedHeightmap = false;
+        private boolean changedMultipass = false;
+
+        public JsonEntry(BiomeDatabase database) {
+            super(database, null);
+        }
+
+        /**
+         * Copies the changed data stored in this JSON entry to the specified {@code other} entry.
+         * This copy method does not overwrite properties in {@code other} that were not changed by this JSON entry.
+         *
+         * @param other the other entry
+         */
+        public void copyTo(Entry other) {
+            if (this.changedChanceSelector)
+                other.chanceSelector = this.chanceSelector;
+            if (this.changedDensitySelector)
+                other.densitySelector = this.densitySelector;
+            if (this.changedSpeciesSelector)
+                other.speciesSelector = this.speciesSelector;
+            if (this.changedBlacklisted)
+                other.blacklisted = this.blacklisted;
+            if (this.changedForestness)
+                other.forestness = this.forestness;
+            if (this.changedHeightmap)
+                other.heightmap = this.heightmap;
+            if (this.changedMultipass)
+                other.multipass = this.multipass;
+            if (this.caveRootedData != null)
+                other.caveRootedData = this.caveRootedData;
+        }
+
+        @Override
+        public void setChanceSelector(ChanceSelector chanceSelector) {
+            this.changedChanceSelector = true;
+            super.setChanceSelector(chanceSelector);
+        }
+
+        @Override
+        public void setChanceSelector(ChanceSelector selector, Operation op) {
+            this.changedChanceSelector = true;
+            super.setChanceSelector(selector, op);
+        }
+
+        @Override
+        public void setDensitySelector(DensitySelector densitySelector) {
+            this.changedDensitySelector = true;
+            super.setDensitySelector(densitySelector);
+        }
+
+        @Override
+        public void setDensitySelector(DensitySelector selector, Operation op) {
+            this.changedDensitySelector = true;
+            super.setDensitySelector(selector, op);
+        }
+
+        @Override
+        public void setSpeciesSelector(SpeciesSelector speciesSelector) {
+            this.changedSpeciesSelector = true;
+            super.setSpeciesSelector(speciesSelector);
+        }
+
+        @Override
+        public void setSpeciesSelector(SpeciesSelector selector, Operation op) {
+            this.changedSpeciesSelector = true;
+            super.setSpeciesSelector(selector, op);
+        }
+
+        @Override
+        public void setBlacklisted(boolean blacklisted) {
+            this.changedBlacklisted = true;
+            super.setBlacklisted(blacklisted);
+        }
+
+        @Override
+        public void setForestness(float forestness) {
+            this.changedForestness = true;
+            super.setForestness(forestness);
+        }
+
+        @Override
+        public void setHeightmap(String heightmap) {
+            this.changedHeightmap = true;
+            super.setHeightmap(heightmap);
+        }
+
+        @Override
+        public void setMultipass(Function<Integer, Integer> multipass) {
+            this.changedMultipass = true;
+            super.setMultipass(multipass);
+        }
+
+        @Override
+        public void setCustomMultipass(JsonObject json) {
+            this.changedMultipass = true;
+            super.setCustomMultipass(json);
+        }
     }
 
     public SpeciesSelector getSpecies(Holder<Biome> biome) {
@@ -471,6 +537,7 @@ public class BiomeDatabase {
 
     public static BiomeDatabase copyOf(final BiomeDatabase database) {
         final BiomeDatabase databaseCopy = new BiomeDatabase();
+        databaseCopy.jsonEntries.putAll(database.jsonEntries);
         databaseCopy.entries.putAll(database.entries);
         return databaseCopy;
     }

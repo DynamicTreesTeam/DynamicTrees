@@ -87,7 +87,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
     }
 
     private final JsonPropertyAppliers<BiomeDatabase.BaseEntry> entryAppliers = new JsonPropertyAppliers<>(BiomeDatabase.BaseEntry.class);
-    private final JsonPropertyAppliers<BiomeDatabase.CaveRootedEntry> caveRootedEntryAppliers = new JsonPropertyAppliers<>(BiomeDatabase.CaveRootedEntry.class);
+    private final JsonPropertyAppliers<BiomeDatabase.CaveRootedData> caveRootedDataAppliers = new JsonPropertyAppliers<>(BiomeDatabase.CaveRootedData.class);
 
     public BiomePopulatorsResourceLoader() {
         super(RESOURCE_PREPARER);
@@ -106,9 +106,9 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                 .register("heightmap", String.class, BiomeDatabase.BaseEntry::setHeightmap)
                 .registerIfTrueApplier("reset", BiomeDatabase.BaseEntry::reset);
 
-        this.caveRootedEntryAppliers
-                .register("generate_on_surface", Boolean.class, BiomeDatabase.CaveRootedEntry::setGenerateOnSurface)
-                .register("max_dist_to_surface", Integer.class, BiomeDatabase.CaveRootedEntry::setMaxDistToSurface);
+        this.caveRootedDataAppliers
+                .register("generate_on_surface", Boolean.class, BiomeDatabase.CaveRootedData::setGenerateOnSurface)
+                .register("max_dist_to_surface", Integer.class, BiomeDatabase.CaveRootedData::setMaxDistToSurface);
 
         ApplierResourceLoader.postApplierEvent(new EntryApplierRegistryEvent<>(this.entryAppliers, ENTRY_APPLIERS));
     }
@@ -196,11 +196,9 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
     }
 
     private void readCaveRootedPopulatorSection(BiomeDatabase database, ResourceLocation location, JsonObject json) throws DeserialisationException {
-        final DTBiomeHolderSet biomes = collectBiomes(json, warning -> {
-        });
-        if (biomes != null && biomes.size() > 0) {
+        final DTBiomeHolderSet biomes = collectBiomes(json, warning -> LOGGER.warn("Warning whilst loading cave rooted populator \"{}\": {}", location, warning));
+        if (biomes != null)
             applyCaveRootedPopulatorSection(database, json.getAsJsonObject(APPLY), biomes);
-        }
     }
 
     @Override
@@ -324,7 +322,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 //                .orElseThrow();
         JsonResult.forInput(json)
                 .mapIfContains(APPLY, JsonObject.class, applyObject -> {
-                    BiomeDatabase.Entry entry = database.getJsonEntry(biomes);
+                    var entry = database.getJsonEntry(biomes);
                     this.entryAppliers.applyAll(new JsonMapWrapper(applyObject), entry);
                     return PropertyApplierResult.success();
                 }, PropertyApplierResult.success())
@@ -341,10 +339,9 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
         if (json.has(CAVE_ROOTED) && json.get(CAVE_ROOTED).isJsonObject()) {
             JsonObject caveRootedJson = json.getAsJsonObject(CAVE_ROOTED);
             JsonMapWrapper applyData = new JsonMapWrapper(caveRootedJson);
-            biomes.stream().map(biome -> database.getEntry(biome).getOrCreateCaveRootedEntry()).forEach(entry -> {
-                entryAppliers.applyAll(applyData, entry);
-                caveRootedEntryAppliers.applyAll(applyData, entry);
-            });
+            var entry = database.getJsonEntry(biomes);
+            this.entryAppliers.applyAll(applyData, entry);
+            this.caveRootedDataAppliers.applyAll(applyData, entry.getOrCreateCaveRootedData());
         }
     }
 
