@@ -50,21 +50,24 @@ public class BiomeDatabase {
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
 
     public Entry getJsonEntry(DTBiomeHolderSet biomes) {
-        return this.jsonEntries.computeIfAbsent(biomes, k -> new Entry(this, null, null));
+        return this.jsonEntries.computeIfAbsent(biomes, k -> new Entry(this, null));
     }
 
     public Entry getEntry(Holder<Biome> biomeHolder) {
-        ResourceKey<Biome> biomeKey = biomeHolder.unwrapKey().orElseThrow();
+        return this.getEntry(biomeHolder.unwrapKey().orElseThrow());
+    }
+
+    public Entry getEntry(ResourceKey<Biome> biomeKey) {
         ResourceLocation biomeRegistryName = biomeKey.location();
 
         if (this.entries.containsKey(biomeRegistryName))
             return this.entries.get(biomeRegistryName);
 
-        Entry entry = new Entry(this, biomeKey, biomeHolder.value());
+        Entry entry = new Entry(this, biomeKey);
         this.entries.put(biomeRegistryName, entry);
 
         for (Map.Entry<DTBiomeHolderSet, Entry> jsonEntry : this.jsonEntries.entrySet()) {
-            if (jsonEntry.getKey().contains(biomeHolder)) {
+            if (jsonEntry.getKey().containsKey(biomeKey)) {
                 // Copy any data explicitly set from json
                 entry.copyFrom(jsonEntry.getValue());
             }
@@ -94,26 +97,11 @@ public class BiomeDatabase {
         this.entries.clear();
     }
 
-//    public boolean isValid() {
-//        for (Biome biome : ForgeRegistries.BIOMES) {
-//            final BaseEntry entry = this.getEntry(Holder.direct(biome));
-//            final ResourceLocation biomeRegistryName = ForgeRegistries.BIOMES.getKey(entry.getBiome().get());
-//
-//            if (biomeRegistryName != null && !biomeRegistryName.equals(ForgeRegistries.BIOMES.getKey(biome))) {
-//                return false;
-//            }
-//        }
-//
-//        return true;
-//    }
-
     public boolean isPopulated() {
         return this.entries.size() > 0;
     }
 
     public interface EntryReader {
-        Codec<EntryReader> CODEC = ResourceLocation.CODEC.comapFlatMap(EntryReader::read, entry -> ForgeRegistries.BIOMES.getKey(entry.getBiome()));
-
         static DataResult<EntryReader> read(ResourceLocation biomeName) {
             EntryReader entry = BiomeDatabases.getDefault().getEntry(biomeName);
             if (entry == BAD_ENTRY) {
@@ -122,7 +110,7 @@ public class BiomeDatabase {
             return DataResult.success(entry);
         }
 
-        Biome getBiome();
+        ResourceKey<Biome> getBiomeKey();
 
         ChanceSelector getChanceSelector();
 
@@ -144,7 +132,7 @@ public class BiomeDatabase {
 
     public static abstract class BaseEntry implements EntryReader {
         private final BiomeDatabase database;
-        private final Biome biome;
+        private final ResourceKey<Biome> biomeKey;
         private ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
         private DensitySelector densitySelector = (rnd, nd) -> -1;
         private SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
@@ -157,12 +145,12 @@ public class BiomeDatabase {
 
         public BaseEntry() {
             this.database = null;
-            this.biome = ForgeRegistries.BIOMES.getValue(Biomes.OCEAN.registry());
+            this.biomeKey = Biomes.OCEAN;
         }
 
-        public BaseEntry(final BiomeDatabase database, final ResourceKey<Biome> biomeKey, final Biome biome) {
+        public BaseEntry(final BiomeDatabase database, final ResourceKey<Biome> biomeKey) {
             this.database = database;
-            this.biome = biome;
+            this.biomeKey = biomeKey;
         }
 
         public BiomeDatabase getDatabase() {
@@ -170,8 +158,8 @@ public class BiomeDatabase {
         }
 
         @Override
-        public Biome getBiome() {
-            return biome;
+        public ResourceKey<Biome> getBiomeKey() {
+            return this.biomeKey;
         }
 
         @Override
@@ -373,8 +361,8 @@ public class BiomeDatabase {
             super();
         }
 
-        public Entry(BiomeDatabase database, final ResourceKey<Biome> biomeKey, final Biome biome) {
-            super(database, biomeKey, biome);
+        public Entry(BiomeDatabase database, final ResourceKey<Biome> biomeKey) {
+            super(database, biomeKey);
         }
 
         public CaveRootedEntry getCaveRootedEntry() {

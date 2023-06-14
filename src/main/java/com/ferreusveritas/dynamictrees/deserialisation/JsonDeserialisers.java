@@ -37,7 +37,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
@@ -209,7 +208,6 @@ public final class JsonDeserialisers {
 
     public static JsonDeserialiser<Block> BLOCK;
     public static JsonDeserialiser<Item> ITEM;
-    public static JsonDeserialiser<Biome> BIOME;
 
     // TODO: Read json object for quantity and NBT.
     public static JsonDeserialiser<ItemStack> ITEM_STACK = register(ItemStack.class,
@@ -315,7 +313,6 @@ public final class JsonDeserialisers {
         BLOCK = register(Block.class,
                 new ForgeRegistryEntryDeserialiser<>(ForgeRegistries.BLOCKS, "block", Blocks.AIR));
         ITEM = register(Item.class, new ForgeRegistryEntryDeserialiser<>(ForgeRegistries.ITEMS, "item", Items.AIR));
-        BIOME = register(Biome.class, new ForgeRegistryEntryDeserialiser<>(ForgeRegistries.BIOMES, "biome"));
     }
 
     public static void postRegistryEvent() {

@@ -302,7 +302,6 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
         final DTBiomeHolderSet biomes = collectBiomes(json, warning ->
                 LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning));
-        var biomeList = biomes.getList();
 //        if (biomes == null || biomes.size() == 0) {
 //            warnNoBiomesSelected(json);
 //            return;

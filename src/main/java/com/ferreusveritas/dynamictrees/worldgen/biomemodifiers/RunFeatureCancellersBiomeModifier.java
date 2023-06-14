@@ -6,11 +6,11 @@ import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
-import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.ferreusveritas.dynamictrees.worldgen.FeatureCancellationRegistry;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
@@ -26,12 +26,13 @@ public class RunFeatureCancellersBiomeModifier implements BiomeModifier {
     @Override
     public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
         if (phase == Phase.REMOVE && DTConfigs.WORLD_GEN.get()) {
+            ResourceKey<Biome> biomeKey = biome.unwrapKey().orElseThrow();
             BiomeGenerationSettingsBuilder generationSettings = builder.getGenerationSettings();
 
             BiomePropertySelectors.NormalFeatureCancellation featureCancellations = new BiomePropertySelectors.NormalFeatureCancellation();
 
             for (FeatureCancellationRegistry.Entry entry : FeatureCancellationRegistry.getCancellations()) {
-                if (entry.biomes().includesBiome(biome)) {
+                if (entry.biomes().containsKey(biomeKey)) {
                     if (entry.operation() == BiomeDatabase.Operation.REPLACE)
                         featureCancellations.reset();
                     featureCancellations.addFrom(entry.cancellations());
