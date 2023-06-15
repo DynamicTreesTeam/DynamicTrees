@@ -18,11 +18,10 @@ import net.minecraft.ResourceLocationException;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.registries.DataPackRegistriesHooks;
 import net.minecraftforge.registries.holdersets.OrHolderSet;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +40,7 @@ import java.util.function.Supplier;
 public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHolderSet> {
 
     private static final Map<ResourceLocation, List<ResourceLocation>> TAGS = Maps.newHashMap();
-    public static final Supplier<Registry<Biome>> DELAYED_BIOME_REGISTRY = () -> ServerLifecycleHooks.getCurrentServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+    public static final Supplier<Registry<Biome>> DELAYED_BIOME_REGISTRY = () -> ServerLifecycleHooks.getCurrentServer().registryAccess().registryOrThrow(Registries.BIOME);
 
     private static final Applier<DTBiomeHolderSet, String> TAG_APPLIER = (biomeList, tagString) -> {
         tagString = tagString.toLowerCase();
@@ -53,7 +52,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHold
 
         try {
             ResourceLocation tagLocation = new ResourceLocation(tagString);
-            TagKey<Biome> tagKey = TagKey.create(Registry.BIOME_REGISTRY, tagLocation);
+            TagKey<Biome> tagKey = TagKey.create(Registries.BIOME, tagLocation);
 
             (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()).add(new DelayedTagEntriesHolderSet<>(DELAYED_BIOME_REGISTRY, tagKey));
         } catch (ResourceLocationException e) {

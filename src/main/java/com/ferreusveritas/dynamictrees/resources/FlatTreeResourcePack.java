@@ -1,109 +1,71 @@
 package com.ferreusveritas.dynamictrees.resources;
 
 import com.ferreusveritas.dynamictrees.api.resource.TreeResourcePack;
-import com.ferreusveritas.dynamictrees.util.CommonCollectors;
-import com.google.common.base.Joiner;
+import com.mojang.logging.LogUtils;
+import net.minecraft.FileUtil;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.AbstractPackResources;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.ResourcePackFileNotFoundException;
+import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraftforge.resource.PathPackResources;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Credits: A lot of the file reading code was based off {@link PathPackResources}.
  *
  * @author Harley O'Connor
  */
-public class FlatTreeResourcePack extends AbstractPackResources implements TreeResourcePack {
+public class FlatTreeResourcePack extends PathPackResources implements TreeResourcePack {
+    private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final Path path;
-
-    public FlatTreeResourcePack(final Path path) {
-        super(new File("dummy"));
-        this.path = path;
+    public FlatTreeResourcePack(String packId, boolean isBuiltin, Path source) {
+        super(packId, isBuiltin, source);
     }
 
     @Override
-    public InputStream getResource(@Nullable PackType type, ResourceLocation location) throws IOException {
-        final Path path = this.getPath(location.getNamespace(), location.getPath());
-        if (!Files.exists(path)) {
-            throw new FileNotFoundException("Could not find tree resource for path '" + path + "'.");
-        }
-        return Files.newInputStream(path, StandardOpenOption.READ);
+    public IoSupplier<InputStream> getResource(@Nullable PackType packType, ResourceLocation location) {
+        return this.getRootResource(getPathFromLocation(location));
+    }
+
+    private static String[] getPathFromLocation(ResourceLocation location) {
+        String[] parts = location.getPath().split("/");
+        String[] result = new String[parts.length + 2];
+        result[0] = FOLDER;
+        result[1] = location.getNamespace();
+        System.arraycopy(parts, 0, result, 2, parts.length);
+        return result;
     }
 
     @Override
-    protected InputStream getResource(String resourcePath) throws IOException {
-        // We never use this method, so just throw an exception.
-        throw new ResourcePackFileNotFoundException(this.file, resourcePath);
+    public void listResources(@Nullable PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
+        FileUtil.decomposePath(path).get()
+                .ifLeft(parts -> net.minecraft.server.packs.PathPackResources.listPath(namespace, resolve(FOLDER, namespace).toAbsolutePath(), parts, resourceOutput))
+                .ifRight(dataResult -> LOGGER.error("Invalid path {}: {}", path, dataResult.message()));
     }
 
     @Override
-    public boolean hasResource(ResourceLocation location) {
-        return Files.exists(this.getPath(location.getNamespace(), location.getPath()));
-    }
-
-    @Override
-    protected boolean hasResource(String resourcePath) {
-        // We never use this method, so just return false.
-        return false;
-    }
-
-    @Override
-    public Collection<ResourceLocation> getResources(@Nullable PackType type, String namespace, String pathIn, Predicate<ResourceLocation> filter) {
+    public Set<String> getNamespaces(@Nullable PackType type) {
         try {
-            Path root = this.getPath(namespace);
-            Path inputPath = root.getFileSystem().getPath(pathIn);
-
-            return Files.walk(root)
-                    .map(path -> root.relativize(path.toAbsolutePath()))
-                    .filter(path -> !path.toString().endsWith(".mcmeta") && path.startsWith(inputPath))
-                    // It is VERY IMPORTANT that we do not rely on Path.toString as this is inconsistent between operating systems
-                    // Join the path names ourselves to force forward slashes #8813
-                    .filter(path -> ResourceLocation.isValidPath(Joiner.on('/').join(path))) // Only process valid paths Fixes the case where people put invalid resources in their jar.
-                    .map(path -> new ResourceLocation(namespace, Joiner.on('/').join(path)))
-                    .filter(filter)
-                    .collect(CommonCollectors.toAlternateLinkedSet());
+            Path root = this.resolve();
+            try (Stream<Path> walker = Files.walk(root, 1)) {
+                return walker
+                        .filter(Files::isDirectory)
+                        .map(root::relativize)
+                        .filter(p -> p.getNameCount() > 0) // Skip the root entry
+                        .map(p -> p.toString().replaceAll("/$", "")) // Remove the trailing slash, if present
+                        .filter(s -> !s.isEmpty()) // Filter empty strings, otherwise empty strings default to minecraft namespace in ResourceLocations
+                        .collect(Collectors.toSet());
+            }
         } catch (IOException e) {
-            return Collections.emptyList();
+            return Set.of();
         }
     }
-
-    @Override
-    public Set<String> getNamespaces(@Nullable final PackType type) {
-        try {
-            Path root = this.getPath();
-
-            return Files.walk(root, 1)
-                    .map(path -> root.relativize(path.toAbsolutePath()))
-                    .filter(path -> path.getNameCount() > 0) // skip the root entry
-                    .map(p -> p.toString().replaceAll("/$", "")) // remove the trailing slash, if present
-                    .filter(s -> !s.isEmpty()) // filter empty strings, otherwise empty strings default to minecraft in ResourceLocations
-                    .collect(CommonCollectors.toLinkedSet());
-        } catch (IOException e) {
-            return Collections.emptySet();
-        }
-    }
-
-    protected Path getPath(final String... paths) {
-        return this.path.getFileSystem().getPath(this.path.toString(), paths);
-    }
-
-    @Override
-    public void close() {
-    }
-
 }

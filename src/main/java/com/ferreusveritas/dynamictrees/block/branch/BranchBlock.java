@@ -49,11 +49,10 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -87,8 +86,8 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     /**
      * @param name name of branch, without a {@code _branch} suffix
      */
-    public BranchBlock(ResourceLocation name, Material material) {
-        this(name, Properties.of(material));
+    public BranchBlock(ResourceLocation name) {
+        this(name, Properties.of().pushReaction(PushReaction.BLOCK));
     }
 
     /**
@@ -464,12 +463,12 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return lootTableSupplier.getName();
     }
 
-    public LootTable getLootTable(LootTables lootTables, Species species) {
+    public LootTable getLootTable(LootDataManager lootTables, Species species) {
         return lootTableSupplier.get(lootTables, species);
     }
 
     public LootTable.Builder createBranchDrops() {
-        return DTLootTableProvider.createBranchDrops(getPrimitiveLog().get(), family.getStick(1).getItem());
+        return DTLootTableProvider.BlockLoot.createBranchDrops(getPrimitiveLog().get(), family.getStick(1).getItem());
     }
 
     public float getPrimitiveLogs(float volumeIn, List<ItemStack> drops) {
@@ -494,7 +493,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     @Override
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
         // Tries to get the face being pounded on.
-        final double reachDistance = entity instanceof Player ? entity.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() : 5.0D;
+        final double reachDistance = entity instanceof Player ? entity.getAttribute(ForgeMod.BLOCK_REACH.get()).getValue() : 5.0D;
         final BlockHitResult ragTraceResult = this.playerRayTrace(entity, reachDistance, 1.0F);
         final Direction toolDir = ragTraceResult != null ? (entity.isShiftKeyDown() ? ragTraceResult.getDirection().getOpposite() : ragTraceResult.getDirection()) : Direction.DOWN;
 
@@ -566,7 +565,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         Vec3 vec3d = entity.getEyePosition(partialTick);
         Vec3 vec3d1 = entity.getViewVector(partialTick);
         Vec3 vec3d2 = vec3d.add(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
-        return entity.level.clip(new ClipContext(vec3d, vec3d2, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity));
+        return entity.level().clip(new ClipContext(vec3d, vec3d2, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity));
     }
 
 
@@ -672,19 +671,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         destroyMode = mode;
         level.removeBlock(pos, false);
         destroyMode = DynamicTrees.DestroyMode.SLOPPY;
-    }
-
-    /**
-     * Gets the {@link PushReaction} for this {@link Block}. By default, {@link BranchBlock}s use {@link
-     * PushReaction#BLOCK} in order to prevent tree branches from being pushed by a piston. This is done for reasons
-     * that should be obvious if you are paying any attention.
-     *
-     * @param state The {@link BlockState} of the {@link BranchBlock}.
-     * @return {@link PushReaction#BLOCK} to prevent {@link BranchBlock}s being pushed.
-     */
-    @Override
-    public PushReaction getPistonPushReaction(BlockState state) {
-        return PushReaction.BLOCK;
     }
 
     ///////////////////////////////////////////

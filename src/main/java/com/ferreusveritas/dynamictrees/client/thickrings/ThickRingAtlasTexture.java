@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.client.thickrings;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.platform.PngInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.CrashReport;

@@ -34,6 +34,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
+import net.minecraftforge.resource.PathPackResources;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
@@ -130,13 +131,13 @@ public final class Resources {
                 .toAbsolutePath();
 
         if (Files.exists(treesPath)) {
-            MANAGER.addPack(new ModTreeResourcePack(treesPath, modFile));
+            MANAGER.addPack(new ModTreeResourcePack("treepack/" + modFile.getModInfos().get(0).getModId(), true, treesPath, modFile));
         }
     }
 
     private static void registerFlatTreePack() {
         final File mainTreeFolder = getTreeFolder();
-        MANAGER.addPack(new FlatTreeResourcePack(mainTreeFolder.toPath().toAbsolutePath()));
+        MANAGER.addPack(new FlatTreeResourcePack("treepack_flat", true, mainTreeFolder.toPath().toAbsolutePath()));
     }
 
     private static File getTreeFolder() {

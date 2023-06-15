@@ -1,7 +1,10 @@
 package com.ferreusveritas.dynamictrees.worldgen.structure;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
@@ -10,7 +13,7 @@ import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
  * @author Harley O'Connor
  */
 public class RegularTemplatePoolModifier implements TemplatePoolModifier {
-
+    private static final HolderLookup.Provider VANILLA_LOOKUP = VanillaRegistries.createLookup();
     private final StructureTemplatePool templatePool;
 
     private RegularTemplatePoolModifier(StructureTemplatePool templatePool) {
@@ -44,11 +47,11 @@ public class RegularTemplatePoolModifier implements TemplatePoolModifier {
 
     public static TemplatePoolModifier village(String type, String patternGroup) {
         ResourceLocation patternName = new ResourceLocation("village/" + type + "/" + patternGroup);
-        StructureTemplatePool pattern = BuiltinRegistries.TEMPLATE_POOL.get(patternName);
-        if (pattern == null) {
-            VillageTreeReplacement.LOGGER.error("Could not find StructureTemplatePool with name {}.", patternName);
-            return TemplatePoolModifier.NULL;
-        }
+        StructureTemplatePool pattern = VANILLA_LOOKUP.lookupOrThrow(Registries.TEMPLATE_POOL).getOrThrow(ResourceKey.create(Registries.TEMPLATE_POOL, patternName)).value();
+        // if (pattern == null) {
+        //     VillageTreeReplacement.LOGGER.error("Could not find StructureTemplatePool with name {}.", patternName);
+        //     return TemplatePoolModifier.NULL;
+        // }
         return new RegularTemplatePoolModifier(pattern);
     }
 

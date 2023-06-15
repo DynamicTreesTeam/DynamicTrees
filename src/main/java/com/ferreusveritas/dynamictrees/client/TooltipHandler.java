@@ -27,11 +27,11 @@ public class TooltipHandler {
         Seed seed = (Seed) item;
         Player player = event.getEntity();
 
-        if (player == null || player.level == null) {
+        if (player == null || player.level() == null) {
             return;
         }
 
-        LevelContext levelContext = LevelContext.create(player.level);
+        LevelContext levelContext = LevelContext.create(player.level());
         Species species = seed.getSpecies();
 
         if (SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null || species == null || !species.isValid()) {

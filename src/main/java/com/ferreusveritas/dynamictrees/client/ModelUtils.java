@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.client;
 
-import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
@@ -17,6 +16,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.client.RenderTypeGroup;
 import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
+import org.joml.Vector3f;
 
 public class ModelUtils {
 

@@ -34,7 +34,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -390,11 +389,11 @@ public class JoCode {
             return true;
 
         BlockState blockState = level.getBlockState(pos);
-        return blockState.getMaterial().isLiquid() || isReplaceable(blockState, false);
+        return blockState.liquid() || isReplaceable(blockState, false);
     }
 
     protected boolean isReplaceable(BlockState state, boolean airOnly) {
-        boolean isEmpty = airOnly ? state.isAir() : state.getMaterial().isReplaceable();
+        boolean isEmpty = airOnly ? state.isAir() : state.canBeReplaced();
         return isEmpty || state.is(DTBlockTags.FOLIAGE) || state.is(BlockTags.FLOWERS);
     }
 
@@ -467,7 +466,7 @@ public class JoCode {
 
                 do {
                     final BlockState state = level.getBlockState(iPos);
-                    if (state.getMaterial() == Material.AIR) {
+                    if (state.isAir()) {
                         level.setBlock(iPos, Blocks.SNOW.defaultBlockState(), 2);
                         break;
                     } else if (state.getBlock() == Blocks.SNOW) {

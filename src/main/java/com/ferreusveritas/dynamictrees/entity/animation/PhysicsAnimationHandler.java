@@ -6,8 +6,7 @@ import com.ferreusveritas.dynamictrees.block.branch.TrunkShellBlock;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
@@ -24,6 +23,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Vector3f;
 
 
 public class PhysicsAnimationHandler implements AnimationHandler {
@@ -44,7 +44,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
     }
 
     protected void playEndSound(FallingTreeEntity entity, boolean onWater){
-        if (!getData(entity).endSoundPlayed && !entity.level.isClientSide()){
+        if (!getData(entity).endSoundPlayed && !entity.level().isClientSide()){
             SoundInstance fallingInstance = getData(entity).fallingSoundInstance;
             if (fallingInstance != null)
                 Minecraft.getInstance().getSoundManager().stop(fallingInstance);
@@ -62,7 +62,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
 
         //playStartSound(entity);
 
-        final long seed = entity.level.random.nextLong();
+        final long seed = entity.level().random.nextLong();
         final RandomSource random = RandomSource.create(seed ^ (((long) cutPos.getX()) << 32 | ((long) cutPos.getZ())));
         final float mass = entity.getDestroyData().woodVolume.getVolume();
         final float inertialMass = Mth.clamp(mass, 1, 3);
@@ -107,9 +107,9 @@ public class PhysicsAnimationHandler implements AnimationHandler {
             radius = ((BranchBlock) state.getBlock()).getRadius(state);
         }
 
-        final Level level = entity.level;
+        final Level level = entity.level();
         final AABB fallBox = new AABB(entity.getX() - radius, entity.getY(), entity.getZ() - radius, entity.getX() + radius, entity.getY() + 1.0, entity.getZ() + radius);
-        final BlockPos pos = new BlockPos(entity.getX(), entity.getY(), entity.getZ());
+        final BlockPos pos = BlockPos.containing(entity.getX(), entity.getY(), entity.getZ());
         final BlockState collState = level.getBlockState(pos);
 
         if (!TreeHelper.isLeaves(collState) && !TreeHelper.isBranch(collState) && !(collState.getBlock() instanceof TrunkShellBlock)) {
@@ -141,8 +141,8 @@ public class PhysicsAnimationHandler implements AnimationHandler {
                     entity.landed = true;
                     entity.setOnGround(true);
                     if (entity.onFire) {
-                        if (entity.level.isEmptyBlock(pos.above())) {
-                            entity.level.setBlockAndUpdate(pos.above(), Blocks.FIRE.defaultBlockState());
+                        if (entity.level().isEmptyBlock(pos.above())) {
+                            entity.level().setBlockAndUpdate(pos.above(), Blocks.FIRE.defaultBlockState());
                         }
                     }
                 }
@@ -153,8 +153,8 @@ public class PhysicsAnimationHandler implements AnimationHandler {
 
     @Override
     public void dropPayload(FallingTreeEntity entity) {
-        final Level level = entity.level;
-        entity.getPayload().forEach(i -> Block.popResource(level, new BlockPos(entity.getX(), entity.getY(), entity.getZ()), i));
+        final Level level = entity.level();
+        entity.getPayload().forEach(i -> Block.popResource(level, BlockPos.containing(entity.getX(), entity.getY(), entity.getZ()), i));
         entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(level, entity.getDestroyData().cutPos.offset(bis.pos), bis.stack));
     }
 
@@ -176,8 +176,8 @@ public class PhysicsAnimationHandler implements AnimationHandler {
 
         final Vec3 mc = entity.getMassCenter();
         poseStack.translate(mc.x, mc.y, mc.z);
-        poseStack.mulPose(new Quaternion(new Vector3f(0, 1, 0), -yaw, true));
-        poseStack.mulPose(new Quaternion(new Vector3f(1, 0, 0), pit, true));
+        poseStack.mulPose(Axis.YN.rotationDegrees(yaw));
+        poseStack.mulPose(Axis.XP.rotationDegrees(pit));
         poseStack.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
 
     }

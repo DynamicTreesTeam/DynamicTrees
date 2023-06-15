@@ -135,7 +135,7 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
     }
 
     private Resource getResource(ResourceLocation path, TreeResourcePack resourcePack) {
-        return new Resource(resourcePack.getName(), () -> resourcePack.getResource(path));
+        return new Resource(resourcePack, () -> resourcePack.getResource(path));
     }
 
     @Override

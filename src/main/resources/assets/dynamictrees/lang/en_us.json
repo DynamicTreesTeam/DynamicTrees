@@ -109,6 +109,7 @@
   "desc.dynamictrees.seasonal.winter": "Winter",
 
   "death.attack.falling_tree": "%1$s was crushed by a falling tree",
+  "death.attack.falling_tree.player": "%1$s was crushed by a falling tree whilst fighting %2$s",
 
   "sounds.dynamictrees.falling_tree.start": "Timber!",
   "sounds.dynamictrees.falling_tree.small.start": "Branch is chopped",

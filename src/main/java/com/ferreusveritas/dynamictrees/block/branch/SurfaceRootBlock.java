@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
@@ -48,14 +48,13 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
     private final Family family;
 
     public SurfaceRootBlock(Family family) {
-        this(Material.WOOD, family);
+        this(MapColor.WOOD, family);
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
     }
 
-    public SurfaceRootBlock(Material material, Family family) {
-        super(Block.Properties.of(material)
-//                .harvestTool(ToolType.AXE)
-//                .harvestLevel(0)
+    public SurfaceRootBlock(MapColor mapColor, Family family) {
+        super(Properties.of()
+                .mapColor(mapColor)
                 .strength(2.5f, 1.0F)
                 .sound(SoundType.WOOD));
 

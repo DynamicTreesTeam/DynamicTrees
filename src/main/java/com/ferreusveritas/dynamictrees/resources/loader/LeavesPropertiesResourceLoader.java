@@ -117,8 +117,7 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
     private void generateBlocks(LeavesProperties leavesProperties, JsonObject json) {
         final BlockBehaviour.Properties blockProperties = JsonHelper.getBlockProperties(
                 json,
-                leavesProperties.getDefaultMaterial(),
-                leavesProperties.getDefaultMaterial().getColor(),
+                leavesProperties.getDefaultMapColor(),
                 leavesProperties::getDefaultBlockProperties,
                 error -> this.logError(leavesProperties.getRegistryName(), error),
                 warning -> this.logWarning(leavesProperties.getRegistryName(), warning)

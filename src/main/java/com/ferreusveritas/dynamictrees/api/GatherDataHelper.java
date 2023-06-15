@@ -6,10 +6,13 @@ import com.ferreusveritas.dynamictrees.data.provider.DTBlockTagsProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemTagsProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraftforge.data.event.GatherDataEvent;
 
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Harley O'Connor
@@ -25,27 +28,29 @@ public final class GatherDataHelper {
 
     public static void gatherTagData(final String modId, final GatherDataEvent event) {
         final DataGenerator generator = event.getGenerator();
+        PackOutput packOutput = generator.getPackOutput();
+        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        final DTBlockTagsProvider blockTagsProvider = new DTBlockTagsProvider(generator, modId, event.getExistingFileHelper());
-        final DTItemTagsProvider itemTagsProvider = new DTItemTagsProvider(generator, modId, blockTagsProvider, event.getExistingFileHelper());
+        final DTBlockTagsProvider blockTagsProvider = new DTBlockTagsProvider(packOutput, lookupProvider, modId, event.getExistingFileHelper());
+        final DTItemTagsProvider itemTagsProvider = new DTItemTagsProvider(packOutput, modId, lookupProvider, blockTagsProvider.contentsGetter(), event.getExistingFileHelper());
 
         generator.addProvider(event.includeServer(), blockTagsProvider);
         generator.addProvider(event.includeServer(), itemTagsProvider);
     }
 
     public static void gatherBlockStateAndModelData(final String modId, final GatherDataEvent event, Registry<?>... registries) {
-        event.getGenerator().addProvider(event.includeServer(), new DTBlockStateProvider(event.getGenerator(), modId,
+        event.getGenerator().addProvider(event.includeServer(), new DTBlockStateProvider(event.getGenerator().getPackOutput(), modId,
                 event.getExistingFileHelper(), Arrays.asList(registries)));
     }
 
     public static void gatherItemModelData(final String modId, final GatherDataEvent event, Registry<?>... registries) {
-        event.getGenerator().addProvider(event.includeServer(), new DTItemModelProvider(event.getGenerator(), modId,
+        event.getGenerator().addProvider(event.includeServer(), new DTItemModelProvider(event.getGenerator().getPackOutput(), modId,
                 event.getExistingFileHelper(), Arrays.asList(registries)));
     }
 
     public static void gatherLootData(final String modId, final GatherDataEvent event) {
         event.getGenerator().addProvider(event.includeServer(), new DTLootTableProvider(
-                event.getGenerator(), modId, event.getExistingFileHelper()
+                event.getGenerator().getPackOutput(), modId, event.getExistingFileHelper()
         ));
     }
 

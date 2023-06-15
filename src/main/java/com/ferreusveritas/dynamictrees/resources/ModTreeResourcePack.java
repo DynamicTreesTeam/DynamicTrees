@@ -17,13 +17,13 @@ public final class ModTreeResourcePack extends FlatTreeResourcePack {
 
     private final IModFile modFile;
 
-    public ModTreeResourcePack(final Path path, final IModFile modFile) {
-        super(path);
+    public ModTreeResourcePack(String packId, boolean isBuiltin, final Path path, final IModFile modFile) {
+        super(packId, isBuiltin, path);
         this.modFile = modFile;
     }
 
     @Override
-    protected Path getPath(String... paths) {
+    protected Path resolve(String... paths) {
         final List<String> pathsList = new ArrayList<>(Arrays.asList(paths));
         pathsList.add(0, Resources.TREES);
         return this.modFile.findResource(pathsList.toArray(new String[0]))

@@ -11,10 +11,11 @@ import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraftforge.common.Tags;
 
 public class MoundGenFeature extends GenFeature {
 
@@ -59,17 +60,15 @@ public class MoundGenFeature extends GenFeature {
             BlockState initialDirtState = level.getBlockState(rootPos);
             BlockState initialUnderState = level.getBlockState(rootPos.below());
 
-            if (initialUnderState.getMaterial() == Material.AIR ||
-                    (initialUnderState.getMaterial() != Material.DIRT && initialUnderState.getMaterial() != Material.STONE)
-            ) {
-                final Biome biome = level.getUncachedNoiseBiome(
-                        rootPos.getX() >> 2,
-                        rootPos.getY() >> 2,
-                        rootPos.getZ() >> 2
-                ).value();
-                //todo: figure out if needs replacement
-//                initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
-            }
+//             if (initialUnderState.isAir() || (!initialUnderState.is(BlockTags.DIRT) && !initialUnderState.is(Tags.Blocks.STONE))) {
+//                 final Biome biome = level.getUncachedNoiseBiome(
+//                         rootPos.getX() >> 2,
+//                         rootPos.getY() >> 2,
+//                         rootPos.getZ() >> 2
+//                 ).value();
+//                 //todo: figure out if needs replacement
+// //                initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
+//             }
 
             rootPos = rootPos.above();
 

@@ -41,7 +41,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -70,8 +70,8 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     /**
      * @param name name of branch, without a {@code _branch} suffix
      */
-    public BasicBranchBlock(ResourceLocation name, Material material) {
-        this(name, BlockBehaviour.Properties.of(material).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
+    public BasicBranchBlock(ResourceLocation name, MapColor mapColor) {
+        this(name, BlockBehaviour.Properties.of().mapColor(mapColor).sound(SoundType.WOOD), RADIUS, MAX_RADIUS);
     }
 
     /**

@@ -120,9 +120,9 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootDataManager;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -226,7 +226,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     private static DataResult<Species> read(ResourceLocation name) {
         final Species species = Species.REGISTRY.get(name);
-        return species == null ? DataResult.error("Species not found: " + name) : DataResult.success(species);
+        return species == null ? DataResult.error(() -> "Species not found: " + name) : DataResult.success(species);
     }
 
     /**
@@ -769,12 +769,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         if (level.isClientSide) {
             return Collections.emptyList();
         }
-        return getLootTable(level.getServer().getLootTables(), species -> species.voluntaryDropsPath.get())
-                .getRandomItems(createVoluntaryLootContext(level, rootPos, fertility));
+        return getLootTable(level.getServer().getLootData(), species -> species.voluntaryDropsPath.get())
+                .getRandomItems(createVoluntaryLootParams(level, rootPos, fertility));
     }
 
-    private LootContext createVoluntaryLootContext(Level level, BlockPos rootPos, int fertility) {
-        return new LootContext.Builder(LevelContext.getServerLevelOrThrow(level))
+    private LootParams createVoluntaryLootParams(Level level, BlockPos rootPos, int fertility) {
+        return new LootParams.Builder(LevelContext.getServerLevelOrThrow(level))
                 .withParameter(LootContextParams.BLOCK_STATE, level.getBlockState(rootPos))
                 .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR,
                         seasonalSeedDropFactor(LevelContext.create(level), rootPos))
@@ -782,9 +782,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 .create(DTLootParameterSets.VOLUNTARY);
     }
 
-    public LootTable getLootTable(LootTables lootTables, Function<Species, ResourceLocation> nameFunction) {
-        final LootTable table = lootTables.get(nameFunction.apply(this));
-        return table == EMPTY ? (this.isCommonSpecies() ? lootTables.get(nameFunction.apply(getCommonSpecies())) : EMPTY) : table;
+    public LootTable getLootTable(LootDataManager lootTables, Function<Species, ResourceLocation> nameFunction) {
+        final LootTable table = lootTables.getLootTable(nameFunction.apply(this));
+        return table == EMPTY ? (this.isCommonSpecies() ? lootTables.getLootTable(nameFunction.apply(getCommonSpecies())) : EMPTY) : table;
     }
 
     public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume) {
@@ -820,13 +820,13 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     private List<ItemStack> getDropsForBranchType(Level level, ItemStack tool, @Nullable Float explosionRadius,
                                                   int branchVolume, BranchBlock branchBlock) {
-        return branchBlock.getLootTable(level.getServer().getLootTables(), this)
-                .getRandomItems(createBranchesLootContext(level, branchVolume, tool, explosionRadius));
+        return branchBlock.getLootTable(level.getServer().getLootData(), this)
+                .getRandomItems(createBranchesLootParams(level, branchVolume, tool, explosionRadius));
     }
 
-    private LootContext createBranchesLootContext(Level level, int volume, ItemStack tool,
+    private LootParams createBranchesLootParams(Level level, int volume, ItemStack tool,
                                                   @Nullable Float explosionRadius) {
-        return new LootContext.Builder(LevelContext.getServerLevelOrThrow(level))
+        return new LootParams.Builder(LevelContext.getServerLevelOrThrow(level))
                 .withParameter(LootContextParams.TOOL, tool)
                 .withParameter(DTLootContextParams.SPECIES, this)
                 .withParameter(DTLootContextParams.VOLUME, volume)
@@ -1046,7 +1046,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         final DynamicSaplingBlock sapling = this.getSapling().or(() -> this.getCommonSpecies().getSapling()).orElse(null);
 
-        if (sapling == null || !level.getBlockState(pos).getMaterial().isReplaceable() ||
+        if (sapling == null || !level.getBlockState(pos).canBeReplaced() ||
                 !DynamicSaplingBlock.canSaplingStay(level, this, pos)) {
             return false;
         }
@@ -1062,11 +1062,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * Checks if the sapling can grow at the given position.
      *
-     * @param level The {@link Level} object.
+     * @param level The {@link LevelReader} object.
      * @param pos   The {@link BlockPos} the sapling is on.
      * @return True if it can grow.
      */
-    public boolean canSaplingGrow(Level level, BlockPos pos) {
+    public boolean canSaplingGrow(LevelReader level, BlockPos pos) {
         return this.acceptableBlocksForGrowth.isEmpty() || this.acceptableBlocksForGrowth.stream().anyMatch(block -> block == level.getBlockState(pos.below()).getBlock());
     }
 
@@ -1091,7 +1091,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     //Returns if sapling should consume bonemeal when used on it.
     //if true is returned canSaplingUseBoneMeal is then run to determine if the sapling grows or not.
-    public boolean canSaplingConsumeBoneMeal(Level level, BlockPos pos) {
+    public boolean canSaplingConsumeBoneMeal(LevelReader level, BlockPos pos) {
         return canBoneMealTree() && canSaplingGrow(level, pos);
     }
 
@@ -2007,8 +2007,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return getLeafBlockIndex((DynamicLeavesBlock) block);
     }
 
-    public boolean leavesAreSolid (){
-        return getLeavesProperties().getPrimitiveLeaves().getMaterial().isSolidBlocking();
+    public boolean leavesAreSolid() {
+        return getLeavesProperties().getPrimitiveLeaves().isSolid();
     }
 
     ///////////////////////////////////////////
@@ -2330,7 +2330,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public LootTable.Builder createVoluntaryDrops() {
-        return DTLootTableProvider.createVoluntaryDrops(seed.get());
+        return DTLootTableProvider.BlockLoot.createVoluntaryDrops(seed.get());
     }
 
     public void setDropSeeds(boolean dropSeeds) {

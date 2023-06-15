@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.data.provider;
 
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
@@ -14,8 +14,8 @@ public class DTItemModelProvider extends ItemModelProvider implements DTDataProv
 
     private final List<Registry<?>> registries;
 
-    public DTItemModelProvider(DataGenerator generator, String modId, ExistingFileHelper existingFileHelper, List<Registry<?>> registries) {
-        super(generator, modId, existingFileHelper);
+    public DTItemModelProvider(PackOutput output, String modId, ExistingFileHelper existingFileHelper, List<Registry<?>> registries) {
+        super(output, modId, existingFileHelper);
         this.registries = registries;
     }
 

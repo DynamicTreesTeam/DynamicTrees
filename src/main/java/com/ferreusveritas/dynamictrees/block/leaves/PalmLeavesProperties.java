@@ -122,14 +122,14 @@ public class PalmLeavesProperties extends LeavesProperties {
     @Override
     public LootTable.Builder createBlockDrops() {
         if (primitiveLeaves != null && getPrimitiveLeavesBlock().isPresent()) {
-            return DTLootTableProvider.createPalmLeavesBlockDrops(primitiveLeaves.getBlock(), seedDropChances);
+            return DTLootTableProvider.BlockLoot.createPalmLeavesBlockDrops(primitiveLeaves.getBlock(), seedDropChances);
         }
-        return DTLootTableProvider.createPalmLeavesDrops(seedDropChances, LootContextParamSets.BLOCK);
+        return DTLootTableProvider.BlockLoot.createPalmLeavesDrops(seedDropChances, LootContextParamSets.BLOCK);
     }
 
     @Override
     public LootTable.Builder createDrops() {
-        return DTLootTableProvider.createPalmLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES);
+        return DTLootTableProvider.BlockLoot.createPalmLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES);
     }
 
 }

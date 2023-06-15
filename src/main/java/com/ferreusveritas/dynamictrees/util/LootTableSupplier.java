@@ -2,8 +2,8 @@ package com.ferreusveritas.dynamictrees.util;
 
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
 
 /**
  * @author Harley O'Connor
@@ -20,12 +20,12 @@ public final class LootTableSupplier {
         this.baseName = ResourceLocationUtils.prefix(name, path);
     }
 
-    public LootTable get(LootTables lootTables, Species species) {
-        final LootTable speciesOverrideTable = lootTables.get(getName(species));
+    public LootTable get(LootDataManager lootTables, Species species) {
+        final LootTable speciesOverrideTable = lootTables.getLootTable(getName(species));
         if (speciesOverrideTable != LootTable.EMPTY) {
             return speciesOverrideTable;
         }
-        return lootTables.get(baseName);
+        return lootTables.getLootTable(baseName);
     }
 
     public ResourceLocation getName(Species species) {

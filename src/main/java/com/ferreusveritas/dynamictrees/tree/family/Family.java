@@ -55,8 +55,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -562,17 +561,24 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return null;
     }
 
-    public Material getDefaultBranchMaterial() {
-        return Material.WOOD;
+    public MapColor getDefaultBranchMapColor() {
+        return MapColor.WOOD;
+    }
+
+    public boolean getDefaultFlammable() {
+        return true;
     }
 
     public SoundType getDefaultBranchSoundType() {
         return SoundType.WOOD;
     }
 
-    public BlockBehaviour.Properties getDefaultBranchProperties(final Material material, final MaterialColor materialColor) {
-        return BlockBehaviour.Properties.of(material, materialColor).sound(this.getDefaultBranchSoundType())
+    public BlockBehaviour.Properties getDefaultBranchProperties(MapColor mapColor) {
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().sound(this.getDefaultBranchSoundType()).mapColor(mapColor)
                 .noLootTable().requiresCorrectToolForDrops();
+        if (!this.isFireProof())
+            properties.ignitedByLava();
+        return properties;
     }
 
     private BlockBehaviour.Properties properties;
@@ -583,8 +589,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @return The {@link #properties} for this {@link Family} object.
      */
     public BlockBehaviour.Properties getProperties() {
-        return this.properties == null ? this.getDefaultBranchProperties(this.getDefaultBranchMaterial(),
-                this.getDefaultBranchMaterial().getColor()) : this.properties;
+        return this.properties == null ? this.getDefaultBranchProperties(this.getDefaultBranchMapColor()) : this.properties;
     }
 
 

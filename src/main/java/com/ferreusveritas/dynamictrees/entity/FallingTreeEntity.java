@@ -23,6 +23,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -221,9 +222,9 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         BlockBounds renderBounds = new BlockBounds(destroyData.cutPos);
 
         for (BlockPos absPos : Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES))) {
-            BlockState state = level.getBlockState(absPos);
+            BlockState state = level().getBlockState(absPos);
             if (TreeHelper.isTreePart(state)) {
-                level.setBlock(absPos, BlockStates.AIR, 0);////The client needs to set it's blocks to air
+                level().setBlock(absPos, BlockStates.AIR, 0);////The client needs to set it's blocks to air
                 renderBounds.union(absPos);//Expand the re-render volume to include this block
             }
         }
@@ -240,8 +241,8 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
                 BlockPos pos = destroyData.getBranchRelPos(i).offset(cutPos);
                 for (Surround dir : Surround.values()) {
                     BlockPos dPos = pos.offset(dir.getOffset());
-                    if (level.getBlockState(dPos).getBlock() instanceof TrunkShellBlock) {
-                        level.removeBlock(dPos, false);
+                    if (level().getBlockState(dPos).getBlock() instanceof TrunkShellBlock) {
+                        level().removeBlock(dPos, false);
                     }
                 }
             }
@@ -316,14 +317,14 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public void tick() {
         super.tick();
 
-        if (this.level.isClientSide && !this.clientBuilt) {
+        if (this.level().isClientSide && !this.clientBuilt) {
             this.buildClient();
             if (!isAlive()) {
                 return;
             }
         }
 
-        if (!this.level.isClientSide && this.firstUpdate) {
+        if (!this.level().isClientSide && this.firstUpdate) {
             this.updateNeighbors();
         }
 
@@ -362,7 +363,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         }
 
         //Update each of the blocks that need to be updated
-        toUpdate.forEach(pos -> level.neighborChanged(pos, Blocks.AIR, pos));
+        toUpdate.forEach(pos -> level().neighborChanged(pos, Blocks.AIR, pos));
     }
 
     protected AnimationHandler selectAnimationHandler() {
@@ -396,7 +397,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void modelCleanup() {
-        FallingTreeEntityModelTrackerCache.cleanupModels(level, this);
+        FallingTreeEntityModelTrackerCache.cleanupModels(level(), this);
     }
 
     public void handleMotion() {
@@ -409,7 +410,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     }
 
     public void dropPayLoad() {
-        if (!level.isClientSide) {
+        if (!level().isClientSide) {
             currentAnimationHandler.dropPayload(this);
         }
     }
@@ -431,7 +432,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
      * @param entity The {@link FallingTreeEntity} object.
      */
     public static void standardDropLogsPayload(FallingTreeEntity entity) {
-        Level level = entity.level;
+        Level level = entity.level();
         if (!level.isClientSide) {
             BlockPos cutPos = entity.getDestroyData().cutPos;
             entity.getPayload().forEach(i -> spawnItemAsEntity(level, cutPos, i));
@@ -439,7 +440,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     }
 
     public static void standardDropLeavesPayLoad(FallingTreeEntity entity) {
-        Level level = entity.level;
+        Level level = entity.level();
         if (!level.isClientSide) {
             BlockPos cutPos = entity.getDestroyData().cutPos;
             entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(level, cutPos.offset(bis.pos), bis.stack));
@@ -466,13 +467,13 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     public void cleanupRootyDirt() {
         // Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             final BlockPos rootPos = getDestroyData().cutPos.below();
-            final BlockState belowState = this.level.getBlockState(rootPos);
+            final BlockState belowState = this.level().getBlockState(rootPos);
 
             if (TreeHelper.isRooty(belowState)) {
                 final RootyBlock rootyBlock = (RootyBlock) belowState.getBlock();
-                rootyBlock.doDecay(this.level, rootPos, belowState, getDestroyData().species);
+                rootyBlock.doDecay(this.level(), rootPos, belowState, getDestroyData().species);
             }
         }
     }
@@ -525,7 +526,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     @Nonnull
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 

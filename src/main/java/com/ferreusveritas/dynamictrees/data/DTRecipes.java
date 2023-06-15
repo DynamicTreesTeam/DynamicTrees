@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
@@ -76,7 +77,7 @@ public final class DTRecipes {
     }
 
     private static ShapelessRecipe createShapeless(final ResourceLocation registryName, final ItemStack out, final Ingredient... ingredients) {
-        return new ShapelessRecipe(registryName, "CRAFTING_MISC", out, NonNullList.of(Ingredient.EMPTY, ingredients));
+        return new ShapelessRecipe(registryName, "CRAFTING_MISC", CraftingBookCategory.MISC, out, NonNullList.of(Ingredient.EMPTY, ingredients));
     }
 
     private static Ingredient[] ingredients(Collection<Item> items) {

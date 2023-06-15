@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.util.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -18,8 +19,8 @@ public class SeedSaplingRecipe {
     @SuppressWarnings("deprecation")
     public static final Codec<SeedSaplingRecipe> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Registry.BLOCK.byNameCodec().optionalFieldOf("sapling_block").forGetter(SeedSaplingRecipe::getSaplingBlock),
-                    Registry.ITEM.byNameCodec().optionalFieldOf("sapling_item").forGetter(SeedSaplingRecipe::getSaplingItem)
+                    BuiltInRegistries.BLOCK.byNameCodec().optionalFieldOf("sapling_block").forGetter(SeedSaplingRecipe::getSaplingBlock),
+                    BuiltInRegistries.ITEM.byNameCodec().optionalFieldOf("sapling_item").forGetter(SeedSaplingRecipe::getSaplingItem)
             ).apply(instance, (saplingBlock, saplingItem) -> new SeedSaplingRecipe(
                     saplingBlock.orElse(null),
                     saplingItem.orElseGet(() ->
