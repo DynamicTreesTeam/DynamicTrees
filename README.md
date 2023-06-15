@@ -4,10 +4,11 @@ Minecraft Forge mod providing dynamic trees that progressively grow from seed to
 
 ![Logo](./header.png)
 
-This branch is for the 1.16.5 version of Minecraft.
+This branch is for the 1.19.2 version of Minecraft.
 
 ### Links
-- [Downloads](https://minecraft.curseforge.com/projects/dynamictrees/files)
+- [CurseForge](https://minecraft.curseforge.com/projects/dynamictrees)
+- [Modrinth](https://modrinth.com/mod/dynamictrees)
 - [Discord](https://discord.gg/A4FCBS3)
 
 ### Compiling
