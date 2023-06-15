@@ -42,7 +42,7 @@ version = "$mcVersion-$modVersion"
 group = property("group")
 
 minecraft {
-    mappings("parchment", "${property("mappingsVersion")}-$mcVersion")
+    mappings(property("mappingsChannel"), property("mappingsVersion"))
     accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
 
     runs {
@@ -93,9 +93,9 @@ dependencies {
 
     implementation(fg.deobf("curse.maven:SereneSeasons-291874:${property("ssVersion")}"))
 
-    runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
-    runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
-    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.19:${property("suggestionProviderFixVersion")}"))
+    // runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
+    // runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
+    // runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.19:${property("suggestionProviderFixVersion")}"))
 
     //Small lib that allows changing the blocks snow can be on
 //    runtimeOnly(fg.deobf("curse.maven:snow-coated-843893:4465018"))
