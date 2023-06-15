@@ -6,7 +6,6 @@
     "lowest_branch_height": 3,
     "growth_rate": 1.5,
     "soil_longevity": 3,
-    "growth_logic_kit": "deciduous",
     "leaves_properties": "jungle",
     "generate_seed": true,
     "generate_sapling": true,
