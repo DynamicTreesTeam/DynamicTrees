@@ -1,0 +1,21 @@
+{
+  "type": "dynamictrees:voluntary",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "condition": "dynamictrees:voluntary_seed_drop_chance",
+              "rarity": 1.0
+            }
+          ],
+          "name": "dynamictrees:cocoa_seed"
+        }
+      ]
+    }
+  ]
+}

@@ -164,8 +164,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     protected int lightRequirement = 13;
     protected AgeingConfiguration ageingConfiguration = AgeingConfiguration.ALWAYS;
     protected boolean connectAnyRadius = false;
-
     protected boolean requiresShears = true;
+
+    protected ResourceLocation texturePath;
 
     private LeavesProperties() {
         this.blockLootTableSupplier = new LootTableSupplier("null/", DTTrees.NULL);
@@ -298,6 +299,14 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
      */
     public ItemStack getPrimitiveLeavesItemStack() {
         return new ItemStack(Item.BY_BLOCK.get(getPrimitiveLeaves().getBlock()));
+    }
+
+    public void setLeavesTexturePath(String texturePath) {
+        this.texturePath = new ResourceLocation(texturePath);
+    }
+
+    public Optional<ResourceLocation> getTexturePath() {
+        return Optional.ofNullable(texturePath);
     }
 
     ///////////////////////////////////////////

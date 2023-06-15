@@ -214,6 +214,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<BiomeList> 
                 .register("tag", String.class, TAG_APPLIER)
                 .registerArrayApplier("tags", String.class, TAG_APPLIER)
                 .register("category", String.class, CATEGORY_APPLIER)
+                .registerArrayApplier("categories", String.class, CATEGORY_APPLIER)
                 .register("name", String.class, NAME_APPLIER)
                 .registerArrayApplier("names", String.class, NAME_APPLIER)
                 .register("names_or", JsonArray.class, NAMES_OR_APPLIER)

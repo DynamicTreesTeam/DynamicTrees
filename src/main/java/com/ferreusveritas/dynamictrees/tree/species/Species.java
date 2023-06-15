@@ -2250,9 +2250,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
                                    ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-        textureConsumer.accept("particle", leavesTextureLocation);
+        ResourceLocation leavesLoc = getLeavesProperties().getTexturePath().orElse(leavesTextureLocation);
+        textureConsumer.accept("particle", leavesLoc);
         textureConsumer.accept("log", barkTextureLocation);
-        textureConsumer.accept("leaves", leavesTextureLocation);
+        textureConsumer.accept("leaves", leavesLoc);
     }
 
     @Override
