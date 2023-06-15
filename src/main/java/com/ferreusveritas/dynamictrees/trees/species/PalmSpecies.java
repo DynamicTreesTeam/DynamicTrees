@@ -78,8 +78,8 @@ public class PalmSpecies extends Species {
     public void postGeneration(PostGenerationContext context) {
         final IWorld world = context.world();
 
-        if (!context.endPoints().isEmpty()) {
-            BlockPos tip = context.endPoints().get(0).above(2);
+        for (BlockPos endPoint : context.endPoints()){
+            BlockPos tip = endPoint.above(2);
             if (context.bounds().inBounds(tip, true)) {
                 if (world.getBlockState(tip).getBlock() instanceof DynamicLeavesBlock) {
                     for (CoordUtils.Surround surr : CoordUtils.Surround.values()) {

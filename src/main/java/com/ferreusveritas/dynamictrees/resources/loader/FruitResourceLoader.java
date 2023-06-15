@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.systems.fruit;
+package com.ferreusveritas.dynamictrees.resources.loader;
 
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.blocks.GrowableBlock;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
+import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.util.Null;
 import com.google.gson.JsonObject;
 import net.minecraft.block.AbstractBlock;
@@ -42,6 +43,8 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
                 .register("season_offset", Float.class, Fruit::setSeasonOffset)
                 .register("min_production_factor", Float.class, Fruit::setMinProductionFactor)
                 .register("mature_action", GrowableBlock.MatureAction.class, Fruit::setMatureAction);
+
+        super.registerAppliers();
     }
 
     @Override

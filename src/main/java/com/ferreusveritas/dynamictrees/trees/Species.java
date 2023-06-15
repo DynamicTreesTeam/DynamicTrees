@@ -1741,6 +1741,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 : 1.0F;
     }
 
+    public void inheritSeasonalFruitingOffsetToFruits(){
+        this.fruits.forEach((fruit)->fruit.setSeasonOffset(this.seasonalFruitingOffset));
+    }
+
+    public void inheritSeasonalFruitingOffsetToPods(){
+        this.pods.forEach((pod)->pod.setSeasonOffset(this.seasonalFruitingOffset));
+    }
+
     // TODO: Update for data-driven fruit
 
     /**
@@ -1751,7 +1759,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         final float seasonEnd = 1 - 1f / 6;
         final float threshold = 0.75f;
 
-        if (this.hasFruits()) {
+        if (this.hasFruits() || this.hasPods()) {
             int seasonFlags = 0;
             for (int i = 0; i < 4; i++) {
                 boolean isValidSeason = false;

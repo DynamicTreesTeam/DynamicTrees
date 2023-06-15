@@ -1,4 +1,4 @@
-package com.ferreusveritas.dynamictrees.systems.pod;
+package com.ferreusveritas.dynamictrees.resources.loader;
 
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.api.treepacks.ApplierRegistryEvent;
@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.compat.seasons.FlowerHoldPeriod;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.deserialisation.ResourceLocationDeserialiser;
+import com.ferreusveritas.dynamictrees.systems.pod.Pod;
 import com.ferreusveritas.dynamictrees.util.Null;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -48,6 +49,8 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
                 .register("flower_hold_period_length", Float.class, Pod::setFlowerHoldPeriodLength)
                 .register("min_production_factor", Float.class, Pod::setMinProductionFactor)
                 .register("mature_action", GrowableBlock.MatureAction.class, Pod::setMatureAction);
+
+        super.registerAppliers();
     }
 
     private void readBlockShapes(Pod pod, JsonObject json) {
