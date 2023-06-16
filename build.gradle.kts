@@ -13,7 +13,7 @@ apply(from = "https://gist.githubusercontent.com/Harleyoc1/4d23d4e991e868d98d548
 plugins {
     id("java")
     id("net.minecraftforge.gradle")
-    id("org.parchmentmc.librarian.forgegradle")
+//    id("org.parchmentmc.librarian.forgegradle")
     id("idea")
     id("maven-publish")
     id("com.harleyoconnor.translationsheet") version "0.1.1"
@@ -42,7 +42,8 @@ version = "$mcVersion-$modVersion"
 group = property("group")
 
 minecraft {
-    mappings("parchment", "${property("mappingsVersion")}-$mcVersion")
+//    mappings("parchment", "${property("mappingsVersion")}-$mcVersion")
+    mappings("official", "$mcVersion")
     accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
 
     runs {
@@ -94,7 +95,7 @@ dependencies {
     implementation(fg.deobf("curse.maven:SereneSeasons-291874:${property("ssVersion")}"))
 
 //    runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
-    runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion-forge:${property("ccVersion")}"))
+    runtimeOnly(fg.deobf("cc.tweaked:cc-tweaked-$mcVersion-forge:${property("ccVersion")}"))
 //    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.19:${property("suggestionProviderFixVersion")}"))
 
     //Small lib that allows changing the blocks snow can be on
