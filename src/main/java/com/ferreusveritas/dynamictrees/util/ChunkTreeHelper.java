@@ -130,22 +130,9 @@ public class ChunkTreeHelper {
         return bounds;
     }
 
+    @SuppressWarnings("removal")
     private static int getTopFilledSegment(final LevelChunk chunk) {
-        final LevelChunkSection lastChunkSection = getLastSection(chunk);
-        return lastChunkSection == null ? 0 : lastChunkSection.bottomBlockY();
-    }
-
-    @Nullable
-    private static LevelChunkSection getLastSection(final LevelChunk chunk) {
-        final LevelChunkSection[] sections = chunk.getSections();
-
-        for (int i = sections.length - 1; i >= 0; i--) {
-            if (sections[i] != null && !sections[i].hasOnlyAir()) {
-                return sections[i];
-            }
-        }
-
-        return null;
+        return chunk.getHighestSectionPosition();
     }
 
     private static void doTreeDestroy(Level level, BranchBlock branchBlock, BlockPos pos) {

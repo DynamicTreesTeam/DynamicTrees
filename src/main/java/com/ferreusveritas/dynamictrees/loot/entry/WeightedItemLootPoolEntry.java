@@ -36,7 +36,7 @@ public final class WeightedItemLootPoolEntry extends LootPoolSingletonContainer 
 
     @Override
     public LootPoolEntryType getType() {
-        return DTLootPoolEntries.WEIGHTED_ITEM;
+        return DTLootPoolEntries.WEIGHTED_ITEM.get();
     }
 
     @Override

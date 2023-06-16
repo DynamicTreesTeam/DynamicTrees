@@ -132,6 +132,7 @@ public class DTTrees {
     public static void replaceNyliumFungiFeatures() {
         TreeRegistry.findSpecies(CRIMSON).getSapling().ifPresent(crimsonSapling ->
                 TreeRegistry.findSpecies(WARPED).getSapling().ifPresent(warpedSapling -> {
+                    // TODO 1.20: These seem to now be local variables in NetherFeatures#bootstrap
                     replaceFeatureConfigs(((WeightedStateProvider) new NetherForestVegetationConfig(NetherFeatures.CRIMSON_VEGETATION_PROVIDER, 8, 4).stateProvider), crimsonSapling, warpedSapling);
                     replaceFeatureConfigs(((WeightedStateProvider) new NetherForestVegetationConfig(NetherFeatures.WARPED_VEGETATION_PROVIDER, 8, 4).stateProvider), crimsonSapling, warpedSapling);
                 })

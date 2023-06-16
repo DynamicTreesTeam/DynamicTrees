@@ -104,7 +104,7 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
     }
 
     public DendroPotion() {
-        super(new Item.Properties().tab(DTRegistries.ITEM_GROUP).stacksTo(1));
+        super(new Item.Properties().stacksTo(1));
     }
 
     public ItemStack applyIndexTag(final ItemStack potionStack, final int potionIndex) {

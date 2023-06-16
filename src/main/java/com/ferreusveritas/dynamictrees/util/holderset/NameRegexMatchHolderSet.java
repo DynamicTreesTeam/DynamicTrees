@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.util.holderset;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.registries.holdersets.HolderSetType;
@@ -16,12 +17,8 @@ public class NameRegexMatchHolderSet<T> extends RegexMatchHolderSet<T> {
         return RegexMatchHolderSet.codec(registryKey, NameRegexMatchHolderSet::new);
     }
 
-    public NameRegexMatchHolderSet(Registry<T> registry, String regex) {
-        super(registry, regex);
-    }
-
-    public NameRegexMatchHolderSet(Supplier<Registry<T>> registrySupplier, String regex) {
-        super(registrySupplier, regex);
+    public NameRegexMatchHolderSet(HolderLookup.RegistryLookup<T> registryLookup, String regex) {
+        super(registryLookup, regex);
     }
 
     @Override

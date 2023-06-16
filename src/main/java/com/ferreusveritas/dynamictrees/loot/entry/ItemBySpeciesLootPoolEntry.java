@@ -40,7 +40,7 @@ public final class ItemBySpeciesLootPoolEntry extends LootPoolSingletonContainer
 
     @Override
     public LootPoolEntryType getType() {
-        return DTLootPoolEntries.ITEM_BY_SPECIES;
+        return DTLootPoolEntries.ITEM_BY_SPECIES.get();
     }
 
     @Override

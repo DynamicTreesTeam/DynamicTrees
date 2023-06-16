@@ -38,7 +38,7 @@ public final class ShapeFunctions {
     public static DataResult<VoxelShape> calculateShape(String functionId, JsonElement parametersJson) {
         final ShapeFunction<?> shapeFunction = SHAPE_FUNCTIONS.get(functionId);
         return shapeFunction != null ? calculateShape(shapeFunction, parametersJson) :
-                DataResult.error("No shape function with ID \"" + functionId + "\".");
+                DataResult.error(() -> "No shape function with ID \"" + functionId + "\".");
     }
 
     private static <P> DataResult<VoxelShape> calculateShape(ShapeFunction<P> shapeFunction, JsonElement parametersJson) {

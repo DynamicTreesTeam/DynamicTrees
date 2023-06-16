@@ -21,7 +21,7 @@ public class SubterraneanGroundFinder implements GroundFinder {
     private static final List<BlockPos> NO_LAYERS = Collections.singletonList(BlockPos.ZERO);
 
     protected boolean isReplaceable(final LevelAccessor level, final BlockPos pos) {
-        return (level.isEmptyBlock(pos) || !level.getBlockState(pos).getMaterial().blocksMotion() || level.getBlockState(pos).getBlock() instanceof DynamicSaplingBlock) && !level.getBlockState(pos).getMaterial().isLiquid();
+        return (level.isEmptyBlock(pos) || !level.getBlockState(pos).blocksMotion() || level.getBlockState(pos).getBlock() instanceof DynamicSaplingBlock) && !level.getBlockState(pos).liquid();
     }
 
     protected boolean inRange(final BlockPos pos, final int minY, final int maxY) {

@@ -23,7 +23,7 @@ public final class SpeciesMatches implements LootItemCondition {
 
     @Override
     public LootItemConditionType getType() {
-        return DTLootConditions.SPECIES_MATCHES;
+        return DTLootConditions.SPECIES_MATCHES.get();
     }
 
     @Override

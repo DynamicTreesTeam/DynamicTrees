@@ -111,8 +111,7 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
     private void generateSoilBlock(SoilProperties soilProperties, JsonObject json) {
         soilProperties.generateBlock(JsonHelper.getBlockProperties(
                 json,
-                soilProperties.getDefaultMaterial(),
-                soilProperties.getDefaultMaterial().getColor(),
+                soilProperties.getDefaultMapColor(),
                 soilProperties::getDefaultBlockProperties,
                 error -> this.logError(soilProperties.getRegistryName(), error),
                 warning -> this.logWarning(soilProperties.getRegistryName(), warning)

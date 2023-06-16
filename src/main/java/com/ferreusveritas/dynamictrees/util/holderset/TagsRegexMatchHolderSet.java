@@ -3,11 +3,15 @@ package com.ferreusveritas.dynamictrees.util.holderset;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderOwner;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.holdersets.HolderSetType;
 import net.minecraftforge.registries.holdersets.ICustomHolderSet;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -16,12 +20,8 @@ public class TagsRegexMatchHolderSet<T> extends RegexMatchHolderSet<T> {
         return RegexMatchHolderSet.codec(registryKey, TagsRegexMatchHolderSet::new);
     }
 
-    public TagsRegexMatchHolderSet(Registry<T> registry, String regex) {
-        super(registry, regex);
-    }
-
-    public TagsRegexMatchHolderSet(Supplier<Registry<T>> registrySupplier, String regex) {
-        super(registrySupplier, regex);
+    public TagsRegexMatchHolderSet(HolderLookup.RegistryLookup<T> registryLookup, String regex) {
+        super(registryLookup, regex);
     }
 
     @Override

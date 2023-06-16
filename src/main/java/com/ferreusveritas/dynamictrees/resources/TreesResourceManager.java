@@ -109,7 +109,7 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
     @Override
     public Set<String> getNamespaces() {
         return this.resourcePacks.stream()
-                .map(treeResourcePack -> treeResourcePack.getNamespaces(null))
+                .map(TreeResourcePack::getNamespaces)
                 .flatMap(Collection::stream)
                 .collect(CommonCollectors.toLinkedSet());
     }
@@ -135,7 +135,7 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
     }
 
     private Resource getResource(ResourceLocation path, TreeResourcePack resourcePack) {
-        return new Resource(resourcePack, () -> resourcePack.getResource(path));
+        return new Resource(resourcePack, resourcePack.getResource(path));
     }
 
     @Override
@@ -144,11 +144,13 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
 
         for (TreeResourcePack pack : this.resourcePacks) {
             for (String namespace : pack.getNamespaces()) {
-                Collection<ResourceLocation> subResources = pack.getResources(namespace, path, filter);
-                for (ResourceLocation location : subResources) {
-                    // TODO Should this throw or doing anything if the key already has an associated value?
-                    resources.computeIfAbsent(location, loc -> getResource(loc, pack));
-                }
+                pack.listResources(namespace, path, (loc, resource) -> {
+                    // TODO Mcmeta files? See FallbackResourceManager#listResources for an example
+                    if (filter.test(loc)) {
+                        // TODO Should this throw or doing anything if the key already has an associated value?
+                        resources.computeIfAbsent(loc, l -> getResource(l, pack));
+                    }
+                });
             }
         }
 
@@ -161,19 +163,21 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
 
         for (TreeResourcePack pack : this.resourcePacks) {
             for (String namespace : pack.getNamespaces()) {
-                Collection<ResourceLocation> subResources = pack.getResources(namespace, path, filter);
-                for (ResourceLocation location : subResources) {
-                    resources.computeIfAbsent(location, this::getResourceStack);
-                }
+                pack.listResources(namespace, path, (loc, resource) -> {
+                    // TODO Mcmeta files? See FallbackResourceManager#listResourceStacks for an example
+                    if (filter.test(loc)) {
+                        resources.computeIfAbsent(loc, this::getResourceStack);
+                    }
+                });
             }
         }
 
         return resources;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Stream<PackResources> listPacks() {
-        return this.resourcePacks.stream().map(treeResourcePack -> treeResourcePack);
+        return (Stream<PackResources>) (Stream<?>) this.resourcePacks.stream();
     }
-
 }

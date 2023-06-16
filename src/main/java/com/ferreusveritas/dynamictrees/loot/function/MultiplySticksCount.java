@@ -23,7 +23,7 @@ public final class MultiplySticksCount extends LootItemConditionalFunction {
 
     @Override
     public LootItemFunctionType getType() {
-        return DTLootFunctions.MULTIPLY_STICKS_COUNT;
+        return DTLootFunctions.MULTIPLY_STICKS_COUNT.get();
     }
 
     @Override

@@ -95,8 +95,7 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
     private void createBlock(Pod pod, JsonObject json, JsonObject propertiesJson) {
         final BlockBehaviour.Properties blockProperties = JsonHelper.getBlockProperties(
                 propertiesJson,
-                pod.getDefaultMaterial(),
-                pod.getDefaultMaterialColor(),
+                pod.getDefaultMapColor(),
                 pod::getDefaultBlockProperties,
                 error -> this.logError(pod.getRegistryName(), error),
                 warning -> this.logWarning(pod.getRegistryName(), warning)

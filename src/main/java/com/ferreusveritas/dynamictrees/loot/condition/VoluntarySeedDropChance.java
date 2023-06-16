@@ -23,7 +23,7 @@ public final class VoluntarySeedDropChance implements LootItemCondition {
 
     @Override
     public LootItemConditionType getType() {
-        return DTLootConditions.VOLUNTARY_SEED_DROP_CHANCE;
+        return DTLootConditions.VOLUNTARY_SEED_DROP_CHANCE.get();
     }
 
     @Override

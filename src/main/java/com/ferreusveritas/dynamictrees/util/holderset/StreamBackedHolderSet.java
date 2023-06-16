@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Either;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 
@@ -25,28 +24,29 @@ public abstract class StreamBackedHolderSet<T> implements HolderSet<T> {
         return this.stream().collect(Collectors.toSet());
     }
 
+    @Override
     public int size() {
         return this.contents().size();
     }
 
+    @Override
     public Spliterator<Holder<T>> spliterator() {
         return this.stream().spliterator();
     }
 
+    @Override
     public Iterator<Holder<T>> iterator() {
         return this.stream().iterator();
     }
 
+    @Override
     public Optional<Holder<T>> getRandomElement(RandomSource random) {
         return Util.getRandomSafe(this.contents(), random);
     }
 
+    @Override
     public Holder<T> get(int index) {
         return this.contents().get(index);
-    }
-
-    public boolean isValidInRegistry(Registry<T> registry) {
-        return true;
     }
 
     @Override
@@ -57,5 +57,10 @@ public abstract class StreamBackedHolderSet<T> implements HolderSet<T> {
     @Override
     public boolean contains(Holder<T> holder) {
         return this.stream().anyMatch(h -> Objects.equals(h, holder));
+    }
+
+    @Override
+    public Optional<TagKey<T>> unwrapKey() {
+        return Optional.empty();
     }
 }

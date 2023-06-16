@@ -22,7 +22,7 @@ import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.google.gson.JsonObject;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -61,7 +61,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
 
     @Override
     public void registerAppliers() {
-        this.environmentFactorAppliers.register(new TagKeyJsonPropertyApplier<>(Registry.BIOME_REGISTRY, Species.class,
+        this.environmentFactorAppliers.register(new TagKeyJsonPropertyApplier<>(Registries.BIOME, Species.class,
                 (TriConsumer<TagKey<Biome>, Species, Float>) (tagKey, species, factor) -> species.envFactor(tagKey, factor)));
 
         JsonDeserialisers.register(Species.CommonOverride.class, input ->

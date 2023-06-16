@@ -65,8 +65,7 @@ public class Staff extends Item {
     private final Multimap<Attribute, AttributeModifier> attributeModifiers;
 
     public Staff() {
-        super(new Item.Properties().stacksTo(1)
-                .tab(DTRegistries.ITEM_GROUP));
+        super(new Item.Properties().stacksTo(1));
 
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
@@ -114,7 +113,7 @@ public class Staff extends Item {
 
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
-        if (state.getMaterial().isReplaceable() || state.is(DTBlockTags.FOLIAGE)){
+        if (state.canBeReplaced() || state.is(DTBlockTags.FOLIAGE)) {
             pos = pos.below();
             state = level.getBlockState(pos);
         }

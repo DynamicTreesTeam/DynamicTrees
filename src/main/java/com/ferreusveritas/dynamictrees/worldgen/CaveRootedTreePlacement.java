@@ -1,9 +1,9 @@
 package com.ferreusveritas.dynamictrees.worldgen;
 
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
@@ -13,14 +13,8 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import java.util.stream.Stream;
 
 public class CaveRootedTreePlacement extends PlacementModifier {
-
     public static final CaveRootedTreePlacement INSTANCE = new CaveRootedTreePlacement();
-
-    public static final PlacementModifierType<CaveRootedTreePlacement> TYPE = Registry.register(
-            Registry.PLACEMENT_MODIFIERS,
-            "cave_rooted_tree",
-            () -> Codec.unit(() -> INSTANCE)
-    );
+    public static final Codec<CaveRootedTreePlacement> CODEC = Codec.unit(() -> INSTANCE);
 
     private CaveRootedTreePlacement() {
     }
@@ -34,6 +28,6 @@ public class CaveRootedTreePlacement extends PlacementModifier {
 
     @Override
     public PlacementModifierType<?> type() {
-        return TYPE;
+        return DTRegistries.CAVE_ROOTED_TREE_PLACEMENT_MODIFIER_TYPE.get();
     }
 }
