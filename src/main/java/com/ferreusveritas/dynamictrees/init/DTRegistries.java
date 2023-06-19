@@ -21,6 +21,9 @@ import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKits;
 import com.ferreusveritas.dynamictrees.item.DendroPotion;
 import com.ferreusveritas.dynamictrees.item.DirtBucket;
 import com.ferreusveritas.dynamictrees.item.Staff;
+import com.ferreusveritas.dynamictrees.loot.condition.DTLootConditions;
+import com.ferreusveritas.dynamictrees.loot.entry.DTLootPoolEntries;
+import com.ferreusveritas.dynamictrees.loot.function.DTLootFunctions;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeature;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatures;
@@ -31,15 +34,20 @@ import com.ferreusveritas.dynamictrees.worldgen.CaveRootedTreePlacement;
 import com.ferreusveritas.dynamictrees.worldgen.DynamicTreeFeature;
 import com.ferreusveritas.dynamictrees.worldgen.biomemodifiers.AddDynamicTreesBiomeModifier;
 import com.ferreusveritas.dynamictrees.worldgen.biomemodifiers.RunFeatureCancellersBiomeModifier;
+import com.ferreusveritas.dynamictrees.worldgen.feature.DTReplaceNyliumFungiBlockStateProvider;
 import com.ferreusveritas.dynamictrees.worldgen.featurecancellation.FungusFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.featurecancellation.MushroomFeatureCanceller;
 import com.ferreusveritas.dynamictrees.worldgen.featurecancellation.TreeFeatureCanceller;
+import com.ferreusveritas.dynamictrees.worldgen.structure.DTCancelVanillaTreePoolElement;
+import com.ferreusveritas.dynamictrees.worldgen.structure.TreePoolElement;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.valueproviders.ConstantInt;
@@ -47,6 +55,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -59,14 +69,13 @@ import net.minecraft.world.level.levelgen.feature.configurations.HugeMushroomFea
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.RootSystemConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
 import net.minecraft.world.level.levelgen.placement.BiomeFilter;
 import net.minecraft.world.level.levelgen.placement.EnvironmentScanPlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.placement.RandomOffsetPlacement;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -83,31 +92,31 @@ import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
-
-    /**
-     * This is the creative tab that holds all DT items. Must be instantiated here so that it's not {@code null} when we
-     * create blocks and items.
-     */
-    public static final CreativeModeTab ITEM_GROUP = new CreativeModeTab(DynamicTrees.MOD_ID) {
-        // TODO 1.20: Update this and add all items that are under the DT mod id
-        @Override
-        public ItemStack makeIcon() {
-            return TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1);
-        }
-    };
-
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DynamicTrees.MOD_ID);
     public static final DeferredRegister<PlacementModifierType<?>> PLACEMENT_MODIFIER_TYPES = DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, DynamicTrees.MOD_ID);
-    // TODO 1.20: These must be bootstrapped now or something??
-    public static final DeferredRegister<ConfiguredFeature<?, ?>> CONFIGURED_FEATURES = DeferredRegister.create(Registries.CONFIGURED_FEATURE, DynamicTrees.MOD_ID);
-    public static final DeferredRegister<PlacedFeature> PLACED_FEATURES = DeferredRegister.create(Registries.PLACED_FEATURE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, DynamicTrees.MOD_ID);
     public static final DeferredRegister<Codec<? extends BiomeModifier>> BIOME_MODIFIER_SERIALIZERS = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, DynamicTrees.MOD_ID);
     public static final DeferredRegister<HolderSetType> HOLDER_SET_TYPES = DeferredRegister.create(ForgeRegistries.Keys.HOLDER_SET_TYPES, DynamicTrees.MOD_ID);
-    public static final DeferredRegister<LootPoolEntryType> LOOT_POOL_ENTRY_TYPES = DeferredRegister.create(Registries.LOOT_POOL_ENTRY_TYPE, DynamicTrees.MOD_ID);
-    public static final DeferredRegister<LootItemConditionType> LOOT_CONDITION_TYPES = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, DynamicTrees.MOD_ID);
-    public static final DeferredRegister<LootItemFunctionType> LOOT_FUNCTION_TYPES = DeferredRegister.create(Registries.LOOT_FUNCTION_TYPE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<BlockStateProviderType<?>> BLOCK_STATE_PROVIDER_TYPES = DeferredRegister.create(Registries.BLOCK_STATE_PROVIDER_TYPE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTrees.MOD_ID);
+
+    public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("tab", () -> CreativeModeTab.builder()
+            .icon(() -> TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1))
+            .title(Component.translatable("itemGroup.dynamictrees"))
+            .displayItems((parameters, output) -> {
+                BuiltInRegistries.ITEM.entrySet().forEach(e -> {
+                    if (e.getKey().location().getNamespace().equals(DynamicTrees.MOD_ID) && !(e.getValue() instanceof DendroPotion)) {
+                        output.accept(e.getValue().getDefaultInstance());
+                    }
+                });
+                for (final DendroPotion.DendroPotionType potion : DendroPotion.DendroPotionType.values()) {
+                    if (potion.isActive()) {
+                        output.accept(DendroPotion.applyIndexTag(new ItemStack(DTRegistries.DENDRO_POTION.get()), potion.getIndex()));
+                    }
+                }
+            }).build());
 
     ///////////////////////////////////////////
     // BLOCKS
@@ -126,17 +135,17 @@ public class DTRegistries {
     public static void setup() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ENTITY_TYPES.register(modBus);
+        CREATIVE_MODE_TABS.register(modBus);
         FEATURES.register(modBus);
         PLACEMENT_MODIFIER_TYPES.register(modBus);
-        CONFIGURED_FEATURES.register(modBus);
-        PLACED_FEATURES.register(modBus);
         SOUND_EVENTS.register(modBus);
         BIOME_MODIFIER_SERIALIZERS.register(modBus);
         HOLDER_SET_TYPES.register(modBus);
-        LOOT_POOL_ENTRY_TYPES.register(modBus);
-        LOOT_CONDITION_TYPES.register(modBus);
-        LOOT_FUNCTION_TYPES.register(modBus);
-
+        BLOCK_STATE_PROVIDER_TYPES.register(modBus);
+        STRUCTURE_POOL_ELEMENT_TYPES.register(modBus);
+        DTLootPoolEntries.LOOT_POOL_ENTRY_TYPES.register(modBus);
+        DTLootConditions.LOOT_CONDITION_TYPES.register(modBus);
+        DTLootFunctions.LOOT_FUNCTION_TYPES.register(modBus);
 
         setupBlocks();
         setupConnectables();
@@ -250,18 +259,6 @@ public class DTRegistries {
     public static final RegistryObject<DynamicTreeFeature> DYNAMIC_TREE_FEATURE = FEATURES.register("tree", DynamicTreeFeature::new);
     public static final RegistryObject<CaveRootedTreeFeature> CAVE_ROOTED_TREE_FEATURE = FEATURES.register("cave_rooted_tree", CaveRootedTreeFeature::new);
 
-    public static final RegistryObject<ConfiguredFeature<NoneFeatureConfiguration, ?>> DYNAMIC_TREE_CONFIGURED_FEATURE = CONFIGURED_FEATURES.register("dynamic_tree",
-            () -> new ConfiguredFeature<>(DYNAMIC_TREE_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
-    public static final RegistryObject<ConfiguredFeature<NoneFeatureConfiguration, ?>> CAVE_SURFACE_TREE_CONFIGURED_FEATURE = CONFIGURED_FEATURES.register("cave_rooted_tree",
-            () -> new ConfiguredFeature<>(CAVE_ROOTED_TREE_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
-
-    public static final RegistryObject<PlacedFeature> DYNAMIC_TREE_PLACED_FEATURE = PLACED_FEATURES.register("dynamic_tree_placed_feature",
-            () -> PlacementUtils.inlinePlaced(DYNAMIC_TREE_CONFIGURED_FEATURE.getHolder().get()).value());
-    /**
-     * Placement for trees that generate on the surface above the target biome. This is used for trees like the azalea.
-     */
-    public static final RegistryObject<PlacedFeature> SURFACE_DYNAMIC_TREE_PLACED_FEATURE = PLACED_FEATURES.register("cave_rooted_tree",
-            () -> PlacementUtils.inlinePlaced(CAVE_SURFACE_TREE_CONFIGURED_FEATURE.getHolder().get(), CaveRootedTreePlacement.INSTANCE, PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT, EnvironmentScanPlacement.scanningFor(Direction.UP, BlockPredicate.solid(), BlockPredicate.ONLY_IN_AIR_PREDICATE, 12), RandomOffsetPlacement.vertical(ConstantInt.of(-1)), BiomeFilter.biome()).value());
     public static final RegistryObject<Codec<AddDynamicTreesBiomeModifier>> ADD_DYNAMIC_TREES_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("add_dynamic_trees",
             () -> Codec.unit(AddDynamicTreesBiomeModifier::new));
     public static final RegistryObject<Codec<RunFeatureCancellersBiomeModifier>> RUN_FEATURE_CANCELLERS_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("run_feature_cancellers",
@@ -269,6 +266,14 @@ public class DTRegistries {
     public static final RegistryObject<HolderSetType> INCLUDES_EXCLUDES_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("includes_excludes", () -> IncludesExcludesHolderSet::codec);
     public static final RegistryObject<HolderSetType> NAME_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("name_regex_match", () -> NameRegexMatchHolderSet::codec);
     public static final RegistryObject<HolderSetType> TAGS_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("tags_regex_match", () -> NameRegexMatchHolderSet::codec);
+
+    public static final RegistryObject<BlockStateProviderType<DTReplaceNyliumFungiBlockStateProvider>> REPLACE_NYLIUM_FUNGI_BLOCK_STATE_PROVIDER_TYPE = BLOCK_STATE_PROVIDER_TYPES.register(
+        "replace_nylium_fungi", () -> new BlockStateProviderType<>(DTReplaceNyliumFungiBlockStateProvider.CODEC));
+
+    public static final RegistryObject<StructurePoolElementType<DTCancelVanillaTreePoolElement>> CANCEL_VANILLA_VILLAGE_TREE_STRUCTURE_POOL_ELEMENT_TYPE = STRUCTURE_POOL_ELEMENT_TYPES.register(
+            "cancel_vanilla_village_tree_element", () -> () -> DTCancelVanillaTreePoolElement.CODEC);
+    public static final RegistryObject<StructurePoolElementType<TreePoolElement>> TREE_STRUCTURE_POOL_ELEMENT_TYPE = STRUCTURE_POOL_ELEMENT_TYPES.register(
+            "tree_pool_element", () -> () -> TreePoolElement.CODEC);
 
     public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.location("tree"), TreeConfiguration.class);
 

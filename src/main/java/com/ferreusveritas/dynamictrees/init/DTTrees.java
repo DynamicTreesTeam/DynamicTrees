@@ -1,7 +1,6 @@
 package com.ferreusveritas.dynamictrees.init;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
-import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.Registries;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
@@ -24,14 +23,7 @@ import com.ferreusveritas.dynamictrees.tree.species.NetherFungusSpecies;
 import com.ferreusveritas.dynamictrees.tree.species.PalmSpecies;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.tree.species.SwampOakSpecies;
-import net.minecraft.data.worldgen.features.NetherFeatures;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.random.WeightedEntry;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.configurations.NetherForestVegetationConfig;
-import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -128,26 +120,4 @@ public class DTTrees {
                 .filter(registry -> registry instanceof SimpleRegistry)
                 .forEach(Registry::lock);
     }
-
-    public static void replaceNyliumFungiFeatures() {
-        TreeRegistry.findSpecies(CRIMSON).getSapling().ifPresent(crimsonSapling ->
-                TreeRegistry.findSpecies(WARPED).getSapling().ifPresent(warpedSapling -> {
-                    // TODO 1.20: These seem to now be local variables in NetherFeatures#bootstrap
-                    replaceFeatureConfigs(((WeightedStateProvider) new NetherForestVegetationConfig(NetherFeatures.CRIMSON_VEGETATION_PROVIDER, 8, 4).stateProvider), crimsonSapling, warpedSapling);
-                    replaceFeatureConfigs(((WeightedStateProvider) new NetherForestVegetationConfig(NetherFeatures.WARPED_VEGETATION_PROVIDER, 8, 4).stateProvider), crimsonSapling, warpedSapling);
-                })
-        );
-    }
-
-    private static void replaceFeatureConfigs(WeightedStateProvider featureConfig, Block crimsonSapling, Block warpedSapling) {
-        for (final WeightedEntry.Wrapper<BlockState> entry : featureConfig.weightedList.items) {
-			if (entry.getData().getBlock() == Blocks.CRIMSON_FUNGUS) {
-                entry.data = crimsonSapling.defaultBlockState();
-            }
-			if (entry.data.getBlock() == Blocks.WARPED_FUNGUS) {
-				entry.data = warpedSapling.defaultBlockState();
-			}
-        }
-    }
-
 }

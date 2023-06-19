@@ -1001,7 +1001,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Generates and registers a {@link DynamicLeavesBlock} for this species. Note that it will only be generated if
+     * Generates and registers a {@link DynamicSaplingBlock} for this species. Note that it will only be generated if
      * {@link #shouldGenerateSapling} is {@code true}.
      *
      * @return This {@link Species} object for chaining.

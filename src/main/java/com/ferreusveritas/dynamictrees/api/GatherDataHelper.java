@@ -1,8 +1,10 @@
 package com.ferreusveritas.dynamictrees.api;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockTagsProvider;
+import com.ferreusveritas.dynamictrees.data.provider.DTDatapackBuiltinEntriesProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemTagsProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTLootTableProvider;
@@ -12,6 +14,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraftforge.data.event.GatherDataEvent;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -24,6 +27,7 @@ public final class GatherDataHelper {
         gatherBlockStateAndModelData(modId, event, registries);
         gatherItemModelData(modId, event, registries);
         gatherLootData(modId, event);
+        gatherDatapackData(modId, event);
     }
 
     public static void gatherTagData(final String modId, final GatherDataEvent event) {
@@ -52,6 +56,11 @@ public final class GatherDataHelper {
         event.getGenerator().addProvider(event.includeServer(), new DTLootTableProvider(
                 event.getGenerator().getPackOutput(), modId, event.getExistingFileHelper()
         ));
+    }
+
+    public static void gatherDatapackData(final String modId, final GatherDataEvent event) {
+        event.getGenerator().addProvider(event.includeServer(), new DTDatapackBuiltinEntriesProvider(
+                event.getGenerator().getPackOutput(), event.getLookupProvider(), Set.of(modId, DynamicTrees.MINECRAFT)));
     }
 
 }
