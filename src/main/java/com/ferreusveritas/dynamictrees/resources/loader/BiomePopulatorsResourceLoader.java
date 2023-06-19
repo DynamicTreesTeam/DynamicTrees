@@ -86,7 +86,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                 !suppress.getAsJsonPrimitive().getAsBoolean();
     }
 
-    private final JsonPropertyAppliers<BiomeDatabase.BaseEntry> entryAppliers = new JsonPropertyAppliers<>(BiomeDatabase.BaseEntry.class);
+    private final JsonPropertyAppliers<BiomeDatabase.JsonEntry> entryAppliers = new JsonPropertyAppliers<>(BiomeDatabase.JsonEntry.class);
     private final JsonPropertyAppliers<BiomeDatabase.CaveRootedData> caveRootedDataAppliers = new JsonPropertyAppliers<>(BiomeDatabase.CaveRootedData.class);
 
     public BiomePopulatorsResourceLoader() {
@@ -104,7 +104,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
                 .register("blacklist", Boolean.class, BiomeDatabase.BaseEntry::setBlacklisted)
                 .register("forestness", Float.class, BiomeDatabase.BaseEntry::setForestness)
                 .register("heightmap", String.class, BiomeDatabase.BaseEntry::setHeightmap)
-                .registerIfTrueApplier("reset", BiomeDatabase.BaseEntry::reset);
+                .register("force", Boolean.class, BiomeDatabase.JsonEntry::setForce);
 
         this.caveRootedDataAppliers
                 .register("generate_on_surface", Boolean.class, BiomeDatabase.CaveRootedData::setGenerateOnSurface)
