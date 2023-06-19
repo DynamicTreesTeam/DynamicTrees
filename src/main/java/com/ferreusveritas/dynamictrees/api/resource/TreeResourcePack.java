@@ -14,8 +14,6 @@ import java.util.Set;
  * @author Harley O'Connor
  */
 public interface TreeResourcePack extends PackResources {
-    String FOLDER = "trees";
-
     @SuppressWarnings("ConstantConditions")
     default IoSupplier<InputStream> getResource(ResourceLocation location) {
         return this.getResource(null, location);

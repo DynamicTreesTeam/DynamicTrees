@@ -1,8 +1,7 @@
 {
-  "type": "dynamictrees:voluntary",
+  "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
       "entries": [
         {
@@ -15,7 +14,9 @@
           ],
           "name": "dynamictrees:warped_seed"
         }
-      ]
+      ],
+      "rolls": 1.0
     }
-  ]
+  ],
+  "random_sequence": "dynamictrees:trees/voluntary/warped"
 }

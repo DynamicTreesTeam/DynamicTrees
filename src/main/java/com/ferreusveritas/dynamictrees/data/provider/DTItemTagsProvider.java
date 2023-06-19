@@ -66,7 +66,7 @@ public class DTItemTagsProvider extends ItemTagsProvider {
 
     @Override
     public String getName() {
-        return modId + " DT Block Tags";
+        return modId + " DT Item Tags";
     }
 
 }

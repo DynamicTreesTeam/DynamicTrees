@@ -42,7 +42,7 @@ public final class TreePoolElement extends StructurePoolElement {
 
     public static final Codec<TreePoolElement> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(Species.CODEC.fieldOf("species").forGetter(TreePoolElement::getSpecies),
-                    BlockPos.CODEC.fieldOf("offset").forGetter(TreePoolElement::getOffset),
+                    BlockPos.CODEC.optionalFieldOf("offset", BlockPos.ZERO).forGetter(TreePoolElement::getOffset),
                     projectionCodec())
             .apply(instance, TreePoolElement::new));
 

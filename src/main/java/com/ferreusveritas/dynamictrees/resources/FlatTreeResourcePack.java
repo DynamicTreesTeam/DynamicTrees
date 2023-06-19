@@ -31,23 +31,22 @@ public class FlatTreeResourcePack extends PathPackResources implements TreeResou
     }
 
     @Override
-    public IoSupplier<InputStream> getResource(@Nullable PackType packType, ResourceLocation location) {
+    public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation location) {
         return this.getRootResource(getPathFromLocation(location));
     }
 
     private static String[] getPathFromLocation(ResourceLocation location) {
         String[] parts = location.getPath().split("/");
-        String[] result = new String[parts.length + 2];
-        result[0] = FOLDER;
-        result[1] = location.getNamespace();
-        System.arraycopy(parts, 0, result, 2, parts.length);
+        String[] result = new String[parts.length + 1];
+        result[0] = location.getNamespace();
+        System.arraycopy(parts, 0, result, 1, parts.length);
         return result;
     }
 
     @Override
     public void listResources(@Nullable PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
         FileUtil.decomposePath(path).get()
-                .ifLeft(parts -> net.minecraft.server.packs.PathPackResources.listPath(namespace, resolve(FOLDER, namespace).toAbsolutePath(), parts, resourceOutput))
+                .ifLeft(parts -> net.minecraft.server.packs.PathPackResources.listPath(namespace, resolve(namespace).toAbsolutePath(), parts, resourceOutput))
                 .ifRight(dataResult -> LOGGER.error("Invalid path {}: {}", path, dataResult.message()));
     }
 

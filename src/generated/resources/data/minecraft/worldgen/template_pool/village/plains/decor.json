@@ -1,0 +1,54 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "minecraft:village/plains/plains_lamp_1",
+        "processors": {
+          "processors": []
+        },
+        "projection": "rigid"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "disabled": {
+          "element_type": "minecraft:feature_pool_element",
+          "feature": "minecraft:oak",
+          "projection": "rigid"
+        },
+        "element_type": "dynamictrees:cancel_vanilla_village_tree_element",
+        "enabled": {
+          "element_type": "dynamictrees:tree_pool_element",
+          "projection": "terrain_matching",
+          "species": "dynamictrees:oak"
+        }
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:feature_pool_element",
+        "feature": "minecraft:flower_plain",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:feature_pool_element",
+        "feature": "minecraft:pile_hay",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:empty_pool_element"
+      },
+      "weight": 2
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

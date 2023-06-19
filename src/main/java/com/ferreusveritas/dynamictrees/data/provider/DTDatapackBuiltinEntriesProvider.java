@@ -8,7 +8,9 @@ import com.ferreusveritas.dynamictrees.worldgen.DTFeatures;
 import com.ferreusveritas.dynamictrees.worldgen.feature.DTReplaceNyliumFungiBlockStateProvider;
 import com.ferreusveritas.dynamictrees.worldgen.structure.VillageTreeReplacement;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderOwner;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,6 +21,7 @@ import net.minecraft.data.worldgen.features.NetherFeatures;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,8 +38,10 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.RandomOffsetPlacement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,10 +52,24 @@ public class DTDatapackBuiltinEntriesProvider extends DatapackBuiltinEntriesProv
         super(output, registries.thenApply(p -> constructRegistries(p, getBuilder(p))), modIds);
     }
 
+    @SuppressWarnings("unchecked")
     private static HolderLookup.Provider constructRegistries(HolderLookup.Provider original, RegistrySetBuilder datapackEntriesBuilder) {
-        var builderKeys = new HashSet<>(datapackEntriesBuilder.getEntryKeys());
-        DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().filter(data -> !builderKeys.contains(data.key())).forEach(data -> datapackEntriesBuilder.add(data.key(), context -> {}));
-        return datapackEntriesBuilder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), original);
+        try {
+            // We don't need SRG mappings; this is for in-dev datagen only
+            Field ownerField = ObfuscationReflectionHelper.findField(Holder.Reference.class, "owner");
+            Object holderOwner = ownerField.get(original.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.BADLANDS));
+            Class<?> compositeOwnerClass = Class.forName("net.minecraft.core.RegistrySetBuilder$CompositeOwner");
+            Field ownersField = ObfuscationReflectionHelper.findField(compositeOwnerClass, "owners");
+            Set<HolderOwner<?>> owners = (Set<HolderOwner<?>>) ownersField.get(holderOwner);
+            var builderKeys = new HashSet<>(datapackEntriesBuilder.getEntryKeys());
+            DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().filter(data -> !builderKeys.contains(data.key())).forEach(data -> datapackEntriesBuilder.add(data.key(), context -> {}));
+            HolderLookup.Provider provider = datapackEntriesBuilder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), original);
+            Object newHolderOwner = ownerField.get(provider.lookupOrThrow(Registries.CONFIGURED_FEATURE).getOrThrow(DTFeatures.DYNAMIC_TREE_CONFIGURED_FEATURE));
+            owners.addAll((Set<HolderOwner<?>>) ownersField.get(newHolderOwner));
+            return provider;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static RegistrySetBuilder getBuilder(HolderLookup.Provider vanillaProvider) {

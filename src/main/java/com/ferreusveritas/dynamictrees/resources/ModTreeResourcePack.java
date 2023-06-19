@@ -3,9 +3,6 @@ package com.ferreusveritas.dynamictrees.resources;
 import net.minecraftforge.forgespi.locating.IModFile;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A {@link FlatTreeResourcePack} for loading resources packaged with mods. This
@@ -14,7 +11,6 @@ import java.util.List;
  * @author Harley O'Connor
  */
 public final class ModTreeResourcePack extends FlatTreeResourcePack {
-
     private final IModFile modFile;
 
     public ModTreeResourcePack(String packId, boolean isBuiltin, final Path path, final IModFile modFile) {
@@ -24,10 +20,9 @@ public final class ModTreeResourcePack extends FlatTreeResourcePack {
 
     @Override
     protected Path resolve(String... paths) {
-        final List<String> pathsList = new ArrayList<>(Arrays.asList(paths));
-        pathsList.add(0, Resources.TREES);
-        return this.modFile.findResource(pathsList.toArray(new String[0]))
-                .toAbsolutePath();
+        String[] newPaths = new String[paths.length + 1];
+        newPaths[0] = Resources.TREES;
+        System.arraycopy(paths, 0, newPaths, 1, paths.length);
+        return this.modFile.findResource(newPaths).toAbsolutePath();
     }
-
 }

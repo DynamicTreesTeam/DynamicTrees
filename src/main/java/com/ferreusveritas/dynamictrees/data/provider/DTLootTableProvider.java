@@ -16,10 +16,11 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.data.loot.packs.VanillaBlockLoot;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -44,6 +45,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 /**
  * @author Harley O'Connor
@@ -71,7 +73,11 @@ public class DTLootTableProvider extends LootTableProvider {
         return List.of(new SubProviderEntry(BlockLoot::new, LootContextParamSets.BLOCK));
     }
 
-    public class BlockLoot extends VanillaBlockLoot {
+    public class BlockLoot extends BlockLootSubProvider {
+        protected BlockLoot() {
+            super(Set.of(), FeatureFlagSet.of());
+        }
+
         @Override
         protected void generate() {
             Species.REGISTRY.dataGenerationStream(modId).forEach(this::addVoluntaryTable);
@@ -89,6 +95,13 @@ public class DTLootTableProvider extends LootTableProvider {
 
             Fruit.REGISTRY.dataGenerationStream(modId).forEach(this::addFruitBlockTable);
             Pod.REGISTRY.dataGenerationStream(modId).forEach(this::addPodBlockTable);
+        }
+
+        @Override
+        public void generate(BiConsumer<ResourceLocation, LootTable.Builder> saver) {
+            this.generate();
+
+            this.map.forEach(saver::accept);
         }
 
         private void addVoluntaryTable(Species species) {
