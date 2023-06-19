@@ -53,9 +53,12 @@ public class BranchBlockModelGeometry implements IUnbakedGeometry<BranchBlockMod
     @Override
     public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides,
             ResourceLocation modelLocation) {
-        if (!this.useThickModel(this.setFamily(modelLocation))) {
+        boolean useThickModel = this.useThickModel(this.setFamily(modelLocation));
+        if (!useThickModel) {
             return new BasicBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc);
         } else {
+            if (this.thickRingsResLoc == null)
+                this.thickRingsResLoc = this.ringsResLoc.withSuffix("_thick");
             return new ThickBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc, this.thickRingsResLoc);
         }
     }

@@ -201,7 +201,7 @@ public class DTConfigs {
 
         SERVER_BUILDER.comment("Debug Settings").push("debug");
         WORLD_GEN_DEBUG = SERVER_BUILDER.comment("Enable to mark tree spawn locations with concrete circles.").
-                define("debug", !FMLEnvironment.production);
+                define("debug", false);
         SERVER_BUILDER.pop();
 
         SERVER_CONFIG = SERVER_BUILDER.build();
