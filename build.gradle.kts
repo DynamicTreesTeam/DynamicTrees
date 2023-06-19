@@ -7,13 +7,12 @@ import java.time.format.DateTimeFormatter
 fun property(key: String) = project.findProperty(key).toString()
 fun optionalProperty(key: String) = project.findProperty(key)?.toString()
 
-apply(from = "https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle")
 apply(from = "https://gist.githubusercontent.com/Harleyoc1/4d23d4e991e868d98d548ac55832381e/raw/applesiliconfg.gradle")
 
 plugins {
     id("java")
-    id("net.minecraftforge.gradle")
-    id("org.parchmentmc.librarian.forgegradle")
+    id("net.minecraftforge.gradle") version "[6.0,6.2)"
+    id("org.parchmentmc.librarian.forgegradle") version "1.+"
     id("idea")
     id("maven-publish")
     id("com.harleyoconnor.translationsheet") version "0.1.1"
@@ -253,7 +252,7 @@ tasks.autoUpdate {
 fun net.minecraftforge.gradle.common.util.RunConfig.applyDefaultConfiguration(runDirectory: String = "run") {
     workingDirectory = file(runDirectory).absolutePath
 
-    property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
+    property("forge.logging.markers", "REGISTRIES,REGISTRYDUMP")
     property("forge.logging.console.level", "debug")
 
     property("mixin.env.remapRefMap", "true")
