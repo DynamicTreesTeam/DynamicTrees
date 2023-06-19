@@ -111,16 +111,13 @@ public class DTClient {
             LogManager.getLogger().warn("Could not get color of " + face + " side for " + state.getBlock() + "! Branch needs to be handled manually!");
             return 0;
         }
-        final ResourceLocation resLoc = quads.get(0).getSprite().getName(); // Now we get the texture location of that selected face.
-        if (!resLoc.toString().isEmpty()) {
-            final TextureUtils.PixelBuffer pixelBuffer = new TextureUtils.PixelBuffer(textureGetter.apply(resLoc));
-            final int u = pixelBuffer.w / 16;
-            final TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
-            pixelBuffer.blit(center, u * -8, u * -8);
+        TextureAtlasSprite sprite = quads.get(0).getSprite();
+        final TextureUtils.PixelBuffer pixelBuffer = new TextureUtils.PixelBuffer(sprite);
+        final int u = pixelBuffer.w / 16;
+        final TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
+        pixelBuffer.blit(center, u * -8, u * -8);
 
-            return center.averageColor();
-        }
-        return 0;
+        return center.averageColor();
     }
 
     private static void cleanup() {
