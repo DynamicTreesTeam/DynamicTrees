@@ -19,6 +19,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.data.worldgen.features.NetherFeatures;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.level.biome.Biomes;
@@ -76,7 +77,7 @@ public class DTDatapackBuiltinEntriesProvider extends DatapackBuiltinEntriesProv
         return new RegistrySetBuilder()
                 .add(Registries.TEMPLATE_POOL, context -> bootstrapTemplatePools(vanillaProvider, context))
                 .add(Registries.CONFIGURED_FEATURE, context -> bootstrapConfiguredFeatures(vanillaProvider, context))
-                .add(Registries.PLACED_FEATURE, context -> bootstrapPlacedFeatures(vanillaProvider, context));
+                .add(Registries.PLACED_FEATURE, DTDatapackBuiltinEntriesProvider::bootstrapPlacedFeatures);
     }
 
     private static void bootstrapTemplatePools(HolderLookup.Provider vanillaProvider, BootstapContext<StructureTemplatePool> context) {
@@ -94,7 +95,7 @@ public class DTDatapackBuiltinEntriesProvider extends DatapackBuiltinEntriesProv
         replaceNyliumFungiFeatures(vanillaProvider, context);
     }
 
-    private static void bootstrapPlacedFeatures(HolderLookup.Provider vanillaProvider, BootstapContext<PlacedFeature> context) {
+    private static void bootstrapPlacedFeatures(BootstapContext<PlacedFeature> context) {
         var configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
 
         context.register(DTFeatures.DYNAMIC_TREE_PLACED_FEATURE,
@@ -110,28 +111,27 @@ public class DTDatapackBuiltinEntriesProvider extends DatapackBuiltinEntriesProv
         TreeRegistry.findSpecies(DTTrees.CRIMSON).getSapling().ifPresent(crimsonSapling ->
                 TreeRegistry.findSpecies(DTTrees.WARPED).getSapling().ifPresent(warpedSapling -> {
                     var configuredFeatures = vanillaProvider.lookup(Registries.CONFIGURED_FEATURE).orElseThrow();
-                    var crimsonFeature = configuredFeatures.getOrThrow(NetherFeatures.CRIMSON_FOREST_VEGETATION).value();
-                    var crimsonConfig = (NetherForestVegetationConfig) crimsonFeature.config();
-                    var crimsonStateProvider = (WeightedStateProvider) crimsonConfig.stateProvider;
-                    var warpedFeature = configuredFeatures.getOrThrow(NetherFeatures.WARPED_FOREST_VEGETION).value();
-                    var warpedConfig = (NetherForestVegetationConfig) warpedFeature.config();
-                    var warpedStateProvider = (WeightedStateProvider) warpedConfig.stateProvider;
-
-                    var newCrimsonStateProvider = replaceFeatureConfigs(crimsonStateProvider, crimsonSapling, warpedSapling);
-                    var newCrimsonConfig = new NetherForestVegetationConfig(newCrimsonStateProvider, crimsonConfig.spreadWidth, crimsonConfig.spreadHeight);
-                    var newWarpedStateProvider = replaceFeatureConfigs(warpedStateProvider, crimsonSapling, warpedSapling);
-                    var newWarpedConfig = new NetherForestVegetationConfig(newWarpedStateProvider, warpedConfig.spreadWidth, warpedConfig.spreadHeight);
-
-                    context.register(NetherFeatures.CRIMSON_FOREST_VEGETATION, new ConfiguredFeature<>(Feature.NETHER_FOREST_VEGETATION, newCrimsonConfig));
-                    context.register(NetherFeatures.WARPED_FOREST_VEGETION, new ConfiguredFeature<>(Feature.NETHER_FOREST_VEGETATION, newWarpedConfig));
+                    List.of(NetherFeatures.CRIMSON_FOREST_VEGETATION, NetherFeatures.CRIMSON_FOREST_VEGETATION_BONEMEAL,
+                                    NetherFeatures.WARPED_FOREST_VEGETION, NetherFeatures.WARPED_FOREST_VEGETATION_BONEMEAL)
+                            .forEach(key -> replaceFeature(context, configuredFeatures, key, crimsonSapling, warpedSapling));
                 })
         );
     }
 
-    private static BlockStateProvider replaceFeatureConfigs(WeightedStateProvider featureConfig, Block crimsonSapling, Block warpedSapling) {
+    private static void replaceFeature(BootstapContext<ConfiguredFeature<?, ?>> context, HolderLookup.RegistryLookup<ConfiguredFeature<?, ?>> configuredFeatures,
+            ResourceKey<ConfiguredFeature<?, ?>> key, Block crimsonSapling, Block warpedSapling) {
+        var feature = configuredFeatures.getOrThrow(key).value();
+        var config = (NetherForestVegetationConfig) feature.config();
+        var stateProvider = (WeightedStateProvider) config.stateProvider;
+
+        var newConfig = new NetherForestVegetationConfig(replaceBlockStates(stateProvider, crimsonSapling, warpedSapling), config.spreadWidth, config.spreadHeight);
+        context.register(key, new ConfiguredFeature<>(Feature.NETHER_FOREST_VEGETATION, newConfig));
+    }
+
+    private static BlockStateProvider replaceBlockStates(WeightedStateProvider stateProvider, Block crimsonSapling, Block warpedSapling) {
         var listBuilder = SimpleWeightedRandomList.<BlockState>builder();
 
-        for (var entry : featureConfig.weightedList.unwrap()) {
+        for (var entry : stateProvider.weightedList.unwrap()) {
             BlockState blockState = entry.getData();
             if (blockState.is(Blocks.CRIMSON_FUNGUS)) {
                 blockState = crimsonSapling.defaultBlockState();
@@ -142,6 +142,6 @@ public class DTDatapackBuiltinEntriesProvider extends DatapackBuiltinEntriesProv
             listBuilder.add(blockState, entry.getWeight().asInt());
         }
 
-        return new DTReplaceNyliumFungiBlockStateProvider(new WeightedStateProvider(listBuilder), featureConfig);
+        return new DTReplaceNyliumFungiBlockStateProvider(new WeightedStateProvider(listBuilder), stateProvider);
     }
 }

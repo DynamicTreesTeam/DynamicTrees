@@ -1,0 +1,56 @@
+{
+  "type": "minecraft:nether_forest_vegetation",
+  "config": {
+    "spread_height": 1,
+    "spread_width": 3,
+    "state_provider": {
+      "type": "dynamictrees:replace_nylium_fungi",
+      "disabled": {
+        "type": "minecraft:weighted_state_provider",
+        "entries": [
+          {
+            "data": {
+              "Name": "minecraft:crimson_roots"
+            },
+            "weight": 87
+          },
+          {
+            "data": {
+              "Name": "minecraft:crimson_fungus"
+            },
+            "weight": 11
+          },
+          {
+            "data": {
+              "Name": "minecraft:warped_fungus"
+            },
+            "weight": 1
+          }
+        ]
+      },
+      "enabled": {
+        "type": "minecraft:weighted_state_provider",
+        "entries": [
+          {
+            "data": {
+              "Name": "minecraft:crimson_roots"
+            },
+            "weight": 87
+          },
+          {
+            "data": {
+              "Name": "dynamictrees:crimson_sapling"
+            },
+            "weight": 11
+          },
+          {
+            "data": {
+              "Name": "dynamictrees:warped_sapling"
+            },
+            "weight": 1
+          }
+        ]
+      }
+    }
+  }
+}
