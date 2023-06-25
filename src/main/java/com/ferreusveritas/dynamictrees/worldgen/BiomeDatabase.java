@@ -32,7 +32,7 @@ public class BiomeDatabase {
     private final Map<DTBiomeHolderSet, JsonEntry> jsonEntries = new LinkedHashMap<>();
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
 
-    public Entry getJsonEntry(DTBiomeHolderSet biomes) {
+    public JsonEntry getJsonEntry(DTBiomeHolderSet biomes) {
         return this.jsonEntries.computeIfAbsent(biomes, k -> new JsonEntry(this));
     }
 
@@ -73,10 +73,7 @@ public class BiomeDatabase {
      * @implNote does not reset cancellers, since they are only applied once on initial load
      */
     public void reset() {
-        this.entries.values().forEach(BaseEntry::reset);
-    }
-
-    public void clear() {
+        this.jsonEntries.clear();
         this.entries.clear();
     }
 
@@ -386,6 +383,7 @@ public class BiomeDatabase {
      * deferred and applied later to a set of biome-specific entries.
      */
     public static class JsonEntry extends Entry {
+        private boolean force = false;
         private boolean changedChanceSelector = false;
         private boolean changedDensitySelector = false;
         private boolean changedSpeciesSelector = false;
@@ -399,12 +397,29 @@ public class BiomeDatabase {
         }
 
         /**
+         * {@return whether this json entry should be forcefully copied and reset any other properties on all declared biomes}
+         * Defaults to false.
+         */
+        public boolean isForce() {
+            return this.force;
+        }
+
+        /**
+         * Sets whether this json entry should be forcefully copied and reset any other properties on all declared biomes.
+         */
+        public void setForce(boolean force) {
+            this.force = force;
+        }
+
+        /**
          * Copies the changed data stored in this JSON entry to the specified {@code other} entry.
          * This copy method does not overwrite properties in {@code other} that were not changed by this JSON entry.
          *
          * @param other the other entry
          */
         public void copyTo(Entry other) {
+            if (this.force)
+                other.reset();
             if (this.changedChanceSelector)
                 other.chanceSelector = this.chanceSelector;
             if (this.changedDensitySelector)
