@@ -7,32 +7,22 @@ import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
-import com.ferreusveritas.dynamictrees.util.holderset.DelayedTagEntriesHolderSet;
 import com.ferreusveritas.dynamictrees.util.holderset.NameRegexMatchHolderSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.ferreusveritas.dynamictrees.util.holderset.TagsRegexMatchHolderSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.ResourceLocationException;
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.registries.DataPackRegistriesHooks;
 import net.minecraftforge.registries.holdersets.OrHolderSet;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -42,23 +32,15 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHold
 
     public static final Supplier<Registry<Biome>> DELAYED_BIOME_REGISTRY = () -> ServerLifecycleHooks.getCurrentServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
 
-    private static final Applier<DTBiomeHolderSet, String> TAG_APPLIER = (biomeList, tagString) -> {
-        tagString = tagString.toLowerCase();
-        final boolean notOperator = usingNotOperator(tagString);
+    private static final Applier<DTBiomeHolderSet, String> TAG_APPLIER = (biomeList, tagRegex) -> {
+        tagRegex = tagRegex.toLowerCase();
+        final boolean notOperator = usingNotOperator(tagRegex);
         if (notOperator)
-            tagString = tagString.substring(1);
-        if (tagString.charAt(0) == '#')
-            tagString = tagString.substring(1);
+            tagRegex = tagRegex.substring(1);
+        if (tagRegex.charAt(0) == '#')
+            tagRegex = tagRegex.substring(1);
 
-        try {
-            ResourceLocation tagLocation = new ResourceLocation(tagString);
-            TagKey<Biome> tagKey = TagKey.create(Registry.BIOME_REGISTRY, tagLocation);
-
-            (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()).add(new DelayedTagEntriesHolderSet<>(DELAYED_BIOME_REGISTRY, tagKey));
-        } catch (ResourceLocationException e) {
-            return PropertyApplierResult.failure(e.getMessage());
-        }
-
+        (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()).add(new TagsRegexMatchHolderSet<>(DELAYED_BIOME_REGISTRY, tagRegex));
         return PropertyApplierResult.success();
     };
 
