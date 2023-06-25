@@ -6,14 +6,11 @@ import com.ferreusveritas.dynamictrees.api.resource.ResourceAccessor;
 import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.MultiJsonResourcePreparer;
-import com.ferreusveritas.dynamictrees.deserialisation.BiomeListDeserialiser;
 import com.ferreusveritas.dynamictrees.deserialisation.DeserialisationException;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonPropertyAppliers;
 import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
-import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.util.CommonCollectors;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
@@ -21,18 +18,13 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDatabases;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.level.biome.Biome;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
@@ -57,10 +49,6 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
     private static final String CAVE_ROOTED = "cave_rooted";
 
     public static final String ENTRY_APPLIERS = "entries";
-
-    static boolean isWorldGenDisabled() {
-        return !DTConfigs.WORLD_GEN.get();
-    }
 
     static LinkedList<JsonElement> toLinkedList(Iterable<JsonElement> elements) {
         return StreamSupport.stream(elements.spliterator(), false)
@@ -169,11 +157,6 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
     @Override
     public void applyOnReload(ResourceAccessor<Iterable<JsonElement>> resourceAccessor, ResourceManager resourceManager) {
-        BiomeDatabases.reset();
-//        if (isWorldGenDisabled()) {
-//            return;
-//        }
-
         this.readPopulators(
                 resourceAccessor.filtered(this::isDefaultPopulator).map(BiomePopulatorsResourceLoader::toLinkedList)
         );
@@ -247,26 +230,7 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
         final DTBiomeHolderSet biomes = collectBiomes(json, warning ->
                 LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning));
-//        if (biomes == null || biomes.size() == 0) {
-//            warnNoBiomesSelected(json);
-//            return;
-//        }
 
-//        JsonResult.forInput(json)
-//                .mapIfContains(APPLY, JsonObject.class, applyObject -> {
-//                    if (BiomeDatabases.getDefault() == database) {
-//                        applyCaveRootedPopulatorSection(database, applyObject, biomes);
-//                    }
-//                    biomes.getList().forEach(biome -> this.entryAppliers.applyAll(new JsonMapWrapper(applyObject), database.getJsonEntry(biomes)));
-//                    return PropertyApplierResult.success();
-//                }, PropertyApplierResult.success())
-//                .elseMapIfContains(WHITE, String.class, type -> {
-//                    this.applyWhite(database, location, biomes, type);
-//                    return PropertyApplierResult.success();
-//                }, PropertyApplierResult.success())
-//                .forEachWarning(warning ->
-//                        LOGGER.warn("Warning whilst loading populator \"{}\": {}", location, warning))
-//                .orElseThrow();
         JsonResult.forInput(json)
                 .mapIfContains(APPLY, JsonObject.class, applyObject -> {
                     var entry = database.getJsonEntry(biomes);

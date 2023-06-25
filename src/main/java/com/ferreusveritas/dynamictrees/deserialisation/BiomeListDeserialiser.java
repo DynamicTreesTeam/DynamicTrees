@@ -40,7 +40,6 @@ import java.util.function.Supplier;
  */
 public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHolderSet> {
 
-    private static final Map<ResourceLocation, List<ResourceLocation>> TAGS = Maps.newHashMap();
     public static final Supplier<Registry<Biome>> DELAYED_BIOME_REGISTRY = () -> ServerLifecycleHooks.getCurrentServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
 
     private static final Applier<DTBiomeHolderSet, String> TAG_APPLIER = (biomeList, tagString) -> {
@@ -62,6 +61,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHold
 
         return PropertyApplierResult.success();
     };
+
     private static final VoidApplier<DTBiomeHolderSet, String> NAME_APPLIER = (biomeList, nameRegex) -> {
         nameRegex = nameRegex.toLowerCase();
         final boolean notOperator = usingNotOperator(nameRegex);
@@ -70,14 +70,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHold
 
         (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()).add(new NameRegexMatchHolderSet<>(DELAYED_BIOME_REGISTRY, nameRegex));
     };
-    public static void cacheNewTags(Map<ResourceLocation, Collection<Holder<Biome>>> biomeTags) {
-        TAGS.clear();
-        biomeTags.forEach((key, tag) ->
-                tag.forEach(biome ->
-                        TAGS.computeIfAbsent(biome.unwrapKey().orElseThrow().location(), k -> Lists.newLinkedList()).add(key)
-                )
-        );
-    }
+
     private static boolean usingNotOperator(String categoryString) {
         return categoryString.charAt(0) == '!';
     }
