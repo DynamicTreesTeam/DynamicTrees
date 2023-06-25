@@ -18,6 +18,7 @@ plugins {
     id("maven-publish")
     id("com.harleyoconnor.translationsheet") version "0.1.1"
     id("com.matthewprenger.cursegradle") version "1.4.0"
+    id("com.modrinth.minotaur") version "2.+"
     id("com.harleyoconnor.autoupdatetool") version "1.0.0"
 }
 
@@ -133,34 +134,48 @@ java {
     }
 }
 
+val changelogFile = file("build/changelog.txt")
+
 curseforge {
-    if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
-        apiKey = property("curseApiKey")
+    if (!project.hasProperty("curseApiKey")) {
+        project.logger.warn("API Key for CurseForge not detected; uploading will be disabled.")
+        return@curseforge
+    }
 
-        project {
-            id = "252818"
+    apiKey = property("curseApiKey")
 
-            addGameVersion(mcVersion)
+    project {
+        id = "252818"
 
-            changelog = file("changelog.txt")
-            changelogType = "markdown"
-            releaseType = property("curseFileType")
+        addGameVersion(mcVersion)
 
-            addArtifact(tasks.findByName("sourcesJar"))
+        changelog = changelogFile
+        changelogType = "markdown"
+        releaseType = optionalProperty("versionType") ?: "release"
 
-            mainArtifact(tasks.findByName("jar")) {
-                relations {
-                    optionalDependency("dynamictreesplus")
-                    optionalDependency("chunk-saving-fix")
-                }
+        addArtifact(tasks.findByName("sourcesJar"))
+
+        mainArtifact(tasks.findByName("jar")) {
+            relations {
+                optionalDependency("dynamictreesplus")
             }
         }
-    } else {
-        project.logger.log(
-            LogLevel.WARN,
-            "API Key and file type for CurseForge not detected; uploading will be disabled."
-        )
     }
+}
+
+modrinth {
+    if (!project.hasProperty("modrinthToken")) {
+        project.logger.warn("Token for Modrinth not detected; uploading will be disabled.")
+        return@modrinth
+    }
+
+    token.set(property("modrinthToken"))
+    projectId.set(modId)
+    versionNumber.set(modVersion)
+    versionType.set(optionalProperty("versionType") ?: "release")
+    uploadFile.set(tasks.jar.get())
+    gameVersions.add(mcVersion)
+    changelog.set(changelogFile.readText())
 }
 
 tasks.withType<GenerateModuleMetadata> {
