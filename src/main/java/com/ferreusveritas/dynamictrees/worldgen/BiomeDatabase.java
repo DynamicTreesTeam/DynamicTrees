@@ -385,8 +385,11 @@ public class BiomeDatabase {
     public static class JsonEntry extends Entry {
         private boolean force = false;
         private boolean changedChanceSelector = false;
+        private Operation chanceSelectorOp = Operation.REPLACE;
         private boolean changedDensitySelector = false;
+        private Operation densitySelectorOp = Operation.REPLACE;
         private boolean changedSpeciesSelector = false;
+        private Operation speciesSelectorOp = Operation.REPLACE;
         private boolean changedBlacklisted = false;
         private boolean changedForestness = false;
         private boolean changedHeightmap = false;
@@ -421,11 +424,11 @@ public class BiomeDatabase {
             if (this.force)
                 other.reset();
             if (this.changedChanceSelector)
-                other.chanceSelector = this.chanceSelector;
+                other.setChanceSelector(this.chanceSelector, this.chanceSelectorOp);
             if (this.changedDensitySelector)
-                other.densitySelector = this.densitySelector;
+                other.setDensitySelector(this.densitySelector, this.densitySelectorOp);
             if (this.changedSpeciesSelector)
-                other.speciesSelector = this.speciesSelector;
+                other.setSpeciesSelector(this.speciesSelector, this.speciesSelectorOp);
             if (this.changedBlacklisted)
                 other.blacklisted = this.blacklisted;
             if (this.changedForestness)
@@ -447,7 +450,8 @@ public class BiomeDatabase {
         @Override
         public void setChanceSelector(ChanceSelector selector, Operation op) {
             this.changedChanceSelector = true;
-            super.setChanceSelector(selector, op);
+            this.chanceSelectorOp = op;
+            super.setChanceSelector(selector);
         }
 
         @Override
@@ -459,7 +463,8 @@ public class BiomeDatabase {
         @Override
         public void setDensitySelector(DensitySelector selector, Operation op) {
             this.changedDensitySelector = true;
-            super.setDensitySelector(selector, op);
+            this.densitySelectorOp = op;
+            super.setDensitySelector(selector);
         }
 
         @Override
@@ -471,7 +476,8 @@ public class BiomeDatabase {
         @Override
         public void setSpeciesSelector(SpeciesSelector selector, Operation op) {
             this.changedSpeciesSelector = true;
-            super.setSpeciesSelector(selector, op);
+            this.speciesSelectorOp = op;
+            super.setSpeciesSelector(selector);
         }
 
         @Override
