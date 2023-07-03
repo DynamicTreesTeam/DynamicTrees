@@ -16,7 +16,7 @@ public class GrowthSubstance implements SubstanceEffect {
     private final boolean fillFertility;
 
     public GrowthSubstance() {
-        this(-1, 24);
+        this(Integer.MAX_VALUE, 24);
     }
 
     public GrowthSubstance(int pulses, int ticksPerPulse) {
