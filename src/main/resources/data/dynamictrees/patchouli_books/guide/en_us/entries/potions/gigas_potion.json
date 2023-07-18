@@ -10,7 +10,7 @@
       "ingredient": "minecraft:pumpkin_seeds",
       "bottle": "dynamictrees:dendro_potion",
       "output": "dynamictrees:dendro_potion{potion_index:2}",
-      "text": "This potion changes the tree species to its mega equivalent. (if available)"
+      "text": "This potion changes the tree species to its mega equivalent. Note that this only works on trees that have mega variants - spruce and jungle only by default."
     },
     {
       "type": "relations",

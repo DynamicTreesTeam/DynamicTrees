@@ -19,7 +19,7 @@ plugins {
     id("com.harleyoconnor.translationsheet") version "0.1.1"
     id("com.matthewprenger.cursegradle") version "1.4.0"
     id("com.modrinth.minotaur") version "2.+"
-    id("com.harleyoconnor.autoupdatetool") version "1.0.0"
+    id("com.harleyoconnor.autoupdatetool") version "1.+"
 }
 
 repositories {
@@ -175,7 +175,9 @@ modrinth {
     versionType.set(optionalProperty("versionType") ?: "release")
     uploadFile.set(tasks.jar.get())
     gameVersions.add(mcVersion)
-    changelog.set(changelogFile.readText())
+    if (changelogFile.exists()) {
+        changelog.set(changelogFile.readText())
+    }
 }
 
 tasks.withType<GenerateModuleMetadata> {
@@ -254,15 +256,20 @@ tasks.register("publishToAllPlatforms") {
     this.dependsOn("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
 }
 
+val minecraftVersion = mcVersion
+
 autoUpdateTool {
-    this.mcVersion.set(mcVersion)
+    this.mcVersion.set(minecraftVersion)
     this.version.set(modVersion)
     this.versionRecommended.set(property("versionRecommended") == "true")
     this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
 }
 
 tasks.autoUpdate {
-    finalizedBy("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
+    doLast {
+        modrinth.changelog.set(changelogFile.readText())
+    }
+    finalizedBy("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge", "modrinth")
 }
 
 fun net.minecraftforge.gradle.common.util.RunConfig.applyDefaultConfiguration(runDirectory: String = "run") {
