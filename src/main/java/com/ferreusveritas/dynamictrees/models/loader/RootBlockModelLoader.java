@@ -16,7 +16,7 @@ public class RootBlockModelLoader extends BranchBlockModelLoader {
     @Override
     public BranchBlockModelGeometry read(JsonObject modelObject, JsonDeserializationContext deserializationContext) {
         final JsonObject textures = this.getTexturesObject(modelObject);
-        return new RootBlockModelGeometry(this.getBarkResLoc(textures));
+        return new RootBlockModelGeometry(this.getBarkTextureLocation(textures));
     }
 
     @Override

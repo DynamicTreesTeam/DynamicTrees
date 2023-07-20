@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.event.handler;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.block.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.models.baked.BakedModelBlockBonsaiPot;
-import com.ferreusveritas.dynamictrees.models.baked.BranchBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.loader.BranchBlockModelLoader;
 import com.ferreusveritas.dynamictrees.models.loader.RootBlockModelLoader;
 import com.ferreusveritas.dynamictrees.models.loader.ThickBranchBlockModelLoader;
@@ -36,10 +35,6 @@ public final class BakedModelEventHandler {
 
     @SubscribeEvent
     public static void onModelBake(BakingCompleted event) {
-        // Setup branch baked models (bakes cores and sleeves).
-        BranchBlockBakedModel.INSTANCES.forEach(BranchBlockBakedModel::setupModels);
-        BranchBlockBakedModel.INSTANCES.clear();
-
         // Put bonsai pot baked model into its model location.
         BakedModel flowerPotModel = event.getModelManager().getModel(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""));
         event.getModels().put(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""),

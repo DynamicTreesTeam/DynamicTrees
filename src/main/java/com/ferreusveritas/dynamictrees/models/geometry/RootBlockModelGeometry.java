@@ -26,7 +26,7 @@ public class RootBlockModelGeometry extends BranchBlockModelGeometry {
 
     @Override
     public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
-        return new RootBlockBakedModel(modelLocation, this.barkResLoc);
+        return new RootBlockBakedModel(modelLocation, this.barkTextureLocation, spriteGetter);
     }
 
 }
