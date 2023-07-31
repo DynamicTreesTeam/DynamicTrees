@@ -189,7 +189,7 @@ publishing {
                         name.set("Ferreus Veritas")
                     }
                     developer {
-                        id.set("supermassimo")
+                        id.set("MaxHyper")
                         name.set("Max Hyper")
                     }
                     developer {
