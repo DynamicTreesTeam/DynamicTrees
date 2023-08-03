@@ -66,22 +66,23 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
      * @return the direction for the signal to turn to
      */
     public Direction selectNewDirection(GrowthLogicKitConfiguration configuration, DirectionSelectionContext context) {
+        final GrowSignal signal = context.signal();
         // Prevent branches growing on the ground.
-        if (context.signal().numSteps + 1 <= configuration.getLowestBranchHeight(
-                new PositionalSpeciesContext(context.level(), context.signal().rootPos, context.species())
-        ) && !context.signal().getSpecies().getLeavesProperties().canGrowOnGround()) {
+        if (!(signal.numSteps == 0 && signal.getSpecies().getLeavesProperties().canGrowOnGround()) &&
+                signal.numSteps + 1 <= configuration.getLowestBranchHeight(
+                new PositionalSpeciesContext(context.level(), signal.rootPos, context.species()))) {
             return Direction.UP;
         }
 
         // Populate the direction probability map.
         final int[] probMap = configuration.populateDirectionProbabilityMap(
                 new DirectionManipulationContext(context.level(), context.pos(), context.species(), context.branch(),
-                        context.signal(), context.branch().getRadius(context.level().getBlockState(context.pos())),
+                        signal, context.branch().getRadius(context.level().getBlockState(context.pos())),
                         new int[6])
         );
 
         // Select a direction from the probability map.
-        final int choice = MathHelper.selectRandomFromDistribution(context.signal().rand, probMap);
+        final int choice = MathHelper.selectRandomFromDistribution(signal.rand, probMap);
         return Direction.values()[choice != -1 ? choice : 1]; // Default to up if it failed.
     }
 
