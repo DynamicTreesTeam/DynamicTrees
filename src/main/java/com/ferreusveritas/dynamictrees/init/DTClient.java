@@ -215,8 +215,8 @@ public class DTClient {
     private static void addDustParticle(Level level, double fx, double fy, double fz, double mx, double my, double mz, BlockState blockState, float r, float g, float b) {
         if (level.isClientSide) {
             Particle particle = Minecraft.getInstance().particleEngine.createParticle(new BlockParticleOption(ParticleTypes.BLOCK, blockState), fx, fy, fz, mx, my, mz);
-            assert particle != null;
-            particle.setColor(r, g, b);
+            if (particle != null)
+                particle.setColor(r, g, b);
         }
     }
 
