@@ -151,6 +151,7 @@ curseforge {
                 relations {
                     optionalDependency("dynamictreesplus")
                     optionalDependency("chunk-saving-fix")
+                    optionalDependency("snow-coated")
                 }
             }
         }

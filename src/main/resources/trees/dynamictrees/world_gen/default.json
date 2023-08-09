@@ -184,8 +184,14 @@
     "_comment": "Windswept Forests are denser and spawn more trees.",
     "select": "minecraft:windswept_forest",
     "apply": {
-      "density": [ 0.7 ],
-      "chance": 0.6
+      "species": {
+        "random": {
+          "oak": 1,
+          "spruce": 1
+        }
+      },
+      "density": [ 0.8 ],
+      "chance": 0.8
     }
   },
   {
