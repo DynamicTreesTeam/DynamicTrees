@@ -13,13 +13,7 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
@@ -140,7 +134,7 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
 
     @Override
     public Map<ResourceLocation, Resource> listResources(String path, Predicate<ResourceLocation> filter) {
-        Map<ResourceLocation, Resource> resources = new TreeMap<>();
+        Map<ResourceLocation, Resource> resources = new LinkedHashMap<>();
 
         for (TreeResourcePack pack : this.resourcePacks) {
             for (String namespace : pack.getNamespaces()) {
@@ -157,7 +151,7 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
 
     @Override
     public Map<ResourceLocation, List<Resource>> listResourceStacks(String path, Predicate<ResourceLocation> filter) {
-        Map<ResourceLocation, List<Resource>> resources = new TreeMap<>();
+        Map<ResourceLocation, List<Resource>> resources = new LinkedHashMap<>();
 
         for (TreeResourcePack pack : this.resourcePacks) {
             for (String namespace : pack.getNamespaces()) {
