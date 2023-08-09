@@ -46,9 +46,17 @@
     }
   },
   {
-    "select": { "name": "minecraft:windswept_savanna" },
+    "_comment": "Windswept Forests are denser and spawn more trees.",
+    "select": "minecraft:windswept_forest",
     "apply": {
-      "density": [ 0.2 ]
+      "species": {
+        "random": {
+          "oak": 1,
+          "spruce": 1
+        }
+      },
+      "density": [ 0.8 ],
+      "chance": 0.8
     }
   },
   {
