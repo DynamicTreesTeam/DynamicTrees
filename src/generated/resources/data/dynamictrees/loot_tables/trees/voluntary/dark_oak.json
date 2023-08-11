@@ -2,7 +2,6 @@
   "type": "dynamictrees:voluntary",
   "pools": [
     {
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
       "entries": [
         {
@@ -15,7 +14,8 @@
           ],
           "name": "dynamictrees:dark_oak_seed"
         }
-      ]
+      ],
+      "rolls": 1.0
     }
   ]
 }

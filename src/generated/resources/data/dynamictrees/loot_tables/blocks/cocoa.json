@@ -2,28 +2,33 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:item",
-          "conditions": [
+          "functions": [
             {
-              "condition": "minecraft:block_state_property",
-              "block": "dynamictrees:cocoa",
-              "properties": {
-                "age": "2"
-              }
+              "add": false,
+              "conditions": [
+                {
+                  "block": "dynamictrees:cocoa",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
+                    "age": "2"
+                  }
+                }
+              ],
+              "count": 3.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "function": "minecraft:explosion_decay"
             }
           ],
-          "name": "dynamictrees:cocoa_seed"
+          "name": "minecraft:air"
         }
-      ]
-    }
-  ],
-  "functions": [
-    {
-      "function": "minecraft:explosion_decay"
+      ],
+      "rolls": 1.0
     }
   ]
 }

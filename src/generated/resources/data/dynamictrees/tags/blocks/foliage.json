@@ -1,13 +1,7 @@
 {
-  "replace": false,
   "values": [
-    "#minecraft:flowers",
     "minecraft:grass",
     "minecraft:tall_grass",
-    "minecraft:fern",
-    "minecraft:crimson_roots",
-    "minecraft:warped_roots",
-    "minecraft:nether_sprouts",
-    "minecraft:moss_carpet"
+    "minecraft:fern"
   ]
 }

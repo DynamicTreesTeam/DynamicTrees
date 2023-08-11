@@ -9,8 +9,9 @@
         "#forge:is_cold": 0.5,
         "#forge:is_dry": 0.5
     },
-    "common_override": { "type": "swamp" },
-    "perfect_biomes": { "type": "swamp" },
+    "perfect_biomes": { "tag": "#forge:is_swamp" },
+    "common_override": { "name": "minecraft:swamp" },
+    "generate_sapling": true,
     "acceptable_soils": ["dirt_like", "water_like"],
     "features" : [
         {

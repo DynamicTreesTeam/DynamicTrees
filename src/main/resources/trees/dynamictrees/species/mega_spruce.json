@@ -19,8 +19,9 @@
         "#forge:is_dry": 0.25,
         "#forge:is_wet": 0.75
     },
-    "common_override": { "name": "minecraft:.*giant_tree_taiga.*" },
-    "perfect_biomes": { "name": "minecraft:.*giant_tree_taiga.*" },
+    "perfect_biomes": { "name": "minecraft:old_growth_(pine|spruce)_taiga" },
+    "common_override": { "name": "minecraft:old_growth_(pine|spruce)_taiga" },
+    "generate_sapling": true,
     "features" : [
         "conifer_topper",
         {
