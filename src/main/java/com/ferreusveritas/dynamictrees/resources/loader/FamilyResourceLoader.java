@@ -4,8 +4,10 @@ import com.ferreusveritas.dynamictrees.api.TreeRegistry;
 import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
@@ -57,6 +59,19 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("branch_is_ladder", Boolean.class, Family::setBranchIsLadder)
                 .register("max_signal_depth", Integer.class, Family::setMaxSignalDepth)
                 .register("loot_volume_multiplier", Float.class, Family::setLootVolumeMultiplier);
+
+        //Mangrove appliers
+        this.gatherDataAppliers
+                .register("primitive_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRoots)
+                .register("primitive_filled_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsFilled)
+                .register("primitive_covered_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsCovered);
+        this.setupAppliers
+                .register("primitive_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRoots)
+                .register("primitive_filled_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsFilled)
+                .register("primitive_covered_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsCovered);
+        this.reloadAppliers
+                .register("default_soil", MangroveFamily.class, SoilProperties.class, MangroveFamily::setDefaultSoil);
+        //---------------//
 
         super.registerAppliers();
     }

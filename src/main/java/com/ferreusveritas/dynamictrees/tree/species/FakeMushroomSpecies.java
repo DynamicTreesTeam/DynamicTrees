@@ -5,14 +5,14 @@ import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatures;
 import com.ferreusveritas.dynamictrees.systems.genfeature.HugeMushroomGenFeature;
 import net.minecraft.world.level.block.Blocks;
 
-public class Mushroom extends Species {
+public class FakeMushroomSpecies extends Species {
 
     protected final boolean redcap;
 
     /**
-     * @param redcap True to select redcap mushroom.  Otherwise brown cap is selected
+     * @param redcap True to select redcap mushroom.  Otherwise, brown cap is selected
      */
-    public Mushroom(boolean redcap) {
+    public FakeMushroomSpecies(boolean redcap) {
         this.redcap = redcap;
 
         this.setRegistryName(DynamicTrees.location((redcap ? "red" : "brown") + "_mushroom"));

@@ -101,7 +101,6 @@ public class NetherFungusSpecies extends Species {
     public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
                                    ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
         final ResourceLocation capLocation = surround(this.getRegistryName(), "block/", "_cap");
-        textureConsumer.accept("particle", capLocation);
         textureConsumer.accept("stem", barkTextureLocation);
         textureConsumer.accept("cap", capLocation);
     }

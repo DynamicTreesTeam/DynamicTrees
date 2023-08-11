@@ -21,11 +21,7 @@ import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.tree.family.NetherFungusFamily;
-import com.ferreusveritas.dynamictrees.tree.species.Mushroom;
-import com.ferreusveritas.dynamictrees.tree.species.NetherFungusSpecies;
-import com.ferreusveritas.dynamictrees.tree.species.PalmSpecies;
-import com.ferreusveritas.dynamictrees.tree.species.Species;
-import com.ferreusveritas.dynamictrees.tree.species.SwampOakSpecies;
+import com.ferreusveritas.dynamictrees.tree.species.*;
 import net.minecraft.data.worldgen.features.NetherFeatures;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.random.WeightedEntry;
@@ -61,7 +57,7 @@ public class DTTrees {
     @SubscribeEvent
     public static void registerSpecies(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<Species> event) {
         // Registers fake species for generating mushrooms.
-        event.getRegistry().registerAll(new Mushroom(true), new Mushroom(false));
+        event.getRegistry().registerAll(new FakeMushroomSpecies(true), new FakeMushroomSpecies(false));
     }
 
     @SubscribeEvent
@@ -91,6 +87,7 @@ public class DTTrees {
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusSpecies.TYPE);
         event.registerType(DynamicTrees.location("swamp_oak"), SwampOakSpecies.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmSpecies.TYPE);
+        event.registerType(DynamicTrees.location("mangrove"), MangroveSpecies.TYPE);
     }
 
     @SubscribeEvent

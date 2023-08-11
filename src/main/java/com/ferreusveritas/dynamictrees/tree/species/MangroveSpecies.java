@@ -21,10 +21,10 @@ public class MangroveSpecies extends Species {
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(MangroveSpecies::new);
 
-    private int worldgenHeightOffset = 4;
+    private int worldGenHeightOffset = 4;
 
-    public void setWorldgenHeightOffset(int worldgenHeightOffset) {
-        this.worldgenHeightOffset = worldgenHeightOffset;
+    public void setWorldGenHeightOffset(int worldGenHeightOffset) {
+        this.worldGenHeightOffset = worldGenHeightOffset;
     }
 
     public MangroveSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
@@ -49,7 +49,7 @@ public class MangroveSpecies extends Species {
 
         if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock)) {
             //soil is not valid so we place default roots
-            level.setBlock(rootPos, getFamily().getAerialRootsSoil().getSoilState(dirtState, fertility, this.doesRequireTileEntity(level, rootPos)), 3);
+            level.setBlock(rootPos, getFamily().getDefaultSoil().getSoilState(dirtState, fertility, this.doesRequireTileEntity(level, rootPos)), 3);
             return true;
         }
 
@@ -58,7 +58,7 @@ public class MangroveSpecies extends Species {
 
     @Override
     public boolean generate(GenerationContext context) {
-        context.rootPos().move(Direction.UP, worldgenHeightOffset);
+        context.rootPos().move(Direction.UP, worldGenHeightOffset);
         return super.generate(context);
     }
 

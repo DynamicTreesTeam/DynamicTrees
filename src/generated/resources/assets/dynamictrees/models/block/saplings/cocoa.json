@@ -3,7 +3,6 @@
   "render_type": "minecraft:cutout_mipped",
   "textures": {
     "leaves": "minecraft:block/jungle_leaves",
-    "log": "minecraft:block/jungle_log",
-    "particle": "minecraft:block/jungle_leaves"
+    "log": "minecraft:block/jungle_log"
   }
 }

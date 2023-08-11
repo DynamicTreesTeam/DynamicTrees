@@ -2,7 +2,7 @@
   "type": "mangrove",
   "family": "mangrove",
   "tapering": 0.3,
-  "signal_energy": 12.0,
+  "signal_energy": 20.0,
   "up_probability": 8,
   "lowest_branch_height": 2,
   "growth_rate": 0.6,
@@ -13,6 +13,7 @@
   },
   "perfect_biomes": { "tag": "#forge:is_swamp" },
   "primitive_sapling": "mangrove_propagule",
+  "sapling_shape": "slim_sapling",
   "acceptable_soils": ["dirt_like", "mud_like", "water_like"],
   "plantable_on_fluid": true,
   "features" : [

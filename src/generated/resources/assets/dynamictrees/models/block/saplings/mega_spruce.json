@@ -3,7 +3,6 @@
   "render_type": "minecraft:cutout_mipped",
   "textures": {
     "leaves": "minecraft:block/spruce_leaves",
-    "log": "minecraft:block/spruce_log",
-    "particle": "minecraft:block/spruce_leaves"
+    "log": "minecraft:block/spruce_log"
   }
 }

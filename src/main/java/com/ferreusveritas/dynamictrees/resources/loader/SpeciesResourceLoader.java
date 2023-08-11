@@ -17,6 +17,7 @@ import com.ferreusveritas.dynamictrees.systems.SeedSaplingRecipe;
 import com.ferreusveritas.dynamictrees.systems.fruit.Fruit;
 import com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.ferreusveritas.dynamictrees.systems.pod.Pod;
+import com.ferreusveritas.dynamictrees.tree.species.MangroveSpecies;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.CommonSetup;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
@@ -129,6 +130,11 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                     if (doInherit) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingOffsetToPods); })
                 .register("big_tree_sound_threshold", Float.class, Species::setBigTreeSoundThreshold)
                 .register("plantable_on_fluid", Boolean.class, Species::setPlantableOnFluid);
+
+        //Mangrove appliers
+        this.reloadAppliers
+                .register("world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setWorldGenHeightOffset);
+        //---------------//
 
         super.registerAppliers();
     }

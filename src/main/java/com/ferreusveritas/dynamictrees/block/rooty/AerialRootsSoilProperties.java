@@ -1,8 +1,11 @@
 package com.ferreusveritas.dynamictrees.block.rooty;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.data.AerialRootsSoilGenerator;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
+import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockGetter;
@@ -20,8 +23,18 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
     public static final TypedRegistry.EntryType<SoilProperties> TYPE = TypedRegistry.newType(AerialRootsSoilProperties::new);
 
+    protected MangroveFamily family;
     public AerialRootsSoilProperties(final ResourceLocation registryName) {
         super(registryName);
+        this.soilStateGenerator.reset(AerialRootsSoilGenerator::new);
+    }
+
+    public void setFamily(MangroveFamily family) {
+        this.family = family;
+    }
+
+    public MangroveFamily getFamily() {
+        return family;
     }
 
     @Override

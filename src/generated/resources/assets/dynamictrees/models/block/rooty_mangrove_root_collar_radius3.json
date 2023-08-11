@@ -1,0 +1,7 @@
+{
+  "parent": "dynamictrees:block/smartmodel/rooty/aerial_roots_radius3",
+  "textures": {
+    "end": "minecraft:block/mangrove_log",
+    "side": "minecraft:block/mangrove_log"
+  }
+}

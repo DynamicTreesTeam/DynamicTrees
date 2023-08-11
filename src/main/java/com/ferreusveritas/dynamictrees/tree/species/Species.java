@@ -1164,7 +1164,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public int saplingColorMultiplier(BlockState state, BlockAndTintGetter level, BlockPos pos, int tintIndex) {
-        return getLeavesProperties().foliageColorMultiplier(state, level, pos);
+        if (tintIndex == 0)
+            return getLeavesProperties().foliageColorMultiplier(state, level, pos);
+        if (tintIndex == 1)
+            return family.getRootColor(state, true);
+        return -1;
     }
 
     private SoundType saplingSound = SoundType.GRASS;
@@ -2303,7 +2307,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
                                    ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
         ResourceLocation leavesLoc = getLeavesProperties().getTexturePath().orElse(leavesTextureLocation);
-        textureConsumer.accept("particle", leavesLoc);
         textureConsumer.accept("log", barkTextureLocation);
         textureConsumer.accept("leaves", leavesLoc);
     }

@@ -10,15 +10,34 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlock {
+    public static final String NAME_SUFFIX = "_roots";
+
+    public static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, 8);
+    public static final EnumProperty<Layer> LAYER = EnumProperty.create("layer", Layer.class);
+
+    public enum Layer implements StringRepresentable {
+        EXPOSED,
+        FILLED,
+        COVERED,
+        WATERLOGGED;
+        @Override public @NotNull String getSerializedName() {
+            return toString().toLowerCase();
+        }
+    }
+
     public BasicRootsBlock(ResourceLocation name, Material material) {
         super(name, material);
     }
