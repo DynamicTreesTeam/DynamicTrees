@@ -15,7 +15,7 @@
         "#forge:is_dry": 0.25,
         "mushroom": 1.25
     },
-    "perfect_biomes": { "type": "spooky", "name": "minecraft:.*" },
+    "perfect_biomes": { "tag": "#forge:is_spooky", "name": "minecraft:.*" },
     "primitive_sapling": "dark_oak_sapling",
     "features" : [
         {

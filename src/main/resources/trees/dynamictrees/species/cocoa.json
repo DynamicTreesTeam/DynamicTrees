@@ -16,7 +16,7 @@
         "#forge:is_hot": 1.1,
         "#forge:is_wet": 1.1
     },
-    "perfect_biomes": { "type": "jungle" },
+    "perfect_biomes": { "tag": "#minecraft:is_jungle" },
     "pods": [
         "cocoa"
     ],
