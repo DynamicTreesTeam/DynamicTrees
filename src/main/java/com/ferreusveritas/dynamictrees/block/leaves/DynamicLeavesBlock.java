@@ -36,12 +36,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DoublePlantBlock;
-import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.material.PushReaction;
@@ -53,10 +48,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.EntityCollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nonnull;
@@ -255,11 +247,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        // This is for blocks that check the shape, for example snow.
-//        if (context.getEntity() == null) {
-//            return Shapes.block();
-//        }
-
         if (isLeavesPassable() || this.isEntityPassable(context)) {
             return Shapes.empty();
         } else if (DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.VANILLA_LEAVES_COLLISION.get()) {
@@ -267,6 +254,15 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         } else {
             return Shapes.create(new AABB(0.125, 0, 0.125, 0.875, 0.50, 0.875));
         }
+    }
+
+    /**
+     * This support shape allows for placement on the sides (vines) but not on top
+     */
+    protected static final VoxelShape SUPPORT_SHAPE = Shapes.join(Shapes.block(), box(2.0D, 14.0D, 2.0D, 14.0D, 16.0D, 14.0D), BooleanOp.ONLY_FIRST);
+    @Override
+    public VoxelShape getBlockSupportShape(BlockState pState, BlockGetter pReader, BlockPos pPos) {
+        return SUPPORT_SHAPE;
     }
 
     protected boolean isLeavesPassable() {
