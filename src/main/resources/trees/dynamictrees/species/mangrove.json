@@ -1,0 +1,33 @@
+{
+  "type": "mangrove",
+  "family": "mangrove",
+  "tapering": 0.3,
+  "signal_energy": 12.0,
+  "up_probability": 8,
+  "lowest_branch_height": 2,
+  "growth_rate": 0.6,
+  "leaves_properties": "mangrove",
+  "environment_factors" : {
+    "#forge:is_cold": 0.75,
+    "#forge:is_dry": 0.2
+  },
+  "perfect_biomes": { "tag": "#forge:is_swamp" },
+  "primitive_sapling": "mangrove_propagule",
+  "acceptable_soils": ["dirt_like", "mud_like", "water_like"],
+  "features" : [
+    {
+      "name": "pneumatophore_roots",
+      "properties": {
+        "roots": "mangrove_roots",
+        "secondary_roots": "underground_roots"
+      }
+    },
+    {
+      "name": "vines",
+      "properties": {
+        "max_length": 7,
+        "quantity": 24
+      }
+    }
+  ]
+}

@@ -12,12 +12,14 @@ import com.ferreusveritas.dynamictrees.block.leaves.PalmLeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.ScruffyLeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.SolidLeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.WartProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.AerialRootsSoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SpreadableSoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.WaterSoilProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.tree.family.NetherFungusFamily;
 import com.ferreusveritas.dynamictrees.tree.species.Mushroom;
 import com.ferreusveritas.dynamictrees.tree.species.NetherFungusSpecies;
@@ -81,6 +83,7 @@ public class DTTrees {
     @SubscribeEvent
     public static void registerFamilyTypes(final TypeRegistryEvent<Family> event) {
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
+        event.registerType(DynamicTrees.location("mangrove"), MangroveFamily.TYPE);
     }
 
     @SubscribeEvent
@@ -94,6 +97,7 @@ public class DTTrees {
     public static void registerSoilPropertiesTypes(final TypeRegistryEvent<SoilProperties> event) {
         event.registerType(DynamicTrees.location("water"), WaterSoilProperties.TYPE);
         event.registerType(DynamicTrees.location("spreadable"), SpreadableSoilProperties.TYPE);
+        event.registerType(DynamicTrees.location("aerial_roots"), AerialRootsSoilProperties.TYPE);
     }
 
     @SubscribeEvent

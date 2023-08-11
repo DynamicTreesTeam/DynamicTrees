@@ -45,7 +45,8 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
         this.tag(DTBlockTags.FOLIAGE)
                 .add(Blocks.GRASS)
                 .add(Blocks.TALL_GRASS)
-                .add(Blocks.FERN);
+                .add(Blocks.FERN)
+                .add(Blocks.LILY_PAD);
 
         this.tag(DTBlockTags.STRIPPED_BRANCHES)
                 .addTag(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN)

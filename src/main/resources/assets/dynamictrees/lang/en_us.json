@@ -12,6 +12,8 @@
   "block.dynamictrees.acacia_branch": "Acacia Tree",
   "block.dynamictrees.crimson_branch": "Crimson Fungus",
   "block.dynamictrees.warped_branch": "Warped Fungus",
+  "block.dynamictrees.mangrove_branch": "Mangrove Tree",
+  "block.dynamictrees.mangrove_roots": "Mangrove Tree",
   "block.dynamictrees.rooty_water": "Water Roots",
 
   "species.dynamictrees.oak": "Oak",
@@ -35,6 +37,7 @@
   "species.dynamictrees.cocoa": "Cocoa",
   "species.dynamictrees.oak_undergrowth": "Oak Undergrowth",
   "species.dynamictrees.jungle_undergrowth": "Jungle Undergrowth",
+  "species.dynamictrees.mangrove": "Mangrove",
 
   "item.dynamictrees.oak_seed": "Oak Acorn",
   "item.dynamictrees.azalea_seed": "Azalea Seed",
@@ -47,6 +50,7 @@
   "item.dynamictrees.apple_oak_seed": "Apple Pip",
   "item.dynamictrees.crimson_seed": "Crimson Cap",
   "item.dynamictrees.warped_seed": "Warped Cap",
+  "item.dynamictrees.mangrove_seed": "Mangrove Propagule",
 
   "item.dynamictrees.dendro_potion.biochar": "Biochar Base Potion",
   "item.dynamictrees.dendro_potion.depletion": "Potion of Depletion",
@@ -120,5 +124,8 @@
   "config.jade.plugin_dynamictrees.fruit": "Fruit",
   "config.jade.plugin_dynamictrees.rooty": "Rooty Soil",
   "config.jade.plugin_dynamictrees.pod": "Pod",
-  "config.jade.plugin_dynamictrees.branch": "Branch"
+  "config.jade.plugin_dynamictrees.branch": "Branch",
+
+  "block.minecraft.mangrove_propagule": "Mangrove Sapling",
+  "block.minecraft.potted_mangrove_propagule": "Potted Mangrove Sapling"
 }
