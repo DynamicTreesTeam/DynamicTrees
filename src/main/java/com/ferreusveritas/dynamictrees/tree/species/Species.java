@@ -98,6 +98,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -245,7 +246,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected GrowthLogicKitConfiguration logicKit = GrowthLogicKitConfiguration.getDefault();
 
     /**
-     * How quickly the branch thickens on it's own without branch merges [default = 0.3]
+     * How quickly the branch thickens on its own without branch merges [default = 0.3]
      */
     protected float tapering = 0.3f;
     /**
@@ -288,7 +289,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected int maxBranchRadius = 8;
 
     /**
-     * Stores whether or not this species can be transformed to another, if {@code true} and this species has it's own
+     * Stores whether this species can be transformed to another, if {@code true} and this species has its own
      * seed a transformation potion will also be automatically created.
      */
     private boolean transformable = true;
@@ -378,7 +379,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     /**
      * Resets this {@link Species} object's environment factors, gen features, acceptable blocks for growth, and
-     * acceptable soils. May also be overridden by sub-classes that need lists to be cleared on reload, for example.
+     * acceptable soils. May also be overridden by subclasses that need lists to be cleared on reload, for example.
      *
      * @return This {@link Species} object for chaining.
      */
@@ -398,7 +399,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Can be overridden by sub-classes for setting defaults for things before reload, such as {@link #envFactors}.
+     * Can be overridden by subclasses for setting defaults for things before reload, such as {@link #envFactors}.
      *
      * @return This {@link Species} object for chaining.
      */
@@ -410,7 +411,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Can be overridden by sub-classes for setting defaults for things after reload. This is for defaults like lists,
+     * Can be overridden by subclasses for setting defaults for things after reload. This is for defaults like lists,
      * and so defaults should only be set if there was nothing set by the Json.
      *
      * @return This {@link Species} object for chaining.
@@ -430,7 +431,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Can be overridden by sub-classes to set the default growing parameters.
+     * Can be overridden by subclasses to set the default growing parameters.
      *
      * @return This {@link Species} object for chaining.
      */
@@ -469,7 +470,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Checks whether or not {@link #seed} is the same instance as the {@link Seed} of the common {@link Species} of the
+     * Checks whether {@link #seed} is the same instance as the {@link Seed} of the common {@link Species} of the
      * owning {@link Family}.
      *
      * @return {@code true} if {@link #seed} {@code ==} the {@link Seed} of the common {@link Species} of {@link
@@ -562,7 +563,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     /**
      * Works out if this {@link Species} will require a {@link SpeciesBlockEntity} at the given position. It should
-     * require one if it's not the common species and it's not in its common species override for the given position.
+     * require one if it's not the common species, and it's not in its common species override for the given position.
      *
      * @param level The {@link LevelAccessor} the tree is being planted in.
      * @param pos   The {@link BlockPos} at which the tree is being planted at.
@@ -573,7 +574,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Returns whether or not this species can be transformed to another. See {@link #transformable} for more details.
+     * Returns whether this species can be transformed to another. See {@link #transformable} for more details.
      *
      * @return True if it can be transformed to, false if not.
      */
@@ -582,7 +583,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Sets whether or not this species can be transformed to another. See {@link #transformable} for more details.
+     * Sets whether this species can be transformed to another. See {@link #transformable} for more details.
      *
      * @param transformable True if it should be transformable.
      * @return This {@link Species} for chaining.
@@ -702,7 +703,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Holds whether or not a {@link Seed} should be generated. Stored as a {@code non-primitive} so its default value
+     * Holds whether a {@link Seed} should be generated. Stored as a {@code non-primitive} so its default value
      * is {@code null}.
      */
     private Boolean shouldGenerateSeed;
@@ -814,7 +815,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public void processVolume(NetVolumeNode.Volume volume) {
-        volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters.. you know who you are.
+        volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters. you know who you are.
         volume.multiplyVolume(getFamily().getLootVolumeMultiplier()); //the family can have a multiplier too
     }
 
@@ -973,7 +974,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //    }
 
     /**
-     * Holds whether or not a {@link Seed} should be generated. Stored as a {@code non-primitive} so its default value
+     * Holds whether a {@link Seed} should be generated. Stored as a {@code non-primitive} so its default value
      * is {@code null}.
      */
     private Boolean shouldGenerateSapling;
@@ -1051,6 +1052,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return false;
         }
 
+        level.playSound(null, pos, saplingSound.getPlaceSound(), SoundSource.BLOCKS, 1, 0.8f);
+
         level.setBlock(pos, sapling.defaultBlockState(), 3);
         return true;
     }
@@ -1078,7 +1081,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Determines whether or not the {@link #saplingBlock} should be able to grow without player intervention
+     * Determines whether the {@link #saplingBlock} should be able to grow without player intervention
      * (bone-mealing).
      *
      * @param level The {@link Level} instance.
@@ -1095,7 +1098,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return canBoneMealTree() && canSaplingGrow(level, pos);
     }
 
-    //Returns whether or not the bonemealing should cause sapling growth.
+    //Returns whether the bonemealing should cause sapling growth.
     public boolean canSaplingGrowAfterBoneMeal(Level level, RandomSource rand, BlockPos pos) {
         return canBoneMealTree() && canSaplingGrow(level, pos);
     }
@@ -1302,6 +1305,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags);
     }
 
+    public boolean isAcceptableSoil(String... soilTypes) {
+        return (SoilHelper.getSoilFlags(soilTypes) & soilTypeFlags) != 0;
+    }
+
     /**
      * Position sensitive soil acceptability tester.  Mostly to test if the block is dirt but could be overridden to
      * allow gravel, sand, or whatever makes sense for the tree species.
@@ -1339,6 +1346,15 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return SoilHelper.isSoilAcceptable(soilBlockState, SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE));
     }
 
+    private boolean plantableOnFluid = false;
+
+    public void setPlantableOnFluid(boolean plantableOnFluid) {
+        this.plantableOnFluid = plantableOnFluid;
+    }
+
+    public boolean isPlantableOnFluid() {
+        return plantableOnFluid;
+    }
 
     //////////////////////////////
     // GROWTH
@@ -1362,7 +1378,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public boolean update(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
 
-        //Analyze structure to gather all of the endpoints.  They will be useful for this entire update
+        //Analyze structure to gather all the endpoints.  They will be useful for this entire update
         List<BlockPos> ends = getEnds(level, treePos, treeBase);
 
         //This will prune rotted positions from the level and the end point list
@@ -1424,7 +1440,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                     if (safeBounds != SafeChunkBounds.ANY) { // worldgen
                         TreeHelper.ageVolume(level, endPos.below((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2, safeBounds);
                     }
-                    iter.remove(); // Prune out the rotted end points so we don't spawn fruit from them.
+                    iter.remove(); // Prune out the rotted end points, so we don't spawn fruit from them.
                 }
             }
         }
@@ -1517,7 +1533,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * The grow handler.
+     * The growth handler.
      *
      * @param level     The level
      * @param rootyDirt The {@link RootyBlock} that is supporting this tree
@@ -1540,7 +1556,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                     final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.random);
                     boolean success = treeBase.growSignal(level, treePos, signal).success;
 
-                    int soilLongevity = getSoilLongevity(level, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the grow operation failed
+                    int soilLongevity = getSoilLongevity(level, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the growth operation failed
 
                     if (soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
                         rootyDirt.setFertility(level, rootPos, fertility - 1);//decrement fertility
@@ -1591,7 +1607,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Allows a species to do things after a grow event just occurred. Such as used by Jungle trees to create cocoa pods
+     * Allows a species to do things after a growth event just occurred. Such as used by Jungle trees to create cocoa pods
      * on the trunk.
      *
      * @param level     The level
@@ -1638,7 +1654,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * @param level The {@link Level} object.
      * @param pos
-     * @return range from 0.0 - 1.0.  (0.0f for completely unsuited.. 1.0f for perfectly suited)
+     * @return range from 0.0 - 1.0.  (0.0f for completely unsuited. 1.0f for perfectly suited)
      */
     public float biomeSuitability(Level level, BlockPos pos) {
 
@@ -1748,7 +1764,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     /**
      * The default fruiting will PEAK in the middle of summer, starting at the middle of spring and ending at the middle
-     * of fall. this offset will move the fruiting by a factor of one season. (an offset of 2.0 will ma fruiting peak in
+     * of fall. this offset will move the fruiting by a factor of one season. (an offset of 2.0 will my fruiting peak in
      * winter). set to null for it to be all year round
      */
     public void setSeasonalFruitingOffset(@Nullable Float offset) {
@@ -1891,7 +1907,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Called when a player right clicks a {@link Species} of tree anywhere on it's branches.
+     * Called when a player right-clicks a {@link Species} of tree anywhere on its branches.
      *
      * @return True if action was handled, false otherwise.
      */
@@ -2172,7 +2188,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param facing     The direction the joCode will build the tree
      * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
      * @param joCode     The joCode that will be used to grow the tree
-     * @return new blockposition of root block.  BlockPos.ZERO to cancel generation
+     * @return new blockposition of root block.  BlockPos. ZERO to cancel generation
      */
     public BlockPos preGeneration(LevelAccessor level, BlockPos.MutableBlockPos rootPos, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
         this.genFeatures.forEach(configuration -> rootPos.set(
@@ -2197,7 +2213,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Worldgen can produce thin sickly trees from the underinflation caused by not living it's full fertility. This
+     * Worldgen can produce thin sickly trees from the underinflation caused by not living its full fertility. This
      * factor is an attempt to compensate for the problem.
      *
      * @return

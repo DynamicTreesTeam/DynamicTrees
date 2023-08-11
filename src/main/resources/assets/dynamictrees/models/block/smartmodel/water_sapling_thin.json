@@ -1,0 +1,58 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "#leaves",
+    "root": "dynamictrees:blocks/sapling_water_roots"
+  },
+  "display": {
+    "fixed": {
+      "rotation": [ 0, 90, 0 ],
+      "translation": [ 0, 0, 0 ],
+      "scale": [ 0.5, 0.5, 0.5 ]
+    }
+  },
+  "elements": [
+    {	"__comment": "Leaves",
+      "from": [ 5, 8, 5 ],
+      "to": [ 11, 16, 11 ],
+      "faces": {
+        "down":  { "uv": [ 5, 4, 10, 11 ], "texture": "#leaves", "tintindex": 0 },
+        "up":    { "uv": [ 5, 4, 10, 11 ], "texture": "#leaves", "tintindex": 0 },
+        "north": { "uv": [ 5, 4, 10, 11 ], "texture": "#leaves", "tintindex": 0 },
+        "south": { "uv": [ 5, 4, 10, 11 ], "texture": "#leaves", "tintindex": 0 },
+        "west":  { "uv": [ 5, 4, 10, 11 ], "texture": "#leaves", "tintindex": 0 },
+        "east":  { "uv": [ 5, 4, 10, 11 ], "texture": "#leaves", "tintindex": 0 }
+      }
+    },
+    {	"__comment": "Trunk",
+      "from": [ 7, -2, 7 ],
+      "to": [ 9, 10, 9 ],
+      "faces": {
+        "down":  { "uv": [ 7, 7, 9, 9 ], "texture": "#log", "cullface": "down"},
+        "up":    { "uv": [ 7, 7, 9, 9 ], "texture": "#log"},
+        "north": { "uv": [ 7, 0, 9, 12 ], "texture": "#log"},
+        "south": { "uv": [ 7, 0, 9, 12 ], "texture": "#log"},
+        "west":  { "uv": [ 7, 0, 9, 12 ], "texture": "#log"},
+        "east":  { "uv": [ 7, 0, 9, 12 ], "texture": "#log"}
+      }
+    },
+    {	"from": [ 0.8, -16, 8 ],
+      "to": [ 15.2, 0, 8 ],
+      "rotation": { "origin": [ 8, 8, 8 ], "axis": "y", "angle": 45, "rescale": true },
+      "shade": false,
+      "faces": {
+        "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#root" },
+        "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#root" }
+      }
+    },
+    {	"from": [ 8, -16, 0.8 ],
+      "to": [ 8, 0, 15.2 ],
+      "rotation": { "origin": [ 8, 8, 8 ], "axis": "y", "angle": 45, "rescale": true },
+      "shade": false,
+      "faces": {
+        "west": { "uv": [ 0, 0, 16, 16 ], "texture": "#root" },
+        "east": { "uv": [ 0, 0, 16, 16 ], "texture": "#root" }
+      }
+    }
+  ]
+}

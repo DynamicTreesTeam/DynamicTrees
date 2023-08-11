@@ -13,6 +13,7 @@
     "common_override": { "name": "minecraft:swamp" },
     "generate_sapling": true,
     "acceptable_soils": ["dirt_like", "water_like"],
+    "plantable_on_fluid": true,
     "features" : [
         {
             "name": "vines",

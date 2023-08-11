@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.tree.species;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
@@ -31,6 +32,11 @@ public class MangroveSpecies extends Species {
         if (!(family instanceof MangroveFamily)) {
             throw new InvalidParameterException("Family " + family.toString() + " for mangrove species " + name + "is not of type "+ MangroveFamily.class);
         }
+    }
+
+    @Override
+    public ResourceLocation getSaplingSmartModelLocation() {
+        return DynamicTrees.location("block/smartmodel/water_sapling_thin");
     }
 
     public MangroveFamily getFamily() {

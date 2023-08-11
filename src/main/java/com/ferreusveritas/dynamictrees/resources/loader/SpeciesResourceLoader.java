@@ -127,7 +127,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                     if (doInherit) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingOffsetToFruits); })
                 .register("inherit_fruiting_offset_to_pods", Boolean.class, (species, doInherit)->{
                     if (doInherit) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingOffsetToPods); })
-                .register("big_tree_sound_threshold", Float.class, Species::setBigTreeSoundThreshold);
+                .register("big_tree_sound_threshold", Float.class, Species::setBigTreeSoundThreshold)
+                .register("plantable_on_fluid", Boolean.class, Species::setPlantableOnFluid);
 
         super.registerAppliers();
     }
