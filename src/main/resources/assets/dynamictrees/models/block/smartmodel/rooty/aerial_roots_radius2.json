@@ -3,7 +3,6 @@
 	"parent": "block/block",
 	"textures": {
 		"roots": "dynamictrees:block/roots",
-		"roots_bottom": "dynamictrees:block/roots_bottom",
 		"particle": "#side"
 	},
 	"elements": [

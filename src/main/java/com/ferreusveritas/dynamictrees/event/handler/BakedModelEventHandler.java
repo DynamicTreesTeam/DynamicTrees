@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.Mod;
 public final class BakedModelEventHandler {
 
     public static final ResourceLocation BRANCH = DynamicTrees.location("branch");
-    public static final ResourceLocation ROOT = DynamicTrees.location("root");
+    public static final ResourceLocation SURFACE_ROOT = DynamicTrees.location("root");
     public static final ResourceLocation THICK_BRANCH = DynamicTrees.location("thick_branch");
 
     @SubscribeEvent

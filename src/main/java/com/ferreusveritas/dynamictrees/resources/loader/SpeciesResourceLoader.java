@@ -133,7 +133,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
 
         //Mangrove appliers
         this.reloadAppliers
-                .register("world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setWorldGenHeightOffset);
+                .register("min_world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setMinWorldGenHeightOffset)
+                .register("max_world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setMaxWorldGenHeightOffset);
         //---------------//
 
         super.registerAppliers();

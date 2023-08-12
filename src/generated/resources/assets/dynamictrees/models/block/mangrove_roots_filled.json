@@ -1,0 +1,7 @@
+{
+  "loader": "dynamictrees:branch",
+  "textures": {
+    "bark": "minecraft:block/muddy_mangrove_roots_side",
+    "rings": "minecraft:block/muddy_mangrove_roots_top"
+  }
+}

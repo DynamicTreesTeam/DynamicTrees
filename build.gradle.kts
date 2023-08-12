@@ -19,7 +19,7 @@ plugins {
     id("com.harleyoconnor.translationsheet") version "0.1.1"
     id("com.matthewprenger.cursegradle") version "1.4.0"
     id("com.modrinth.minotaur") version "2.+"
-    id("com.harleyoconnor.autoupdatetool") version "1.+"
+    id("com.harleyoconnor.autoupdatetool") version "1.0.7"
 }
 
 repositories {
@@ -258,12 +258,12 @@ tasks.register("publishToAllPlatforms") {
 
 val minecraftVersion = mcVersion
 
-autoUpdateTool {
-    this.mcVersion.set(minecraftVersion)
-    this.version.set(modVersion)
-    this.versionRecommended.set(property("versionRecommended") == "true")
-    this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
-}
+//autoUpdateTool {
+//    this.mcVersion.set(minecraftVersion)
+//    this.version.set(modVersion)
+//    this.versionRecommended.set(property("versionRecommended") == "true")
+//    this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
+//}
 
 tasks.autoUpdate {
     doLast {

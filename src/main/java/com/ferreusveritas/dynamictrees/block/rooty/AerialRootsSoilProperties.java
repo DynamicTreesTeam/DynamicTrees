@@ -7,15 +7,22 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -42,18 +49,40 @@ public class AerialRootsSoilProperties extends SoilProperties {
         return new RootRootyBlock(this, blockProperties);
     }
 
-    public static class RootRootyBlock extends RootyBlock {
+    public static class RootRootyBlock extends RootyBlock implements SimpleWaterloggedBlock {
 
         protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, 8);
+        public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
         public RootRootyBlock(SoilProperties properties, Properties blockProperties) {
             super(properties, blockProperties);
-            registerDefaultState(defaultBlockState().setValue(RADIUS, 8));
+            registerDefaultState(defaultBlockState().setValue(RADIUS, 8).setValue(WATERLOGGED, false));
         }
 
         @Override
         protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-            builder.add(FERTILITY, IS_VARIANT, RADIUS);
+            super.createBlockStateDefinition(builder.add(RADIUS, WATERLOGGED));
+        }
+
+        @Override
+        public FluidState getFluidState(BlockState state) {
+            return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+        }
+
+        @Override
+        public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
+            if (stateIn.getValue(WATERLOGGED)) {
+                level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            }
+            return super.updateShape(stateIn, facing, facingState, level, currentPos, facingPos);
+        }
+
+        @Override
+        public BlockState getDecayBlockState(BlockState state, BlockGetter level, BlockPos pos) {
+            if (state.hasProperty(WATERLOGGED) && !state.getValue(WATERLOGGED)) {
+                return Blocks.AIR.defaultBlockState();
+            }
+            return super.getDecayBlockState(state, level, pos);
         }
 
         @Override
@@ -81,6 +110,12 @@ public class AerialRootsSoilProperties extends SoilProperties {
         public void neighborChanged(BlockState pState, Level pLevel, BlockPos pPos, Block pBlock, BlockPos pFromPos, boolean pIsMoving) {
             updateRadius(pLevel, pState, pPos);
             super.neighborChanged(pState, pLevel, pPos, pBlock, pFromPos, pIsMoving);
+        }
+
+        public boolean fallWithTree(BlockState state, Level level, BlockPos pos) {
+            //The block is removed when this is checked because it means it got attached to a tree
+            level.setBlockAndUpdate(pos, getDecayBlockState(state, level, pos));
+            return true;
         }
     }
 

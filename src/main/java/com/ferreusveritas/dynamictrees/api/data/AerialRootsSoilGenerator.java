@@ -43,20 +43,10 @@ public final class AerialRootsSoilGenerator extends SoilStateGenerator {
 
     private BlockModelBuilder soilModelBuilder (BlockStateProvider provider, int radius, String name, Block primitiveBlock){
         ResourceLocation side = provider.blockTexture(primitiveBlock);
+        ResourceLocation top = new ResourceLocation(side.getNamespace(), side.getPath()+"_top");
         return provider.models().withExistingParent(name+"_radius"+radius,  DynamicTrees.location("block/smartmodel/rooty/aerial_roots_radius"+ radius))
                 .texture("side", side)
-                .texture("end", side);
+                .texture("end", top);
     }
 
-
-//    builder = builder.partialState().with(BasicRootsBlock.RADIUS, i)
-//                    .with(BasicRootsBlock.LAYER, BasicRootsBlock.Layer.EXPOSED)
-//                    .modelForState().modelFile(exposedModel).addModel();
-//    builder = builder.partialState().with(BasicRootsBlock.RADIUS, i)
-//                    .with(BasicRootsBlock.LAYER, BasicRootsBlock.Layer.WATERLOGGED)
-//                    .modelForState().modelFile(exposedModel).addModel();
-//
-//    builder = builder.partialState().with(BasicRootsBlock.RADIUS, i)
-//                    .with(BasicRootsBlock.LAYER, BasicRootsBlock.Layer.FILLED)
-//                    .modelForState().modelFile(soilModelBuilder(provider, i, dependencies.get(FILLED_PRIMITIVE_ROOT))).addModel();
 }

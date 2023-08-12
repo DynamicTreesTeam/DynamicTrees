@@ -197,10 +197,10 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     @org.jetbrains.annotations.Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-//        if (pState.getValue(IS_VARIANT)) {
+        if (pState.getValue(IS_VARIANT)) {
             return new SpeciesBlockEntity(pPos,pState);
-//        }
-//        return null;
+        }
+        return null;
     }
 //
 //    @Override

@@ -32,6 +32,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,9 +50,9 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
     private final BakedModel[] trunksTopRings = new BakedModel[16]; // The trunk will feature rings on its top when there's no branches on top of it.
     private final BakedModel[] trunksBotRings = new BakedModel[16]; // The trunk will always feature rings on its bottom surface if nothing is below it.
 
-    public ThickBranchBlockBakedModel(ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
+    public ThickBranchBlockBakedModel(IGeometryBakingContext customData, ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
                                       ResourceLocation thickRingsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
-        super(modelLocation, barkTextureLocation, ringsTextureLocation, spriteGetter);
+        super(customData, modelLocation, barkTextureLocation, ringsTextureLocation, spriteGetter);
         initThickModels(spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, thickRingsTextureLocation)));
     }
 

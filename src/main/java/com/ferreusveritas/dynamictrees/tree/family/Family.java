@@ -811,12 +811,20 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public ResourceLocation getBranchItemParentLocation() {
         return DynamicTrees.location("item/branch");
     }
+    public ResourceLocation getRootItemParentLocation() {
+        return DynamicTrees.location("item/root_branch");
+    }
 
     protected final MutableLazyValue<Generator<DTItemModelProvider, Family>> branchItemModelGenerator =
             MutableLazyValue.supplied(BranchItemModelGenerator::new);
 
     public void addBranchTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {
         textureConsumer.accept("bark", primitiveLogLocation);
+        textureConsumer.accept("rings", suffix(primitiveLogLocation, "_top"));
+    }
+
+    public void addRootTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {
+        textureConsumer.accept("bark", suffix(primitiveLogLocation, "_side"));
         textureConsumer.accept("rings", suffix(primitiveLogLocation, "_top"));
     }
 

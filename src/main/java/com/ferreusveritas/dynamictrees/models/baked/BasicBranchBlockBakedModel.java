@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.models.baked;
 
-import com.ferreusveritas.dynamictrees.block.branch.BasicBranchBlock;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
@@ -26,6 +25,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IDynamicBakedModel;
 import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,10 +48,11 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
     private final BakedModel[][] cores = new BakedModel[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
     private final BakedModel[] rings = new BakedModel[8]; // 8 Cores with the ring textures on all 6 sides.
 
-    public BasicBranchBlockBakedModel(ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
+    public BasicBranchBlockBakedModel(IGeometryBakingContext customData, ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
                                       Function<Material, TextureAtlasSprite> spriteGetter) {
         this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT,
                 ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
+        this.blockModel.customData.setRenderTypeHint(customData.getRenderTypeHint());
         this.modelLocation = modelLocation;
         this.barkTexture = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTextureLocation));
         this.ringsTexture = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, ringsTextureLocation));
@@ -297,7 +298,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 
     protected int getRadius(BlockState blockState) {
         // This way works with branches that don't have the RADIUS property, like cactus
-        return ((BasicBranchBlock) blockState.getBlock()).getRadius(blockState);
+        return ((BranchBlock) blockState.getBlock()).getRadius(blockState);
     }
 
     @Override
