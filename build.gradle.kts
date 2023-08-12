@@ -19,7 +19,7 @@ plugins {
     id("com.harleyoconnor.translationsheet") version "0.1.1"
     id("com.matthewprenger.cursegradle") version "1.4.0"
     id("com.modrinth.minotaur") version "2.+"
-    id("com.harleyoconnor.autoupdatetool") version "1.+"
+    id("com.harleyoconnor.autoupdatetool") version "1.0.7"
 }
 
 repositories {
@@ -103,12 +103,11 @@ dependencies {
 }
 
 translationSheet {
-    this.sheetId.set("1xjxEh2NdbeV_tQc6fDHPgcRmtchqCZJKt--6oifq1qc")
-    this.sectionColour.set(0xF9CB9C)
-    this.sectionPattern.set("Dynamic Trees")
-    this.outputDir("src/localization/resources/assets/dynamictrees/lang/")
-
-    this.useJson()
+    sheetId.set("1xjxEh2NdbeV_tQc6fDHPgcRmtchqCZJKt--6oifq1qc")
+    sectionColour.set(0xF9CB9C)
+    sectionPattern.set("Dynamic Trees")
+    outputDirectory.set(file("src/localization/resources/assets/dynamictrees/lang/"))
+    useJson()
 }
 
 tasks.jar {
@@ -256,13 +255,12 @@ tasks.register("publishToAllPlatforms") {
     this.dependsOn("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
 }
 
-val minecraftVersion = mcVersion
-
 autoUpdateTool {
-    this.mcVersion.set(minecraftVersion)
-    this.version.set(modVersion)
-    this.versionRecommended.set(property("versionRecommended") == "true")
-    this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
+    minecraftVersion.set(mcVersion)
+    version.set(modVersion)
+    versionRecommended.set(property("versionRecommended") == "true")
+    changelogOutputFile.set(changelogFile)
+    updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
 }
 
 tasks.autoUpdate {
