@@ -19,9 +19,9 @@ jobs:
         with:
           source_path: './gradle.properties'
           target_path: './gradle.properties'
-          property: |
+          properties: |
             modVersion
-          value: |
+          values: |
             ${{ github.ref_name }}
       - name: Commit gradle properties
         run: |
