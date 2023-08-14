@@ -1,4 +1,4 @@
-name: Updates version and publishes to Maven, Modrinth, and CurseForge
+name: Automatic updater
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Write new version to gradle.properties file
-        uses: anbazhagan45/write-property-file@1.0.0
+        uses: anbazhagan45/copy-update-file@1.0.0
         with:
           source_path: './gradle.properties'
           target_path: './gradle.properties'
