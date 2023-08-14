@@ -13,7 +13,7 @@ jobs:
   update-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - name: Write new version to gradle.properties file
         uses: Stuie/write-properties-file@1.0.1
         with:
@@ -24,7 +24,8 @@ jobs:
         run: |
           git config --global user.name 'Publish Action'
           git config --global user.email 'admin@harleyoconnor.com'
-          git commit -am "[exclc] Bump version to ${{ github.ref_name }}"
+          git add gradle.properties
+          git commit -m "[exclc] Bump version to ${{ github.ref_name }}"
           git push
 
   publish:
