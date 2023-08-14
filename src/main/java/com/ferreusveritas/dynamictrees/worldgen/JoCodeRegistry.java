@@ -65,11 +65,9 @@ public final class JoCodeRegistry {
     @Nullable
     public static JoCode getRandomCode(ResourceLocation speciesName, int radius, RandomSource random) {
         final List<JoCode> list = getCodes(speciesName, radius);
-
         if (list.isEmpty()) {
             return null;
         }
-
         return list.get(random.nextInt(list.size()));
     }
 
