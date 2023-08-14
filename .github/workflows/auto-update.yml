@@ -15,14 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Write new version to gradle.properties file
-        uses: anbazhagan45/copy-update-file@1.0.0
+        uses: Stuie/write-properties-file@1.0.1
         with:
-          source_path: './gradle.properties'
-          target_path: './gradle.properties'
-          properties: |
-            modVersion
-          values: |
-            ${{ github.ref_name }}
+          path: './gradle.properties'
+          property: 'modVersion'
+          value: ${{ github.ref_name }}
       - name: Commit gradle properties
         run: |
           git config --global user.name 'Publish Action'
