@@ -19,7 +19,7 @@ plugins {
     id("com.harleyoconnor.translationsheet") version "0.1.1"
     id("com.matthewprenger.cursegradle") version "1.4.0"
     id("com.modrinth.minotaur") version "2.+"
-    id("com.harleyoconnor.autoupdatetool") version "1.0.8"
+    id("com.harleyoconnor.autoupdatetool") version "1.0.9"
 }
 
 repositories {
