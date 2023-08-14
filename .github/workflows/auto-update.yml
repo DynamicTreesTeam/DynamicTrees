@@ -1,6 +1,7 @@
 name: Automatic updater
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - '*'
