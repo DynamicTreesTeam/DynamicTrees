@@ -29,6 +29,8 @@ jobs:
           file-url: 'https://github.com/DynamicTreesTeam/DynamicTreesVersionInfo/blob/master/DynamicTrees.json?raw=true'
           file-name: 'version_info.json'
           location: './build'
+      - name: Fetch full repo so tags are retrievable
+        run: git fetch --prune --unshallow
       - name: Run autoUpdate task
         run: ./gradlew autoUpdate
         env:
