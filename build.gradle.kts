@@ -130,7 +130,7 @@ java {
     }
 }
 
-val changelogFile = file("build/changelog.txt")
+val changelogFile = file("temp/changelog.txt")
 
 curseforge {
     val curseApiKey = optionalProperty("curseApiKey") ?: System.getenv("CURSEFORGE_API_KEY")
@@ -257,7 +257,7 @@ autoUpdateTool {
     version.set(modVersion)
     versionRecommended.set(property("versionRecommended") == "true")
     changelogOutputFile.set(changelogFile)
-    updateCheckerFile.set(file("build/version_info.json"))
+    updateCheckerFile.set(file("temp/version_info.json"))
 }
 
 tasks.autoUpdate {
