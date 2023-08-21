@@ -25,7 +25,7 @@
               "function": "minecraft:explosion_decay"
             }
           ],
-          "name": "minecraft:air"
+          "name": "dynamictrees:cocoa_seed"
         }
       ],
       "rolls": 1.0

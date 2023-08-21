@@ -1,14 +1,14 @@
 {
   "values": [
-    "dynamictrees:acacia_leaves",
-    "dynamictrees:azalea_leaves",
-    "dynamictrees:birch_leaves",
-    "dynamictrees:dark_oak_leaves",
-    "dynamictrees:flowering_azalea_leaves",
-    "dynamictrees:jungle_leaves",
-    "dynamictrees:jungle_undergrowth_leaves",
     "dynamictrees:oak_leaves",
     "dynamictrees:oak_undergrowth_leaves",
-    "dynamictrees:spruce_leaves"
+    "dynamictrees:jungle_undergrowth_leaves",
+    "dynamictrees:jungle_leaves",
+    "dynamictrees:dark_oak_leaves",
+    "dynamictrees:spruce_leaves",
+    "dynamictrees:azalea_leaves",
+    "dynamictrees:acacia_leaves",
+    "dynamictrees:birch_leaves",
+    "dynamictrees:flowering_azalea_leaves"
   ]
 }
