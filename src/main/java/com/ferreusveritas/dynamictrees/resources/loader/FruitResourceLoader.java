@@ -36,8 +36,8 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
         );
 
         // Item is needed on datagen and setup
-        this.gatherDataAppliers.register("item_stack", Item.class, (pod, item) -> pod.setItemStack(new ItemStack(item)));
-        this.setupAppliers.register("item_stack", Item.class, (pod, item) -> pod.setItemStack(new ItemStack(item)));
+        this.gatherDataAppliers.register("item_stack", Item.class, (fruit, item) -> fruit.setItemStack(new ItemStack(item)));
+        this.setupAppliers.register("item_stack", Item.class, (fruit, item) -> fruit.setItemStack(new ItemStack(item)));
 
         this.reloadAppliers
                 .register("item_stack", ItemStack.class, Fruit::setItemStack)
