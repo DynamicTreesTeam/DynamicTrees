@@ -19,14 +19,17 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -34,6 +37,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -47,6 +51,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlock {
     public static final String NAME_SUFFIX = "_roots";
@@ -56,15 +62,21 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     public enum Layer implements StringRepresentable {
-        EXPOSED,
-        FILLED,
-        COVERED;
+        EXPOSED (MangroveFamily::getPrimitiveRoots),
+        FILLED (MangroveFamily::getPrimitiveFilledRoots),
+        COVERED (MangroveFamily::getPrimitiveCoveredRoots);
+        final Function<MangroveFamily, Optional<Block>> primitiveFunc;
+        Layer(Function<MangroveFamily, Optional<Block>> primitiveFunc){
+            this.primitiveFunc = primitiveFunc;
+        }
         @Override public @NotNull String getSerializedName() {
             return toString().toLowerCase();
         }
+
+        public Optional<Block> getPrimitive (MangroveFamily family){
+            return primitiveFunc.apply(family);
+        }
     }
-
-
 
     private int flammability = 5; // Mimic vanilla logs
     private int fireSpreadSpeed = 5; // Mimic vanilla logs
@@ -178,6 +190,20 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     }
 
     //////////////////////////////
+    // SOUNDS
+    //////////////////////////////
+
+    @Override
+    public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, @Nullable Entity entity) {
+        Optional<Block> primitive = state.getValue(LAYER).getPrimitive(getFamily());
+        if (primitive.isPresent()){
+            return primitive.get().getSoundType(state, level, pos, entity);
+        } else
+            return super.getSoundType(state, level, pos, entity);
+    }
+
+
+    //////////////////////////////
     // WATER LOGGING
     //////////////////////////////
 
@@ -205,7 +231,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public boolean placeLiquid(LevelAccessor pLevel, BlockPos pPos, BlockState pState, FluidState pFluidState) {
         if (canPlaceLiquid(pLevel, pPos, pState, pFluidState.getType())) {
             if (!pLevel.isClientSide()) {
-                pLevel.setBlock(pPos, pState.setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(true)), 3);
+                pLevel.setBlock(pPos, pState.setValue(BlockStateProperties.WATERLOGGED, true).setValue(LAYER, Layer.EXPOSED), 3);
                 pLevel.scheduleTick(pPos, pFluidState.getType(), pFluidState.getType().getTickDelay(pLevel));
             }
 
@@ -215,22 +241,8 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         }
     }
 
-    @Override
-    public ItemStack pickupBlock(LevelAccessor pLevel, BlockPos pPos, BlockState pState) {
-        if (pState.getValue(BlockStateProperties.WATERLOGGED)) {
-            pLevel.setBlock(pPos, pState.setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(false)), 3);
-            if (!pState.canSurvive(pLevel, pPos)) {
-                pLevel.destroyBlock(pPos, true);
-            }
-
-            return new ItemStack(Items.WATER_BUCKET);
-        } else {
-            return ItemStack.EMPTY;
-        }
-    }
-
     //////////////////////////////
-    // PLACEMENT
+    // INTERACTION
     //////////////////////////////
 
     protected boolean canPlace(Player player, Level level, BlockPos clickedPos, BlockState pState) {
@@ -246,7 +258,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         ItemStack handStack = player.getItemInHand(hand);
         Block coverBlock = getFamily().getPrimitiveCoveredRoots().orElse(null);
         if (coverBlock != null && handStack.getItem() == coverBlock.asItem()){
-            BlockState newState = state.setValue(LAYER, Layer.COVERED);
+            BlockState newState = state.setValue(LAYER, Layer.COVERED).setValue(WATERLOGGED, false);
             if (canPlace(player, level, pos, newState)){
                 level.setBlock(pos, newState, 3);
                 if (!player.isCreative()) handStack.shrink(1);
@@ -255,6 +267,20 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             }
         }
         return InteractionResult.PASS;
+    }
+
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+
+        if (isFullBlock(state)){
+            level.setBlock(pos, state.setValue(LAYER, Layer.FILLED), level.isClientSide ? 11 : 3);
+            this.spawnDestroyParticles(level, player, pos, state);
+            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+            Block primitive = state.getValue(LAYER).getPrimitive(getFamily()).orElse(null);
+            if (!player.isCreative() && primitive != null) dropResources(primitive.defaultBlockState(), level, pos);
+            return false;
+        }
+        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
     }
 
     //////////////////////////////
@@ -266,6 +292,17 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public VoxelShape getOcclusionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
         if (pState.getValue(LAYER) == Layer.EXPOSED) return Shapes.empty();
         return super.getOcclusionShape(pState, pLevel, pPos);
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        if (isFullBlock(pState)) {
+            VoxelShape fullShape = Shapes.block();
+            if (getFamily().getPrimitiveCoveredRoots().isPresent())
+                fullShape = getFamily().getPrimitiveCoveredRoots().get().getCollisionShape(pState, pLevel, pPos, pContext);
+            return fullShape;
+        }
+        return super.getCollisionShape(pState, pLevel, pPos, pContext);
     }
 
     @Nonnull

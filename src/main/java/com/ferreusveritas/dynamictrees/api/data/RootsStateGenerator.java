@@ -12,7 +12,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.Objects;
 
 /**
- * @author Harley O'Connor
+ * @author Max Hyper
  */
 public class RootsStateGenerator implements Generator<DTBlockStateProvider, Family> {
 
@@ -26,12 +26,12 @@ public class RootsStateGenerator implements Generator<DTBlockStateProvider, Fami
         final BranchBlock root = dependencies.get(ROOT);
         final BranchLoaderBuilder builderExposed = provider.models().getBuilder(
                 Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(root)).getPath()
-        ).customLoader(root.getFamily().getBranchLoaderConstructor());
+        ).customLoader(BranchLoaderBuilder::Roots);
         input.addRootTextures(builderExposed::texture, provider.block(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_ROOT))));
 
         final BranchLoaderBuilder builderFilled = provider.models().getBuilder(
                 Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(root)).getPath() + "_filled"
-        ).customLoader(root.getFamily().getBranchLoaderConstructor());
+        ).customLoader(BranchLoaderBuilder::Roots);
         input.addRootTextures(builderFilled::texture, provider.block(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_FILLED_ROOT))));
 
         provider.getVariantBuilder(root)

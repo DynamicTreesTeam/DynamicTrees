@@ -1,43 +1,64 @@
 {
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
-	"textures": {
-		"bark": "block/oak_log",
-		"rings": "block/oak_log_top"
-	},
-	"display": {
-		"fixed": {
-			"rotation": [ 0, 90, 0 ],
-			"translation": [ 0, 0, 0 ],
-			"scale": [ 0.5, 0.5, 0.5 ]
-		}
-	},
 	"elements": [
 		{
 			"name": "Trunk",
-			"from": [4, 4, 0],
-			"to": [12, 12, 16],
+			"from": [0, 4, 4],
+			"to": [16, 12, 12],
 			"faces": {
-				"north": {"uv": [4, 4, 12, 12], "rotation": 90, "texture": "#rings"},
-				"east": {"uv": [4, 0, 12, 16], "rotation": 90, "texture": "#bark"},
-				"south": {"uv": [4, 4, 12, 12], "rotation": 90, "texture": "#rings"},
-				"west": {"uv": [4, 0, 12, 16], "rotation": 270, "texture": "#bark"},
-				"up": {"uv": [4, 0, 12, 16], "texture": "#bark"},
-				"down": {"uv": [4, 0, 12, 16], "rotation": 180, "texture": "#bark"}
+				"north": {"uv": [4, 0, 12, 16], "rotation": 90, "texture": "#bark"},
+				"east": {"uv": [4, 4, 12, 12], "texture": "#rings"},
+				"south": {"uv": [4, 0, 12, 16], "rotation": 270, "texture": "#bark"},
+				"west": {"uv": [4, 4, 12, 12], "texture": "#rings"},
+				"up": {"uv": [4, 0, 12, 16], "rotation": 270, "texture": "#bark"},
+				"down": {"uv": [4, 0, 12, 16], "rotation": 270, "texture": "#bark"}
+			}
+		},
+		{
+			"name": "Trunk",
+			"from": [16, 12, 12],
+			"to": [0, 4, 4],
+			"faces": {
+				"north": {"uv": [4, 0, 12, 16], "rotation": 90, "texture": "#bark"},
+				"east": {"uv": [4, 4, 12, 12], "texture": "#rings"},
+				"south": {"uv": [4, 0, 12, 16], "rotation": 270, "texture": "#bark"},
+				"west": {"uv": [4, 4, 12, 12], "texture": "#rings"},
+				"up": {"uv": [4, 0, 12, 16], "rotation": 270, "texture": "#bark"},
+				"down": {"uv": [4, 0, 12, 16], "rotation": 270, "texture": "#bark"}
 			}
 		},
 		{
 			"name": "BranchL",
-			"from": [12, 6, 6],
-			"to": [16, 10, 10],
+			"from": [6, 6, 0],
+			"to": [10, 10, 4],
 			"faces": {
-				"north": {"uv": [6, 12, 10, 16], "rotation": 180, "texture": "#bark"},
-				"east": {"uv": [6, 6, 10, 10], "rotation": 90, "texture": "#rings"},
-				"south": {"uv": [6, 12, 10, 16], "rotation": 180, "texture": "#bark"},
-				"west": {"uv": [6, 6, 10, 10], "rotation": 270, "texture": "#rings"},
-				"up": {"uv": [6, 12, 10, 16], "rotation": 90, "texture": "#bark"},
-				"down": {"uv": [6, 12, 10, 16], "rotation": 270, "texture": "#bark"}
+				"north": {"uv": [6, 6, 10, 10], "texture": "#rings"},
+				"east": {"uv": [6, 12, 10, 16], "texture": "#bark"},
+				"south": {"uv": [6, 6, 10, 10], "texture": "#rings"},
+				"west": {"uv": [6, 12, 10, 16], "texture": "#bark"},
+				"up": {"uv": [6, 12, 10, 16], "texture": "#bark"},
+				"down": {"uv": [6, 12, 10, 16], "texture": "#bark"}
+			}
+		},
+		{
+			"name": "BranchR",
+			"from": [5, 5, 12],
+			"to": [11, 11, 16],
+			"faces": {
+				"north": {"uv": [5, 5, 11, 11], "texture": "#rings"},
+				"east": {"uv": [5, 10, 11, 16], "texture": "#bark"},
+				"south": {"uv": [5, 5, 11, 11], "texture": "#rings"},
+				"west": {"uv": [5, 10, 11, 16], "texture": "#bark"},
+				"up": {"uv": [5, 10, 11, 16], "texture": "#bark"},
+				"down": {"uv": [5, 10, 11, 16], "texture": "#bark"}
 			}
 		}
-	]
+	],
+	"display": {
+		"fixed": {
+			"rotation": [0, 90, 0],
+			"scale": [0.5, 0.5, 0.5]
+		}
+	}
 }

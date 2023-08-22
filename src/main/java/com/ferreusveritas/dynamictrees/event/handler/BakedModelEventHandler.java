@@ -4,7 +4,8 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.block.PottedSaplingBlock;
 import com.ferreusveritas.dynamictrees.models.baked.BakedModelBlockBonsaiPot;
 import com.ferreusveritas.dynamictrees.models.loader.BranchBlockModelLoader;
-import com.ferreusveritas.dynamictrees.models.loader.RootBlockModelLoader;
+import com.ferreusveritas.dynamictrees.models.loader.RootsBlockModelLoader;
+import com.ferreusveritas.dynamictrees.models.loader.SurfaceRootBlockModelLoader;
 import com.ferreusveritas.dynamictrees.models.loader.ThickBranchBlockModelLoader;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -22,15 +23,17 @@ import net.minecraftforge.fml.common.Mod;
 public final class BakedModelEventHandler {
 
     public static final ResourceLocation BRANCH = DynamicTrees.location("branch");
-    public static final ResourceLocation SURFACE_ROOT = DynamicTrees.location("root");
+    public static final ResourceLocation SURFACE_ROOT = DynamicTrees.location("surface_root");
+    public static final ResourceLocation ROOTS = DynamicTrees.location("roots");
     public static final ResourceLocation THICK_BRANCH = DynamicTrees.location("thick_branch");
 
     @SubscribeEvent
     public static void onModelRegistryEvent(RegisterGeometryLoaders event) {
         // Register model loaders for baked models.
         event.register("branch", new BranchBlockModelLoader());
-        event.register("root", new RootBlockModelLoader());
+        event.register("surface_root", new SurfaceRootBlockModelLoader());
         event.register("thick_branch", new ThickBranchBlockModelLoader());
+        event.register("roots", new RootsBlockModelLoader());
     }
 
     @SubscribeEvent

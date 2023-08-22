@@ -60,7 +60,12 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("max_signal_depth", Integer.class, Family::setMaxSignalDepth)
                 .register("loot_volume_multiplier", Float.class, Family::setLootVolumeMultiplier);
 
-        //Mangrove appliers
+        registerMangroveAppliers();
+
+        super.registerAppliers();
+    }
+
+    private void registerMangroveAppliers(){
         this.gatherDataAppliers
                 .register("primitive_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRoots)
                 .register("primitive_filled_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsFilled)
@@ -71,9 +76,7 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("primitive_covered_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsCovered);
         this.reloadAppliers
                 .register("default_soil", MangroveFamily.class, SoilProperties.class, MangroveFamily::setDefaultSoil);
-        //---------------//
 
-        super.registerAppliers();
     }
 
     /**

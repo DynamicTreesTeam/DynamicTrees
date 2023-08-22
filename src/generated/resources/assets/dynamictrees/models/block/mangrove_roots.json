@@ -1,5 +1,5 @@
 {
-  "loader": "dynamictrees:branch",
+  "loader": "dynamictrees:roots",
   "render_type": "minecraft:cutout_mipped",
   "textures": {
     "bark": "minecraft:block/mangrove_roots_side",

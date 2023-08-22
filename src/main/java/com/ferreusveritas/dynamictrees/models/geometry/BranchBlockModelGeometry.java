@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * BranchBlockModelLoader}.
  *
  * <p>Can also be used by sub-classes to bake other models, like for roots in
- * {@link RootBlockModelGeometry}.</p>
+ * {@link SurfaceRootBlockModelGeometry}.</p>
  *
  * @author Harley O'Connor
  */
@@ -91,7 +91,7 @@ public class BranchBlockModelGeometry implements IUnbakedGeometry<BranchBlockMod
         return this.family;
     }
 
-    private boolean useThickModel(final Family family) {
+    protected boolean useThickModel(final Family family) {
         return this.forceThickness || family.isThick();
     }
 

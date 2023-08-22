@@ -47,4 +47,8 @@ public final class BranchLoaderBuilder extends CustomLoaderBuilder<BlockModelBui
         return new BranchLoaderBuilder(BakedModelEventHandler.SURFACE_ROOT, parent, existingFileHelper);
     }
 
+    public static BranchLoaderBuilder Roots(BlockModelBuilder parent, ExistingFileHelper existingFileHelper) {
+        return new BranchLoaderBuilder(BakedModelEventHandler.ROOTS, parent, existingFileHelper);
+    }
+
 }

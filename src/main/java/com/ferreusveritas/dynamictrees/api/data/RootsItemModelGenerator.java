@@ -9,7 +9,7 @@ import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.registries.ForgeRegistries;
 
 /**
- * @author Harley O'Connor
+ * @author Max Hyper
  */
 public class RootsItemModelGenerator implements Generator<DTItemModelProvider, Family> {
 

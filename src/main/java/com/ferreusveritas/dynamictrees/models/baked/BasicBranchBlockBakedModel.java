@@ -5,6 +5,7 @@ import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.google.common.collect.Maps;
 import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -22,10 +23,13 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.ChunkRenderTypeSet;
+import net.minecraftforge.client.NamedRenderTypeManager;
 import net.minecraftforge.client.model.IDynamicBakedModel;
 import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,10 +47,10 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
     protected final TextureAtlasSprite barkTexture;
     protected final TextureAtlasSprite ringsTexture;
 
-    // 74 Baked models per tree family to achieve this. I guess it's not my problem.  Wasn't my idea anyway.
-    private final BakedModel[][] sleeves = new BakedModel[6][7];
-    private final BakedModel[][] cores = new BakedModel[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-    private final BakedModel[] rings = new BakedModel[8]; // 8 Cores with the ring textures on all 6 sides.
+
+    protected final BakedModel[][] sleeves = new BakedModel[6][7];
+    protected final BakedModel[][] cores = new BakedModel[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
+    protected final BakedModel[] rings = new BakedModel[8]; // 8 Cores with the ring textures on all 6 sides.
 
     public BasicBranchBlockBakedModel(IGeometryBakingContext customData, ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
                                       Function<Material, TextureAtlasSprite> spriteGetter) {
@@ -75,7 +79,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
         }
     }
 
-    public BakedModel bakeSleeve(int radius, Direction dir, TextureAtlasSprite bark) {
+    public BlockElement generateSleevePart(int radius, Direction dir, boolean flipNormals){
         //Work in double units(*2)
         int dradius = radius * 2;
         int halfSize = (16 - dradius) / 2;
@@ -89,6 +93,12 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 
         Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2f, (centerY - halfSizeY) / 2f, (centerZ - halfSizeZ) / 2f);
         Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2f, (centerY + halfSizeY) / 2f, (centerZ + halfSizeZ) / 2f);
+        if (flipNormals){
+            Vector3f aux = posFrom;
+            posFrom = posTo;
+            posTo = aux;
+            dir = dir.getOpposite();
+        }
 
         boolean negative = dir.getAxisDirection() == AxisDirection.NEGATIVE;
         if (dir.getAxis() == Axis.Z) {//North/South
@@ -113,7 +123,11 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
             }
         }
 
-        BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
+        return new BlockElement(posFrom, posTo, mapFacesIn, null, true);
+    }
+    public BakedModel bakeSleeve(int radius, Direction dir, TextureAtlasSprite bark) {
+
+        BlockElement part = generateSleevePart(radius, dir, false);
         IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, bark);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
@@ -124,10 +138,14 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
         return builder.build();
     }
 
-    public BakedModel bakeCore(int radius, Axis axis, TextureAtlasSprite icon) {
-
+    protected BlockElement generateCorePart (int radius, Axis axis, boolean flipNormals){
         Vector3f posFrom = new Vector3f(8 - radius, 8 - radius, 8 - radius);
         Vector3f posTo = new Vector3f(8 + radius, 8 + radius, 8 + radius);
+        if (flipNormals){
+            Vector3f aux = posFrom;
+            posFrom = posTo;
+            posTo = aux;
+        }
 
         Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 
@@ -136,7 +154,11 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
             mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
         }
 
-        BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
+        return new BlockElement(posFrom, posTo, mapFacesIn, null, true);
+    }
+    public BakedModel bakeCore(int radius, Axis axis, TextureAtlasSprite icon) {
+
+        BlockElement part = generateCorePart(radius, axis, false);
         IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, icon);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
@@ -223,11 +245,11 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
                     }
                 }
                 // Get quads for sleeves models.
-                if (coreRadius != 8) { // Special case for r!=8.. If it's a solid block so it has no sleeves.
+                if (coreRadius != 8) { // Special case for r!=8... If it's a solid block, so it has no sleeves.
                     for (Direction connDir : Direction.values()) {
                         final int idx = connDir.get3DDataValue();
                         final int connRadius = connections[idx];
-                        // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius 1 connections for leaves (which are partly transparent).
+                        // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius-1 connections for leaves (which are partly transparent).
                         if (connRadius > 0 && (connRadius == twigRadius.get() || face != connDir)) {
                             quadsList.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData, renderType));
                         }
@@ -236,6 +258,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 
             }
         }
+
 
         return quadsList;
     }
@@ -332,4 +355,15 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
         return false;
     }
 
+    @Override
+    public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data) {
+        return ChunkRenderTypeSet.of(getRenderType());
+    }
+
+    public RenderType getRenderType (){
+        ResourceLocation renderTypeHint = blockModel.customData.getRenderTypeHint();
+        if (renderTypeHint == null)
+            return RenderType.solid();
+        return NamedRenderTypeManager.get(renderTypeHint).block();
+    }
 }
