@@ -1557,10 +1557,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         do {
             if (fertility > 0) {
                 if (growthRate > random.nextFloat()) {
-                    final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.random);
-                    boolean success = treeBase.growSignal(level, treePos, signal).success;
+                    GrowSignal signal = sendGrowthSignal(treeBase, level, treePos, rootPos);
 
-                    int soilLongevity = getSoilLongevity(level, rootPos) * (success ? 1 : 16);//Don't deplete the soil as much if the growth operation failed
+                    int soilLongevity = getSoilLongevity(level, rootPos) * (signal.success ? 1 : 16);//Don't deplete the soil as much if the growth operation failed
 
                     if (soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
                         rootyDirt.setFertility(level, rootPos, fertility - 1);//decrement fertility
@@ -1577,6 +1576,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         this.postGrow(level, rootPos, treePos, fertility, natural);
         return true;
+    }
+
+    protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos){
+        final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.random);
+        return treeBase.growSignal(level, treePos, signal);
     }
 
     public Species setGrowthLogicKit(GrowthLogicKit logicKit) {

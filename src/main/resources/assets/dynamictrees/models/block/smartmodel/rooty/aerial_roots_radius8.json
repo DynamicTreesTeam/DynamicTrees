@@ -2,6 +2,7 @@
   "parent": "block/block",
   "textures": {
     "overlay": "dynamictrees:block/air",
+    "overlay_end": "dynamictrees:block/air",
     "roots": "dynamictrees:block/roots",
     "particle": "#side"
   },
@@ -31,7 +32,7 @@
       "from": [ 0, 0, 0 ],
       "to": [ 16, 16, 16 ],
       "faces": {
-        "down":  { "texture": "#overlay", "cullface": "down" },
+        "down":  { "texture": "#overlay_end", "cullface": "down" },
         "north": { "texture": "#overlay" },
         "south": { "texture": "#overlay" },
         "west":  { "texture": "#overlay" },

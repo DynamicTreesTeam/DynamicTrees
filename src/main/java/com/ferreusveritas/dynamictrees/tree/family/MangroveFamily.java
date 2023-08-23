@@ -18,7 +18,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -31,6 +35,9 @@ public class MangroveFamily extends Family {
     private Supplier<BranchBlock> root;
     private Supplier<Item> rootItem;
     private Block primitiveRoots, primitiveRootsFilled, primitiveRootsCovered;
+
+    private Block[] replaceableByRoots = new Block[]
+            {Blocks.MUD, Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.SAND};
 
     protected final MutableLazyValue<Generator<DTBlockStateProvider, Family>> rootsStateGenerator =
             MutableLazyValue.supplied(RootsStateGenerator::new);
@@ -114,6 +121,10 @@ public class MangroveFamily extends Family {
 
     public ResourceLocation getBranchItemParentLocation() {
         return DynamicTrees.location("item/branch");
+    }
+
+    public Boolean isReplaceableByRoots(Block block){
+        return Arrays.stream(replaceableByRoots).anyMatch(b->b == block);
     }
 
     ///////////////////////////////////////////

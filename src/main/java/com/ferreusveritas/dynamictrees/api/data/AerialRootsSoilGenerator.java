@@ -44,14 +44,15 @@ public final class AerialRootsSoilGenerator extends SoilStateGenerator {
     private BlockModelBuilder soilModelBuilder (BlockStateProvider provider, int radius, String name, Block primitiveBlock, Block roots){
         ResourceLocation side = provider.blockTexture(primitiveBlock);
         ResourceLocation top = new ResourceLocation(side.getNamespace(), side.getPath()+"_top");
-        ResourceLocation rootsLoc = provider.blockTexture(roots);
-        ResourceLocation overlaySide = new ResourceLocation(rootsLoc.getNamespace(), rootsLoc.getPath()+"_side");
-        ResourceLocation overlayEnd = new ResourceLocation(rootsLoc.getNamespace(), rootsLoc.getPath()+"_top");
+        //ResourceLocation rootsLoc = provider.blockTexture(roots);
+        //ResourceLocation overlaySide = new ResourceLocation(rootsLoc.getNamespace(), rootsLoc.getPath()+"_side");
+        //ResourceLocation overlayEnd = new ResourceLocation(rootsLoc.getNamespace(), rootsLoc.getPath()+"_top");
         return provider.models().withExistingParent(name+"_radius"+radius,  DynamicTrees.location("block/smartmodel/rooty/aerial_roots_radius"+ radius))
                 .texture("side", side)
                 .texture("end", top)
-                .texture("overlay", overlaySide)
-                .texture("overlay_end", overlayEnd);
+                //.texture("overlay", overlaySide)
+                //.texture("overlay_end", overlayEnd)
+                ;
     }
 
 }

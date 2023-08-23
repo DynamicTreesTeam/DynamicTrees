@@ -69,11 +69,15 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
         this.gatherDataAppliers
                 .register("primitive_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRoots)
                 .register("primitive_filled_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsFilled)
-                .register("primitive_covered_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsCovered);
+                .register("primitive_covered_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsCovered)
+                //to-do: put in soil properties instead
+                .register("default_soil", MangroveFamily.class, SoilProperties.class, MangroveFamily::setDefaultSoil);
         this.setupAppliers
                 .register("primitive_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRoots)
                 .register("primitive_filled_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsFilled)
-                .register("primitive_covered_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsCovered);
+                .register("primitive_covered_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsCovered)
+                //.register("replaceable_by_roots", MangroveFamily.class , ,)
+        ;
         this.reloadAppliers
                 .register("default_soil", MangroveFamily.class, SoilProperties.class, MangroveFamily::setDefaultSoil);
 

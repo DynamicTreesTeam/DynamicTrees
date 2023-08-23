@@ -3,6 +3,7 @@
 	"parent": "block/block",
 	"textures": {
 		"overlay": "dynamictrees:block/air",
+		"overlay_end": "dynamictrees:block/air",
 		"roots": "dynamictrees:block/roots",
 		"particle": "#side"
 	},
@@ -36,7 +37,7 @@
 				"east":  {"uv": [7, 0, 9, 16], "texture": "#overlay"},
 				"south": {"uv": [7, 0, 9, 16], "texture": "#overlay"},
 				"west":  {"uv": [7, 0, 9, 16], "texture": "#overlay"},
-				"down":  {"uv": [7, 7, 9, 9],  "texture": "#overlay", "cullface": "down"}
+				"down":  {"uv": [7, 7, 9, 9],  "texture": "#overlay_end", "cullface": "down"}
 			}
 		}
 	]

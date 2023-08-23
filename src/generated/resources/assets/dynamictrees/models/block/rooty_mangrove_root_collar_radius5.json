@@ -2,8 +2,6 @@
   "parent": "dynamictrees:block/smartmodel/rooty/aerial_roots_radius5",
   "textures": {
     "end": "minecraft:block/mangrove_log_top",
-    "overlay": "minecraft:block/mangrove_roots_side",
-    "overlay_end": "minecraft:block/mangrove_roots_top",
     "side": "minecraft:block/mangrove_log"
   }
 }

@@ -1,6 +1,6 @@
 package com.ferreusveritas.dynamictrees.models.geometry;
 
-import com.ferreusveritas.dynamictrees.models.baked.RootsBlockBakedModel;
+import com.ferreusveritas.dynamictrees.models.baked.BasicRootsBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.baked.SurfaceRootBlockBakedModel;
 import com.ferreusveritas.dynamictrees.models.loader.SurfaceRootBlockModelLoader;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
@@ -29,7 +29,7 @@ public class RootsBlockModelGeometry extends BranchBlockModelGeometry {
 
     @Override
     public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
-        return new RootsBlockBakedModel(owner, modelLocation, this.barkTextureLocation, this.ringsTextureLocation, spriteGetter);
+        return new BasicRootsBlockBakedModel(owner, modelLocation, this.barkTextureLocation, this.ringsTextureLocation, spriteGetter);
     }
 
     @Override

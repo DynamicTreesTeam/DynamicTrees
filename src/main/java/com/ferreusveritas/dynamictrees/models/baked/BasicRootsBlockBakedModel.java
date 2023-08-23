@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.models.baked;
 
-import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.client.ModelUtils;
 import com.ferreusveritas.dynamictrees.models.modeldata.ModelConnections;
 import com.google.common.collect.Maps;
@@ -11,38 +10,29 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.ChunkRenderTypeSet;
-import net.minecraftforge.client.NamedRenderTypeManager;
-import net.minecraftforge.client.model.IDynamicBakedModel;
 import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
-public class RootsBlockBakedModel extends BasicBranchBlockBakedModel {
+public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
 
     private final BakedModel[][] sleeveFaces = new BakedModel[6][7];
 
-    public RootsBlockBakedModel(IGeometryBakingContext customData, ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
-                                Function<Material, TextureAtlasSprite> spriteGetter) {
+    public BasicRootsBlockBakedModel(IGeometryBakingContext customData, ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
+                                     Function<Material, TextureAtlasSprite> spriteGetter) {
         super(customData, modelLocation, barkTextureLocation, ringsTextureLocation, spriteGetter);
         initModels();
     }

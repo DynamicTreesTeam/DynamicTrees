@@ -3,16 +3,20 @@ package com.ferreusveritas.dynamictrees.tree.species;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
+import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
+import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
+import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -51,6 +55,10 @@ public class MangroveSpecies extends Species {
     public MangroveFamily getFamily() {
         return (MangroveFamily) family;
     }
+
+    //////////////////////
+    // ROOTY SOIL
+    //////////////////////
 
     public boolean placeRootyDirtBlock(LevelAccessor level, BlockPos rootPos, int fertility) {
         BlockState dirtState = level.getBlockState(rootPos);
@@ -91,6 +99,11 @@ public class MangroveSpecies extends Species {
         return super.postGrow(level, rootPos, treePos, fertility, natural);
     }
 
+    //////////////////////
+    // GENERATION
+    //////////////////////
+
+
     @Override
     public boolean generate(GenerationContext context) {
         context.rootPos().move(Direction.UP,
@@ -98,4 +111,30 @@ public class MangroveSpecies extends Species {
         return super.generate(context);
     }
 
+
+    //////////////////////
+    // GROWTH
+    //////////////////////
+
+    @Override
+    protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos) {
+        GrowSignal treeSignal = super.sendGrowthSignal(treeBase, level, treePos, rootPos);
+
+        if (treeSignal.success){
+            BlockPos belowPos = rootPos.below();
+            BlockState belowState = level.getBlockState(belowPos);
+            if (TreeHelper.isBranch(belowState)){
+                GrowSignal rootGrowSignal = new GrowSignal(this, rootPos, getRootEnergy(level, rootPos), level.random);
+                return TreeHelper.getTreePart(belowState).growSignal(level, treePos, rootGrowSignal);
+            } else {
+                getFamily().getRoot().ifPresent(branch -> branch.setRadius(level, belowPos, family.getPrimaryThickness(), null));
+            }
+        }
+
+        return treeSignal;
+    }
+
+    public float getRootEnergy(Level level, BlockPos rootPos) {
+        return this.logicKit.getEnergy(new PositionalSpeciesContext(level, rootPos, this)) / 2f;
+    }
 }
