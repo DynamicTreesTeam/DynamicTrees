@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.api.data.RootsStateGenerator;
 import com.ferreusveritas.dynamictrees.api.registry.RegistryHandler;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
-import com.ferreusveritas.dynamictrees.block.branch.roots.BasicRootsBlock;
+import com.ferreusveritas.dynamictrees.block.branch.BasicRootsBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.AerialRootsSoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
@@ -21,8 +21,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -130,6 +128,31 @@ public class MangroveFamily extends Family {
     ///////////////////////////////////////////
     // PRIMITIVE ROOTS
     ///////////////////////////////////////////
+
+    private int primaryRootThickness = 2;
+    private int secondaryRootThickness = 3;
+    private int supportedRootThicknessExtra = 2;
+
+    public int getPrimaryRootThickness() {
+        return primaryRootThickness;
+    }
+    public int getSecondaryRootThickness() {
+        return secondaryRootThickness;
+    }
+    public int getSupportedRootThicknessExtra() {
+        return supportedRootThicknessExtra;
+    }
+
+    public void setPrimaryRootThickness(int primaryRootThickness) {
+        this.primaryRootThickness = primaryRootThickness;
+    }
+
+    public void setSecondaryRootThickness(int secondaryRootThickness) {
+        this.secondaryRootThickness = secondaryRootThickness;
+    }
+    public void setSupportedRootThicknessExtra(int supportedRootThicknessExtra) {
+        this.supportedRootThicknessExtra = supportedRootThicknessExtra;
+    }
 
     public void setPrimitiveRoots(Block primitiveRoots) {
         this.primitiveRoots = primitiveRoots;

@@ -13,6 +13,7 @@ public class GrowSignal {
     public int numTurns;
     public int numSteps;
     private final Species species;
+    public final Direction defaultDir;
 
     public BlockPos rootPos;
     public BlockPos delta;
@@ -28,11 +29,15 @@ public class GrowSignal {
     public boolean choked;
 
     public RandomSource rand;
-
     public GrowSignal(Species species, BlockPos rootPos, float energy, RandomSource random) {
+        this(species, rootPos, energy, random, Direction.UP);
+    }
+
+    public GrowSignal(Species species, BlockPos rootPos, float energy, RandomSource random, Direction defaultDir) {
         this.species = species;
         this.energy = energy;
-        dir = Direction.UP;
+        this.defaultDir = defaultDir;
+        dir = defaultDir;
         radius = 0.0f;
         numTurns = 0;
         numSteps = 0;

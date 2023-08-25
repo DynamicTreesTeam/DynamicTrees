@@ -2,16 +2,23 @@ package com.ferreusveritas.dynamictrees.tree.species;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
+import com.ferreusveritas.dynamictrees.block.branch.BasicRootsBlock;
 import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
+import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
+import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,16 +29,19 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-import java.security.InvalidParameterException;
+import java.util.List;
 
 public class MangroveSpecies extends Species {
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(MangroveSpecies::new);
 
-    private int minWorldGenHeightOffset = 3;
-    private int maxWorldGenHeightOffset = 8;
-
+    protected GrowthLogicKitConfiguration rootLogicKit = GrowthLogicKitConfiguration.getDefault();
+    private int minWorldGenHeightOffset = 1;
+    private int maxWorldGenHeightOffset = 6;
+    protected float rootSignalEnergy = 16.0f;
+    protected float rootTapering = 0.3f;
     public void setMinWorldGenHeightOffset(int minWorldGenHeightOffset) {
         this.minWorldGenHeightOffset = minWorldGenHeightOffset;
     }
@@ -100,6 +110,33 @@ public class MangroveSpecies extends Species {
     }
 
     //////////////////////
+    // ROT
+    //////////////////////
+
+    public float rotChance(LevelAccessor level, BlockPos pos, RandomSource rand, int radius) {
+        BlockState branchState = level.getBlockState(pos);
+        if (branchState.getBlock() instanceof BasicRootsBlock){
+            if (radius == 0) return 0;
+            if (branchState.getValue(BlockStateProperties.WATERLOGGED)) return 0;
+            float chance = 0.3f + ((1f / (radius * (branchState.getValue(BlockStateProperties.WATERLOGGED) ? 3f : 1f) )));// Thicker roots take longer to rot, and waterlogged roots survive longer
+            chance *= 0.01;
+            return chance;
+        }
+        return super.rotChance(level, pos, rand, radius);
+    }
+    public boolean update(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
+
+        //Analyze structure to gather all the root's endpoints.
+        BlockPos rootCrownPos = rootPos.below();
+        List<BlockPos> rootEnds = getEnds(level, rootCrownPos, TreeHelper.getTreePart(level.getBlockState(rootCrownPos)));
+
+        //Rot roots
+        handleRot(level, rootEnds, rootPos, rootCrownPos, fertility, SafeChunkBounds.ANY);
+
+        return super.update(level, rootyDirt, rootPos, fertility, treeBase, treePos, random, natural);
+    }
+
+    //////////////////////
     // GENERATION
     //////////////////////
 
@@ -116,16 +153,30 @@ public class MangroveSpecies extends Species {
     // GROWTH
     //////////////////////
 
-    @Override
-    protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos) {
-        GrowSignal treeSignal = super.sendGrowthSignal(treeBase, level, treePos, rootPos);
+    public float getRootSignalEnergy() {
+        return rootSignalEnergy;
+    }
+    public void setRootSignalEnergy(float rootSignalEnergy) {
+        this.rootSignalEnergy = rootSignalEnergy;
+    }
 
-        if (treeSignal.success){
+    public float getRootTapering() {
+        return rootTapering;
+    }
+    public void setRootTapering(float rootTapering) {
+        this.rootTapering = rootTapering;
+    }
+
+    @Override
+    protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos, Direction defaultDir) {
+        GrowSignal treeSignal = super.sendGrowthSignal(treeBase, level, treePos, rootPos, defaultDir);
+
+        for (int i=0; i<10; i++){
             BlockPos belowPos = rootPos.below();
             BlockState belowState = level.getBlockState(belowPos);
             if (TreeHelper.isBranch(belowState)){
-                GrowSignal rootGrowSignal = new GrowSignal(this, rootPos, getRootEnergy(level, rootPos), level.random);
-                return TreeHelper.getTreePart(belowState).growSignal(level, treePos, rootGrowSignal);
+                GrowSignal rootGrowSignal = new GrowSignal(this, rootPos, getRootEnergy(level, rootPos), level.random, defaultDir.getOpposite());
+                return TreeHelper.getTreePart(belowState).growSignal(level, belowPos, rootGrowSignal);
             } else {
                 getFamily().getRoot().ifPresent(branch -> branch.setRadius(level, belowPos, family.getPrimaryThickness(), null));
             }
@@ -135,6 +186,28 @@ public class MangroveSpecies extends Species {
     }
 
     public float getRootEnergy(Level level, BlockPos rootPos) {
-        return this.logicKit.getEnergy(new PositionalSpeciesContext(level, rootPos, this)) / 2f;
+        return this.rootLogicKit.getEnergy(new PositionalSpeciesContext(level, rootPos, this));
     }
+
+    public Species setRootsGrowthLogicKit(GrowthLogicKit logicKit) {
+        this.rootLogicKit = logicKit.getDefaultConfiguration();
+        return this;
+    }
+
+    /**
+     * Set the logic kit used to determine how the tree branch network expands. Provides an alternate and more modular
+     * method to override a trees growth logic.
+     *
+     * @param logicKit A growth logic kit
+     * @return this species for chaining
+     */
+    public Species setRootsGrowthLogicKit(GrowthLogicKitConfiguration logicKit) {
+        this.rootLogicKit = logicKit;
+        return this;
+    }
+
+    public GrowthLogicKitConfiguration getRootsGrowthLogicKit() {
+        return rootLogicKit;
+    }
+
 }

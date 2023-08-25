@@ -70,7 +70,7 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
         if (context.signal().numSteps + 1 <= configuration.getLowestBranchHeight(
                 new PositionalSpeciesContext(context.level(), context.signal().rootPos, context.species())
         ) && !context.signal().getSpecies().getLeavesProperties().canGrowOnGround()) {
-            return Direction.UP;
+            return context.signal().defaultDir;
         }
 
         // Populate the direction probability map.
@@ -102,9 +102,10 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
                                                  DirectionManipulationContext context) {
         final int[] probMap = context.probMap();
         final Direction originDir = context.signal().dir.getOpposite();
+        final Direction defaultDir = context.signal().defaultDir; //usually UP
 
         // Use the up probability of the species, as long as the current direction is not down.
-        probMap[Direction.UP.ordinal()] = context.signal().dir != Direction.DOWN ?
+        probMap[defaultDir.ordinal()] = context.signal().dir != defaultDir.getOpposite() ?
                 context.species().getUpProbability() : 0;
         // Favour the current direction of travel as defined by the species.
         probMap[context.signal().dir.ordinal()] += context.species().getProbabilityForCurrentDir();

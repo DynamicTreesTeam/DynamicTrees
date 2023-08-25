@@ -2,11 +2,14 @@
   "type": "mangrove",
   "family": "mangrove",
   "tapering": 0.25,
+  "root_tapering": 0.2,
   "signal_energy": 20.0,
+  "root_signal_energy": 20.0,
   "up_probability": 8,
   "lowest_branch_height": 2,
   "growth_rate": 0.6,
   "leaves_properties": "mangrove",
+  "roots_growth_logic_kit": "mangrove_roots",
   "environment_factors" : {
     "#forge:is_cold": 0.75,
     "#forge:is_dry": 0.2

@@ -1557,7 +1557,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         do {
             if (fertility > 0) {
                 if (growthRate > random.nextFloat()) {
-                    GrowSignal signal = sendGrowthSignal(treeBase, level, treePos, rootPos);
+                    GrowSignal signal = sendGrowthSignal(treeBase, level, treePos, rootPos, rootyDirt.getTrunkDirection(level, rootPos));
 
                     int soilLongevity = getSoilLongevity(level, rootPos) * (signal.success ? 1 : 16);//Don't deplete the soil as much if the growth operation failed
 
@@ -1578,8 +1578,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return true;
     }
 
-    protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos){
-        final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.random);
+    protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos, Direction defaultDir){
+        final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.random, defaultDir);
         return treeBase.growSignal(level, treePos, signal);
     }
 

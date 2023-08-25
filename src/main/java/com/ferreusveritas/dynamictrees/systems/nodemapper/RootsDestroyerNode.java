@@ -2,7 +2,7 @@ package com.ferreusveritas.dynamictrees.systems.nodemapper;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
-import com.ferreusveritas.dynamictrees.block.branch.roots.BasicRootsBlock;
+import com.ferreusveritas.dynamictrees.block.branch.BasicRootsBlock;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

@@ -1,7 +1,20 @@
-// 1.19.2	2023-08-23T16:41:52.8485487	dynamictrees DT Block Tags
-0852fd1f90777eeab7126995157c4b1242a44700 data/dynamictrees/tags/items/branches.json
-c16c437c51cfaa61f8cec19b3f2c9af858cf2e3e data/dynamictrees/tags/items/branches_that_burn.json
-265c9a52b7eb0cfd09154318ed7e17789980c9a6 data/dynamictrees/tags/items/fungus_branches.json
-80f707272ee43de5e1e0d5897629cdd2798eb9dd data/dynamictrees/tags/items/fungus_caps.json
-bc9fc83554c6581be3209e99ddfd16c3af8d6d27 data/dynamictrees/tags/items/seeds.json
-40d8c97822466372474dc35e9087e3f6ac034207 data/minecraft/tags/items/saplings.json
+// 1.19.2	2023-08-23T19:36:01.2715272	dynamictrees DT Block Tags
+0852fd1f90777eeab7126995157c4b1242a44700 data/dynamictrees/tags/blocks/branches.json
+c16c437c51cfaa61f8cec19b3f2c9af858cf2e3e data/dynamictrees/tags/blocks/branches_that_burn.json
+c442ebbd74e7603d2ce20deea3e8948883715416 data/dynamictrees/tags/blocks/foliage.json
+265c9a52b7eb0cfd09154318ed7e17789980c9a6 data/dynamictrees/tags/blocks/fungus_branches.json
+a86aa6fa2f09d162f8300475ee0d944102f6334c data/dynamictrees/tags/blocks/fungus_caps.json
+9b5ab09c1aee5e896642d4ae3ffaa2afdbbe5c72 data/dynamictrees/tags/blocks/leaves.json
+50d65f934a69b1a0935e1240a99b63298b5b7fab data/dynamictrees/tags/blocks/saplings.json
+ef507377a99fc5ec5cc3ca9cdd35486ea719a119 data/dynamictrees/tags/blocks/stripped_branches.json
+9cc41779f2e3f981b1883b1fda538c83cb43afca data/dynamictrees/tags/blocks/stripped_branches_that_burn.json
+3e34ca7dcdebfeae6d9931c582ba2243275afd6c data/dynamictrees/tags/blocks/stripped_fungus_branches.json
+df7ab2d6211815d5441e432477abca88841b501c data/dynamictrees/tags/blocks/wart_blocks.json
+4458fce0a5d1dbd6e884e4a581f15f4df9def5fb data/minecraft/tags/blocks/enderman_holdable.json
+bb90442c6cad4ad25a29f41c20d4540e8bd80799 data/minecraft/tags/blocks/flower_pots.json
+478c83611465564e2ad9f75d9a1f60369b13b8da data/minecraft/tags/blocks/hoglin_repellents.json
+5d45d3e56c20aa5b2eacc4ae25a9815459a664ef data/minecraft/tags/blocks/leaves.json
+c6cbc2390b831eca0a8a61bd1a5faee1cf798f13 data/minecraft/tags/blocks/logs.json
+bc2b505c9efcae8fad28abd2638a512645158332 data/minecraft/tags/blocks/logs_that_burn.json
+b1d094064f3a9f87563f9c43b97ddd084255a7d1 data/minecraft/tags/blocks/saplings.json
+145d07f74a6f711d7e0f71365129d520a3d65269 data/minecraft/tags/blocks/wart_blocks.json

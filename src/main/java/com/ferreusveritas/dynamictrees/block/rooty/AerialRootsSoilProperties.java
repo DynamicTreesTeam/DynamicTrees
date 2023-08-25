@@ -4,8 +4,11 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.data.AerialRootsSoilGenerator;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
+import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
+import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +28,9 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.ArrayList;
+import java.util.Optional;
 
 public class AerialRootsSoilProperties extends SoilProperties {
 
@@ -116,6 +122,20 @@ public class AerialRootsSoilProperties extends SoilProperties {
             //The block is removed when this is checked because it means it got attached to a tree
             level.setBlockAndUpdate(pos, getDecayBlockState(state, level, pos));
             return true;
+        }
+
+        public void destroyTree(Level level, BlockPos rootPos) {
+            Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
+            Optional<BranchBlock> root = TreeHelper.getBranchOpt(level.getBlockState(rootPos.below()));
+
+            if (branch.isPresent()) {
+                BranchDestructionData destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), Direction.DOWN, true, null);
+                FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
+            }
+            if (root.isPresent()) {
+                BranchDestructionData destroyData = root.get().destroyBranchFromNode(level, rootPos.below(), Direction.UP, true, null);
+                FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
+            }
         }
     }
 

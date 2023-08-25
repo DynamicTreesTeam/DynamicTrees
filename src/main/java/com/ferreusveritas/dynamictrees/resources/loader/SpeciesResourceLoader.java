@@ -131,13 +131,18 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("big_tree_sound_threshold", Float.class, Species::setBigTreeSoundThreshold)
                 .register("plantable_on_fluid", Boolean.class, Species::setPlantableOnFluid);
 
-        //Mangrove appliers
-        this.reloadAppliers
-                .register("min_world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setMinWorldGenHeightOffset)
-                .register("max_world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setMaxWorldGenHeightOffset);
-        //---------------//
+        registerMangroveAppliers();
 
         super.registerAppliers();
+    }
+
+    private void registerMangroveAppliers(){
+        this.reloadAppliers
+                .register("min_world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setMinWorldGenHeightOffset)
+                .register("max_world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setMaxWorldGenHeightOffset)
+                .register("roots_growth_logic_kit", MangroveSpecies.class, GrowthLogicKitConfiguration.class, MangroveSpecies::setRootsGrowthLogicKit)
+                .register("root_tapering", MangroveSpecies.class, Float.class, MangroveSpecies::setRootTapering)
+                .register("root_signal_energy", MangroveSpecies.class, Float.class, MangroveSpecies::setRootSignalEnergy);
     }
 
     private void setSeed(Species species, ResourceLocation seedName) {

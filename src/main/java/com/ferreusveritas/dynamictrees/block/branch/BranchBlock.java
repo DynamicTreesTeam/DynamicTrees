@@ -266,6 +266,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return connections;
     }
 
+    public boolean connectToLeaves(BlockGetter blockAccess, BlockPos leavesPos, Direction branchConnectionDir, int branchRadius){
+        return true;
+    }
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
