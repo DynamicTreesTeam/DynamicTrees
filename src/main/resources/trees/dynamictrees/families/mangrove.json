@@ -8,5 +8,6 @@
   "default_soil": "dynamictrees:mangrove_root_collar",
   "primitive_root": "mangrove_roots",
   "primitive_filled_root": "muddy_mangrove_roots",
-  "primitive_covered_root": "mud"
+  "primitive_covered_root": "mud",
+  "root_system_acceptable_soils": ["dirt_like", "mud_like", "sand_like"]
 }

@@ -54,6 +54,12 @@ public class NetVolumeNode implements NodeInspector {
             }
         }
 
+        public void addVolume (Volume other){
+            for (Map.Entry<Integer, Integer> vols : other.branchVolumes.entrySet()){
+                addVolume(vols.getValue(), vols.getKey());
+            }
+        }
+
         public void multiplyVolume(double multiplier) {
             branchVolumes.replaceAll((a, b) -> (int) (b * multiplier));
         }

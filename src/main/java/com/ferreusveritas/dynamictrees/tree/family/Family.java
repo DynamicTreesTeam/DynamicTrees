@@ -429,6 +429,18 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return getBranch();
     }
 
+    /**
+     * This is used for trees with root systems, i.e. mangrove trees.
+     * By default, most trees do not have one, so we just return the normal branch.
+     * @param level the world
+     * @param species the species
+     * @param pos the position the branch will be placed on
+     * @return the branch block selected
+     */
+    public Optional<BranchBlock> getBranchForRootsPlacement(LevelAccessor level, Species species, BlockPos pos) {
+        return getBranch();
+    }
+
     public Optional<BranchBlock> getStrippedBranch() {
         return Optionals.ofBlock(this.strippedBranch);
     }
@@ -523,7 +535,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return Optionals.ofBlock(primitiveStrippedLog);
     }
 
-    private List<ItemStack> getLogDropsForBranch(float volume, int branch) {
+    public List<ItemStack> getLogDropsForBranch(float volume, int branch) {
         BranchBlock branchBlock = getValidBranchBlock(branch);
         List<ItemStack> logs = new LinkedList<>();
         if (branchBlock != null) {
@@ -636,9 +648,25 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     /**
+     * Thickness of tips of the root system.
+     * By default, most trees do not have one, so we return the regular primary thickness.
+     */
+    public int getPrimaryRootThickness() {
+        return primaryThickness;
+    }
+
+    /**
      * Thickness of the branch connected to a twig (radius == getPrimaryThickness) [default = 2]
      */
     public int getSecondaryThickness() {
+        return secondaryThickness;
+    }
+
+    /**
+     * Thickness of the root connected to tips in the root system.
+     * By default, most trees do not have one, so we return the regular secondary thickness.
+     */
+    public int getSecondaryRootThickness() {
         return secondaryThickness;
     }
 
@@ -724,6 +752,15 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     protected Family setSurfaceRoot(Supplier<SurfaceRootBlock> surfaceRootSup) {
         this.surfaceRoot = surfaceRootSup;
         return this;
+    }
+
+    ///////////////////////////////////////////
+    // ROOT SYSTEM
+    ///////////////////////////////////////////
+
+    //By default there is no root species anyways. This is overriden by families like mangrove.
+    public boolean isAcceptableSoilForRootSystem(BlockState soilBlockState) {
+        return getCommonSpecies().isAcceptableSoil(soilBlockState);
     }
 
     ///////////////////////////////////////////

@@ -21,9 +21,11 @@ import com.ferreusveritas.dynamictrees.tree.species.MangroveSpecies;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.EntityUtils;
 import com.ferreusveritas.dynamictrees.util.LootTableSupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -167,7 +169,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
         BlockState currentState = level.getBlockState(pos);
         boolean replacingWater = currentState.getFluidState() == Fluids.WATER.getSource(false);
-        boolean replacingGround = getFamily().isReplaceableByRoots(currentState.getBlock());
+        boolean replacingGround = getFamily().isAcceptableSoilForRootSystem(currentState);
         boolean setWaterlogged = replacingWater && !replacingGround;
         Layer layer = currentState.is(this) ? currentState.getValue(LAYER) : (replacingGround?Layer.COVERED:Layer.EXPOSED);
         level.setBlock(pos, getStateForRadius(radius)
@@ -272,21 +274,20 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (isFullBlock(state)) {
-            return InteractionResult.PASS;
-        }
-        ItemStack handStack = player.getItemInHand(hand);
-        Block coverBlock = getFamily().getPrimitiveCoveredRoots().orElse(null);
-        if (coverBlock != null && handStack.getItem() == coverBlock.asItem()){
-            BlockState newState = state.setValue(LAYER, Layer.COVERED).setValue(WATERLOGGED, false);
-            if (canPlace(player, level, pos, newState)){
-                level.setBlock(pos, newState, 3);
-                if (!player.isCreative()) handStack.shrink(1);
-                level.playSound(null, pos, coverBlock.getSoundType(state, level, pos, player).getPlaceSound(), SoundSource.BLOCKS, 1f, 0.8f);
-                return InteractionResult.SUCCESS;
+        if (!isFullBlock(state)) {
+            ItemStack handStack = player.getItemInHand(hand);
+            Block coverBlock = getFamily().getPrimitiveCoveredRoots().orElse(null);
+            if (coverBlock != null && handStack.getItem() == coverBlock.asItem()){
+                BlockState newState = state.setValue(LAYER, Layer.COVERED).setValue(WATERLOGGED, false);
+                if (canPlace(player, level, pos, newState)){
+                    level.setBlock(pos, newState, 3);
+                    if (!player.isCreative()) handStack.shrink(1);
+                    level.playSound(null, pos, coverBlock.getSoundType(state, level, pos, player).getPlaceSound(), SoundSource.BLOCKS, 1f, 0.8f);
+                    return InteractionResult.SUCCESS;
+                }
             }
         }
-        return InteractionResult.PASS;
+        return super.use(state, level, pos , player, hand, hitResult);
     }
 
     @Override
@@ -307,7 +308,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
         // Tries to get the face being pounded on.
         final double reachDistance = entity instanceof Player ? Objects.requireNonNull(entity.getAttribute(ForgeMod.REACH_DISTANCE.get())).getValue() : 5.0D;
-        final BlockHitResult ragTraceResult = this.playerRayTrace(entity, reachDistance, 1.0F);
+        final BlockHitResult ragTraceResult = EntityUtils.playerRayTrace(entity, reachDistance, 1.0F);
         final Direction toolDir = ragTraceResult != null ? (entity.isShiftKeyDown() ? ragTraceResult.getDirection().getOpposite() : ragTraceResult.getDirection()) : Direction.DOWN;
 
         // Play and render block break sound and particles (must be done before block is broken).
@@ -360,7 +361,15 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             cutDir = Direction.UP;
         }
 
-        return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), new HashMap<>(), new ArrayList<>(), destroyer.getEnds(), volumeSum.getVolume(), cutPos, cutDir, toolDir, trunkHeight);
+        BlockPos lowestBlock = stateMapper.getBranchConnectionMap().keySet().stream().min(Comparator.comparingInt(Vec3i::getY)).orElse(BlockPos.ZERO);
+        final BlockPos.MutableBlockPos basePos = new BlockPos(cutPos).mutable();
+        for (int i = 0; i>lowestBlock.getY(); i--) {
+            if (!level.getBlockState(basePos.move(0, -1, 0).below()).getMaterial().isReplaceable()){
+                break;
+            }
+        }
+
+        return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), new HashMap<>(), new ArrayList<>(), destroyer.getEnds(), volumeSum.getVolume(), cutPos, basePos, cutDir, toolDir, trunkHeight);
     }
 
     //////////////////////////////
@@ -464,7 +473,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     private boolean canGrowInto(Level level, BlockPos pos){
         BlockState state = level.getBlockState(pos);
-        boolean isFree = getFamily().isReplaceableByRoots(state.getBlock()) || state.getMaterial().isReplaceable();
+        boolean isFree = getFamily().isAcceptableSoilForRootSystem(state) || state.getMaterial().isReplaceable();
         return isFree || state.getBlock() instanceof BasicRootsBlock;
     }
 
@@ -484,8 +493,9 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             signal.success = false;
             return signal;
         }
-        int supportExtraThickness = (getFamily().isReplaceableByRoots(level.getBlockState(pos).getBlock()) && !fromGround)
-                ? getFamily().getSupportedRootThicknessExtra() : 0;
+        int supportExtraThickness =
+                //(getFamily().isAcceptableSoilForRootSystem(level.getBlockState(pos)) && !fromGround) ? getFamily().getSupportedRootThicknessExtra() :
+                0;
         int radius = getFamily().getPrimaryRootThickness() + supportExtraThickness;
         setRadius(level, pos, radius, null);
         signal.radius = getFamily().getSecondaryRootThickness() + supportExtraThickness;

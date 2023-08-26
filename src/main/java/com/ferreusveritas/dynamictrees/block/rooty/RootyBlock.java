@@ -300,7 +300,10 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
         ) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
 
-    public void destroyTree(Level level, BlockPos rootPos) {
+    public void destroyTree(Level level, BlockPos rootPos){
+        destroyTree(level, rootPos, null);
+    }
+    public void destroyTree(Level level, BlockPos rootPos, @Nullable Player player) {
         Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
 
         if (branch.isPresent()) {
@@ -311,7 +314,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
 
     @Override
     public void playerWillDestroy(Level level, @Nonnull BlockPos pos, BlockState state, @Nonnull Player player) {
-        this.destroyTree(level, pos);
+        this.destroyTree(level, pos, player);
         super.playerWillDestroy(level, pos, state, player);
     }
 

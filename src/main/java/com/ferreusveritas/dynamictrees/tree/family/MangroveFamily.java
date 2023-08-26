@@ -9,18 +9,22 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.branch.BasicRootsBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.AerialRootsSoilProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
 import com.ferreusveritas.dynamictrees.util.Optionals;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -33,9 +37,6 @@ public class MangroveFamily extends Family {
     private Supplier<BranchBlock> root;
     private Supplier<Item> rootItem;
     private Block primitiveRoots, primitiveRootsFilled, primitiveRootsCovered;
-
-    private Block[] replaceableByRoots = new Block[]
-            {Blocks.MUD, Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.SAND};
 
     protected final MutableLazyValue<Generator<DTBlockStateProvider, Family>> rootsStateGenerator =
             MutableLazyValue.supplied(RootsStateGenerator::new);
@@ -105,6 +106,12 @@ public class MangroveFamily extends Family {
     public Optional<Item> getRootItem() {
         return Optionals.ofItem(rootItem);
     }
+
+    @Override
+    public Optional<BranchBlock> getBranchForRootsPlacement(LevelAccessor level, Species species, BlockPos pos) {
+        return getRoot();
+    }
+
     @Override
     public void generateStateData(DTBlockStateProvider provider) {
         super.generateStateData(provider);
@@ -121,8 +128,16 @@ public class MangroveFamily extends Family {
         return DynamicTrees.location("item/branch");
     }
 
-    public Boolean isReplaceableByRoots(Block block){
-        return Arrays.stream(replaceableByRoots).anyMatch(b->b == block);
+    protected int rootSystemSoilTypeFlags = 0;
+
+    @Override
+    public boolean isAcceptableSoilForRootSystem(BlockState soilBlockState){
+        return SoilHelper.isSoilAcceptable(soilBlockState, rootSystemSoilTypeFlags);
+    }
+
+    public Family addAcceptableSoilsForRootSystem(String... soilTypes) {
+        rootSystemSoilTypeFlags |= SoilHelper.getSoilFlags(soilTypes);
+        return this;
     }
 
     ///////////////////////////////////////////
@@ -133,9 +148,11 @@ public class MangroveFamily extends Family {
     private int secondaryRootThickness = 3;
     private int supportedRootThicknessExtra = 2;
 
+    @Override
     public int getPrimaryRootThickness() {
         return primaryRootThickness;
     }
+    @Override
     public int getSecondaryRootThickness() {
         return secondaryRootThickness;
     }
@@ -156,6 +173,9 @@ public class MangroveFamily extends Family {
 
     public void setPrimitiveRoots(Block primitiveRoots) {
         this.primitiveRoots = primitiveRoots;
+        if (this.root != null) {
+            this.root.get().setPrimitiveLogDrops(new ItemStack(primitiveRoots));
+        }
     }
     public void setPrimitiveRootsFilled(Block primitiveRootsFilled) {
         this.primitiveRootsFilled = primitiveRootsFilled;

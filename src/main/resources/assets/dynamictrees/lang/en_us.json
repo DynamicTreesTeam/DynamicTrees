@@ -71,6 +71,7 @@
   "tooltip.dynamictrees.species": "Species: %s",
   "tooltip.dynamictrees.fertility": "Fertility: %s",
   "tooltip.dynamictrees.jo_code": "JoCode: %s",
+  "tooltip.dynamictrees.roots_jo_code": "Roots JoCode: %s",
   "tooltip.dynamictrees.force_planting": "Force Planting: %s",
   "tooltip.dynamictrees.seed_life_span": "Seed Life Span: %s",
 

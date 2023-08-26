@@ -2,7 +2,6 @@ package com.ferreusveritas.dynamictrees.tree.species;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
-import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.branch.BasicRootsBlock;
@@ -13,9 +12,7 @@ import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
 import com.ferreusveritas.dynamictrees.growthlogic.context.PositionalSpeciesContext;
-import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
-import com.ferreusveritas.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
@@ -42,12 +39,17 @@ public class MangroveSpecies extends Species {
     private int maxWorldGenHeightOffset = 6;
     protected float rootSignalEnergy = 16.0f;
     protected float rootTapering = 0.3f;
+    protected int rootGrowthMultiplier = 15;
     public void setMinWorldGenHeightOffset(int minWorldGenHeightOffset) {
         this.minWorldGenHeightOffset = minWorldGenHeightOffset;
     }
 
     public void setMaxWorldGenHeightOffset(int maxWorldGenHeightOffset) {
         this.maxWorldGenHeightOffset = maxWorldGenHeightOffset;
+    }
+
+    public void setRootGrowthMultiplier(int rootGrowthMultiplier) {
+        this.rootGrowthMultiplier = rootGrowthMultiplier;
     }
 
     public MangroveSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
@@ -118,9 +120,7 @@ public class MangroveSpecies extends Species {
         if (branchState.getBlock() instanceof BasicRootsBlock){
             if (radius == 0) return 0;
             if (branchState.getValue(BlockStateProperties.WATERLOGGED)) return 0;
-            float chance = 0.3f + ((1f / (radius * (branchState.getValue(BlockStateProperties.WATERLOGGED) ? 3f : 1f) )));// Thicker roots take longer to rot, and waterlogged roots survive longer
-            chance *= 0.01;
-            return chance;
+            return 0.3f + ((1f / (radius * (branchState.getValue(BlockStateProperties.WATERLOGGED) ? 3f : 1f) )));
         }
         return super.rotChance(level, pos, rand, radius);
     }
@@ -148,7 +148,6 @@ public class MangroveSpecies extends Species {
         return super.generate(context);
     }
 
-
     //////////////////////
     // GROWTH
     //////////////////////
@@ -171,7 +170,7 @@ public class MangroveSpecies extends Species {
     protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos, Direction defaultDir) {
         GrowSignal treeSignal = super.sendGrowthSignal(treeBase, level, treePos, rootPos, defaultDir);
 
-        for (int i=0; i<10; i++){
+        for (int i = 0; i< rootGrowthMultiplier; i++){
             BlockPos belowPos = rootPos.below();
             BlockState belowState = level.getBlockState(belowPos);
             if (TreeHelper.isBranch(belowState)){

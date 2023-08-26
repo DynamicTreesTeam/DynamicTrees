@@ -72,12 +72,12 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
 
         if (destructionData.getNumBranches() > 0) {
             BlockState exState = destructionData.getBranchBlockState(0);
-            BlockPos rootPos = destructionData.cutPos;
+            BlockPos cutPos = destructionData.cutPos;
             if (exState != null) {
                 Species species = destructionData.species;
 
                 //Draw the rooty block if it is set to fall too
-                BlockPos bottomPos = entity.blockPosition().below();
+                BlockPos bottomPos = cutPos.below();
                 BlockState bottomState = entity.level.getBlockState(bottomPos);
                 boolean rootyBlockAdded = false;
                 if (TreeHelper.isRooty(bottomState)) {
@@ -128,7 +128,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                     for (Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
                         BlockState leafState = leafLoc.getValue();
                         treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(dispatcher.getBlockModel(leafState), leafState, new Vec3(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), ModelData.EMPTY),
-                                species.leafColorMultiplier(entity.level, rootPos.offset(leafLoc.getKey())), leafState));
+                                species.leafColorMultiplier(entity.level, cutPos.offset(leafLoc.getKey())), leafState));
                     }
                 } else {
                     for (int index = 0; index < destructionData.getNumLeaves(); index++) {
@@ -136,7 +136,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                         BlockState leafState = destructionData.getLeavesBlockState(index);
                         BakedModel leavesModel = dispatcher.getBlockModel(leafState);
                         treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, leafState, new Vec3(relPos.getX(), relPos.getY(), relPos.getZ()), ModelData.EMPTY),
-                                destructionData.getLeavesProperties(index).treeFallColorMultiplier(leafState, entity.level, rootPos.offset(relPos)), leafState));
+                                destructionData.getLeavesProperties(index).treeFallColorMultiplier(leafState, entity.level, cutPos.offset(relPos)), leafState));
                     }
                 }
 

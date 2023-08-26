@@ -83,6 +83,7 @@ import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
 import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
+import com.ferreusveritas.dynamictrees.worldgen.RootsJoCode;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
@@ -2142,6 +2143,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public JoCode getJoCode(String joCodeString) {
         return new JoCode(joCodeString);
+    }
+
+    public JoCode getRootsJoCode(String joCodeString) {
+        return new RootsJoCode(joCodeString);
     }
 
     public Collection<JoCode> getJoCodes() {

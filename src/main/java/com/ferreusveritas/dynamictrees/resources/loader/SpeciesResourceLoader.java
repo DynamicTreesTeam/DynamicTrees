@@ -141,6 +141,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("min_world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setMinWorldGenHeightOffset)
                 .register("max_world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setMaxWorldGenHeightOffset)
                 .register("roots_growth_logic_kit", MangroveSpecies.class, GrowthLogicKitConfiguration.class, MangroveSpecies::setRootsGrowthLogicKit)
+                .register("root_growth_multiplier", MangroveSpecies.class, Integer.class, MangroveSpecies::setRootGrowthMultiplier)
                 .register("root_tapering", MangroveSpecies.class, Float.class, MangroveSpecies::setRootTapering)
                 .register("root_signal_energy", MangroveSpecies.class, Float.class, MangroveSpecies::setRootSignalEnergy);
     }
@@ -176,19 +177,10 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     }
 
     private PropertyApplierResult addAcceptableSoil(Species species, String acceptableSoil) {
-        if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
-            return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
-        }
-        species.addAcceptableSoils(acceptableSoil);
-        return PropertyApplierResult.success();
+        return SoilHelper.applyIfSoilIsAcceptable(species, acceptableSoil, Species::addAcceptableSoils);
     }
-
     private PropertyApplierResult addAcceptableSoilForWorldGen(Species species, String acceptableSoil) {
-        if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
-            return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
-        }
-        species.addAcceptableSoilsForWorldGen(acceptableSoil);
-        return PropertyApplierResult.success();
+        return SoilHelper.applyIfSoilIsAcceptable(species, acceptableSoil, Species::addAcceptableSoilsForWorldGen);
     }
 
     @Override

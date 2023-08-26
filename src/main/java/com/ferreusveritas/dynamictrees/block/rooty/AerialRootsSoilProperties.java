@@ -6,12 +6,18 @@ import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
-import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
+import com.ferreusveritas.dynamictrees.util.EntityUtils;
+import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -26,10 +32,14 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.ForgeMod;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class AerialRootsSoilProperties extends SoilProperties {
@@ -124,17 +134,52 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return true;
         }
 
-        public void destroyTree(Level level, BlockPos rootPos) {
+//        @Override
+//        public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+//            playerWillDestroy(level, pos, state, player);
+//            //Do not destroy roots if broken, we will do that
+//            return false;
+//        }
+
+        @Override
+        public void destroyTree(Level level, BlockPos rootPos, @Nullable Player player) {
             Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
             Optional<BranchBlock> root = TreeHelper.getBranchOpt(level.getBlockState(rootPos.below()));
 
+            BranchDestructionData destroyData = null;
+            Optional<Direction> toolDir = Optional.empty();
+            if (player != null){
+                final double reachDistance = Objects.requireNonNull(player.getAttribute(ForgeMod.REACH_DISTANCE.get())).getValue();
+                final BlockHitResult ragTraceResult = EntityUtils.playerRayTrace(player, reachDistance, 1.0F);
+                toolDir = Optional.of(ragTraceResult != null ? (player.isShiftKeyDown() ? ragTraceResult.getDirection().getOpposite() : ragTraceResult.getDirection()) : Direction.DOWN);
+            }
+
             if (branch.isPresent()) {
-                BranchDestructionData destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), Direction.DOWN, true, null);
-                FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
+                destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), toolDir.orElse(Direction.DOWN), false, player);
             }
             if (root.isPresent()) {
-                BranchDestructionData destroyData = root.get().destroyBranchFromNode(level, rootPos.below(), Direction.UP, true, null);
-                FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
+                BranchDestructionData rootDestroyData = root.get().destroyBranchFromNode(level, rootPos.below(), toolDir.orElse(Direction.UP), false, player);
+                if (destroyData == null){
+                    destroyData = rootDestroyData;
+                } else {
+                    destroyData = destroyData.merge(rootDestroyData);
+                }
+            }
+            if (destroyData == null){
+                fallWithTree(level.getBlockState(rootPos), level, rootPos);
+            } else {
+
+                final ItemStack heldItem = player == null ? ItemStack.EMPTY : player.getMainHandItem();
+                final int fortune = EnchantmentHelper.getTagEnchantmentLevel(Enchantments.BLOCK_FORTUNE, heldItem);
+                final float fortuneFactor = 1.0f + 0.25f * fortune;
+                final NetVolumeNode.Volume woodVolume = destroyData.woodVolume; // The amount of wood calculated from the body of the tree network.
+                woodVolume.multiplyVolume(fortuneFactor);
+                final List<ItemStack> woodItems = destroyData.species.getBranchesDrops(level, woodVolume, heldItem);
+
+                FallingTreeEntity.dropTree(level, destroyData, woodItems, FallingTreeEntity.DestroyType.HARVEST);
+
+                if (player != null)
+                    ItemUtils.damageAxe(player, heldItem, getRadius(level.getBlockState(rootPos)), woodVolume, true);
             }
         }
     }
