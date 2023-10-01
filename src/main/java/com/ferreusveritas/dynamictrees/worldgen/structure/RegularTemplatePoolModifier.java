@@ -18,6 +18,7 @@ public class RegularTemplatePoolModifier implements TemplatePoolModifier {
     }
 
     public TemplatePoolModifier replaceTemplate(int index, StructurePoolElement element) {
+        if (templatePool.rawTemplates.size() <= index) return this;
         Pair<StructurePoolElement, Integer> removedRawTemplate = templatePool.rawTemplates.remove(index);
         templatePool.rawTemplates.add(index, Pair.of(element, removedRawTemplate.getSecond()));
         templatePool.templates.replaceAll(template -> {
