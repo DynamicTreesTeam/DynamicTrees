@@ -96,6 +96,7 @@ dependencies {
     // runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
     // runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.19:${property("suggestionProviderFixVersion")}"))
 
+
     // Small lib that allows changing the blocks snow can be on
     // runtimeOnly(fg.deobf("curse.maven:snow-coated-843893:${property("snowCoatedVersion")}"))
 }
