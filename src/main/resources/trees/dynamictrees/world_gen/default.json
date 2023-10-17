@@ -73,6 +73,13 @@
     }
   },
   {
+    "select": { "name": "minecraft:cherry_grove" },
+    "apply": {
+      "species" : "cherry",
+        "density": [ 0.8 ]
+    }
+  },
+  {
     "select": { "name": "minecraft:.*", "tag": "#minecraft:is_jungle" },
     "apply": {
       "species" : {

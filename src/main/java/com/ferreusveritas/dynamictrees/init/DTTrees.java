@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.registry.Registry;
 import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
 import com.ferreusveritas.dynamictrees.api.registry.TypeRegistryEvent;
 import com.ferreusveritas.dynamictrees.api.worldgen.FeatureCanceller;
+import com.ferreusveritas.dynamictrees.block.leaves.CherryLeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.PalmLeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.ScruffyLeavesProperties;
@@ -68,6 +69,7 @@ public class DTTrees {
         event.registerType(DynamicTrees.location("wart"), WartProperties.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmLeavesProperties.TYPE);
         event.registerType(DynamicTrees.location("scruffy"), ScruffyLeavesProperties.TYPE);
+        event.registerType(DynamicTrees.location("cherry"), CherryLeavesProperties.TYPE);
     }
 
     @SubscribeEvent
