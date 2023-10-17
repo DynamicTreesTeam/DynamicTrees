@@ -21,7 +21,7 @@ public final class SeasonalSeedDropChance implements LootItemCondition {
 
     @Override
     public LootItemConditionType getType() {
-        return DTLootConditions.SEASONAL_SEED_DROP_CHANCE;
+        return DTLootConditions.SEASONAL_SEED_DROP_CHANCE.get();
     }
 
     @Override

@@ -207,7 +207,7 @@ public class HugeMushroomGenFeature extends GenFeature {
                 for (BlockPos mutPos : Iterables.concat(BlockPos.betweenClosed(BlockPos.ZERO.below(capMap.getLenY()), BlockPos.ZERO.below(height - 1)), capMap.getAllNonZero())) {
                     final BlockPos dPos = mutPos.offset(capPos);
                     final BlockState state = level.getBlockState(dPos);
-                    if (!state.getMaterial().isReplaceable()) {
+                    if (!state.canBeReplaced()) {
                         return true;
                     }
                 }

@@ -41,8 +41,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -283,10 +282,8 @@ public final class JsonDeserialisers {
             SeedSaplingRecipe.class, new SeedSaplingRecipeDeserialiser()
     );
 
-    public static final JsonDeserialiser<Material> MATERIAL =
-            register(Material.class, new MaterialDeserialiser());
-    public static final JsonDeserialiser<MaterialColor> MATERIAL_COLOR =
-            register(MaterialColor.class, new MaterialColorDeserialiser());
+    public static final JsonDeserialiser<MapColor> MAP_COLOR =
+            register(MapColor.class, new MapColorDeserialiser());
     public static final JsonDeserialiser<SoundType> SOUND_TYPE =
             register(SoundType.class, new SoundTypeDeserialiser());
 

@@ -43,9 +43,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -80,7 +80,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     private final SoilProperties properties;
 
     public RootyBlock(SoilProperties properties, Properties blockProperties) {
-        super(blockProperties.randomTicks());
+        super(blockProperties.randomTicks().pushReaction(PushReaction.BLOCK));
         this.properties = properties;
         registerDefaultState(defaultBlockState().setValue(FERTILITY, 0).setValue(IS_VARIANT, false));
     }
@@ -125,8 +125,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     }
 
     @Override
-    public MaterialColor defaultMaterialColor() {
-        return getPrimitiveSoilBlock().defaultMaterialColor();
+    public MapColor defaultMapColor() {
+        return getPrimitiveSoilBlock().defaultMapColor();
     }
 
     @Override
@@ -166,7 +166,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
 
     @Nonnull
     @Override
-    public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
+    public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootParams.Builder builder) {
         return getPrimitiveSoilState(state).getDrops(builder);
     }
 
@@ -319,13 +319,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
         destroyTree(level, pos);
         super.onBlockExploded(state, level, pos, explosion);
-    }
-
-
-    @Nonnull
-    @Override
-    public PushReaction getPistonPushReaction(BlockState state) {
-        return PushReaction.BLOCK;
     }
 
     ///////////////////////////////////////////

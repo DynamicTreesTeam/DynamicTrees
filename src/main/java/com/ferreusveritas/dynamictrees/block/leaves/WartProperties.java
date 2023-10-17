@@ -8,8 +8,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.Collections;
@@ -32,13 +31,13 @@ public class WartProperties extends SolidLeavesProperties {
     }
 
     @Override
-    public Material getDefaultMaterial() {
-        return Material.GRASS;
+    public MapColor getDefaultMapColor() {
+        return MapColor.GRASS;
     }
 
     @Override
-    public BlockBehaviour.Properties getDefaultBlockProperties(Material material, MaterialColor materialColor) {
-        return BlockBehaviour.Properties.of(material, materialColor).strength(1.0F).sound(SoundType.WART_BLOCK)./*harvestTool(ToolType.HOE).*/randomTicks();
+    public BlockBehaviour.Properties getDefaultBlockProperties(MapColor mapColor) {
+        return BlockBehaviour.Properties.of().mapColor(mapColor).strength(1.0F).sound(SoundType.WART_BLOCK).randomTicks();
     }
 
     @Override
@@ -48,12 +47,12 @@ public class WartProperties extends SolidLeavesProperties {
 
     @Override
     public LootTable.Builder createBlockDrops() {
-        return DTLootTableProvider.createWartBlockDrops(primitiveLeaves.getBlock());
+        return DTLootTableProvider.BlockLoot.createWartBlockDrops(primitiveLeaves.getBlock());
     }
 
     @Override
     public LootTable.Builder createDrops() {
-        return DTLootTableProvider.createWartDrops(primitiveLeaves.getBlock());
+        return DTLootTableProvider.BlockLoot.createWartDrops(primitiveLeaves.getBlock());
     }
 
 }

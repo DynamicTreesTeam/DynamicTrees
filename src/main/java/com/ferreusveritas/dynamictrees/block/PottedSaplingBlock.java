@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -43,7 +43,7 @@ public class PottedSaplingBlock extends BaseEntityBlock {
     protected static final AABB FLOWER_POT_AABB = new AABB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 
     public PottedSaplingBlock() {
-        super(Block.Properties.of(Material.DECORATION).instabreak().noOcclusion());
+        super(Block.Properties.of().instabreak().noOcclusion().pushReaction(PushReaction.DESTROY));
     }
 
     //////////////////////////////

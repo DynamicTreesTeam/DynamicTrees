@@ -10,7 +10,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,8 +35,9 @@ public class NetherFungusFamily extends Family {
     }
 
     @Override
-    public Material getDefaultBranchMaterial() {
-        return Material.NETHER_WOOD;
+    public MapColor getDefaultBranchMapColor() {
+        // TODO 1.20: Customize warped and crimson in default.json
+        return MapColor.WARPED_STEM;
     }
 
     @Override

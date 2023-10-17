@@ -36,7 +36,7 @@ public final class WeightedItemLootPoolEntry extends LootPoolSingletonContainer 
 
     @Override
     public LootPoolEntryType getType() {
-        return DTLootPoolEntries.WEIGHTED_ITEM;
+        return DTLootPoolEntries.WEIGHTED_ITEM.get();
     }
 
     @Override
@@ -55,8 +55,8 @@ public final class WeightedItemLootPoolEntry extends LootPoolSingletonContainer 
         public void serializeCustom(JsonObject json, WeightedItemLootPoolEntry value, JsonSerializationContext conditions) {
             super.serializeCustom(json, value, conditions);
             JsonObject weightedItemsJson = new JsonObject();
-            value.items.items.forEach(entry ->
-                    weightedItemsJson.addProperty(String.valueOf(ForgeRegistries.ITEMS.getKey(entry.data)), entry.getWeight().asInt())
+            value.items.unwrap().forEach(entry ->
+                    weightedItemsJson.addProperty(String.valueOf(ForgeRegistries.ITEMS.getKey(entry.getData())), entry.getWeight().asInt())
             );
             json.add("items", weightedItemsJson);
         }

@@ -24,7 +24,7 @@ public abstract class ChunkBasedCommand extends SubCommand {
     }
 
     private ChunkPos getChunkPos(final CommandSourceStack source) {
-        return new ChunkPos(new BlockPos(source.getPosition().x, source.getPosition().y, source.getPosition().z));
+        return new ChunkPos(BlockPos.containing(source.getPosition().x, source.getPosition().y, source.getPosition().z));
     }
 
     @Override

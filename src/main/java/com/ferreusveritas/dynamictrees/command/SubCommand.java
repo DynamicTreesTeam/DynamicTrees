@@ -171,12 +171,12 @@ public abstract class SubCommand {
     }
 
     protected static void sendSuccess(final CommandSourceStack source, final Component component) {
-        source.sendSuccess(component.copy().withStyle(style -> style.withColor(ChatFormatting.GREEN)),
+        source.sendSuccess(() -> component.copy().withStyle(style -> style.withColor(ChatFormatting.GREEN)),
                 false);
     }
 
     protected static void sendSuccessAndLog(final CommandSourceStack source, final Component component) {
-        source.sendSuccess(component.copy().withStyle(style -> style.withColor(ChatFormatting.GREEN)),
+        source.sendSuccess(() -> component.copy().withStyle(style -> style.withColor(ChatFormatting.GREEN)),
                 true);
     }
 

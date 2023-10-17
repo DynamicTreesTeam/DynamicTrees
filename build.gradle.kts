@@ -7,13 +7,12 @@ import java.time.format.DateTimeFormatter
 fun property(key: String) = project.findProperty(key).toString()
 fun optionalProperty(key: String) = project.findProperty(key)?.toString()
 
-apply(from = "https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle")
 apply(from = "https://gist.githubusercontent.com/Harleyoc1/4d23d4e991e868d98d548ac55832381e/raw/applesiliconfg.gradle")
 
 plugins {
     id("java")
-    id("net.minecraftforge.gradle")
-//    id("org.parchmentmc.librarian.forgegradle")
+    id("net.minecraftforge.gradle") version "[6.0,6.2)"
+    id("org.parchmentmc.librarian.forgegradle") version "1.+"
     id("idea")
     id("maven-publish")
     id("com.harleyoconnor.translationsheet") version "0.1.1"
@@ -42,8 +41,7 @@ version = "$mcVersion-$modVersion"
 group = property("group")
 
 minecraft {
-//    mappings("parchment", "${property("mappingsVersion")}-$mcVersion")
-    mappings("official", "$mcVersion")
+    mappings(property("mappingsChannel"), property("mappingsVersion"))
     accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
 
     runs {
@@ -86,20 +84,21 @@ sourceSets.main.get().resources {
 dependencies {
     minecraft("net.minecraftforge:forge:$mcVersion-${property("forgeVersion")}")
 
-    implementation(fg.deobf("curse.maven:jade-324717:4573193"))
+    compileOnly(fg.deobf("curse.maven:jade-324717:${property("jadeVersion")}"))
 
     compileOnly(fg.deobf("mezz.jei:jei-$mcVersion-forge-api:${property("jeiVersion")}"))
     compileOnly(fg.deobf("mezz.jei:jei-$mcVersion-common-api:${property("jeiVersion")}"))
     runtimeOnly(fg.deobf("mezz.jei:jei-$mcVersion-forge:${property("jeiVersion")}"))
 
-    implementation(fg.deobf("curse.maven:SereneSeasons-291874:${property("ssVersion")}"))
+    compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:${property("ssVersion")}"))
 
-//    runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
-    runtimeOnly(fg.deobf("cc.tweaked:cc-tweaked-$mcVersion-forge:${property("ccVersion")}"))
-//    runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.19:${property("suggestionProviderFixVersion")}"))
+    // runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
+    // runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
+    // runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.19:${property("suggestionProviderFixVersion")}"))
 
-    //Small lib that allows changing the blocks snow can be on
-//    runtimeOnly(fg.deobf("curse.maven:snow-coated-843893:4465018"))
+
+    // Small lib that allows changing the blocks snow can be on
+    // runtimeOnly(fg.deobf("curse.maven:snow-coated-843893:${property("snowCoatedVersion")}"))
 }
 
 translationSheet {
@@ -254,7 +253,7 @@ tasks.autoUpdate {
 fun net.minecraftforge.gradle.common.util.RunConfig.applyDefaultConfiguration(runDirectory: String = "run") {
     workingDirectory = file(runDirectory).absolutePath
 
-    property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
+    property("forge.logging.markers", "REGISTRIES,REGISTRYDUMP")
     property("forge.logging.console.level", "debug")
 
     property("mixin.env.remapRefMap", "true")

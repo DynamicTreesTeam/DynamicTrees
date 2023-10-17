@@ -1,0 +1,52 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "minecraft:village/savanna/savanna_lamp_post_01",
+        "processors": "minecraft:zombie_savanna",
+        "projection": "rigid"
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "disabled": {
+          "element_type": "minecraft:feature_pool_element",
+          "feature": "minecraft:acacia",
+          "projection": "rigid"
+        },
+        "element_type": "dynamictrees:cancel_vanilla_village_tree_element",
+        "enabled": {
+          "element_type": "dynamictrees:tree_pool_element",
+          "projection": "terrain_matching",
+          "species": "dynamictrees:acacia"
+        }
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "element_type": "minecraft:feature_pool_element",
+        "feature": "minecraft:pile_hay",
+        "projection": "rigid"
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "element_type": "minecraft:feature_pool_element",
+        "feature": "minecraft:pile_melon",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:empty_pool_element"
+      },
+      "weight": 4
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

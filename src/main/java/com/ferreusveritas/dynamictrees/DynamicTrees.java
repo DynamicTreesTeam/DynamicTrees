@@ -71,8 +71,6 @@ public final class DynamicTrees {
         loadingContext.registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
         loadingContext.registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
 
-//        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> DTClient::clientStart);
-
         RegistryHandler.setup(MOD_ID);
 
         DTRegistries.setup();
@@ -102,13 +100,6 @@ public final class DynamicTrees {
         DTRegistries.DENDRO_POTION.get().registerRecipes();
 
         Resources.MANAGER.setup();
-
-        if (DTConfigs.REPLACE_NYLIUM_FUNGI.get()) {
-            DTTrees.replaceNyliumFungiFeatures();
-        }
-        if (DTConfigs.CANCEL_VANILLA_VILLAGE_TREES.get()) {
-            VillageTreeReplacement.replaceTreesFromVanillaVillages();
-        }
     }
 
     private void gatherData(final GatherDataEvent event) {

@@ -24,9 +24,8 @@ import net.minecraft.world.phys.HitResult;
 import javax.annotation.Nullable;
 
 public class DirtBucket extends Item {
-
     public DirtBucket() {
-        super(new Item.Properties().stacksTo(1).tab(DTRegistries.ITEM_GROUP));
+        super(new Item.Properties().stacksTo(1));
     }
 
     @Override
@@ -61,7 +60,7 @@ public class DirtBucket extends Item {
                 if (!world.mayInteract(player, pos)) {
                     return new InteractionResultHolder<>(InteractionResult.FAIL, itemStack);
                 } else {
-                    final boolean isReplaceable = world.getBlockState(pos).getMaterial().isReplaceable();
+                    final boolean isReplaceable = world.getBlockState(pos).canBeReplaced();
                     final BlockPos workingPos = isReplaceable && blockRayTraceResult.getDirection() == Direction.UP ? pos : pos.relative(blockRayTraceResult.getDirection());
 
                     if (!player.mayUseItemAt(workingPos, blockRayTraceResult.getDirection(), itemStack)) {
@@ -81,7 +80,7 @@ public class DirtBucket extends Item {
 
     public boolean tryPlaceContainedDirt(@Nullable Player player, Level world, BlockPos posIn) {
         BlockState blockState = world.getBlockState(posIn);
-        if (blockState.getMaterial().isReplaceable()) {
+        if (blockState.canBeReplaced()) {
             if (!world.isClientSide && !blockState.isAir()) {
                 world.destroyBlock(posIn, true);
             }

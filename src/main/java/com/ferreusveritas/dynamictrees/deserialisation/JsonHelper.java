@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
-import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -8,8 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,8 +16,8 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class JsonHelper {
@@ -127,10 +125,8 @@ public class JsonHelper {
                         .orElseThrow();
     }
 
-    public static BlockBehaviour.Properties getBlockProperties(final JsonObject jsonObject, final Material defaultMaterial, final MaterialColor defaultMaterialColor, final BiFunction<Material, MaterialColor, BlockBehaviour.Properties> defaultPropertiesGetter, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
-        final Material material = JsonHelper.getOrDefault(jsonObject, "material", Material.class, defaultMaterial);
-        final BlockBehaviour.Properties properties = defaultPropertiesGetter.apply(material,
-                JsonHelper.getOrDefault(jsonObject, "material_color", MaterialColor.class, defaultMaterialColor));
+    public static BlockBehaviour.Properties getBlockProperties(final JsonObject jsonObject, final MapColor defaultMapColor, final Function<MapColor, BlockBehaviour.Properties> defaultPropertiesGetter, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
+        final BlockBehaviour.Properties properties = defaultPropertiesGetter.apply(JsonHelper.getOrDefault(jsonObject, "map_color", MapColor.class, defaultMapColor));
 
         JsonPropertyApplierLists.PROPERTIES.applyAll(new JsonMapWrapper(jsonObject), properties)
                 .forEachErrorWarning(errorConsumer, warningConsumer);

@@ -19,8 +19,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.LootDataType;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -37,7 +39,7 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock, IPl
     protected Species species;
 
     public DynamicSaplingBlock(Species species) {
-        super(Properties.of(Material.PLANT).sound(SoundType.GRASS).randomTicks().noOcclusion());
+        super(Properties.of().mapColor(MapColor.PLANT).noCollission().pushReaction(PushReaction.DESTROY).instabreak().sound(SoundType.GRASS).randomTicks().noOcclusion());
         this.species = species;
     }
 
@@ -51,8 +53,8 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock, IPl
     }
 
     @Override
-    public boolean isValidBonemealTarget(@Nonnull BlockGetter level, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
-        return this.getSpecies().canSaplingConsumeBoneMeal((Level) level, pos);
+    public boolean isValidBonemealTarget(@Nonnull LevelReader level, @Nonnull BlockPos pos, @Nonnull BlockState state, boolean isClient) {
+        return this.getSpecies().canSaplingConsumeBoneMeal(level, pos);
     }
 
     @Override
@@ -142,9 +144,9 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock, IPl
 
     @Nonnull
     @Override
-    public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootContext.Builder builder) {
+    public List<ItemStack> getDrops(@Nonnull BlockState state, @Nonnull LootParams.Builder builder) {
         // If a loot table has been added load those drops instead (until drop creators).
-        if (builder.getLevel().getServer().getLootTables().getIds().contains(this.getLootTable())) {
+        if (builder.getLevel().getServer().getLootData().getElement(LootDataType.TABLE, this.getLootTable()) != null) {
             return super.getDrops(state, builder);
         }
 

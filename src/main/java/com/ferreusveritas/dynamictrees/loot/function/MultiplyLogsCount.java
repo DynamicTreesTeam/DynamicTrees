@@ -23,7 +23,7 @@ public final class MultiplyLogsCount extends LootItemConditionalFunction {
 
     @Override
     public LootItemFunctionType getType() {
-        return DTLootFunctions.MULTIPLY_LOGS_COUNT;
+        return DTLootFunctions.MULTIPLY_LOGS_COUNT.get();
     }
 
     @Override

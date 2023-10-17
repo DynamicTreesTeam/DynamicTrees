@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.worldgen.structure;
 
+import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.item.Seed;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.google.common.collect.Lists;
@@ -30,6 +31,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @author Harley O'Connor
@@ -40,13 +42,9 @@ public final class TreePoolElement extends StructurePoolElement {
 
     public static final Codec<TreePoolElement> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(Species.CODEC.fieldOf("species").forGetter(TreePoolElement::getSpecies),
-                    BlockPos.CODEC.fieldOf("offset").forGetter(TreePoolElement::getOffset),
+                    BlockPos.CODEC.optionalFieldOf("offset", BlockPos.ZERO).forGetter(TreePoolElement::getOffset),
                     projectionCodec())
             .apply(instance, TreePoolElement::new));
-
-    public static final StructurePoolElementType<TreePoolElement> TREE_POOL_ELEMENT = StructurePoolElementType.register(
-            "tree_pool_element", CODEC
-    );
 
     private final Species species;
 
@@ -64,6 +62,14 @@ public final class TreePoolElement extends StructurePoolElement {
         this.defaultJigsawNBT = this.fillDefaultJigsawNBT();
     }
 
+    public static Function<StructureTemplatePool.Projection, TreePoolElement> create(Species species) {
+        return projection -> new TreePoolElement(species, projection);
+    }
+
+    public static Function<StructureTemplatePool.Projection, TreePoolElement> create(Species species, BlockPos offset) {
+        return projection -> new TreePoolElement(species, offset, projection);
+    }
+
     private CompoundTag fillDefaultJigsawNBT() {
         CompoundTag tag = new CompoundTag();
         tag.putString("name", "minecraft:bottom");
@@ -77,7 +83,8 @@ public final class TreePoolElement extends StructurePoolElement {
     @Override
     public List<StructureTemplate.StructureBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager structureManager, BlockPos pos, Rotation rotation, RandomSource random) {
         return Lists.newArrayList(
-                new StructureTemplate.StructureBlockInfo(pos, Blocks.JIGSAW.defaultBlockState().setValue(JigsawBlock.ORIENTATION, FrontAndTop.fromFrontAndTop(Direction.DOWN, Direction.SOUTH)), this.defaultJigsawNBT)
+                new StructureTemplate.StructureBlockInfo(pos, Blocks.JIGSAW.defaultBlockState().setValue(JigsawBlock.ORIENTATION, FrontAndTop.fromFrontAndTop(Direction.DOWN, Direction.SOUTH)),
+                        this.defaultJigsawNBT)
         );
     }
 
@@ -93,9 +100,9 @@ public final class TreePoolElement extends StructurePoolElement {
     }
 
 
-
     @Override
-    public boolean place(StructureTemplateManager structureManager, WorldGenLevel level, StructureManager structureFeatureManager, ChunkGenerator chunkGenerator, BlockPos pos, BlockPos p_210488_, Rotation rotation, BoundingBox box, RandomSource random, boolean keepJigsaws) {
+    public boolean place(StructureTemplateManager structureManager, WorldGenLevel level, StructureManager structureFeatureManager, ChunkGenerator chunkGenerator, BlockPos pos, BlockPos p_210488_,
+            Rotation rotation, BoundingBox box, RandomSource random, boolean keepJigsaws) {
         final Seed seed = species.getSeed().orElse(null);
         if (seed == null) {
             return false;
@@ -130,7 +137,7 @@ public final class TreePoolElement extends StructurePoolElement {
 
     @Override
     public StructurePoolElementType<?> getType() {
-        return TREE_POOL_ELEMENT;
+        return DTRegistries.TREE_STRUCTURE_POOL_ELEMENT_TYPE.get();
     }
 
     public Species getSpecies() {

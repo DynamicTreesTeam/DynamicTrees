@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
@@ -97,10 +98,10 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
             return;
         }
 
-        final BlockState blockState = this.level.getBlockState(this.blockPos);
+        final BlockState blockState = this.level().getBlockState(this.blockPos);
 
         if (blockState.getBlock() instanceof RootyBlock) {
-            if (!this.effect.update(this.level, this.blockPos, this.tickCount, blockState.getValue(RootyBlock.FERTILITY))) {
+            if (!this.effect.update(this.level(), this.blockPos, this.tickCount, blockState.getValue(RootyBlock.FERTILITY))) {
                 this.kill();
             }
         } else {
@@ -109,7 +110,7 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
     }
 
     @Override
-    public Packet<?> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
@@ -125,8 +126,8 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
         final byte index = additionalData.readByte();
         this.effect = index < 0 ? null : LingeringSubstances.fromIndex(index).get();
 
-        if (this.effect != null && this.level != null) {
-            this.effect.apply(this.level, this.blockPos);
+        if (this.effect != null && this.level() != null) {
+            this.effect.apply(this.level(), this.blockPos);
         }
     }
 

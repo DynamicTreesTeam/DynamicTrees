@@ -1,8 +1,7 @@
 {
-  "type": "dynamictrees:branches",
+  "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
       "entries": [
         {
@@ -17,10 +16,10 @@
           ],
           "name": "minecraft:stripped_spruce_log"
         }
-      ]
+      ],
+      "rolls": 1.0
     },
     {
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
       "entries": [
         {
@@ -35,7 +34,9 @@
           ],
           "name": "minecraft:stick"
         }
-      ]
+      ],
+      "rolls": 1.0
     }
-  ]
+  ],
+  "random_sequence": "dynamictrees:trees/branches/stripped_spruce"
 }

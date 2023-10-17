@@ -24,7 +24,7 @@ public final class SeedItemLootPoolEntry extends LootPoolSingletonContainer {
 
     @Override
     public LootPoolEntryType getType() {
-        return DTLootPoolEntries.SEED_ITEM;
+        return DTLootPoolEntries.SEED_ITEM.get();
     }
 
     @Override

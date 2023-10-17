@@ -6,7 +6,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import sereneseasons.api.season.Season.SubSeason;
 import sereneseasons.api.season.SeasonHelper;
-import sereneseasons.config.BiomeConfig;
 import sereneseasons.config.SeasonsConfig;
 import sereneseasons.season.SeasonHooks;
 
@@ -28,7 +27,8 @@ public class SereneSeasonsSeasonProvider implements SeasonProvider {
     public boolean shouldSnowMelt(Level level, BlockPos pos) {
         if (SeasonsConfig.generateSnowAndIce.get() && seasonValue < com.ferreusveritas.dynamictrees.compat.season.SeasonHelper.WINTER) {
             Holder<Biome> biomeHolder = level.getBiome(pos);
-            return BiomeConfig.enablesSeasonalEffects(biomeHolder) &&
+            // TODO 1.20: Reinstate Serene Seasons compat here, BiomeConfig class is gone
+            return /*BiomeConfig.enablesSeasonalEffects(biomeHolder) &&*/
                     SeasonHooks.getBiomeTemperature(level, biomeHolder, pos) >= 0.15f;
         }
         return false;

@@ -104,23 +104,12 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
     }
 
     public DendroPotion() {
-        super(new Item.Properties().tab(DTRegistries.ITEM_GROUP).stacksTo(1));
+        super(new Item.Properties().stacksTo(1));
     }
 
-    public ItemStack applyIndexTag(final ItemStack potionStack, final int potionIndex) {
+    public static ItemStack applyIndexTag(final ItemStack potionStack, final int potionIndex) {
         potionStack.getOrCreateTag().putInt(INDEX_TAG_KEY, potionIndex);
         return potionStack;
-    }
-
-    @Override
-    public void fillItemCategory(final CreativeModeTab group, final NonNullList<ItemStack> items) {
-        if (this.allowedIn(group)) {
-            for (final DendroPotionType potion : DendroPotionType.values()) {
-                if (potion.isActive()) {
-                    items.add(this.applyIndexTag(new ItemStack(this, 1), potion.getIndex()));
-                }
-            }
-        }
     }
 
     public static DendroPotionType getPotionType(ItemStack stack) {

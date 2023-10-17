@@ -21,8 +21,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -186,12 +185,12 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     // MATERIAL
     ///////////////////////////////////////////
 
-    public Material getDefaultMaterial() {
-        return Material.DIRT;
+    public MapColor getDefaultMapColor() {
+        return MapColor.DIRT;
     }
 
-    public BlockBehaviour.Properties getDefaultBlockProperties(final Material material, final MaterialColor materialColor) {
-        return BlockBehaviour.Properties.of(material, materialColor).strength(0.5F).sound(SoundType.GRAVEL);
+    public BlockBehaviour.Properties getDefaultBlockProperties(final MapColor mapColor) {
+        return BlockBehaviour.Properties.of().mapColor(mapColor).strength(0.5F).sound(SoundType.GRAVEL);
     }
 
     ///////////////////////////////////////////

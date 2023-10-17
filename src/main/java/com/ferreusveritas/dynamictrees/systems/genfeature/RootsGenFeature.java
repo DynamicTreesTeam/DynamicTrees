@@ -15,11 +15,11 @@ import com.ferreusveritas.dynamictrees.util.function.TetraFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 public class RootsGenFeature extends GenFeature {
 
@@ -149,8 +149,7 @@ public class RootsGenFeature extends GenFeature {
             return true;
         }
 
-        Material material = placeState.getMaterial();
-        return material.isReplaceable() && material != Material.LAVA;
+        return placeState.canBeReplaced() && !placeState.getFluidState().is(FluidTags.LAVA);
     }
 
     public RootsGenFeature setScaler(TetraFunction<Integer, Integer, Integer, Float, Integer> scaler) {

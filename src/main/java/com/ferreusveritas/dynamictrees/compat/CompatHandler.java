@@ -12,7 +12,6 @@ import com.google.common.collect.Maps;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
-import sereneseasons.config.BiomeConfig;
 import sereneseasons.config.ServerConfig;
 
 import java.util.LinkedHashMap;
@@ -48,7 +47,7 @@ public final class CompatHandler {
                             new Tuple<>(new SereneSeasonsSeasonProvider(), new ActiveSeasonGrowthCalculator()) :
                             new Tuple<>(new NullSeasonProvider(), new NullSeasonGrowthCalculator())
             );
-            seasonManager.setTropicalPredicate((world, pos) -> BiomeConfig.usesTropicalSeasons(world.getBiome(pos)));
+            seasonManager.setTropicalPredicate((world, pos) -> sereneseasons.api.season.SeasonHelper.usesTropicalSeasons(world.getBiome(pos)));
             return seasonManager;
         });
     }

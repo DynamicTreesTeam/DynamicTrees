@@ -47,11 +47,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.LootDataManager;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraftforge.api.distmarker.Dist;
@@ -226,7 +226,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return blockLootTableSupplier.getName();
     }
 
-    public LootTable getBlockLootTable(LootTables lootTables, Species species) {
+    public LootTable getBlockLootTable(LootDataManager lootTables, Species species) {
         return blockLootTableSupplier.get(lootTables, species);
     }
 
@@ -236,9 +236,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     public LootTable.Builder createBlockDrops() {
         if (primitiveLeaves != null && getPrimitiveLeavesBlock().isPresent()) {
-            return DTLootTableProvider.createLeavesBlockDrops(primitiveLeaves.getBlock(), seedDropChances);
+            return DTLootTableProvider.BlockLoot.createLeavesBlockDrops(primitiveLeaves.getBlock(), seedDropChances);
         }
-        return DTLootTableProvider.createLeavesDrops(seedDropChances, LootContextParamSets.BLOCK);
+        return DTLootTableProvider.BlockLoot.createLeavesDrops(seedDropChances, LootContextParamSets.BLOCK);
     }
 
     private final LootTableSupplier lootTableSupplier;
@@ -247,7 +247,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return lootTableSupplier.getName();
     }
 
-    public LootTable getLootTable(LootTables lootTables, Species species) {
+    public LootTable getLootTable(LootDataManager lootTables, Species species) {
         return lootTableSupplier.get(lootTables, species);
     }
 
@@ -256,19 +256,19 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     public LootTable.Builder createDrops() {
-        return DTLootTableProvider.createLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES);
+        return DTLootTableProvider.BlockLoot.createLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES);
     }
 
     public List<ItemStack> getDrops(Level level, BlockPos pos, ItemStack tool, Species species) {
         if (level.isClientSide) {
             return Collections.emptyList();
         }
-        return getLootTable(level.getServer().getLootTables(), species)
-                .getRandomItems(createLootContext(level, pos, tool, species));
+        return getLootTable(level.getServer().getLootData(), species)
+                .getRandomItems(createLootParams(level, pos, tool, species));
     }
 
-    private LootContext createLootContext(Level level, BlockPos pos, ItemStack tool, Species species) {
-        return new LootContext.Builder(LevelContext.getServerLevelOrThrow(level))
+    private LootParams createLootParams(Level level, BlockPos pos, ItemStack tool, Species species) {
+        return new LootParams.Builder(LevelContext.getServerLevelOrThrow(level))
                 .withParameter(LootContextParams.BLOCK_STATE, level.getBlockState(pos))
                 .withParameter(DTLootContextParams.SPECIES, species)
                 .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR, species.seasonalSeedDropFactor(LevelContext.create(level), pos))
@@ -540,14 +540,16 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.connectAnyRadius = connectAnyRadius;
     }
 
-    public Material getDefaultMaterial() {
-        return Material.LEAVES;
+    public MapColor getDefaultMapColor() {
+        return MapColor.PLANT;
     }
 
-    public BlockBehaviour.Properties getDefaultBlockProperties(final Material material, final MaterialColor materialColor) {
-        return BlockBehaviour.Properties.of(material, materialColor)
+    public BlockBehaviour.Properties getDefaultBlockProperties(final MapColor mapColor) {
+        return BlockBehaviour.Properties.of()
+                .mapColor(mapColor)
+                .ignitedByLava()
+                .pushReaction(PushReaction.DESTROY)
                 .strength(0.2F)
-                //.harvestTool(ToolTypes.SHEARS)
                 .randomTicks()
                 .sound(SoundType.GRASS)
                 .noOcclusion()

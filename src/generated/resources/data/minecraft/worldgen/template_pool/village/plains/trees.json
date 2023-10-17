@@ -1,0 +1,21 @@
+{
+  "elements": [
+    {
+      "element": {
+        "disabled": {
+          "element_type": "minecraft:feature_pool_element",
+          "feature": "minecraft:oak",
+          "projection": "rigid"
+        },
+        "element_type": "dynamictrees:cancel_vanilla_village_tree_element",
+        "enabled": {
+          "element_type": "dynamictrees:tree_pool_element",
+          "projection": "terrain_matching",
+          "species": "dynamictrees:oak"
+        }
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

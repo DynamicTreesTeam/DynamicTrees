@@ -76,8 +76,7 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
     private void createBlock(Fruit fruit, JsonObject json, JsonObject propertiesJson) {
         final BlockBehaviour.Properties blockProperties = JsonHelper.getBlockProperties(
                 propertiesJson,
-                fruit.getDefaultMaterial(),
-                fruit.getDefaultMaterialColor(),
+                fruit.getDefaultMapColor(),
                 fruit::getDefaultBlockProperties,
                 error -> this.logError(fruit.getRegistryName(), error),
                 warning -> this.logWarning(fruit.getRegistryName(), warning)

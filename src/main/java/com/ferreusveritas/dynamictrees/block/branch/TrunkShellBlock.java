@@ -37,7 +37,6 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.AABB;
@@ -80,7 +79,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     }
 
     public TrunkShellBlock() {
-        super(Block.Properties.of(Material.WOOD));
+        super(Properties.of().ignitedByLava().pushReaction(PushReaction.BLOCK));
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
     }
 
@@ -337,11 +336,6 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.INVISIBLE;
-    }
-
-    @Override
-    public PushReaction getPistonPushReaction(BlockState state) {
-        return PushReaction.BLOCK;
     }
 
     @Override

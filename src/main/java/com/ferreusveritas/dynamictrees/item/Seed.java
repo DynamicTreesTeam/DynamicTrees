@@ -72,7 +72,7 @@ public class Seed extends Item implements IPlantable {
     }
 
     public Seed(Species species, Item.Properties properties) {
-        super(properties.tab(DTRegistries.ITEM_GROUP));
+        super(properties);
         this.species = species;
     }
 
@@ -90,7 +90,7 @@ public class Seed extends Item implements IPlantable {
         }
 
         if (entityItem.tickCount >= entityItem.lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
-            final Level level = entityItem.level;
+            final Level level = entityItem.level();
             if (!level.isClientSide) {//Server side only
                 final ItemStack seedStack = entityItem.getItem();
                 final BlockPos pos = new BlockPos(entityItem.blockPosition());
@@ -229,7 +229,7 @@ public class Seed extends Item implements IPlantable {
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         BlockPos pos = context.getClickedPos();
         Direction facing = context.getClickedFace();
-        if (state.getMaterial().isReplaceable()) {
+        if (state.canBeReplaced()) {
             pos = pos.below();
             facing = Direction.UP;
         }

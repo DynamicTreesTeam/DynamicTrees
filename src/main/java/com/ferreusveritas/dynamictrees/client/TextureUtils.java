@@ -19,8 +19,8 @@ public class TextureUtils {
         }
 
         public PixelBuffer(TextureAtlasSprite sprite) {
-            this.w = sprite.getWidth();
-            this.h = sprite.getHeight();
+            this.w = sprite.contents().width();
+            this.h = sprite.contents().height();
             pixels = new int[w * h];
             for (int x = 0; x < w; x++) {
                 for (int y = 0; y < h; y++) {

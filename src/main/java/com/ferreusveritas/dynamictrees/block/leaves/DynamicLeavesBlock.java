@@ -47,6 +47,7 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -77,7 +78,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     public DynamicLeavesBlock(Properties properties) {
-        super(properties);
+        super(properties.pushReaction(PushReaction.DESTROY));
         this.registerDefaultState(this.stateDefinition.any().setValue(DISTANCE, LeavesProperties.maxHydro).setValue(PERSISTENT, false).setValue(WATERLOGGED, false));
     }
 
@@ -296,6 +297,13 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return false;
     }
 
+    /**
+     * Only here so that subclasses can override {@link #fallOn(Level, BlockState, BlockPos, Entity, float)}
+     * and return it to the default behavior in {@link Block#fallOn(Level, BlockState, BlockPos, Entity, float)}.
+     */
+    protected void superFallOn(Level level, BlockState blockState, BlockPos pos, Entity entity, float fallDistance) {
+        super.fallOn(level, blockState, pos, entity, fallDistance);
+    }
 
     @Override
     public void fallOn(Level level, BlockState blockState, BlockPos pos, Entity entity, float fallDistance) {
@@ -412,7 +420,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
             level.removeBlock(pos, false);
         }
 
-        return (level.isEmptyBlock(pos) || level.getBlockState(pos).getMaterial().isReplaceable()) && hasAdequateLight(blockState, level, leavesProperties, pos);
+        return (level.isEmptyBlock(pos) || level.getBlockState(pos).canBeReplaced()) && hasAdequateLight(blockState, level, leavesProperties, pos);
     }
 
     /**
@@ -611,7 +619,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         final Vec3 originPos = builder.getOptionalParameter(LootContextParams.ORIGIN);
         final LootTable lootTable;
         Species species = Species.NULL_SPECIES;
@@ -619,18 +627,18 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         ServerLevel level = builder.getLevel();
 
         if (originPos == null) {
-            lootTable = level.getServer().getLootTables().get(getLootTable());
+            lootTable = level.getServer().getLootData().getLootTable(getLootTable());
         } else {
-            pos = new BlockPos(originPos.x, originPos.y, originPos.z);
+            pos = BlockPos.containing(originPos.x, originPos.y, originPos.z);
             LeavesProperties leavesProperties = getProperties(state);
             species = getExactSpecies(level, pos, leavesProperties);
-            lootTable = leavesProperties.getBlockLootTable(level.getServer().getLootTables(), species);
+            lootTable = leavesProperties.getBlockLootTable(level.getServer().getLootData(), species);
         }
 
-        if (lootTable.getLootTableId() == BuiltInLootTables.EMPTY) {
+        if (lootTable == LootTable.EMPTY || lootTable.getLootTableId() == BuiltInLootTables.EMPTY) {
             return Collections.emptyList();
         } else {
-            LootContext context = builder
+            LootParams context = builder
                     .withParameter(LootContextParams.BLOCK_STATE, state)
                     .withParameter(DTLootContextParams.SPECIES, species)
                     .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR,
@@ -724,11 +732,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     public int branchSupport(BlockState state, BlockGetter level, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
         // Leaves are only support for "twigs".
         return radius == branch.getFamily().getPrimaryThickness() && branch.getFamily() == getFamily(state, level, pos) ? BranchBlock.setSupport(0, 1) : 0;
-    }
-
-    @Override
-    public PushReaction getPistonPushReaction(BlockState state) {
-        return PushReaction.DESTROY;
     }
 
     @Override

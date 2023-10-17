@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -160,19 +161,19 @@ public class FruitBlock extends Block implements BonemealableBlock, GrowableBloc
 
     @SuppressWarnings("deprecation")
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         ResourceLocation resourcelocation = this.getLootTable();
         if (resourcelocation == BuiltInLootTables.EMPTY) return Collections.emptyList();
         else {
-            LootContext context = builder.withParameter(LootContextParams.BLOCK_STATE, state).create(LootContextParamSets.BLOCK);
-            LootTable table = context.getLevel().getServer().getLootTables().get(resourcelocation);
+            LootParams lootParams = builder.withParameter(LootContextParams.BLOCK_STATE, state).create(LootContextParamSets.BLOCK);
+            LootTable table = lootParams.getLevel().getServer().getLootData().getLootTable(resourcelocation);
 
             //If no loot table is set up, the default behaviour is to drop the fruit item if the age is max.
             if (table == LootTable.EMPTY && state.hasProperty(fruit.getAgeProperty()) && state.getValue(fruit.getAgeProperty()) == fruit.getMaxAge()) {
                 return Collections.singletonList(fruit.getItemStack());
             }
 
-            return table.getRandomItems(context);
+            return table.getRandomItems(lootParams);
         }
     }
 
@@ -192,7 +193,7 @@ public class FruitBlock extends Block implements BonemealableBlock, GrowableBloc
     }
 
     @Override
-    public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
+    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClient) {
         return fruit.canBoneMeal() && getAge(state) < fruit.getMaxAge();
     }
 

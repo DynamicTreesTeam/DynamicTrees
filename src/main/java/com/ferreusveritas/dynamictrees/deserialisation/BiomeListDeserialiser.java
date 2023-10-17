@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.deserialisation.result.JsonResult;
 import com.ferreusveritas.dynamictrees.deserialisation.result.Result;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
-import com.ferreusveritas.dynamictrees.util.holderset.DelayedTagEntriesHolderSet;
+import com.ferreusveritas.dynamictrees.util.holderset.DelayedHolderSet;
 import com.ferreusveritas.dynamictrees.util.holderset.NameRegexMatchHolderSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -18,11 +18,11 @@ import net.minecraft.ResourceLocationException;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.registries.DataPackRegistriesHooks;
 import net.minecraftforge.registries.holdersets.OrHolderSet;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +41,13 @@ import java.util.function.Supplier;
 public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHolderSet> {
 
     private static final Map<ResourceLocation, List<ResourceLocation>> TAGS = Maps.newHashMap();
-    public static final Supplier<Registry<Biome>> DELAYED_BIOME_REGISTRY = () -> ServerLifecycleHooks.getCurrentServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+    public static final Supplier<Registry<Biome>> DELAYED_BIOME_REGISTRY = () -> {
+        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        if (currentServer == null)
+            throw new IllegalStateException("Queried biome registry too early; server does not exist yet!");
+
+        return currentServer.registryAccess().registryOrThrow(Registries.BIOME);
+    };
 
     private static final Applier<DTBiomeHolderSet, String> TAG_APPLIER = (biomeList, tagString) -> {
         tagString = tagString.toLowerCase();
@@ -53,9 +59,9 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHold
 
         try {
             ResourceLocation tagLocation = new ResourceLocation(tagString);
-            TagKey<Biome> tagKey = TagKey.create(Registry.BIOME_REGISTRY, tagLocation);
+            TagKey<Biome> tagKey = TagKey.create(Registries.BIOME, tagLocation);
 
-            (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()).add(new DelayedTagEntriesHolderSet<>(DELAYED_BIOME_REGISTRY, tagKey));
+            (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()).add(new DelayedHolderSet<>(() -> DELAYED_BIOME_REGISTRY.get().getOrCreateTag(tagKey)));
         } catch (ResourceLocationException e) {
             return PropertyApplierResult.failure(e.getMessage());
         }
@@ -68,7 +74,9 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHold
         if (notOperator)
             nameRegex = nameRegex.substring(1);
 
-        (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()).add(new NameRegexMatchHolderSet<>(DELAYED_BIOME_REGISTRY, nameRegex));
+        String finalNameRegex = nameRegex;
+        (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()).add(new DelayedHolderSet<>(
+                () -> new NameRegexMatchHolderSet<>(DELAYED_BIOME_REGISTRY.get().asLookup(), finalNameRegex)));
     };
     public static void cacheNewTags(Map<ResourceLocation, Collection<Holder<Biome>>> biomeTags) {
         TAGS.clear();
@@ -95,7 +103,9 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHold
             if (notOperator)
                 nameRegex = nameRegex.substring(1);
 
-            (notOperator ? orExcludes : orIncludes).add(new NameRegexMatchHolderSet<>(DELAYED_BIOME_REGISTRY, nameRegex));
+        String finalNameRegex = nameRegex;
+        (notOperator ? orExcludes : orIncludes).add(new DelayedHolderSet<>(
+                () -> new NameRegexMatchHolderSet<>(DELAYED_BIOME_REGISTRY.get().asLookup(), finalNameRegex)));
         });
 
         if (!orIncludes.isEmpty())
@@ -151,7 +161,7 @@ public final class BiomeListDeserialiser implements JsonDeserialiser<DTBiomeHold
         return JsonResult.forInput(input)
                 .mapIfType(String.class, biomeName -> {
                     DTBiomeHolderSet biomes = new DTBiomeHolderSet();
-                    biomes.getIncludeComponents().add(new NameRegexMatchHolderSet<>(DELAYED_BIOME_REGISTRY, biomeName.toLowerCase(Locale.ROOT)));
+                    biomes.getIncludeComponents().add(new DelayedHolderSet<>(() -> new NameRegexMatchHolderSet<>(DELAYED_BIOME_REGISTRY.get().asLookup(), biomeName.toLowerCase(Locale.ROOT))));
                     return biomes;
                 })
                 .elseMapIfType(JsonObject.class, selectorObject -> {

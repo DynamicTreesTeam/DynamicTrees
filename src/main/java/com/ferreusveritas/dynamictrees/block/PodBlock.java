@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -164,19 +165,19 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
 
     @SuppressWarnings("deprecation")
     @Override
-    public List<ItemStack> getDrops(BlockState pState, LootContext.Builder level) {
+    public List<ItemStack> getDrops(BlockState pState, LootParams.Builder level) {
         ResourceLocation resourcelocation = this.getLootTable();
         if (resourcelocation == BuiltInLootTables.EMPTY) return Collections.emptyList();
         else {
-            LootContext lootcontext = level.withParameter(LootContextParams.BLOCK_STATE, pState).create(LootContextParamSets.BLOCK);
-            LootTable loottable = lootcontext.getLevel().getServer().getLootTables().get(resourcelocation);
+            LootParams lootParams = level.withParameter(LootContextParams.BLOCK_STATE, pState).create(LootContextParamSets.BLOCK);
+            LootTable loottable = lootParams.getLevel().getServer().getLootData().getLootTable(resourcelocation);
 
             //If no loot table is set up, the default behaviour is to drop the pod item if the age is max.
             if (loottable == LootTable.EMPTY &&
                     pState.hasProperty(pod.getAgeProperty()) && pState.getValue(pod.getAgeProperty()) == pod.getMaxAge())
                 return Collections.singletonList(pod.getItemStack());
 
-            return loottable.getRandomItems(lootcontext);
+            return loottable.getRandomItems(lootParams);
         }
     }
 
@@ -198,7 +199,7 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
     }
 
     @Override
-    public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
+    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClient) {
         return pod.canBoneMeal() && getAge(state) < pod.getMaxAge();
     }
 

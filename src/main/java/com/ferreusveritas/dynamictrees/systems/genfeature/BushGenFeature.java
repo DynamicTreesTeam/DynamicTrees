@@ -94,7 +94,7 @@ public class BushGenFeature extends GenFeature {
         for (int i = 0; i < 2; i++) {
             int rad = Mth.clamp(random.nextInt(radius - 2) + 2, 2, radius - 1);
             Vec3 v = vTree.add(new Vec3(1, 0, 0).scale(rad).yRot((float) (random.nextFloat() * Math.PI * 2)));
-            BlockPos vPos = new BlockPos(v);
+            BlockPos vPos = BlockPos.containing(v);
 
             if (!safeBounds.inBounds(vPos, true)) {
                 continue;
@@ -104,7 +104,7 @@ public class BushGenFeature extends GenFeature {
             final BlockState soilBlockState = level.getBlockState(groundPos);
 
             final BlockPos pos = groundPos.above();
-            if (!level.getBlockState(groundPos).getMaterial().isLiquid() &&
+            if (!level.getBlockState(groundPos).liquid() &&
                     species.isAcceptableSoil(level, groundPos, soilBlockState)) {
                 level.setBlock(pos, configuration.get(LOG).defaultBlockState(), 3);
 
@@ -113,7 +113,7 @@ public class BushGenFeature extends GenFeature {
                 for (BlockPos.MutableBlockPos dPos : leafMap.getAllNonZero()) {
                     leafPos.set(pos.getX() + dPos.getX(), pos.getY() + dPos.getY(), pos.getZ() + dPos.getZ());
                     if (safeBounds.inBounds(leafPos, true) && (coordHashCode(leafPos) % 5) != 0 &&
-                            level.getBlockState(leafPos).getMaterial().isReplaceable()) {
+                            level.getBlockState(leafPos).canBeReplaced()) {
                         placeLeaves(configuration, level, random, leafPos);
                     }
                 }

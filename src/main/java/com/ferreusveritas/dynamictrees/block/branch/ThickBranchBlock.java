@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -33,8 +33,8 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, MAX_RADIUS_THICK); //39 ?
 
-    public ThickBranchBlock(ResourceLocation name, Material material) {
-        this(name, Properties.of(material));
+    public ThickBranchBlock(ResourceLocation name, MapColor mapColor) {
+        this(name, Properties.of().mapColor(mapColor));
     }
 
     public ThickBranchBlock(ResourceLocation name, Properties properties) {
@@ -147,7 +147,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
             return pos.offset(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;
         }
 
-        if (state.getMaterial().isReplaceable() || state.is(DTBlockTags.FOLIAGE)) {
+        if (state.canBeReplaced() || state.is(DTBlockTags.FOLIAGE)) {
             return ReplaceableState.REPLACEABLE;
         }
 

@@ -7,8 +7,7 @@ import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvent;
@@ -22,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Vector3f;
 
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +49,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
     protected void playStartSound(FallingTreeEntity entity){
 
-        if (!getData(entity).startSoundPlayed && entity.level.isClientSide()){
+        if (!getData(entity).startSoundPlayed && entity.level().isClientSide()){
             Species species = entity.getSpecies();
             SoundEvent sound = species.getFallingTreeStartSound(entity.getVolume(), entity.hasLeaves());
             SoundInstanceHandler.playSoundInstance(sound, species.getFallingTreePitch(entity.getVolume()), entity.position(), entity);
@@ -57,7 +57,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
     protected void playEndSound(FallingTreeEntity entity){
         if (!getData(entity).endSoundPlayed){
-            if (entity.level.isClientSide){
+            if (entity.level().isClientSide){
                 SoundInstanceHandler.stopSoundInstance(entity);
             } else {
                 Species species = entity.getSpecies();
@@ -70,7 +70,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     protected void playFallThroughWaterSound(FallingTreeEntity entity){
-        if (!getData(entity).fallThroughWaterSoundPlayed && !entity.level.isClientSide()){
+        if (!getData(entity).fallThroughWaterSoundPlayed && !entity.level().isClientSide()){
             entity.playSound(entity.getSpecies().getFallingTreeHitWaterSound(entity.getVolume(), entity.hasLeaves()), 2, 1);
             getData(entity).fallThroughWaterSoundPlayed = true;
         }
@@ -84,7 +84,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
         playStartSound(entity);
 
         BlockPos belowBlock = entity.getDestroyData().cutPos.below();
-        if (entity.level.getBlockState(belowBlock).isFaceSturdy(entity.level, belowBlock, Direction.UP)) {
+        if (entity.level().getBlockState(belowBlock).isFaceSturdy(entity.level(), belowBlock, Direction.UP)) {
             entity.setOnGround(true);
         }
     }
@@ -94,7 +94,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
         float fallSpeed = getData(entity).fallSpeed;
 
-        if (entity.isOnGround()) {
+        if (entity.onGround()) {
             float height = (float) entity.getMassCenter().y * 2;
             fallSpeed += (0.2 / height);
             addRotation(entity, fallSpeed);
@@ -104,14 +104,14 @@ public class FalloverAnimationHandler implements AnimationHandler {
         entity.setPos(entity.getX(), entity.getY() + entity.getDeltaMovement().y, entity.getZ());
 
         {//Handle entire entity falling and collisions with it's base and the ground
-            Level level = entity.level;
+            Level level = entity.level();
             int radius = 8;
             BlockState state = entity.getDestroyData().getBranchBlockState(0);
             if (TreeHelper.isBranch(state)) {
                 radius = ((BranchBlock) state.getBlock()).getRadius(state);
             }
             AABB fallBox = new AABB(entity.getX() - radius, entity.getY(), entity.getZ() - radius, entity.getX() + radius, entity.getY() + 1.0, entity.getZ() + radius);
-            BlockPos pos = new BlockPos(entity.getX(), entity.getY(), entity.getZ());
+            BlockPos pos = BlockPos.containing(entity.getX(), entity.getY(), entity.getZ());
             BlockState collState = level.getBlockState(pos);
 
             VoxelShape shape = collState.getBlockSupportShape(level, pos);
@@ -138,7 +138,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
         }
 
         //Crush living things with clumsy dead trees
-        Level level = entity.level;
+        Level level = entity.level();
         if (DTConfigs.ENABLE_FALLING_TREE_DAMAGE.get() && !level.isClientSide) {
             List<LivingEntity> elist = testEntityCollision(entity);
             for (LivingEntity living : elist) {
@@ -154,7 +154,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
                         living.setDeltaMovement(living.getDeltaMovement().x + (level.random.nextFloat() - 0.5), living.getDeltaMovement().y, living.getDeltaMovement().z + (level.random.nextFloat() - 0.5));
                         damage *= DTConfigs.FALLING_TREE_DAMAGE_MULTIPLIER.get();
                         //System.out.println("Tree Falling Damage: " + damage + "/" + living.getHealth());
-                        living.hurt(AnimationConstants.TREE_DAMAGE, damage);
+                        living.hurt(AnimationConstants.treeDamage(level.registryAccess()), damage);
                     }
                 }
             }
@@ -196,11 +196,11 @@ public class FalloverAnimationHandler implements AnimationHandler {
             float half = Mth.clamp(tex * (segment + 1) * 2, tex, maxRadius);
             AABB testBB = new AABB(segX - half, segY - half, segZ - half, segX + half, segY + half, segZ + half);
 
-            if (entity.level.containsAnyLiquid(testBB)){
+            if (entity.level().containsAnyLiquid(testBB)){
                 playFallThroughWaterSound(entity);
             }
 
-            if (!entity.level.noCollision(entity, testBB)) {
+            if (!entity.level().noCollision(entity, testBB)) {
                 return true;
             }
         }
@@ -234,7 +234,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
     public List<LivingEntity> testEntityCollision(FallingTreeEntity entity) {
 
-        Level level = entity.level;
+        Level level = entity.level();
 
         Direction toolDir = entity.getDestroyData().toolDir;
 
@@ -277,7 +277,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
     @Override
     public void dropPayload(FallingTreeEntity entity) {
-        Level level = entity.level;
+        Level level = entity.level();
         BlockPos cutPos = entity.getDestroyData().cutPos;
         entity.getPayload().forEach(i -> Block.popResource(level, cutPos, i));
     }
@@ -294,7 +294,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
         //Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
         if (dead) {
             entity.cleanupRootyDirt();
-            if (entity.level.isClientSide)
+            if (entity.level().isClientSide)
                 SoundInstanceHandler.stopSoundInstance(entity);
         }
 
@@ -316,8 +316,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
         Vec3 toolVec = new Vec3(toolDir.getStepX(), toolDir.getStepY(), toolDir.getStepZ()).scale(radius / 16.0f);
 
         poseStack.translate(-toolVec.x, -toolVec.y, -toolVec.z);
-        poseStack.mulPose(new Quaternion(new Vector3f(0, 0, 1), -yaw, true));
-        poseStack.mulPose(new Quaternion(new Vector3f(1, 0, 0), pit, true));
+        poseStack.mulPose(Axis.ZN.rotationDegrees(yaw));
+        poseStack.mulPose(Axis.XP.rotationDegrees(pit));
         poseStack.translate(toolVec.x, toolVec.y, toolVec.z);
 
         poseStack.translate(-0.5, 0, -0.5);

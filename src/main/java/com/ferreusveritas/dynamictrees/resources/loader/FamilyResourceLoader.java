@@ -83,8 +83,7 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
     private void setBranchProperties(Family family, JsonObject json) {
         family.setProperties(JsonHelper.getBlockProperties(
                 JsonHelper.getOrDefault(json, "branch_properties", JsonObject.class, new JsonObject()),
-                family.getDefaultBranchMaterial(),
-                family.getDefaultBranchMaterial().getColor(),
+                family.getDefaultBranchMapColor(),
                 family::getDefaultBranchProperties,
                 error -> this.logError(family.getRegistryName(), error),
                 warning -> this.logWarning(family.getRegistryName(), warning)

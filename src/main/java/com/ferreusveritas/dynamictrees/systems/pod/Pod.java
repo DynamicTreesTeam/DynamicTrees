@@ -30,8 +30,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -159,20 +159,19 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         else return new PodBlock(properties, this);
     }
 
-    public Material getDefaultMaterial() {
-        return Material.PLANT;
-    }
-
-    public MaterialColor getDefaultMaterialColor() {
-        return getDefaultMaterial().getColor();
+    public MapColor getDefaultMapColor() {
+        return MapColor.PLANT;
     }
 
     public BlockBehaviour.Properties getDefaultBlockProperties() {
-        return getDefaultBlockProperties(getDefaultMaterial(), getDefaultMaterialColor());
+        return getDefaultBlockProperties(this.getDefaultMapColor());
     }
 
-    public BlockBehaviour.Properties getDefaultBlockProperties(Material material, MaterialColor materialColor) {
-        return BlockBehaviour.Properties.of(material, materialColor)
+    public BlockBehaviour.Properties getDefaultBlockProperties(MapColor mapColor) {
+        return BlockBehaviour.Properties.of()
+                .mapColor(mapColor)
+                .noCollission()
+                .pushReaction(PushReaction.DESTROY)
                 .sound(SoundType.CROP)
                 .randomTicks()
                 .strength(0.3F);
@@ -352,7 +351,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     }
 
     public LootTable.Builder createBlockDrops() {
-        return DTLootTableProvider.createPodDrops(block.get(), itemStack.getItem(), ageProperty, maxAge);
+        return DTLootTableProvider.BlockLoot.createPodDrops(block.get(), itemStack.getItem(), ageProperty, maxAge);
     }
 
     public void setMaxRadius(int maxRadius) {
