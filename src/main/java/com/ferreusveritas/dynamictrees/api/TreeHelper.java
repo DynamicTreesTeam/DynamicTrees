@@ -14,6 +14,7 @@ import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.ferreusveritas.dynamictrees.worldgen.RootsJoCode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -126,17 +127,23 @@ public class TreeHelper {
 
     }
 
+    public static Optional<JoCode> getRootsJoCode(Level level, BlockPos pos) {
+        return getJoCode(level, pos, Direction.SOUTH, true);
+    }
     public static Optional<JoCode> getJoCode(Level level, BlockPos pos) {
-        return getJoCode(level, pos, Direction.SOUTH);
+        return getJoCode(level, pos, Direction.SOUTH, false);
     }
 
-    public static Optional<JoCode> getJoCode(Level level, BlockPos pos, Direction direction) {
+    public static Optional<JoCode> getJoCode(Level level, BlockPos pos, Direction direction, boolean roots) {
         if (pos == null) {
             return Optional.empty();
         }
         pos = dereferenceTrunkShell(level, pos);
         BlockPos rootPos = TreeHelper.findRootNode(level, pos);
-        return rootPos != BlockPos.ZERO ? Optional.of(new JoCode(level, rootPos, direction)) : Optional.empty();
+        return rootPos != BlockPos.ZERO ? Optional.of (
+                roots ? new RootsJoCode(level, rootPos, direction)
+                        : new JoCode(level, rootPos, direction)
+        ) : Optional.empty();
     }
 
     public static BlockPos dereferenceTrunkShell(Level level, BlockPos pos) {

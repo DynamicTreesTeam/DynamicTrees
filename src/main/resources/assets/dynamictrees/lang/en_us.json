@@ -78,6 +78,7 @@
   "tooltip.dynamictrees.enabled": "Enabled",
 
   "commands.dynamictrees.success.get_tree": "Species: %s JoCode: %s",
+  "commands.dynamictrees.success.get_roots": "Species: %s Roots JoCode: %s",
   "commands.dynamictrees.error.get_tree": "Could not find tree species at position %s.",
   "commands.dynamictrees.success.set_tree": "Successfully set tree at position %s to species %s with JoCode %s.",
   "commands.dynamictrees.success.kill_tree": "Successfully killed tree at position %s.",

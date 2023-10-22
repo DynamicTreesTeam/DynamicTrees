@@ -2145,7 +2145,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return new JoCode(joCodeString);
     }
 
-    public JoCode getRootsJoCode(String joCodeString) {
+    public RootsJoCode getRootsJoCode(String joCodeString) {
         return new RootsJoCode(joCodeString);
     }
 

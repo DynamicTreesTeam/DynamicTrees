@@ -17,6 +17,8 @@ import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
+import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -29,6 +31,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.util.List;
+
+import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.suffix;
 
 public class MangroveSpecies extends Species {
 
@@ -140,12 +144,21 @@ public class MangroveSpecies extends Species {
     // GENERATION
     //////////////////////
 
-
     @Override
     public boolean generate(GenerationContext context) {
         context.rootPos().move(Direction.UP,
                 context.random().nextIntBetweenInclusive(minWorldGenHeightOffset, maxWorldGenHeightOffset));
-        return super.generate(context);
+
+            if (super.generate(context)
+                    && !JoCodeRegistry.getCodes(this.getRegistryName(), true).isEmpty()) {
+                final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), context.radius(), context.random(), true);
+                if (code != null) {
+                    code.generate(context);
+                    return true;
+                }
+            }
+
+        return false;
     }
 
     //////////////////////

@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
 
@@ -91,7 +92,7 @@ public class RootsJoCode extends JoCode {
         final List<BlockPos> endPoints = endFinder.getEnds();
 
         // Rot the unsupported branches.
-        species.handleRot(level, endPoints, rootPos, rootsPos, 0, context.safeBounds());
+        //species.handleRot(level, endPoints, rootPos, rootsPos, 0, context.safeBounds());
     }
 
     @Override
