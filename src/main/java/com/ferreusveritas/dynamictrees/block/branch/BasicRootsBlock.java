@@ -161,6 +161,8 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     @Override
     public int branchSupport(BlockState state, BlockGetter level, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
+        if (branch instanceof BasicRootsBlock)
+            return isSameTree(branch) ? BasicBranchBlock.setSupport(1, 0) : 0;
         return 0;
     }
 

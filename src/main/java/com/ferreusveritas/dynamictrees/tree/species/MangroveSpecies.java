@@ -39,7 +39,7 @@ public class MangroveSpecies extends Species {
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(MangroveSpecies::new);
 
     protected GrowthLogicKitConfiguration rootLogicKit = GrowthLogicKitConfiguration.getDefault();
-    private int minWorldGenHeightOffset = 1;
+    private int minWorldGenHeightOffset = 2;
     private int maxWorldGenHeightOffset = 6;
     protected float rootSignalEnergy = 16.0f;
     protected float rootTapering = 0.3f;

@@ -92,7 +92,7 @@ public class RootsJoCode extends JoCode {
         final List<BlockPos> endPoints = endFinder.getEnds();
 
         // Rot the unsupported branches.
-        //species.handleRot(level, endPoints, rootPos, rootsPos, 0, context.safeBounds());
+        species.handleRot(level, endPoints, rootPos, rootsPos, 0, context.safeBounds());
     }
 
     @Override

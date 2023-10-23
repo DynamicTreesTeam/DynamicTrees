@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.cell.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.BlockWithDynamicHardness;
+import com.ferreusveritas.dynamictrees.block.branch.BasicRootsBlock;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
@@ -418,7 +419,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
 
     @Override
     public int branchSupport(BlockState state, BlockGetter level, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
-        return dir == Direction.DOWN ? BranchBlock.setSupport(1, 1) : 0;
+        Direction supportDir = branch instanceof BasicRootsBlock ? Direction.UP : Direction.DOWN;
+        return (dir == supportDir) ? BranchBlock.setSupport(1, 1) : 0;
     }
 
     @Override
