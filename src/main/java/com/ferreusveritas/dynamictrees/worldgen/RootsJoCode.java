@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.network.NodeInspector;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
+import com.ferreusveritas.dynamictrees.block.rooty.AerialRootsSoilProperties;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.CoderNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
@@ -59,6 +60,8 @@ public class RootsJoCode extends JoCode {
             return;
         }
 
+        int rootRadius = AerialRootsSoilProperties.updateRadius(level, level.getBlockState(context.rootPos()), context.rootPos(), 2);
+
         // Make the root branch structure.
         this.generateFork(level, species, 0, rootPos, false);
 
@@ -77,7 +80,7 @@ public class RootsJoCode extends JoCode {
         // If a branch exists then the growth was successful.
 
         final SimpleVoxmap rootsMap = new SimpleVoxmap(radius * 2 + 1, species.getWorldGenLeafMapHeight(), radius * 2 + 1).setMapAndCenter(rootsPos, new BlockPos(radius, species.getWorldGenLeafMapHeight(), radius));
-        final NodeInspector inflator = species.getNodeInflator(rootsMap); // This is responsible for thickening the branches.
+        final NodeInspector inflator = species.getNodeInflator(rootsMap, rootRadius); // This is responsible for thickening the branches.
         final FindEndsNode endFinder = new FindEndsNode(); // This is responsible for gathering a list of branch end points.
         final MapSignal signal = new MapSignal(inflator, endFinder); // The inflator signal will "paint" a temporary voxmap of all of the leaves and branches.
         signal.destroyLoopedNodes = this.careful;

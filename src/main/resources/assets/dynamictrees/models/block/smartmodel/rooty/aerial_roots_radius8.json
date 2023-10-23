@@ -1,9 +1,9 @@
 {
   "parent": "block/block",
   "textures": {
-    "overlay": "dynamictrees:block/air",
-    "overlay_end": "dynamictrees:block/air",
-    "roots": "dynamictrees:block/roots",
+    "overlay": "block/mangrove_roots_side",
+    "overlay_end": "block/mangrove_roots_top",
+    "roots": "dynamictrees:block/air",
     "particle": "#side"
   },
   "elements": [

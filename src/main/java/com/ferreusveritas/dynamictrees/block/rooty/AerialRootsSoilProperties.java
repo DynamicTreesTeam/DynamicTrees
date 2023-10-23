@@ -72,6 +72,21 @@ public class AerialRootsSoilProperties extends SoilProperties {
         return new RootRootyBlock(this, blockProperties);
     }
 
+    public static int updateRadius (LevelAccessor level, BlockState state, BlockPos pos, int flags){
+        if (!(state.getBlock() instanceof RootRootyBlock)) return 8;
+        int upRad = TreeHelper.getRadius(level, pos.above());
+        if (upRad > 0){
+            int thisRad = state.getValue(RootRootyBlock.RADIUS);
+            if (upRad != thisRad){
+                int newRadius = Math.min(upRad, 8);
+                level.setBlock(pos, state.setValue(RootRootyBlock.RADIUS, newRadius), flags);
+                return newRadius;
+            }
+            return upRad;
+        }
+        return 0;
+    }
+
     public static class RootRootyBlock extends RootyBlock implements SimpleWaterloggedBlock {
 
         protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, 8);
@@ -114,14 +129,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return Block.box(8-radius,0,8-radius,radius+8,16,radius+8);
         }
 
-        protected void updateRadius (LevelAccessor level, BlockState state, BlockPos pos){
-            int upRad = TreeHelper.getRadius(level, pos.above());
-            if (upRad > 0){
-                int thisRad = state.getValue(RADIUS);
-                if (upRad != thisRad)
-                    level.setBlock(pos, state.setValue(RADIUS, Math.min(upRad, 8)), 3);
-            }
-        }
+
 
         public boolean isStructurallyStable(LevelAccessor level, BlockPos rootPos){
             BlockPos belowPos = rootPos.below();
@@ -138,13 +146,13 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
         @Override
         public MapSignal startAnalysis(LevelAccessor level, BlockPos rootPos, MapSignal signal) {
-            updateRadius(level, level.getBlockState(rootPos), rootPos);
+            updateRadius(level, level.getBlockState(rootPos), rootPos, 3);
             return super.startAnalysis(level, rootPos, signal);
         }
 
         @Override
         public void neighborChanged(BlockState pState, Level pLevel, BlockPos pPos, Block pBlock, BlockPos pFromPos, boolean pIsMoving) {
-            updateRadius(pLevel, pState, pPos);
+            updateRadius(pLevel, pState, pPos, 3);
             super.neighborChanged(pState, pLevel, pPos, pBlock, pFromPos, pIsMoving);
         }
 

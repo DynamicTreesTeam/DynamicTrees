@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.branch.BasicRootsBlock;
 import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.AerialRootsSoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
 import com.ferreusveritas.dynamictrees.growthlogic.GrowthLogicKit;
@@ -102,7 +103,8 @@ public class MangroveSpecies extends Species {
             if (soilState.getBlock() instanceof RootyBlock rootyBlock
                     && !rootyBlock.getSoilProperties().equals(getFamily().getDefaultSoil())){
                 BlockEntity TE = level.getBlockEntity(treePos);
-                level.setBlock(rootPos, getFamily().getDefaultSoil().getSoilState(rootyBlock.getPrimitiveSoilState(soilState), fertility, soilState.getValue(RootyBlock.IS_VARIANT)), 3);
+                BlockState rootCollarState = getFamily().getDefaultSoil().getSoilState(rootyBlock.getPrimitiveSoilState(soilState), fertility, soilState.getValue(RootyBlock.IS_VARIANT));
+                AerialRootsSoilProperties.updateRadius(level, rootCollarState, rootPos, 3);
                 if (TE != null){
                     level.setBlockEntity(TE);
                     if (TE instanceof SpeciesBlockEntity speciesTE) {
