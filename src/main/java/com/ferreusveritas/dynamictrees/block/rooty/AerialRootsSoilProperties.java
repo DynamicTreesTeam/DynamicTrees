@@ -7,12 +7,17 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.RootIntegrityNode;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.EntityUtils;
 import com.ferreusveritas.dynamictrees.util.ItemUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.ChatMessageContent;
+import net.minecraft.network.chat.ComponentContents;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -37,7 +42,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.ForgeMod;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -116,6 +123,19 @@ public class AerialRootsSoilProperties extends SoilProperties {
             }
         }
 
+        public boolean isStructurallyStable(LevelAccessor level, BlockPos rootPos){
+            BlockPos belowPos = rootPos.below();
+            final RootIntegrityNode node = new RootIntegrityNode();
+            BlockState belowState = level.getBlockState(belowPos);
+            TreeHelper.getTreePart(belowState).analyse(belowState, level, belowPos, null, new MapSignal(node)); // Analyze entire tree network to find root node and species.
+            if (node.getStable().isEmpty())
+                return false;
+            else {
+                System.out.println("found stable: "+ node.getStable().get(0));
+                return true;
+            }
+        }
+
         @Override
         public MapSignal startAnalysis(LevelAccessor level, BlockPos rootPos, MapSignal signal) {
             updateRadius(level, level.getBlockState(rootPos), rootPos);
@@ -141,8 +161,27 @@ public class AerialRootsSoilProperties extends SoilProperties {
 //            return false;
 //        }
 
-        @Override
         public void destroyTree(Level level, BlockPos rootPos, @Nullable Player player) {
+            Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
+            Optional<BranchBlock> root = TreeHelper.getBranchOpt(level.getBlockState(rootPos.below()));
+
+            if (branch.isPresent()) {
+                BranchDestructionData destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), Direction.DOWN, true, null);
+                FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
+            }
+            if (root.isPresent()) {
+                BranchDestructionData destroyData = root.get().destroyBranchFromNode(level, rootPos.below(), Direction.UP, true, null);
+                FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
+            }
+        }
+
+        @Override
+        public void playerWillDestroy(Level level, @Nonnull BlockPos pos, BlockState state, @Nonnull Player player) {
+            this.dropWholeTree(level, pos, player);
+            super.playerWillDestroy(level, pos, state, player);
+        }
+
+        public void dropWholeTree(Level level, BlockPos rootPos, @Nullable Player player){
             Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
             Optional<BranchBlock> root = TreeHelper.getBranchOpt(level.getBlockState(rootPos.below()));
 
@@ -182,6 +221,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
                     ItemUtils.damageAxe(player, heldItem, getRadius(level.getBlockState(rootPos)), woodVolume, true);
             }
         }
+
     }
 
 

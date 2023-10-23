@@ -332,6 +332,8 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
         // Damage the axe by a prescribed amount.
         this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);
+
+
     }
 
     public BranchDestructionData destroyBranchFromNode(Level level, BlockPos cutPos, Direction toolDir, boolean wholeTree, @javax.annotation.Nullable final LivingEntity entity) {
@@ -371,7 +373,19 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             }
         }
 
+        if (signal.foundRoot)
+            DropTreeIfUnsupported(level, cutPos, signal.root, entity instanceof Player ? (Player) entity : null);
+
         return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), new HashMap<>(), new ArrayList<>(), destroyer.getEnds(), volumeSum.getVolume(), cutPos, basePos, cutDir, toolDir, trunkHeight);
+    }
+
+    private void DropTreeIfUnsupported (Level level, BlockPos cutPos, BlockPos rootPos, @Nullable Player player){
+        if (level.getBlockState(rootPos).getBlock() instanceof AerialRootsSoilProperties.RootRootyBlock rootyBlock){
+            if (!rootyBlock.isStructurallyStable(level, rootPos)){
+                rootyBlock.dropWholeTree(level, rootPos, player);
+            }
+        }
+
     }
 
     //////////////////////////////
