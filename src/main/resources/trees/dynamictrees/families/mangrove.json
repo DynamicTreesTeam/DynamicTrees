@@ -5,7 +5,7 @@
   "primitive_log": "mangrove_log",
   "primitive_stripped_log": "stripped_mangrove_log",
   "max_branch_radius": 8,
-  "default_soil": "dynamictrees:mangrove_root_collar",
+  "default_soil": "dynamictrees:mangrove_aerial_roots",
   "primitive_root": "mangrove_roots",
   "primitive_filled_root": "muddy_mangrove_roots",
   "primitive_covered_root": "mud",

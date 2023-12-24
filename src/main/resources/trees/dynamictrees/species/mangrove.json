@@ -21,13 +21,6 @@
   "plantable_on_fluid": true,
   "features" : [
     {
-      "name": "pneumatophore_roots",
-      "properties": {
-        "roots": "mangrove_roots",
-        "secondary_roots": "underground_roots"
-      }
-    },
-    {
       "name": "vines",
       "properties": {
         "max_length": 7,

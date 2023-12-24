@@ -2,6 +2,7 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
 	"textures": {
+		"rings": "block/mangrove_log_top",
 		"overlay": "block/mangrove_roots_side",
 		"overlay_end": "block/mangrove_roots_top",
 		"roots": "dynamictrees:block/air",
@@ -12,6 +13,7 @@
 			"from": [2, 0, 2],
 			"to": [14, 16, 14],
 			"faces": {
+				"up":  {"uv": [2, 0, 14, 16], "texture": "#rings", "cullface": "up" },
 				"north": {"uv": [2, 0, 14, 16], "texture": "#side"},
 				"east": {"uv": [2, 0, 14, 16], "texture": "#side"},
 				"south": {"uv": [2, 0, 14, 16], "texture": "#side"},

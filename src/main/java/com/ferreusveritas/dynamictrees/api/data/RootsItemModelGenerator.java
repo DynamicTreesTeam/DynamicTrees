@@ -31,7 +31,7 @@ public class RootsItemModelGenerator implements Generator<DTItemModelProvider, F
     public Dependencies gatherDependencies(Family input) {
         MangroveFamily mangroveInput = (MangroveFamily) input;
         return new Dependencies()
-                .append(ROOT_ITEM, mangroveInput.getRootItem())
+                .append(ROOT_ITEM, mangroveInput.getRootsItem())
                 .append(PRIMITIVE_ROOT, mangroveInput.getPrimitiveRoots());
     }
 

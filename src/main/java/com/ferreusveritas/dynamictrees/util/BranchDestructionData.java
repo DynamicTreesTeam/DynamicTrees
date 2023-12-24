@@ -174,11 +174,11 @@ public class BranchDestructionData {
             radPosData[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock) origState.getBlock(), origState);
             connectionData[index] = encodeBranchesConnections(origConnData.getConnections());
             blockIndexData[index++] = encodeBranchBlocks((BranchBlock) origState.getBlock());
-            branchList.remove(BlockPos.ZERO);
         }
 
         //Encode the remaining blocks
         for (Entry<BlockPos, BranchConnectionData> set : branchList.entrySet()) {
+            if (set.getKey().equals(BlockPos.ZERO)) continue;
             BlockPos relPos = set.getKey();
             BranchConnectionData connData = set.getValue();
             BlockState state = connData.getBlockState();
@@ -226,9 +226,13 @@ public class BranchDestructionData {
     public BlockPos getBranchRelPos(int index) {
         BlockPos pos = decodeRelPos(destroyedBranchesRadiusPosition[index]);
         if (basePos != cutPos){ //When a root system is involved, the relative positions are moved down
-            return pos.offset(cutPos.subtract(basePos));
+            return pos.offset(getRelativeCutPos());
         }
         return pos;
+    }
+
+    public BlockPos getRelativeCutPos(){
+        return cutPos.subtract(basePos);
     }
 
     public int getBranchRadius(int index) {
@@ -312,7 +316,7 @@ public class BranchDestructionData {
     public BlockPos getLeavesRelPos(int index) {
         BlockPos pos = decodeLeavesRelPos(destroyedLeaves[index]);
         if (basePos != cutPos){ //When a root system is involved, the relative positions are moved down
-            return pos.offset(cutPos.subtract(basePos));
+            return pos.offset(getRelativeCutPos());
         }
         return pos;
     }
@@ -366,7 +370,7 @@ public class BranchDestructionData {
     public BlockPos getEndPointRelPos(int index) {
         BlockPos pos = decodeRelPos(endPoints[index]);
         if (basePos != cutPos){ //When a root system is involved, the relative positions are moved down
-            return pos.offset(cutPos.subtract(basePos));
+            return pos.offset(getRelativeCutPos());
         }
         return pos;
     }
@@ -407,15 +411,15 @@ public class BranchDestructionData {
         switch (posType) {
             default:
             case BRANCHES:
-                getter = absolute ? i -> getBranchRelPos(i).offset(cutPos) : this::getBranchRelPos;
+                getter = absolute ? i -> getBranchRelPos(i).offset(basePos) : this::getBranchRelPos;
                 limit = getNumBranches();
                 break;
             case ENDPOINTS:
-                getter = absolute ? i -> getEndPointRelPos(i).offset(cutPos) : this::getEndPointRelPos;
+                getter = absolute ? i -> getEndPointRelPos(i).offset(basePos) : this::getEndPointRelPos;
                 limit = getNumEndpoints();
                 break;
             case LEAVES:
-                getter = absolute ? i -> getLeavesRelPos(i).offset(cutPos) : this::getLeavesRelPos;
+                getter = absolute ? i -> getLeavesRelPos(i).offset(basePos) : this::getLeavesRelPos;
                 limit = getNumLeaves();
                 break;
         }

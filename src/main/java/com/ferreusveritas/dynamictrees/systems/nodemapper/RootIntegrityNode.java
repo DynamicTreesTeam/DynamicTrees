@@ -29,7 +29,6 @@ public class RootIntegrityNode implements NodeInspector {
 
     @Override
     public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
-        System.out.println(pos);
         if (state.getBlock() instanceof BasicRootsBlock rootsBlock && rootsBlock.isFullBlock(state)){
             endPoints.add(pos);
             return true;

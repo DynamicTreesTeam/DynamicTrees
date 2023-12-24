@@ -1,6 +1,7 @@
 {
   "parent": "block/block",
   "textures": {
+    "rings": "block/mangrove_log_top",
     "overlay": "block/mangrove_roots_side",
     "overlay_end": "block/mangrove_roots_top",
     "roots": "dynamictrees:block/air",
@@ -11,6 +12,7 @@
       "from": [ 0, 0, 0 ],
       "to": [ 16, 16, 16 ],
       "faces": {
+        "up":  { "texture": "#rings", "cullface": "up" },
         "down":  { "texture": "#side", "cullface": "down" },
         "north": { "texture": "#side" },
         "south": { "texture": "#side" },

@@ -47,7 +47,7 @@ public class RootsStateGenerator implements Generator<DTBlockStateProvider, Fami
     public Dependencies gatherDependencies(Family input) {
         MangroveFamily mangroveInput = (MangroveFamily) input;
         return new Dependencies()
-                .append(ROOT, mangroveInput.getRoot())
+                .append(ROOT, mangroveInput.getRoots())
                 .append(PRIMITIVE_ROOT, mangroveInput.getPrimitiveRoots())
                 .append(PRIMITIVE_FILLED_ROOT, mangroveInput.getPrimitiveFilledRoots())
                 .append(PRIMITIVE_COVERED_ROOT, mangroveInput.getPrimitiveCoveredRoots());

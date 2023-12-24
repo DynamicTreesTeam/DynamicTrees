@@ -9,8 +9,11 @@ import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.OffsetablePodBlock;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.AerialRootsSoilProperties;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
+import com.ferreusveritas.dynamictrees.event.FutureBreak;
 import com.ferreusveritas.dynamictrees.growthlogic.context.DirectionSelectionContext;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.GrowSignal;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.RootsDestroyerNode;
@@ -41,6 +44,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -306,6 +310,15 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
     }
 
+    public boolean removedByEntity(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
+        //the topmost root block will drop the whole tree
+        if (level.getBlockState(cutPos.above()).getBlock() instanceof AerialRootsSoilProperties.RootRootyBlock aerialRootyBlock){
+            aerialRootyBlock.dropWholeTree(level, cutPos.above(), entity instanceof Player ? (Player) entity : null);
+        } else
+            FutureBreak.add(new FutureBreak(state, level, cutPos, entity, 0));
+        return false;
+    }
+
     @Override
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
         // Tries to get the face being pounded on.
@@ -332,8 +345,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
         // Damage the axe by a prescribed amount.
         this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);
-
-
     }
 
     public BranchDestructionData destroyBranchFromNode(Level level, BlockPos cutPos, Direction toolDir, boolean wholeTree, @javax.annotation.Nullable final LivingEntity entity) {
@@ -373,8 +384,9 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             }
         }
 
-        if (signal.foundRoot)
+        if (signal.foundRoot){
             DropTreeIfUnsupported(level, cutPos, signal.root, entity instanceof Player ? (Player) entity : null);
+        }
 
         return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), new HashMap<>(), new ArrayList<>(), destroyer.getEnds(), volumeSum.getVolume(), cutPos, basePos, cutDir, toolDir, trunkHeight);
     }
@@ -386,6 +398,15 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             }
         }
 
+    }
+
+    @Override
+    public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
+        if (isFullBlock(state)) return getFamily().getPrimitiveCoveredRoots().orElse(Blocks.AIR).defaultDestroyTime();
+        final int radius = this.getRadius(level.getBlockState(pos));
+        final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
+                .getDestroySpeed(level, pos) * (radius * radius) / 64.0f * 8.0f;
+        return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
     }
 
     //////////////////////////////

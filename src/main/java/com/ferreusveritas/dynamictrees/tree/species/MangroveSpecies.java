@@ -33,8 +33,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.util.List;
 
-import static com.ferreusveritas.dynamictrees.util.ResourceLocationUtils.suffix;
-
 public class MangroveSpecies extends Species {
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(MangroveSpecies::new);
@@ -192,7 +190,7 @@ public class MangroveSpecies extends Species {
                 GrowSignal rootGrowSignal = new GrowSignal(this, rootPos, getRootEnergy(level, rootPos), level.random, defaultDir.getOpposite());
                 return TreeHelper.getTreePart(belowState).growSignal(level, belowPos, rootGrowSignal);
             } else {
-                getFamily().getRoot().ifPresent(branch -> branch.setRadius(level, belowPos, family.getPrimaryThickness(), null));
+                getFamily().getRoots().ifPresent(branch -> branch.setRadius(level, belowPos, family.getPrimaryThickness(), null));
             }
         }
 

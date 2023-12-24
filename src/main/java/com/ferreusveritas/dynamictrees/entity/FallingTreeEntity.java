@@ -220,13 +220,13 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
         BlockBounds renderBounds = new BlockBounds(destroyData.cutPos);
 
-        for (BlockPos absPos : Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES))) {
-            BlockState state = level.getBlockState(absPos);
-            if (TreeHelper.isTreePart(state)) {
-                level.setBlock(absPos, BlockStates.AIR, 0);////The client needs to set it's blocks to air
-                renderBounds.union(absPos);//Expand the re-render volume to include this block
-            }
-        }
+//        for (BlockPos absPos : Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES))) {
+//            BlockState state = level.getBlockState(absPos);
+//            if (TreeHelper.isTreePart(state)) {
+//                level.setBlock(absPos, BlockStates.AIR, 0);////The client needs to set it's blocks to air
+//                renderBounds.union(absPos);//Expand the re-render volume to include this block
+//            }
+//        }
 
         cleanupShellBlocks(destroyData);
 

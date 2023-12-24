@@ -11,6 +11,7 @@ import com.ferreusveritas.dynamictrees.block.branch.BasicRootsBlock;
 import com.ferreusveritas.dynamictrees.block.rooty.AerialRootsSoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.data.provider.DTBlockStateProvider;
 import com.ferreusveritas.dynamictrees.data.provider.DTItemModelProvider;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
@@ -18,13 +19,18 @@ import com.ferreusveritas.dynamictrees.util.MutableLazyValue;
 import com.ferreusveritas.dynamictrees.util.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -34,8 +40,8 @@ public class MangroveFamily extends Family {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(MangroveFamily::new);
     private AerialRootsSoilProperties defaultSoil;
-    private Supplier<BranchBlock> root;
-    private Supplier<Item> rootItem;
+    private Supplier<BranchBlock> roots;
+    private Supplier<Item> rootsItem;
     private Block primitiveRoots, primitiveRootsFilled, primitiveRootsCovered;
 
     protected final MutableLazyValue<Generator<DTBlockStateProvider, Family>> rootsStateGenerator =
@@ -69,12 +75,12 @@ public class MangroveFamily extends Family {
     @Override
     public void setupBlocks() {
         super.setupBlocks();
-        this.setRoot(this.createRoots(this.getBranchName()));
-        this.setRootItem(this.createRootsItem(this.getBranchName(), this.root));
+        this.setRoots(this.createRoots(this.getBranchName()));
+        this.setRootsItem(this.createRootsItem(this.getBranchName(), this.roots));
     }
 
     protected Supplier<BranchBlock> createRoots(final ResourceLocation name) {
-        return RegistryHandler.addBlock(suffix(name, getRootNameSuffix()), () -> createRootsBlock(name));
+        return RegistryHandler.addBlock(suffix(name, getRootsNameSuffix()), () -> createRootsBlock(name));
     }
     protected BranchBlock createRootsBlock(ResourceLocation name) {
         final BasicRootsBlock branch = new BasicRootsBlock(name, this.getProperties());
@@ -84,32 +90,32 @@ public class MangroveFamily extends Family {
         return branch;
     }
     public Supplier<BlockItem> createRootsItem(final ResourceLocation registryName, final Supplier<BranchBlock> rootsSup) {
-        return RegistryHandler.addItem(suffix(registryName, getRootNameSuffix()), () -> new BlockItem(rootsSup.get(), new Item.Properties()));
+        return RegistryHandler.addItem(suffix(registryName, getRootsNameSuffix()), () -> new BlockItem(rootsSup.get(), new Item.Properties()));
     }
 
-    protected String getRootNameSuffix() {
+    protected String getRootsNameSuffix() {
         return BasicRootsBlock.NAME_SUFFIX;
     }
 
-    public Family setRoot(final Supplier<BranchBlock> branchSup) {
-        this.root = setupBranch(branchSup, false);
+    public Family setRoots(final Supplier<BranchBlock> branchSup) {
+        this.roots = setupBranch(branchSup, false);
         return this;
     }
     @SuppressWarnings("unchecked")
-    protected <T extends Item> Family setRootItem(Supplier<T> branchItemSup) {
-        this.rootItem = (Supplier<Item>) branchItemSup;
+    protected <T extends Item> Family setRootsItem(Supplier<T> branchItemSup) {
+        this.rootsItem = (Supplier<Item>) branchItemSup;
         return this;
     }
-    public Optional<BranchBlock> getRoot() {
-        return Optionals.ofBlock(root);
+    public Optional<BranchBlock> getRoots() {
+        return Optionals.ofBlock(roots);
     }
-    public Optional<Item> getRootItem() {
-        return Optionals.ofItem(rootItem);
+    public Optional<Item> getRootsItem() {
+        return Optionals.ofItem(rootsItem);
     }
 
     @Override
     public Optional<BranchBlock> getBranchForRootsPlacement(LevelAccessor level, Species species, BlockPos pos) {
-        return getRoot();
+        return getRoots();
     }
 
     @Override
@@ -126,6 +132,18 @@ public class MangroveFamily extends Family {
 
     public ResourceLocation getBranchItemParentLocation() {
         return DynamicTrees.location("item/branch");
+    }
+
+    public List<TagKey<Block>> defaultRootsTags() {
+        return Collections.singletonList(DTBlockTags.ROOTS);
+    }
+
+    /**
+     * {@code null} = can harvest with hand
+     */
+    @Nullable
+    public Tier getDefaultRootsHarvestTier() {
+        return null;
     }
 
     protected int rootSystemSoilTypeFlags = 0;
@@ -173,8 +191,8 @@ public class MangroveFamily extends Family {
 
     public void setPrimitiveRoots(Block primitiveRoots) {
         this.primitiveRoots = primitiveRoots;
-        if (this.root != null) {
-            this.root.get().setPrimitiveLogDrops(new ItemStack(primitiveRoots));
+        if (this.roots != null) {
+            this.roots.get().setPrimitiveLogDrops(new ItemStack(primitiveRoots));
         }
     }
     public void setPrimitiveRootsFilled(Block primitiveRootsFilled) {

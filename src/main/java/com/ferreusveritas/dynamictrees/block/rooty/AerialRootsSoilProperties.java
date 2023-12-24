@@ -1,24 +1,25 @@
 package com.ferreusveritas.dynamictrees.block.rooty;
 
+import com.ferreusveritas.dynamictrees.api.FutureBreakable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.data.AerialRootsSoilGenerator;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
+import com.ferreusveritas.dynamictrees.block.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
+import com.ferreusveritas.dynamictrees.event.FutureBreak;
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.RootIntegrityNode;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
 import com.ferreusveritas.dynamictrees.util.EntityUtils;
 import com.ferreusveritas.dynamictrees.util.ItemUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.ChatMessageContent;
-import net.minecraft.network.chat.ComponentContents;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -29,6 +30,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -116,6 +118,15 @@ public class AerialRootsSoilProperties extends SoilProperties {
         }
 
         @Override
+        public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
+            BlockState up = level.getBlockState(pos.above());
+            if (up.getBlock() instanceof BlockWithDynamicHardness upBlock){
+                return upBlock.getHardness(up, level, pos.above());
+            }
+            return 2.0F;
+        }
+
+        @Override
         public BlockState getDecayBlockState(BlockState state, BlockGetter level, BlockPos pos) {
             if (state.hasProperty(WATERLOGGED) && !state.getValue(WATERLOGGED)) {
                 return Blocks.AIR.defaultBlockState();
@@ -129,19 +140,12 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return Block.box(8-radius,0,8-radius,radius+8,16,radius+8);
         }
 
-
-
         public boolean isStructurallyStable(LevelAccessor level, BlockPos rootPos){
             BlockPos belowPos = rootPos.below();
             final RootIntegrityNode node = new RootIntegrityNode();
             BlockState belowState = level.getBlockState(belowPos);
             TreeHelper.getTreePart(belowState).analyse(belowState, level, belowPos, null, new MapSignal(node)); // Analyze entire tree network to find root node and species.
-            if (node.getStable().isEmpty())
-                return false;
-            else {
-                System.out.println("found stable: "+ node.getStable().get(0));
-                return true;
-            }
+            return !node.getStable().isEmpty();
         }
 
         @Override
@@ -155,19 +159,6 @@ public class AerialRootsSoilProperties extends SoilProperties {
             updateRadius(pLevel, pState, pPos, 3);
             super.neighborChanged(pState, pLevel, pPos, pBlock, pFromPos, pIsMoving);
         }
-
-        public boolean fallWithTree(BlockState state, Level level, BlockPos pos) {
-            //The block is removed when this is checked because it means it got attached to a tree
-            level.setBlockAndUpdate(pos, getDecayBlockState(state, level, pos));
-            return true;
-        }
-
-//        @Override
-//        public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-//            playerWillDestroy(level, pos, state, player);
-//            //Do not destroy roots if broken, we will do that
-//            return false;
-//        }
 
         public void destroyTree(Level level, BlockPos rootPos, @Nullable Player player) {
             Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
@@ -183,10 +174,26 @@ public class AerialRootsSoilProperties extends SoilProperties {
             }
         }
 
+        public boolean fallWithTree(BlockState state, Level level, BlockPos pos, boolean hasRoots) {
+            if (hasRoots){
+                //The block is removed when this is checked because it means it got attached to a tree
+                level.setBlockAndUpdate(pos, getDecayBlockState(state, level, pos));
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Called when a player removes a block.
+         * This is responsible for actually destroying the block, and the block is intact at time of call.
+         * This is called regardless of whether the player can harvest the block or not.
+         * @return true if the block is actually destroyed.
+         * Note: When used in multiplayer, this is called on both client and server sides!
+         */
         @Override
-        public void playerWillDestroy(Level level, @Nonnull BlockPos pos, BlockState state, @Nonnull Player player) {
+        public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
             this.dropWholeTree(level, pos, player);
-            super.playerWillDestroy(level, pos, state, player);
+            return false;
         }
 
         public void dropWholeTree(Level level, BlockPos rootPos, @Nullable Player player){
@@ -209,6 +216,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
                 if (destroyData == null){
                     destroyData = rootDestroyData;
                 } else {
+                    System.out.println(destroyData.getNumBranches() + " " +rootDestroyData.getNumBranches());
                     destroyData = destroyData.merge(rootDestroyData);
                 }
             }

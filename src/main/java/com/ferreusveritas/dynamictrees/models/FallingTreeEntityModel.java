@@ -77,14 +77,15 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                 Species species = destructionData.species;
 
                 //Draw the rooty block if it is set to fall too
-                BlockPos bottomPos = cutPos.below();
-                BlockState bottomState = entity.level.getBlockState(bottomPos);
+                BlockPos rootPos = cutPos.below();
+                BlockState bottomState = entity.level.getBlockState(rootPos);
                 boolean rootyBlockAdded = false;
                 if (TreeHelper.isRooty(bottomState)) {
                     RootyBlock rootyBlock = TreeHelper.getRooty(bottomState);
-                    if (rootyBlock != null && rootyBlock.fallWithTree(bottomState, entity.level, bottomPos)) {
+                    if (rootyBlock != null && rootyBlock.fallWithTree(bottomState, entity.level, rootPos, !destructionData.getRelativeCutPos().equals(BlockPos.ZERO))) {
                         BakedModel rootyModel = dispatcher.getBlockModel(bottomState);
-                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, bottomState, new Vec3(0, -1, 0), ModelData.EMPTY),
+                        BlockPos cutOffset = destructionData.getRelativeCutPos();
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, bottomState, new Vec3(cutOffset.getX(), cutOffset.getY()-1, cutOffset.getZ()), ModelData.EMPTY),
                                 destructionData.species.getFamily().getRootColor(bottomState, rootyBlock.getColorFromBark()),
                                 bottomState));
                         rootyBlockAdded = true;
@@ -96,7 +97,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeEntity> {
                 destructionData.getConnections(0, connectionArray);
                 boolean bottomRingsAdded = false;
                 if (!rootyBlockAdded && connectionArray[cutDir.get3DDataValue()] > 0) {
-                    BlockPos offsetPos = BlockPos.ZERO.relative(cutDir);
+                    BlockPos offsetPos = destructionData.getRelativeCutPos().relative(cutDir);
                     float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.MAX_RADIUS)) / 16f;
                     treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null},
                                     new ModelConnections(cutDir).setFamily(TreeHelper.getBranch(exState)).toModelData()),
