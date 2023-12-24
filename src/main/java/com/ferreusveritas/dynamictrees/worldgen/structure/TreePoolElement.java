@@ -45,7 +45,7 @@ public final class TreePoolElement extends StructurePoolElement {
             .apply(instance, TreePoolElement::new));
 
     public static final StructurePoolElementType<TreePoolElement> TREE_POOL_ELEMENT = StructurePoolElementType.register(
-            "tree_pool_element", CODEC
+            "dynamictrees:tree_pool_element", CODEC
     );
 
     private final Species species;

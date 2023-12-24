@@ -19,7 +19,7 @@ plugins {
     id("com.harleyoconnor.translationsheet") version "0.1.1"
     id("com.matthewprenger.cursegradle") version "1.4.0"
     id("com.modrinth.minotaur") version "2.+"
-    id("com.harleyoconnor.autoupdatetool") version "1.0.7"
+    id("com.harleyoconnor.autoupdatetool") version "1.0.9"
 }
 
 repositories {
@@ -97,18 +97,14 @@ dependencies {
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
     runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
     runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.19:${property("suggestionProviderFixVersion")}"))
-
-    //Small lib that allows changing the blocks snow can be on
-//    runtimeOnly(fg.deobf("curse.maven:snow-coated-843893:4465018"))
 }
 
 translationSheet {
-    this.sheetId.set("1xjxEh2NdbeV_tQc6fDHPgcRmtchqCZJKt--6oifq1qc")
-    this.sectionColour.set(0xF9CB9C)
-    this.sectionPattern.set("Dynamic Trees")
-    this.outputDir("src/localization/resources/assets/dynamictrees/lang/")
-
-    this.useJson()
+    sheetId.set("1xjxEh2NdbeV_tQc6fDHPgcRmtchqCZJKt--6oifq1qc")
+    sectionColour.set(0xF9CB9C)
+    sectionPattern.set("Dynamic Trees")
+    outputDirectory.set(file("src/localization/resources/assets/dynamictrees/lang/"))
+    useJson()
 }
 
 tasks.jar {
@@ -134,15 +130,16 @@ java {
     }
 }
 
-val changelogFile = file("build/changelog.txt")
+val changelogFile = file("temp/changelog.txt")
 
 curseforge {
-    if (!project.hasProperty("curseApiKey")) {
+    val curseApiKey = optionalProperty("curseApiKey") ?: System.getenv("CURSEFORGE_API_KEY")
+    if (curseApiKey == null) {
         project.logger.warn("API Key for CurseForge not detected; uploading will be disabled.")
         return@curseforge
     }
 
-    apiKey = property("curseApiKey")
+    apiKey = curseApiKey
 
     project {
         id = "252818"
@@ -164,12 +161,13 @@ curseforge {
 }
 
 modrinth {
-    if (!project.hasProperty("modrinthToken")) {
+    val modrinthToken = optionalProperty("modrinthToken") ?: System.getenv("MODRINTH_TOKEN")
+    if (modrinthToken == null) {
         project.logger.warn("Token for Modrinth not detected; uploading will be disabled.")
         return@modrinth
     }
 
-    token.set(property("modrinthToken"))
+    token.set(modrinthToken)
     projectId.set(modId)
     versionNumber.set("$mcVersion-$modVersion")
     versionType.set(optionalProperty("versionType") ?: "release")
@@ -238,32 +236,29 @@ publishing {
     }
     repositories {
         maven("file:///${project.projectDir}/mcmodsrepo")
-        if (hasProperty("harleyOConnorMavenUsername") && hasProperty("harleyOConnorMavenPassword")) {
-            maven("https://harleyoconnor.com/maven") {
-                name = "HarleyOConnor"
-                credentials {
-                    username = property("harleyOConnorMavenUsername")
-                    password = property("harleyOConnorMavenPassword")
-                }
+        val mavenUsername = optionalProperty("harleyOConnorMavenUsername") ?: System.getenv("MAVEN_USERNAME")
+        val mavenPassword = optionalProperty("harleyOConnorMavenPassword") ?: System.getenv("MAVEN_PASSWORD")
+        if (mavenUsername == null || mavenPassword == null) {
+            logger.warn("Credentials for maven not detected; it will be disabled.")
+            return@repositories
+        }
+        maven("https://harleyoconnor.com/maven") {
+            name = "HarleyOConnor"
+            credentials {
+                username = mavenUsername
+                password = mavenPassword
             }
-        } else {
-            logger.log(LogLevel.WARN, "Credentials for maven not detected; it will be disabled.")
         }
     }
 }
 
-tasks.register("publishToAllPlatforms") {
-    this.dependsOn("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
+autoUpdateTool {
+    minecraftVersion.set(mcVersion)
+    version.set(modVersion)
+    versionRecommended.set(property("versionRecommended") == "true")
+    changelogOutputFile.set(changelogFile)
+    updateCheckerFile.set(file("temp/version_info.json"))
 }
-
-val minecraftVersion = mcVersion
-
-//autoUpdateTool {
-//    this.mcVersion.set(minecraftVersion)
-//    this.version.set(modVersion)
-//    this.versionRecommended.set(property("versionRecommended") == "true")
-//    this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
-//}
 
 tasks.autoUpdate {
     doLast {

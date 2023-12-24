@@ -29,8 +29,6 @@ public final class JsonResourcePreparer extends AbstractResourcePreparer<JsonEle
         super(folderName, JSON_EXTENSION, resourceCollector);
     }
 
-
-
     @Override
     protected void readAndPutResource(Resource resource, ResourceLocation resourceName) throws PreparationException, IOException {
         final JsonElement jsonElement = readResource(resource);

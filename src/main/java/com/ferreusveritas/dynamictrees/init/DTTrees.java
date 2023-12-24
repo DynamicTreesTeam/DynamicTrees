@@ -119,11 +119,12 @@ public class DTTrees {
     }
 
     @SubscribeEvent
-    public static void onRegisterBlocks(RegisterEvent event) {
-        if(event.getRegistryKey() != ForgeRegistries.BLOCKS.getRegistryKey()) return;
+    public static void loadResources(RegisterEvent event) {
+        if (event.getRegistryKey() != ForgeRegistries.BLOCKS.getRegistryKey()) {
+            return;
+        }
         // Register any registry entries from Json files.
         Resources.MANAGER.load();
-
         // Lock all the registries.
         Registries.REGISTRIES.stream()
                 .filter(registry -> registry instanceof SimpleRegistry)

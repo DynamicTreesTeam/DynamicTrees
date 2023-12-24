@@ -1,17 +1,17 @@
 {
   "values": [
+    "dynamictrees:oak_sapling",
+    "dynamictrees:swamp_oak_sapling",
+    "dynamictrees:jungle_sapling",
+    "dynamictrees:dark_oak_sapling",
+    "dynamictrees:spruce_sapling",
+    "dynamictrees:azalea_sapling",
+    "dynamictrees:mega_spruce_sapling",
     "dynamictrees:acacia_sapling",
     "dynamictrees:apple_oak_sapling",
-    "dynamictrees:azalea_sapling",
+    "dynamictrees:tall_birch_sapling",
     "dynamictrees:birch_sapling",
     "dynamictrees:cocoa_sapling",
-    "dynamictrees:dark_oak_sapling",
-    "dynamictrees:jungle_sapling",
-    "dynamictrees:mangrove_sapling",
-    "dynamictrees:mega_spruce_sapling",
-    "dynamictrees:oak_sapling",
-    "dynamictrees:spruce_sapling",
-    "dynamictrees:swamp_oak_sapling",
-    "dynamictrees:tall_birch_sapling"
+    "dynamictrees:mangrove_sapling"
   ]
 }

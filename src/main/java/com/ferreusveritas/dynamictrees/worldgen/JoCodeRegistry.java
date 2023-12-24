@@ -86,7 +86,6 @@ public final class JoCodeRegistry {
         if (list.isEmpty()) {
             return null;
         }
-
         return list.get(random.nextInt(list.size()));
     }
 

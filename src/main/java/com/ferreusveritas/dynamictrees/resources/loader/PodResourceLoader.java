@@ -13,6 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -39,12 +40,11 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
                 .register("minimum_radius", Integer.class, Pod::setMinRadius)
                 .register("maximum_radius", Integer.class, Pod::setMaxRadius);
 
-        this.commonAppliers
-                .register("block_shapes", JsonObject.class, this::readBlockShapes)
-                .register("item_stack", ResourceLocation.class, (pod, resourceLocation) ->
-                        Species.REGISTRY.runOnNextLock(
-                                ()-> pod.setItemStack(new ItemStack(ForgeRegistries.ITEMS.getValue(resourceLocation)))
-                        ));
+        this.commonAppliers.register("block_shapes", JsonObject.class, this::readBlockShapes);
+
+        // Item is needed on datagen and setup
+        this.gatherDataAppliers.register("item_stack", Item.class, (pod, item) -> pod.setItemStack(new ItemStack(item)));
+        this.setupAppliers.register("item_stack", Item.class, (pod, item) -> pod.setItemStack(new ItemStack(item)));
 
         this.reloadAppliers
                 .register("item_stack", ItemStack.class, Pod::setItemStack)

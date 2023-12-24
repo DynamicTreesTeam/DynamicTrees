@@ -111,7 +111,6 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
     @Override
     public Optional<Resource> getResource(final ResourceLocation location) {
         final List<Resource> resources = this.getResourceStack(location);
-
         return resources.isEmpty() ? Optional.empty() : Optional.of(resources.get(resources.size() - 1));
     }
 
@@ -140,8 +139,7 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
             for (String namespace : pack.getNamespaces()) {
                 Collection<ResourceLocation> subResources = pack.getResources(namespace, path, filter);
                 for (ResourceLocation location : subResources) {
-                    // TODO Should this throw or doing anything if the key already has an associated value?
-                    resources.computeIfAbsent(location, loc -> getResource(loc, pack));
+                    resources.put(location, getResource(location, pack));
                 }
             }
         }
