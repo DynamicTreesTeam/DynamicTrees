@@ -1,6 +1,5 @@
 package com.ferreusveritas.dynamictrees.block.rooty;
 
-import com.ferreusveritas.dynamictrees.api.FutureBreakable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.data.AerialRootsSoilGenerator;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
@@ -8,8 +7,6 @@ import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.entity.FallingTreeEntity;
-import com.ferreusveritas.dynamictrees.event.FutureBreak;
-import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.RootIntegrityNode;
 import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
@@ -19,7 +16,6 @@ import com.ferreusveritas.dynamictrees.util.ItemUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -30,7 +26,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -44,7 +39,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.ForgeMod;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -231,6 +225,10 @@ public class AerialRootsSoilProperties extends SoilProperties {
                 woodVolume.multiplyVolume(fortuneFactor);
                 final List<ItemStack> woodItems = destroyData.species.getBranchesDrops(level, woodVolume, heldItem);
 
+//                if (player != null)
+//                    this.spawnDestroyParticles(level, player, rootPos, level.getBlockState(rootPos));
+//                level.gameEvent(GameEvent.BLOCK_DESTROY, rootPos, GameEvent.Context.of(player, level.getBlockState(rootPos)));
+//                level.setBlock(rootPos, Blocks.AIR.defaultBlockState(), 3);
                 FallingTreeEntity.dropTree(level, destroyData, woodItems, FallingTreeEntity.DestroyType.HARVEST);
 
                 if (player != null)
