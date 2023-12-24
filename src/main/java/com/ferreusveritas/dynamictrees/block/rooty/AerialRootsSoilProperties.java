@@ -32,6 +32,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
@@ -186,7 +187,8 @@ public class AerialRootsSoilProperties extends SoilProperties {
          */
         @Override
         public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-            this.dropWholeTree(level, pos, player);
+            if (!level.isClientSide)
+                this.dropWholeTree(level, pos, player);
             return false;
         }
 
@@ -215,7 +217,10 @@ public class AerialRootsSoilProperties extends SoilProperties {
                 }
             }
             if (destroyData == null){
-                fallWithTree(level.getBlockState(rootPos), level, rootPos);
+//                if (player != null)
+//                    this.spawnDestroyParticles(level, player, rootPos, level.getBlockState(rootPos));
+//                level.gameEvent(GameEvent.BLOCK_DESTROY, rootPos, GameEvent.Context.of(player, level.getBlockState(rootPos)));
+//                level.setBlock(rootPos, Blocks.AIR.defaultBlockState(), 3);
             } else {
 
                 final ItemStack heldItem = player == null ? ItemStack.EMPTY : player.getMainHandItem();
