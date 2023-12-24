@@ -38,6 +38,15 @@
     }
   },
   {
+    "_comment" : "Mangrove swamp has mangroves, duh.",
+    "select": { "name": "minecraft:mangrove_swamp" },
+    "apply": {
+      "species" : "mangrove",
+      "density": 1.0,
+      "chance": 1.0
+    }
+  },
+  {
     "select": { "name": "minecraft:.*", "tag": "#minecraft:is_savanna" },
     "apply": {
       "species" : "acacia",

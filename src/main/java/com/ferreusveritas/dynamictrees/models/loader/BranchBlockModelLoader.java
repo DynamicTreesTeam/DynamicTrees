@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
  * Loads a branch block model from a Json file, with useful warnings when things aren't found.
  *
  * <p>Can also be used by sub-classes to load other models, like for roots in
- * {@link RootBlockModelLoader}.</p>
+ * {@link SurfaceRootBlockModelLoader}.</p>
  *
  * @author Harley O'Connor
  */

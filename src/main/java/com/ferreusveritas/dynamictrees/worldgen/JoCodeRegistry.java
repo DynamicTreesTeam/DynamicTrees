@@ -20,13 +20,20 @@ public final class JoCodeRegistry {
     }
 
     private static final Map<ResourceLocation, Map<Integer, List<JoCode>>> CODES = new HashMap<>();
+    private static final Map<ResourceLocation, Map<Integer, List<JoCode>>> ROOTS_CODES = new HashMap<>();
 
     public static void clear() {
         CODES.clear();
+        ROOTS_CODES.clear();
     }
 
     public static void register(ResourceLocation speciesName, int radius, JoCode code) {
         CODES.computeIfAbsent(speciesName, s -> new HashMap<>())
+                .computeIfAbsent(radius, r -> new ArrayList<>()).add(code);
+    }
+
+    public static void registerRoot(ResourceLocation speciesName, int radius, RootsJoCode code) {
+        ROOTS_CODES.computeIfAbsent(speciesName, s -> new HashMap<>())
                 .computeIfAbsent(radius, r -> new ArrayList<>()).add(code);
     }
 
@@ -39,7 +46,10 @@ public final class JoCodeRegistry {
      * none were found for the specified {@code speciesName}
      */
     public static Map<Integer, List<JoCode>> getCodes(ResourceLocation speciesName) {
-        return Collections.unmodifiableMap(CODES.getOrDefault(speciesName, new HashMap<>()));
+        return getCodes(speciesName, false);
+    }
+    public static Map<Integer, List<JoCode>> getCodes(ResourceLocation speciesName, boolean root) {
+        return Collections.unmodifiableMap((root?ROOTS_CODES:CODES).getOrDefault(speciesName, new HashMap<>()));
     }
 
     /**
@@ -51,7 +61,10 @@ public final class JoCodeRegistry {
      * {@code radius} under the specified {@code speciesName}
      */
     public static List<JoCode> getCodes(ResourceLocation speciesName, int radius) {
-        return Collections.unmodifiableList(getCodes(speciesName).getOrDefault(radius, new ArrayList<>()));
+        return getCodes(speciesName, radius, false);
+    }
+    public static List<JoCode> getCodes(ResourceLocation speciesName, int radius, boolean root) {
+        return Collections.unmodifiableList(getCodes(speciesName, root).getOrDefault(radius, new ArrayList<>()));
     }
 
     /**
@@ -64,7 +77,12 @@ public final class JoCodeRegistry {
      */
     @Nullable
     public static JoCode getRandomCode(ResourceLocation speciesName, int radius, RandomSource random) {
-        final List<JoCode> list = getCodes(speciesName, radius);
+        return getRandomCode(speciesName,radius,random,false);
+    }
+    @Nullable
+    public static JoCode getRandomCode(ResourceLocation speciesName, int radius, RandomSource random, boolean root) {
+        final List<JoCode> list = getCodes(speciesName, radius, root);
+
         if (list.isEmpty()) {
             return null;
         }

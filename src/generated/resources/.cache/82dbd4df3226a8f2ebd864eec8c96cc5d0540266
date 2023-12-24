@@ -1,7 +1,7 @@
-// 1.19.2	2023-08-21T16:16:04.953408	dynamictrees DT Block Tags
+// 1.19.2	2023-12-23T21:59:27.6817055	dynamictrees DT Block Tags
 0852fd1f90777eeab7126995157c4b1242a44700 data/dynamictrees/tags/items/branches.json
-b65ca9878da5f5030398581afe4b6de0eb2017a6 data/dynamictrees/tags/items/branches_that_burn.json
-f15c76b05745ecc48938d892f056855e9899125d data/dynamictrees/tags/items/fungus_branches.json
-1147947552bd2be2f56d89f93d16cecd31d312b0 data/dynamictrees/tags/items/fungus_caps.json
-7590fb2197fd251762a882272c124cd5383af71d data/dynamictrees/tags/items/seeds.json
+c16c437c51cfaa61f8cec19b3f2c9af858cf2e3e data/dynamictrees/tags/items/branches_that_burn.json
+265c9a52b7eb0cfd09154318ed7e17789980c9a6 data/dynamictrees/tags/items/fungus_branches.json
+80f707272ee43de5e1e0d5897629cdd2798eb9dd data/dynamictrees/tags/items/fungus_caps.json
+bc9fc83554c6581be3209e99ddfd16c3af8d6d27 data/dynamictrees/tags/items/seeds.json
 40d8c97822466372474dc35e9087e3f6ac034207 data/minecraft/tags/items/saplings.json

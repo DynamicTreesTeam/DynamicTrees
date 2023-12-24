@@ -1,5 +1,5 @@
 {
-  "loader": "dynamictrees:root",
+  "loader": "dynamictrees:surface_root",
   "textures": {
     "bark": "minecraft:block/dark_oak_log"
   }

@@ -1,0 +1,45 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "rings": "block/mangrove_log_top",
+    "overlay": "block/mangrove_roots_side",
+    "overlay_end": "block/mangrove_roots_top",
+    "roots": "dynamictrees:block/air",
+    "particle": "#side"
+  },
+  "elements": [
+    {
+      "from": [ 0, 0, 0 ],
+      "to": [ 16, 16, 16 ],
+      "faces": {
+        "up":  { "texture": "#rings", "cullface": "up" },
+        "down":  { "texture": "#side", "cullface": "down" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west":  { "texture": "#side" },
+        "east":  { "texture": "#side" }
+      }
+    },
+    {
+      "from": [ 0, 0, 0 ],
+      "to": [ 16, 16, 16 ],
+      "faces": {
+        "north": { "texture": "#roots", "tintindex": 1 },
+        "south": { "texture": "#roots", "tintindex": 1 },
+        "west":  { "texture": "#roots", "tintindex": 1 },
+        "east":  { "texture": "#roots", "tintindex": 1 }
+      }
+    },
+    {
+      "from": [ 0, 0, 0 ],
+      "to": [ 16, 16, 16 ],
+      "faces": {
+        "down":  { "texture": "#overlay_end", "cullface": "down" },
+        "north": { "texture": "#overlay" },
+        "south": { "texture": "#overlay" },
+        "west":  { "texture": "#overlay" },
+        "east":  { "texture": "#overlay" }
+      }
+    }
+  ]
+}

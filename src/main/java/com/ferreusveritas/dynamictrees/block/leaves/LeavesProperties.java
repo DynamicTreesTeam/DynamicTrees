@@ -567,6 +567,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     public int getRadiusForConnection(BlockState state, BlockGetter blockAccess, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         final int twigRadius = from.getFamily().getPrimaryThickness();
+        if (!from.connectToLeaves(blockAccess, pos, side, fromRadius)) return 0;
         return (fromRadius == twigRadius || this.connectAnyRadius) && from.getFamily().isCompatibleDynamicLeaves(from.getFamily().getCommonSpecies(), blockAccess.getBlockState(pos), blockAccess, pos) ? twigRadius : 0;
     }
 

@@ -19,12 +19,7 @@ import com.ferreusveritas.dynamictrees.systems.nodemapper.SpeciesNode;
 import com.ferreusveritas.dynamictrees.systems.nodemapper.StateNode;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
-import com.ferreusveritas.dynamictrees.util.BlockBounds;
-import com.ferreusveritas.dynamictrees.util.BlockStates;
-import com.ferreusveritas.dynamictrees.util.BranchDestructionData;
-import com.ferreusveritas.dynamictrees.util.Connections;
-import com.ferreusveritas.dynamictrees.util.LootTableSupplier;
-import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
+import com.ferreusveritas.dynamictrees.util.*;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap.Cell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,7 +35,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -266,6 +260,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return connections;
     }
 
+    public boolean connectToLeaves(BlockGetter blockAccess, BlockPos leavesPos, Direction branchConnectionDir, int branchRadius){
+        return true;
+    }
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
@@ -279,6 +277,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     public int getRadius(BlockState state) {
         return 1;
     }
+
 
     public abstract int setRadius(LevelAccessor level, BlockPos pos, int radius, @Nullable Direction originDir, int flags);
 
@@ -495,7 +494,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
         // Tries to get the face being pounded on.
         final double reachDistance = entity instanceof Player ? entity.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() : 5.0D;
-        final BlockHitResult ragTraceResult = this.playerRayTrace(entity, reachDistance, 1.0F);
+        final BlockHitResult ragTraceResult = EntityUtils.playerRayTrace(entity, reachDistance, 1.0F);
         final Direction toolDir = ragTraceResult != null ? (entity.isShiftKeyDown() ? ragTraceResult.getDirection().getOpposite() : ragTraceResult.getDirection()) : Direction.DOWN;
 
         // Play and render block break sound and particles (must be done before block is broken).
@@ -504,9 +503,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         // Do the actual destruction.
         final BranchDestructionData destroyData = this.destroyBranchFromNode(level, cutPos, toolDir, false, entity);
 
-        // Get all of the wood drops.
+        // Get all the wood drops.
         final ItemStack heldItem = entity.getMainHandItem();
-        final int fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, heldItem);
+        final int fortune = EnchantmentHelper.getTagEnchantmentLevel(Enchantments.BLOCK_FORTUNE, heldItem);
         final float fortuneFactor = 1.0f + 0.25f * fortune;
         final NetVolumeNode.Volume woodVolume = destroyData.woodVolume; // The amount of wood calculated from the body of the tree network.
         woodVolume.multiplyVolume(fortuneFactor);
@@ -552,51 +551,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         FallingTreeEntity.dropTree(level, destroyData, woodDropList, destroyType);
     }
 
-    /**
-     * This is a copy of Entity.rayTrace which is client side only. There's no reason for this function to be
-     * client-side only as all of it's calls are client/server compatible.
-     *
-     * @param entity             The {@link LivingEntity} to ray trace from.
-     * @param blockReachDistance The {@code reachDistance} of the entity.
-     * @param partialTick        The partial ticks.
-     * @return The {@link BlockHitResult} created.
-     */
-    @Nullable
-    public BlockHitResult playerRayTrace(LivingEntity entity, double blockReachDistance, float partialTick) {
-        Vec3 vec3d = entity.getEyePosition(partialTick);
-        Vec3 vec3d1 = entity.getViewVector(partialTick);
-        Vec3 vec3d2 = vec3d.add(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
-        return entity.level.clip(new ClipContext(vec3d, vec3d2, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity));
-    }
-
 
     public void damageAxe(final LivingEntity entity, @Nullable final ItemStack heldItem, final int radius, final NetVolumeNode.Volume woodVolume, final boolean forBlockBreak) {
-        if (heldItem == null || !heldItem.canPerformAction(ToolActions.AXE_DIG)) {
-            return;
-        }
-
-        int damage;
-
-        switch (DTConfigs.AXE_DAMAGE_MODE.get()) {
-            default:
-            case VANILLA:
-                damage = 1;
-                break;
-            case THICKNESS:
-                damage = Math.max(1, radius) / 2;
-                break;
-            case VOLUME:
-                damage = (int) woodVolume.getVolume();
-                break;
-        }
-
-        if (forBlockBreak) {
-            damage--; // Minecraft already damaged the tool by one unit
-        }
-
-        if (damage > 0) {
-            heldItem.hurtAndBreak(damage, entity, LivingEntity::tick);
-        }
+        ItemUtils.damageAxe(entity, heldItem, radius, woodVolume, forBlockBreak);
     }
 
     @Override

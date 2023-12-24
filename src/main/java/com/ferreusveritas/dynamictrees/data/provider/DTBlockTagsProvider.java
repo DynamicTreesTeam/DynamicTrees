@@ -2,10 +2,13 @@ package com.ferreusveritas.dynamictrees.data.provider;
 
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.AerialRootsSoilProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.init.DTTrees;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.BlockTagsProvider;
@@ -45,7 +48,8 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
         this.tag(DTBlockTags.FOLIAGE)
                 .add(Blocks.GRASS)
                 .add(Blocks.TALL_GRASS)
-                .add(Blocks.FERN);
+                .add(Blocks.FERN)
+                .add(Blocks.LILY_PAD);
 
         this.tag(DTBlockTags.STRIPPED_BRANCHES)
                 .addTag(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN)
@@ -75,6 +79,10 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
 
         this.tag(BlockTags.WART_BLOCKS)
                 .addTag(DTBlockTags.WART_BLOCKS);
+
+        this.tag(BlockTags.MINEABLE_WITH_AXE)
+                .addTag(DTBlockTags.ROOTS)
+                .addTag(DTBlockTags.AERIAL_ROOTS_ROOTY_SOIL);
     }
 
     protected void addDTTags() {
@@ -100,6 +108,16 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
                 family.defaultStrippedBranchTags().forEach(tag ->
                         this.tag(tag).add(strippedBranch));
             });
+
+            //Create roots tag and root harvest tag if the family is mangrove-like.
+            if (family instanceof MangroveFamily mangroveFamily){
+                mangroveFamily.getRoots().ifPresent(roots -> {
+                    this.tierTag(mangroveFamily.getDefaultRootsHarvestTier()).ifPresent(tagBuilder -> tagBuilder.add(roots));
+                    mangroveFamily.defaultRootsTags().forEach(tag ->
+                            this.tag(tag).add(roots));
+                });
+            }
+
         });
 
         Species.REGISTRY.dataGenerationStream(this.modId).forEach(species -> {
@@ -107,6 +125,18 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
             species.getSapling().ifPresent(sapling ->
                     species.defaultSaplingTags().forEach(tag ->
                             this.tag(tag).add(sapling)));
+        });
+
+        SoilProperties.REGISTRY.dataGenerationStream(this.modId).forEach(soilProperties -> {
+            // add rooty blocks to the rooty soil tag.
+            soilProperties.getBlock().ifPresent(rootyBlock ->
+                    tag(DTBlockTags.ROOTY_SOIL).add(rootyBlock));
+            // add mangrove-like rooty blocks to the axe mineable tags.
+            if (soilProperties instanceof AerialRootsSoilProperties){
+                soilProperties.getBlock().ifPresent(rootyBlock ->
+                        tag(DTBlockTags.AERIAL_ROOTS_ROOTY_SOIL).add(rootyBlock)
+                );
+            }
         });
     }
 

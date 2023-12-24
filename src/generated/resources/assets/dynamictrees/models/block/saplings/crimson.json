@@ -3,7 +3,6 @@
   "render_type": "minecraft:cutout_mipped",
   "textures": {
     "cap": "dynamictrees:block/crimson_cap",
-    "particle": "dynamictrees:block/crimson_cap",
     "stem": "minecraft:block/crimson_stem"
   }
 }

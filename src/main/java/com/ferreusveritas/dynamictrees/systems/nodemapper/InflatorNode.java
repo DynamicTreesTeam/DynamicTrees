@@ -16,15 +16,20 @@ public class InflatorNode implements NodeInspector {
     private float radius;
     private BlockPos last;
     private BlockPos highestTrunkBlock;
+    private int maxRadius;
 
     Species species;
     SimpleVoxmap leafMap;
 
     public InflatorNode(Species species, SimpleVoxmap leafMap) {
+        this(species, leafMap, species.getMaxBranchRadius());
+    }
+    public InflatorNode(Species species, SimpleVoxmap leafMap, int maxRadius) {
         this.species = species;
         this.leafMap = leafMap;
         last = BlockPos.ZERO;
         highestTrunkBlock = null;
+        this.maxRadius = Math.min(maxRadius, species.getMaxBranchRadius());
     }
 
     @Override
@@ -82,7 +87,6 @@ public class InflatorNode implements NodeInspector {
                 radius = (float) Math.sqrt(areaAccum) + (species.getTapering() * species.getWorldGenTaperingFactor());
 
                 //Ensure the branch is never inflated past it's species maximum
-                int maxRadius = species.getMaxBranchRadius();
                 if (radius > maxRadius) {
                     radius = maxRadius;
                 }

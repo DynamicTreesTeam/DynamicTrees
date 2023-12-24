@@ -12,18 +12,16 @@ import com.ferreusveritas.dynamictrees.block.leaves.PalmLeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.ScruffyLeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.SolidLeavesProperties;
 import com.ferreusveritas.dynamictrees.block.leaves.WartProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.AerialRootsSoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.SpreadableSoilProperties;
 import com.ferreusveritas.dynamictrees.block.rooty.WaterSoilProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonDeserialisers;
 import com.ferreusveritas.dynamictrees.resources.Resources;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
 import com.ferreusveritas.dynamictrees.tree.family.NetherFungusFamily;
-import com.ferreusveritas.dynamictrees.tree.species.Mushroom;
-import com.ferreusveritas.dynamictrees.tree.species.NetherFungusSpecies;
-import com.ferreusveritas.dynamictrees.tree.species.PalmSpecies;
-import com.ferreusveritas.dynamictrees.tree.species.Species;
-import com.ferreusveritas.dynamictrees.tree.species.SwampOakSpecies;
+import com.ferreusveritas.dynamictrees.tree.species.*;
 import net.minecraft.data.worldgen.features.NetherFeatures;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.random.WeightedEntry;
@@ -59,7 +57,7 @@ public class DTTrees {
     @SubscribeEvent
     public static void registerSpecies(final com.ferreusveritas.dynamictrees.api.registry.RegistryEvent<Species> event) {
         // Registers fake species for generating mushrooms.
-        event.getRegistry().registerAll(new Mushroom(true), new Mushroom(false));
+        event.getRegistry().registerAll(new FakeMushroomSpecies(true), new FakeMushroomSpecies(false));
     }
 
     @SubscribeEvent
@@ -81,6 +79,7 @@ public class DTTrees {
     @SubscribeEvent
     public static void registerFamilyTypes(final TypeRegistryEvent<Family> event) {
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
+        event.registerType(DynamicTrees.location("mangrove"), MangroveFamily.TYPE);
     }
 
     @SubscribeEvent
@@ -88,12 +87,14 @@ public class DTTrees {
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusSpecies.TYPE);
         event.registerType(DynamicTrees.location("swamp_oak"), SwampOakSpecies.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmSpecies.TYPE);
+        event.registerType(DynamicTrees.location("mangrove"), MangroveSpecies.TYPE);
     }
 
     @SubscribeEvent
     public static void registerSoilPropertiesTypes(final TypeRegistryEvent<SoilProperties> event) {
         event.registerType(DynamicTrees.location("water"), WaterSoilProperties.TYPE);
         event.registerType(DynamicTrees.location("spreadable"), SpreadableSoilProperties.TYPE);
+        event.registerType(DynamicTrees.location("aerial_roots"), AerialRootsSoilProperties.TYPE);
     }
 
     @SubscribeEvent

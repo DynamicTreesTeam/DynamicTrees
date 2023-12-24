@@ -22,6 +22,9 @@ public final class DTBlockTags {
     public static final TagKey<Block> LEAVES = bind("leaves");
     public static final TagKey<Block> SAPLINGS = bind("saplings");
     public static final TagKey<Block> WART_BLOCKS = bind("wart_blocks");
+    public static final TagKey<Block> ROOTY_SOIL = bind("rooty_soil");
+    public static final TagKey<Block> AERIAL_ROOTS_ROOTY_SOIL = bind("aerial_roots_rooty_soil");
+    public static final TagKey<Block> ROOTS = bind("roots");
 
     private static TagKey<Block> bind(String identifier) {
         return BlockTags.create(new ResourceLocation(DynamicTrees.MOD_ID, identifier));
