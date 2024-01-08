@@ -1,0 +1,9 @@
+{
+  "parent": "dynamictrees:block/smartmodel/sapling",
+  "render_type": "minecraft:cutout_mipped",
+  "textures": {
+    "leaves": "minecraft:block/cherry_leaves",
+    "log": "minecraft:block/cherry_log",
+    "particle": "minecraft:block/cherry_leaves"
+  }
+}

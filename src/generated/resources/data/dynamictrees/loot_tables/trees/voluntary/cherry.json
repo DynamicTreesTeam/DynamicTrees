@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "condition": "dynamictrees:voluntary_seed_drop_chance",
+              "rarity": 1.0
+            }
+          ],
+          "name": "dynamictrees:cherry_seed"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "dynamictrees:trees/voluntary/cherry"
+}

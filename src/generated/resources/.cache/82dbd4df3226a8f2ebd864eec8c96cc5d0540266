@@ -1,13 +1,13 @@
-// 1.20.1	2023-06-19T04:23:35.9486726	dynamictrees DT Block Tags
+// 1.20.1	2023-10-17T09:49:40.2618754	dynamictrees DT Block Tags
 0852fd1f90777eeab7126995157c4b1242a44700 data/dynamictrees/tags/blocks/branches.json
-0d01eeb76e4008a6fa9e400e30347c242ac2b8ae data/dynamictrees/tags/blocks/branches_that_burn.json
+9c9752d59733d36adde0a017bbfb0e573adf1fc5 data/dynamictrees/tags/blocks/branches_that_burn.json
 1ea3935b1444b7260a6f3d3cccb81c3e21942853 data/dynamictrees/tags/blocks/foliage.json
 265c9a52b7eb0cfd09154318ed7e17789980c9a6 data/dynamictrees/tags/blocks/fungus_branches.json
 a86aa6fa2f09d162f8300475ee0d944102f6334c data/dynamictrees/tags/blocks/fungus_caps.json
-b64a22a4d2851155545aa1959722eccc71fcb513 data/dynamictrees/tags/blocks/leaves.json
-f35db0de56468795e3e28c2774f75c8acb53cb65 data/dynamictrees/tags/blocks/saplings.json
+6b0859b89f632a7002c1802596a403700ebec42f data/dynamictrees/tags/blocks/leaves.json
+713f8af120198b9232b875ab87e045f3b749fd0a data/dynamictrees/tags/blocks/saplings.json
 ef507377a99fc5ec5cc3ca9cdd35486ea719a119 data/dynamictrees/tags/blocks/stripped_branches.json
-da7ee3a8e08774676558bf3ba4471cf328174fd6 data/dynamictrees/tags/blocks/stripped_branches_that_burn.json
+312478f9c1e530aaed7d33bc133ba07f1ab185b0 data/dynamictrees/tags/blocks/stripped_branches_that_burn.json
 3e34ca7dcdebfeae6d9931c582ba2243275afd6c data/dynamictrees/tags/blocks/stripped_fungus_branches.json
 df7ab2d6211815d5441e432477abca88841b501c data/dynamictrees/tags/blocks/wart_blocks.json
 4458fce0a5d1dbd6e884e4a581f15f4df9def5fb data/minecraft/tags/blocks/enderman_holdable.json
