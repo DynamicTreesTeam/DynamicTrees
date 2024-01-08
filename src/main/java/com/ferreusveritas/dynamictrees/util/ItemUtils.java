@@ -1,9 +1,15 @@
 package com.ferreusveritas.dynamictrees.util;
 
+import com.ferreusveritas.dynamictrees.init.DTConfigs;
+import com.ferreusveritas.dynamictrees.systems.nodemapper.NetVolumeNode;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ToolActions;
+
+import javax.annotation.Nullable;
 
 /**
  * @author Harley O'Connor
@@ -43,6 +49,34 @@ public final class ItemUtils {
         itemEntity.setDeltaMovement(0, 0, 0);
         // Add (spawn) the item to the world.
         world.addFreshEntity(itemEntity);
+    }
+
+    /**
+     * Damages any axe item depending on radius or volume. Used by branch blocks
+     * @param entity        Entity doing the breaking
+     * @param heldItem      The axe
+     * @param radius        Radius of branch
+     * @param woodVolume    Volume of tree
+     * @param forBlockBreak If this function was used for breaking a block, as minecraft already did 1 value of damage.
+     */
+    public static void damageAxe(final LivingEntity entity, @Nullable final ItemStack heldItem, final int radius, final NetVolumeNode.Volume woodVolume, final boolean forBlockBreak) {
+        if (heldItem == null || !heldItem.canPerformAction(ToolActions.AXE_DIG)) {
+            return;
+        }
+
+        int damage = switch (DTConfigs.AXE_DAMAGE_MODE.get()) {
+            case VANILLA -> 1;
+            case THICKNESS -> Math.max(1, radius) / 2;
+            case VOLUME -> (int) woodVolume.getVolume();
+        };
+
+        if (forBlockBreak) {
+            damage--; // Minecraft already damaged the tool by one unit
+        }
+
+        if (damage > 0) {
+            heldItem.hurtAndBreak(damage, entity, LivingEntity::tick);
+        }
     }
 
 }

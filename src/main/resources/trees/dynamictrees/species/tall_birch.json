@@ -13,8 +13,9 @@
         "#forge:is_dry": 0.5,
         "#is_forest": 1.05
     },
-    "common_override": { "name": "minecraft:tall_birch.*" },
-    "perfect_biomes": { "name": "minecraft:tall_birch.*" },
+    "perfect_biomes": { "name": "minecraft:old_growth_birch_forest" },
+    "common_override": { "name": "minecraft:old_growth_birch_forest" },
+    "generate_sapling": true,
     "features" : [
         {
             "name": "mushroom_rot",

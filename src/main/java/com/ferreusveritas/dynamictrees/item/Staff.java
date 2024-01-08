@@ -12,6 +12,7 @@ import com.ferreusveritas.dynamictrees.util.LevelContext;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
+import com.ferreusveritas.dynamictrees.worldgen.RootsJoCode;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.client.Minecraft;
@@ -57,6 +58,7 @@ public class Staff extends Item {
     public final static String READ_ONLY = "read_only";
     public final static String TREE = "tree";
     public final static String CODE = "code";
+    public final static String ROOTS_CODE = "roots_code";
     public final static String USES = "uses";
     public final static String MAX_USES = "max_uses";
 
@@ -128,6 +130,8 @@ public class Staff extends Item {
                 if (!context.getPlayer().isShiftKeyDown()) {
                     String code = new JoCode(level, rootPos, context.getPlayer().getDirection()).toString();
                     setCode(heldStack, code);
+                    String rootCode = new RootsJoCode(level, rootPos, context.getPlayer().getDirection()).toString();
+                    setRootsCode(heldStack, rootCode);
                     if (level.isClientSide) { // Make sure this doesn't run on the server
                         Minecraft.getInstance().keyboardHandler.setClipboard(code); // Put the code in the system clipboard to annoy everyone.
                     }
@@ -142,6 +146,9 @@ public class Staff extends Item {
         if (species.isValid() && species.isAcceptableSoil(level, pos, state)) {
             GenerationContext generationContext = new GenerationContext(LevelContext.create(level), species, pos, pos.mutable(), level.getBiome(pos), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY);
             species.getJoCode(getCode(heldStack)).setCareful(true).generate(generationContext);
+            String rootsCode = getRootsCode(heldStack);
+            if (!rootsCode.isEmpty())
+                species.getRootsJoCode(rootsCode).setCareful(true).generate(generationContext);
             if (hasMaxUses(heldStack)) {
                 if (decUses(heldStack)) {
                     heldStack.shrink(1);//If the player is in creative this will have no effect.
@@ -190,6 +197,11 @@ public class Staff extends Item {
 
     public Staff setCode(ItemStack itemStack, String code) {
         itemStack.getOrCreateTag().putString(CODE, code);
+        return this;
+    }
+
+    public Staff setRootsCode(ItemStack itemStack, String code) {
+        itemStack.getOrCreateTag().putString(ROOTS_CODE, code);
         return this;
     }
 
@@ -245,7 +257,7 @@ public class Staff extends Item {
     public boolean decUses(ItemStack itemStack) {
         int uses = Math.max(0, getUses(itemStack) - 1);
         setUses(itemStack, uses);
-        return uses <= 0;
+        return uses == 0;
     }
 
     public int getColor(ItemStack itemStack, int tint) {
@@ -320,11 +332,21 @@ public class Staff extends Item {
         return code;
     }
 
+    public String getRootsCode(ItemStack itemStack) {
+        if (itemStack.getOrCreateTag().contains(ROOTS_CODE)) {
+            return itemStack.getTag().getString(ROOTS_CODE);
+        }
+        return "";
+    }
+
     @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flagIn) {
         tooltip.add(Component.translatable("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
         tooltip.add(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
+        String rootsCode = getRootsCode(stack);
+        if (!rootsCode.isEmpty())
+            tooltip.add(Component.translatable("tooltip.dynamictrees.roots_jo_code", new RootsJoCode(rootsCode).getTextComponent()));
     }
 
     /**

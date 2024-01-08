@@ -1,6 +1,8 @@
 package com.ferreusveritas.dynamictrees.block.branch;
 
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
+import com.ferreusveritas.dynamictrees.block.FruitBlock;
+import com.ferreusveritas.dynamictrees.block.PodBlock;
 import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
@@ -160,6 +162,10 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         }
 
         if (BranchConnectables.isBlockConnectable(block)) {
+            return ReplaceableState.TREEPART;
+        }
+
+        if (block instanceof FruitBlock || block instanceof PodBlock){
             return ReplaceableState.TREEPART;
         }
 

@@ -11,6 +11,6 @@
         "#is_nether": 0.75,
         "#forge:is_wet": 0.75
     },
-    "perfect_biomes": { "type": "savanna" },
+    "perfect_biomes": { "tag": "#minecraft:is_savanna" },
     "primitive_sapling": "acacia_sapling"
 }

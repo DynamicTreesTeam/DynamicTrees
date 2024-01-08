@@ -6,52 +6,54 @@ import com.ferreusveritas.dynamictrees.util.CoordUtils;
 import com.ferreusveritas.dynamictrees.util.RootConnections;
 import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockElementFace;
-import net.minecraft.client.renderer.block.model.BlockFaceUV;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.IDynamicBakedModel;
 import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.ModelData;
 import org.joml.Vector3f;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
-public class RootBlockBakedModel extends BranchBlockBakedModel {
+public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
 
-    private TextureAtlasSprite barkTexture;
+    private final BlockModel blockModel;
+
+    private final ResourceLocation modelLocation;
+
+    private final TextureAtlasSprite barkTexture;
 
     private final BakedModel[][] sleeves = new BakedModel[4][7];
     private final BakedModel[][] cores = new BakedModel[2][8]; //8 Cores for 2 axis(X, Z) with the bark texture on all 6 sides rotated appropriately.
     private final BakedModel[][] verts = new BakedModel[4][8];
 
-    public RootBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc) {
-        super(modelResLoc, barkResLoc, null);
+    public SurfaceRootBlockBakedModel(ResourceLocation modelLocation, ResourceLocation barkTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
+        this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT,
+                ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
+        this.modelLocation = modelLocation;
+        this.barkTexture = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTextureLocation));
+        initModels();
     }
 
-    @Override
-    public void setupModels() {
-        this.barkTexture = ModelUtils.getTexture(this.barkResLoc);
-
+    public void initModels() {
         for (int r = 0; r < 8; r++) {
             int radius = r + 1;
             if (radius < 8) {
@@ -112,7 +114,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), this.barkTexture, face, BlockModelRotation.X0_Y0, this.modelResLoc));
+            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), this.barkTexture, face, BlockModelRotation.X0_Y0, this.modelLocation));
         }
 
         return builder.build();
@@ -137,7 +139,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
                 Vector3f[] limits = ModelUtils.AABBLimits(pieceBoundary);
 
                 BlockElement part = new BlockElement(limits[0], limits[1], mapFacesIn, null, true);
-                builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), this.barkTexture, face, BlockModelRotation.X0_Y0, this.modelResLoc));
+                builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), this.barkTexture, face, BlockModelRotation.X0_Y0, this.modelLocation));
             }
         }
 
@@ -169,7 +171,7 @@ public class RootBlockBakedModel extends BranchBlockBakedModel {
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0, this.modelResLoc));
+            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0, this.modelLocation));
         }
 
         return builder.build();

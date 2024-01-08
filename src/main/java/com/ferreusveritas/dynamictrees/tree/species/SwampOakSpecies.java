@@ -1,9 +1,11 @@
 package com.ferreusveritas.dynamictrees.tree.species;
 
+import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.registry.TypedRegistry;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.util.CommonVoxelShapes;
 import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -35,6 +37,11 @@ public class SwampOakSpecies extends Species {
             }
         }
         return super.generate(context);
+    }
+
+    @Override
+    public ResourceLocation getSaplingSmartModelLocation() {
+        return DynamicTrees.location("block/smartmodel/water_sapling");
     }
 
 }

@@ -8,6 +8,7 @@ import com.ferreusveritas.dynamictrees.api.cell.CellNull;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.BlockWithDynamicHardness;
+import com.ferreusveritas.dynamictrees.block.branch.BasicRootsBlock;
 import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
 import com.ferreusveritas.dynamictrees.block.entity.SpeciesBlockEntity;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
@@ -197,10 +198,10 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     @org.jetbrains.annotations.Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-//        if (pState.getValue(IS_VARIANT)) {
+        if (pState.getValue(IS_VARIANT)) {
             return new SpeciesBlockEntity(pPos,pState);
-//        }
-//        return null;
+        }
+        return null;
     }
 //
 //    @Override
@@ -300,7 +301,10 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
         ) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
 
-    public void destroyTree(Level level, BlockPos rootPos) {
+    public void destroyTree(Level level, BlockPos rootPos){
+        destroyTree(level, rootPos, null);
+    }
+    public void destroyTree(Level level, BlockPos rootPos, @Nullable Player player) {
         Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
 
         if (branch.isPresent()) {
@@ -311,7 +315,7 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
 
     @Override
     public void playerWillDestroy(Level level, @Nonnull BlockPos pos, BlockState state, @Nonnull Player player) {
-        this.destroyTree(level, pos);
+        this.destroyTree(level, pos, player);
         super.playerWillDestroy(level, pos, state, player);
     }
 
@@ -408,7 +412,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
 
     @Override
     public int branchSupport(BlockState state, BlockGetter level, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
-        return dir == Direction.DOWN ? BranchBlock.setSupport(1, 1) : 0;
+        Direction supportDir = branch instanceof BasicRootsBlock ? Direction.UP : Direction.DOWN;
+        return (dir == supportDir) ? BranchBlock.setSupport(1, 1) : 0;
     }
 
     @Override
@@ -469,14 +474,11 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
 
     public int colorMultiplier(BlockColors blockColors, BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int tintIndex) {
         final int white = 0xFFFFFFFF;
-        switch (tintIndex) {
-            case 0:
-                return blockColors.getColor(getPrimitiveSoilState(state), level, pos, tintIndex);
-            case 1:
-                return state.getBlock() instanceof RootyBlock ? rootColor(state, level, pos) : white;
-            default:
-                return white;
-        }
+        return switch (tintIndex) {
+            case 0 -> blockColors.getColor(getPrimitiveSoilState(state), level, pos, tintIndex);
+            case 1 -> state.getBlock() instanceof RootyBlock ? rootColor(state, level, pos) : white;
+            default -> white;
+        };
     }
 
     public boolean getColorFromBark() {
@@ -486,6 +488,10 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     @OnlyIn(Dist.CLIENT)
     public int rootColor(BlockState state, BlockGetter blockAccess, BlockPos pos) {
         return getFamily(state, blockAccess, pos).getRootColor(state, getColorFromBark());
+    }
+
+    public boolean fallWithTree(BlockState state, Level level, BlockPos pos, boolean hasRoots) {
+        return fallWithTree(state, level, pos);
     }
 
     public boolean fallWithTree(BlockState state, Level level, BlockPos pos) {

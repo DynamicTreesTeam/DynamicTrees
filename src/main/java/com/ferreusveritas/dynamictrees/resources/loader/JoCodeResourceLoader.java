@@ -6,6 +6,7 @@ import com.ferreusveritas.dynamictrees.api.resource.loading.AbstractResourceLoad
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.ferreusveritas.dynamictrees.worldgen.JoCode;
 import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
+import com.ferreusveritas.dynamictrees.worldgen.RootsJoCode;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -45,16 +46,23 @@ public final class JoCodeResourceLoader extends AbstractResourceLoader<List<Stri
 
     private void registerCodeForLine(Species species, String line) {
         final String[] radiusAndCode = line.split(":");
-        this.registerCode(species, Integer.parseInt(radiusAndCode[0]), radiusAndCode[1]);
+        boolean isRoot = false;
+        if (radiusAndCode[0].charAt(0) == '*'){
+            radiusAndCode[0] = radiusAndCode[0].substring(1);
+            isRoot = true;
+        }
+        this.registerCode(species, Integer.parseInt(radiusAndCode[0]), radiusAndCode[1], isRoot);
     }
 
-    private void registerCode(Species species, int radius, String code) {
-        final JoCode joCode = species.getJoCode(code).setCareful(false);
-
-        // Code reserved for collecting WorldGen JoCodes
-        //this.collectWorldGenCodes(species, radius, joCode);
-
-        JoCodeRegistry.register(species.getRegistryName(), radius, joCode);
+    private void registerCode(Species species, int radius, String code, boolean root) {
+        if (root){
+            final RootsJoCode joCode = species.getRootsJoCode(code);
+            joCode.setCareful(false);
+            JoCodeRegistry.registerRoot(species.getRegistryName(), radius, joCode);
+        } else {
+            final JoCode joCode = species.getJoCode(code).setCareful(false);
+            JoCodeRegistry.register(species.getRegistryName(), radius, joCode);
+        }
     }
 
     /**

@@ -62,6 +62,10 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
                         ));
     }
 
+//    private void registerAerialRootsAppliers(){
+//
+//    }
+
     @Override
     protected void applyLoadAppliers(LoadData loadData, JsonObject json) {
         this.readCustomBlockRegistryName(loadData.getResource(), json);

@@ -16,12 +16,14 @@ import net.minecraft.client.renderer.block.model.BlockFaceUV;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -29,6 +31,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 import org.joml.Vector3f;
 
 import javax.annotation.Nonnull;
@@ -37,40 +40,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
 public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
-
-    protected final ResourceLocation thickRingsResLoc;
 
     private final BakedModel[] trunksBark = new BakedModel[16]; // The trunk will always feature bark on its sides.
     private final BakedModel[] trunksTopBark = new BakedModel[16]; // The trunk will feature bark on its top when there's a branch on top of it.
     private final BakedModel[] trunksTopRings = new BakedModel[16]; // The trunk will feature rings on its top when there's no branches on top of it.
     private final BakedModel[] trunksBotRings = new BakedModel[16]; // The trunk will always feature rings on its bottom surface if nothing is below it.
 
-    public ThickBranchBlockBakedModel(ResourceLocation modelResLoc, ResourceLocation barkResLoc, ResourceLocation ringsResLoc, ResourceLocation thickRingsResLoc) {
-        super(modelResLoc, barkResLoc, ringsResLoc);
-        this.thickRingsResLoc = thickRingsResLoc;
+    public ThickBranchBlockBakedModel(IGeometryBakingContext customData, ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
+                                      ResourceLocation thickRingsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
+        super(customData, modelLocation, barkTextureLocation, ringsTextureLocation, spriteGetter);
+        initThickModels(spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, thickRingsTextureLocation)));
     }
 
-    private boolean isTextureNull(@Nullable TextureAtlasSprite sprite) {
-        return sprite == null || sprite.equals(ModelUtils.getTexture(new ResourceLocation("")));
-    }
-
-    @Override
-    public void setupModels() {
-        super.setupModels();
-
-        TextureAtlasSprite thickRingsTexture = this.thickRingsResLoc == null ? this.ringsTexture : ModelUtils.getTexture(this.thickRingsResLoc);
-
-        //if (isTextureNull(thickRingsTexture)){
-        //thickRingsTexture = ThickRingTextureManager.uploader.getTextureAtlas().getSprite(thickRingsResLoc);
-        //thickRingsTexture = ModelUtils.getTexture(thickRingsResLoc, ThickRingTextureManager.LOCATION_THICKRINGS_TEXTURE);
-
+    public void initThickModels(TextureAtlasSprite thickRingsTexture) {
         if (isTextureNull(thickRingsTexture)) {
             thickRingsTexture = this.ringsTexture;
         }
-        //}
 
         for (int i = 0; i < ThickBranchBlock.MAX_RADIUS_THICK - ThickBranchBlock.MAX_RADIUS; i++) {
             int radius = i + ThickBranchBlock.MAX_RADIUS + 1;
@@ -79,6 +68,10 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
             trunksTopRings[i] = bakeTrunkRings(radius, thickRingsTexture, Direction.UP);
             trunksBotRings[i] = bakeTrunkRings(radius, thickRingsTexture, Direction.DOWN);
         }
+    }
+
+    private boolean isTextureNull(@Nullable TextureAtlasSprite sprite) {
+        return sprite == null || sprite.equals(ModelUtils.getTexture(new ResourceLocation("")));
     }
 
     public BakedModel bakeTrunkBark(int radius, TextureAtlasSprite bark, boolean side) {
@@ -110,7 +103,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
                     mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
 
                     BlockElement part = new BlockElement(limits[0], limits[1], mapFacesIn, null, true);
-                    builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), bark, face, BlockModelRotation.X0_Y0, this.modelResLoc));
+                    builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), bark, face, BlockModelRotation.X0_Y0, this.modelLocation));
                 }
 
             }
@@ -158,7 +151,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
             mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
 
             BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), ring, face, BlockModelRotation.X0_Y0, this.modelResLoc));
+            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), ring, face, BlockModelRotation.X0_Y0, this.modelLocation));
         }
 
         return builder.build();

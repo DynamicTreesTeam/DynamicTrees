@@ -1,7 +1,7 @@
 package com.ferreusveritas.dynamictrees.models.loader;
 
 import com.ferreusveritas.dynamictrees.models.geometry.BranchBlockModelGeometry;
-import com.ferreusveritas.dynamictrees.models.geometry.RootBlockModelGeometry;
+import com.ferreusveritas.dynamictrees.models.geometry.SurfaceRootBlockModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import net.minecraftforge.api.distmarker.Dist;
@@ -11,12 +11,12 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Harley O'Connor
  */
 @OnlyIn(Dist.CLIENT)
-public class RootBlockModelLoader extends BranchBlockModelLoader {
+public class SurfaceRootBlockModelLoader extends BranchBlockModelLoader {
 
     @Override
     public BranchBlockModelGeometry read(JsonObject modelObject, JsonDeserializationContext deserializationContext) {
         final JsonObject textures = this.getTexturesObject(modelObject);
-        return new RootBlockModelGeometry(this.getBarkResLoc(textures));
+        return new SurfaceRootBlockModelGeometry(this.getBarkTextureLocation(textures));
     }
 
     @Override

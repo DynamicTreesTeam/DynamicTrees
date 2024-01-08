@@ -1,11 +1,17 @@
 package com.ferreusveritas.dynamictrees.resources.loader;
 
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
+import com.ferreusveritas.dynamictrees.api.applier.Applier;
 import com.ferreusveritas.dynamictrees.api.applier.ApplierRegistryEvent;
+import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.ferreusveritas.dynamictrees.block.leaves.LeavesProperties;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilHelper;
+import com.ferreusveritas.dynamictrees.block.rooty.SoilProperties;
 import com.ferreusveritas.dynamictrees.deserialisation.JsonHelper;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
+import com.ferreusveritas.dynamictrees.tree.family.MangroveFamily;
+import com.ferreusveritas.dynamictrees.tree.species.MangroveSpecies;
 import com.ferreusveritas.dynamictrees.tree.species.Species;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
@@ -58,7 +64,29 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("max_signal_depth", Integer.class, Family::setMaxSignalDepth)
                 .register("loot_volume_multiplier", Float.class, Family::setLootVolumeMultiplier);
 
+        registerMangroveAppliers();
+
         super.registerAppliers();
+    }
+
+    private void registerMangroveAppliers(){
+        this.gatherDataAppliers
+                .register("primitive_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRoots)
+                .register("primitive_filled_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsFilled)
+                .register("primitive_covered_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsCovered)
+                //to-do: put in soil properties instead
+                .register("default_soil", MangroveFamily.class, SoilProperties.class, MangroveFamily::setDefaultSoil);
+        this.setupAppliers
+                .register("primitive_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRoots)
+                .register("primitive_filled_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsFilled)
+                .register("primitive_covered_root", MangroveFamily.class, Block.class, MangroveFamily::setPrimitiveRootsCovered)
+                //.register("replaceable_by_roots", MangroveFamily.class , ,)
+        ;
+        this.reloadAppliers
+                .register("default_soil", MangroveFamily.class, SoilProperties.class, MangroveFamily::setDefaultSoil)
+                .registerArrayApplier("root_system_acceptable_soils", MangroveFamily.class, String.class, (Applier<MangroveFamily, String>) this::addAcceptableSoilForRootSystem);
+        ;
+
     }
 
     /**
@@ -94,6 +122,10 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
     protected void postLoadOnLoad(LoadData loadData, JsonObject json) {
         super.postLoadOnLoad(loadData, json);
         loadData.getResource().setupBlocks();
+    }
+
+    private PropertyApplierResult addAcceptableSoilForRootSystem(MangroveFamily family, String acceptableSoil) {
+        return SoilHelper.applyIfSoilIsAcceptable(family, acceptableSoil, MangroveFamily::addAcceptableSoilsForRootSystem);
     }
 
 }

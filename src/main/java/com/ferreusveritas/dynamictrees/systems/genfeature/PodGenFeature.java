@@ -24,6 +24,7 @@ public class PodGenFeature extends GenFeature {
     public static final ConfigurationProperty<Pod> POD = ConfigurationProperty.property("pod", Pod.class);
     //inverse of pods per block. 8 means one pod will generate for every 8 attempts.
     public static final ConfigurationProperty<Integer> BLOCKS_PER_POD = ConfigurationProperty.integer("blocks_per_pod");
+    public static final ConfigurationProperty<Integer> LOWEST_TRUNK_HEIGHT = ConfigurationProperty.integer("lowest_trunk_height");
 
     public PodGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -31,7 +32,7 @@ public class PodGenFeature extends GenFeature {
 
     @Override
     protected void registerProperties() {
-        this.register(POD, PLACE_CHANCE, FRUITING_RADIUS, BLOCKS_PER_POD);
+        this.register(POD, PLACE_CHANCE, FRUITING_RADIUS, BLOCKS_PER_POD, LOWEST_TRUNK_HEIGHT);
     }
 
     @Override
@@ -40,7 +41,8 @@ public class PodGenFeature extends GenFeature {
                 .with(POD, Pod.NULL)
                 .with(PLACE_CHANCE, 0.8F)
                 .with(FRUITING_RADIUS, 8)
-                .with(BLOCKS_PER_POD, 29);
+                .with(BLOCKS_PER_POD, 29)
+                .with(LOWEST_TRUNK_HEIGHT, 0);
     }
 
     @Override
@@ -52,7 +54,7 @@ public class PodGenFeature extends GenFeature {
                 && shouldGrow(configuration, context.species(), context.levelContext(), context.treePos(), context.random())) {
             Pod pod = configuration.get(POD);
             this.place(pod, pod::place, level, context.pos(),
-                    SeasonHelper.getSeasonValue(context.levelContext(), context.pos()), configuration.get(BLOCKS_PER_POD));
+                    SeasonHelper.getSeasonValue(context.levelContext(), context.pos()), configuration.get(BLOCKS_PER_POD), configuration.get(LOWEST_TRUNK_HEIGHT));
         }
         return false;
     }
@@ -68,7 +70,7 @@ public class PodGenFeature extends GenFeature {
         if (shouldGenerate(configuration, context.random())) {
             Pod pod = configuration.get(POD);
             this.place(pod, pod::placeDuringWorldGen, context.level(), context.pos(),
-                    context.seasonValue(), configuration.get(BLOCKS_PER_POD));
+                    context.seasonValue(), configuration.get(BLOCKS_PER_POD), configuration.get(LOWEST_TRUNK_HEIGHT));
             return true;
         }
         return false;
@@ -79,9 +81,9 @@ public class PodGenFeature extends GenFeature {
     }
 
     private void place(Pod pod, PodGenerationNode.PodPlacer podPlacer, LevelAccessor level, BlockPos rootPos,
-                       @Nullable Float seasonValue, int blocksPerPod) {
+                       @Nullable Float seasonValue, int blocksPerPod, int lowestTrunkHeight) {
         TreeHelper.startAnalysisFromRoot(level, rootPos,
-                new MapSignal(new PodGenerationNode(pod, podPlacer, seasonValue, blocksPerPod)));
+                new MapSignal(new PodGenerationNode(pod, podPlacer, seasonValue, blocksPerPod, rootPos, lowestTrunkHeight)));
     }
 
 }

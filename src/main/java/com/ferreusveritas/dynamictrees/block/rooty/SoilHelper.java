@@ -1,5 +1,8 @@
 package com.ferreusveritas.dynamictrees.block.rooty;
 
+import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
+import com.ferreusveritas.dynamictrees.api.applier.VoidApplier;
+import com.ferreusveritas.dynamictrees.tree.species.Species;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -126,6 +129,14 @@ public class SoilHelper {
         }
 
         return flags;
+    }
+
+    public static <T> PropertyApplierResult applyIfSoilIsAcceptable(T value, String acceptableSoil, VoidApplier<T, String> soilApplier) {
+        if (SoilHelper.getSoilFlags(acceptableSoil) == 0) {
+            return PropertyApplierResult.failure("Could not find acceptable soil '" + acceptableSoil + "'.");
+        }
+        soilApplier.apply(value, acceptableSoil);
+        return PropertyApplierResult.success();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
+import com.ferreusveritas.dynamictrees.util.IgnoreThrowable;
 import com.ferreusveritas.dynamictrees.util.JsonMapWrapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -140,14 +141,14 @@ public class JsonHelper {
         }
     }
 
-    public static void throwIfShouldNotLoad(JsonObject json) /*throws IgnoreThrowable*/ {
+    public static void throwIfShouldNotLoad(JsonObject json) throws IgnoreThrowable {
         final String key = "only_if_loaded";
         if (json.has(key)) {
             final boolean continueLoading = JsonDeserialisers.STRING.deserialise(json.get(key))
                     .map(modId -> ModList.get().isLoaded(modId))
                     .orElse(true);
             if (!continueLoading) {
-//                throw IgnoreThrowable.INSTANCE;
+                throw IgnoreThrowable.INSTANCE;
             }
         }
     }
