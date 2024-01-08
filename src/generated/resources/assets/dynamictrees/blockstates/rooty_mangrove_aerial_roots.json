@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "radius=1": {
+      "model": "dynamictrees:block/rooty_mangrove_aerial_roots_radius1"
+    },
+    "radius=2": {
+      "model": "dynamictrees:block/rooty_mangrove_aerial_roots_radius2"
+    },
+    "radius=3": {
+      "model": "dynamictrees:block/rooty_mangrove_aerial_roots_radius3"
+    },
+    "radius=4": {
+      "model": "dynamictrees:block/rooty_mangrove_aerial_roots_radius4"
+    },
+    "radius=5": {
+      "model": "dynamictrees:block/rooty_mangrove_aerial_roots_radius5"
+    },
+    "radius=6": {
+      "model": "dynamictrees:block/rooty_mangrove_aerial_roots_radius6"
+    },
+    "radius=7": {
+      "model": "dynamictrees:block/rooty_mangrove_aerial_roots_radius7"
+    },
+    "radius=8": {
+      "model": "dynamictrees:block/rooty_mangrove_aerial_roots_radius8"
+    }
+  }
+}

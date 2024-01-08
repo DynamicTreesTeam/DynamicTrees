@@ -12,7 +12,7 @@
         "#forge:is_dry": 0.25,
         "#forge:is_wet": 0.75
     },
-    "perfect_biomes": { "type": "coniferous" },
+    "perfect_biomes": { "tag": "#forge:is_coniferous" },
     "primitive_sapling": "spruce_sapling",
     "acceptable_soils": ["dirt_like"],
     "world_gen_acceptable_soils": ["snow_like"],

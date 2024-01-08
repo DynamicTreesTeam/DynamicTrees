@@ -1,0 +1,46 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"rings": "block/mangrove_log_top",
+		"overlay": "block/mangrove_roots_side",
+		"overlay_end": "block/mangrove_roots_top",
+		"roots": "dynamictrees:block/air",
+		"particle": "#side"
+	},
+	"elements": [
+		{
+			"from": [5, 0, 5],
+			"to": [11, 16, 11],
+			"faces": {
+				"up":  {"uv": [5, 0, 11, 16], "texture": "#rings", "cullface": "up" },
+				"north": {"uv": [5, 0, 11, 16], "texture": "#side"},
+				"east": {"uv": [5, 0, 11, 16], "texture": "#side"},
+				"south": {"uv": [5, 0, 11, 16], "texture": "#side"},
+				"west": {"uv": [5, 0, 11, 16], "texture": "#side"},
+				"down": {"uv": [5, 5, 11, 11], "texture": "#side", "cullface": "down"}
+			}
+		},
+		{
+			"from": [5, 0, 5],
+			"to": [11, 16, 11],
+			"faces": {
+				"north": {"uv": [5, 0, 11, 16], "texture": "#roots", "tintindex": 1},
+				"east": {"uv": [5, 0, 11, 16], "texture": "#roots", "tintindex": 1},
+				"south": {"uv": [5, 0, 11, 16], "texture": "#roots", "tintindex": 1},
+				"west": {"uv": [5, 0, 11, 16], "texture": "#roots", "tintindex": 1}
+			}
+		},
+		{
+			"from": [5, 0, 5],
+			"to": [11, 16, 11],
+			"faces": {
+				"north": {"uv": [5, 0, 11, 16], "texture": "#overlay"},
+				"east":  {"uv": [5, 0, 11, 16], "texture": "#overlay"},
+				"south": {"uv": [5, 0, 11, 16], "texture": "#overlay"},
+				"west":  {"uv": [5, 0, 11, 16], "texture": "#overlay"},
+				"down":  {"uv": [5, 5, 11, 11], "texture": "#overlay_end", "cullface": "down"}
+			}
+		}
+	]
+}

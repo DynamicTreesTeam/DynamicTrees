@@ -68,7 +68,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
     protected void generateTrees(LevelContext levelContext, BiomeDatabase biomeDatabase, PoissonDisc disc, BlockPos originPos, SafeChunkBounds safeBounds) {
         BlockPos basePos = new BlockPos(disc.x, 0, disc.z);
-        Holder<Biome> biome = levelContext.accessor().getBiome(originPos);
+        Holder<Biome> biome = levelContext.accessor().getBiome(basePos);
         Heightmap.Types heightmap = Heightmap.Types.valueOf(biomeDatabase.getHeightmap(biome).toUpperCase());
         for (BlockPos groundPos : GroundFinder.getGroundFinder(levelContext.level()).findGround(levelContext.accessor(), basePos, heightmap)) {
             BiomeDatabase.EntryReader entry = biomeDatabase.getEntry(levelContext.accessor().getBiome(groundPos));

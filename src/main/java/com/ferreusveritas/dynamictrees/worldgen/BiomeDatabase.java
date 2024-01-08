@@ -32,7 +32,7 @@ public class BiomeDatabase {
     private final Map<DTBiomeHolderSet, JsonEntry> jsonEntries = new LinkedHashMap<>();
     private final Map<ResourceLocation, Entry> entries = new HashMap<>();
 
-    public Entry getJsonEntry(DTBiomeHolderSet biomes) {
+    public JsonEntry getJsonEntry(DTBiomeHolderSet biomes) {
         return this.jsonEntries.computeIfAbsent(biomes, k -> new JsonEntry(this));
     }
 
@@ -73,10 +73,7 @@ public class BiomeDatabase {
      * @implNote does not reset cancellers, since they are only applied once on initial load
      */
     public void reset() {
-        this.entries.values().forEach(BaseEntry::reset);
-    }
-
-    public void clear() {
+        this.jsonEntries.clear();
         this.entries.clear();
     }
 
@@ -386,9 +383,13 @@ public class BiomeDatabase {
      * deferred and applied later to a set of biome-specific entries.
      */
     public static class JsonEntry extends Entry {
+        private boolean force = false;
         private boolean changedChanceSelector = false;
+        private Operation chanceSelectorOp = Operation.REPLACE;
         private boolean changedDensitySelector = false;
+        private Operation densitySelectorOp = Operation.REPLACE;
         private boolean changedSpeciesSelector = false;
+        private Operation speciesSelectorOp = Operation.REPLACE;
         private boolean changedBlacklisted = false;
         private boolean changedForestness = false;
         private boolean changedHeightmap = false;
@@ -399,18 +400,35 @@ public class BiomeDatabase {
         }
 
         /**
+         * {@return whether this json entry should be forcefully copied and reset any other properties on all declared biomes}
+         * Defaults to false.
+         */
+        public boolean isForce() {
+            return this.force;
+        }
+
+        /**
+         * Sets whether this json entry should be forcefully copied and reset any other properties on all declared biomes.
+         */
+        public void setForce(boolean force) {
+            this.force = force;
+        }
+
+        /**
          * Copies the changed data stored in this JSON entry to the specified {@code other} entry.
          * This copy method does not overwrite properties in {@code other} that were not changed by this JSON entry.
          *
          * @param other the other entry
          */
         public void copyTo(Entry other) {
+            if (this.force)
+                other.reset();
             if (this.changedChanceSelector)
-                other.chanceSelector = this.chanceSelector;
+                other.setChanceSelector(this.chanceSelector, this.chanceSelectorOp);
             if (this.changedDensitySelector)
-                other.densitySelector = this.densitySelector;
+                other.setDensitySelector(this.densitySelector, this.densitySelectorOp);
             if (this.changedSpeciesSelector)
-                other.speciesSelector = this.speciesSelector;
+                other.setSpeciesSelector(this.speciesSelector, this.speciesSelectorOp);
             if (this.changedBlacklisted)
                 other.blacklisted = this.blacklisted;
             if (this.changedForestness)
@@ -432,7 +450,8 @@ public class BiomeDatabase {
         @Override
         public void setChanceSelector(ChanceSelector selector, Operation op) {
             this.changedChanceSelector = true;
-            super.setChanceSelector(selector, op);
+            this.chanceSelectorOp = op;
+            super.setChanceSelector(selector);
         }
 
         @Override
@@ -444,7 +463,8 @@ public class BiomeDatabase {
         @Override
         public void setDensitySelector(DensitySelector selector, Operation op) {
             this.changedDensitySelector = true;
-            super.setDensitySelector(selector, op);
+            this.densitySelectorOp = op;
+            super.setDensitySelector(selector);
         }
 
         @Override
@@ -456,7 +476,8 @@ public class BiomeDatabase {
         @Override
         public void setSpeciesSelector(SpeciesSelector selector, Operation op) {
             this.changedSpeciesSelector = true;
-            super.setSpeciesSelector(selector, op);
+            this.speciesSelectorOp = op;
+            super.setSpeciesSelector(selector);
         }
 
         @Override

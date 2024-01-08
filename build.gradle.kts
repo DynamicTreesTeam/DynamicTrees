@@ -17,7 +17,8 @@ plugins {
     id("maven-publish")
     id("com.harleyoconnor.translationsheet") version "0.1.1"
     id("com.matthewprenger.cursegradle") version "1.4.0"
-    id("com.harleyoconnor.autoupdatetool") version "1.0.0"
+    id("com.modrinth.minotaur") version "2.+"
+    id("com.harleyoconnor.autoupdatetool") version "1.0.9"
 }
 
 repositories {
@@ -102,12 +103,11 @@ dependencies {
 }
 
 translationSheet {
-    this.sheetId.set("1xjxEh2NdbeV_tQc6fDHPgcRmtchqCZJKt--6oifq1qc")
-    this.sectionColour.set(0xF9CB9C)
-    this.sectionPattern.set("Dynamic Trees")
-    this.outputDir("src/localization/resources/assets/dynamictrees/lang/")
-
-    this.useJson()
+    sheetId.set("1xjxEh2NdbeV_tQc6fDHPgcRmtchqCZJKt--6oifq1qc")
+    sectionColour.set(0xF9CB9C)
+    sectionPattern.set("Dynamic Trees")
+    outputDirectory.set(file("src/localization/resources/assets/dynamictrees/lang/"))
+    useJson()
 }
 
 tasks.jar {
@@ -133,33 +133,51 @@ java {
     }
 }
 
+val changelogFile = file("temp/changelog.txt")
+
 curseforge {
-    if (project.hasProperty("curseApiKey") && project.hasProperty("curseFileType")) {
-        apiKey = property("curseApiKey")
+    val curseApiKey = optionalProperty("curseApiKey") ?: System.getenv("CURSEFORGE_API_KEY")
+    if (curseApiKey == null) {
+        project.logger.warn("API Key for CurseForge not detected; uploading will be disabled.")
+        return@curseforge
+    }
 
-        project {
-            id = "252818"
+    apiKey = curseApiKey
 
-            addGameVersion(mcVersion)
+    project {
+        id = "252818"
 
-            changelog = file("changelog.txt")
-            changelogType = "markdown"
-            releaseType = property("curseFileType")
+        addGameVersion(mcVersion)
 
-            addArtifact(tasks.findByName("sourcesJar"))
+        changelog = changelogFile
+        changelogType = "markdown"
+        releaseType = optionalProperty("versionType") ?: "release"
 
-            mainArtifact(tasks.findByName("jar")) {
-                relations {
-                    optionalDependency("dynamictreesplus")
-                    optionalDependency("chunk-saving-fix")
-                }
+        addArtifact(tasks.findByName("sourcesJar"))
+
+        mainArtifact(tasks.findByName("jar")) {
+            relations {
+                optionalDependency("dynamictreesplus")
             }
         }
-    } else {
-        project.logger.log(
-            LogLevel.WARN,
-            "API Key and file type for CurseForge not detected; uploading will be disabled."
-        )
+    }
+}
+
+modrinth {
+    val modrinthToken = optionalProperty("modrinthToken") ?: System.getenv("MODRINTH_TOKEN")
+    if (modrinthToken == null) {
+        project.logger.warn("Token for Modrinth not detected; uploading will be disabled.")
+        return@modrinth
+    }
+
+    token.set(modrinthToken)
+    projectId.set(modId)
+    versionNumber.set("$mcVersion-$modVersion")
+    versionType.set(optionalProperty("versionType") ?: "release")
+    uploadFile.set(tasks.jar.get())
+    gameVersions.add(mcVersion)
+    if (changelogFile.exists()) {
+        changelog.set(changelogFile.readText())
     }
 }
 
@@ -221,33 +239,35 @@ publishing {
     }
     repositories {
         maven("file:///${project.projectDir}/mcmodsrepo")
-        if (hasProperty("harleyOConnorMavenUsername") && hasProperty("harleyOConnorMavenPassword")) {
-            maven("https://harleyoconnor.com/maven") {
-                name = "HarleyOConnor"
-                credentials {
-                    username = property("harleyOConnorMavenUsername")
-                    password = property("harleyOConnorMavenPassword")
-                }
+        val mavenUsername = optionalProperty("harleyOConnorMavenUsername") ?: System.getenv("MAVEN_USERNAME")
+        val mavenPassword = optionalProperty("harleyOConnorMavenPassword") ?: System.getenv("MAVEN_PASSWORD")
+        if (mavenUsername == null || mavenPassword == null) {
+            logger.warn("Credentials for maven not detected; it will be disabled.")
+            return@repositories
+        }
+        maven("https://harleyoconnor.com/maven") {
+            name = "HarleyOConnor"
+            credentials {
+                username = mavenUsername
+                password = mavenPassword
             }
-        } else {
-            logger.log(LogLevel.WARN, "Credentials for maven not detected; it will be disabled.")
         }
     }
 }
 
-tasks.register("publishToAllPlatforms") {
-    this.dependsOn("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
-}
-
 autoUpdateTool {
-    this.mcVersion.set(mcVersion)
-    this.version.set(modVersion)
-    this.versionRecommended.set(property("versionRecommended") == "true")
-    this.updateCheckerFile.set(file(property("dynamictrees.version_info_repo.path") + File.separatorChar + property("updateCheckerPath")))
+    minecraftVersion.set(mcVersion)
+    version.set(modVersion)
+    versionRecommended.set(property("versionRecommended") == "true")
+    changelogOutputFile.set(changelogFile)
+    updateCheckerFile.set(file("temp/version_info.json"))
 }
 
 tasks.autoUpdate {
-    finalizedBy("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge")
+    doLast {
+        modrinth.changelog.set(changelogFile.readText())
+    }
+    finalizedBy("publishMavenJavaPublicationToHarleyOConnorRepository", "curseforge", "modrinth")
 }
 
 fun net.minecraftforge.gradle.common.util.RunConfig.applyDefaultConfiguration(runDirectory: String = "run") {

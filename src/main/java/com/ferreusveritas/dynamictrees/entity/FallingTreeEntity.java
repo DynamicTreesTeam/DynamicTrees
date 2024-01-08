@@ -121,7 +121,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
             kill();
             return this;
         }
-        BlockPos cutPos = destroyData.cutPos;
+        BlockPos basePos = destroyData.basePos;
         this.payload = payload;
         this.destroyType = destroyType;
         this.onFire = destroyType == DestroyType.FIRE;
@@ -132,7 +132,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
         this.species = destroyData.species;
 
-        this.setPosRaw(cutPos.getX() + 0.5, cutPos.getY(), cutPos.getZ() + 0.5);
+        this.setPosRaw(basePos.getX() + 0.5, basePos.getY(), basePos.getZ() + 0.5);
 
         int numBlocks = destroyData.getNumBranches();
         geomCenter = new Vec3(0, 0, 0);
@@ -221,13 +221,13 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
         BlockBounds renderBounds = new BlockBounds(destroyData.cutPos);
 
-        for (BlockPos absPos : Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES))) {
-            BlockState state = level().getBlockState(absPos);
-            if (TreeHelper.isTreePart(state)) {
-                level().setBlock(absPos, BlockStates.AIR, 0);////The client needs to set it's blocks to air
-                renderBounds.union(absPos);//Expand the re-render volume to include this block
-            }
-        }
+        // for (BlockPos absPos : Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES))) {
+        //     BlockState state = level().getBlockState(absPos);
+        //     if (TreeHelper.isTreePart(state)) {
+        //         level().setBlock(absPos, BlockStates.AIR, 0);////The client needs to set it's blocks to air
+        //         renderBounds.union(absPos);//Expand the re-render volume to include this block
+        //     }
+        // }
 
         cleanupShellBlocks(destroyData);
 
@@ -533,7 +533,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public static FallingTreeEntity dropTree(Level level, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
         //Spawn the appropriate item entities into the level
         if (!level.isClientSide) {// Only spawn entities server side
-            // Falling tree currently has severe rendering issues.
             FallingTreeEntity entity = new FallingTreeEntity(level).setData(destroyData, woodDropList, destroyType);
             if (entity.isAlive()) {
                 level.addFreshEntity(entity);

@@ -69,6 +69,10 @@ public class JoCode {
      * @param facing  A final rotation applied to the code after creation
      */
     public JoCode(Level level, BlockPos rootPos, Direction facing) {
+        getCodeFromWorld(level, rootPos, facing);
+    }
+
+    protected void getCodeFromWorld (Level level, BlockPos rootPos, Direction facing){
         Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
 
         if (branch.isPresent()) {
@@ -164,7 +168,9 @@ public class JoCode {
         boolean worldGen = context.safeBounds() != SafeChunkBounds.ANY;
 
         this.setFacing(context.facing());
-        final BlockPos rootPos = species.preGeneration(level, context.rootPos(), radius, context.facing(), context.safeBounds(), this);
+
+        context.rootPos().set(species.preGeneration(level, context.rootPos(), radius, context.facing(), context.safeBounds(), this));
+        BlockPos rootPos = context.rootPos();
 
         if (rootPos == BlockPos.ZERO) {
             return;
@@ -375,7 +381,7 @@ public class JoCode {
     }
 
     protected boolean setBlockForGeneration(LevelAccessor level, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
-        if (isFreeToSetBlock(level, pos) && (!careful || this.isClearOfNearbyBranches(level, pos, dir.getOpposite()))) {
+        if (isFreeToSetBlock(level, pos, species) && (!careful || this.isClearOfNearbyBranches(level, pos, dir.getOpposite()))) {
             species.getFamily().getBranchForPlacement(level, species, pos).ifPresent(branch ->
                     branch.setRadius(level, pos, species.getFamily().getPrimaryThickness(), null, careful ? 3 : 2)
             );
@@ -384,7 +390,7 @@ public class JoCode {
         return true;
     }
 
-    protected boolean isFreeToSetBlock(LevelAccessor level, BlockPos pos) {
+    protected boolean isFreeToSetBlock(LevelAccessor level, BlockPos pos, Species species) {
         if (TreeFeature.validTreePos(level, pos) || level.isStateAtPosition(pos, (blockState) -> blockState.is(BlockTags.LOGS)))
             return true;
 

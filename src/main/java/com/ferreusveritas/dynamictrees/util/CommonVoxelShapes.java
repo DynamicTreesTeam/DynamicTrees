@@ -21,7 +21,7 @@ public final class CommonVoxelShapes {
 
     public static final VoxelShape SAPLING_TRUNK = Block.box(7D, 0D, 7D, 9D, 5D, 9D);
     public static final VoxelShape SAPLING_LEAVES = Block.box(4D, 4D, 4D, 12D, 12D, 12D);
-    public static final VoxelShape SLIM_SAPLING_LEAVES = Block.box(5D, 4D, 5D, 11D, 14D, 11D);
+    public static final VoxelShape SLIM_SAPLING_LEAVES = Block.box(5D, 5D, 5D, 11D, 14D, 11D);
     public static final VoxelShape MUSHROOM_STEM = Block.box(7D, 0D, 7D, 9D, 5D, 9D);
     public static final VoxelShape MUSHROOM_CAP_FLAT = Block.box(4D, 5D, 4D, 12D, 8D, 12D);
     public static final VoxelShape MUSHROOM_CAP_ROUND = Block.box(5D, 3D, 5D, 11D, 8D, 11D);

@@ -22,6 +22,7 @@ public class RegularTemplatePoolModifier implements TemplatePoolModifier {
     }
 
     public TemplatePoolModifier replaceTemplate(int index, StructurePoolElement element) {
+        if (templatePool.rawTemplates.size() <= index) return this;
         Pair<StructurePoolElement, Integer> removedRawTemplate = templatePool.rawTemplates.remove(index);
         var elementFinal = new DTCancelVanillaTreePoolElement(element, removedRawTemplate.getFirst());
         templatePool.rawTemplates.add(index, Pair.of(elementFinal, removedRawTemplate.getSecond()));

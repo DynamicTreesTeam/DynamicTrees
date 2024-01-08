@@ -14,8 +14,8 @@ import javax.annotation.Nullable;
 public class ThickBranchBlockModelLoader extends BranchBlockModelLoader {
 
     @Override
-    protected BranchBlockModelGeometry getModelGeometry(ResourceLocation barkTextureName, ResourceLocation ringsTextureName, @Nullable ResourceLocation familyName) {
-        return new BranchBlockModelGeometry(barkTextureName, ringsTextureName, familyName, true);
+    protected BranchBlockModelGeometry getModelGeometry(ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation, @Nullable ResourceLocation familyName) {
+        return new BranchBlockModelGeometry(barkTextureLocation, ringsTextureLocation, familyName, true);
     }
 
     @Override

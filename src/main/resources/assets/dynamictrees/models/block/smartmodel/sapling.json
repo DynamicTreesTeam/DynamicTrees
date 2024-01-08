@@ -1,9 +1,7 @@
 {
     "parent": "block/block",
     "textures": {
-        "particle": "block/stone",
-        "log": "block/stone",
-        "leaves": "block/stone"
+        "particle": "#leaves"
     },
     "display": {
         "fixed": {

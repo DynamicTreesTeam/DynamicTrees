@@ -78,12 +78,8 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
     }
 
     @Override
-    public void applyOnSetup(ResourceAccessor<Iterable<JsonElement>> resourceAccessor,
-                             ResourceManager resourceManager) {
+    public void applyOnReload(ResourceAccessor<Iterable<JsonElement>> resourceAccessor, ResourceManager resourceManager) {
         BiomeDatabases.reset();
-//        if (BiomePopulatorsResourceLoader.isWorldGenDisabled()) {
-//            return;
-//        }
         this.readCancellers(
                 resourceAccessor.filtered(FeatureCancellationResourceLoader::isCancellationFile).map(BiomePopulatorsResourceLoader::toLinkedList)
         );
@@ -145,11 +141,6 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
 
         final DTBiomeHolderSet biomes = BiomePopulatorsResourceLoader.collectBiomes(json, warningConsumer);
 
-//        if (biomes.getList().isEmpty()) {
-//            BiomePopulatorsResourceLoader.warnNoBiomesSelected(json);
-//            return;
-//        }
-
         JsonResult.forInput(json)
                 .mapIfContains(CANCELLERS, JsonObject.class, cancellerObject ->
                                 this.applyCanceller(location, errorConsumer, warningConsumer,
@@ -174,12 +165,6 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
                 .forEachWarning(warningConsumer)
                 .orElse(BiomeDatabase.Operation.SPLICE_AFTER, errorConsumer, warningConsumer);
 
-//        if (operation == BiomeDatabase.Operation.REPLACE) {
-//            this.replaceCancellationsWith(cancellation, biomes.getList());
-//        } else {
-//            var list = biomes.getList();
-//            this.addCancellationsTo(cancellation, list);
-//        }
         FeatureCancellationRegistry.addCancellations(biomes, operation, cancellation);
         return PropertyApplierResult.success();
     }
@@ -192,20 +177,6 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
                         warning -> LOGGER.warn("Warning whilst applying feature " +
                                 "cancellations in \"{}\" populator: {}", location, warning)
                 );
-    }
-
-    private void replaceCancellationsWith(BiomePropertySelectors.NormalFeatureCancellation cancellation, List<Holder<Biome>> biomes) {
-        biomes.forEach(biome -> {
-            var currentCancellations = BiomeDatabases.getDefault().getEntry(biome).getOrCreateFeatureCancellation();
-            currentCancellations.replaceFrom(cancellation);
-        });
-    }
-
-    private void addCancellationsTo(BiomePropertySelectors.NormalFeatureCancellation cancellation, List<Holder<Biome>> biomes) {
-        biomes.forEach(biome -> {
-            var currentCancellation = BiomeDatabases.getDefault().getEntry(biome).getOrCreateFeatureCancellation();
-            currentCancellation.addFrom(cancellation);
-        });
     }
 
 }

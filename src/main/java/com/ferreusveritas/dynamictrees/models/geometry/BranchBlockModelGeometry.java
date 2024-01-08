@@ -6,10 +6,7 @@ import com.ferreusveritas.dynamictrees.models.loader.BranchBlockModelLoader;
 import com.ferreusveritas.dynamictrees.tree.family.Family;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -26,27 +23,26 @@ import java.util.function.Function;
  * BranchBlockModelLoader}.
  *
  * <p>Can also be used by sub-classes to bake other models, like for roots in
- * {@link RootBlockModelGeometry}.</p>
+ * {@link SurfaceRootBlockModelGeometry}.</p>
  *
  * @author Harley O'Connor
  */
 @OnlyIn(Dist.CLIENT)
 public class BranchBlockModelGeometry implements IUnbakedGeometry<BranchBlockModelGeometry> {
     protected final Set<ResourceLocation> textures = new HashSet<>();
-    protected final ResourceLocation barkResLoc;
-    protected final ResourceLocation ringsResLoc;
+    protected final ResourceLocation barkTextureLocation;
+    protected final ResourceLocation ringsTextureLocation;
     protected final boolean forceThickness;
 
-    protected ResourceLocation familyResLoc;
+    protected ResourceLocation familyName;
     protected Family family;
 
-    protected ResourceLocation thickRingsResLoc;
+    protected ResourceLocation thickRingsTextureLocation;
 
-    public BranchBlockModelGeometry(@Nullable final ResourceLocation barkResLoc, @Nullable final ResourceLocation ringsResLoc, @Nullable final ResourceLocation familyResLoc,
-            final boolean forceThickness) {
-        this.barkResLoc = barkResLoc;
-        this.ringsResLoc = ringsResLoc;
-        this.familyResLoc = familyResLoc;
+    public BranchBlockModelGeometry(@Nullable final ResourceLocation barkTextureLocation, @Nullable final ResourceLocation ringsTextureLocation, @Nullable final ResourceLocation familyName, final boolean forceThickness) {
+        this.barkTextureLocation = barkTextureLocation;
+        this.ringsTextureLocation = ringsTextureLocation;
+        this.familyName = familyName;
         this.forceThickness = forceThickness;
     }
 
@@ -55,29 +51,29 @@ public class BranchBlockModelGeometry implements IUnbakedGeometry<BranchBlockMod
             ResourceLocation modelLocation) {
         boolean useThickModel = this.useThickModel(this.setFamily(modelLocation));
         if (!useThickModel) {
-            return new BasicBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc);
+            return new BasicBranchBlockBakedModel(context, modelLocation, this.barkTextureLocation, this.ringsTextureLocation, spriteGetter);
         } else {
-            if (this.thickRingsResLoc == null)
-                this.thickRingsResLoc = this.ringsResLoc.withSuffix("_thick");
-            return new ThickBranchBlockBakedModel(modelLocation, this.barkResLoc, this.ringsResLoc, this.thickRingsResLoc);
+            if (this.thickRingsTextureLocation == null)
+                this.thickRingsTextureLocation = this.ringsTextureLocation.withSuffix("_thick");
+            return new ThickBranchBlockBakedModel(context, modelLocation, this.barkTextureLocation, this.ringsTextureLocation, this.thickRingsTextureLocation, spriteGetter);
         }
     }
 
-    private ResourceLocation setFamilyResLoc(final ResourceLocation modelResLoc) {
-        if (this.familyResLoc == null) {
-            this.familyResLoc = new ResourceLocation(modelResLoc.getNamespace(), modelResLoc.getPath().replace("block/", "").replace("_branch", "").replace("stripped_", ""));
+    private ResourceLocation setFamilyName(final ResourceLocation modelLocation) {
+        if (this.familyName == null) {
+            this.familyName = new ResourceLocation(modelLocation.getNamespace(), modelLocation.getPath().replace("block/", "").replace("_branch", "").replace("stripped_", ""));
         }
-        return this.familyResLoc;
+        return this.familyName;
     }
 
     private Family setFamily(final ResourceLocation modelResLoc) {
         if (this.family == null) {
-            this.family = Family.REGISTRY.get(this.setFamilyResLoc(modelResLoc));
+            this.family = Family.REGISTRY.get(this.setFamilyName(modelResLoc));
         }
         return this.family;
     }
 
-    private boolean useThickModel(final Family family) {
+    protected boolean useThickModel(final Family family) {
         return this.forceThickness || family.isThick();
     }
 }

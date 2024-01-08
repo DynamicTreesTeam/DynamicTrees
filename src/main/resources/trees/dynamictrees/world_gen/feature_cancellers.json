@@ -1,9 +1,5 @@
 [
   {
-    "_note": "These cancellers are only read on game load, so the game must be restarted for changes to take effect.",
-    "__note": "Biome tags cannot be used for selectors here because at the point these are loaded they do not exist (nor when the features are removed from biomes)."
-  },
-  {
     "__comment": "Cancel standard tree features from the overworld.",
     "select": { "name": "minecraft:.*", "tag": "#minecraft:is_overworld" },
     "cancellers": {
