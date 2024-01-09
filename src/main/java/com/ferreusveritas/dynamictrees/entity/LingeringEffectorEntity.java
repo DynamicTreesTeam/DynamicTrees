@@ -35,7 +35,7 @@ public class LingeringEffectorEntity extends Entity implements IEntityAdditional
 
     public LingeringEffectorEntity(Level level, BlockPos pos, SubstanceEffect effect) {
         this(DTRegistries.LINGERING_EFFECTOR.get(), level);
-        this.maxUpStep = 1f;
+        this.setMaxUpStep(1f);
         this.noPhysics = true;
         this.setBlockPos(pos);
         this.effect = effect;
