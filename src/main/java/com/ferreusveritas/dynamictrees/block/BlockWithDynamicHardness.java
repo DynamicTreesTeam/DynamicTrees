@@ -6,6 +6,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -46,6 +47,16 @@ public abstract class BlockWithDynamicHardness extends Block {
     }
 
     /**
+     * Sub-classes can override this method to return if there is a tile entity based on the blockstate.
+     * Used for rooty blocks.
+     * @param state
+     * @return
+     */
+    public boolean hasTileEntity(BlockState state) {
+        return state.getBlock() instanceof EntityBlock;
+    }
+
+    /**
      * Custom extension of {@link BlockState} to allow for dynamic hardness.
      */
     protected final class DynamicHardnessBlockState extends BlockState {
@@ -57,6 +68,10 @@ public abstract class BlockWithDynamicHardness extends Block {
         @Override
         public float getDestroySpeed(BlockGetter level, BlockPos pos) {
             return getHardness(this, level, pos);
+        }
+
+        public boolean hasBlockEntity() {
+            return hasTileEntity(this);
         }
 
     }

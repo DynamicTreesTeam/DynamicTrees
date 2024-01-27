@@ -1205,7 +1205,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             this.placeRootyDirtBlock(level, rootPos, dirtState, fertility);
         }
 
-        BlockEntity tileEntity = level.getBlockEntity(rootPos);
+        BlockEntity tileEntity = level.getExistingBlockEntity(rootPos);
         if (tileEntity instanceof SpeciesBlockEntity speciesTE) {
             speciesTE.setSpecies(this);
         }
