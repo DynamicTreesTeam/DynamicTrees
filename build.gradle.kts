@@ -22,15 +22,16 @@ plugins {
 }
 
 repositories {
-    maven("https://ldtteam.jfrog.io/ldtteam/modding/")
-    maven("https://maven.tehnut.info")
+    mavenCentral()
+    maven("https://ldtteam.jfrog.io/ldtteam/modding/") //patchouli
+    //maven("https://maven.tehnut.info")
     maven("https://www.cursemaven.com") {
         content {
             includeGroup("curse.maven")
         }
     }
-    maven("https://harleyoconnor.com/maven")
-    maven("https://squiddev.cc/maven/")
+    //maven("https://harleyoconnor.com/maven")
+    maven("https://squiddev.cc/maven/") //cc-twekaed
 }
 
 val modName = property("modName")
@@ -93,13 +94,12 @@ dependencies {
 
     compileOnly(fg.deobf("curse.maven:SereneSeasons-291874:${property("ssVersion")}"))
 
-    // runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
-    // runtimeOnly(fg.deobf("org.squiddev:cc-tweaked-$mcVersion:${property("ccVersion")}"))
+    runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:${property("patchouliVersion")}"))
+
+    runtimeOnly(fg.deobf("cc.tweaked:cc-tweaked-$mcVersion-core:${property("ccVersion")}"))
+    runtimeOnly(fg.deobf("cc.tweaked:cc-tweaked-$mcVersion-forge:${property("ccVersion")}"))
+
     // runtimeOnly(fg.deobf("com.harleyoconnor.suggestionproviderfix:SuggestionProviderFix-1.19:${property("suggestionProviderFixVersion")}"))
-
-
-    // Small lib that allows changing the blocks snow can be on
-    // runtimeOnly(fg.deobf("curse.maven:snow-coated-843893:${property("snowCoatedVersion")}"))
 }
 
 translationSheet {

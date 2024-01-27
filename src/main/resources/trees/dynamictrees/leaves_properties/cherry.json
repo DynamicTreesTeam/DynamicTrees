@@ -1,4 +1,6 @@
 {
   "type": "dynamictrees:cherry",
-  "primitive_leaves": "minecraft:cherry_leaves"
+  "primitive_leaves": "minecraft:cherry_leaves",
+  "smother": 5,
+  "light_requirement": 14
 }

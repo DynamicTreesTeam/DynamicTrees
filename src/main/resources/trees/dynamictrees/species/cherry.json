@@ -2,6 +2,8 @@
     "family": "cherry",
     "tapering": 0.3,
     "signal_energy": 12.0,
+    "up_probability": 1,
+    "lowest_branch_height": 4,
     "growth_rate": 0.8,
     "leaves_properties": "cherry",
     "environment_factors" : {

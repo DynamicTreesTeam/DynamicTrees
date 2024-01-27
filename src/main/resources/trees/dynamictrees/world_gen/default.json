@@ -100,7 +100,7 @@
     "apply": {
       "species": "cherry",
       "density": [
-        1.0
+        0.3
       ],
       "chance": 1.0
     }
