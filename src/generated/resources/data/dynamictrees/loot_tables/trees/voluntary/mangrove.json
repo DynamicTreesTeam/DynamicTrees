@@ -1,5 +1,5 @@
 {
-  "type": "dynamictrees:voluntary",
+  "type": "minecraft:block",
   "pools": [
     {
       "bonus_rolls": 0.0,
@@ -17,5 +17,6 @@
       ],
       "rolls": 1.0
     }
-  ]
+  ],
+  "random_sequence": "dynamictrees:trees/voluntary/mangrove"
 }

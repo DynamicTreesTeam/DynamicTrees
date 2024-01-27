@@ -1,4 +1,4 @@
-// 1.20.1	2023-10-17T09:49:40.2623716	Item Models: dynamictrees
+// 1.20.1	2024-01-27T13:51:06.5327671	Item Models: dynamictrees
 1f9425675ff3d713f0dd06fd3d1177c66513087a assets/dynamictrees/models/item/acacia_branch.json
 532f140669da99b328b9a70c6102d246580997ec assets/dynamictrees/models/item/acacia_seed.json
 54853d40b15711f7e03af7c9adea92726af9a78d assets/dynamictrees/models/item/apple_oak_seed.json
@@ -14,6 +14,9 @@ a32c202fbb6da4e7a874208dd9cec27baf149104 assets/dynamictrees/models/item/dark_oa
 9b2aebb94f4a52afc09f9b0c41eaa0a342436b2b assets/dynamictrees/models/item/dark_oak_seed.json
 88c3f02ac8ae87a85cffc2ecc1cb25886a237677 assets/dynamictrees/models/item/jungle_branch.json
 d220e9feaf18c42013f66d5229af116f4a716fa2 assets/dynamictrees/models/item/jungle_seed.json
+fe2b74afefe052cef5a1e21e84f87b31c02f6987 assets/dynamictrees/models/item/mangrove_branch.json
+1ef3b0d26a42523f218e5af446f504aec32d632f assets/dynamictrees/models/item/mangrove_roots.json
+b73206687d7b81afa245128641201e1e7af7649b assets/dynamictrees/models/item/mangrove_seed.json
 68c6183dee60590ec9cb99bb9ee56ec0cf8573d2 assets/dynamictrees/models/item/oak_branch.json
 1e6386e05c482bdfa730b3048c82cd0499caf68b assets/dynamictrees/models/item/oak_seed.json
 86cc99a83f65af4a568a8cd18f083ba1131a084c assets/dynamictrees/models/item/spruce_branch.json

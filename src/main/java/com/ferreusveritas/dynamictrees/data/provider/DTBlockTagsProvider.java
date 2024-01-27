@@ -50,7 +50,11 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
                 .add(Blocks.GRASS)
                 .add(Blocks.TALL_GRASS)
                 .add(Blocks.FERN)
-                .add(Blocks.LILY_PAD);
+                .add(Blocks.LILY_PAD)
+                .add(Blocks.PINK_PETALS)
+                .add(Blocks.BROWN_MUSHROOM)
+                .add(Blocks.RED_MUSHROOM)
+                .addTag(BlockTags.FLOWERS);
 
         this.tag(DTBlockTags.STRIPPED_BRANCHES)
                 .addTag(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN)

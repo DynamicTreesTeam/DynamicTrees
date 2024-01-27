@@ -3,7 +3,6 @@
   "render_type": "minecraft:cutout_mipped",
   "textures": {
     "leaves": "minecraft:block/dark_oak_leaves",
-    "log": "minecraft:block/dark_oak_log",
-    "particle": "minecraft:block/dark_oak_leaves"
+    "log": "minecraft:block/dark_oak_log"
   }
 }

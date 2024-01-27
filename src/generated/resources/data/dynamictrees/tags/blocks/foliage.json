@@ -2,6 +2,11 @@
   "values": [
     "minecraft:grass",
     "minecraft:tall_grass",
-    "minecraft:fern"
+    "minecraft:fern",
+    "minecraft:lily_pad",
+    "minecraft:pink_petals",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "#minecraft:flowers"
   ]
 }
