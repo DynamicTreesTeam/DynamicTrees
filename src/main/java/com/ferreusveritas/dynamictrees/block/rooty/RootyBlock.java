@@ -203,11 +203,11 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
         }
         return null;
     }
-//
-//    @Override
-//    public boolean hasTileEntity(BlockState state) {
-//        return state.getValue(IS_VARIANT);
-//    }
+
+    @Override
+    public boolean hasTileEntity(BlockState state) {
+        return state.getValue(IS_VARIANT);
+    }
 
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
