@@ -80,6 +80,7 @@ public class Seed extends Item implements IPlantable {
     public Seed(Species species, Item.Properties properties) {
         super(properties);
         this.species = species;
+        DTRegistries.CREATIVE_TAB_ITEMS.add(this);
     }
 
     public Species getSpecies() {

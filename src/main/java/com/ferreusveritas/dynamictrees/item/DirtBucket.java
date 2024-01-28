@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 public class DirtBucket extends Item {
     public DirtBucket() {
         super(new Item.Properties().stacksTo(1));
+        DTRegistries.CREATIVE_TAB_ITEMS.add(this);
     }
 
     @Override

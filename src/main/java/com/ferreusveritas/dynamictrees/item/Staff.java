@@ -68,6 +68,7 @@ public class Staff extends Item {
 
     public Staff() {
         super(new Item.Properties().stacksTo(1));
+        DTRegistries.CREATIVE_TAB_ITEMS.add(this);
 
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));

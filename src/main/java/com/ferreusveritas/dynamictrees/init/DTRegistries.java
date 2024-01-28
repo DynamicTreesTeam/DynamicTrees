@@ -44,37 +44,26 @@ import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
-import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.HugeFungusConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.HugeMushroomFeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.RootSystemConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
-import net.minecraft.world.level.levelgen.placement.BiomeFilter;
-import net.minecraft.world.level.levelgen.placement.EnvironmentScanPlacement;
-import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
-import net.minecraft.world.level.levelgen.placement.RandomOffsetPlacement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -87,6 +76,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.registries.holdersets.HolderSetType;
 
+import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -102,20 +92,17 @@ public class DTRegistries {
     public static final DeferredRegister<BlockStateProviderType<?>> BLOCK_STATE_PROVIDER_TYPES = DeferredRegister.create(Registries.BLOCK_STATE_PROVIDER_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTrees.MOD_ID);
 
-    public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("tab", () -> CreativeModeTab.builder()
+    public static final LinkedList<Item> CREATIVE_TAB_ITEMS = new LinkedList<>();
+    public static final RegistryObject<CreativeModeTab> DT_CREATIVE_TAB = CREATIVE_MODE_TABS.register(DynamicTrees.MOD_ID, () -> CreativeModeTab.builder()
             .icon(() -> TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1))
             .title(Component.translatable("itemGroup.dynamictrees"))
             .displayItems((parameters, output) -> {
-                BuiltInRegistries.ITEM.entrySet().forEach(e -> {
-                    if (e.getKey().location().getNamespace().equals(DynamicTrees.MOD_ID) && !(e.getValue() instanceof DendroPotion)) {
-                        output.accept(e.getValue().getDefaultInstance());
-                    }
-                });
                 for (final DendroPotion.DendroPotionType potion : DendroPotion.DendroPotionType.values()) {
                     if (potion.isActive()) {
                         output.accept(DendroPotion.applyIndexTag(new ItemStack(DTRegistries.DENDRO_POTION.get()), potion.getIndex()));
                     }
                 }
+                CREATIVE_TAB_ITEMS.forEach(e -> output.accept(e.getDefaultInstance()));
             }).build());
 
     ///////////////////////////////////////////
