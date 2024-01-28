@@ -60,7 +60,7 @@
     },
     "apply": {
       "species": "mangrove",
-      "density": 1.0,
+      "density": 0.8,
       "chance": 1.0
     }
   },

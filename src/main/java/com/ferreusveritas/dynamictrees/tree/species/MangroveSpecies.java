@@ -40,15 +40,19 @@ public class MangroveSpecies extends Species {
     protected GrowthLogicKitConfiguration rootLogicKit = GrowthLogicKitConfiguration.getDefault();
     private int minWorldGenHeightOffset = 2;
     private int maxWorldGenHeightOffset = 6;
+    private int worldGenHeightOffsetVar = 1;
     protected float rootSignalEnergy = 16.0f;
     protected float rootTapering = 0.3f;
     protected int rootGrowthMultiplier = 15;
+
     public void setMinWorldGenHeightOffset(int minWorldGenHeightOffset) {
         this.minWorldGenHeightOffset = minWorldGenHeightOffset;
     }
-
     public void setMaxWorldGenHeightOffset(int maxWorldGenHeightOffset) {
         this.maxWorldGenHeightOffset = maxWorldGenHeightOffset;
+    }
+    public void setWorldGenHeightOffsetVar(int worldGenHeightOffsetVar) {
+        worldGenHeightOffsetVar = worldGenHeightOffsetVar;
     }
 
     public void setRootGrowthMultiplier(int rootGrowthMultiplier) {
@@ -146,8 +150,10 @@ public class MangroveSpecies extends Species {
 
     @Override
     public boolean generate(GenerationContext context) {
-        context.rootPos().move(Direction.UP,
-                context.random().nextIntBetweenInclusive(minWorldGenHeightOffset, maxWorldGenHeightOffset));
+        int offset = minWorldGenHeightOffset + Math.round((context.radius()-2) / 6f * (maxWorldGenHeightOffset-minWorldGenHeightOffset))
+                + (context.random().nextInt(1+(2*worldGenHeightOffsetVar))-worldGenHeightOffsetVar);
+        int clampedOffset = Math.max(minWorldGenHeightOffset, Math.min(maxWorldGenHeightOffset, offset));
+        context.rootPos().move(Direction.UP, clampedOffset);
 
             if (super.generate(context)
                     && !JoCodeRegistry.getCodes(this.getRegistryName(), true).isEmpty()) {

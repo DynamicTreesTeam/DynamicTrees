@@ -140,6 +140,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         this.reloadAppliers
                 .register("min_world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setMinWorldGenHeightOffset)
                 .register("max_world_gen_height_offset", MangroveSpecies.class, Integer.class, MangroveSpecies::setMaxWorldGenHeightOffset)
+                .register("world_gen_height_offset_var", MangroveSpecies.class, Integer.class, MangroveSpecies::setWorldGenHeightOffsetVar)
                 .register("roots_growth_logic_kit", MangroveSpecies.class, GrowthLogicKitConfiguration.class, MangroveSpecies::setRootsGrowthLogicKit)
                 .register("root_growth_multiplier", MangroveSpecies.class, Integer.class, MangroveSpecies::setRootGrowthMultiplier)
                 .register("root_tapering", MangroveSpecies.class, Float.class, MangroveSpecies::setRootTapering)
