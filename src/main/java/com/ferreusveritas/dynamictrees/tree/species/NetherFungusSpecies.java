@@ -54,7 +54,6 @@ public class NetherFungusSpecies extends Species {
     @Override
     public Species setPreReloadDefaults() {
         return this.setDefaultGrowingParameters()
-                .setSaplingShape(CommonVoxelShapes.FLAT_MUSHROOM)
                 .setSaplingSound(SoundType.FUNGUS)
                 .setCanSaplingGrowNaturally(false)
                 .envFactor(Tags.Biomes.IS_COLD, 0.25f)

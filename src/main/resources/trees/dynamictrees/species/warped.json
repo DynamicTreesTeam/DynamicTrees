@@ -18,6 +18,7 @@
     "acceptable_soils": ["nether_soil_like", "fungus_like", "dirt_like"],
     "acceptable_growth_blocks": ["minecraft:warped_nylium", "dynamictrees:rooty_warped_nylium"],
     "mega_species": "mega_warped",
+    "sapling_shape": "flat_mushroom",
     "features": [
         "clear_volume",
         "shroomlight",
