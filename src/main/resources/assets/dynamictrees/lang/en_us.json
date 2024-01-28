@@ -14,6 +14,7 @@
   "block.dynamictrees.warped_branch": "Warped Fungus",
   "block.dynamictrees.mangrove_branch": "Mangrove Tree",
   "block.dynamictrees.mangrove_roots": "Mangrove Tree",
+  "block.dynamictrees.cherry_branch": "Cherry Tree",
   "block.dynamictrees.rooty_water": "Water Roots",
 
   "species.dynamictrees.oak": "Oak",
@@ -38,6 +39,7 @@
   "species.dynamictrees.oak_undergrowth": "Oak Undergrowth",
   "species.dynamictrees.jungle_undergrowth": "Jungle Undergrowth",
   "species.dynamictrees.mangrove": "Mangrove",
+  "species.dynamictrees.cherry": "Cherry Blossom",
 
   "item.dynamictrees.oak_seed": "Oak Acorn",
   "item.dynamictrees.azalea_seed": "Azalea Seed",
@@ -51,6 +53,7 @@
   "item.dynamictrees.crimson_seed": "Crimson Cap",
   "item.dynamictrees.warped_seed": "Warped Cap",
   "item.dynamictrees.mangrove_seed": "Mangrove Propagule",
+  "item.dynamictrees.cherry_seed": "Cherry Blossom Pit",
 
   "item.dynamictrees.dendro_potion.biochar": "Biochar Base Potion",
   "item.dynamictrees.dendro_potion.depletion": "Potion of Depletion",
