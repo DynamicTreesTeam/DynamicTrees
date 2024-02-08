@@ -7,6 +7,7 @@ import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
 import com.ferreusveritas.dynamictrees.api.applier.VoidApplier;
 import com.google.gson.JsonElement;
 
+import java.util.Map;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,10 @@ public interface PropertyAppliers<O, I> {
 
     <V> PropertyAppliers<O, I> registerListApplier(String key, Class<V> valueClass, VoidApplier<O, List<V>> applier);
 
+    <V> PropertyAppliers<O, I> registerMapApplier(String key, Class<V> valueClass, Applier<O, Map<String,V>> applier);
+
+    <V> PropertyAppliers<O, I> registerMapApplier(String key, Class<V> valueClass, VoidApplier<O, Map<String,V>> applier);
+
     PropertyAppliers<O, I> registerIfTrueApplier(String key, IfTrueApplier<O> applier);
 
     <E extends O, V> PropertyAppliers<O, I> register(String key, Class<E> subClass, Class<V> valueClass,
@@ -56,6 +61,12 @@ public interface PropertyAppliers<O, I> {
 
     <E extends O, V> PropertyAppliers<O, I> registerListApplier(String key, Class<E> subClass, Class<V> valueClass,
                                                                 VoidApplier<E, List<V>> applier);
+
+    <E extends O, V> PropertyAppliers<O, I> registerMapApplier(String key, Class<E> subClass, Class<V> valueClass,
+                                                                Applier<E, Map<String,V>> applier);
+
+    <E extends O, V> PropertyAppliers<O, I> registerMapApplier(String key, Class<E> subClass, Class<V> valueClass,
+                                                                VoidApplier<E, Map<String,V>> applier);
 
     Class<O> getObjectType();
 

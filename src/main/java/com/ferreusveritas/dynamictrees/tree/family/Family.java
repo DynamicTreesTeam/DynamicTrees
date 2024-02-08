@@ -62,17 +62,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -855,14 +851,55 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     protected final MutableLazyValue<Generator<DTItemModelProvider, Family>> branchItemModelGenerator =
             MutableLazyValue.supplied(BranchItemModelGenerator::new);
 
-    public void addBranchTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {
-        textureConsumer.accept("bark", primitiveLogLocation);
-        textureConsumer.accept("rings", suffix(primitiveLogLocation, "_top"));
+    protected HashMap<String, ResourceLocation> textureOverrides = new HashMap<>();
+    public static final String BRANCH = "branch";
+    public static final String BRANCH_TOP = "branch_top";
+    public static final String STRIPPED_BRANCH = "stripped_branch";
+    public static final String STRIPPED_BRANCH_TOP = "stripped_branch_top";
+    public static final String ROOTS_SIDE = "roots_side";
+    public static final String ROOTS_TOP = "roots_top";
+
+    public void setTextureOverrides(Map<String, ResourceLocation> textureOverrides) {
+        this.textureOverrides.putAll(textureOverrides);
+    }
+
+    /**
+     * @deprecated Use method with that includes the Block parameter
+     * @see Family#addBranchTextures(BiConsumer, ResourceLocation, Block)
+     */
+    @Deprecated
+    public void addBranchTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {}
+    public void addBranchTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation, Block sourceBlock) {
+        ResourceLocation bark = primitiveLogLocation;
+        ResourceLocation rings = suffix(primitiveLogLocation, "_top");
+
+        AtomicBoolean isStripped = new AtomicBoolean(false);
+        getPrimitiveStrippedLog().ifPresent(l-> isStripped.set(l.equals(sourceBlock)));
+        if (isStripped.get()){
+            if (textureOverrides.containsKey(STRIPPED_BRANCH)) bark = textureOverrides.get(STRIPPED_BRANCH);
+            if (textureOverrides.containsKey(STRIPPED_BRANCH_TOP)) rings = textureOverrides.get(STRIPPED_BRANCH_TOP);
+        } else {
+            if (textureOverrides.containsKey(BRANCH)) bark = textureOverrides.get(BRANCH);
+            if (textureOverrides.containsKey(BRANCH_TOP)) rings = textureOverrides.get(BRANCH_TOP);
+        }
+
+        textureConsumer.accept("bark", bark);
+        textureConsumer.accept("rings", rings);
     }
 
     public void addRootTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {
-        textureConsumer.accept("bark", suffix(primitiveLogLocation, "_side"));
-        textureConsumer.accept("rings", suffix(primitiveLogLocation, "_top"));
+        ResourceLocation bark = suffix(primitiveLogLocation, "_side");
+        ResourceLocation rings = suffix(primitiveLogLocation, "_top");
+
+        if (textureOverrides.containsKey(ROOTS_SIDE)) bark = textureOverrides.get(ROOTS_SIDE);
+        if (textureOverrides.containsKey(ROOTS_TOP)) rings = textureOverrides.get(ROOTS_TOP);
+
+        textureConsumer.accept("bark", bark);
+        textureConsumer.accept("rings", rings);
+    }
+
+    public Optional<ResourceLocation> getTexturePath(String key) {
+        return Optional.ofNullable(textureOverrides.getOrDefault(key, null));
     }
 
     @Override

@@ -93,11 +93,6 @@ public class NetherFungusSpecies extends Species {
     }
 
     @Override
-    public ResourceLocation getSaplingSmartModelLocation() {
-        return DynamicTrees.location("block/smartmodel/mushroom_" + (this.getSaplingShape() == CommonVoxelShapes.FLAT_MUSHROOM ? "flat" : "round"));
-    }
-
-    @Override
     public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
                                    ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
         final ResourceLocation capLocation = surround(this.getRegistryName(), "block/", "_cap");

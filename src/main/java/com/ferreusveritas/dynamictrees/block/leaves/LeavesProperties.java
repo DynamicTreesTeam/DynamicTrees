@@ -61,11 +61,8 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This class provides a means of holding individual properties for leaves.  This is necessary since leaves can contain
@@ -309,12 +306,22 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return new ItemStack(Item.BY_BLOCK.get(getPrimitiveLeaves().getBlock()));
     }
 
-    public void setLeavesTexturePath(String texturePath) {
-        this.texturePath = new ResourceLocation(texturePath);
+    protected HashMap<String, ResourceLocation> textureOverrides = new HashMap<>();
+    protected HashMap<String, ResourceLocation> modelOverrides = new HashMap<>();
+    public static final String LEAVES = "leaves";
+
+    public void setTextureOverrides(Map<String, ResourceLocation> textureOverrides) {
+        this.textureOverrides.putAll(textureOverrides);
+    }
+    public void setModelOverrides(Map<String, ResourceLocation> modelOverrides) {
+        this.modelOverrides.putAll(modelOverrides);
     }
 
-    public Optional<ResourceLocation> getTexturePath() {
-        return Optional.ofNullable(texturePath);
+    public Optional<ResourceLocation> getTexturePath(String key) {
+        return Optional.ofNullable(textureOverrides.getOrDefault(key, null));
+    }
+    public Optional<ResourceLocation> getModelPath(String key) {
+        return Optional.ofNullable(modelOverrides.getOrDefault(key, null));
     }
 
     ///////////////////////////////////////////

@@ -17,6 +17,9 @@
   "perfect_biomes": { "tag": "#forge:is_swamp" },
   "primitive_sapling": "mangrove_propagule",
   "sapling_shape": "slim_sapling",
+  "model_overrides": {
+    "sapling": "dynamictrees:block/smartmodel/water_sapling_thin"
+  },
   "acceptable_soils": ["dirt_like", "mud_like", "water_like"],
   "plantable_on_fluid": true,
   "features" : [

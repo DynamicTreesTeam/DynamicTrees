@@ -17,7 +17,9 @@ public class LeavesStateGenerator implements Generator<DTBlockStateProvider, Lea
     @Override
     public void generate(DTBlockStateProvider provider, LeavesProperties input, Dependencies dependencies) {
         provider.simpleBlock(dependencies.get(LEAVES), provider.models().getExistingFile(
-                provider.block(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LEAVES)))
+                input.getModelPath(LeavesProperties.LEAVES).orElse(
+                        provider.block(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LEAVES)))
+                )
         ));
     }
 

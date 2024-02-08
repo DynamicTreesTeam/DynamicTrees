@@ -243,6 +243,10 @@ public final class JsonDeserialisers {
     public static final JsonDeserialiser<List<SoilProperties>> SOIL_PROPERTIES_LIST =
             register(ListDeserialiser.getListClass(SoilProperties.class), new ListDeserialiser<>(SOIL_PROPERTIES));
 
+    public static final JsonDeserialiser<Map<String, ResourceLocation>> RESOURCE_LOCATION_MAP =
+            register(MapDeserialiser.getMapClass(String.class, ResourceLocation.class), new MapDeserialiser<>(STRING, RESOURCE_LOCATION));
+
+
     public static final JsonDeserialiser<GenFeatureConfiguration> CONFIGURED_GEN_FEATURE =
             register(GenFeatureConfiguration.class,
                     new ConfiguredDeserialiser<>("Gen Feature", GenFeature.class, GenFeatureConfiguration.TEMPLATES));

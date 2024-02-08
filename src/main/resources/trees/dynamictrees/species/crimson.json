@@ -19,6 +19,9 @@
     "acceptable_growth_blocks": ["minecraft:crimson_nylium", "dynamictrees:rooty_crimson_nylium"],
     "mega_species": "mega_crimson",
     "sapling_shape": "round_mushroom_rim",
+    "model_overrides": {
+        "sapling": "dynamictrees:block/smartmodel/mushroom_round"
+    },
     "features": [
         {
             "name": "vines",

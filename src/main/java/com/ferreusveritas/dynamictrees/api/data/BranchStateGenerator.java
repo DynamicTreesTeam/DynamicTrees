@@ -23,7 +23,8 @@ public class BranchStateGenerator implements Generator<DTBlockStateProvider, Fam
         final BranchLoaderBuilder builder = provider.models().getBuilder(
                 Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(branch)).getPath()
         ).customLoader(branch.getFamily().getBranchLoaderConstructor());
-        input.addBranchTextures(builder::texture, provider.block(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LOG))));
+        Block block = dependencies.get(PRIMITIVE_LOG);
+        input.addBranchTextures(builder::texture, provider.block(ForgeRegistries.BLOCKS.getKey(block)), block);
         provider.simpleBlock(branch, builder.end());
     }
 

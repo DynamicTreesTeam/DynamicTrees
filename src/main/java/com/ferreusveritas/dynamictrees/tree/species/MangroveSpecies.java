@@ -62,11 +62,6 @@ public class MangroveSpecies extends Species {
         }
     }
 
-    @Override
-    public ResourceLocation getSaplingSmartModelLocation() {
-        return DynamicTrees.location("block/smartmodel/water_sapling_thin");
-    }
-
     public MangroveFamily getFamily() {
         return (MangroveFamily) family;
     }

@@ -21,9 +21,11 @@ public class BranchItemModelGenerator implements Generator<DTItemModelProvider, 
                 String.valueOf(ForgeRegistries.ITEMS.getKey(dependencies.get(PRIMITIVE_LOG_ITEM))),
                 input.getBranchItemParentLocation()
         );
+        Block block = dependencies.get(PRIMITIVE_LOG_BLOCK);
         input.addBranchTextures(
                 builder::texture,
-                provider.block(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LOG_BLOCK)))
+                provider.block(ForgeRegistries.BLOCKS.getKey(block)),
+                block
         );
     }
 

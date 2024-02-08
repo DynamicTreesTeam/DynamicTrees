@@ -20,6 +20,8 @@ import net.minecraft.world.level.block.Block;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+
 /**
  * @author Harley O'Connor
  */
@@ -45,7 +47,8 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
         // Primitive logs are needed before gathering data.
         this.gatherDataAppliers
                 .register("primitive_log", Block.class, Family::setPrimitiveLog)
-                .register("primitive_stripped_log", Block.class, Family::setPrimitiveStrippedLog);
+                .register("primitive_stripped_log", Block.class, Family::setPrimitiveStrippedLog)
+                .registerMapApplier("texture_overrides", ResourceLocation.class, Family::setTextureOverrides);
 
         this.setupAppliers
                 .register("primitive_log", Block.class, Family::setPrimitiveLog)

@@ -39,9 +39,4 @@ public class SwampOakSpecies extends Species {
         return super.generate(context);
     }
 
-    @Override
-    public ResourceLocation getSaplingSmartModelLocation() {
-        return DynamicTrees.location("block/smartmodel/water_sapling");
-    }
-
 }

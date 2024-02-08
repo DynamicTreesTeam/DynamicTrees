@@ -19,6 +19,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.apache.logging.log4j.LogManager;
 
+import java.util.HashMap;
+
 /**
  * @author Harley O'Connor
  */
@@ -37,7 +39,8 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
         this.gatherDataAppliers
                 .register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
                 .registerListApplier("seed_drop_chances", Float.class, LeavesProperties::setSeedDropChances)
-                .register("leaves_texture",String.class, LeavesProperties::setLeavesTexturePath);
+                .registerMapApplier("texture_overrides", ResourceLocation.class, LeavesProperties::setTextureOverrides)
+                .registerMapApplier("model_overrides", ResourceLocation.class, LeavesProperties::setModelOverrides);
 
         // Primitive leaves are needed both client and server (so cannot be done on load).
         this.setupAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)

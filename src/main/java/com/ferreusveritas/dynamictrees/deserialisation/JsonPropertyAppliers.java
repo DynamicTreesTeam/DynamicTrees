@@ -1,17 +1,11 @@
 package com.ferreusveritas.dynamictrees.deserialisation;
 
-import com.ferreusveritas.dynamictrees.api.applier.Applier;
-import com.ferreusveritas.dynamictrees.api.applier.ArrayIteratorPropertyApplier;
-import com.ferreusveritas.dynamictrees.api.applier.ArrayPropertyApplier;
-import com.ferreusveritas.dynamictrees.api.applier.IfTrueApplier;
-import com.ferreusveritas.dynamictrees.api.applier.JsonPropertyApplier;
-import com.ferreusveritas.dynamictrees.api.applier.PropertyApplier;
-import com.ferreusveritas.dynamictrees.api.applier.PropertyApplierResult;
-import com.ferreusveritas.dynamictrees.api.applier.VoidApplier;
+import com.ferreusveritas.dynamictrees.api.applier.*;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.List;
 import java.util.Map;
 
@@ -116,6 +110,17 @@ public final class JsonPropertyAppliers<O> implements PropertyAppliers<O, JsonEl
                                                                     VoidApplier<O, List<V>> applier) {
         return this.registerListApplier(key, this.objectType, valueClass, applier);
     }
+    @Override
+    public <V> PropertyAppliers<O, JsonElement> registerMapApplier(String key, Class<V> valueClass,
+                                                                   Applier<O, Map<String,V>> applier) {
+        return this.registerMapApplier(key, this.objectType, valueClass, applier);
+    }
+
+    @Override
+    public <V> PropertyAppliers<O, JsonElement> registerMapApplier(String key, Class<V> valueClass,
+                                                                   VoidApplier<O, Map<String,V>> applier) {
+        return this.registerMapApplier(key, this.objectType, valueClass, applier);
+    }
 
     @Override
     public JsonPropertyAppliers<O> registerIfTrueApplier(final String key, final IfTrueApplier<O> applier) {
@@ -173,6 +178,20 @@ public final class JsonPropertyAppliers<O> implements PropertyAppliers<O, JsonEl
                                                                                  Class<V> valueClass,
                                                                                  VoidApplier<E, List<V>> applier) {
         return this.register(ArrayPropertyApplier.json(key, subClass, valueClass, applier));
+    }
+
+    @Override
+    public <E extends O, V> PropertyAppliers<O, JsonElement> registerMapApplier(String key, Class<E> subClass,
+                                                                                 Class<V> valueClass,
+                                                                                 Applier<E, Map<String,V>> applier) {
+        return this.register(MapPropertyApplier.json(key, subClass, valueClass, applier));
+    }
+
+    @Override
+    public <E extends O, V> PropertyAppliers<O, JsonElement> registerMapApplier(String key, Class<E> subClass,
+                                                                                 Class<V> valueClass,
+                                                                                 VoidApplier<E, Map<String,V>> applier) {
+        return this.register(MapPropertyApplier.json(key, subClass, valueClass, applier));
     }
 
     @Override

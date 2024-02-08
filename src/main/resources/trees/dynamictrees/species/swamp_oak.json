@@ -12,6 +12,9 @@
     "perfect_biomes": { "tag": "#forge:is_swamp" },
     "common_override": { "name": "minecraft:swamp" },
     "generate_sapling": true,
+    "model_overrides": {
+        "sapling": "dynamictrees:block/smartmodel/water_sapling"
+    },
     "acceptable_soils": ["dirt_like", "water_like"],
     "plantable_on_fluid": true,
     "features" : [
