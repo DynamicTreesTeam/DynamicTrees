@@ -80,10 +80,7 @@ import com.ferreusveritas.dynamictrees.util.ResourceLocationUtils;
 import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
 import com.ferreusveritas.dynamictrees.util.holderset.DTBiomeHolderSet;
-import com.ferreusveritas.dynamictrees.worldgen.GenerationContext;
-import com.ferreusveritas.dynamictrees.worldgen.JoCode;
-import com.ferreusveritas.dynamictrees.worldgen.JoCodeRegistry;
-import com.ferreusveritas.dynamictrees.worldgen.RootsJoCode;
+import com.ferreusveritas.dynamictrees.worldgen.*;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
@@ -2111,7 +2108,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         // prevent trees generating if there's a structure/mountain overhang above.
         BlockPos.MutableBlockPos pos = rootPos.above().mutable();
         for (int i = 0; i < signalEnergy; i++) {
-            if (!TreeFeature.validTreePos(levelContext.accessor(), pos)) {
+            if (!DynamicTreeFeature.validTreePos(levelContext.accessor(), pos)) {
                 return false;
             }
             pos.move(Direction.UP);

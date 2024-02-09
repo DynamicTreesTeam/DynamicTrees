@@ -392,7 +392,7 @@ public class JoCode {
     }
 
     protected boolean isFreeToSetBlock(LevelAccessor level, BlockPos pos, Species species) {
-        if (TreeFeature.validTreePos(level, pos) || level.isStateAtPosition(pos, (blockState) -> blockState.is(BlockTags.LOGS)))
+        if (DynamicTreeFeature.validTreePos(level, pos) || level.isStateAtPosition(pos, (blockState) -> blockState.is(BlockTags.LOGS)))
             return true;
 
         BlockState blockState = level.getBlockState(pos);

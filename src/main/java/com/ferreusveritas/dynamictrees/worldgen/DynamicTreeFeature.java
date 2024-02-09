@@ -3,6 +3,7 @@ package com.ferreusveritas.dynamictrees.worldgen;
 import com.ferreusveritas.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.ferreusveritas.dynamictrees.api.worldgen.GroundFinder;
 import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
+import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.init.DTConfigs;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.ferreusveritas.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
@@ -14,16 +15,20 @@ import com.ferreusveritas.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Arrays;
@@ -64,6 +69,14 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         );
 
         return true;
+    }
+
+    public static boolean isFoliage(LevelSimulatedReader pLevel, BlockPos pPos) {
+        return pLevel.isStateAtPosition(pPos, (state) -> state.is(DTBlockTags.FOLIAGE));
+    }
+
+    public static boolean validTreePos(LevelSimulatedReader pLevel, BlockPos pPos) {
+        return isFoliage(pLevel, pPos) || TreeFeature.validTreePos(pLevel, pPos);
     }
 
     protected void generateTrees(LevelContext levelContext, BiomeDatabase biomeDatabase, PoissonDisc disc, BlockPos originPos, SafeChunkBounds safeBounds) {

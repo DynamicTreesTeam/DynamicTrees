@@ -19,6 +19,7 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.common.data.ForgeBlockTagsProvider;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -46,10 +47,9 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
                 .addTag(DTBlockTags.FUNGUS_BRANCHES);
 
         this.tag(DTBlockTags.FOLIAGE)
-                .add(Blocks.GRASS)
-                .add(Blocks.TALL_GRASS)
-                .add(Blocks.FERN)
-                .add(Blocks.LILY_PAD);
+                .add(Blocks.LILY_PAD)
+                .addTag(BlockTags.FLOWERS)
+                .addTag(BlockTags.REPLACEABLE_PLANTS);
 
         this.tag(DTBlockTags.STRIPPED_BRANCHES)
                 .addTag(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN)

@@ -23,8 +23,8 @@ public class SurfaceRootStateGenerator implements Generator<DTBlockStateProvider
         provider.simpleBlock(surfaceRoot,
                 provider.models().getBuilder(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(surfaceRoot)).getPath())
                         .customLoader(BranchLoaderBuilder::surfaceRoot)
-                        .texture("bark", provider.block(
-                                Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LOG)))
+                        .texture("bark", input.getTexturePath(Family.BRANCH)
+                                .orElse(provider.block(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(dependencies.get(PRIMITIVE_LOG))))
                         )).end()
         );
     }

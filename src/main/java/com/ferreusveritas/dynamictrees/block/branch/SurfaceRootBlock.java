@@ -220,8 +220,8 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
 
         if (state != null && state.getBlock() instanceof SurfaceRootBlock) {
             return new RootConnection(connectionLevel, ((SurfaceRootBlock) state.getBlock()).getRadius(state));
-        } else if (connectionLevel == RootConnections.ConnectionLevel.MID && TreeHelper.isBranch(state) && TreeHelper.getTreePart(state).getRadius(state) >= 8) {
-            return new RootConnection(RootConnections.ConnectionLevel.MID, 8);
+        } else if (connectionLevel == RootConnections.ConnectionLevel.MID && TreeHelper.isBranch(state)) {
+            return new RootConnection(RootConnections.ConnectionLevel.MID, Math.min(TreeHelper.getTreePart(state).getRadius(state), 8));
         }
 
         return null;
