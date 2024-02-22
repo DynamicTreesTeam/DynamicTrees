@@ -43,6 +43,7 @@ public class MangroveSpecies extends Species {
     protected float rootSignalEnergy = 16.0f;
     protected float rootTapering = 0.3f;
     protected int rootGrowthMultiplier = 15;
+    protected int updateSoilOnWaterRadius = 5;
     public void setMinWorldGenHeightOffset(int minWorldGenHeightOffset) {
         this.minWorldGenHeightOffset = minWorldGenHeightOffset;
     }
@@ -53,6 +54,14 @@ public class MangroveSpecies extends Species {
 
     public void setRootGrowthMultiplier(int rootGrowthMultiplier) {
         this.rootGrowthMultiplier = rootGrowthMultiplier;
+    }
+
+    public void setUpdateSoilOnWaterRadius(int updateSoilOnWaterRadius) {
+        this.updateSoilOnWaterRadius = updateSoilOnWaterRadius;
+    }
+
+    public int getUpdateSoilOnWaterRadius() {
+        return updateSoilOnWaterRadius;
     }
 
     public MangroveSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
@@ -74,7 +83,7 @@ public class MangroveSpecies extends Species {
         BlockState dirtState = level.getBlockState(rootPos);
         Block dirt = dirtState.getBlock();
 
-        if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock)) {
+        if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock) && !isWater(dirtState)) {
             //soil is not valid so we place default roots
             level.setBlock(rootPos, getFamily().getDefaultSoil().getSoilState(dirtState, fertility, this.doesRequireTileEntity(level, rootPos)), 3);
 
@@ -91,13 +100,13 @@ public class MangroveSpecies extends Species {
     @Override
     public boolean postGrow(Level level, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
         int radius = TreeHelper.getRadius(level, treePos);
-        if (radius >= 8) {
-            BlockState soilState = level.getBlockState(rootPos);
+        BlockState soilState = level.getBlockState(rootPos);
+        if (radius >= 8 || (isWater(soilState) && radius >= updateSoilOnWaterRadius)) {
             if (soilState.getBlock() instanceof RootyBlock rootyBlock
                     && !rootyBlock.getSoilProperties().equals(getFamily().getDefaultSoil())){
                 BlockEntity TE = level.getBlockEntity(treePos);
                 BlockState rootCollarState = getFamily().getDefaultSoil().getSoilState(rootyBlock.getPrimitiveSoilState(soilState), fertility, soilState.getValue(RootyBlock.IS_VARIANT));
-                AerialRootsSoilProperties.updateRadius(level, rootCollarState, rootPos, 3);
+                AerialRootsSoilProperties.updateRadius(level, rootCollarState, rootPos, 3, true);
                 if (TE != null){
                     level.setBlockEntity(TE);
                     if (TE instanceof SpeciesBlockEntity speciesTE) {

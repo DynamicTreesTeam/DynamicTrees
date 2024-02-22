@@ -69,12 +69,15 @@ public class AerialRootsSoilProperties extends SoilProperties {
         return new RootRootyBlock(this, blockProperties);
     }
 
-    public static int updateRadius (LevelAccessor level, BlockState state, BlockPos pos, int flags){
+    public static int updateRadius (LevelAccessor level, BlockState state, BlockPos pos, int flags) {
+        return updateRadius(level, state, pos, flags, false);
+    }
+    public static int updateRadius (LevelAccessor level, BlockState state, BlockPos pos, int flags, boolean force){
         if (!(state.getBlock() instanceof RootRootyBlock)) return 8;
         int upRad = TreeHelper.getRadius(level, pos.above());
         if (upRad > 0){
             int thisRad = state.getValue(RootRootyBlock.RADIUS);
-            if (upRad != thisRad){
+            if (upRad != thisRad || force){
                 int newRadius = Math.min(upRad, 8);
                 level.setBlock(pos, state.setValue(RootRootyBlock.RADIUS, newRadius), flags);
                 return newRadius;

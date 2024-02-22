@@ -145,7 +145,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("roots_growth_logic_kit", MangroveSpecies.class, GrowthLogicKitConfiguration.class, MangroveSpecies::setRootsGrowthLogicKit)
                 .register("root_growth_multiplier", MangroveSpecies.class, Integer.class, MangroveSpecies::setRootGrowthMultiplier)
                 .register("root_tapering", MangroveSpecies.class, Float.class, MangroveSpecies::setRootTapering)
-                .register("root_signal_energy", MangroveSpecies.class, Float.class, MangroveSpecies::setRootSignalEnergy);
+                .register("root_signal_energy", MangroveSpecies.class, Float.class, MangroveSpecies::setRootSignalEnergy)
+                .register("update_soil_on_water_radius", MangroveSpecies.class, Integer.class, MangroveSpecies::setUpdateSoilOnWaterRadius);
     }
 
     private void setSeed(Species species, ResourceLocation seedName) {
