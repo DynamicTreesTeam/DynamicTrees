@@ -8,6 +8,10 @@
   "block.dynamictrees.acacia_branch": "Acacia",
   "block.dynamictrees.crimson_branch": "Champignon carmin",
   "block.dynamictrees.warped_branch": "Champignon biscornu",
+  "block.dynamictrees.mangrove_branch": "Palétuvier",
+  "block.dynamictrees.mangrove_roots": "Racines de palétuvier",
+  "block.dynamictrees.cherry_branch": "Cerisier",
+
   "species.dynamictrees.oak": "Chêne",
   "species.dynamictrees.swamp_oak": "Chêne des marais",
   "species.dynamictrees.spruce": "Épicéa",
@@ -23,6 +27,16 @@
   "species.dynamictrees.mega_crimson": "Champignon carmin géant",
   "species.dynamictrees.warped": "Champignon biscornu",
   "species.dynamictrees.mega_warped": "Champignon biscornu géant",
+  "species.dynamictrees.red_mushroom": "Champignon rouge",
+  "species.dynamictrees.brown_mushroom": "Champignon Marron",
+  "species.dynamictrees.cocoa": "Cacao",
+  "species.dynamictrees.oak_undergrowth": "Buisson de chêne",
+  "species.dynamictrees.jungle_undergrowth": "Buisson d'acajou",
+  "species.dynamictrees.mangrove": "Palétuvier",
+  "species.dynamictrees.cherry": "Cerisier",
+  "species.dynamictrees.azalea": "Azalée",
+
+
   "item.dynamictrees.oak_seed": "Gland de chêne",
   "item.dynamictrees.spruce_seed": "Cône d'épicéa",
   "item.dynamictrees.birch_seed": "Graine de bouleau",
@@ -32,6 +46,11 @@
   "item.dynamictrees.apple_oak_seed": "Pépin de pomme",
   "item.dynamictrees.crimson_seed": "Chapeau de champignon carmin",
   "item.dynamictrees.warped_seed": "Chapeau de champignon biscornu",
+  "item.dynamictrees.mangrove_seed": "Propagule de palétuvier",
+  "item.dynamictrees.cocoa_seed": "Graine de cacao",
+  "item.dynamictrees.cherry_seed": "Noyau de cerisier",
+  "item.dynamictrees.azalea_seed": "Graine d'azalée",
+
   "item.dynamictrees.dendro_potion.biochar": "Potion bio-charbon de base",
   "item.dynamictrees.dendro_potion.depletion": "Potion d'épuisement",
   "item.dynamictrees.dendro_potion.gigas": "Potion de gigantisme",
@@ -41,9 +60,11 @@
   "item.dynamictrees.dendro_potion.transform": "Potion de transformation",
   "item.dynamictrees.dendro_potion.harvest": "Potion de récolte",
   "item.dynamictrees.dendro_potion.denuding": "Potion de déboisement",
+
   "item.dynamictrees.dirt_bucket": "Seau de terre",
   "item.dynamictrees.staff": "Bâton des bois",
   "block.dynamictrees.potted_sapling": "Pousse en pot",
+
   "chat.registry_name": "Nom de registre: %s",
   "tooltip.dynamictrees.species": "Espèce: %s",
   "tooltip.dynamictrees.fertility": "Fertilité: %s",
@@ -79,5 +100,8 @@
   "potion.harvest.description": "Accélère la production de fruits",
   "potion.denuding.description": "Enlève toute l'écorce et les feuilles d'un arbre",
   "death.attack.falling_tree": "%1$s a été écrasé par un arbre qui tombe",
-  "block.dynamictrees.rooty_water": "Racines aquatiques"
+  "block.dynamictrees.rooty_water": "Racines aquatiques",
+
+  "block.minecraft.mangrove_propagule": "Propagule de palétuvier",
+  "block.minecraft.potted_mangrove_propagule": "Propagule de palétuvier en pot"
 }
