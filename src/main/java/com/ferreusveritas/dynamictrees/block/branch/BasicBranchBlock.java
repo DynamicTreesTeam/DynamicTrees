@@ -212,10 +212,14 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     @Override
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
+        if (level == null) {
+            return 1.0f;
+        }
+
         final int radius = this.getRadius(level.getBlockState(pos));
         final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
                 .getDestroySpeed(level, pos) * (radius * radius) / 64.0f * 8.0f;
-        return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
+        return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get());
     }
 
     @Override
