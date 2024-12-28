@@ -1,8 +1,0 @@
-{
-    "parent": "item/handheld",
-    "textures": {
-        "layer0":"dynamictrees:item/staff_handle",
-        "layer1":"dynamictrees:item/staff_overlay",
-        "layer2":"dynamictrees:item/staff_glimmer"
-    }
-}

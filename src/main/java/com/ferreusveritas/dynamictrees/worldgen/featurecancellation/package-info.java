@@ -1,4 +1,0 @@
-@ParametersAreNonnullByDefault
-package com.ferreusveritas.dynamictrees.worldgen.featurecancellation;
-
-import javax.annotation.ParametersAreNonnullByDefault;

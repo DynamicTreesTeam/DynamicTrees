@@ -1,0 +1,3 @@
+accessWidener v2 named
+
+mutable field net/minecraft/world/level/block/Block stateDefinition Lnet/minecraft/world/level/block/state/StateDefinition;

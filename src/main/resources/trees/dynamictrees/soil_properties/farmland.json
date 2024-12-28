@@ -1,5 +1,0 @@
-{
-  "primitive_soil": "farmland",
-  "acceptable_soils": [ "dirt_like" ],
-  "substitute_soil" : "dirt"
-}

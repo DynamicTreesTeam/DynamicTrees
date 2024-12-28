@@ -1,5 +1,0 @@
-{
-  "primitive_soil": "powder_snow",
-  "acceptable_soils": [ "snow_like" ],
-  "substitute_soil": "dirt"
-}

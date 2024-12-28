@@ -1,8 +1,0 @@
-{
-  "parent": "dynamictrees:block/smartmodel/water_sapling_thin",
-  "render_type": "minecraft:cutout_mipped",
-  "textures": {
-    "leaves": "minecraft:block/mangrove_leaves",
-    "log": "minecraft:block/mangrove_log"
-  }
-}
