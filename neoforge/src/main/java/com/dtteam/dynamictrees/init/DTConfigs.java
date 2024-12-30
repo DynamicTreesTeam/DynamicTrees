@@ -1,0 +1,230 @@
+package com.dtteam.dynamictrees.init;
+
+import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.common.ModConfigSpec;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+@EventBusSubscriber(modid = DynamicTreesCommon.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+public class DTConfigs {
+
+    public static final File CONFIG_DIRECTORY;
+
+    public static final ModConfigSpec SERVER_CONFIG;
+    public static final ModConfigSpec COMMON_CONFIG;
+    public static final ModConfigSpec CLIENT_CONFIG;
+
+    public static final ModConfigSpec.DoubleValue SEED_DROP_RATE;
+    public static final ModConfigSpec.DoubleValue VOLUNTARY_SEED_DROP_RATE;
+    public static final ModConfigSpec.DoubleValue SEED_PLANT_RATE;
+    public static final ModConfigSpec.IntValue SEED_TIME_TO_LIVE;
+    public static final ModConfigSpec.BooleanValue SEED_ONLY_FOREST;
+    public static final ModConfigSpec.DoubleValue SEED_MIN_FORESTNESS;
+
+    public static final ModConfigSpec.DoubleValue TREE_GROWTH_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue TREE_HARVEST_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue MAX_TREE_HARDNESS;
+    public static final ModConfigSpec.DoubleValue TREE_HARDNESS_MULTIPLIER;
+    public static final ModConfigSpec.IntValue TREE_GROWTH_FOLDING;
+    public static final ModConfigSpec.BooleanValue DROP_STICKS;
+    public static final ModConfigSpec.DoubleValue SCALE_BIOME_GROWTH_RATE;
+    public static final ModConfigSpec.DoubleValue DISEASE_CHANCE;
+    public static final ModConfigSpec.IntValue MAX_BRANCH_ROT_RADIUS;
+    public static final ModConfigSpec.DoubleValue ROOTY_BLOCK_HARDNESS_MULTIPLIER;
+    public static final ModConfigSpec.EnumValue<DynamicTreesCommon.SwampOakWaterState> SWAMP_OAKS_IN_WATER;
+    public static final ModConfigSpec.IntValue BONE_MEAL_GROWTH_PULSES;
+
+    public static final ModConfigSpec.BooleanValue IS_LEAVES_PASSABLE;
+    public static final ModConfigSpec.BooleanValue VANILLA_LEAVES_COLLISION;
+    public static final ModConfigSpec.BooleanValue ENABLE_BRANCH_CLIMBING;
+    public static final ModConfigSpec.BooleanValue CANOPY_CRASH;
+    public static final ModConfigSpec.EnumValue<DynamicTreesCommon.AxeDamage> AXE_DAMAGE_MODE;
+    public static final ModConfigSpec.BooleanValue ENABLE_FALLING_TREES;
+    public static final ModConfigSpec.BooleanValue ENABLE_FALLING_TREE_DAMAGE;
+    public static final ModConfigSpec.DoubleValue FALLING_TREE_DAMAGE_MULTIPLIER;
+    public static final ModConfigSpec.BooleanValue DIRT_BUCKET_PLACES_DIRT;
+    public static final ModConfigSpec.BooleanValue SLOPPY_BREAK_DROPS;
+    public static final ModConfigSpec.IntValue MIN_RADIUS_FOR_STRIP;
+    public static final ModConfigSpec.BooleanValue ENABLE_STRIP_RADIUS_REDUCTION;
+    public static final ModConfigSpec.BooleanValue CAN_BONE_MEAL_FRUIT;
+    public static final ModConfigSpec.BooleanValue CAN_BONE_MEAL_PODS;
+    public static final ModConfigSpec.BooleanValue DYNAMIC_SAPLING_DROPS;
+
+    public static final ModConfigSpec.BooleanValue REPLACE_VANILLA_SAPLING;
+    public static final ModConfigSpec.BooleanValue REPLACE_NYLIUM_FUNGI;
+    public static final ModConfigSpec.BooleanValue CANCEL_VANILLA_VILLAGE_TREES;
+    public static final ModConfigSpec.IntValue MAX_FALLING_TREE_LEAVES_PARTICLES;
+
+    public static final ModConfigSpec.BooleanValue PODZOL_GEN;
+
+    public static final ModConfigSpec.BooleanValue GENERATE_DIRT_BUCKET_RECIPES;
+    public static final ModConfigSpec.ConfigValue<String> BIOCHAR_BASE_BREWING_BASE;
+
+    public static final ModConfigSpec.BooleanValue WORLD_GEN;
+    public static final ModConfigSpec.ConfigValue<List<String>> DIMENSION_BLACKLIST;
+
+    //public static final ModConfigSpec.BooleanValue fancyThickRings;
+
+    public static final ModConfigSpec.BooleanValue WORLD_GEN_DEBUG;
+
+//    public static final ModConfigSpec.ConfigValue<String> PREFERRED_SEASON_MOD;
+    public static final ModConfigSpec.BooleanValue ENABLE_SEASONAL_SEED_DROP_FACTOR;
+    public static final ModConfigSpec.BooleanValue ENABLE_SEASONAL_GROWTH_FACTOR;
+    public static final ModConfigSpec.BooleanValue ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR;
+
+    static {
+        CONFIG_DIRECTORY = new File(FMLPaths.CONFIGDIR.get().toUri());
+
+        final ModConfigSpec.Builder SERVER_BUILDER = new ModConfigSpec.Builder();
+        final ModConfigSpec.Builder COMMON_BUILDER = new ModConfigSpec.Builder();
+        final ModConfigSpec.Builder CLIENT_BUILDER = new ModConfigSpec.Builder();
+
+        SERVER_BUILDER.comment("Seed Settings").push("seeds");
+        SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds drop from leaves.").
+                defineInRange("leavesSeedDropRate", 1.0, 0.0, 64.0);
+        VOLUNTARY_SEED_DROP_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
+                defineInRange("voluntarySeedDropRate", 0.01, 0.0, 1.0);
+        SEED_PLANT_RATE = SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
+                defineInRange("seedPlantRate", 1f / 6f, 0.0, 1.0);
+        SEED_TIME_TO_LIVE = SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
+                defineInRange("timeToLive", 1200, 0, 6000);
+        SEED_ONLY_FOREST = SERVER_BUILDER.comment("If enabled then seeds will only voluntarily plant themselves in forest-like biomes.").
+                define("seedOnlyForest", true);
+        SEED_MIN_FORESTNESS = SERVER_BUILDER.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional.").
+                defineInRange("seedMinForestness", 0.0, 0.0, 1.0);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.comment("Tree Settings").push("trees");
+        TREE_GROWTH_MULTIPLIER = SERVER_BUILDER.comment("Factor that multiplies the rate at which trees grow. Use at own risk").
+                defineInRange("growthMultiplier", 0.5f, 0, 16f);
+        TREE_HARVEST_MULTIPLIER = SERVER_BUILDER.comment("Factor that multiplies the wood returned from harvesting a tree.  You cheat.").
+                defineInRange("harvestMultiplier", 1f, 0f, 128f);
+        MAX_TREE_HARDNESS = SERVER_BUILDER.comment("Maximum harvesting hardness that can be calculated. Regardless of tree thickness.").
+                defineInRange("maxTreeHardness", 20f, 1f, 200f);
+        TREE_HARDNESS_MULTIPLIER = SERVER_BUILDER.comment("A multiplier of tree hardness. Higher values make trees slower to chop, lower values makes them faster to chop.").
+                defineInRange("treeHardnessMultiplier", 1, (1/128f), 32f);
+        TREE_GROWTH_FOLDING = SERVER_BUILDER.comment("Do X growth cycles at once while ignoring (X-1)/X attempts.  Higher numbers can improve client side performance but too high can make trees grow wierd.").
+                defineInRange("growthFolding", 2, 1, 8);
+        DROP_STICKS = SERVER_BUILDER.comment("If enabled then sticks will be dropped for partial logs").
+                define("dropSticks", true);
+        SCALE_BIOME_GROWTH_RATE = SERVER_BUILDER.comment("Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome").
+                defineInRange("scaleBiomeGrowthRate", 0.5f, 0.0f, 1.0f);
+        DISEASE_CHANCE = SERVER_BUILDER.comment("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days").
+                defineInRange("diseaseChance", 0.0f, 0.0f, 1.0f);
+        MAX_BRANCH_ROT_RADIUS = SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. 24 = Full 3x3 thick size. Set to 0 to prevent rotting").
+                defineInRange("maxBranchRotRadius", 7, 0, ThickBranchBlock.MAX_RADIUS_THICK);
+        ROOTY_BLOCK_HARDNESS_MULTIPLIER = SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
+                defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f);
+        SWAMP_OAKS_IN_WATER = SERVER_BUILDER.comment("Options for how oak trees generate in swamps. ROOTED: Swamp oak trees will generate on shallow water with mangrove-like roots. SUNK: Swamp oak trees will generate on shallow water one block under the surface. DISABLED: Swamp oaks will not generate on water.").
+                defineEnum("swampOaksInWater", DynamicTreesCommon.SwampOakWaterState.ROOTED);
+        BONE_MEAL_GROWTH_PULSES = SERVER_BUILDER.comment("The amount of growth pulses to send when bone meal is applied to a tree. Warning: setting values higher than 64 is not recommended other than for testing purposes. ").
+                defineInRange("boneMealGrowthPulses", 1, 1, 512);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.comment("Interaction Settings").push("interaction");
+        IS_LEAVES_PASSABLE = SERVER_BUILDER.comment("If enabled all leaves will be passable. If the Passable Foliage mod is installed this config is overridden").
+                define("isLeavesPassable", false);
+        VANILLA_LEAVES_COLLISION = SERVER_BUILDER.comment("If enabled player movement on leaves will not be enhanced").
+                define("vanillaLeavesCollision", false);
+        ENABLE_BRANCH_CLIMBING = SERVER_BUILDER.comment("If enabled then thinner branches can be climbed").
+                define("enableBranchClimbling", true);
+        CANOPY_CRASH = SERVER_BUILDER.comment("If enabled players receive reduced fall damage on leaves at the expense of the block(s) destruction").
+                define("canopyCrash", true);
+        AXE_DAMAGE_MODE = SERVER_BUILDER.comment("Damage dealt to the axe item when cutting a tree down. VANILLA: Standard 1 Damage. THICKNESS: By Branch/Trunk Thickness. VOLUME: By Tree Volume.").
+                defineEnum("axeDamageMode", DynamicTreesCommon.AxeDamage.THICKNESS);
+        ENABLE_FALLING_TREES = SERVER_BUILDER.comment("If enabled then trees will fall over when harvested").
+                define("enableFallingTrees", true);
+        ENABLE_FALLING_TREE_DAMAGE = SERVER_BUILDER.comment("If enabled then trees will harm living entities when falling").
+                define("enableFallingTreeDamage", true);
+        FALLING_TREE_DAMAGE_MULTIPLIER = SERVER_BUILDER.comment("Multiplier for damage incurred by a falling tree").
+                defineInRange("fallingTreeDamageMultiplier", 1.0, 0.0, 100.0);
+        DIRT_BUCKET_PLACES_DIRT = SERVER_BUILDER.comment("If enabled the Dirt Bucket will place a dirt block on right-click").
+                define("dirtBucketPlacesDirt", true);
+        SLOPPY_BREAK_DROPS = SERVER_BUILDER.comment("If enabled then improperly broken trees(not by an entity) will still drop wood.").
+                define("sloppyBreakDrops", false);
+        MIN_RADIUS_FOR_STRIP = SERVER_BUILDER.comment("The minimum radius a branch must have before its able to be stripped. 8 = Full block size. Set to 0 to disable stripping trees").
+                defineInRange("minRadiusForStrip", 6, 0, 24);
+        ENABLE_STRIP_RADIUS_REDUCTION = SERVER_BUILDER.comment("If enabled, stripping a branch will decrease its radius by one").
+                define("enableStripRadiusReduction", true);
+        CAN_BONE_MEAL_FRUIT = SERVER_BUILDER.comment("Sets the default for whether or not fruit growing from dynamic trees can be bone-mealed. Note that this is a default; it can be overridden by the individual fruit.").
+                define("canBoneMealFruit", false);
+        CAN_BONE_MEAL_PODS = SERVER_BUILDER.comment("Sets the default for whether or not pods growing from dynamic trees can be bone-mealed. Note that this is a default; it can be overridden by the individual pod.").
+                define("canBoneMealPods", true);
+        DYNAMIC_SAPLING_DROPS = SERVER_BUILDER.comment("If enabled, dynamic sapling blocks will drop their seed when broken.").
+                define("dynamicSaplingDrops", true);
+        SERVER_BUILDER.pop();
+
+        COMMON_BUILDER.comment("Vanilla Trees Settings").push("vanilla");
+        REPLACE_VANILLA_SAPLING = COMMON_BUILDER.comment("Right clicking with a vanilla sapling places a dynamic sapling instead.").
+                define("replaceVanillaSapling", false);
+        REPLACE_NYLIUM_FUNGI = COMMON_BUILDER.comment("Crimson Fungus and Warped Fungus that sprout from nylium will be dynamic instead.").
+                define("replaceNyliumFungi", true);
+        CANCEL_VANILLA_VILLAGE_TREES = COMMON_BUILDER.comment("If enabled, cancels the non-dynamic trees that spawn with vanilla villages.").
+                define("cancelVanillaVillageTrees", true);
+        MAX_FALLING_TREE_LEAVES_PARTICLES = SERVER_BUILDER.comment("The maximum number of leaves blocks that will fling particles when a falling tree crashes into the ground. Higher values might have a performance impact.").
+                defineInRange("growthFolding", 400, 0, 4096);
+        COMMON_BUILDER.pop();
+
+        SERVER_BUILDER.comment("World Generation Settings").push("world");
+        PODZOL_GEN = SERVER_BUILDER.comment("Randomly generate podzol under select trees like spruce.").
+                define("podzolGen", true);
+        WORLD_GEN = SERVER_BUILDER.comment("World Generation produces Dynamic Trees instead of Vanilla trees.").
+                define("worldGen", true);
+        DIMENSION_BLACKLIST = SERVER_BUILDER.comment("Blacklist of dimension registry names for disabling Dynamic Tree worldgen").
+                define("dimensionsBlacklist", new ArrayList<>());
+        SERVER_BUILDER.pop();
+
+        COMMON_BUILDER.comment("Miscellaneous Settings").push("misc");
+        GENERATE_DIRT_BUCKET_RECIPES = COMMON_BUILDER.comment("If enabled, dirt bucket recipes will be automatically generated.")
+                .define("generateDirtBucketRecipes", true);
+        BIOCHAR_BASE_BREWING_BASE = COMMON_BUILDER.comment("The base potion the Biochar Base is brewed from. Minecraft potions use 'awkward'. If you change this, don't forget to update the patchouli manual page too.")
+                .define("biocharBrewingBase", "thick");
+        COMMON_BUILDER.pop();
+
+        COMMON_BUILDER.comment("Mod Integration Settings").push("integration");
+//        PREFERRED_SEASON_MOD = COMMON_BUILDER.comment("The mod ID of preferred season mod. If a season provider for this mod ID is present, it will be used for integration with seasons. Set this to \"!\" to disable integration or \"*\" to accept the any integration (the first available).")
+//                .define("preferredSeasonMod", CompatHandler.ANY);
+        ENABLE_SEASONAL_SEED_DROP_FACTOR = COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
+                define("enableSeasonalSeedDropFactor", true);
+        ENABLE_SEASONAL_GROWTH_FACTOR = COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
+                define("enableSeasonalGrowthFactor", true);
+        ENABLE_SEASONAL_FRUIT_PRODUCTION_FACTOR = COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").
+                define("enableSeasonalFruitProductionFactor", true);
+
+        COMMON_BUILDER.pop();
+
+//		CLIENT_BUILDER.comment("Visual Settings").push("visuals");
+//		fancyThickRings = CLIENT_BUILDER.comment("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched").
+//				define("fancyThickRings", true);
+//		CLIENT_BUILDER.pop();
+
+        SERVER_BUILDER.comment("Debug Settings").push("debug");
+        WORLD_GEN_DEBUG = SERVER_BUILDER.comment("Enable to mark tree spawn locations with concrete circles.").
+                define("debug", false);
+        SERVER_BUILDER.pop();
+
+        SERVER_CONFIG = SERVER_BUILDER.build();
+        COMMON_CONFIG = COMMON_BUILDER.build();
+        CLIENT_CONFIG = CLIENT_BUILDER.build();
+    }
+
+    @SubscribeEvent
+    public static void onLoad(final ModConfigEvent.Loading event) {
+//        EventHandlers.configReload();
+//        CompatHandler.reloadSeasonManager();
+    }
+
+    @SubscribeEvent
+    public static void onReload(final ModConfigEvent.Reloading event) {
+//        EventHandlers.configReload();
+//        CompatHandler.reloadSeasonManager();
+    }
+
+}

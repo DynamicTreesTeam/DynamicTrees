@@ -1,65 +1,36 @@
 package com.dtteam.dynamictrees.tree.species;
 
+import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.api.registry.RegistryEntry;
+import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
+import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.util.ResourceLocationUtils;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelAccessor;
-
+import com.dtteam.dynamictrees.treepacks.Resettable;
+import com.dtteam.dynamictrees.treepacks.Resources;
+import com.dtteam.dynamictrees.util.Optionals;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.TagKey;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.*;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 //import static net.minecraft.world.level.storage.loot.LootTable.EMPTY;
 //
-public class Species {//extends RegistryEntry<Species> implements Resettable<Species> {
+public class Species extends RegistryEntry<Species> implements Resettable<Species> {
 
     public static final Species NULL_SPECIES = new Species() {
 //        @Override
@@ -113,33 +84,33 @@ public class Species {//extends RegistryEntry<Species> implements Resettable<Spe
 //        }
     };
 
-//    public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(Species::new);
-//
-//    public static final Codec<Species> CODEC = ResourceLocation.CODEC.comapFlatMap(Species::read, Species::getRegistryName);
-//
-//    public static TypedRegistry.EntryType<Species> createDefaultType(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
-//        return TypedRegistry.newType(createDefaultCodec(constructor));
-//    }
-//
-//    public static Codec<Species> createDefaultCodec(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
-//        return RecordCodecBuilder.create(instance -> instance
-//                .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString())
-//                                .forGetter(Species::getRegistryName),
-//                        Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
-//                        LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
-//                                LeavesProperties.NULL).forGetter(Species::getLeavesProperties))
-//                .apply(instance, constructor));
-//    }
-//
-//    private static DataResult<Species> read(ResourceLocation name) {
-//        final Species species = Species.REGISTRY.get(name);
-//        return species == null ? DataResult.error(() -> "Species not found: " + name) : DataResult.success(species);
-//    }
-//
-//    /**
-//     * Central registry for all {@link Species} objects.
-//     */
-//    public static final TypedRegistry<Species> REGISTRY = new TypedRegistry<>(Species.class, NULL_SPECIES, TYPE);
+    public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(Species::new);
+
+    public static final Codec<Species> CODEC = ResourceLocation.CODEC.comapFlatMap(Species::read, Species::getRegistryName);
+
+    public static TypedRegistry.EntryType<Species> createDefaultType(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
+        return TypedRegistry.newType(createDefaultCodec(constructor));
+    }
+
+    public static Codec<Species> createDefaultCodec(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
+        return RecordCodecBuilder.create(instance -> instance
+                .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString())
+                                .forGetter(Species::getRegistryName),
+                        Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
+                        LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
+                                LeavesProperties.NULL).forGetter(Species::getLeavesProperties))
+                .apply(instance, constructor));
+    }
+
+    private static DataResult<Species> read(ResourceLocation name) {
+        final Species species = Species.REGISTRY.get(name);
+        return species == null ? DataResult.error(() -> "Species not found: " + name) : DataResult.success(species);
+    }
+
+    /**
+     * Central registry for all {@link Species} objects.
+     */
+    public static final TypedRegistry<Species> REGISTRY = new TypedRegistry<>(Species.class, NULL_SPECIES, TYPE);
 
     /**
      * The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family
@@ -200,19 +171,19 @@ public class Species {//extends RegistryEntry<Species> implements Resettable<Spe
      */
     private boolean transformable = true;
 
-//    /**
-//     * If this is not empty, saplings will only grow when planted on these blocks.
-//     */
-//    protected final List<Block> acceptableBlocksForGrowth = Lists.newArrayList();
-//
-//    //Leaves
-//    protected LeavesProperties leavesProperties = LeavesProperties.NULL;
-//
-//    /**
-//     * A list of leaf blocks the species accepts as its own. Used for the falling tree renderer
-//     */
-//    private final List<LeavesProperties> validLeaves = new LinkedList<>();
-//
+    /**
+     * If this is not empty, saplings will only grow when planted on these blocks.
+     */
+    protected final List<Block> acceptableBlocksForGrowth = Lists.newArrayList();
+
+    //Leaves
+    protected LeavesProperties leavesProperties = LeavesProperties.NULL;
+
+    /**
+     * A list of leaf blocks the species accepts as its own. Used for the falling tree renderer
+     */
+    private final List<LeavesProperties> validLeaves = new LinkedList<>();
+
 //    //Seeds
 //    /**
 //     * The seed used to reproduce this species.  Drops from the tree and can plant itself
@@ -249,45 +220,45 @@ public class Species {//extends RegistryEntry<Species> implements Resettable<Spe
 //     * A {@link BiPredicate} that returns true if this species should override the common in the given position.
 //     */
 //    protected CommonOverride commonOverride;
-//
-//    private String unlocalizedName = "";
-//
+
+    private String unlocalizedName = "";
+
 //    private Set<Fruit> fruits = new HashSet<>();
 //
 //    private Set<Pod> pods = new HashSet<>();
-//
-//    /**
-//     * Blank constructor for {@link #NULL_SPECIES}.
-//     */
-//    public Species() {
-//        this.setRegistryName(DTTrees.NULL);
-//    }
-//
-//    /**
-//     * Constructor suitable for derivative mods that defaults the leavesProperties to the common type for the family
-//     *
-//     * @param name   The simple name of the species e.g. "oak"
-//     * @param family The {@link Family} that this species belongs to.
-//     */
-//    public Species(ResourceLocation name, Family family) {
-//        this(name, family, family.getCommonLeaves());
-//    }
-//
-//    /**
-//     * Constructor suitable for derivative mods
-//     *
-//     * @param name             The simple name of the species e.g. "oak"
-//     * @param leavesProperties The properties of the leaves to be used for this species
-//     * @param family           The {@link Family} that this species belongs to.
-//     */
-//    public Species(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
-//        this.setRegistryName(name);
-//        this.setUnlocalizedName(name.toString());
-//        this.family = family;
-//        this.family.addSpecies(this);
-//        this.setLeavesProperties(leavesProperties.isValid() ? leavesProperties : family.getCommonLeaves());
-//    }
-//
+
+    /**
+     * Blank constructor for {@link #NULL_SPECIES}.
+     */
+    public Species() {
+        this.setRegistryName(DynamicTreesCommon.NULL);
+    }
+
+    /**
+     * Constructor suitable for derivative mods that defaults the leavesProperties to the common type for the family
+     *
+     * @param name   The simple name of the species e.g. "oak"
+     * @param family The {@link Family} that this species belongs to.
+     */
+    public Species(ResourceLocation name, Family family) {
+        this(name, family, family.getCommonLeaves());
+    }
+
+    /**
+     * Constructor suitable for derivative mods
+     *
+     * @param name             The simple name of the species e.g. "oak"
+     * @param leavesProperties The properties of the leaves to be used for this species
+     * @param family           The {@link Family} that this species belongs to.
+     */
+    public Species(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+        this.setRegistryName(name);
+        this.setUnlocalizedName(name.toString());
+        this.family = family;
+        this.family.addSpecies(this);
+        this.setLeavesProperties(leavesProperties.isValid() ? leavesProperties : family.getCommonLeaves());
+    }
+
 //    /**
 //     * Resets this {@link Species} object's environment factors, gen features, acceptable blocks for growth, and
 //     * acceptable soils. May also be overridden by subclasses that need lists to be cleared on reload, for example.
@@ -390,20 +361,20 @@ public class Species {//extends RegistryEntry<Species> implements Resettable<Spe
 //    public boolean isSeedCommon() {
 //        return this.getCommonSpecies().getSeed().orElse(null) == this.seed.get();
 //    }
-//
-//    public Species setUnlocalizedName(String name) {
-//        this.unlocalizedName = "species." + name.replace(":", ".");
-//        return this;
-//    }
-//
-//    public String getLocalizedName() {
-//        return I18n.get(this.getUnlocalizedName());
-//    }
-//
-//    public String getUnlocalizedName() {
-//        return this.unlocalizedName;
-//    }
-//
+
+    public Species setUnlocalizedName(String name) {
+        this.unlocalizedName = "species." + name.replace(":", ".");
+        return this;
+    }
+
+    public String getLocalizedName() {
+        return I18n.get(this.getUnlocalizedName());
+    }
+
+    public String getUnlocalizedName() {
+        return this.unlocalizedName;
+    }
+
 //    @Override
 //    public Component getTextComponent() {
 //        return this.formatComponent(Component.translatable(this.getUnlocalizedName()), ChatFormatting.AQUA);
@@ -526,38 +497,38 @@ public class Species {//extends RegistryEntry<Species> implements Resettable<Spe
 //    public interface CommonOverride extends BiPredicate<BlockGetter, BlockPos> {
 //
 //    }
-//
-//    ///////////////////////////////////////////
-//    //LEAVES
-//    ///////////////////////////////////////////
-//
-//    public Species setLeavesProperties(LeavesProperties leavesProperties) {
-//        this.leavesProperties = leavesProperties;
-//        leavesProperties.setFamily(getFamily());
-//        addValidLeafBlocks(leavesProperties);
-//        return this;
-//    }
-//
-//    public LeavesProperties getLeavesProperties() {
-//        return leavesProperties;
-//    }
-//
-//    public Optional<DynamicLeavesBlock> getLeavesBlock() {
-//        return this.leavesProperties.getDynamicLeavesBlock();
-//    }
-//
-//    public Optional<Block> getPrimitiveLeaves() {
-//        return Optionals.ofBlock(this.leavesProperties.getPrimitiveLeaves().getBlock());
-//    }
-//
-//    public void addValidLeafBlocks(LeavesProperties... leaves) {
-//        for (LeavesProperties leaf : leaves) {
-//            if (!this.validLeaves.contains(leaf)) {
-//                this.validLeaves.add(leaf);
-//            }
-//        }
-//    }
-//
+
+    ///////////////////////////////////////////
+    //LEAVES
+    ///////////////////////////////////////////
+
+    public Species setLeavesProperties(LeavesProperties leavesProperties) {
+        this.leavesProperties = leavesProperties;
+        leavesProperties.setFamily(getFamily());
+        addValidLeafBlocks(leavesProperties);
+        return this;
+    }
+
+    public LeavesProperties getLeavesProperties() {
+        return leavesProperties;
+    }
+
+    public Optional<DynamicLeavesBlock> getLeavesBlock() {
+        return this.leavesProperties.getDynamicLeavesBlock();
+    }
+
+    public Optional<Block> getPrimitiveLeaves() {
+        return Optionals.ofBlock(this.leavesProperties.getPrimitiveLeaves().getBlock());
+    }
+
+    public void addValidLeafBlocks(LeavesProperties... leaves) {
+        for (LeavesProperties leaf : leaves) {
+            if (!this.validLeaves.contains(leaf)) {
+                this.validLeaves.add(leaf);
+            }
+        }
+    }
+
 //    public int getLeafBlockIndex(DynamicLeavesBlock block) {
 //        int index = validLeaves.indexOf(block.properties);
 //        if (index < 0) {
@@ -583,12 +554,12 @@ public class Species {//extends RegistryEntry<Species> implements Resettable<Spe
 //        }
 //        return (DynamicLeavesBlock) properties.getDynamicLeavesState().getBlock();
 //    }
-//
-//    public boolean isValidLeafBlock(final DynamicLeavesBlock leavesBlock) {
-//        return this.validLeaves.stream().anyMatch(properties ->
-//                properties.getDynamicLeavesBlock().orElse(null) == leavesBlock);
-//    }
-//
+
+    public boolean isValidLeafBlock(final DynamicLeavesBlock leavesBlock) {
+        return this.validLeaves.stream().anyMatch(properties ->
+                properties.getDynamicLeavesBlock().orElse(null) == leavesBlock);
+    }
+
 //    public int colorTreeQuads(int defaultColor, FallingTreeEntityModel.TreeQuadData treeQuad) {
 //        return defaultColor;
 //    }
@@ -814,7 +785,7 @@ public class Species {//extends RegistryEntry<Species> implements Resettable<Spe
 //    public boolean handleVoluntaryDrops(Level level, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
 //        int tickSpeed = level.getGameRules().getInt(GameRules.RULE_RANDOMTICKING);
 //        if (tickSpeed > 0) {
-//            double slowFactor = 3.0 / tickSpeed;//This is an attempt to normalize voluntary drop rates.
+//            double slowFactor = 3.0 / tickSpeed; //This is to prevent high tick-speeds from spamming the floor with seeds
 //            if (level.random.nextDouble() < slowFactor) {
 //                final List<ItemStack> drops = getVoluntaryDrops(level, rootPos, fertility);
 //
@@ -1389,7 +1360,7 @@ public class Species {//extends RegistryEntry<Species> implements Resettable<Spe
 //                float rotChance = rotChance(level, endPos, level.getRandom(), radius);
 //                if (branch.checkForRot(level, endPos, this, fertility, radius, level.getRandom(), rotChance, safeBounds != SafeChunkBounds.ANY) || radius != family.getPrimaryThickness()) {
 //                    if (safeBounds != SafeChunkBounds.ANY) { // worldgen
-//                        TreeHelper.ageVolume(level, endPos.below((leafMap.getLenZ() - 1) / 2), (leafMap.getLenX() - 1) / 2, leafMap.getLenY(), 2, safeBounds);
+//                        TreeHelper.ageVolume(level, endPos.below(leafMap.getCenter().getY()), leafMap.getLenX() / 2, leafMap.getLenY(), 2, safeBounds);
 //                    }
 //                    iter.remove(); // Prune out the rotted end points, so we don't spawn fruit from them.
 //                }
@@ -1406,22 +1377,22 @@ public class Species {//extends RegistryEntry<Species> implements Resettable<Spe
 //    public void setDoesRot(boolean doesRot) {
 //        this.doesRot = doesRot;
 //    }
-//
-//    /**
-//     * Handles rotting branches.
-//     *
-//     * @param level         The level
-//     * @param pos           The {@link BlockPos}.
-//     * @param neighborCount Count of neighbors reinforcing this block
-//     * @param radius        The radius of the branch
-//     * @param fertility     The fertility of the tree.
-//     * @param random        Access to a random number generator
-//     * @param rapid         True if this rot is happening under a generation scenario as opposed to natural tree
-//     *                      updates
-//     * @param growLeaves    {@code true} if this rot should attempt to grow leaves first.
-//     * @return true if the branch should rot
-//     */
-//    public boolean rot(LevelAccessor level, BlockPos pos, int neighborCount, int radius, int fertility, RandomSource random, boolean rapid, boolean growLeaves) {
+
+    /**
+     * Handles rotting branches.
+     *
+     * @param level         The level
+     * @param pos           The {@link BlockPos}.
+     * @param neighborCount Count of neighbors reinforcing this block
+     * @param radius        The radius of the branch
+     * @param fertility     The fertility of the tree.
+     * @param random        Access to a random number generator
+     * @param rapid         True if this rot is happening under a generation scenario as opposed to natural tree
+     *                      updates
+     * @param growLeaves    {@code true} if this rot should attempt to grow leaves first.
+     * @return true if the branch should rot
+     */
+    public boolean rot(LevelAccessor level, BlockPos pos, int neighborCount, int radius, int fertility, RandomSource random, boolean rapid, boolean growLeaves) {
 //        if (!doesRot) {
 //            return false;
 //        }
@@ -1450,10 +1421,10 @@ public class Species {//extends RegistryEntry<Species> implements Resettable<Spe
 //            this.postRot(new PostRotContext(level, pos, this, radius, neighborCount, fertility, rapid));
 //            return true;
 //        }
-//
-//        return false;
-//    }
-//
+
+        return false;
+    }
+
 //    /**
 //     * @deprecated No longe in use due to extra parameter. Use/override {@link #rot(LevelAccessor, BlockPos, int, int, int,
 //     * RandomSource, boolean, boolean)} instead.

@@ -26,8 +26,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -89,17 +88,17 @@ public final class CoordUtils {
         return true;
     }
 
-//    @SuppressWarnings("deprecation")
-//    public static boolean canAccessStateSafely(BlockGetter level, BlockPos pos) {
-//        if (level instanceof LevelReader) { // Handles most cases.
-//            return ((LevelReader) level).hasChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
-//        } else if (level instanceof PathNavigationRegion) { // Handles Region.
-//            return !(((PathNavigationRegion) level).getChunk(pos) instanceof EmptyLevelChunk);
-//        }
-//        // Otherwise assume we can access state safely. In most cases this is true, and if not we know it is a
-//        // mod compatibility issue and a crash or logging will be more helpful in solving the problem.
-//        return true;
-//    }
+    @SuppressWarnings("deprecation")
+    public static boolean canAccessStateSafely(BlockGetter level, BlockPos pos) {
+        if (level instanceof LevelReader) { // Handles most cases.
+            return ((LevelReader) level).hasChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
+        } else if (level instanceof PathNavigationRegion pathLevel) { // Handles Region.
+            return !(pathLevel.getChunk(pos) instanceof EmptyLevelChunk);
+        }
+        // Otherwise assume we can access state safely. In most cases this is true, and if not we know it is a
+        // mod compatibility issue and a crash or logging will be more helpful in solving the problem.
+        return true;
+    }
 
     /**
      * Gets the {@link BlockState} object at the given position, or null if the block wasn't loaded. This is safer
@@ -108,10 +107,10 @@ public final class CoordUtils {
      * @param level The {@link BlockGetter} object.
      * @return The {@link BlockState} object, or null if it's not loaded.
      */
-//    @Nullable
-//    public static BlockState getStateSafe(BlockGetter level, BlockPos blockPos) {
-//        return canAccessStateSafely(level, blockPos) ? level.getBlockState(blockPos) : null;
-//    }
+    @Nullable
+    public static BlockState getStateSafe(BlockGetter level, BlockPos blockPos) {
+        return canAccessStateSafely(level, blockPos) ? level.getBlockState(blockPos) : null;
+    }
 
     public static Direction getRandomDir(RandomSource rand) {
         return Direction.values()[2 + rand.nextInt(4)];//Return NSWE
@@ -346,8 +345,7 @@ public final class CoordUtils {
     }
 
     public static Iterable<BlockPos> goHorSides(final BlockPos pos, @Nullable final Direction ignore) {
-        return new Iterable<BlockPos>() {
-            @Nonnull
+        return new Iterable<>() {
             @Override
             public Iterator<BlockPos> iterator() {
                 return new AbstractIterator<BlockPos>() {

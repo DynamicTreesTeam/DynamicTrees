@@ -15,8 +15,8 @@
 //import net.minecraft.world.level.block.Block;
 //import net.minecraft.world.level.block.state.BlockState;
 //
-//import javax.annotation.Nonnull;
-//import javax.annotation.Nullable;
+//import org.jetbrains.annotations.Nonnull;
+//import org.jetbrains.annotations.Nullable;
 //import java.util.*;
 //import java.util.Map.Entry;
 //import java.util.function.Function;

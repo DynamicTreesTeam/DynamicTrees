@@ -14,7 +14,7 @@ public class MixinTitleScreen {
     @Inject(at = @At("HEAD"), method = "init()V")
     private void init(CallbackInfo info) {
         
-        com.dtteam.dynamictrees.Constants.LOG.info("This line is printed by an example mod mixin from Fabric!");
+        DynamicTreesCommon.LOG.info("This line is printed by an example mod mixin from Fabric!");
         DynamicTreesCommon.LOG.info("MC Version: {}", Minecraft.getInstance().getVersionType());
     }
 }

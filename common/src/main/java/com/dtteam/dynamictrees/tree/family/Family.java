@@ -1,18 +1,31 @@
 package com.dtteam.dynamictrees.tree.family;
 
+import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.api.registry.RegistryEntry;
+import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
+import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.treepacks.Resettable;
+import com.dtteam.dynamictrees.util.BlockBounds;
+import com.dtteam.dynamictrees.util.Optionals;
+import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.Set;
+import org.jetbrains.annotations.Nullable;
+import java.util.*;
+import java.util.function.Supplier;
 
 //import com.ferreusveritas.dynamictrees.DynamicTrees;
 //import com.ferreusveritas.dynamictrees.api.TreeHelper;
@@ -74,7 +87,7 @@ import java.util.Set;
 //import org.apache.commons.lang3.tuple.Pair;
 //import org.apache.logging.log4j.LogManager;
 //
-//import javax.annotation.Nullable;
+//import org.jetbrains.annotations.Nullable;
 //import java.util.*;
 //import java.util.concurrent.atomic.AtomicBoolean;
 //import java.util.function.BiConsumer;
@@ -99,10 +112,10 @@ import java.util.Set;
 // *
 // * @author ferreusveritas
 // */
-public class Family {// extends RegistryEntry<Family> implements Resettable<Family> {
-//
-//    public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(Family::new);
-//
+public class Family extends RegistryEntry<Family> implements Resettable<Family> {
+
+    public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(Family::new);
+
     public final static Family NULL_FAMILY = new Family() {
         @Override
         public void setupCommonSpecies(Species species) {
@@ -133,65 +146,65 @@ public class Family {// extends RegistryEntry<Family> implements Resettable<Fami
             return Species.NULL_SPECIES;
         }
     };
-//
-//    /**
-//     * Central registry for all {@link Family} objects.
-//     */
-//    public static final TypedRegistry<Family> REGISTRY = new TypedRegistry<>(Family.class, NULL_FAMILY, TYPE);
-//
+
+    /**
+     * Central registry for all {@link Family} objects.
+     */
+    public static final TypedRegistry<Family> REGISTRY = new TypedRegistry<>(Family.class, NULL_FAMILY, TYPE);
+
     protected Species commonSpecies;
-//
-//    protected LeavesProperties commonLeaves = LeavesProperties.NULL;
-//
-//    //Branches
-//    /**
-//     * The dynamic branch used by this tree family
-//     */
-//    private Supplier<BranchBlock> branch;
-//    /**
-//     * The stripped variant of the branch used by this tree family
-//     */
-//    private Supplier<BranchBlock> strippedBranch;
-//    protected boolean hasStrippedBranch = true;
-//    /**
-//     * The minimum radius that the branch needs to have to be stripped by an axe
-//     * If it's not modified by a tree-pack (null), it uses the value of {@link DTConfigs#MIN_RADIUS_FOR_STRIP}
-//     */
-//    protected Integer minRadiusForStripping = null;
-//    /**
-//     * Whether the radius of the branch is reduced by 1 when stripped.
-//     * This parameter is ignored if the value of {@link DTConfigs#ENABLE_STRIP_RADIUS_REDUCTION} is set to FALSE.
-//     */
-//    protected boolean reduceRadiusWhenStripping = true;
-//    /**
-//     * The dynamic branch's block item
-//     */
-//    private Supplier<Item> branchItem;
+
+    protected LeavesProperties commonLeaves = LeavesProperties.NULL;
+
+    //Branches
+    /**
+     * The dynamic branch used by this tree family
+     */
+    private Supplier<BranchBlock> branch;
+    /**
+     * The stripped variant of the branch used by this tree family
+     */
+    private Supplier<BranchBlock> strippedBranch;
+    protected boolean hasStrippedBranch = true;
+    /**
+     * The minimum radius that the branch needs to have to be stripped by an axe
+     * If it's not modified by a tree-pack (null), it uses the value of {@link DTConfigs#MIN_RADIUS_FOR_STRIP}
+     */
+    protected Integer minRadiusForStripping = null;
+    /**
+     * Whether the radius of the branch is reduced by 1 when stripped.
+     * This parameter is ignored if the value of {@link DTConfigs#ENABLE_STRIP_RADIUS_REDUCTION} is set to FALSE.
+     */
+    protected boolean reduceRadiusWhenStripping = true;
+    /**
+     * The dynamic branch's block item
+     */
+    private Supplier<Item> branchItem;
 //    /**
 //     * The surface root used by this tree family
 //     */
 //    private Supplier<SurfaceRootBlock> surfaceRoot;
 //    protected boolean hasSurfaceRoot = false;
-//    /**
-//     * The primitive (vanilla) log to base the texture, drops, and other behavior from
-//     */
-//    private Block primitiveLog = Blocks.AIR;
-//    /**
-//     * The primitive stripped log to base the texture, drops, and other behavior from
-//     */
-//    private Block primitiveStrippedLog = Blocks.AIR;
-//
-//    /**
-//     * A list of branches the tree accepts as its own. Used for the falling tree renderer
-//     */
-//    private final List<BranchBlock> validBranches = new LinkedList<>();
-//
-//    /**
-//     * The maximum radius of a {@link BranchBlock} belonging to this family. {@link Species#getMaxBranchRadius()} will be
-//     * clamped to this value.
-//     */
-//    private int maxBranchRadius = BranchBlock.MAX_RADIUS;
-//
+    /**
+     * The primitive (vanilla) log to base the texture, drops, and other behavior from
+     */
+    private Block primitiveLog = Blocks.AIR;
+    /**
+     * The primitive stripped log to base the texture, drops, and other behavior from
+     */
+    private Block primitiveStrippedLog = Blocks.AIR;
+
+    /**
+     * A list of branches the tree accepts as its own. Used for the falling tree renderer
+     */
+    private final List<BranchBlock> validBranches = new LinkedList<>();
+
+    /**
+     * The maximum radius of a {@link BranchBlock} belonging to this family. {@link Species#getMaxBranchRadius()} will be
+     * clamped to this value.
+     */
+    private int maxBranchRadius = BranchBlock.MAX_RADIUS;
+
     //Misc
     /**
      * The stick that is returned when a whole log can't be dropped
@@ -210,21 +223,21 @@ public class Family {// extends RegistryEntry<Family> implements Resettable<Fami
      */
     private final Set<Species> species = new HashSet<>();
 
-//    private Family() {
-//        this.setRegistryName(DTTrees.NULL);
-//    }
-//
-//    /**
-//     * Constructor suitable for derivative mods
-//     *
-//     * @param name The ResourceLocation of the tree e.g. "mymod:poplar"
-//     */
-//    public Family(ResourceLocation name) {
-//        this.setRegistryName(name);
-//        this.commonSpecies = Species.NULL_SPECIES;
-//    }
-//
-//    public void setupBlocks() {
+    private Family() {
+        this.setRegistryName(DynamicTreesCommon.NULL);
+    }
+
+    /**
+     * Constructor suitable for derivative mods
+     *
+     * @param name The ResourceLocation of the tree e.g. "mymod:poplar"
+     */
+    public Family(ResourceLocation name) {
+        this.setRegistryName(name);
+        this.commonSpecies = Species.NULL_SPECIES;
+    }
+
+    public void setupBlocks() {
 //        this.setBranch(this.createBranch(this.getBranchName()));
 //        this.setBranchItem(this.createBranchItem(this.getBranchName(), this.branch));
 //
@@ -235,12 +248,12 @@ public class Family {// extends RegistryEntry<Family> implements Resettable<Fami
 //        if (this.hasSurfaceRoot()) {
 //            this.setSurfaceRoot(this.createSurfaceRoot());
 //        }
-//    }
-//
-//    public void setCommonSpecies(final Species species) {
-//        this.commonSpecies = species;
-//    }
-//
+    }
+
+    public void setCommonSpecies(final Species species) {
+        this.commonSpecies = species;
+    }
+
     public void setupCommonSpecies(final Species species) {
         // Set the common species and auto-generate seeds and saplings unless opted out.
         this.commonSpecies = species.setShouldGenerateSeedIfNull(true).setShouldGenerateSaplingIfNull(true)
@@ -250,15 +263,15 @@ public class Family {// extends RegistryEntry<Family> implements Resettable<Fami
     public Species getCommonSpecies() {
         return commonSpecies;
     }
-//
-//    public Family addSpecies(final Species species) {
-//        this.species.add(species);
-//        return this;
-//    }
-//
-//    public Set<Species> getSpecies() {
-//        return this.species;
-//    }
+
+    public Family addSpecies(final Species species) {
+        this.species.add(species);
+        return this;
+    }
+
+    public Set<Species> getSpecies() {
+        return this.species;
+    }
 
     ///////////////////////////////////////////
     // SPECIES LOCATION OVERRIDES
@@ -425,25 +438,25 @@ public class Family {// extends RegistryEntry<Family> implements Resettable<Fami
 //        this.branchItem = (Supplier<Item>) branchItemSup;
 //        return this;
 //    }
-//
-//    public Optional<BranchBlock> getBranch() {
-//        return Optionals.ofBlock(this.branch);
-//    }
-//
-//    /**
-//     * Version of getBranch() used by jocodes to generate the tree.
-//     * By default it acts just like getBranch() but it can be overriden
-//     * by addons to customize the branch selected by the jocode
-//     *
-//     * @param level   The level the tree is generating in
-//     * @param species The species of the tree generated
-//     * @param pos     The position of the branch block
-//     * @return branch block picked
-//     */
-//    public Optional<BranchBlock> getBranchForPlacement(LevelAccessor level, Species species, BlockPos pos) {
-//        return getBranch();
-//    }
-//
+
+    public Optional<BranchBlock> getBranch() {
+        return Optionals.ofBlock(this.branch);
+    }
+
+    /**
+     * Version of getBranch() used by jocodes to generate the tree.
+     * By default it acts just like getBranch() but it can be overriden
+     * by addons to customize the branch selected by the jocode
+     *
+     * @param level   The level the tree is generating in
+     * @param species The species of the tree generated
+     * @param pos     The position of the branch block
+     * @return branch block picked
+     */
+    public Optional<BranchBlock> getBranchForPlacement(LevelAccessor level, Species species, BlockPos pos) {
+        return getBranch();
+    }
+
 //    /**
 //     * This is used for trees with root systems, i.e. mangrove trees.
 //     * By default, most trees do not have one, so we just return the normal branch.
@@ -560,15 +573,15 @@ public class Family {// extends RegistryEntry<Family> implements Resettable<Fami
 //        return logs;
 //    }
 //
-//    private boolean isFireProof = false;
-//
-//    public boolean isFireProof() {
-//        return isFireProof;
-//    }
-//
-//    public void setIsFireProof(boolean isFireProof) {
-//        this.isFireProof = isFireProof;
-//    }
+    private boolean isFireProof = false;
+
+    public boolean isFireProof() {
+        return isFireProof;
+    }
+
+    public void setIsFireProof(boolean isFireProof) {
+        this.isFireProof = isFireProof;
+    }
 //
 //    /**
 //     * Use branchBlock.getSoundType(state, level, pos, entity) instead
@@ -654,65 +667,65 @@ public class Family {// extends RegistryEntry<Family> implements Resettable<Fami
 //
 //        return MetadataCell.radiusAndMeta(radius, meta);
 //    }
-//
-//    private int primaryThickness = 1;
-//    private int secondaryThickness = 2;
-//
-//    public void setPrimaryThickness(int primaryThickness) {
-//        this.primaryThickness = primaryThickness;
-//    }
-//
-//    public void setSecondaryThickness(int secondaryThickness) {
-//        this.secondaryThickness = secondaryThickness;
-//    }
-//
-//    /**
-//     * Thickness of a twig [default = 1]
-//     */
-//    public int getPrimaryThickness() {
-//        return primaryThickness;
-//    }
-//
-//    /**
-//     * Thickness of tips of the root system.
-//     * By default, most trees do not have one, so we return the regular primary thickness.
-//     */
-//    public int getPrimaryRootThickness() {
-//        return primaryThickness;
-//    }
-//
-//    /**
-//     * Thickness of the branch connected to a twig (radius == getPrimaryThickness) [default = 2]
-//     */
-//    public int getSecondaryThickness() {
-//        return secondaryThickness;
-//    }
-//
-//    /**
-//     * Thickness of the root connected to tips in the root system.
-//     * By default, most trees do not have one, so we return the regular secondary thickness.
-//     */
-//    public int getSecondaryRootThickness() {
-//        return secondaryThickness;
-//    }
-//
-//    public boolean hasStrippedBranch() {
-//        return this.hasStrippedBranch;
-//    }
-//
-//    public void setHasStrippedBranch(boolean hasStrippedBranch) {
-//        this.hasStrippedBranch = hasStrippedBranch;
-//    }
-//
+
+    private int primaryThickness = 1;
+    private int secondaryThickness = 2;
+
+    public void setPrimaryThickness(int primaryThickness) {
+        this.primaryThickness = primaryThickness;
+    }
+
+    public void setSecondaryThickness(int secondaryThickness) {
+        this.secondaryThickness = secondaryThickness;
+    }
+
+    /**
+     * Thickness of a twig [default = 1]
+     */
+    public int getPrimaryThickness() {
+        return primaryThickness;
+    }
+
+    /**
+     * Thickness of tips of the root system.
+     * By default, most trees do not have one, so we return the regular primary thickness.
+     */
+    public int getPrimaryRootThickness() {
+        return primaryThickness;
+    }
+
+    /**
+     * Thickness of the branch connected to a twig (radius == getPrimaryThickness) [default = 2]
+     */
+    public int getSecondaryThickness() {
+        return secondaryThickness;
+    }
+
+    /**
+     * Thickness of the root connected to tips in the root system.
+     * By default, most trees do not have one, so we return the regular secondary thickness.
+     */
+    public int getSecondaryRootThickness() {
+        return secondaryThickness;
+    }
+
+    public boolean hasStrippedBranch() {
+        return this.hasStrippedBranch;
+    }
+
+    public void setHasStrippedBranch(boolean hasStrippedBranch) {
+        this.hasStrippedBranch = hasStrippedBranch;
+    }
+
 //    public int getMinRadiusForStripping() {
 //        if (minRadiusForStripping == null) return DTConfigs.MIN_RADIUS_FOR_STRIP.get();
 //        return minRadiusForStripping;
 //    }
-//
-//    public void setMinRadiusForStripping(int radius) {
-//        this.minRadiusForStripping = radius;
-//    }
-//
+
+    public void setMinRadiusForStripping(int radius) {
+        this.minRadiusForStripping = radius;
+    }
+
 //    public boolean reduceRadiusWhenStripping() {
 //        if (DTConfigs.ENABLE_STRIP_RADIUS_REDUCTION.get())
 //            return reduceRadiusWhenStripping;
@@ -746,34 +759,34 @@ public class Family {// extends RegistryEntry<Family> implements Resettable<Fami
 //        }
         return null;
     }
-//
-//    public boolean isValidBranchBlock(BranchBlock block) {
-//        return this.validBranches.contains(block);
-//    }
-//
-//    public int getNumberOfValidBranchBlocks() {
-//        return validBranches.size();
-//    }
-//
-//    private boolean branchIsLadder = true;
-//
-//    public void setBranchIsLadder(boolean branchIsLadder) {
-//        this.branchIsLadder = branchIsLadder;
-//    }
-//
-//    public boolean branchIsLadder() {
-//        return branchIsLadder;
-//    }
-//
-//    private int maxSignalDepth = 32;
-//
-//    public int getMaxSignalDepth() {
-//        return maxSignalDepth;
-//    }
-//
-//    public void setMaxSignalDepth(int maxSignalDepth) {
-//        this.maxSignalDepth = maxSignalDepth;
-//    }
+
+    public boolean isValidBranchBlock(BranchBlock block) {
+        return this.validBranches.contains(block);
+    }
+
+    public int getNumberOfValidBranchBlocks() {
+        return validBranches.size();
+    }
+
+    private boolean branchIsLadder = true;
+
+    public void setBranchIsLadder(boolean branchIsLadder) {
+        this.branchIsLadder = branchIsLadder;
+    }
+
+    public boolean branchIsLadder() {
+        return branchIsLadder;
+    }
+
+    private int maxSignalDepth = 32;
+
+    public int getMaxSignalDepth() {
+        return maxSignalDepth;
+    }
+
+    public void setMaxSignalDepth(int maxSignalDepth) {
+        this.maxSignalDepth = maxSignalDepth;
+    }
 //
 //    ///////////////////////////////////////////
 //    // SURFACE ROOTS
@@ -816,40 +829,40 @@ public class Family {// extends RegistryEntry<Family> implements Resettable<Fami
 //    public AnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
 //        return fallingEntity.defaultAnimationHandler();
 //    }
-//
-//    ///////////////////////////////////////////
-//    // LEAVES HANDLING
-//    ///////////////////////////////////////////
-//
-//    /**
-//     * When destroying leaves, an area is created from the branch endpoints to look for leaves blocks and destroy them.
-//     * This area is then expanded by a certain size to make sure it covers all the leaves in the canopy.
-//     *
-//     * @return the expanded block bounds.
-//     */
-//    public BlockBounds expandLeavesBlockBounds(BlockBounds bounds) {
-//        return bounds.expand(3);
-//    }
-//
-//    public boolean isCompatibleDynamicLeaves(Species species, BlockState blockState, BlockGetter blockAccess, BlockPos pos) {
-//        final DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);
-//        return (leaves != null) && (this == leaves.getFamily(blockState, blockAccess, pos)
-//                || species.isValidLeafBlock(leaves));
-//    }
-//
-//    public boolean isCompatibleGenericLeaves(final Species species, BlockState blockState, LevelAccessor blockAccess, BlockPos pos) {
-//        return this.isCompatibleDynamicLeaves(species, blockState, blockAccess, pos);
-//    }
-//
-//    public LeavesProperties getCommonLeaves() {
-//        return this.commonLeaves;
-//    }
-//
-//    public void setCommonLeaves(LeavesProperties properties) {
-//        this.commonLeaves = properties;
-//        properties.setFamily(this);
-//    }
-//
+
+    ///////////////////////////////////////////
+    // LEAVES HANDLING
+    ///////////////////////////////////////////
+
+    /**
+     * When destroying leaves, an area is created from the branch endpoints to look for leaves blocks and destroy them.
+     * This area is then expanded by a certain size to make sure it covers all the leaves in the canopy.
+     *
+     * @return the expanded block bounds.
+     */
+    public BlockBounds expandLeavesBlockBounds(BlockBounds bounds) {
+        return bounds.expand(3);
+    }
+
+    public boolean isCompatibleDynamicLeaves(Species species, BlockState blockState, BlockGetter blockAccess, BlockPos pos) {
+        final DynamicLeavesBlock leaves = TreeHelper.getLeaves(blockState);
+        return (leaves != null) && (this == leaves.getFamily(blockState, blockAccess, pos)
+                || species.isValidLeafBlock(leaves));
+    }
+
+    public boolean isCompatibleGenericLeaves(final Species species, BlockState blockState, LevelAccessor blockAccess, BlockPos pos) {
+        return this.isCompatibleDynamicLeaves(species, blockState, blockAccess, pos);
+    }
+
+    public LeavesProperties getCommonLeaves() {
+        return this.commonLeaves;
+    }
+
+    public void setCommonLeaves(LeavesProperties properties) {
+        this.commonLeaves = properties;
+        properties.setFamily(this);
+    }
+
 //    public List<TagKey<Block>> defaultBranchTags() {
 //        return this.isFireProof ? Collections.singletonList(DTBlockTags.BRANCHES) :
 //                Collections.singletonList(DTBlockTags.BRANCHES_THAT_BURN);
