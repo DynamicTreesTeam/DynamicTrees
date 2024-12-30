@@ -1,6 +1,8 @@
 package com.dtteam.dynamictrees.block.branch;
 
+import com.dtteam.dynamictrees.DynamicTreesCommon;
 import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictrees.util.Null;
 import net.minecraft.client.particle.ParticleEngine;
@@ -204,6 +206,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean p_220069_6_) {
+        System.out.println(Services.CONFIG.getIntConfig("biocharBrewingBase"));
         this.scheduleUpdateTick(level, pos);
     }
 

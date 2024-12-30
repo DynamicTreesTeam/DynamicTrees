@@ -1,7 +1,9 @@
 package com.dtteam.dynamictrees.init;
 
 import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
+import com.dtteam.dynamictrees.platform.Services;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -17,6 +19,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.world.BiomeModifier;
+import net.neoforged.neoforge.event.entity.player.CanPlayerSleepEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -112,7 +115,7 @@ public class DTRegistries {
 
     private static void setupBlocks() {
 //        RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, POTTED_SAPLING);
-//        RegistryHandler.addBlock(DynamicTreesCommon.location("trunk_shell"), TRUNK_SHELL);
+        RegistryHandler.addBlock(DynamicTreesCommon.location("trunk_shell"), TRUNK_SHELL);
     }
 
     private static void setupConnectables() {

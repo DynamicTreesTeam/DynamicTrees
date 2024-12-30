@@ -1,10 +1,14 @@
 package com.dtteam.dynamictrees.tree.species;
 
 import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.systems.nodemapper.DiseaseNode;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.treepacks.Resettable;
 import com.dtteam.dynamictrees.treepacks.Resources;
@@ -16,17 +20,18 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 //import static net.minecraft.world.level.storage.loot.LootTable.EMPTY;
 //
@@ -200,18 +205,18 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //     * A blockState that will turn itself into this tree
 //     */
 //    protected Supplier<DynamicSaplingBlock> saplingBlock;
-//
-//    /**
-//     * Wether the sapling block should be tinted with the leaves' tint index/
-//     */
-//    protected Boolean tintSapling = true;
-//
-//    //WorldGen
-//    /**
-//     * A map of environmental biome factors that change a tree's suitability
-//     */
-//    protected Map<TagKey<Biome>, Float> envFactors = new HashMap<>();//Environmental factors
-//
+
+    /**
+     * Wether the sapling block should be tinted with the leaves' tint index/
+     */
+    protected Boolean tintSapling = true;
+
+    //WorldGen
+    /**
+     * A map of environmental biome factors that change a tree's suitability
+     */
+    protected Map<TagKey<Biome>, Float> envFactors = new HashMap<>();//Environmental factors
+
 //    protected DTBiomeHolderSet  perfectBiomes = new DTBiomeHolderSet();
 //
 //    protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
@@ -743,19 +748,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //            }
 //        }
 //    }
-//
-//    public static class LogsAndSticks {
-//
-//        public List<ItemStack> logs;
-//        public final int sticks;
-//
-//        public LogsAndSticks(List<ItemStack> logs, int sticks) {
-//            this.logs = logs;
-//            this.sticks = DTConfigs.DROP_STICKS.get() ? sticks : 0;
-//        }
-//
-//    }
-//
+
+    public static class LogsAndSticks {
+
+        public List<ItemStack> logs;
+        public final int sticks;
+
+        public LogsAndSticks(List<ItemStack> logs, int sticks) {
+            this.logs = logs;
+            this.sticks = Services.CONFIG.getBoolConfig("dropSticks") ? sticks : 0;
+        }
+
+    }
+
 //    public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume) {
 //        return getLogsAndSticks(volume, false, 0);
 //    }
@@ -1552,31 +1557,31 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //                ));
 //        return true;
 //    }
-//
-//    /**
-//     * Decide what happens for diseases.
-//     *
-//     * @return true if the tree became diseased
-//     */
-//    public boolean handleDisease(Level level, TreePart baseTreePart, BlockPos treePos, RandomSource random, int fertility) {
-//        if (fertility == 0 && DTConfigs.DISEASE_CHANCE.get() > random.nextFloat()) {
-//            baseTreePart.analyse(level.getBlockState(treePos), level, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
-//            return true;
-//        }
-//
-//        return false;
-//    }
-//
-//
-//    //////////////////////////////
-//    // BIOME HANDLING
-//    //////////////////////////////
-//
-//    public Species envFactor(TagKey<Biome> type, float factor) {
-//        envFactors.put(type, factor);
-//        return this;
-//    }
-//
+
+    /**
+     * Decide what happens for diseases.
+     *
+     * @return true if the tree became diseased
+     */
+    public boolean handleDisease(Level level, TreePart baseTreePart, BlockPos treePos, RandomSource random, int fertility) {
+        if (fertility == 0 && Services.CONFIG.getDoubleConfig("diseaseChance") > random.nextFloat()) {
+            baseTreePart.analyse(level.getBlockState(treePos), level, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
+            return true;
+        }
+
+        return false;
+    }
+
+
+    //////////////////////////////
+    // BIOME HANDLING
+    //////////////////////////////
+
+    public Species envFactor(TagKey<Biome> type, float factor) {
+        envFactors.put(type, factor);
+        return this;
+    }
+
     /**
      * @param level The {@link Level} object.
      * @param pos

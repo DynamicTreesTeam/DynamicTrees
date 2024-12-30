@@ -20,7 +20,12 @@ public class FabricRegistryHelper implements IRegistryHelper {
     }
 
     @Override
-    public RegistryHandler newRegistryHandler(String modid) {
+    public RegistryHandler newRegistryHandler() {
+        return null;
+    }
+
+    @Override
+    public RegistryHandler newRegistryHandler(String modId) {
         return null;
     }
 

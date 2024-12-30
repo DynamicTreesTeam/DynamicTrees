@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.api.registry;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
-import com.dtteam.dynamictrees.util.ResourceLocationUtils;
+import com.dtteam.dynamictrees.DynamicTreesNeoForge;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -43,87 +42,16 @@ public class NeoForgeRegistryHandler extends RegistryHandler {
         }
     }
 
-    /**
-     * Sets up a {@link RegistryHandler} for the given {@code modId}. This includes instantiating, registering, and
-     * subscribing it to the {@code mod event bus}. This should be {@code only} be called from the relevant mod
-     * constructor!
-     *
-     * @param modId The {@code mod ID} to setup for.
-     */
-    public static void setup(final String modId) {
-        final NeoForgeRegistryHandler registryHandler = new NeoForgeRegistryHandler(modId);
-        RegistryHandler.REGISTRY.register(registryHandler);
-        IEventBus modEventBus = NeoForge.EVENT_BUS;
-        modEventBus.register(new RegisterEventHandler<>(registryHandler.blocksDeferredRegister));
-        modEventBus.register(new RegisterEventHandler<>(registryHandler.itemsDeferredRegister));
-    }
-
-    /**
-     * Gets the {@link RegistryHandler} for the given mod ID, or the null registry handler if it doesn't exist.
-     *
-     * @param modId The mod ID of the mod to get the {@link RegistryHandler} for.
-     * @return The {@link RegistryHandler} object.
-     */
-    public static RegistryHandler get(final String modId) {
-        return REGISTRY.get(ResourceLocation.fromNamespaceAndPath(modId, modId));
-    }
-
-    /**
-     * Gets the {@link RegistryHandler} for the given mod ID, or defaults to the Dynamic Trees one if it doesn't exist.
-     *
-     * @param modId The mod ID of the mod to get the {@link RegistryHandler} for.
-     * @return The {@link RegistryHandler} object.
-     */
-    public static RegistryHandler getOrCorrected(final String modId) {
-        final RegistryHandler handler = get(modId);
-        return handler.isValid() ? handler : get(DynamicTreesCommon.MOD_ID);
-    }
-
-    /**
-     * Ensures the given registry name is 'correct'. This will change the namespace to
-     * <tt>dynamictrees</tt> if the namespace for the given {@link ResourceLocation}
-     * doesn't have a {@link RegistryHandler} registered, so that we don't register blocks or items to mod without a
-     * {@link RegistryHandler} (non-add-on mods).
-     *
-     * @param registryName The {@link ResourceLocation} registry name.
-     * @return The correct {@link ResourceLocation} registry name.
-     */
-    public static ResourceLocation correctRegistryName(ResourceLocation registryName) {
-        if (!get(registryName.getNamespace()).isValid()) {
-            registryName = ResourceLocationUtils.namespace(registryName, DynamicTreesCommon.MOD_ID);
-        }
-        return registryName;
-    }
-
-    /**
-     * Adds a {@link Block} to be registered with the given registry name, for the namespace of that registry name.
-     *
-     * @param registryName The {@link ResourceLocation} registry name to set for the block.
-     * @param blockSup The supplier of the {@link Block} object to register.
-     * @param <T> The {@link Class} of the {@link Block}.
-     * @return The supplier of the {@link Block}, allowing for this to be called in-line.
-     */
-    public static <T extends Block> Supplier<T> addBlock(ResourceLocation registryName, Supplier<T> blockSup) {
-        registryName = correctRegistryName(registryName);
-        return get(registryName.getNamespace()).putBlock(registryName, blockSup);
-    }
-
-    /**
-     * Adds an {@link Item} to be registered with the given registry name, for the namespace of that registry name.
-     *
-     * @param registryName The {@link ResourceLocation} registry name to set for the block.
-     * @param itemSup The supplier of the {@link Item} object to register.
-     * @param <T> The {@link Class} of the {@link Item}.
-     * @return The supplier of the {@link Item}, allowing for this to be called in-line.
-     */
-    public static <T extends Item> Supplier<T> addItem(ResourceLocation registryName, Supplier<T> itemSup) {
-        registryName = correctRegistryName(registryName);
-        return get(registryName.getNamespace()).putItem(registryName, itemSup);
-    }
-
     protected final DeferredRegister<Block> blocksDeferredRegister = DeferredRegister.create(BuiltInRegistries.BLOCK, this.getRegistryName().getNamespace());
     protected final DeferredRegister<Item> itemsDeferredRegister = DeferredRegister.create(BuiltInRegistries.ITEM, this.getRegistryName().getNamespace());
 
+    /**
+     * Constructor only to be used by the {@link RegistryHandler#REGISTRY} initialization as a default value,
+     * for all other purposes use the constructor with modId.
+     */
+    public NeoForgeRegistryHandler() {
+        super();
+    }
     /**
      * Instantiates a new {@link RegistryHandler} object for the given mod ID. This should be registered using {@link
      * SimpleRegistry#register(RegistryEntry)} on {@link #REGISTRY}. It will also need to be registered to the mod event bus,
@@ -133,6 +61,11 @@ public class NeoForgeRegistryHandler extends RegistryHandler {
      */
     public NeoForgeRegistryHandler(final String modId) {
         super(ResourceLocation.fromNamespaceAndPath(modId, modId));
+        RegistryHandler.REGISTRY.register(this);
+
+        IEventBus modEventBus = DynamicTreesNeoForge.MOD_EVENT_BUS;
+        modEventBus.register(new RegisterEventHandler<>(blocksDeferredRegister));
+        modEventBus.register(new RegisterEventHandler<>(itemsDeferredRegister));
     }
 
     @Nullable

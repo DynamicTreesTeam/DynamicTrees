@@ -17,8 +17,12 @@ public class NeoForgeRegistryHelper implements IRegistryHelper {
     }
 
     @Override
-    public RegistryHandler newRegistryHandler(String modid) {
-        return new NeoForgeRegistryHandler(modid);
+    public RegistryHandler newRegistryHandler() {
+        return new NeoForgeRegistryHandler();
+    }
+    @Override
+    public RegistryHandler newRegistryHandler(String modId) {
+        return new NeoForgeRegistryHandler(modId);
     }
 
 }
