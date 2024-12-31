@@ -28,8 +28,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class PottedSaplingBlock extends BaseEntityBlock {
 
-    public static final ResourceLocation REG_NAME = DynamicTrees.location("potted_sapling");
-
     protected static final AABB FLOWER_POT_AABB = new AABB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 
     public PottedSaplingBlock() {

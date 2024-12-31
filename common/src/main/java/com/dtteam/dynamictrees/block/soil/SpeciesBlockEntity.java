@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.block.soil;
 
+import com.dtteam.dynamictrees.init.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -18,7 +19,7 @@ public class SpeciesBlockEntity extends BlockEntity {
     private Species species = Species.NULL_SPECIES;
 
     public SpeciesBlockEntity(BlockPos pos, BlockState state) {
-        super(null, pos, state); //DTRegistries.SPECIES_BLOCK_ENTITY
+        super(DTRegistries.SPECIES_BLOCK_ENTITY.get(), pos, state);
     }
 
     public Species getSpecies() {

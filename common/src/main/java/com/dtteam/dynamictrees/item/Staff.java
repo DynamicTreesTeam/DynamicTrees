@@ -4,6 +4,8 @@ import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
+import com.dtteam.dynamictrees.init.DTRegistries;
+import com.dtteam.dynamictrees.init.RegistryLoader;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import com.google.common.collect.ImmutableMultimap;
@@ -47,7 +49,8 @@ public class Staff extends Item {
 
     public Staff() {
         super(new Properties().stacksTo(1));
-//        DTRegistries.CREATIVE_TAB_ITEMS.add(this);
+
+        DTRegistries.CREATIVE_TAB_ITEMS.add(this);
 
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 //        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));

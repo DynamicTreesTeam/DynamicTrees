@@ -2,36 +2,37 @@ package com.dtteam.dynamictrees.init;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
-import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
+import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.neoforge.registries.holdersets.HolderSetType;
-import com.google.common.base.Suppliers;
-import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.entity.EntityType;
 
-import java.util.LinkedList;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-@EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
-public class DTRegistries {
+public class NeoForgeRegistryLoader extends RegistryLoader {
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DynamicTrees.MOD_ID);
     public static final DeferredRegister<PlacementModifierType<?>> PLACEMENT_MODIFIER_TYPES = DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, DynamicTrees.MOD_ID);
@@ -42,21 +43,8 @@ public class DTRegistries {
     public static final DeferredRegister<BlockStateProviderType<?>> BLOCK_STATE_PROVIDER_TYPES = DeferredRegister.create(Registries.BLOCK_STATE_PROVIDER_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTrees.MOD_ID);
 
-    public static final LinkedList<Item> CREATIVE_TAB_ITEMS = new LinkedList<>();
-    public static final Supplier<CreativeModeTab> DT_CREATIVE_TAB = CREATIVE_MODE_TABS.register(DynamicTrees.MOD_ID, () -> CreativeModeTab.builder()
-            .icon(() -> new ItemStack(Items.STICK))//TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1))
-            .title(Component.translatable("itemGroup.dynamictrees"))
-            .displayItems((parameters, output) -> {
-                output.accept(Items.STICK);
-//                for (final DendroPotion.DendroPotionType potion : DendroPotion.DendroPotionType.values()) {
-//                    if (potion.isActive()) {
-//                        output.accept(DendroPotion.applyIndexTag(new ItemStack(DTRegistries.DENDRO_POTION.get()), potion.getIndex()));
-//                    }
-//                }
-                CREATIVE_TAB_ITEMS.forEach(e -> output.accept(e.getDefaultInstance()));
-            }).build());
-
     public static void setup(IEventBus modBus) {
+        BLOCK_ENTITY_TYPES.register(modBus);
         ENTITY_TYPES.register(modBus);
         CREATIVE_MODE_TABS.register(modBus);
         FEATURES.register(modBus);
@@ -70,121 +58,44 @@ public class DTRegistries {
 //        DTLootConditions.LOOT_CONDITION_TYPES.register(modBus);
 //        DTLootFunctions.LOOT_FUNCTION_TYPES.register(modBus);
 
-        setupBlocks();
-        setupConnectables();
-        setupItems();
+        DTRegistries.setup();
     }
 
-//    ///////////////////////////////////////////
-//    // BLOCKS
-//    ///////////////////////////////////////////
-//
-//    /**
-//     * A potted sapling block, which is a normal pot but for dynamic saplings.
-//     */
-//    public static final Supplier<PottedSaplingBlock> POTTED_SAPLING = Suppliers.memoize(PottedSaplingBlock::new);
-
-    /**
-     * A trunk shell block, which is the outer block for thick branches.
-     */
-    public static final Supplier<TrunkShellBlock> TRUNK_SHELL = Suppliers.memoize(TrunkShellBlock::new);
-
-    private static void setupBlocks() {
-//        RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, POTTED_SAPLING);
-        RegistryHandler.addBlock(DynamicTrees.location("trunk_shell"), TRUNK_SHELL);
+    @Override
+    public <T extends Block> Supplier<T> registerBlock (ResourceLocation resLoc, com.google.common.base.Supplier<T> newBlock){
+        Supplier<T> sup = Suppliers.memoize(newBlock);
+        RegistryHandler.addBlock(resLoc, sup);
+        return sup;
     }
 
-    private static void setupConnectables() {
-//        BranchConnectables.makeBlockConnectable(Blocks.BEE_NEST, (state, level, pos, side) -> {
-//            if (side == Direction.DOWN) {
-//                return 1;
-//            }
-//            return 0;
-//        });
-//
-//        BranchConnectables.makeBlockConnectable(Blocks.SHROOMLIGHT, (state, level, pos, side) -> {
-//            if (side == Direction.DOWN) {
-//                BlockState branchState = level.getBlockState(pos.relative(Direction.UP));
-//                BranchBlock branch = TreeHelper.getBranch(branchState);
-//                if (branch != null) {
-//                    return Mth.clamp(branch.getRadius(branchState) - 1, 1, 8);
-//                } else {
-//                    return 8;
-//                }
-//            }
-//            return 0;
-//        });
+    @Override
+    public <T extends Item> Supplier<T> registerItem (ResourceLocation resLoc, com.google.common.base.Supplier<T> newBlock){
+        Supplier<T> sup = Suppliers.memoize(newBlock);
+        RegistryHandler.addItem(resLoc, sup);
+        return sup;
     }
 
-//    ///////////////////////////////////////////
-//    // ITEMS
-//    ///////////////////////////////////////////
-//
-//    /**
-//     * A custom potion called the Dendro Potion, houses all tree potions.
-//     */
-//    public static final Supplier<DendroPotion> DENDRO_POTION = Suppliers.memoize(DendroPotion::new);
-//
-//    /**
-//     * A bucket of dirt item, for crafting saplings into seeds and vice versa.
-//     */
-//    public static final Supplier<DirtBucket> DIRT_BUCKET = Suppliers.memoize(DirtBucket::new);
-//
-//    /**
-//     * A staff, a creative tool for copying and pasting tree shapes.
-//     */
-//    public static final Supplier<Staff> STAFF = Suppliers.memoize(Staff::new);
-//
-    private static void setupItems() {
-//        RegistryHandler.addItem(DynamicTrees.location("staff"), STAFF);
-//        RegistryHandler.addItem(DynamicTrees.location("dirt_bucket"), DIRT_BUCKET);
-//        RegistryHandler.addItem(DynamicTrees.location("dendro_potion"), DENDRO_POTION);
+    @Override
+    public Supplier<CreativeModeTab> registerCreativeTab(String name, ItemStack icon, MutableComponent title, CreativeModeTab.DisplayItemsGenerator displayItems) {
+        return CREATIVE_MODE_TABS.register(name, () -> CreativeModeTab.builder()
+                .icon(() -> icon).title(title).displayItems(displayItems).build());
     }
-//
-//    ///////////////////////////////////////////
-//    // ENTITIES
-//    ///////////////////////////////////////////
-//
-//    public static final Supplier<EntityType<FallingTreeEntity>> FALLING_TREE = registerEntity("falling_tree", () -> EntityType.Builder.<FallingTreeEntity>of(FallingTreeEntity::new, MobCategory.MISC)
-//            .setShouldReceiveVelocityUpdates(true)
-//            .setTrackingRange(512)
-//            .setUpdateInterval(Integer.MAX_VALUE)
-//            .setCustomClientFactory((spawnEntity, level) -> new FallingTreeEntity(level)));
-//    public static final Supplier<EntityType<LingeringEffectorEntity>> LINGERING_EFFECTOR = registerEntity("lingering_effector", () -> EntityType.Builder.<LingeringEffectorEntity>of(LingeringEffectorEntity::new, MobCategory.MISC)
-//            .setCustomClientFactory((spawnEntity, level) ->
-//                    new LingeringEffectorEntity(level, BlockPos.containing(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), null)));
-//
-//    private static <T extends Entity> Supplier<EntityType<T>> registerEntity(String name, Supplier<EntityType.Builder<T>> builderSupplier) {
-//        return ENTITY_TYPES.register(name, () -> builderSupplier.get().build(name));
-//    }
-//
-//    ///////////////////////////////////////////
-//    // TILE ENTITIES
-//    ///////////////////////////////////////////
-//
-//    public static BlockEntityType<SpeciesBlockEntity> SPECIES_BLOCK_ENTITY;
-//    public static BlockEntityType<PottedSaplingBlockEntity> POTTED_SAPLING_BLOCK_ENTITY;
-//
-//    public static void setupTileEntities() {
-//        RootyBlock[] rootyBlocks = SoilProperties.REGISTRY.getAll().stream()
-//                .map(SoilProperties::getBlock)
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .distinct()
-//                .toArray(RootyBlock[]::new);
-//
-//        SPECIES_BLOCK_ENTITY = BlockEntityType.Builder.of(SpeciesBlockEntity::new, rootyBlocks).build(null);
-//        POTTED_SAPLING_BLOCK_ENTITY = BlockEntityType.Builder.of(PottedSaplingBlockEntity::new, POTTED_SAPLING.get()).build(null);
-//    }
 
-    @SubscribeEvent
-    public static void onTileEntitiesRegistry(final RegisterEvent tileEntityRegistryEvent) {
-//        tileEntityRegistryEvent.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, registerHelper -> {
-//            setupTileEntities();
-//            registerHelper.register(PottedSaplingBlock.REG_NAME, POTTED_SAPLING_BLOCK_ENTITY);
-//            registerHelper.register(DynamicTrees.location("tile_entity_species"), SPECIES_BLOCK_ENTITY);
-//        });
+    @Override
+    public <T extends Entity> Supplier<EntityType<T>> registerEntity(String name, EntityType.Builder<T> builder, boolean isTree) {
+        if (isTree)
+            builder.setShouldReceiveVelocityUpdates(true)
+                .setTrackingRange(512)
+                .setUpdateInterval(Integer.MAX_VALUE);
+        return ENTITY_TYPES.register(name, () -> builder.build(name));
     }
+
+    @Override
+    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String name, BlockEntityType.BlockEntitySupplier<? extends T> newBlockEntity, Supplier<Set<Block>> validBlocks) {
+        return BLOCK_ENTITY_TYPES.register(name, () -> new BlockEntityType<>(
+                        newBlockEntity, validBlocks.get(), null));
+    }
+
 
     ///////////////////////////////////////////
     // WORLD GEN

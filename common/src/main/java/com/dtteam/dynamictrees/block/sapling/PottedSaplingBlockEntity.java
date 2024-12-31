@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.block.sapling;
 
+import com.dtteam.dynamictrees.init.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
@@ -23,7 +24,7 @@ public class PottedSaplingBlockEntity extends BlockEntity {
     private Species species = Species.NULL_SPECIES;
 
     public PottedSaplingBlockEntity(BlockPos pos, BlockState state) {
-        super(null, pos, state); //DTRegistries.POTTED_SAPLING_BLOCK_ENTITY
+        super(DTRegistries.POTTED_SAPLING_BLOCK_ENTITY.get(), pos, state); //
     }
 
     public Species getSpecies() {

@@ -1,10 +1,12 @@
 package com.dtteam.dynamictrees.entity;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.soil.RootyBlock;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandlers;
 import com.dtteam.dynamictrees.entity.animation.DataAnimationHandler;
+import com.dtteam.dynamictrees.init.DTRegistries;
 import com.dtteam.dynamictrees.model.ModelTracker;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -84,10 +86,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         ROOT
     }
 
-    public FallingTreeEntity(Level level) {
-        super(null, level); //DTRegistries.FALLING_TREE.get()
-    }
-
     public FallingTreeEntity(EntityType<? extends FallingTreeEntity> type, Level level) {
         super(type, level);
     }
@@ -105,7 +103,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public FallingTreeEntity setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
         this.destroyData = destroyData;
         if (destroyData.getNumBranches() == 0) { //If the entity contains no branches there's no reason to create it at all
-            System.err.println("Warning: Tried to create a EntityFallingTree with no branch blocks. This shouldn't be possible.");
+            DynamicTrees.LOG.error("Warning: Tried to create a EntityFallingTree with no branch blocks. This shouldn't be possible.");
             new Exception().printStackTrace();
             kill();
             return this;
@@ -526,7 +524,9 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public static FallingTreeEntity dropTree(Level level, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
         //Spawn the appropriate item entities into the level
         if (!level.isClientSide) {// Only spawn entities server side
-            FallingTreeEntity entity = new FallingTreeEntity(level).setData(destroyData, woodDropList, destroyType);
+            FallingTreeEntity entity = DTRegistries.FALLING_TREE.get().create(level);
+            if (entity == null) return null;
+            entity.setData(destroyData, woodDropList, destroyType);
             if (entity.isAlive()) {
                 level.addFreshEntity(entity);
             }

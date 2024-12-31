@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.item;
 
+import com.dtteam.dynamictrees.init.DTRegistries;
 import com.dtteam.dynamictrees.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,7 +26,7 @@ import javax.annotation.Nullable;
 public class DirtBucket extends Item {
     public DirtBucket() {
         super(new Properties().stacksTo(1));
-//        DTRegistries.CREATIVE_TAB_ITEMS.add(this);
+        DTRegistries.CREATIVE_TAB_ITEMS.add(this);
     }
 
 //    @Override

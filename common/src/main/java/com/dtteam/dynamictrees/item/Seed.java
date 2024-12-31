@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.item;
 
+import com.dtteam.dynamictrees.init.DTRegistries;
+import com.dtteam.dynamictrees.init.RegistryLoader;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.LazyValue;
@@ -52,7 +54,7 @@ public class Seed extends Item {//implements IPlantable {
     public Seed(Species species, Properties properties) {
         super(properties);
         this.species = species;
-//        DTRegistries.CREATIVE_TAB_ITEMS.add(this);
+        DTRegistries.CREATIVE_TAB_ITEMS.add(this);
     }
 
     public Species getSpecies() {

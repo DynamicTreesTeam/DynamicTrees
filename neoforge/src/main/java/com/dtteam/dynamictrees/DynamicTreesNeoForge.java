@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees;
 
 import com.dtteam.dynamictrees.init.DTClient;
 import com.dtteam.dynamictrees.init.DTConfigs;
-import com.dtteam.dynamictrees.init.DTRegistries;
+import com.dtteam.dynamictrees.init.NeoForgeRegistryLoader;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -30,7 +30,7 @@ public class DynamicTreesNeoForge {
 
         DynamicTrees.init();
 
-        DTRegistries.setup(eventBus);
+        NeoForgeRegistryLoader.setup(eventBus);
 
         //Do not use the mod event bus outside the constructor.
         MOD_EVENT_BUS = null;
