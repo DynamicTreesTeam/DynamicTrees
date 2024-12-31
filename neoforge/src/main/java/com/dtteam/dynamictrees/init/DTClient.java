@@ -1,14 +1,17 @@
 package com.dtteam.dynamictrees.init;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.util.client.TextureUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -29,10 +32,12 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
+import java.util.List;
 import java.util.function.Function;
 
-@EventBusSubscriber(modid = DynamicTreesCommon.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DynamicTrees.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public class DTClient {
 
     //TODO: thick ring stitching
@@ -89,24 +94,23 @@ public class DTClient {
 
     @OnlyIn(Dist.CLIENT)
     private static int getFaceColor(BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
-//        final BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-//        List<BakedQuad> quads = model.getQuads(state, face, RandomSource.create(), ModelData.EMPTY, null);
-//        if (quads.isEmpty()) // If the quad list is empty, means there is no face on that side, so we try with null.
-//        {
-//            quads = model.getQuads(state, null, RandomSource.create(), ModelData.EMPTY, null);
-//        }
-//        if (quads.isEmpty()) { // If null still returns empty, there is nothing we can do so we just warn and exit.
-//            LogManager.getLogger().warn("Could not get color of " + face + " side for " + state.getBlock() + "! Branch needs to be handled manually!");
-//            return 0;
-//        }
-//        TextureAtlasSprite sprite = quads.get(0).getSprite();
-//        final TextureUtils.PixelBuffer pixelBuffer = new TextureUtils.PixelBuffer(sprite);
-//        final int u = pixelBuffer.w / 16;
-//        final TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
-//        pixelBuffer.blit(center, u * -8, u * -8);
-//
-//        return center.averageColor();
-        return 0;
+        final BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
+        List<BakedQuad> quads = model.getQuads(state, face, RandomSource.create(), ModelData.EMPTY, null);
+        if (quads.isEmpty()) // If the quad list is empty, means there is no face on that side, so we try with null.
+        {
+            quads = model.getQuads(state, null, RandomSource.create(), ModelData.EMPTY, null);
+        }
+        if (quads.isEmpty()) { // If null still returns empty, there is nothing we can do so we just warn and exit.
+            DynamicTrees.LOG.warn("Could not get color of " + face + " side for " + state.getBlock() + "! Branch needs to be handled manually!");
+            return 0;
+        }
+        TextureAtlasSprite sprite = quads.get(0).getSprite();
+        final TextureUtils.PixelBuffer pixelBuffer = new TextureUtils.PixelBuffer(sprite);
+        final int u = pixelBuffer.w / 16;
+        final TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
+        pixelBuffer.blit(center, u * -8, u * -8);
+
+        return center.averageColor();
     }
 
     @SubscribeEvent

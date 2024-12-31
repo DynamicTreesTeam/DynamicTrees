@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.util.function;
 
-//import com.ferreusveritas.dynamictrees.api.configuration.ConfigurationProperty;
+//import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 

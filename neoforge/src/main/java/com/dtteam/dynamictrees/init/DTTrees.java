@@ -1,23 +1,20 @@
 package com.dtteam.dynamictrees.init;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.*;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.treepacks.Resources;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@EventBusSubscriber(modid = DynamicTreesCommon.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class DTTrees {
 
     @SubscribeEvent

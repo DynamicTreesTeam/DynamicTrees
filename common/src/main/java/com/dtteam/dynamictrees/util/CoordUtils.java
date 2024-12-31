@@ -1,8 +1,11 @@
 package com.dtteam.dynamictrees.util;
 
-//import com.ferreusveritas.dynamictrees.block.branch.BranchBlock;
-//import com.ferreusveritas.dynamictrees.tree.family.Family;
-//import com.ferreusveritas.dynamictrees.tree.species.Species;
+//import com.dtteam.dynamictrees.block.branch.BranchBlock;
+//import com.dtteam.dynamictrees.tree.family.Family;
+//import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.tree.family.Family;
+import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -125,78 +128,75 @@ public final class CoordUtils {
      * @return The {@link BlockPos} of a suitable location.  The block is always air if successful otherwise it is
      * BlockPos.ZERO
      */
-//    public static BlockPos getRayTraceFruitPos(LevelAccessor level, Species species, BlockPos treePos, BlockPos branchPos, SafeChunkBounds safeBounds) {
-//        final HitResult result = branchRayTrace(level, species, treePos, branchPos, 45, 60, 4 + level.getRandom().nextInt(3), safeBounds);
-//
-//        if (result != null) {
-//            BlockPos hitPos = BlockPos.containing(result.getLocation());
-//            if (hitPos != BlockPos.ZERO) {
-//                do { // Run straight down until we hit a block that's non compatible leaves.
-//                    hitPos = hitPos.below();
-//                } while (species.getFamily().isCompatibleGenericLeaves(species, level.getBlockState(hitPos), level, hitPos));
-//
-//                if (level.isEmptyBlock(hitPos)) { // If that block is air then we have a winner.
-//                    return hitPos;
-//                }
-//            }
-//        }
-//
-//        return BlockPos.ZERO;
-//    }
-//
-//    @Nullable
-//    public static BlockHitResult branchRayTrace(LevelAccessor level, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance, SafeChunkBounds safeBounds) {
-//        treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ()); // Make the tree pos level with the branch pos.
-//
-//        Vec3 vOut = new Vec3(branchPos.getX() - treePos.getX(), 0, branchPos.getZ() - treePos.getZ());
-//
-//        if (vOut.equals(Vec3.ZERO)) {
-//            vOut = new Vec3(1, 0, 0);
-//            spreadHor = 180;
-//        }
-//
-//        final float deltaYaw = (level.getRandom().nextFloat() * spreadHor * 2) - spreadHor;
-//        final float deltaPitch = (level.getRandom().nextFloat() * -spreadVer); // Must be greater than -90 degrees(and less than 90) for the tangent function.
-//        vOut = vOut.normalize(). // Normalize to unit vector.
-//                add(0, Math.tan(Math.toRadians(deltaPitch)), 0). // Pitch the angle downward by 0 to spreadVer degrees.
-//                normalize(). // Re-normalize to unit vector.
-//                yRot((float) Math.toRadians(deltaYaw)). // Vary the yaw by +/- spreadHor.
-//                scale(distance); // Vary the view distance.
-//
-//        final Vec3 branchVec = new Vec3(branchPos.getX(), branchPos.getY(), branchPos.getZ()).add(0.5, 0.5, 0.5); // Get the vector of the middle of the branch block.
-//        final Vec3 vantageVec = branchVec.add(vOut); // Make a vantage point to look at the branch.
-//        final BlockPos vantagePos = BlockPos.containing(vantageVec); // Convert Vector to BlockPos for testing.
-//
-//        if (!safeBounds.inBounds(vantagePos, false) || level.isEmptyBlock(vantagePos)) { // The observing block must be in free space.
-//            final BlockHitResult result = rayTraceBlocks(level, new CustomRayTraceContext(vantageVec, branchVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE), safeBounds);
-//            // Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks.
-//            final BlockPos hitPos = BlockPos.containing(result.getLocation());
-//            if (result.getType() == HitResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) { // We found a block.
-//                if (species.getFamily().isCompatibleGenericLeaves(species, level.getBlockState(hitPos), level, hitPos)) { // Test if it's the right kind of leaves for the species.
-//                    return result;
-//                }
-//            }
-//        }
-//
-//        return null;
-//    }
+    public static BlockPos getRayTraceFruitPos(LevelAccessor level, Species species, BlockPos treePos, BlockPos branchPos, boolean worldGen) {
+        final HitResult result = branchRayTrace(level, species, treePos, branchPos, 45, 60, 4 + level.getRandom().nextInt(3));
+
+        if (result != null) {
+            BlockPos hitPos = BlockPos.containing(result.getLocation());
+            if (hitPos != BlockPos.ZERO) {
+                do { // Run straight down until we hit a block that's non compatible leaves.
+                    hitPos = hitPos.below();
+                } while (species.getFamily().isCompatibleGenericLeaves(species, level.getBlockState(hitPos), level, hitPos));
+
+                if (level.isEmptyBlock(hitPos)) { // If that block is air then we have a winner.
+                    return hitPos;
+                }
+            }
+        }
+
+        return BlockPos.ZERO;
+    }
+
+    @Nullable
+    public static BlockHitResult branchRayTrace(LevelAccessor level, Species species, BlockPos treePos, BlockPos branchPos, float spreadHor, float spreadVer, float distance) {
+        treePos = new BlockPos(treePos.getX(), branchPos.getY(), treePos.getZ()); // Make the tree pos level with the branch pos.
+
+        Vec3 vOut = new Vec3(branchPos.getX() - treePos.getX(), 0, branchPos.getZ() - treePos.getZ());
+
+        if (vOut.equals(Vec3.ZERO)) {
+            vOut = new Vec3(1, 0, 0);
+            spreadHor = 180;
+        }
+
+        final float deltaYaw = (level.getRandom().nextFloat() * spreadHor * 2) - spreadHor;
+        final float deltaPitch = (level.getRandom().nextFloat() * -spreadVer); // Must be greater than -90 degrees(and less than 90) for the tangent function.
+        vOut = vOut.normalize(). // Normalize to unit vector.
+                add(0, Math.tan(Math.toRadians(deltaPitch)), 0). // Pitch the angle downward by 0 to spreadVer degrees.
+                normalize(). // Re-normalize to unit vector.
+                yRot((float) Math.toRadians(deltaYaw)). // Vary the yaw by +/- spreadHor.
+                scale(distance); // Vary the view distance.
+
+        final Vec3 branchVec = new Vec3(branchPos.getX(), branchPos.getY(), branchPos.getZ()).add(0.5, 0.5, 0.5); // Get the vector of the middle of the branch block.
+        final Vec3 vantageVec = branchVec.add(vOut); // Make a vantage point to look at the branch.
+        final BlockPos vantagePos = BlockPos.containing(vantageVec); // Convert Vector to BlockPos for testing.
+
+        //!safeBounds.inBounds(vantagePos, false) ||
+        if (level.isEmptyBlock(vantagePos)) { // The observing block must be in free space.
+            final BlockHitResult result = rayTraceBlocks(level, new CustomRayTraceContext(vantageVec, branchVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE));
+            // Beyond here should be safe since the only blocks that can possibly be hit are in loaded chunks.
+            final BlockPos hitPos = BlockPos.containing(result.getLocation());
+            if (result.getType() == HitResult.Type.BLOCK && !hitPos.equals(BlockPos.ZERO)) { // We found a block.
+                if (species.getFamily().isCompatibleGenericLeaves(species, level.getBlockState(hitPos), level, hitPos)) { // Test if it's the right kind of leaves for the species.
+                    return result;
+                }
+            }
+        }
+
+        return null;
+    }
 
     /**
-     * I had to import Minecraft's block ray trace algorithm to make it worldgen blocksafe. I honestly don't know much
-     * about what's going on in here because I haven't studied it.
-     * <p>
-     * If an attempt is made to read a block in an unloaded chunk it will simply return AIR or the properties of AIR
-     * where applicable.
+     * TO-DO: make sure this is still worldgen safe
      */
-    public static BlockHitResult rayTraceBlocks(LevelAccessor level, CustomRayTraceContext context, SafeChunkBounds safeBounds) {
+    public static BlockHitResult rayTraceBlocks(LevelAccessor level, CustomRayTraceContext context) {
         return getRayTraceVector(context, (fromContext, blockPos) -> {
-            BlockState blockstate = safeBounds.inBounds(blockPos, false) ? level.getBlockState(blockPos) : Blocks.AIR.defaultBlockState();
-            FluidState fluidState = safeBounds.inBounds(blockPos, false) ? level.getFluidState(blockPos) : Fluids.EMPTY.defaultFluidState();
+            BlockState blockstate = level.getBlockState(blockPos);
+            FluidState fluidState = level.getFluidState(blockPos);
             Vec3 startVec = fromContext.getStartVector();
             Vec3 endVec = fromContext.getEndVector();
-            VoxelShape voxelshape = safeBounds.inBounds(blockPos, false) ? fromContext.getBlockShape(blockstate, level, blockPos) : Shapes.empty();
+            VoxelShape voxelshape = fromContext.getBlockShape(blockstate, level, blockPos);
             BlockHitResult blockraytraceresult = level.clipWithInteractionOverride(startVec, endVec, blockPos, voxelshape, blockstate);
-            VoxelShape voxelshape1 = safeBounds.inBounds(blockPos, false) ? fromContext.getFluidShape(fluidState, level, blockPos) : Shapes.empty();
+            VoxelShape voxelshape1 = fromContext.getFluidShape(fluidState, level, blockPos);
             BlockHitResult blockraytraceresult1 = voxelshape1.clip(startVec, endVec, blockPos);
             double d0 = blockraytraceresult == null ? Double.MAX_VALUE : fromContext.getStartVector().distanceToSqr(blockraytraceresult.getLocation());
             double d1 = blockraytraceresult1 == null ? Double.MAX_VALUE : fromContext.getStartVector().distanceToSqr(blockraytraceresult1.getLocation());

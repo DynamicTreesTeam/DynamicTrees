@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.platform.services;
 
+import java.util.List;
+
 public interface IConfigHelper {
 
     <T> T getConfig (String config, Class<T> tClass);
@@ -16,5 +18,13 @@ public interface IConfigHelper {
     default String getStringConfig(String config){
         return getConfig(config, String.class);
     }
+    @SuppressWarnings("unchecked")
+    default List<String> getStringListConfig(String config){
+        return getConfig(config, List.class);
+    }
+
+    boolean isServerConfigLoaded ();
+    boolean isCommonConfigLoaded ();
+    boolean isClientConfigLoaded ();
 
 }

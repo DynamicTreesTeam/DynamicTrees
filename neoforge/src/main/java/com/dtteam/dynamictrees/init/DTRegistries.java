@@ -1,9 +1,8 @@
 package com.dtteam.dynamictrees.init;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
-import com.dtteam.dynamictrees.platform.Services;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -19,55 +18,32 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.world.BiomeModifier;
-import net.neoforged.neoforge.event.entity.player.CanPlayerSleepEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.neoforge.registries.holdersets.HolderSetType;
 import com.google.common.base.Suppliers;
-import com.mojang.serialization.Codec;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.HugeFungusConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.HugeMushroomFeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.RootSystemConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
-import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
-import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 
 import java.util.LinkedList;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(modid = DynamicTreesCommon.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class DTRegistries {
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, DynamicTreesCommon.MOD_ID);
-    public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DynamicTreesCommon.MOD_ID);
-    public static final DeferredRegister<PlacementModifierType<?>> PLACEMENT_MODIFIER_TYPES = DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, DynamicTreesCommon.MOD_ID);
-    public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(Registries.FEATURE, DynamicTreesCommon.MOD_ID);
-    public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, DynamicTreesCommon.MOD_ID);
-    public static final DeferredRegister<MapCodec<? extends BiomeModifier>> BIOME_MODIFIER_SERIALIZERS = DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, DynamicTreesCommon.MOD_ID);
-    public static final DeferredRegister<HolderSetType> HOLDER_SET_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.HOLDER_SET_TYPES, DynamicTreesCommon.MOD_ID);
-    public static final DeferredRegister<BlockStateProviderType<?>> BLOCK_STATE_PROVIDER_TYPES = DeferredRegister.create(Registries.BLOCK_STATE_PROVIDER_TYPE, DynamicTreesCommon.MOD_ID);
-    public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTreesCommon.MOD_ID);
+    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<PlacementModifierType<?>> PLACEMENT_MODIFIER_TYPES = DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(Registries.FEATURE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<MapCodec<? extends BiomeModifier>> BIOME_MODIFIER_SERIALIZERS = DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<HolderSetType> HOLDER_SET_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.HOLDER_SET_TYPES, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<BlockStateProviderType<?>> BLOCK_STATE_PROVIDER_TYPES = DeferredRegister.create(Registries.BLOCK_STATE_PROVIDER_TYPE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTrees.MOD_ID);
 
     public static final LinkedList<Item> CREATIVE_TAB_ITEMS = new LinkedList<>();
-    public static final Supplier<CreativeModeTab> DT_CREATIVE_TAB = CREATIVE_MODE_TABS.register(DynamicTreesCommon.MOD_ID, () -> CreativeModeTab.builder()
+    public static final Supplier<CreativeModeTab> DT_CREATIVE_TAB = CREATIVE_MODE_TABS.register(DynamicTrees.MOD_ID, () -> CreativeModeTab.builder()
             .icon(() -> new ItemStack(Items.STICK))//TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1))
             .title(Component.translatable("itemGroup.dynamictrees"))
             .displayItems((parameters, output) -> {
@@ -115,7 +91,7 @@ public class DTRegistries {
 
     private static void setupBlocks() {
 //        RegistryHandler.addBlock(PottedSaplingBlock.REG_NAME, POTTED_SAPLING);
-        RegistryHandler.addBlock(DynamicTreesCommon.location("trunk_shell"), TRUNK_SHELL);
+        RegistryHandler.addBlock(DynamicTrees.location("trunk_shell"), TRUNK_SHELL);
     }
 
     private static void setupConnectables() {
@@ -160,9 +136,9 @@ public class DTRegistries {
 //    public static final Supplier<Staff> STAFF = Suppliers.memoize(Staff::new);
 //
     private static void setupItems() {
-//        RegistryHandler.addItem(DynamicTreesCommon.location("staff"), STAFF);
-//        RegistryHandler.addItem(DynamicTreesCommon.location("dirt_bucket"), DIRT_BUCKET);
-//        RegistryHandler.addItem(DynamicTreesCommon.location("dendro_potion"), DENDRO_POTION);
+//        RegistryHandler.addItem(DynamicTrees.location("staff"), STAFF);
+//        RegistryHandler.addItem(DynamicTrees.location("dirt_bucket"), DIRT_BUCKET);
+//        RegistryHandler.addItem(DynamicTrees.location("dendro_potion"), DENDRO_POTION);
     }
 //
 //    ///////////////////////////////////////////
@@ -206,44 +182,44 @@ public class DTRegistries {
 //        tileEntityRegistryEvent.register(ForgeRegistries.Keys.BLOCK_ENTITY_TYPES, registerHelper -> {
 //            setupTileEntities();
 //            registerHelper.register(PottedSaplingBlock.REG_NAME, POTTED_SAPLING_BLOCK_ENTITY);
-//            registerHelper.register(DynamicTreesCommon.location("tile_entity_species"), SPECIES_BLOCK_ENTITY);
+//            registerHelper.register(DynamicTrees.location("tile_entity_species"), SPECIES_BLOCK_ENTITY);
 //        });
     }
-//
-//    ///////////////////////////////////////////
-//    // WORLD GEN
-//    ///////////////////////////////////////////
-//
-//    public static final RegistryObject<PlacementModifierType<CaveRootedTreePlacement>> CAVE_ROOTED_TREE_PLACEMENT_MODIFIER_TYPE = PLACEMENT_MODIFIER_TYPES.register("cave_rooted_tree",
+
+    ///////////////////////////////////////////
+    // WORLD GEN
+    ///////////////////////////////////////////
+
+//    public static final Supplier<PlacementModifierType<CaveRootedTreePlacement>> CAVE_ROOTED_TREE_PLACEMENT_MODIFIER_TYPE = PLACEMENT_MODIFIER_TYPES.register("cave_rooted_tree",
 //            () -> () -> CaveRootedTreePlacement.CODEC);
-//
-//    public static final RegistryObject<DynamicTreeFeature> DYNAMIC_TREE_FEATURE = FEATURES.register("tree", DynamicTreeFeature::new);
-//    public static final RegistryObject<CaveRootedTreeFeature> CAVE_ROOTED_TREE_FEATURE = FEATURES.register("cave_rooted_tree", CaveRootedTreeFeature::new);
-//
-//    public static final RegistryObject<Codec<AddDynamicTreesBiomeModifier>> ADD_DYNAMIC_TREES_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("add_dynamic_trees",
+
+//    public static final Supplier<DynamicTreeFeature> DYNAMIC_TREE_FEATURE = FEATURES.register("tree", DynamicTreeFeature::new);
+//    public static final Supplier<CaveRootedTreeFeature> CAVE_ROOTED_TREE_FEATURE = FEATURES.register("cave_rooted_tree", CaveRootedTreeFeature::new);
+
+//    public static final Supplier<Codec<AddDynamicTreesBiomeModifier>> ADD_DYNAMIC_TREES_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("add_dynamic_trees",
 //            () -> Codec.unit(AddDynamicTreesBiomeModifier::new));
-//    public static final RegistryObject<Codec<RunFeatureCancellersBiomeModifier>> RUN_FEATURE_CANCELLERS_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("run_feature_cancellers",
+//    public static final Supplier<Codec<RunFeatureCancellersBiomeModifier>> RUN_FEATURE_CANCELLERS_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("run_feature_cancellers",
 //            () -> Codec.unit(RunFeatureCancellersBiomeModifier::new));
-//    public static final RegistryObject<HolderSetType> INCLUDES_EXCLUDES_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("includes_excludes", () -> IncludesExcludesHolderSet::codec);
-//    public static final RegistryObject<HolderSetType> NAME_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("name_regex_match", () -> NameRegexMatchHolderSet::codec);
-//    public static final RegistryObject<HolderSetType> TAGS_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("tags_regex_match", () -> NameRegexMatchHolderSet::codec);
-//
-//    public static final RegistryObject<BlockStateProviderType<DTReplaceNyliumFungiBlockStateProvider>> REPLACE_NYLIUM_FUNGI_BLOCK_STATE_PROVIDER_TYPE = BLOCK_STATE_PROVIDER_TYPES.register(
+//    public static final Supplier<HolderSetType> INCLUDES_EXCLUDES_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("includes_excludes", () -> IncludesExcludesHolderSet::codec);
+//    public static final Supplier<HolderSetType> NAME_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("name_regex_match", () -> NameRegexMatchHolderSet::codec);
+//    public static final Supplier<HolderSetType> TAGS_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("tags_regex_match", () -> NameRegexMatchHolderSet::codec);
+
+//    public static final Supplier<BlockStateProviderType<DTReplaceNyliumFungiBlockStateProvider>> REPLACE_NYLIUM_FUNGI_BLOCK_STATE_PROVIDER_TYPE = BLOCK_STATE_PROVIDER_TYPES.register(
 //        "replace_nylium_fungi", () -> new BlockStateProviderType<>(DTReplaceNyliumFungiBlockStateProvider.CODEC));
 //
-//    public static final RegistryObject<StructurePoolElementType<DTCancelVanillaTreePoolElement>> CANCEL_VANILLA_VILLAGE_TREE_STRUCTURE_POOL_ELEMENT_TYPE = STRUCTURE_POOL_ELEMENT_TYPES.register(
+//    public static final Supplier<StructurePoolElementType<DTCancelVanillaTreePoolElement>> CANCEL_VANILLA_VILLAGE_TREE_STRUCTURE_POOL_ELEMENT_TYPE = STRUCTURE_POOL_ELEMENT_TYPES.register(
 //            "cancel_vanilla_village_tree_element", () -> () -> DTCancelVanillaTreePoolElement.CODEC);
-//    public static final RegistryObject<StructurePoolElementType<TreePoolElement>> TREE_STRUCTURE_POOL_ELEMENT_TYPE = STRUCTURE_POOL_ELEMENT_TYPES.register(
+//    public static final Supplier<StructurePoolElementType<TreePoolElement>> TREE_STRUCTURE_POOL_ELEMENT_TYPE = STRUCTURE_POOL_ELEMENT_TYPES.register(
 //            "tree_pool_element", () -> () -> TreePoolElement.CODEC);
+
+//    public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.location("tree"), TreeConfiguration.class);
 //
-//    public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTreesCommon.location("tree"), TreeConfiguration.class);
+//    public static final FeatureCanceller ROOTED_TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.location("rooted_tree"), RootSystemConfiguration.class);
 //
-//    public static final FeatureCanceller ROOTED_TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTreesCommon.location("rooted_tree"), RootSystemConfiguration.class);
+//    public static final FeatureCanceller FUNGUS_CANCELLER = new FungusFeatureCanceller<>(DynamicTrees.location("fungus"), HugeFungusConfiguration.class);
 //
-//    public static final FeatureCanceller FUNGUS_CANCELLER = new FungusFeatureCanceller<>(DynamicTreesCommon.location("fungus"), HugeFungusConfiguration.class);
-//
-//    public static final FeatureCanceller MUSHROOM_CANCELLER = new MushroomFeatureCanceller<>(DynamicTreesCommon.location("mushroom"), HugeMushroomFeatureConfiguration.class);
-//
+//    public static final FeatureCanceller MUSHROOM_CANCELLER = new MushroomFeatureCanceller<>(DynamicTrees.location("mushroom"), HugeMushroomFeatureConfiguration.class);
+
 //    @SubscribeEvent
 //    public static void onFeatureCancellerRegistry(final com.dtteam.dynamictrees.registry.RegistryEvent<FeatureCanceller> event) {
 //        event.getRegistry().registerAll(TREE_CANCELLER, ROOTED_TREE_CANCELLER, FUNGUS_CANCELLER, MUSHROOM_CANCELLER);
@@ -272,19 +248,19 @@ public class DTRegistries {
 //    // SOUNDS
 //    ///////////////////////////////////////////
 //
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_HIT_WATER = registerSoundEvent("falling_tree_hit_water");
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_BIG_START = registerSoundEvent("falling_tree_big_start");
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_BIG_END = registerSoundEvent("falling_tree_big_end");
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_MEDIUM_START = registerSoundEvent("falling_tree_medium_start");
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_MEDIUM_END = registerSoundEvent("falling_tree_medium_end");
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_HIT_WATER = registerSoundEvent("falling_tree_small_hit_water");
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_END = registerSoundEvent("falling_tree_small_end");
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_SMALL_END_BARE = registerSoundEvent("falling_tree_small_end_bare");
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_FUNGUS_START = registerSoundEvent("falling_tree_fungus_start");
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_FUNGUS_END = registerSoundEvent("falling_tree_fungus_end");
-//    public static final RegistryObject<SoundEvent> FALLING_TREE_FUNGUS_SMALL_END = registerSoundEvent("falling_tree_fungus_small_end");
+//    public static final Supplier<SoundEvent> FALLING_TREE_HIT_WATER = registerSoundEvent("falling_tree_hit_water");
+//    public static final Supplier<SoundEvent> FALLING_TREE_BIG_START = registerSoundEvent("falling_tree_big_start");
+//    public static final Supplier<SoundEvent> FALLING_TREE_BIG_END = registerSoundEvent("falling_tree_big_end");
+//    public static final Supplier<SoundEvent> FALLING_TREE_MEDIUM_START = registerSoundEvent("falling_tree_medium_start");
+//    public static final Supplier<SoundEvent> FALLING_TREE_MEDIUM_END = registerSoundEvent("falling_tree_medium_end");
+//    public static final Supplier<SoundEvent> FALLING_TREE_SMALL_HIT_WATER = registerSoundEvent("falling_tree_small_hit_water");
+//    public static final Supplier<SoundEvent> FALLING_TREE_SMALL_END = registerSoundEvent("falling_tree_small_end");
+//    public static final Supplier<SoundEvent> FALLING_TREE_SMALL_END_BARE = registerSoundEvent("falling_tree_small_end_bare");
+//    public static final Supplier<SoundEvent> FALLING_TREE_FUNGUS_START = registerSoundEvent("falling_tree_fungus_start");
+//    public static final Supplier<SoundEvent> FALLING_TREE_FUNGUS_END = registerSoundEvent("falling_tree_fungus_end");
+//    public static final Supplier<SoundEvent> FALLING_TREE_FUNGUS_SMALL_END = registerSoundEvent("falling_tree_fungus_small_end");
 //
-//    private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
-//        return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(DynamicTreesCommon.location(name)));
+//    private static Supplier<SoundEvent> registerSoundEvent(String name) {
+//        return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(DynamicTrees.location(name)));
 //    }
 }

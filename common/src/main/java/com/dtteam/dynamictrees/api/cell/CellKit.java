@@ -1,53 +1,50 @@
 package com.dtteam.dynamictrees.api.cell;
 
-//import com.ferreusveritas.dynamictrees.api.registry.RegistryEntry;
-//import com.ferreusveritas.dynamictrees.api.registry.SimpleRegistry;
-//import com.ferreusveritas.dynamictrees.cell.LeafClusters;
-//import com.ferreusveritas.dynamictrees.init.DTTrees;
-//import com.ferreusveritas.dynamictrees.util.SimpleVoxmap;
-//import net.minecraft.resources.ResourceLocation;
-
+import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.registry.RegistryEntry;
+import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
 import com.dtteam.dynamictrees.util.SimpleVoxmap;
 import net.minecraft.resources.ResourceLocation;
 
-public abstract class CellKit {//    extends RegistryEntry<CellKit> {
-//
-//    public static final CellSolver NULL_CELL_SOLVER = cells -> 0;
-//
-//    public static final CellKit NULL_CELL_KIT = new CellKit(DTTrees.NULL) {
-//        @Override
-//        public Cell getCellForLeaves(int hydro) {
-//            return CellNull.NULL_CELL;
-//        }
-//
-//        @Override
-//        public Cell getCellForBranch(int radius, int meta) {
-//            return CellNull.NULL_CELL;
-//        }
-//
-//        @Override
-//        public CellSolver getCellSolver() {
-//            return NULL_CELL_SOLVER;
-//        }
-//
-//        @Override
-//        public SimpleVoxmap getLeafCluster() {
+public abstract class CellKit extends RegistryEntry<CellKit> {
+
+    public static final CellSolver NULL_CELL_SOLVER = cells -> 0;
+
+    public static final CellKit NULL_CELL_KIT = new CellKit(DynamicTrees.NULL) {
+        @Override
+        public Cell getCellForLeaves(int hydro) {
+            return CellNull.NULL_CELL;
+        }
+
+        @Override
+        public Cell getCellForBranch(int radius, int meta) {
+            return CellNull.NULL_CELL;
+        }
+
+        @Override
+        public CellSolver getCellSolver() {
+            return NULL_CELL_SOLVER;
+        }
+
+        @Override
+        public SimpleVoxmap getLeafCluster() {
 //            return LeafClusters.NULL_MAP;
-//        }
-//
-//        @Override
-//        public int getDefaultHydration() {
-//            return 0;
-//        }
-//    };
-//
-//    /**
-//     * Central registry for all {@link CellKit} objects.
-//     */
-//    public static final SimpleRegistry<CellKit> REGISTRY = new SimpleRegistry<>(CellKit.class, NULL_CELL_KIT);
-//
+            return null;
+        }
+
+        @Override
+        public int getDefaultHydration() {
+            return 0;
+        }
+    };
+
+    /**
+     * Central registry for all {@link CellKit} objects.
+     */
+    public static final SimpleRegistry<CellKit> REGISTRY = new SimpleRegistry<>(CellKit.class, NULL_CELL_KIT);
+
     public CellKit(final ResourceLocation registryName) {
-        //this.setRegistryName(registryName);
+        this.setRegistryName(registryName);
     }
 
     public abstract Cell getCellForLeaves(int distance);

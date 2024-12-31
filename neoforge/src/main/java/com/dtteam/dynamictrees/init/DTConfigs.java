@@ -1,7 +1,8 @@
 package com.dtteam.dynamictrees.init;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
+import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-@EventBusSubscriber(modid = DynamicTreesCommon.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class DTConfigs {
 
     public static final File CONFIG_DIRECTORY;
@@ -130,7 +131,7 @@ public class DTConfigs {
         registerConfig(SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
                 defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f));
         registerConfig(SERVER_BUILDER.comment("Options for how oak trees generate in swamps. ROOTED: Swamp oak trees will generate on shallow water with mangrove-like roots. SUNK: Swamp oak trees will generate on shallow water one block under the surface. DISABLED: Swamp oaks will not generate on water.").
-                defineEnum("swampOaksInWater", DynamicTreesCommon.SwampOakWaterState.ROOTED));
+                defineEnum("swampOaksInWater", DynamicTrees.SwampOakWaterState.ROOTED));
         registerConfig(SERVER_BUILDER.comment("The amount of growth pulses to send when bone meal is applied to a tree. Warning: setting values higher than 64 is not recommended other than for testing purposes. ").
                 defineInRange("boneMealGrowthPulses", 1, 1, 512));
         SERVER_BUILDER.pop();
@@ -145,7 +146,7 @@ public class DTConfigs {
         registerConfig(SERVER_BUILDER.comment("If enabled players receive reduced fall damage on leaves at the expense of the block(s) destruction").
                 define("canopyCrash", true));
         registerConfig(SERVER_BUILDER.comment("Damage dealt to the axe item when cutting a tree down. VANILLA: Standard 1 Damage. THICKNESS: By Branch/Trunk Thickness. VOLUME: By Tree Volume.").
-                defineEnum("axeDamageMode", DynamicTreesCommon.AxeDamage.THICKNESS));
+                defineEnum("axeDamageMode", DynamicTrees.AxeDamage.THICKNESS));
         registerConfig(SERVER_BUILDER.comment("If enabled then trees will fall over when harvested").
                 define("enableFallingTrees", true));
         registerConfig(SERVER_BUILDER.comment("If enabled then trees will harm living entities when falling").
@@ -176,7 +177,7 @@ public class DTConfigs {
         registerConfig(COMMON_BUILDER.comment("If enabled, cancels the non-dynamic trees that spawn with vanilla villages.").
                 define("cancelVanillaVillageTrees", true));
         registerConfig(COMMON_BUILDER.comment("The maximum number of leaves blocks that will fling particles when a falling tree crashes into the ground. Higher values might have a performance impact.").
-                defineInRange("maxLeavesParticles", 400, 0, 4096));
+                defineInRange("maxFallingTreeLeavesParticles", 400, 0, 4096));
         COMMON_BUILDER.pop();
 
         SERVER_BUILDER.comment("World Generation Settings").push("world");
@@ -196,8 +197,8 @@ public class DTConfigs {
         COMMON_BUILDER.pop();
 
         COMMON_BUILDER.comment("Mod Integration Settings").push("integration");
-//        PREFERRED_SEASON_MOD = COMMON_BUILDER.comment("The mod ID of preferred season mod. If a season provider for this mod ID is present, it will be used for integration with seasons. Set this to \"!\" to disable integration or \"*\" to accept the any integration (the first available).")
-//                .define("preferredSeasonMod", CompatHandler.ANY);
+        registerConfig(COMMON_BUILDER.comment("The mod ID of preferred season mod. If a season provider for this mod ID is present, it will be used for integration with seasons. Set this to \"!\" to disable integration or \"*\" to accept the any integration (the first available).")
+                .define("preferredSeasonMod", SeasonCompatibilityHandler.ANY));
         registerConfig(COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
                 define("enableSeasonalSeedDropFactor", true));
         registerConfig(COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").

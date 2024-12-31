@@ -1,8 +1,7 @@
 package com.dtteam.dynamictrees.api.registry;
 
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.treepacks.Resources;
-import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.treepack.Resources;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;

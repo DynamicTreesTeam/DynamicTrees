@@ -1,47 +1,101 @@
 package com.dtteam.dynamictrees.tree.species;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.network.MapSignal;
+import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
+import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
+import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.block.pod.Pod;
+import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
+import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilHelper;
+import com.dtteam.dynamictrees.block.soil.SoilProperties;
+import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
+import com.dtteam.dynamictrees.data.tags.DTBlockTags;
+import com.dtteam.dynamictrees.data.tags.DTItemTags;
+import com.dtteam.dynamictrees.entity.FallingTreeEntity;
+import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
+import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.systems.GrowSignal;
+import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
+import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
+import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
+import com.dtteam.dynamictrees.systems.genfeature.context.*;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
+import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.systems.nodemapper.DiseaseNode;
+import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
+import com.dtteam.dynamictrees.systems.nodemapper.InflatorNode;
+import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
+import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.treepacks.Resettable;
-import com.dtteam.dynamictrees.treepacks.Resources;
-import com.dtteam.dynamictrees.util.Optionals;
+import com.dtteam.dynamictrees.treepack.Resettable;
+import com.dtteam.dynamictrees.treepack.Resources;
+import com.dtteam.dynamictrees.util.*;
+import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
+import com.dtteam.dynamictrees.worldgen.JoCode;
+import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
+import com.dtteam.dynamictrees.worldgen.RootsJoCode;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-//import static net.minecraft.world.level.storage.loot.LootTable.EMPTY;
-//
+import com.dtteam.dynamictrees.systems.season.NormalSeasonManager;
+
 public class Species extends RegistryEntry<Species> implements Resettable<Species> {
 
     public static final Species NULL_SPECIES = new Species() {
-//        @Override
-//        public Optional<Seed> getSeed() {
-//            return Optional.empty();
-//        }
+        @Override
+        public Optional<Seed> getSeed() {
+            return Optional.empty();
+        }
 
         @Override
         public Family getFamily() {
@@ -58,35 +112,35 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return false;
         }
 
-//        @Override
-//        public boolean generate(GenerationContext context) {
-//            return false;
-//        }
+        @Override
+        public boolean generate(DynamicTreeGenerationContext context) {
+            return false;
+        }
 
         @Override
         public float biomeSuitability(Level level, BlockPos pos) {
             return 0.0f;
         }
 
-//        @Override
-//        public Species setSeed(Supplier<Seed> seedSup) {
-//            return this;
-//        }
+        @Override
+        public Species setSeed(Supplier<Seed> seedSup) {
+            return this;
+        }
 
         @Override
         public ItemStack getSeedStack(int qty) {
             return ItemStack.EMPTY;
         }
 
-//        @Override
-//        public Component getTextComponent() {
-//            return this.formatComponent(Component.translatable("gui.none"), ChatFormatting.DARK_RED);
-//        }
-//
-//        @Override
-//        public boolean update(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean rapid) {
-//            return false;
-//        }
+        @Override
+        public Component getTextComponent() {
+            return this.formatComponent(Component.translatable("gui.none"), ChatFormatting.DARK_RED);
+        }
+
+        @Override
+        public boolean update(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean rapid) {
+            return false;
+        }
     };
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(Species::new);
@@ -121,11 +175,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family
      */
     protected Family family = Family.NULL_FAMILY;
-//
-//    /**
-//     * Logic kit for standardized extended growth behavior
-//     */
-//    protected GrowthLogicKitConfiguration logicKit = GrowthLogicKitConfiguration.getDefault();
+
+    /**
+     * Logic kit for standardized extended growth behavior
+     */
+    protected GrowthLogicKitConfiguration logicKit = GrowthLogicKitConfiguration.getDefault();
 
     /**
      * How quickly the branch thickens on its own without branch merges [default = 0.3]
@@ -149,10 +203,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Ideal growth rate [default = 1.0]
      */
     protected float growthRate = 1.0f;
-//    /**
-//     * If set, the soil beneath this tree will always be changed to the set soil on worldgen and when growing from seeds.
-//     */
-//    protected SoilProperties forceSoil;
+    /**
+     * If set, the soil beneath this tree will always be changed to the set soil on worldgen and when growing from seeds.
+     */
+    protected SoilProperties forceSoil;
     /**
      * Ideal soil longevity [default = 8]
      */
@@ -189,22 +243,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     private final List<LeavesProperties> validLeaves = new LinkedList<>();
 
-//    //Seeds
-//    /**
-//     * The seed used to reproduce this species.  Drops from the tree and can plant itself
-//     */
-//    protected Supplier<Seed> seed;
-//
-//    /**
-//     * If non-null, overrides result of {@link #shouldDropSeeds}, preventing this species from dropping seeds from
-//     * leaves if {@link SeedItemLootPoolEntry} is used.
-//     */
-//    protected Boolean dropSeeds = null;
-//
-//    /**
-//     * A blockState that will turn itself into this tree
-//     */
-//    protected Supplier<DynamicSaplingBlock> saplingBlock;
+    //Seeds
+    /**
+     * The seed used to reproduce this species.  Drops from the tree and can plant itself
+     */
+    protected Supplier<Seed> seed;
+
+    /**
+     * If non-null, overrides result of {@link #shouldDropSeeds}, preventing this species from dropping seeds from
+     * leaves if {@link SeedItemLootPoolEntry} is used.
+     */
+    protected Boolean dropSeeds = null;
+
+    /**
+     * A blockState that will turn itself into this tree
+     */
+    protected Supplier<DynamicSaplingBlock> saplingBlock;
 
     /**
      * Wether the sapling block should be tinted with the leaves' tint index/
@@ -218,25 +272,25 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected Map<TagKey<Biome>, Float> envFactors = new HashMap<>();//Environmental factors
 
 //    protected DTBiomeHolderSet  perfectBiomes = new DTBiomeHolderSet();
-//
-//    protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
-//
-//    /**
-//     * A {@link BiPredicate} that returns true if this species should override the common in the given position.
-//     */
-//    protected CommonOverride commonOverride;
+
+    protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
+
+    /**
+     * A {@link BiPredicate} that returns true if this species should override the common in the given position.
+     */
+    protected CommonOverride commonOverride;
 
     private String unlocalizedName = "";
 
-//    private Set<Fruit> fruits = new HashSet<>();
-//
-//    private Set<Pod> pods = new HashSet<>();
+    private final Set<Fruit> fruits = new HashSet<>();
+
+    private final Set<Pod> pods = new HashSet<>();
 
     /**
      * Blank constructor for {@link #NULL_SPECIES}.
      */
     public Species() {
-        this.setRegistryName(DynamicTreesCommon.NULL);
+        this.setRegistryName(DynamicTrees.NULL);
     }
 
     /**
@@ -264,108 +318,108 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.setLeavesProperties(leavesProperties.isValid() ? leavesProperties : family.getCommonLeaves());
     }
 
-//    /**
-//     * Resets this {@link Species} object's environment factors, gen features, acceptable blocks for growth, and
-//     * acceptable soils. May also be overridden by subclasses that need lists to be cleared on reload, for example.
-//     *
-//     * @return This {@link Species} object for chaining.
-//     */
-//    @Override
-//    public Species reset() {
-//        this.fruits.clear();
-//        this.pods.clear();
-//        this.envFactors.clear();
-//        this.genFeatures.clear();
-//        this.acceptableBlocksForGrowth.clear();
-//        this.primitiveSaplingRecipe.clear();
+    /**
+     * Resets this {@link Species} object's environment factors, gen features, acceptable blocks for growth, and
+     * acceptable soils. May also be overridden by subclasses that need lists to be cleared on reload, for example.
+     *
+     * @return This {@link Species} object for chaining.
+     */
+    @Override
+    public Species reset() {
+        this.fruits.clear();
+        this.pods.clear();
+        this.envFactors.clear();
+        this.genFeatures.clear();
+        this.acceptableBlocksForGrowth.clear();
+        this.primitiveSaplingRecipe.clear();
 //        this.perfectBiomes.clear();
-//
-//        this.clearAcceptableSoils();
-//
-//        return this;
-//    }
-//
-//    /**
-//     * Can be overridden by subclasses for setting defaults for things before reload, such as {@link #envFactors}.
-//     *
-//     * @return This {@link Species} object for chaining.
-//     */
-//    @Override
-//    public Species setPreReloadDefaults() {
-//        return this.setDefaultGrowingParameters()
-//                .setSaplingShape(CommonVoxelShapes.SAPLING)
-//                .setSaplingSound(SoundType.GRASS);
-//    }
-//
-//    /**
-//     * Can be overridden by subclasses for setting defaults for things after reload. This is for defaults like lists,
-//     * and so defaults should only be set if there was nothing set by the Json.
-//     *
-//     * @return This {@link Species} object for chaining.
-//     */
-//    @Override
-//    public Species setPostReloadDefaults() {
-//        // If no seed has been set, use the common seed.
-//        if (!this.hasSeed()) {
-//            this.seed = this.getCommonSpecies().seed;
-//        }
-//
-//        // If there is no acceptable soil set, use the standard soils.
-//        if (!this.hasAcceptableSoil()) {
-//            this.setStandardSoils();
-//        }
-//        return this;
-//    }
-//
-//    /**
-//     * Can be overridden by subclasses to set the default growing parameters.
-//     *
-//     * @return This {@link Species} object for chaining.
-//     */
-//    public Species setDefaultGrowingParameters() {
-//        return this;
-//    }
-//
-//    /**
-//     * @return The default chance for the compostable {@link Seed} to be successfully composted.
-//     */
-//    public float defaultSeedComposterChance() {
-//        return 0.3f;
-//    }
+
+        this.clearAcceptableSoils();
+
+        return this;
+    }
+
+    /**
+     * Can be overridden by subclasses for setting defaults for things before reload, such as {@link #envFactors}.
+     *
+     * @return This {@link Species} object for chaining.
+     */
+    @Override
+    public Species setPreReloadDefaults() {
+        return this.setDefaultGrowingParameters()
+                .setSaplingShape(CommonVoxelShapes.SAPLING)
+                .setSaplingSound(SoundType.GRASS);
+    }
+
+    /**
+     * Can be overridden by subclasses for setting defaults for things after reload. This is for defaults like lists,
+     * and so defaults should only be set if there was nothing set by the Json.
+     *
+     * @return This {@link Species} object for chaining.
+     */
+    @Override
+    public Species setPostReloadDefaults() {
+        // If no seed has been set, use the common seed.
+        if (!this.hasSeed()) {
+            this.seed = this.getCommonSpecies().seed;
+        }
+
+        // If there is no acceptable soil set, use the standard soils.
+        if (!this.hasAcceptableSoil()) {
+            this.setStandardSoils();
+        }
+        return this;
+    }
+
+    /**
+     * Can be overridden by subclasses to set the default growing parameters.
+     *
+     * @return This {@link Species} object for chaining.
+     */
+    public Species setDefaultGrowingParameters() {
+        return this;
+    }
+
+    /**
+     * @return The default chance for the compostable {@link Seed} to be successfully composted.
+     */
+    public float defaultSeedComposterChance() {
+        return 0.3f;
+    }
 
     public Family getFamily() {
         return family;
     }
-//
-//    public void setFamily(Family family) {
-//        family.addSpecies(this);
-//        this.family = family;
-//    }
-//
-//    /**
-//     * @return the {@link #family}'s {@linkplain Family#getCommonSpecies() common species}
-//     */
-//    public Species getCommonSpecies() {
-//        return this.family.getCommonSpecies();
-//    }
-//
-//    /**
-//     * @return {@code true} if this species is the common of {@link #family}; {@code false} otherwise
-//     */
-//    public boolean isCommonSpecies() {
-//        return this.getCommonSpecies() == this;
-//    }
-//
-//    /**
-//     * Checks whether {@link #seed} is the same instance as the {@link Seed} of the common {@link Species} of the
-//     * owning {@link Family}.
-//     *
-//     * @return {@code true} if {@link #seed} {@code ==} the {@link Seed} of the common {@link Species} of {@link
-//     * #family}; {@code false} otherwise.
-//     */
-//    public boolean isSeedCommon() {
-//        return this.getCommonSpecies().getSeed().orElse(null) == this.seed.get();
-//    }
+
+    public void setFamily(Family family) {
+        family.addSpecies(this);
+        this.family = family;
+    }
+
+    /**
+     * @return the {@link #family}'s {@linkplain Family#getCommonSpecies() common species}
+     */
+    public Species getCommonSpecies() {
+        return this.family.getCommonSpecies();
+    }
+
+    /**
+     * @return {@code true} if this species is the common of {@link #family}; {@code false} otherwise
+     */
+    public boolean isCommonSpecies() {
+        return this.getCommonSpecies() == this;
+    }
+
+    /**
+     * Checks whether {@link #seed} is the same instance as the {@link Seed} of the common {@link Species} of the
+     * owning {@link Family}.
+     *
+     * @return {@code true} if {@link #seed} {@code ==} the {@link Seed} of the common {@link Species} of {@link
+     * #family}; {@code false} otherwise.
+     */
+    public boolean isSeedCommon() {
+        return this.getCommonSpecies().getSeed().orElse(null) == this.seed.get();
+    }
 
     public Species setUnlocalizedName(String name) {
         this.unlocalizedName = "species." + name.replace(":", ".");
@@ -380,85 +434,85 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this.unlocalizedName;
     }
 
-//    @Override
-//    public Component getTextComponent() {
-//        return this.formatComponent(Component.translatable(this.getUnlocalizedName()), ChatFormatting.AQUA);
-//    }
-//
-//    public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
-//        this.tapering = tapering;
-//        this.signalEnergy = energy;
-//        this.upProbability = upProbability;
-//        this.lowestBranchHeight = lowestBranchHeight;
-//        this.growthRate = growthRate;
-//        return this;
-//    }
-//
-//    public void setTapering(float tapering) {
-//        this.tapering = tapering;
-//    }
-//
-//    public void setUpProbability(int upProbability) {
-//        this.upProbability = upProbability;
-//    }
-//
-//    public void setLowestBranchHeight(int lowestBranchHeight) {
-//        this.lowestBranchHeight = lowestBranchHeight;
-//    }
-//
-//    public void setSignalEnergy(float signalEnergy) {
-//        this.signalEnergy = signalEnergy;
-//    }
-//
-//    public void setGrowthRate(float growthRate) {
-//        this.growthRate = growthRate;
-//    }
-//
-//    public float getSignalEnergy() {
-//        return signalEnergy;
-//    }
-//
-//    public float getEnergy(Level level, BlockPos rootPos) {
-//        return this.logicKit.getEnergy(new PositionalSpeciesContext(level, rootPos, this));
-//    }
-//
-//    public float getGrowthRate(Level level, BlockPos rootPos) {
-//        return this.growthRate * this.seasonalGrowthFactor(LevelContext.create(level), rootPos);
-//    }
-//
-//    /**
-//     * Probability reinforcer for up direction which is arguably the direction most trees generally grow in.
-//     */
-//    public int getUpProbability() {
-//        return upProbability;
-//    }
-//
-//    /**
-//     * Probability reinforcer for current travel direction
-//     */
-//    public int getProbabilityForCurrentDir() {
-//        return 1;
-//    }
-//
-//    public int getLowestBranchHeight() {
-//        return lowestBranchHeight;
-//    }
-//
-//    public float getTapering() {
-//        return tapering;
-//    }
-//
-//    /**
-//     * Works out if this {@link Species} will require a {@link SpeciesBlockEntity} at the given position. It should
-//     * require one if it's not the common species, and it's not in its common species override for the given position.
-//     *
-//     * @param level The {@link LevelAccessor} the tree is being planted in.
-//     * @param pos   The {@link BlockPos} at which the tree is being planted at.
-//     * @return True if it will require a {@link SpeciesBlockEntity}.
-//     */
-//    public boolean doesRequireTileEntity(LevelAccessor level, BlockPos pos) {
-//        return !this.isCommonSpecies() && !this.shouldOverrideCommon(level, pos);
-//    }
+    @Override
+    public Component getTextComponent() {
+        return this.formatComponent(Component.translatable(this.getUnlocalizedName()), ChatFormatting.AQUA);
+    }
+
+    public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
+        this.tapering = tapering;
+        this.signalEnergy = energy;
+        this.upProbability = upProbability;
+        this.lowestBranchHeight = lowestBranchHeight;
+        this.growthRate = growthRate;
+        return this;
+    }
+
+    public void setTapering(float tapering) {
+        this.tapering = tapering;
+    }
+
+    public void setUpProbability(int upProbability) {
+        this.upProbability = upProbability;
+    }
+
+    public void setLowestBranchHeight(int lowestBranchHeight) {
+        this.lowestBranchHeight = lowestBranchHeight;
+    }
+
+    public void setSignalEnergy(float signalEnergy) {
+        this.signalEnergy = signalEnergy;
+    }
+
+    public void setGrowthRate(float growthRate) {
+        this.growthRate = growthRate;
+    }
+
+    public float getSignalEnergy() {
+        return signalEnergy;
+    }
+
+    public float getEnergy(Level level, BlockPos rootPos) {
+        return this.logicKit.getEnergy(new PositionalSpeciesContext(level, rootPos, this));
+    }
+
+    public float getGrowthRate(Level level, BlockPos rootPos) {
+        return this.growthRate * this.seasonalGrowthFactor(LevelContext.create(level), rootPos);
+    }
+
+    /**
+     * Probability reinforcer for up direction which is arguably the direction most trees generally grow in.
+     */
+    public int getUpProbability() {
+        return upProbability;
+    }
+
+    /**
+     * Probability reinforcer for current travel direction
+     */
+    public int getProbabilityForCurrentDir() {
+        return 1;
+    }
+
+    public int getLowestBranchHeight() {
+        return lowestBranchHeight;
+    }
+
+    public float getTapering() {
+        return tapering;
+    }
+
+    /**
+     * Works out if this {@link Species} will require a {@link SpeciesBlockEntity} at the given position. It should
+     * require one if it's not the common species, and it's not in its common species override for the given position.
+     *
+     * @param level The {@link LevelAccessor} the tree is being planted in.
+     * @param pos   The {@link BlockPos} at which the tree is being planted at.
+     * @return True if it will require a {@link SpeciesBlockEntity}.
+     */
+    public boolean doesRequireTileEntity(LevelAccessor level, BlockPos pos) {
+        return !this.isCommonSpecies() && !this.shouldOverrideCommon(level, pos);
+    }
 
     /**
      * Returns whether this species can be transformed to another. See {@link #transformable} for more details.
@@ -480,28 +534,27 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
-//    public boolean hasCommonOverride() {
-//        return this.commonOverride != null;
-//    }
-//
-//    public void setCommonOverride(final CommonOverride commonOverride) {
-//        this.commonOverride = commonOverride;
-//    }
+    public boolean hasCommonOverride() {
+        return this.commonOverride != null;
+    }
+
+    public void setCommonOverride(final CommonOverride commonOverride) {
+        this.commonOverride = commonOverride;
+    }
 
     public boolean shouldOverrideCommon(final BlockGetter level, final BlockPos trunkPos) {
-//        //Common Override test will fail if the server has not loaded yet
+        //Common Override test will fail if the server has not loaded yet
 //        if (ServerLifecycleHooks.getCurrentServer() == null) {
-//            LogManager.getLogger().warn("shouldOverrideCommon was called before the server was loaded, will return false for now.");
+//            DynamicTrees.LOG.warn("shouldOverrideCommon was called before the server was loaded, will return false for now.");
 //            return false;
 //        }
-//        return this.hasCommonOverride() && this.commonOverride.test(level, trunkPos);
-        return false;
+        return this.hasCommonOverride() && this.commonOverride.test(level, trunkPos);
     }
-//
-//    @FunctionalInterface
-//    public interface CommonOverride extends BiPredicate<BlockGetter, BlockPos> {
-//
-//    }
+
+    @FunctionalInterface
+    public interface CommonOverride extends BiPredicate<BlockGetter, BlockPos> {
+
+    }
 
     ///////////////////////////////////////////
     //LEAVES
@@ -534,31 +587,31 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
     }
 
-//    public int getLeafBlockIndex(DynamicLeavesBlock block) {
-//        int index = validLeaves.indexOf(block.properties);
-//        if (index < 0) {
-//            LogManager.getLogger().warn("Block {} not valid leaves for {}.", block, this);
-//            return 0;
-//        }
-//        return index;
-//    }
-//
-//    public LeavesProperties getValidLeavesProperties(int index) {
-//        if (index < validLeaves.size())
-//            return this.validLeaves.get(index);
-//        else {
-//            LogManager.getLogger().warn("Attempted to get leaves properties of index {} but {} only has {} valid leaves.", index, this, validLeaves.size());
-//            return this.validLeaves.get(0);
-//        }
-//    }
-//
-//    public DynamicLeavesBlock getValidLeafBlock(int index) {
-//        LeavesProperties properties = getValidLeavesProperties(index);
-//        if (!properties.getDynamicLeavesBlock().isPresent()) {
-//            return null;
-//        }
-//        return (DynamicLeavesBlock) properties.getDynamicLeavesState().getBlock();
-//    }
+    public int getLeafBlockIndex(DynamicLeavesBlock block) {
+        int index = validLeaves.indexOf(block.properties);
+        if (index < 0) {
+            DynamicTrees.LOG.warn("Block {} not valid leaves for {}.", block, this);
+            return 0;
+        }
+        return index;
+    }
+
+    public LeavesProperties getValidLeavesProperties(int index) {
+        if (index < validLeaves.size())
+            return this.validLeaves.get(index);
+        else {
+            DynamicTrees.LOG.warn("Attempted to get leaves properties of index {} but {} only has {} valid leaves.", index, this, validLeaves.size());
+            return this.validLeaves.get(0);
+        }
+    }
+
+    public DynamicLeavesBlock getValidLeafBlock(int index) {
+        LeavesProperties properties = getValidLeavesProperties(index);
+        if (!properties.getDynamicLeavesBlock().isPresent()) {
+            return null;
+        }
+        return (DynamicLeavesBlock) properties.getDynamicLeavesState().getBlock();
+    }
 
     public boolean isValidLeafBlock(final DynamicLeavesBlock leavesBlock) {
         return this.validLeaves.stream().anyMatch(properties ->
@@ -584,17 +637,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return An {@link ItemStack} with the {@link Seed} inside.
      */
     public ItemStack getSeedStack(int qty) {
-        //return !this.hasSeed() ? ItemStack.EMPTY : new ItemStack(this.seed.get(), qty);
-        return ItemStack.EMPTY;
+        return !this.hasSeed() ? ItemStack.EMPTY : new ItemStack(this.seed.get(), qty);
     }
-//
-//    public boolean hasSeed() {
-//        return this.seed != null;
-//    }
-//
-//    public Optional<Seed> getSeed() {
-//        return Optional.ofNullable(this.seed == null ? null : this.seed.get());
-//    }
+
+    public boolean hasSeed() {
+        return this.seed != null;
+    }
+
+    public Optional<Seed> getSeed() {
+        return Optional.ofNullable(this.seed == null ? null : this.seed.get());
+    }
 
     /**
      * Holds whether a {@link Seed} should be generated. Stored as a {@code non-primitive} so its default value
@@ -626,13 +678,13 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     private String seedName = null;
 
-//    public ResourceLocation getSeedName() {
-//        if (seedName == null) {
-//            return ResourceLocationUtils.suffix(getRegistryName(), "_seed");
-//        } else {
-//            return new ResourceLocation(getRegistryName().getNamespace(), seedName);
-//        }
-//    }
+    public ResourceLocation getSeedName() {
+        if (seedName == null) {
+            return ResourceLocationUtils.suffix(getRegistryName(), "_seed");
+        } else {
+            return ResourceLocation.fromNamespaceAndPath(getRegistryName().getNamespace(), seedName);
+        }
+    }
 
     public void setSeedName(String name) {
         seedName = name;
@@ -645,30 +697,29 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return This {@link Species} object for chaining.
      */
     public Species generateSeed() {
-//        return !this.shouldGenerateSeed() || this.seed != null ? this :
-//                this.setSeed(RegistryHandler.addItem(getSeedName(), () -> new Seed(this)));
+        return !this.shouldGenerateSeed() || this.seed != null ? this :
+                this.setSeed(RegistryHandler.addItem(getSeedName(), () -> new Seed(this)));
+    }
+
+    /**
+     * Sets the {@link Seed} supplier for this {@link Species}.
+     *
+     * @param seedSup The supplier of the {@link Seed} to set.
+     * @return This {@link Species} object for chaining.
+     */
+    public Species setSeed(final Supplier<Seed> seedSup) {
+        this.seed = seedSup;
         return this;
     }
 
-//    /**
-//     * Sets the {@link Seed} supplier for this {@link Species}.
-//     *
-//     * @param seedSup The supplier of the {@link Seed} to set.
-//     * @return This {@link Species} object for chaining.
-//     */
-//    public Species setSeed(final Supplier<Seed> seedSup) {
-//        this.seed = seedSup;
-//        return this;
-//    }
-//
-//    public List<ItemStack> getVoluntaryDrops(Level level, BlockPos rootPos, int fertility) {
+    public List<ItemStack> getVoluntaryDrops(Level level, BlockPos rootPos, int fertility) {
 //        if (level.isClientSide) {
-//            return Collections.emptyList();
+            return Collections.emptyList();
 //        }
 //        return getLootTable(level.getServer().getLootData(), species -> species.voluntaryDropsPath.get())
 //                .getRandomItems(createVoluntaryLootParams(level, rootPos, fertility));
-//    }
-//
+    }
+
 //    private LootParams createVoluntaryLootParams(Level level, BlockPos rootPos, int fertility) {
 //        return new LootParams.Builder(LevelContext.getServerLevelOrThrow(level))
 //                .withParameter(LootContextParams.BLOCK_STATE, level.getBlockState(rootPos))
@@ -683,21 +734,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //        return table == EMPTY ? (this.isCommonSpecies() ? lootTables.getLootTable(nameFunction.apply(getCommonSpecies())) : EMPTY) : table;
 //    }
 //
-//    public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume) {
-//        return getBranchesDrops(level, volume, ItemStack.EMPTY);
-//    }
-//
-//    public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume, ItemStack tool) {
-//        return getBranchesDrops(level, volume, tool, null);
-//    }
-//
-//    public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume,
-//                                            ItemStack tool, @Nullable Float explosionRadius) {
+    public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume) {
+        return getBranchesDrops(level, volume, ItemStack.EMPTY);
+    }
+
+    public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume, ItemStack tool) {
+        return getBranchesDrops(level, volume, tool, null);
+    }
+
+    public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume,
+                                            ItemStack tool, @Nullable Float explosionRadius) {
 //        processVolume(volume);
-//        if (level.isClientSide) {
-//            return Collections.emptyList();
-//        }
-//        final List<ItemStack> drops = new ArrayList<>();
+        if (level.isClientSide) {
+            return Collections.emptyList();
+        }
+        final List<ItemStack> drops = new ArrayList<>();
 //        for (int i = 0; i < family.getNumberOfValidBranchBlocks(); i++) {
 //            int branchVolume = volume.getRawVolume(i);
 //            if (branchVolume > 0) {
@@ -706,8 +757,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //            }
 //        }
 //        cleanDropsList(drops);
-//        return drops;
-//    }
+        return drops;
+    }
 //
 //    public void processVolume(NetVolumeNode.Volume volume) {
 //        volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters. you know who you are.
@@ -761,91 +812,91 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     }
 
-//    public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume) {
-//        return getLogsAndSticks(volume, false, 0);
-//    }
-//
-//    public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume, boolean silkTouch, int fortuneLevel) {
-//        List<ItemStack> logsList = new LinkedList<>();
-//        int[] volArray = volume.getRawVolumesArray();
-//        float stickVol = 0;
-//        for (int i = 0; i < volArray.length; i++) {
-//            float vol = (volArray[i] / (float) NetVolumeNode.Volume.VOXELSPERLOG);
-//            if (vol > 0) {
-//                stickVol += getFamily().getValidBranchBlock(i).getPrimitiveLogs(vol, logsList);
-//            }
-//        }
-//        int sticks = (int) (stickVol * 8); // A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
-//        return new LogsAndSticks(logsList, sticks);
-//    }
-//
-//    /**
-//     * @param level
-//     * @param endPoints
-//     * @param rootPos
-//     * @param treePos
-//     * @param fertility
-//     * @return true if seed was dropped
-//     */
-//    public boolean handleVoluntaryDrops(Level level, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
-//        int tickSpeed = level.getGameRules().getInt(GameRules.RULE_RANDOMTICKING);
-//        if (tickSpeed > 0) {
-//            double slowFactor = 3.0 / tickSpeed; //This is to prevent high tick-speeds from spamming the floor with seeds
-//            if (level.random.nextDouble() < slowFactor) {
-//                final List<ItemStack> drops = getVoluntaryDrops(level, rootPos, fertility);
-//
-//                if (!drops.isEmpty() && !endPoints.isEmpty()) {
-//                    for (ItemStack drop : drops) {
-//                        BlockPos branchPos = endPoints.get(level.random.nextInt(endPoints.size()));
-//                        branchPos = branchPos.above();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
-//                        BlockPos itemPos = CoordUtils.getRayTraceFruitPos(level, this, treePos, branchPos, SafeChunkBounds.ANY);
-//
-//                        if (itemPos != BlockPos.ZERO) {
-//                            ItemEntity itemEntity = new ItemEntity(level, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
-//                            Vec3 motion = new Vec3(itemPos.getX(), itemPos.getY(), itemPos.getZ()).subtract(new Vec3(treePos.getX(), treePos.getY(), treePos.getZ()));
-//                            float distAngle = 15;//The spread angle(center to edge)
-//                            float launchSpeed = 4;//Blocks(meters) per second
-//                            motion = new Vec3(motion.x, 0, motion.y).normalize().yRot((level.random.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed / 20f);
-//                            itemEntity.setDeltaMovement(motion.x, motion.y, motion.z);
-//                            return level.addFreshEntity(itemEntity);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return true;
-//    }
-//
-//
-//    ///////////////////////////////////////////
-//    // SAPLING
-//    ///////////////////////////////////////////
-//
-//    /**
-//     * Valid primitive sapling {@link Item}s. Used for dirt bucket recipes.
-//     */
-//    protected final Set<SeedSaplingRecipe> primitiveSaplingRecipe = new HashSet<>();
-//
-//    public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe) {
-//        if (recipe.shouldReplaceSaplingWhenPlaced()){
-//            recipe.getSaplingBlock().ifPresent(block -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), this));
-//        }
-//        primitiveSaplingRecipe.add(recipe);
-//    }
-//
-//    public Set<SeedSaplingRecipe> getPrimitiveSaplingRecipes() {
-//        return new HashSet<>(this.primitiveSaplingRecipe);
-//    }
-//
-//    public Species addPrimitiveSaplingItem(final Item primitiveSaplingItem) {
-//        this.primitiveSaplingRecipe.add(new SeedSaplingRecipe(primitiveSaplingItem));
-//        return this;
-//    }
-//
-//    public Species setSapling(Supplier<DynamicSaplingBlock> sapling) {
-//        saplingBlock = sapling;
-//        return this;
-//    }
+    public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume) {
+        return getLogsAndSticks(volume, false, 0);
+    }
+
+    public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume, boolean silkTouch, int fortuneLevel) {
+        List<ItemStack> logsList = new LinkedList<>();
+        int[] volArray = volume.getRawVolumesArray();
+        float stickVol = 0;
+        for (int i = 0; i < volArray.length; i++) {
+            float vol = (volArray[i] / (float) NetVolumeNode.Volume.VOXELSPERLOG);
+            if (vol > 0) {
+                stickVol += getFamily().getValidBranchBlock(i).getPrimitiveLogs(vol, logsList);
+            }
+        }
+        int sticks = (int) (stickVol * 8); // A stick is 1/8th of a log (1 log = 4 planks, 2 planks = 4 sticks) Give him the stick!
+        return new LogsAndSticks(logsList, sticks);
+    }
+
+    /**
+     * @param level
+     * @param endPoints
+     * @param rootPos
+     * @param treePos
+     * @param fertility
+     * @return true if seed was dropped
+     */
+    public boolean handleVoluntaryDrops(Level level, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
+        int tickSpeed = level.getGameRules().getInt(GameRules.RULE_RANDOMTICKING);
+        if (tickSpeed > 0) {
+            double slowFactor = 3.0 / tickSpeed; //This is to prevent high tick-speeds from spamming the floor with seeds
+            if (level.random.nextDouble() < slowFactor) {
+                final List<ItemStack> drops = getVoluntaryDrops(level, rootPos, fertility);
+
+                if (!drops.isEmpty() && !endPoints.isEmpty()) {
+                    for (ItemStack drop : drops) {
+                        BlockPos branchPos = endPoints.get(level.random.nextInt(endPoints.size()));
+                        branchPos = branchPos.above();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
+                        BlockPos itemPos = CoordUtils.getRayTraceFruitPos(level, this, treePos, branchPos, false);
+
+                        if (itemPos != BlockPos.ZERO) {
+                            ItemEntity itemEntity = new ItemEntity(level, itemPos.getX() + 0.5, itemPos.getY() + 0.5, itemPos.getZ() + 0.5, drop);
+                            Vec3 motion = new Vec3(itemPos.getX(), itemPos.getY(), itemPos.getZ()).subtract(new Vec3(treePos.getX(), treePos.getY(), treePos.getZ()));
+                            float distAngle = 15;//The spread angle(center to edge)
+                            float launchSpeed = 4;//Blocks(meters) per second
+                            motion = new Vec3(motion.x, 0, motion.y).normalize().yRot((level.random.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed / 20f);
+                            itemEntity.setDeltaMovement(motion.x, motion.y, motion.z);
+                            return level.addFreshEntity(itemEntity);
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+
+    ///////////////////////////////////////////
+    // SAPLING
+    ///////////////////////////////////////////
+
+    /**
+     * Valid primitive sapling {@link Item}s. Used for dirt bucket recipes.
+     */
+    protected final Set<SeedSaplingRecipe> primitiveSaplingRecipe = new HashSet<>();
+
+    public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe) {
+        if (recipe.shouldReplaceSaplingWhenPlaced()){
+            recipe.getSaplingBlock().ifPresent(block -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), this));
+        }
+        primitiveSaplingRecipe.add(recipe);
+    }
+
+    public Set<SeedSaplingRecipe> getPrimitiveSaplingRecipes() {
+        return new HashSet<>(this.primitiveSaplingRecipe);
+    }
+
+    public Species addPrimitiveSaplingItem(final Item primitiveSaplingItem) {
+        this.primitiveSaplingRecipe.add(new SeedSaplingRecipe(primitiveSaplingItem));
+        return this;
+    }
+
+    public Species setSapling(Supplier<DynamicSaplingBlock> sapling) {
+        saplingBlock = sapling;
+        return this;
+    }
 
     /**
      * Holds whether a {@link Seed} should be generated. Stored as a {@code non-primitive} so its default value
@@ -882,39 +933,38 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return This {@link Species} object for chaining.
      */
     public Species generateSapling() {
-//        return !this.shouldGenerateSapling() || this.saplingBlock != null ? this :
-//                this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), () -> new DynamicSaplingBlock(this)));
-        return this;
+        return !this.shouldGenerateSapling() || this.saplingBlock != null ? this :
+                this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), () -> new DynamicSaplingBlock(this)));
     }
 
-//    /**
-//     * @return the sapling block. Empty Optional if none is present.
-//     */
-//    public Optional<DynamicSaplingBlock> getSapling() {
-//        return Optional.ofNullable(this.saplingBlock == null ? null : this.saplingBlock.get());
-//    }
-//
-//    /**
-//     * Returns the {@link Species} override for the specified {@link BlockPos} in the specified {@link Level} if {@link
-//     * #shouldUseLocationOverride()}, or returns {@code this} {@link Species} otherwise.
-//     *
-//     * @param level The {@link LevelAccessor} to check for the override in.
-//     * @param pos   The {@link BlockPos} to check.
-//     * @return The relevant {@link Species} override or {@code this} {@link Species}.
-//     */
-//    public Species selfOrLocationOverride(final BlockGetter level, BlockPos pos) {
-//        return this.shouldUseLocationOverride() ? this.getFamily().getSpeciesForLocation(level, pos, this)
-//                : this;
-//    }
-//
-//    /**
-//     * Returns {@code true} if the location override should be used for this {@link Species} if available.
-//     *
-//     * @return {@code true} if the location override should be used if available, {@code false} otherwise.
-//     */
-//    public boolean shouldUseLocationOverride() {
-//        return !this.getSapling().isPresent() || this.isCommonSpecies();
-//    }
+    /**
+     * @return the sapling block. Empty Optional if none is present.
+     */
+    public Optional<DynamicSaplingBlock> getSapling() {
+        return Optional.ofNullable(this.saplingBlock == null ? null : this.saplingBlock.get());
+    }
+
+    /**
+     * Returns the {@link Species} override for the specified {@link BlockPos} in the specified {@link Level} if {@link
+     * #shouldUseLocationOverride()}, or returns {@code this} {@link Species} otherwise.
+     *
+     * @param level The {@link LevelAccessor} to check for the override in.
+     * @param pos   The {@link BlockPos} to check.
+     * @return The relevant {@link Species} override or {@code this} {@link Species}.
+     */
+    public Species selfOrLocationOverride(final BlockGetter level, BlockPos pos) {
+        return this.shouldUseLocationOverride() ? this.getFamily().getSpeciesForLocation(level, pos, this)
+                : this;
+    }
+
+    /**
+     * Returns {@code true} if the location override should be used for this {@link Species} if available.
+     *
+     * @return {@code true} if the location override should be used if available, {@code false} otherwise.
+     */
+    public boolean shouldUseLocationOverride() {
+        return !this.getSapling().isPresent() || this.isCommonSpecies();
+    }
 
     /**
      * Checks surroundings and places a dynamic sapling block.
@@ -922,73 +972,73 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if the planting was successful
      */
     public boolean plantSapling(LevelAccessor level, BlockPos pos, boolean locationOverride) {
-//        DynamicSaplingBlock commonSapling = getCommonSpecies().getSapling().orElse(null);
-//        final DynamicSaplingBlock sapling = locationOverride ? commonSapling : getSapling().orElse(commonSapling);
-//
-//        if (sapling == null || !level.getBlockState(pos).canBeReplaced() ||
-//                !DynamicSaplingBlock.canSaplingStay(level, this, pos)) {
-//            return false;
-//        }
-//
-//        level.playSound(null, pos, saplingSound.getPlaceSound(), SoundSource.BLOCKS, 1, 0.8f);
-//
-//        level.setBlock(pos, sapling.defaultBlockState(), 3);
+        DynamicSaplingBlock commonSapling = getCommonSpecies().getSapling().orElse(null);
+        final DynamicSaplingBlock sapling = locationOverride ? commonSapling : getSapling().orElse(commonSapling);
+
+        if (sapling == null || !level.getBlockState(pos).canBeReplaced() ||
+                !DynamicSaplingBlock.canSaplingStay(level, this, pos)) {
+            return false;
+        }
+
+        level.playSound(null, pos, saplingSound.getPlaceSound(), SoundSource.BLOCKS, 1, 0.8f);
+
+        level.setBlock(pos, sapling.defaultBlockState(), 3);
         return true;
     }
-//
-//    public void addAcceptableBlockForGrowth(final Block block) {
-//        this.acceptableBlocksForGrowth.add(block);
-//    }
-//
-//    /**
-//     * Checks if the sapling can grow at the given position.
-//     *
-//     * @param level The {@link LevelReader} object.
-//     * @param pos   The {@link BlockPos} the sapling is on.
-//     * @return True if it can grow.
-//     */
-//    public boolean canSaplingGrow(LevelReader level, BlockPos pos) {
-//        return this.acceptableBlocksForGrowth.isEmpty() || this.acceptableBlocksForGrowth.stream().anyMatch(block -> block == level.getBlockState(pos.below()).getBlock());
-//    }
-//
-//    private boolean canSaplingGrowNaturally = true;
-//
-//    public Species setCanSaplingGrowNaturally(boolean canSaplingGrowNaturally) {
-//        this.canSaplingGrowNaturally = canSaplingGrowNaturally;
-//        return this;
-//    }
-//
-//    /**
-//     * Determines whether the {@link #saplingBlock} should be able to grow without player intervention
-//     * (bone-mealing).
-//     *
-//     * @param level The {@link Level} instance.
-//     * @param pos   The {@link BlockPos} of the {@link DynamicSaplingBlock}.
-//     * @return {@code true} if the sapling can and should grow naturally; {@code false} otherwise.
-//     */
-//    public boolean canSaplingGrowNaturally(Level level, BlockPos pos) {
-//        return this.canSaplingGrowNaturally && this.canSaplingGrow(level, pos);
-//    }
-//
-//    //Returns if sapling should consume bonemeal when used on it.
-//    //if true is returned canSaplingUseBoneMeal is then run to determine if the sapling grows or not.
-//    public boolean canSaplingConsumeBoneMeal(LevelReader level, BlockPos pos) {
-//        return canBoneMealTree() && canSaplingGrow(level, pos);
-//    }
-//
-//    //Returns whether the bonemealing should cause sapling growth.
-//    public boolean canSaplingGrowAfterBoneMeal(Level level, RandomSource rand, BlockPos pos) {
-//        return canBoneMealTree() && canSaplingGrow(level, pos);
-//    }
-//
-//    public int saplingFireSpread() {
-//        return 0;
-//    }
-//
-//    public int saplingFlammability() {
-//        return 0;
-//    }
-//
+
+    public void addAcceptableBlockForGrowth(final Block block) {
+        this.acceptableBlocksForGrowth.add(block);
+    }
+
+    /**
+     * Checks if the sapling can grow at the given position.
+     *
+     * @param level The {@link LevelReader} object.
+     * @param pos   The {@link BlockPos} the sapling is on.
+     * @return True if it can grow.
+     */
+    public boolean canSaplingGrow(LevelReader level, BlockPos pos) {
+        return this.acceptableBlocksForGrowth.isEmpty() || this.acceptableBlocksForGrowth.stream().anyMatch(block -> block == level.getBlockState(pos.below()).getBlock());
+    }
+
+    private boolean canSaplingGrowNaturally = true;
+
+    public Species setCanSaplingGrowNaturally(boolean canSaplingGrowNaturally) {
+        this.canSaplingGrowNaturally = canSaplingGrowNaturally;
+        return this;
+    }
+
+    /**
+     * Determines whether the {@link #saplingBlock} should be able to grow without player intervention
+     * (bone-mealing).
+     *
+     * @param level The {@link Level} instance.
+     * @param pos   The {@link BlockPos} of the {@link DynamicSaplingBlock}.
+     * @return {@code true} if the sapling can and should grow naturally; {@code false} otherwise.
+     */
+    public boolean canSaplingGrowNaturally(Level level, BlockPos pos) {
+        return this.canSaplingGrowNaturally && this.canSaplingGrow(level, pos);
+    }
+
+    //Returns if sapling should consume bonemeal when used on it.
+    //if true is returned canSaplingUseBoneMeal is then run to determine if the sapling grows or not.
+    public boolean canSaplingConsumeBoneMeal(LevelReader level, BlockPos pos) {
+        return canBoneMealTree() && canSaplingGrow(level, pos);
+    }
+
+    //Returns whether the bonemealing should cause sapling growth.
+    public boolean canSaplingGrowAfterBoneMeal(Level level, RandomSource rand, BlockPos pos) {
+        return canBoneMealTree() && canSaplingGrow(level, pos);
+    }
+
+    public int saplingFireSpread() {
+        return 0;
+    }
+
+    public int saplingFlammability() {
+        return 0;
+    }
+
 //    public final boolean transitionToTree(Level level, BlockPos pos) {
 //        return !Hooks.onTransitionSaplingToTree(this, level, pos) && shouldTransitionToTree(level, pos) &&
 //                transitionToTree(level, pos, getFamily());
@@ -997,391 +1047,391 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //    protected boolean shouldTransitionToTree(Level level, BlockPos pos) {
 //        return level.isEmptyBlock(pos.above()) && isAcceptableSoil(level, pos.below(), level.getBlockState(pos.below()));
 //    }
-//
-//    protected boolean transitionToTree(Level level, BlockPos pos, Family family) {
-//        // Set to a single branch with 1 radius.
-//        family.getBranch().ifPresent(branch -> branch.setRadius(level, pos, family.getPrimaryThickness(), null));
-//        // Place a single leaf block on top.
-//        level.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState());
-//        // Set to fully fertilized rooty dirt underneath.
-//        placeRootyDirtBlock(level, pos.below(), 15);
-//
+
+    protected boolean transitionToTree(Level level, BlockPos pos, Family family) {
+        // Set to a single branch with 1 radius.
+        family.getBranch().ifPresent(branch -> branch.setRadius(level, pos, family.getPrimaryThickness(), null));
+        // Place a single leaf block on top.
+        level.setBlockAndUpdate(pos.above(), getLeavesProperties().getDynamicLeavesState());
+        // Set to fully fertilized rooty dirt underneath.
+        placeRootyDirtBlock(level, pos.below(), 15);
+
 //        if (doesRequireTileEntity(level, pos)) {
 //            SpeciesBlockEntity speciesBlockEntity = DTRegistries.SPECIES_BLOCK_ENTITY.create(pos.below(), level.getBlockState(pos.below()));
 //            level.setBlockEntity(speciesBlockEntity);
 //            speciesBlockEntity.setSpecies(this);
 //        }
-//
-//        return true;
-//    }
-//
-//    private VoxelShape saplingShape = CommonVoxelShapes.SAPLING;
-//
-//    public VoxelShape getSaplingShape() {
-//        return this.saplingShape;
-//    }
-//
-//    public Species setSaplingShape(VoxelShape saplingShape) {
-//        this.saplingShape = saplingShape;
-//        return this;
-//    }
-//
-//    private String saplingName = null;
-//
-//    //This is used to load the sapling model
-//    public ResourceLocation getSaplingRegName() {
-//        if (saplingName == null) {
-//            return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
-//        } else {
-//            return new ResourceLocation(getRegistryName().getNamespace(), saplingName);
-//        }
-//    }
-//
-//    public String getSaplingModelName() {
-//        return "block/saplings/" + Objects.requireNonNullElseGet(saplingName, () -> this.getRegistryName().getPath());
-//    }
-//
-//    public void setSaplingName(String name) {
-//        saplingName = name;
-//    }
-//
-//    public void setTintSapling(Boolean tintSapling) {
-//        this.tintSapling = tintSapling;
-//    }
-//
-//    public int saplingColorMultiplier(BlockState state, BlockAndTintGetter level, BlockPos pos, int tintIndex) {
-//        if (tintSapling){
-//            if (tintIndex == 0)
-//                return getLeavesProperties().foliageColorMultiplier(state, level, pos);
-//            if (tintIndex == 1)
-//                return family.getRootColor(state, true);
-//            return -1;
-//        } else return 0xFFFFFFFF;
-//
-//    }
-//
-//    private SoundType saplingSound = SoundType.GRASS;
-//
-//    public SoundType getSaplingSound() {
-//        return this.saplingSound;
-//    }
-//
-//    public Species setSaplingSound(SoundType saplingSound) {
-//        this.saplingSound = saplingSound;
-//        return this;
-//    }
-//
-//    ///////////////////////////////////////////
-//    //DIRT
-//    ///////////////////////////////////////////
-//
-//    public boolean placeRootyDirtBlock(LevelAccessor level, BlockPos rootPos, int fertility) {
-//        BlockState dirtState = level.getBlockState(rootPos);
-//        Block dirt = dirtState.getBlock();
-//
-//        if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock)) {
-//            //soil is not valid so we default to dirt
-//            LogManager.getLogger().warn("Rooty Dirt block NOT FOUND for soil " + ForgeRegistries.BLOCKS.getKey(dirt)); //default to dirt and print error
-//            this.placeRootyDirtBlock(level, rootPos, Blocks.DIRT.defaultBlockState(), fertility);
-//            return false;
-//        }
-//
-//        if (dirt instanceof RootyBlock) {
-//            //dirt block is already a soil, so we just update it
-//            this.updateRootyDirtBlock(level, rootPos, dirtState, fertility);
-//        } else if (SoilHelper.isSoilRegistered(dirt)) {
-//            this.placeRootyDirtBlock(level, rootPos, dirtState, fertility);
-//        }
-//
-//        BlockEntity tileEntity = level.getExistingBlockEntity(rootPos);
-//        if (tileEntity instanceof SpeciesBlockEntity speciesTE) {
-//            speciesTE.setSpecies(this);
-//        }
-//
-//        return true;
-//    }
-//
-//    private void placeRootyDirtBlock(LevelAccessor level, BlockPos rootPos, BlockState primitiveDirtState, int fertility) {
-//        final SoilProperties soilProperties = forceSoil != null ? forceSoil : SoilHelper.getProperties(primitiveDirtState.getBlock());
-//        soilProperties.getBlock().ifPresent(block ->
-//                level.setBlock(rootPos, soilProperties.getSoilState(primitiveDirtState, fertility, this.doesRequireTileEntity(level, rootPos)), 3)
-//        );
-//    }
-//
-//    private void updateRootyDirtBlock(LevelAccessor level, BlockPos rootPos, BlockState soilState, int fertility) {
-//        if (soilState.getBlock() instanceof RootyBlock) {
-//            level.setBlock(rootPos, soilState.setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(level, rootPos)), 3);
-//        }
-//    }
-//
-//    public SoilProperties getForceSoil() {
-//        return forceSoil;
-//    }
-//
-//    public Species setForceSoil(SoilProperties soil) {
-//        forceSoil = soil;
-//        return this;
-//    }
-//
-//    public Species setSoilLongevity(int longevity) {
-//        soilLongevity = longevity;
-//        return this;
-//    }
-//
-//    public int getSoilLongevity(Level level, BlockPos rootPos) {
-//        return (int) (biomeSuitability(level, rootPos) * soilLongevity);
-//    }
-//
-//    public boolean isThick() {
-//        return this.maxBranchRadius > BranchBlock.MAX_RADIUS;
-//    }
-//
-//    public int getMaxBranchRadius() {
-//        return this.maxBranchRadius;
-//    }
-//
-//    public void setMaxBranchRadius(int maxBranchRadius) {
-//        this.maxBranchRadius = Mth.clamp(maxBranchRadius, 1, this.getFamily().getMaxBranchRadius());
-//    }
-//
-//    public Species addAcceptableSoils(String... soilTypes) {
-//        soilTypeFlags |= SoilHelper.getSoilFlags(soilTypes);
-//        return this;
-//    }
-//
-//    public Species addAcceptableSoilsForWorldGen(String... soilTypes) {
-//        worldGenSoilTypeFlags |= SoilHelper.getSoilFlags(soilTypes);
-//        return this;
-//    }
-//
-//    /**
-//     * Will clear the acceptable soils list.  Useful for making trees that can only be planted in abnormal substrates.
-//     */
-//    public Species clearAcceptableSoils() {
-//        soilTypeFlags = 0;
-//        worldGenSoilTypeFlags = 0;
-//        return this;
-//    }
-//
-//    /**
-//     * This is run by the Species class itself to set the standard blocks available to be used as planting substrate.
-//     * Developer may override this entirely or just modify the list at a later time.
-//     */
-//    protected void setStandardSoils() {
-//        addAcceptableSoils(SoilHelper.DIRT_LIKE);
-//    }
-//
-//    public boolean hasAcceptableSoil() {
-//        return this.soilTypeFlags != 0;
-//    }
-//
-////    /**
-////     * Moves ground position for world generation purposes to allow trees in snow-covered biomes, for example.
-////     */
-////    public BlockPos moveGroundPosWorldgen(LevelAccessor world, BlockPos pos, BlockState soilBlockState) {
-////        if (!soilBlockState.is(BlockTags.SNOW))
-////            return pos;
-////
-////        for (int steps = 8; steps > 0 && soilBlockState.is(BlockTags.SNOW); steps--) {
-////            pos = pos.below();
-////            soilBlockState = world.getBlockState(pos);
-////        }
-////
-////        return pos;
-////    }
-//
-//    /**
-//     * Soil acceptability tester.  Mostly to test if the block is dirt but could be overridden to allow gravel, sand, or
-//     * whatever makes sense for the tree species.
-//     */
-//    public boolean isAcceptableSoil(BlockState soilBlockState) {
-//        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags);
-//    }
-//
-//    public boolean isAcceptableSoil(String... soilTypes) {
-//        return (SoilHelper.getSoilFlags(soilTypes) & soilTypeFlags) != 0;
-//    }
-//
-//    /**
-//     * Position sensitive soil acceptability tester.  Mostly to test if the block is dirt but could be overridden to
-//     * allow gravel, sand, or whatever makes sense for the tree species.
-//     */
-//    public boolean isAcceptableSoil(LevelReader level, BlockPos pos, BlockState soilBlockState) {
-//        return isAcceptableSoil(soilBlockState);
-//    }
-//
-//    private int allowedWaterHeightForWorldgen = 1;
-//
-//    public void setAllowedWaterHeightForWorldgen(int allowedWaterHeightForWorldgen) {
-//        this.allowedWaterHeightForWorldgen = allowedWaterHeightForWorldgen;
-//    }
-//
-//    public int getAllowedWaterHeightForWorldgen() {
-//        return allowedWaterHeightForWorldgen;
-//    }
-//
-//    /**
-//     * Version of soil acceptability tester that is only run for worldgen.  This allows for Swamp oaks and stuff.
-//     *
-//     * @param level
-//     * @param pos
-//     * @param soilBlockState
-//     * @return
-//     */
-//    public boolean isAcceptableSoilForWorldgen(LevelAccessor level, BlockPos pos, BlockState soilBlockState) {
-//        final boolean isAcceptableSoil = isAcceptableSoilForWorldgen(soilBlockState);
-//
-//        // If the block is water, check the block below it is valid soil (and not water).
-//        if (isAcceptableSoil && isWater(soilBlockState)) {
-//            int maxH = getAllowedWaterHeightForWorldgen();
-//            int waterBelow = countWaterBlocksBelow(level, pos, maxH+2);
-//            return waterBelow <= maxH && isAcceptableSoilForWorldgen(level.getBlockState(pos.below(waterBelow)));
-//        }
-//
-//
-//        return isAcceptableSoil;
-//    }
-//
-//    public boolean isAcceptableSoilForWorldgen(BlockState soilBlockState) {
-//        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags) ||
-//                SoilHelper.isSoilAcceptable(soilBlockState, worldGenSoilTypeFlags);
-//    }
-//
-//    protected boolean isWater(BlockState soilBlockState) {
-//        return SoilHelper.isSoilAcceptable(soilBlockState, SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE));
-//    }
-//
-//    protected int countWaterBlocksBelow (LevelAccessor level, BlockPos startPos, int maxCount){
-//        int i=0;
-//        for (; i<=maxCount; i++){
-//            final BlockState downState = level.getBlockState(startPos.below(i));
-//            if (!isWater(downState))
-//                break;
-//        }
-//        return i;
-//    }
-//
-//    private boolean plantableOnFluid = false;
-//
-//    public void setPlantableOnFluid(boolean plantableOnFluid) {
-//        this.plantableOnFluid = plantableOnFluid;
-//    }
-//
-//    public boolean isPlantableOnFluid() {
-//        return plantableOnFluid;
-//    }
-//
-//    /**
-//     * Allows the species to handle a custom action for when the soil block is destroyed
-//     * @param level
-//     * @param rootPos
-//     * @param state
-//     * @param player
-//     * @return TRUE if the action is handled, FALSE to continue with default behavior
-//     */
-//    public boolean soilDestroyAction (Level level, @Nonnull BlockPos rootPos, BlockState state, @Nonnull Player player){
-//        return false;
-//    }
-//
-//    //////////////////////////////
-//    // GROWTH
-//    //////////////////////////////
-//
-//    /**
-//     * Basic update. This handles everything for the species Rot, Drops, Fruit, Disease, and Growth respectively. If the
-//     * rapid option is enabled then drops, fruit and disease are skipped.
-//     * <p>
-//     * This should never be run by the level generator.
-//     *
-//     * @param level     The level
-//     * @param rootyDirt The {@link RootyBlock} that is supporting this tree
-//     * @param rootPos   The {@link BlockPos} of the {@link RootyBlock} type in the level
-//     * @param fertility The fertility of the soil. 0: Depleted -> 15: Full
-//     * @param treePos   The {@link BlockPos} of the {@link Family} trunk base.
-//     * @param random    A random number generator
-//     * @param natural   Set this to true if this member is being used to naturally grow the tree(create drops or fruit)
-//     * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
-//     * is on)
-//     */
-//    public boolean update(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
-//
-//        //Analyze structure to gather all the endpoints.  They will be useful for this entire update
-//        List<BlockPos> ends = getEnds(level, treePos, treeBase);
-//
-//        //This will prune rotted positions from the level and the end point list
-//        if (handleRot(level, ends, rootPos, treePos, fertility, SafeChunkBounds.ANY)) {
-//            return false;//Last piece of tree rotted away.
-//        }
-//
-//        if (natural) {
-//            //This will handle seed drops
-//            handleVoluntaryDrops(level, ends, rootPos, treePos, fertility);
-//
-//            //This will handle disease chance
-//            if (handleDisease(level, treeBase, treePos, random, fertility)) {
-//                return true;//Although the tree may be diseased. The tree network is still viable.
-//            }
-//        }
-//
-//        return grow(level, rootyDirt, rootPos, fertility, treeBase, treePos, random, natural);
-//    }
-//
-//    /**
-//     * A little internal convenience function for getting branch endpoints
-//     *
-//     * @param level    The level
-//     * @param treePos  The {@link BlockPos} of the base of the {@link Family} trunk
-//     * @param treeBase The tree part that is the base of the {@link Family} trunk.  Provided for easy analysis.
-//     * @return A list of all branch endpoints for the {@link Family}
-//     */
-//    final protected List<BlockPos> getEnds(Level level, BlockPos treePos, TreePart treeBase) {
-//        FindEndsNode endFinder = new FindEndsNode();
-//        treeBase.analyse(level.getBlockState(treePos), level, treePos, null, new MapSignal(endFinder));
-//        return endFinder.getEnds();
-//    }
-//
-//    /**
-//     * A postRot handler.
-//     *
-//     * @param level      The level
-//     * @param ends       A {@link List} of {@link BlockPos}s of {@link BranchBlock} endpoints.
-//     * @param rootPos    The {@link BlockPos} of the {@link RootyBlock} for this {@link Family}
-//     * @param treePos    The {@link BlockPos} of the trunk base for this {@link Family}
-//     * @param fertility  The fertility of the {@link RootyBlock}
-//     * @param safeBounds The defined boundaries where it is safe to make block changes
-//     * @return true if last piece of tree rotted away.
-//     */
-//    public boolean handleRot(LevelAccessor level, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int fertility, SafeChunkBounds safeBounds) {
-//
-//        Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
-//        SimpleVoxmap leafMap = getLeavesProperties().getCellKit().getLeafCluster();
-//
-//        while (iter.hasNext()) {
-//            BlockPos endPos = iter.next();
-//            BlockState branchState = level.getBlockState(endPos);
-//            BranchBlock branch = TreeHelper.getBranch(branchState);
-//            if (branch != null) {
-//                int radius = branch.getRadius(branchState);
-//                float rotChance = rotChance(level, endPos, level.getRandom(), radius);
-//                if (branch.checkForRot(level, endPos, this, fertility, radius, level.getRandom(), rotChance, safeBounds != SafeChunkBounds.ANY) || radius != family.getPrimaryThickness()) {
-//                    if (safeBounds != SafeChunkBounds.ANY) { // worldgen
-//                        TreeHelper.ageVolume(level, endPos.below(leafMap.getCenter().getY()), leafMap.getLenX() / 2, leafMap.getLenY(), 2, safeBounds);
-//                    }
-//                    iter.remove(); // Prune out the rotted end points, so we don't spawn fruit from them.
-//                }
-//            }
-//        }
-//
-//        return ends.isEmpty() && !TreeHelper.isBranch(level.getBlockState(treePos));//There are no endpoints and the trunk is missing
-//    }
-//
-//    static private final Direction[] upFirst = {Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
-//
-//    private boolean doesRot = true;
-//
-//    public void setDoesRot(boolean doesRot) {
-//        this.doesRot = doesRot;
-//    }
+
+        return true;
+    }
+
+    private VoxelShape saplingShape = CommonVoxelShapes.SAPLING;
+
+    public VoxelShape getSaplingShape() {
+        return this.saplingShape;
+    }
+
+    public Species setSaplingShape(VoxelShape saplingShape) {
+        this.saplingShape = saplingShape;
+        return this;
+    }
+
+    private String saplingName = null;
+
+    //This is used to load the sapling model
+    public ResourceLocation getSaplingRegName() {
+        if (saplingName == null) {
+            return ResourceLocationUtils.suffix(this.getRegistryName(), "_sapling");
+        } else {
+            return ResourceLocation.fromNamespaceAndPath(getRegistryName().getNamespace(), saplingName);
+        }
+    }
+
+    public String getSaplingModelName() {
+        return "block/saplings/" + Objects.requireNonNullElseGet(saplingName, () -> this.getRegistryName().getPath());
+    }
+
+    public void setSaplingName(String name) {
+        saplingName = name;
+    }
+
+    public void setTintSapling(Boolean tintSapling) {
+        this.tintSapling = tintSapling;
+    }
+
+    public int saplingColorMultiplier(BlockState state, BlockAndTintGetter level, BlockPos pos, int tintIndex) {
+        if (tintSapling){
+            if (tintIndex == 0)
+                return getLeavesProperties().foliageColorMultiplier(state, level, pos);
+            if (tintIndex == 1)
+                return family.getRootColor(state, true);
+            return -1;
+        } else return 0xFFFFFFFF;
+
+    }
+
+    private SoundType saplingSound = SoundType.GRASS;
+
+    public SoundType getSaplingSound() {
+        return this.saplingSound;
+    }
+
+    public Species setSaplingSound(SoundType saplingSound) {
+        this.saplingSound = saplingSound;
+        return this;
+    }
+
+    ///////////////////////////////////////////
+    //DIRT
+    ///////////////////////////////////////////
+
+    public boolean placeRootyDirtBlock(LevelAccessor level, BlockPos rootPos, int fertility) {
+        BlockState dirtState = level.getBlockState(rootPos);
+        Block dirt = dirtState.getBlock();
+
+        if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock)) {
+            //soil is not valid so we default to dirt
+            DynamicTrees.LOG.warn("Rooty Dirt block NOT FOUND for soil {}", BuiltInRegistries.BLOCK.getKey(dirt)); //default to dirt and print error
+            this.placeRootyDirtBlock(level, rootPos, Blocks.DIRT.defaultBlockState(), fertility);
+            return false;
+        }
+
+        if (dirt instanceof RootyBlock) {
+            //dirt block is already a soil, so we just update it
+            this.updateRootyDirtBlock(level, rootPos, dirtState, fertility);
+        } else if (SoilHelper.isSoilRegistered(dirt)) {
+            this.placeRootyDirtBlock(level, rootPos, dirtState, fertility);
+        }
+
+        BlockEntity tileEntity = level.getBlockEntity(rootPos);
+        if (tileEntity instanceof SpeciesBlockEntity speciesTE) {
+            speciesTE.setSpecies(this);
+        }
+
+        return true;
+    }
+
+    private void placeRootyDirtBlock(LevelAccessor level, BlockPos rootPos, BlockState primitiveDirtState, int fertility) {
+        final SoilProperties soilProperties = forceSoil != null ? forceSoil : SoilHelper.getProperties(primitiveDirtState.getBlock());
+        soilProperties.getBlock().ifPresent(block ->
+                level.setBlock(rootPos, soilProperties.getSoilState(primitiveDirtState, fertility, this.doesRequireTileEntity(level, rootPos)), 3)
+        );
+    }
+
+    private void updateRootyDirtBlock(LevelAccessor level, BlockPos rootPos, BlockState soilState, int fertility) {
+        if (soilState.getBlock() instanceof RootyBlock) {
+            level.setBlock(rootPos, soilState.setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(level, rootPos)), 3);
+        }
+    }
+
+    public SoilProperties getForceSoil() {
+        return forceSoil;
+    }
+
+    public Species setForceSoil(SoilProperties soil) {
+        forceSoil = soil;
+        return this;
+    }
+
+    public Species setSoilLongevity(int longevity) {
+        soilLongevity = longevity;
+        return this;
+    }
+
+    public int getSoilLongevity(Level level, BlockPos rootPos) {
+        return (int) (biomeSuitability(level, rootPos) * soilLongevity);
+    }
+
+    public boolean isThick() {
+        return this.maxBranchRadius > BranchBlock.MAX_RADIUS;
+    }
+
+    public int getMaxBranchRadius() {
+        return this.maxBranchRadius;
+    }
+
+    public void setMaxBranchRadius(int maxBranchRadius) {
+        this.maxBranchRadius = Mth.clamp(maxBranchRadius, 1, this.getFamily().getMaxBranchRadius());
+    }
+
+    public Species addAcceptableSoils(String... soilTypes) {
+        soilTypeFlags |= SoilHelper.getSoilFlags(soilTypes);
+        return this;
+    }
+
+    public Species addAcceptableSoilsForWorldGen(String... soilTypes) {
+        worldGenSoilTypeFlags |= SoilHelper.getSoilFlags(soilTypes);
+        return this;
+    }
+
+    /**
+     * Will clear the acceptable soils list.  Useful for making trees that can only be planted in abnormal substrates.
+     */
+    public Species clearAcceptableSoils() {
+        soilTypeFlags = 0;
+        worldGenSoilTypeFlags = 0;
+        return this;
+    }
+
+    /**
+     * This is run by the Species class itself to set the standard blocks available to be used as planting substrate.
+     * Developer may override this entirely or just modify the list at a later time.
+     */
+    protected void setStandardSoils() {
+        addAcceptableSoils(SoilHelper.DIRT_LIKE);
+    }
+
+    public boolean hasAcceptableSoil() {
+        return this.soilTypeFlags != 0;
+    }
+
+    /**
+     * Moves ground position for world generation purposes to allow trees in snow-covered biomes, for example.
+     */
+    public BlockPos moveGroundPosWorldgen(LevelAccessor world, BlockPos pos, BlockState soilBlockState) {
+        if (!soilBlockState.is(BlockTags.SNOW))
+            return pos;
+
+        for (int steps = 8; steps > 0 && soilBlockState.is(BlockTags.SNOW); steps--) {
+            pos = pos.below();
+            soilBlockState = world.getBlockState(pos);
+        }
+
+        return pos;
+    }
+
+    /**
+     * Soil acceptability tester.  Mostly to test if the block is dirt but could be overridden to allow gravel, sand, or
+     * whatever makes sense for the tree species.
+     */
+    public boolean isAcceptableSoil(BlockState soilBlockState) {
+        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags);
+    }
+
+    public boolean isAcceptableSoil(String... soilTypes) {
+        return (SoilHelper.getSoilFlags(soilTypes) & soilTypeFlags) != 0;
+    }
+
+    /**
+     * Position sensitive soil acceptability tester.  Mostly to test if the block is dirt but could be overridden to
+     * allow gravel, sand, or whatever makes sense for the tree species.
+     */
+    public boolean isAcceptableSoil(LevelReader level, BlockPos pos, BlockState soilBlockState) {
+        return isAcceptableSoil(soilBlockState);
+    }
+
+    private int allowedWaterHeightForWorldgen = 1;
+
+    public void setAllowedWaterHeightForWorldgen(int allowedWaterHeightForWorldgen) {
+        this.allowedWaterHeightForWorldgen = allowedWaterHeightForWorldgen;
+    }
+
+    public int getAllowedWaterHeightForWorldgen() {
+        return allowedWaterHeightForWorldgen;
+    }
+
+    /**
+     * Version of soil acceptability tester that is only run for worldgen.  This allows for Swamp oaks and stuff.
+     *
+     * @param level
+     * @param pos
+     * @param soilBlockState
+     * @return
+     */
+    public boolean isAcceptableSoilForWorldgen(LevelAccessor level, BlockPos pos, BlockState soilBlockState) {
+        final boolean isAcceptableSoil = isAcceptableSoilForWorldgen(soilBlockState);
+
+        // If the block is water, check the block below it is valid soil (and not water).
+        if (isAcceptableSoil && isWater(soilBlockState)) {
+            int maxH = getAllowedWaterHeightForWorldgen();
+            int waterBelow = countWaterBlocksBelow(level, pos, maxH+2);
+            return waterBelow <= maxH && isAcceptableSoilForWorldgen(level.getBlockState(pos.below(waterBelow)));
+        }
+
+
+        return isAcceptableSoil;
+    }
+
+    public boolean isAcceptableSoilForWorldgen(BlockState soilBlockState) {
+        return SoilHelper.isSoilAcceptable(soilBlockState, soilTypeFlags) ||
+                SoilHelper.isSoilAcceptable(soilBlockState, worldGenSoilTypeFlags);
+    }
+
+    protected boolean isWater(BlockState soilBlockState) {
+        return SoilHelper.isSoilAcceptable(soilBlockState, SoilHelper.getSoilFlags(SoilHelper.WATER_LIKE));
+    }
+
+    protected int countWaterBlocksBelow (LevelAccessor level, BlockPos startPos, int maxCount){
+        int i=0;
+        for (; i<=maxCount; i++){
+            final BlockState downState = level.getBlockState(startPos.below(i));
+            if (!isWater(downState))
+                break;
+        }
+        return i;
+    }
+
+    private boolean plantableOnFluid = false;
+
+    public void setPlantableOnFluid(boolean plantableOnFluid) {
+        this.plantableOnFluid = plantableOnFluid;
+    }
+
+    public boolean isPlantableOnFluid() {
+        return plantableOnFluid;
+    }
+
+    /**
+     * Allows the species to handle a custom action for when the soil block is destroyed
+     * @param level
+     * @param rootPos
+     * @param state
+     * @param player
+     * @return TRUE if the action is handled, FALSE to continue with default behavior
+     */
+    public boolean soilDestroyAction (Level level, @NotNull BlockPos rootPos, BlockState state, @NotNull Player player){
+        return false;
+    }
+
+    //////////////////////////////
+    // GROWTH
+    //////////////////////////////
+
+    /**
+     * Basic update. This handles everything for the species Rot, Drops, Fruit, Disease, and Growth respectively. If the
+     * rapid option is enabled then drops, fruit and disease are skipped.
+     * <p>
+     * This should never be run by the level generator.
+     *
+     * @param level     The level
+     * @param rootyDirt The {@link RootyBlock} that is supporting this tree
+     * @param rootPos   The {@link BlockPos} of the {@link RootyBlock} type in the level
+     * @param fertility The fertility of the soil. 0: Depleted -> 15: Full
+     * @param treePos   The {@link BlockPos} of the {@link Family} trunk base.
+     * @param random    A random number generator
+     * @param natural   Set this to true if this member is being used to naturally grow the tree(create drops or fruit)
+     * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
+     * is on)
+     */
+    public boolean update(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
+
+        //Analyze structure to gather all the endpoints.  They will be useful for this entire update
+        List<BlockPos> ends = getEnds(level, treePos, treeBase);
+
+        //This will prune rotted positions from the level and the end point list
+        if (handleRot(level, ends, rootPos, treePos, fertility, false)) {
+            return false;//Last piece of tree rotted away.
+        }
+
+        if (natural) {
+            //This will handle seed drops
+            handleVoluntaryDrops(level, ends, rootPos, treePos, fertility);
+
+            //This will handle disease chance
+            if (handleDisease(level, treeBase, treePos, random, fertility)) {
+                return true;//Although the tree may be diseased. The tree network is still viable.
+            }
+        }
+
+        return grow(level, rootyDirt, rootPos, fertility, treeBase, treePos, random, natural);
+    }
+
+    /**
+     * A little internal convenience function for getting branch endpoints
+     *
+     * @param level    The level
+     * @param treePos  The {@link BlockPos} of the base of the {@link Family} trunk
+     * @param treeBase The tree part that is the base of the {@link Family} trunk.  Provided for easy analysis.
+     * @return A list of all branch endpoints for the {@link Family}
+     */
+    final protected List<BlockPos> getEnds(Level level, BlockPos treePos, TreePart treeBase) {
+        FindEndsNode endFinder = new FindEndsNode();
+        treeBase.analyse(level.getBlockState(treePos), level, treePos, null, new MapSignal(endFinder));
+        return endFinder.getEnds();
+    }
+
+    /**
+     * A postRot handler.
+     *
+     * @param level      The level
+     * @param ends       A {@link List} of {@link BlockPos}s of {@link BranchBlock} endpoints.
+     * @param rootPos    The {@link BlockPos} of the {@link RootyBlock} for this {@link Family}
+     * @param treePos    The {@link BlockPos} of the trunk base for this {@link Family}
+     * @param fertility  The fertility of the {@link RootyBlock}
+     * @param worldGen   Weather this is happening during worldgen
+     * @return true if last piece of tree rotted away.
+     */
+    public boolean handleRot(LevelAccessor level, List<BlockPos> ends, BlockPos rootPos, BlockPos treePos, int fertility, boolean worldGen) {
+
+        Iterator<BlockPos> iter = ends.iterator();//We need an iterator since we may be removing elements.
+        SimpleVoxmap leafMap = getLeavesProperties().getCellKit().getLeafCluster();
+
+        while (iter.hasNext()) {
+            BlockPos endPos = iter.next();
+            BlockState branchState = level.getBlockState(endPos);
+            BranchBlock branch = TreeHelper.getBranch(branchState);
+            if (branch != null) {
+                int radius = branch.getRadius(branchState);
+                float rotChance = rotChance(level, endPos, level.getRandom(), radius);
+                if (branch.checkForRot(level, endPos, this, fertility, radius, level.getRandom(), rotChance, worldGen) || radius != family.getPrimaryThickness()) {
+                    if (worldGen) { // worldgen
+                        TreeHelper.ageVolume(level, endPos.below(leafMap.getCenter().getY()), leafMap.getLenX() / 2, leafMap.getLenY(), 2, true);
+                    }
+                    iter.remove(); // Prune out the rotted end points, so we don't spawn fruit from them.
+                }
+            }
+        }
+
+        return ends.isEmpty() && !TreeHelper.isBranch(level.getBlockState(treePos));//There are no endpoints and the trunk is missing
+    }
+
+    static private final Direction[] upFirst = {Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+
+    private boolean doesRot = true;
+
+    public void setDoesRot(boolean doesRot) {
+        this.doesRot = doesRot;
+    }
 
     /**
      * Handles rotting branches.
@@ -1430,52 +1480,52 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return false;
     }
 
-//    /**
-//     * @deprecated No longe in use due to extra parameter. Use/override {@link #rot(LevelAccessor, BlockPos, int, int, int,
-//     * RandomSource, boolean, boolean)} instead.
-//     */
-//    @Deprecated
-//    public boolean rot(LevelAccessor level, BlockPos pos, int neighborCount, int radius, RandomSource random, boolean rapid) {
-//        return false;
-//    }
-//
-//    public void postRot(PostRotContext context) {
-//        this.genFeatures.forEach(configuration -> configuration.generate(GenFeature.Type.POST_ROT, context));
-//    }
-//
-//    /**
-//     * Provides the chance that a log will postRot.
-//     *
-//     * @param level  The level
-//     * @param pos    The {@link BlockPos} of the {@link BranchBlock}
-//     * @param rand   A random number generator
-//     * @param radius The radius of the {@link BranchBlock}
-//     * @return The chance this will postRot. 0.0(never) -> 1.0(always)
-//     */
-//    public float rotChance(LevelAccessor level, BlockPos pos, RandomSource rand, int radius) {
-//        if (radius == 0) {
-//            return 0;
-//        }
-//        return 0.3f + ((1f / radius));// Thicker branches take longer to postRot
-//    }
-//
-//    /**
-//     * The growth handler.
-//     *
-//     * @param level     The level
-//     * @param rootyDirt The {@link RootyBlock} that is supporting this tree
-//     * @param rootPos   The {@link BlockPos} of the {@link RootyBlock} type in the level
-//     * @param fertility The fertility of the soil. 0: Depleted -> 15: Full
-//     * @param treePos   The {@link BlockPos} of the {@link Family} trunk base.
-//     * @param random    A random number generator
-//     * @param natural   If true then this member is being used to grow the tree naturally(create drops or fruit). If
-//     *                  false then this member is being used to grow a tree with a growth accelerant like bonemeal or
-//     *                  the potion of burgeoning
-//     * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
-//     * is on)
-//     */
-//    public boolean grow(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
-//
+    /**
+     * @deprecated No longe in use due to extra parameter. Use/override {@link #rot(LevelAccessor, BlockPos, int, int, int,
+     * RandomSource, boolean, boolean)} instead.
+     */
+    @Deprecated
+    public boolean rot(LevelAccessor level, BlockPos pos, int neighborCount, int radius, RandomSource random, boolean rapid) {
+        return false;
+    }
+
+    public void postRot(PostRotContext context) {
+        this.genFeatures.forEach(configuration -> configuration.generate(GenFeature.Type.POST_ROT, context));
+    }
+
+    /**
+     * Provides the chance that a log will postRot.
+     *
+     * @param level  The level
+     * @param pos    The {@link BlockPos} of the {@link BranchBlock}
+     * @param rand   A random number generator
+     * @param radius The radius of the {@link BranchBlock}
+     * @return The chance this will postRot. 0.0(never) -> 1.0(always)
+     */
+    public float rotChance(LevelAccessor level, BlockPos pos, RandomSource rand, int radius) {
+        if (radius == 0) {
+            return 0;
+        }
+        return 0.3f + ((1f / radius));// Thicker branches take longer to postRot
+    }
+
+    /**
+     * The growth handler.
+     *
+     * @param level     The level
+     * @param rootyDirt The {@link RootyBlock} that is supporting this tree
+     * @param rootPos   The {@link BlockPos} of the {@link RootyBlock} type in the level
+     * @param fertility The fertility of the soil. 0: Depleted -> 15: Full
+     * @param treePos   The {@link BlockPos} of the {@link Family} trunk base.
+     * @param random    A random number generator
+     * @param natural   If true then this member is being used to grow the tree naturally(create drops or fruit). If
+     *                  false then this member is being used to grow a tree with a growth accelerant like bonemeal or
+     *                  the potion of burgeoning
+     * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
+     * is on)
+     */
+    public boolean grow(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
+
 //        float growthRate = (float) (getGrowthRate(level, rootPos) * DTConfigs.TREE_GROWTH_MULTIPLIER.get() * DTConfigs.TREE_GROWTH_FOLDING.get());
 //        do {
 //            if (fertility > 0) {
@@ -1498,65 +1548,65 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //        } while (--growthRate > 0.0f);
 //
 //        this.postGrow(level, rootPos, treePos, fertility, natural);
-//        return true;
-//    }
-//
-//    protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos, Direction defaultDir){
-//        final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.random, defaultDir);
-//        return treeBase.growSignal(level, treePos, signal);
-//    }
-//
-//    public Species setGrowthLogicKit(GrowthLogicKit logicKit) {
-//        this.logicKit = logicKit.getDefaultConfiguration();
-//        return this;
-//    }
-//
-//    /**
-//     * Set the logic kit used to determine how the tree branch network expands. Provides an alternate and more modular
-//     * method to override a trees growth logic.
-//     *
-//     * @param logicKit A growth logic kit
-//     * @return this species for chaining
-//     */
-//    public Species setGrowthLogicKit(GrowthLogicKitConfiguration logicKit) {
-//        this.logicKit = logicKit;
-//        return this;
-//    }
-//
-//    public GrowthLogicKitConfiguration getGrowthLogicKit() {
-//        return logicKit;
-//    }
-//
-//    private boolean canBoneMealTree = true;
-//
-//    public void setCanBoneMealTree(boolean canBoneMealTree) {
-//        this.canBoneMealTree = canBoneMealTree;
-//    }
-//
-//    public boolean canBoneMealTree() {
-//        return canBoneMealTree;
-//    }
-//
-//    /**
-//     * Allows a species to do things after a growth event just occurred. Such as used by Jungle trees to create cocoa pods
-//     * on the trunk.
-//     *
-//     * @param level     The level
-//     * @param rootPos   The position of the rooty dirt block
-//     * @param treePos   The position of the base trunk block of the tree(usually directly above the rooty dirt block)
-//     * @param fertility The fertility of the soil block this tree is planted in
-//     * @param natural   If true then this member is being used to grow the tree naturally (create drops or fruit). If
-//     *                  false then this member is being used to grow a tree with a growth accelerant like bonemeal or
-//     *                  the potion of burgeoning.
-//     */
-//    public boolean postGrow(Level level, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
-//        this.genFeatures.forEach(configuration ->
-//                configuration.generate(
-//                        GenFeature.Type.POST_GROW,
-//                        new PostGrowContext(level, rootPos, this, treePos, fertility, natural)
-//                ));
-//        return true;
-//    }
+        return true;
+    }
+
+    protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos, Direction defaultDir){
+        final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.random, defaultDir);
+        return treeBase.growSignal(level, treePos, signal);
+    }
+
+    public Species setGrowthLogicKit(GrowthLogicKit logicKit) {
+        this.logicKit = logicKit.getDefaultConfiguration();
+        return this;
+    }
+
+    /**
+     * Set the logic kit used to determine how the tree branch network expands. Provides an alternate and more modular
+     * method to override a trees growth logic.
+     *
+     * @param logicKit A growth logic kit
+     * @return this species for chaining
+     */
+    public Species setGrowthLogicKit(GrowthLogicKitConfiguration logicKit) {
+        this.logicKit = logicKit;
+        return this;
+    }
+
+    public GrowthLogicKitConfiguration getGrowthLogicKit() {
+        return logicKit;
+    }
+
+    private boolean canBoneMealTree = true;
+
+    public void setCanBoneMealTree(boolean canBoneMealTree) {
+        this.canBoneMealTree = canBoneMealTree;
+    }
+
+    public boolean canBoneMealTree() {
+        return canBoneMealTree;
+    }
+
+    /**
+     * Allows a species to do things after a growth event just occurred. Such as used by Jungle trees to create cocoa pods
+     * on the trunk.
+     *
+     * @param level     The level
+     * @param rootPos   The position of the rooty dirt block
+     * @param treePos   The position of the base trunk block of the tree(usually directly above the rooty dirt block)
+     * @param fertility The fertility of the soil block this tree is planted in
+     * @param natural   If true then this member is being used to grow the tree naturally (create drops or fruit). If
+     *                  false then this member is being used to grow a tree with a growth accelerant like bonemeal or
+     *                  the potion of burgeoning.
+     */
+    public boolean postGrow(Level level, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
+        this.genFeatures.forEach(configuration ->
+                configuration.generate(
+                        GenFeature.Type.POST_GROW,
+                        new PostGrowContext(level, rootPos, this, treePos, fertility, natural)
+                ));
+        return true;
+    }
 
     /**
      * Decide what happens for diseases.
@@ -1617,7 +1667,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //        return Mth.clamp(suit, 0.0f, 1.0f);
         return 1;
     }
-//
+
 //    /**
 //     * Used to determine if the provided {@link Biome} argument will yield unhindered growth to Maximum potential. This
 //     * has the affect of the suitability being 100%(or 1.0f)
@@ -1628,164 +1678,164 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //    public boolean isBiomePerfect(final Holder<Biome> biome) {
 //        return this.perfectBiomes.contains(biome);
 //    }
-//
-//    /**
-//     * Used to determine if the provided {@link Biome} argument will yield unhindered growth to Maximum potential. This
-//     * has the affect of the suitability being 100%(or 1.0f)
-//     *
-//     * @param biome The biome being tested
-//     * @return True if biome is "perfect" false otherwise.
-//     */
-//    public boolean isBiomePerfect(ResourceKey<Biome> biome) {
-//        return false;
-//    }
-//
+
+    /**
+     * Used to determine if the provided {@link Biome} argument will yield unhindered growth to Maximum potential. This
+     * has the affect of the suitability being 100%(or 1.0f)
+     *
+     * @param biome The biome being tested
+     * @return True if biome is "perfect" false otherwise.
+     */
+    public boolean isBiomePerfect(ResourceKey<Biome> biome) {
+        return false;
+    }
+
 //    public DTBiomeHolderSet getPerfectBiomes() {
 //        return perfectBiomes;
 //    }
-//
-//    /**
-//     * A value that determines what a tree's suitability is before climate manipulation occurs.
-//     */
-//    public static float defaultSuitability() {
-//        return 0.85f;
-//    }
-//
-//    /**
-//     * A convenience function to test if a biome is one of the many options passed.
-//     *
-//     * @param biomeToCheck The biome we are matching
-//     * @param biomes       Multiple biomes to match against
-//     * @return True if a match is found. False if not.
-//     */
-//    @SafeVarargs
-//    public static boolean isOneOfBiomes(ResourceKey<Biome> biomeToCheck, ResourceKey<Biome>... biomes) {
-//        for (ResourceKey<Biome> biome : biomes) {
-//            if (biomeToCheck.equals(biome)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//
-//    //////////////////////////////
-//    // SEASONAL
-//    //////////////////////////////
-//
-//    /**
-//     * default flower holding is relative to the flowering offset, but default is first half of spring
-//     */
-//    protected float flowerSeasonHoldMin = SeasonHelper.SPRING;
-//    protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
-//
-//    @Nullable
-//    protected Float seasonalGrowthOffset = 0f;
-//    @Nullable
-//    protected Float seasonalSeedDropOffset = 0f;
-//    @Nullable
-//    protected Float seasonalFruitingOffset = 0f;
-//
-//    public void setSeasonalGrowthOffset(@Nullable Float offset) {
-//        seasonalGrowthOffset = offset;
-//    }
-//
-//    public void setSeasonalSeedDropOffset(@Nullable Float offset) {
-//        seasonalSeedDropOffset = offset;
-//    }
-//
-//    /**
-//     * The default fruiting will PEAK in the middle of summer, starting at the middle of spring and ending at the middle
-//     * of fall. this offset will move the fruiting by a factor of one season. (an offset of 2.0 will my fruiting peak in
-//     * winter). set to null for it to be all year round
-//     */
-//    public void setSeasonalFruitingOffset(@Nullable Float offset) {
-//        seasonalFruitingOffset = offset;
-//    }
-//
-//    /**
-//     * Pulls data from the {@link NormalSeasonManager} to determine the rate of
-//     * tree growth for the current season.
-//     *
-//     * @param rootPos the {@link BlockPos} of the {@link RootyBlock}.
-//     * @return Factor from 0.0 (no growth) to 1.0 (full growth).
-//     */
-//    public float seasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos) {
-//        return seasonalGrowthOffset != null ? SeasonHelper.globalSeasonalGrowthFactor(levelContext, rootPos, -seasonalGrowthOffset) : 1.0f;
-//    }
-//
-//    public float seasonalSeedDropFactor(LevelContext levelContext, BlockPos pos) {
-//        return seasonalSeedDropOffset != null ? SeasonHelper.globalSeasonalSeedDropFactor(levelContext, pos, -seasonalSeedDropOffset) : 1.0f;
-//    }
-//
-//    public float seasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos) {
-//        return seasonalFruitingOffset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -seasonalFruitingOffset, false) : 1.0f;
-//    }
-//
-//    public void inheritSeasonalFruitingOffsetToFruits(){
-//        this.fruits.forEach((fruit)->fruit.setSeasonOffset(this.seasonalFruitingOffset));
-//    }
-//
-//    public void inheritSeasonalFruitingOffsetToPods(){
-//        this.pods.forEach((pod)->pod.setSeasonOffset(this.seasonalFruitingOffset));
-//    }
-//
-//    /**
-//     * 1 = Spring 2 = Summer 4 = Autumn 8 = Winter Values are OR'ed together for the return
-//     */
-//    public int getSeasonalTooltipFlags(LevelContext levelContext) {
-//        final float seasonStart = 1f / 6;
-//        final float seasonEnd = 1 - 1f / 6;
-//        final float threshold = 0.75f;
-//
-//        if (this.hasFruits() || this.hasPods()) {
-//            int seasonFlags = 0;
-//            for (int i = 0; i < 4; i++) {
-//                boolean isValidSeason = false;
-//                if (seasonalFruitingOffset != null) {
-//                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
-//                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonEnd - seasonalFruitingOffset) * 64.0f), 0), true);
-//                    if (Math.min(prod1, prod2) > threshold) {
-//                        isValidSeason = true;
-//                    }
-//
-//                } else {
-//                    isValidSeason = true;
-//                }
-//
-//                if (isValidSeason) {
-//                    seasonFlags |= 1 << i;
-//                }
-//
-//            }
-//            return seasonFlags;
-//        }
-//
-//        return 0;
-//    }
-//
-//    /**
-//     * When seasons are active allow a seasonal time range where fruit growth does not progress past the flower stage.
-//     * This allows for a flowery spring time.
-//     *
-//     * @param min The minimum season value relative to the fruiting offset.
-//     * @param max The maximum season value relative to the fruiting offset.
-//     * @return This {@link Species} object for chaining.
-//     */
-//    public Species setFlowerSeasonHold(float min, float max) {
-//        flowerSeasonHoldMin = min;
-//        flowerSeasonHoldMax = max;
-//        return this;
-//    }
-//
-//    public boolean testFlowerSeasonHold(Float seasonValue) {
-//        if (seasonalFruitingOffset == null) {
-//            return false;
-//        }
-//        return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin + seasonalFruitingOffset, flowerSeasonHoldMax + seasonalFruitingOffset);
-//    }
-//
-//
+
+    /**
+     * A value that determines what a tree's suitability is before climate manipulation occurs.
+     */
+    public static float defaultSuitability() {
+        return 0.85f;
+    }
+
+    /**
+     * A convenience function to test if a biome is one of the many options passed.
+     *
+     * @param biomeToCheck The biome we are matching
+     * @param biomes       Multiple biomes to match against
+     * @return True if a match is found. False if not.
+     */
+    @SafeVarargs
+    public static boolean isOneOfBiomes(ResourceKey<Biome> biomeToCheck, ResourceKey<Biome>... biomes) {
+        for (ResourceKey<Biome> biome : biomes) {
+            if (biomeToCheck.equals(biome)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    //////////////////////////////
+    // SEASONAL
+    //////////////////////////////
+
+    /**
+     * default flower holding is relative to the flowering offset, but default is first half of spring
+     */
+    protected float flowerSeasonHoldMin = SeasonHelper.SPRING;
+    protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
+
+    @Nullable
+    protected Float seasonalGrowthOffset = 0f;
+    @Nullable
+    protected Float seasonalSeedDropOffset = 0f;
+    @Nullable
+    protected Float seasonalFruitingOffset = 0f;
+
+    public void setSeasonalGrowthOffset(@Nullable Float offset) {
+        seasonalGrowthOffset = offset;
+    }
+
+    public void setSeasonalSeedDropOffset(@Nullable Float offset) {
+        seasonalSeedDropOffset = offset;
+    }
+
+    /**
+     * The default fruiting will PEAK in the middle of summer, starting at the middle of spring and ending at the middle
+     * of fall. this offset will move the fruiting by a factor of one season. (an offset of 2.0 will my fruiting peak in
+     * winter). set to null for it to be all year round
+     */
+    public void setSeasonalFruitingOffset(@Nullable Float offset) {
+        seasonalFruitingOffset = offset;
+    }
+
+    /**
+     * Pulls data from the {@link NormalSeasonManager} to determine the rate of
+     * tree growth for the current season.
+     *
+     * @param rootPos the {@link BlockPos} of the {@link RootyBlock}.
+     * @return Factor from 0.0 (no growth) to 1.0 (full growth).
+     */
+    public float seasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos) {
+        return seasonalGrowthOffset != null ? SeasonHelper.globalSeasonalGrowthFactor(levelContext, rootPos, -seasonalGrowthOffset) : 1.0f;
+    }
+
+    public float seasonalSeedDropFactor(LevelContext levelContext, BlockPos pos) {
+        return seasonalSeedDropOffset != null ? SeasonHelper.globalSeasonalSeedDropFactor(levelContext, pos, -seasonalSeedDropOffset) : 1.0f;
+    }
+
+    public float seasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos) {
+        return seasonalFruitingOffset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -seasonalFruitingOffset, false) : 1.0f;
+    }
+
+    public void inheritSeasonalFruitingOffsetToFruits(){
+        this.fruits.forEach((fruit)->fruit.setSeasonOffset(this.seasonalFruitingOffset));
+    }
+
+    public void inheritSeasonalFruitingOffsetToPods(){
+        this.pods.forEach((pod)->pod.setSeasonOffset(this.seasonalFruitingOffset));
+    }
+
+    /**
+     * 1 = Spring 2 = Summer 4 = Autumn 8 = Winter Values are OR'ed together for the return
+     */
+    public int getSeasonalTooltipFlags(LevelContext levelContext) {
+        final float seasonStart = 1f / 6;
+        final float seasonEnd = 1 - 1f / 6;
+        final float threshold = 0.75f;
+
+        if (this.hasFruits() || this.hasPods()) {
+            int seasonFlags = 0;
+            for (int i = 0; i < 4; i++) {
+                boolean isValidSeason = false;
+                if (seasonalFruitingOffset != null) {
+                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
+                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonEnd - seasonalFruitingOffset) * 64.0f), 0), true);
+                    if (Math.min(prod1, prod2) > threshold) {
+                        isValidSeason = true;
+                    }
+
+                } else {
+                    isValidSeason = true;
+                }
+
+                if (isValidSeason) {
+                    seasonFlags |= 1 << i;
+                }
+
+            }
+            return seasonFlags;
+        }
+
+        return 0;
+    }
+
+    /**
+     * When seasons are active allow a seasonal time range where fruit growth does not progress past the flower stage.
+     * This allows for a flowery spring time.
+     *
+     * @param min The minimum season value relative to the fruiting offset.
+     * @param max The maximum season value relative to the fruiting offset.
+     * @return This {@link Species} object for chaining.
+     */
+    public Species setFlowerSeasonHold(float min, float max) {
+        flowerSeasonHoldMin = min;
+        flowerSeasonHoldMax = max;
+        return this;
+    }
+
+    public boolean testFlowerSeasonHold(Float seasonValue) {
+        if (seasonalFruitingOffset == null) {
+            return false;
+        }
+        return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin + seasonalFruitingOffset, flowerSeasonHoldMax + seasonalFruitingOffset);
+    }
+
+
 //    //////////////////////////////
 //    // INTERACTIVE
 //    //////////////////////////////
@@ -1811,18 +1861,18 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //
 //        return null;
 //    }
-//
-//    /**
-//     * Apply an item to the treepart(e.g. bonemeal). Developer is responsible for decrementing itemStack after
-//     * applying.
-//     *
-//     * @param level     The current level
-//     * @param hitPos    Position
-//     * @param player    The player applying the substance
-//     * @param itemStack The itemstack to be used.
-//     * @return true if item was used, false otherwise
-//     */
-//    public boolean applySubstance(Level level, BlockPos rootPos, BlockPos hitPos, @Nullable Player player, @Nullable InteractionHand hand, ItemStack itemStack) {
+
+    /**
+     * Apply an item to the treepart(e.g. bonemeal). Developer is responsible for decrementing itemStack after
+     * applying.
+     *
+     * @param level     The current level
+     * @param hitPos    Position
+     * @param player    The player applying the substance
+     * @param itemStack The itemstack to be used.
+     * @return true if item was used, false otherwise
+     */
+    public boolean applySubstance(Level level, BlockPos rootPos, BlockPos hitPos, @Nullable Player player, @Nullable InteractionHand hand, ItemStack itemStack) {
 //        final SubstanceEffect effect = getSubstanceEffect(itemStack);
 //
 //        if (effect != null) {
@@ -1834,10 +1884,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //                return applied;
 //            }
 //        }
-//
-//        return false;
-//    }
-//
+
+        return false;
+    }
+
 //    /**
 //     * Called when a player right-clicks a {@link Species} of tree anywhere on its branches.
 //     *
@@ -1854,7 +1904,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //
 //        return false;
 //    }
-//
+
 //    /**
 //     * A convenience function to decrement or otherwise consume an item in use.
 //     *
@@ -1874,101 +1924,101 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //            }
 //        }
 //    }
-//
-//    /**
-//     * The Waila body is the part of the Waila display that shows the species and log/stick count This does not have a
-//     * Tree Pack implementation as coding is required for it to be useful
-//     *
-//     * @return true if the tree uses the default Waila body display. False if it has a custom one (disabling DT's
-//     * display)
-//     */
-//    public boolean useDefaultWailaBody() {
-//        return true;
-//    }
-//
-//    /**
-//     * If left null, the showSpeciesOnWaila will depend on the species being the common species Otherwise, setting to
-//     * true or false will force the waila to display or to not display.
-//     */
-//    protected Boolean alwaysShowOnWaila = null;
-//
-//    public Species setAlwaysShowOnWaila(final boolean alwaysShowOnWaila) {
-//        this.alwaysShowOnWaila = alwaysShowOnWaila;
-//        return this;
-//    }
-//
-//    public boolean showSpeciesOnWaila() {
-//        if (alwaysShowOnWaila == null) {
-//            return this != getFamily().getCommonSpecies();
-//        }
-//        return this.alwaysShowOnWaila;
-//    }
-//
-//    ///////////////////////////////////////////
-//    // MEGANESS
-//    ///////////////////////////////////////////
-//
-//    private Species megaSpecies = Species.NULL_SPECIES;
-//    private Species preMegaSpecies = Species.NULL_SPECIES;
-//
-//    public Species getMegaSpecies() {
-//        return this.megaSpecies;
-//    }
-//
-//    public Species getPreMegaSpecies() {
-//        return this.preMegaSpecies;
-//    }
-//
-//    public boolean isMegaSpecies() {
-//        return preMegaSpecies.isValid();
-//    }
-//
-//    public void setMegaSpecies(final Species megaSpecies) {
-//        this.megaSpecies = megaSpecies;
-//        megaSpecies.preMegaSpecies = this;
-//    }
-//
-//    ///////////////////////////////////////////
-//    // FALL ANIMATION HANDLING
-//    ///////////////////////////////////////////
-//
-//    public AnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
-//        return getFamily().selectAnimationHandler(fallingEntity);
-//    }
-//
-//    /**
-//     * This is used for trees that have leaves that are not cubes and require extra blockstate properties such as palm
-//     * fronds. Used for tree felling animation.
-//     *
-//     * @return
-//     */
-//    @Nullable
-//    public HashMap<BlockPos, BlockState> getFellingLeavesClusters(final BranchDestructionData destructionData) {
-//        return null;
-//    }
-//
-//    public boolean canEncodeLeavesBlocks (BlockPos pos, BlockState state, Block block, BranchDestructionData data){
-//        return block instanceof DynamicLeavesBlock;
-//    }
-//
-//    public int encodeLeavesPos(BlockPos pos, BlockState state, Block block, BranchDestructionData data) {
-//        return (state.getValue(DynamicLeavesBlock.DISTANCE) << 24) | BranchDestructionData.encodeRelBlockPos(pos);
-//    }
-//
-//    public int encodeLeavesBlocks(BlockPos pos, BlockState state, Block block, BranchDestructionData data) {
-//        return getLeafBlockIndex((DynamicLeavesBlock) block);
-//    }
-//
-//    public boolean leavesAreSolid() {
-//        return getLeavesProperties().getPrimitiveLeaves().isSolid();
-//    }
-//
-//    ///////////////////////////////////////////
-//    // SOUND EFFECTS
-//    ///////////////////////////////////////////
-//
-//    protected float bigTreeSoundThreshold = 20;
-//
+
+    /**
+     * The Waila body is the part of the Waila display that shows the species and log/stick count This does not have a
+     * Tree Pack implementation as coding is required for it to be useful
+     *
+     * @return true if the tree uses the default Waila body display. False if it has a custom one (disabling DT's
+     * display)
+     */
+    public boolean useDefaultWailaBody() {
+        return true;
+    }
+
+    /**
+     * If left null, the showSpeciesOnWaila will depend on the species being the common species Otherwise, setting to
+     * true or false will force the waila to display or to not display.
+     */
+    protected Boolean alwaysShowOnWaila = null;
+
+    public Species setAlwaysShowOnWaila(final boolean alwaysShowOnWaila) {
+        this.alwaysShowOnWaila = alwaysShowOnWaila;
+        return this;
+    }
+
+    public boolean showSpeciesOnWaila() {
+        if (alwaysShowOnWaila == null) {
+            return this != getFamily().getCommonSpecies();
+        }
+        return this.alwaysShowOnWaila;
+    }
+
+    ///////////////////////////////////////////
+    // MEGANESS
+    ///////////////////////////////////////////
+
+    private Species megaSpecies = Species.NULL_SPECIES;
+    private Species preMegaSpecies = Species.NULL_SPECIES;
+
+    public Species getMegaSpecies() {
+        return this.megaSpecies;
+    }
+
+    public Species getPreMegaSpecies() {
+        return this.preMegaSpecies;
+    }
+
+    public boolean isMegaSpecies() {
+        return preMegaSpecies.isValid();
+    }
+
+    public void setMegaSpecies(final Species megaSpecies) {
+        this.megaSpecies = megaSpecies;
+        megaSpecies.preMegaSpecies = this;
+    }
+
+    ///////////////////////////////////////////
+    // FALL ANIMATION HANDLING
+    ///////////////////////////////////////////
+
+    public AnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
+        return getFamily().selectAnimationHandler(fallingEntity);
+    }
+
+    /**
+     * This is used for trees that have leaves that are not cubes and require extra blockstate properties such as palm
+     * fronds. Used for tree felling animation.
+     *
+     * @return
+     */
+    @Nullable
+    public HashMap<BlockPos, BlockState> getFellingLeavesClusters(final BranchDestructionData destructionData) {
+        return null;
+    }
+
+    public boolean canEncodeLeavesBlocks (BlockPos pos, BlockState state, Block block, BranchDestructionData data){
+        return block instanceof DynamicLeavesBlock;
+    }
+
+    public int encodeLeavesPos(BlockPos pos, BlockState state, Block block, BranchDestructionData data) {
+        return (state.getValue(DynamicLeavesBlock.DISTANCE) << 24) | BranchDestructionData.encodeRelBlockPos(pos);
+    }
+
+    public int encodeLeavesBlocks(BlockPos pos, BlockState state, Block block, BranchDestructionData data) {
+        return getLeafBlockIndex((DynamicLeavesBlock) block);
+    }
+
+    public boolean leavesAreSolid() {
+        return getLeavesProperties().getPrimitiveLeaves().isSolid();
+    }
+
+    ///////////////////////////////////////////
+    // SOUND EFFECTS
+    ///////////////////////////////////////////
+
+    protected float bigTreeSoundThreshold = 20;
+
 //    public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){
 //        return treeVolume > bigTreeSoundThreshold ?
 //                DTRegistries.FALLING_TREE_BIG_START.get() :
@@ -1980,17 +2030,17 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //                DTRegistries.FALLING_TREE_BIG_END.get() :
 //                DTRegistries.FALLING_TREE_MEDIUM_END.get();
 //    }
-//
-//    public float getFallingTreePitch (float treeVolume){
-//        return treeVolume > bigTreeSoundThreshold ?
-//                (25/treeVolume) :
-//                (10/(5+treeVolume*0.6f));
-//    }
-//
-//    public float getFallingBranchPitch (float treeVolume){
-//        return 1/treeVolume;
-//    }
-//
+
+    public float getFallingTreePitch (float treeVolume){
+        return treeVolume > bigTreeSoundThreshold ?
+                (25/treeVolume) :
+                (10/(5+treeVolume*0.6f));
+    }
+
+    public float getFallingBranchPitch (float treeVolume){
+        return 1/treeVolume;
+    }
+
 //    public SoundEvent getFallingTreeHitWaterSound (float treeVolume, boolean hasLeaves){
 //        return DTRegistries.FALLING_TREE_HIT_WATER.get();
 //    }
@@ -1999,15 +2049,15 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //        return  fellOnWater ? (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_HIT_WATER.get() : SoundEvents.PLAYER_SPLASH) :
 //                (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_END.get() : DTRegistries.FALLING_TREE_SMALL_END_BARE.get());
 //    }
-//
-//    public void setBigTreeSoundThreshold(float bigTreeSoundThreshold) {
-//        this.bigTreeSoundThreshold = bigTreeSoundThreshold;
-//    }
-//
-//    //////////////////////////////
-//    // BONSAI POT
-//    //////////////////////////////
-//
+
+    public void setBigTreeSoundThreshold(float bigTreeSoundThreshold) {
+        this.bigTreeSoundThreshold = bigTreeSoundThreshold;
+    }
+
+    //////////////////////////////
+    // BONSAI POT
+    //////////////////////////////
+
 //    /**
 //     * Provides the {@link PottedSaplingBlock} for this Species. {@link Species} subclasses can derive their own {@link
 //     * PottedSaplingBlock} subclass if they want something custom.
@@ -2017,47 +2067,47 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //    public PottedSaplingBlock getPottedSapling() {
 //        return DTRegistries.POTTED_SAPLING.get();
 //    }
-//
-//
-//    //////////////////////////////
-//    // WORLDGEN
-//    //////////////////////////////
-//
-//    /**
-//     * Default worldgen spawn mechanism. This method uses JoCodes to generate tree models. Override to use other
-//     * methods.
-//     *
-//     * @return true if tree was generated. false otherwise.
-//     */
-//    public boolean generate(GenerationContext context) {
-//        final AtomicBoolean fullGen = new AtomicBoolean(false);
-//        final FullGenerationContext fullGenContext = new FullGenerationContext(context.level(), context.rootPos(), this, context.biome(), context.radius(), context.safeBounds());
-//
-//        this.genFeatures.forEach(configuration ->
-//                fullGen.set(fullGen.get() || configuration.generate(GenFeature.Type.FULL, fullGenContext))
-//        );
-//
-//        if (fullGen.get()) {
-//            return true;
-//        }
-//        if (!shouldGenerate(context.levelContext(), context.rootPos())) {
-//            return false;
-//        }
-//
-//        if (!JoCodeRegistry.getCodes(this.getRegistryName()).isEmpty()) {
-//            final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), context.radius(), context.random());
-//            if (code != null) {
-//                code.generate(context);
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
-//
-//    private boolean shouldGenerate(LevelContext levelContext, BlockPos rootPos) {
-//        // World gen would be slowed down if we did as extensive a check as vanilla. This is good enough to at least
-//        // prevent trees generating if there's a structure/mountain overhang above.
+
+
+    //////////////////////////////
+    // WORLDGEN
+    //////////////////////////////
+
+    /**
+     * Default worldgen spawn mechanism. This method uses JoCodes to generate tree models. Override to use other
+     * methods.
+     *
+     * @return true if tree was generated. false otherwise.
+     */
+    public boolean generate(DynamicTreeGenerationContext context) {
+        final AtomicBoolean fullGen = new AtomicBoolean(false);
+        final FullGenerationContext fullGenContext = new FullGenerationContext(context.level(), context.rootPos(), this, context.biome(), context.radius(), context.isWorldGen());
+
+        this.genFeatures.forEach(configuration ->
+                fullGen.set(fullGen.get() || configuration.generate(GenFeature.Type.FULL, fullGenContext))
+        );
+
+        if (fullGen.get()) {
+            return true;
+        }
+        if (!shouldGenerate(context.levelContext(), context.rootPos())) {
+            return false;
+        }
+
+        if (!JoCodeRegistry.getCodes(this.getRegistryName()).isEmpty()) {
+            final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), context.radius(), context.random());
+            if (code != null) {
+                code.generate(context);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean shouldGenerate(LevelContext levelContext, BlockPos rootPos) {
+        // World gen would be slowed down if we did as extensive a check as vanilla. This is good enough to at least
+        // prevent trees generating if there's a structure/mountain overhang above.
 //        BlockPos.MutableBlockPos pos = rootPos.above().mutable();
 //        for (int i = 0; i < signalEnergy; i++) {
 //            if (!DynamicTreeFeature.validTreePos(levelContext.accessor(), pos)) {
@@ -2065,244 +2115,244 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //            }
 //            pos.move(Direction.UP);
 //        }
-//        return true;
-//    }
-//
-//    public JoCode getJoCode(String joCodeString) {
-//        return new JoCode(joCodeString);
-//    }
-//
-//    public RootsJoCode getRootsJoCode(String joCodeString) {
-//        return new RootsJoCode(joCodeString);
-//    }
-//
-//    public Collection<JoCode> getJoCodes() {
-//        return JoCodeRegistry.getCodes(this.getRegistryName()).values().stream().flatMap(Collection::stream)
-//                .collect(Collectors.toList());
-//    }
-//
-//    /**
-//     * Adds the default configuration of the {@link GenFeature} given.
-//     * <p>
-//     * Note that the {@link GenFeature} may abort its addition if {@link GenFeature#shouldApply(Species,
-//     * com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatureConfiguration)} returns {@code false}.
-//     *
-//     * @param feature the {@link GenFeature} to add
-//     * @return this {@link Species} object for chaining
-//     */
-//    public Species addGenFeature(GenFeature feature) {
-//        return this.addGenFeature(feature.getDefaultConfiguration());
-//    }
-//
-//    /**
-//     * Adds the specified {@code configuration} to this species.
-//     * <p>
-//     * Note that the {@link GenFeature} can abort its addition if {@link GenFeature#shouldApply(Species,
-//     * com.ferreusveritas.dynamictrees.systems.genfeature.GenFeatureConfiguration)} returns {@code false}.
-//     *
-//     * @param configuration the configured gen feature to add
-//     * @return this {@link Species} object for chaining
-//     */
-//    public Species addGenFeature(GenFeatureConfiguration configuration) {
-//        if (configuration.shouldApply(this)) {
-//            this.genFeatures.add(configuration);
-//        }
-//        return this;
-//    }
-//
-//    public boolean hasGenFeatures() {
-//        return this.genFeatures.size() > 0;
-//    }
-//
-//    public List<GenFeatureConfiguration> getGenFeatures() {
-//        return this.genFeatures;
-//    }
-//
-//    /**
-//     * Allows the tree to prepare the area for planting.  For thick tree this may include removing blocks around the
-//     * trunk that could be in the way.
-//     *
-//     * @param level      The level
-//     * @param rootPos    The position of {@link RootyBlock} this tree will be planted in
-//     * @param radius     The radius of the generation area
-//     * @param facing     The direction the joCode will build the tree
-//     * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
-//     * @param joCode     The joCode that will be used to grow the tree
-//     * @return new blockposition of root block.  BlockPos. ZERO to cancel generation
-//     */
-//    public BlockPos preGeneration(LevelAccessor level, BlockPos.MutableBlockPos rootPos, int radius, Direction facing, SafeChunkBounds safeBounds, JoCode joCode) {
-//        this.genFeatures.forEach(configuration -> rootPos.set(
-//                configuration.generate(
-//                        GenFeature.Type.PRE_GENERATION,
-//                        new PreGenerationContext(level, rootPos, this, radius, facing, safeBounds, joCode)
-//                )
-//        ));
-//        return rootPos.immutable();
-//    }
-//
-//    /**
-//     * Allows the tree to decorate itself after it has been generated. Use this to add vines, add fruit, fix the soil,
-//     * add butress roots etc.
-//     *
-//     * @param context The {@link PostGenerationContext} instance.
-//     */
-//    public void postGeneration(PostGenerationContext context) {
-//        this.genFeatures.forEach(configuration ->
-//                configuration.generate(GenFeature.Type.POST_GENERATION, context)
-//        );
-//    }
-//
-//    /**
-//     * Worldgen can produce thin sickly trees from the underinflation caused by not living its full fertility. This
-//     * factor is an attempt to compensate for the problem.
-//     *
-//     * @return
-//     */
-//    public float getWorldGenTaperingFactor() {
-//        return 1.5f;
-//    }
-//
-//    private int worldGenLeafMapHeight = 32;
-//
-//    public int getWorldGenLeafMapHeight() {
-//        return worldGenLeafMapHeight;
-//    }
-//
-//    public void setWorldGenLeafMapHeight(int worldGenLeafMapHeight) {
-//        this.worldGenLeafMapHeight = worldGenLeafMapHeight;
-//    }
-//
-//    public int getWorldGenAgeIterations() {
-//        return 3;
-//    }
-//
-//    public NodeInspector getNodeInflator(SimpleVoxmap leafMap) {
-//        return getNodeInflator(leafMap, getMaxBranchRadius());
-//    }
-//    public NodeInspector getNodeInflator(SimpleVoxmap leafMap, int maxRadius) {
-//        return new InflatorNode(this, leafMap, maxRadius);
-//    }
-//
-//    /**
-//     * General purpose hashing algorithm using a {@link BlockPos} as an ingest.
-//     *
-//     * @param pos
-//     * @return hash for position
-//     */
-//    public int coordHashCode(BlockPos pos) {
-//        return CoordUtils.coordHashCode(pos, 2);
-//    }
-//
-//    public boolean hasFruit(Fruit fruit) {
-//        return fruits.contains(fruit);
-//    }
-//
-//    public boolean hasFruits() {
-//        return !fruits.isEmpty();
-//    }
-//
-//    public void addFruits(Collection<Fruit> fruits) {
-//        this.fruits.addAll(fruits);
-//    }
-//
-//    public Set<Fruit> getFruits() {
-//        return Collections.unmodifiableSet(fruits);
-//    }
-//
-//    public boolean hasPod(Pod pod) {
-//        return pods.contains(pod);
-//    }
-//
-//    public boolean hasPods() {
-//        return !pods.isEmpty();
-//    }
-//
-//    public void addPods(Collection<Pod> pods) {
-//        this.pods.addAll(pods);
-//    }
-//
-//    public Set<Pod> getPods() {
-//        return Collections.unmodifiableSet(pods);
-//    }
-//
-//    public List<TagKey<Block>> defaultSaplingTags() {
-//        return Collections.singletonList(DTBlockTags.SAPLINGS);
-//    }
-//
-//    public List<TagKey<Item>> defaultSeedTags() {
-//        return Collections.singletonList(DTItemTags.SEEDS);
-//    }
-//
-//    protected List<String> onlyIfLoaded = new ArrayList<>();
-//    protected HashMap<String, ResourceLocation> textureOverrides = new HashMap<>();
-//    protected HashMap<String, String> langOverrides = new HashMap<>();
-//    protected HashMap<String, ResourceLocation> modelOverrides = new HashMap<>();
-//    public static final String SAPLING = "sapling";
-//    public static final String SEED_PARENT = "seed_parent";
-//    public static final String SEED = "seed";
-//
-//    public void setOnlyIfLoaded(String onlyIfLoaded) {
-//        this.onlyIfLoaded.add(onlyIfLoaded);
-//    }
-//    public boolean isOnlyIfLoaded() {
-//        return !onlyIfLoaded.isEmpty();
-//    }
-//
-//    public void setModelOverrides(Map<String, ResourceLocation> modelOverrides) {
-//        this.modelOverrides.putAll(modelOverrides);
-//    }
-//    public void setTextureOverrides(Map<String, ResourceLocation> textureOverrides) {
-//        this.textureOverrides.putAll(textureOverrides);
-//    }
-//    public void setLangOverrides(Map<String, String> textureOverrides) {
-//        this.langOverrides.putAll(textureOverrides);
-//    }
-//
-//    public Optional<ResourceLocation> getModelPath(String key) {
-//        return Optional.ofNullable(modelOverrides.getOrDefault(key, null));
-//    }
-//    public Optional<ResourceLocation> getTexturePath(String key) {
-//        return Optional.ofNullable(textureOverrides.getOrDefault(key, null));
-//    }
-//    public Optional<String> getLangOverride(String key) {
-//        return Optional.ofNullable(langOverrides.getOrDefault(key, null));
-//    }
-//    /**
-//     * @return the location of the dynamic sapling smartmodel for this type of species
-//     */
-//    public ResourceLocation getSaplingSmartModelLocation() {
-//        if (modelOverrides.containsKey(SAPLING)) return modelOverrides.get(SAPLING);
-//        return DynamicTrees.location("block/smartmodel/sapling");
-//    }
-//
+        return true;
+    }
+
+    public JoCode getJoCode(String joCodeString) {
+        return new JoCode(joCodeString);
+    }
+
+    public RootsJoCode getRootsJoCode(String joCodeString) {
+        return new RootsJoCode(joCodeString);
+    }
+
+    public Collection<JoCode> getJoCodes() {
+        return JoCodeRegistry.getCodes(this.getRegistryName()).values().stream().flatMap(Collection::stream)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Adds the default configuration of the {@link GenFeature} given.
+     * <p>
+     * Note that the {@link GenFeature} may abort its addition if {@link GenFeature#shouldApply(Species,
+     * com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration)} returns {@code false}.
+     *
+     * @param feature the {@link GenFeature} to add
+     * @return this {@link Species} object for chaining
+     */
+    public Species addGenFeature(GenFeature feature) {
+        return this.addGenFeature(feature.getDefaultConfiguration());
+    }
+
+    /**
+     * Adds the specified {@code configuration} to this species.
+     * <p>
+     * Note that the {@link GenFeature} can abort its addition if {@link GenFeature#shouldApply(Species,
+     * com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration)} returns {@code false}.
+     *
+     * @param configuration the configured gen feature to add
+     * @return this {@link Species} object for chaining
+     */
+    public Species addGenFeature(GenFeatureConfiguration configuration) {
+        if (configuration.shouldApply(this)) {
+            this.genFeatures.add(configuration);
+        }
+        return this;
+    }
+
+    public boolean hasGenFeatures() {
+        return !this.genFeatures.isEmpty();
+    }
+
+    public List<GenFeatureConfiguration> getGenFeatures() {
+        return this.genFeatures;
+    }
+
+    /**
+     * Allows the tree to prepare the area for planting.  For thick tree this may include removing blocks around the
+     * trunk that could be in the way.
+     *
+     * @param level      The level
+     * @param rootPos    The position of {@link RootyBlock} this tree will be planted in
+     * @param radius     The radius of the generation area
+     * @param facing     The direction the joCode will build the tree
+     * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
+     * @param joCode     The joCode that will be used to grow the tree
+     * @return new blockposition of root block.  BlockPos. ZERO to cancel generation
+     */
+    public BlockPos preGeneration(LevelAccessor level, BlockPos.MutableBlockPos rootPos, int radius, Direction facing, boolean worldGen, JoCode joCode) {
+        this.genFeatures.forEach(configuration -> rootPos.set(
+                configuration.generate(
+                        GenFeature.Type.PRE_GENERATION,
+                        new PreGenerationContext(level, rootPos, this, radius, facing, worldGen, joCode)
+                )
+        ));
+        return rootPos.immutable();
+    }
+
+    /**
+     * Allows the tree to decorate itself after it has been generated. Use this to add vines, add fruit, fix the soil,
+     * add butress roots etc.
+     *
+     * @param context The {@link PostGenerationContext} instance.
+     */
+    public void postGeneration(PostGenerationContext context) {
+        this.genFeatures.forEach(configuration ->
+                configuration.generate(GenFeature.Type.POST_GENERATION, context)
+        );
+    }
+
+    /**
+     * Worldgen can produce thin sickly trees from the underinflation caused by not living its full fertility. This
+     * factor is an attempt to compensate for the problem.
+     *
+     * @return
+     */
+    public float getWorldGenTaperingFactor() {
+        return 1.5f;
+    }
+
+    private int worldGenLeafMapHeight = 32;
+
+    public int getWorldGenLeafMapHeight() {
+        return worldGenLeafMapHeight;
+    }
+
+    public void setWorldGenLeafMapHeight(int worldGenLeafMapHeight) {
+        this.worldGenLeafMapHeight = worldGenLeafMapHeight;
+    }
+
+    public int getWorldGenAgeIterations() {
+        return 3;
+    }
+
+    public NodeInspector getNodeInflator(SimpleVoxmap leafMap) {
+        return getNodeInflator(leafMap, getMaxBranchRadius());
+    }
+    public NodeInspector getNodeInflator(SimpleVoxmap leafMap, int maxRadius) {
+        return new InflatorNode(this, leafMap, maxRadius);
+    }
+
+    /**
+     * General purpose hashing algorithm using a {@link BlockPos} as an ingest.
+     *
+     * @param pos
+     * @return hash for position
+     */
+    public int coordHashCode(BlockPos pos) {
+        return CoordUtils.coordHashCode(pos, 2);
+    }
+
+    public boolean hasFruit(Fruit fruit) {
+        return fruits.contains(fruit);
+    }
+
+    public boolean hasFruits() {
+        return !fruits.isEmpty();
+    }
+
+    public void addFruits(Collection<Fruit> fruits) {
+        this.fruits.addAll(fruits);
+    }
+
+    public Set<Fruit> getFruits() {
+        return Collections.unmodifiableSet(fruits);
+    }
+
+    public boolean hasPod(Pod pod) {
+        return pods.contains(pod);
+    }
+
+    public boolean hasPods() {
+        return !pods.isEmpty();
+    }
+
+    public void addPods(Collection<Pod> pods) {
+        this.pods.addAll(pods);
+    }
+
+    public Set<Pod> getPods() {
+        return Collections.unmodifiableSet(pods);
+    }
+
+    public List<TagKey<Block>> defaultSaplingTags() {
+        return Collections.singletonList(DTBlockTags.SAPLINGS);
+    }
+
+    public List<TagKey<Item>> defaultSeedTags() {
+        return Collections.singletonList(DTItemTags.SEEDS);
+    }
+
+    protected List<String> onlyIfLoaded = new ArrayList<>();
+    protected HashMap<String, ResourceLocation> textureOverrides = new HashMap<>();
+    protected HashMap<String, String> langOverrides = new HashMap<>();
+    protected HashMap<String, ResourceLocation> modelOverrides = new HashMap<>();
+    public static final String SAPLING = "sapling";
+    public static final String SEED_PARENT = "seed_parent";
+    public static final String SEED = "seed";
+
+    public void setOnlyIfLoaded(String onlyIfLoaded) {
+        this.onlyIfLoaded.add(onlyIfLoaded);
+    }
+    public boolean isOnlyIfLoaded() {
+        return !onlyIfLoaded.isEmpty();
+    }
+
+    public void setModelOverrides(Map<String, ResourceLocation> modelOverrides) {
+        this.modelOverrides.putAll(modelOverrides);
+    }
+    public void setTextureOverrides(Map<String, ResourceLocation> textureOverrides) {
+        this.textureOverrides.putAll(textureOverrides);
+    }
+    public void setLangOverrides(Map<String, String> textureOverrides) {
+        this.langOverrides.putAll(textureOverrides);
+    }
+
+    public Optional<ResourceLocation> getModelPath(String key) {
+        return Optional.ofNullable(modelOverrides.getOrDefault(key, null));
+    }
+    public Optional<ResourceLocation> getTexturePath(String key) {
+        return Optional.ofNullable(textureOverrides.getOrDefault(key, null));
+    }
+    public Optional<String> getLangOverride(String key) {
+        return Optional.ofNullable(langOverrides.getOrDefault(key, null));
+    }
+    /**
+     * @return the location of the dynamic sapling smartmodel for this type of species
+     */
+    public ResourceLocation getSaplingSmartModelLocation() {
+        if (modelOverrides.containsKey(SAPLING)) return modelOverrides.get(SAPLING);
+        return DynamicTrees.location("block/smartmodel/sapling");
+    }
+
 //    protected final MutableLazyValue<Generator<DTBlockStateProvider, Species>> saplingStateGenerator =
 //            MutableLazyValue.supplied(SaplingStateGenerator::new);
 //
 //    protected final MutableLazyValue<Generator<DTLangProvider,Species>> speciesLangProvider =
 //            MutableLazyValue.supplied(SpeciesLangGenerator::new);
 //
-//    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
-//                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-//        ResourceLocation leavesLoc = getLeavesProperties().getTexturePath(LeavesProperties.LEAVES).orElse(leavesTextureLocation);
-//        ResourceLocation logLoc = getFamily().getTexturePath(Family.BRANCH).orElse(barkTextureLocation);
-//        textureConsumer.accept("log", logLoc);
-//        textureConsumer.accept("leaves", leavesLoc);
-//    }
+    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
+                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
+        ResourceLocation leavesLoc = getLeavesProperties().getTexturePath(LeavesProperties.LEAVES).orElse(leavesTextureLocation);
+        ResourceLocation logLoc = getFamily().getTexturePath(Family.BRANCH).orElse(barkTextureLocation);
+        textureConsumer.accept("log", logLoc);
+        textureConsumer.accept("leaves", leavesLoc);
+    }
 //
 //    @Override
 //    public void generateStateData(DTBlockStateProvider provider) {
 //        // Generate sapling block state and model.
 //        this.saplingStateGenerator.get().generate(provider, this);
 //    }
-//
-//    /**
-//     * @return the location of the parent model of the seed item model
-//     */
-//    public ResourceLocation getSeedParentModelLocation() {
-//        if (modelOverrides.containsKey(SEED_PARENT)) return modelOverrides.get(SEED_PARENT);
-//        return DynamicTrees.location("item/standard_seed");
-//    }
-//
+
+    /**
+     * @return the location of the parent model of the seed item model
+     */
+    public ResourceLocation getSeedParentModelLocation() {
+        if (modelOverrides.containsKey(SEED_PARENT)) return modelOverrides.get(SEED_PARENT);
+        return DynamicTrees.location("item/standard_seed");
+    }
+
 //    protected final MutableLazyValue<Generator<DTItemModelProvider, Species>> seedModelGenerator =
 //            MutableLazyValue.supplied(SeedItemModelGenerator::new);
 //
@@ -2319,30 +2369,30 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //    public void generateLangData(DTLangProvider provider){
 //        this.speciesLangProvider.get().generate(provider, this);
 //    }
-//
-//    public boolean shouldGenerateVoluntaryDrops() {
-//        return this.seed != null;
-//    }
-//
-//    private final LazyValue<ResourceLocation> voluntaryDropsPath = LazyValue.supplied(() ->
-//            ResourceLocationUtils.prefix(getRegistryName(), "trees/voluntary/"));
-//
-//    public ResourceLocation getVoluntaryDropsPath() {
-//        return voluntaryDropsPath.get();
-//    }
-//
+
+    public boolean shouldGenerateVoluntaryDrops() {
+        return this.seed != null;
+    }
+
+    private final LazyValue<ResourceLocation> voluntaryDropsPath = LazyValue.supplied(() ->
+            ResourceLocationUtils.prefix(getRegistryName(), "trees/voluntary/"));
+
+    public ResourceLocation getVoluntaryDropsPath() {
+        return voluntaryDropsPath.get();
+    }
+
 //    public LootTable.Builder createVoluntaryDrops() {
 //        return DTLootTableProvider.BlockLoot.createVoluntaryDrops(seed.get());
 //    }
-//
-//    public void setDropSeeds(boolean dropSeeds) {
-//        this.dropSeeds = dropSeeds;
-//    }
-//
-//    public boolean shouldDropSeeds() {
-//        return Optional.ofNullable(dropSeeds).orElse(!this.hasFruits());
-//    }
-//
+
+    public void setDropSeeds(boolean dropSeeds) {
+        this.dropSeeds = dropSeeds;
+    }
+
+    public boolean shouldDropSeeds() {
+        return Optional.ofNullable(dropSeeds).orElse(!this.hasFruits());
+    }
+
 //    @Override
 //    public String toLoadDataString() {
 //        final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
@@ -2368,7 +2418,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //                Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
 //                Pair.of("genFeatures", this.genFeatures));
 //    }
-//
+
 //    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
 //        // Create dynamic sapling block tags.
 //        getSapling().ifPresent(sapling ->

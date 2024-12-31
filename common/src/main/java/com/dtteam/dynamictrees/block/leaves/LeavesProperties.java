@@ -1,20 +1,27 @@
 package com.dtteam.dynamictrees.block.leaves;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.CellKit;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
+import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.data.tags.DTBlockTags;
+import com.dtteam.dynamictrees.systems.cell.CellKits;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.treepacks.Resettable;
-import com.dtteam.dynamictrees.treepacks.Resources;
+import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.treepack.Resettable;
+import com.dtteam.dynamictrees.treepack.Resources;
+import com.dtteam.dynamictrees.util.BlockStates;
 import com.dtteam.dynamictrees.util.Optionals;
+import com.dtteam.dynamictrees.util.ResourceLocationUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
@@ -22,6 +29,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -30,8 +38,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 
 /**
@@ -47,71 +55,71 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
             .apply(instance, LeavesProperties::new));
 
     public static final LeavesProperties NULL = new LeavesProperties() {
-//        @Override
-//        public LeavesProperties setFamily(Family family) {
-//            return this;
-//        }
-//
-//        @Override
-//        public Family getFamily() {
-//            return Family.NULL_FAMILY;
-//        }
-//
-//        @Override
-//        public BlockState getPrimitiveLeaves() {
-//            return Blocks.AIR.defaultBlockState();
-//        }
-//
-//        @Override
-//        public ItemStack getPrimitiveLeavesItemStack() {
-//            return ItemStack.EMPTY;
-//        }
-//
-//        @Override
-//        public LeavesProperties setDynamicLeavesState(BlockState state) {
-//            return this;
-//        }
-//
-//        @Override
-//        public BlockState getDynamicLeavesState() {
-//            return Blocks.AIR.defaultBlockState();
-//        }
-//
-//        @Override
-//        public BlockState getDynamicLeavesState(int hydro) {
-//            return Blocks.AIR.defaultBlockState();
-//        }
-//
-//        @Override
-//        public CellKit getCellKit() {
-//            return CellKit.NULL_CELL_KIT;
-//        }
-//
-//        @Override
-//        public int getFlammability() {
-//            return 0;
-//        }
-//
-//        @Override
-//        public int getFireSpreadSpeed() {
-//            return 0;
-//        }
-//
-//        @Override
-//        public int getSmotherLeavesMax() {
-//            return 0;
-//        }
-//
-//        @Override
-//        public int getLightRequirement() {
-//            return 15;
-//        }
-//
-//        @Override
-//        public boolean updateTick(LevelAccessor level, BlockPos pos, BlockState state, RandomSource rand) {
-//            return false;
-//        }
-    }.setRegistryName(DynamicTreesCommon.NULL).setBlockRegistryName(DynamicTreesCommon.NULL);
+        @Override
+        public LeavesProperties setFamily(Family family) {
+            return this;
+        }
+
+        @Override
+        public Family getFamily() {
+            return Family.NULL_FAMILY;
+        }
+
+        @Override
+        public BlockState getPrimitiveLeaves() {
+            return Blocks.AIR.defaultBlockState();
+        }
+
+        @Override
+        public ItemStack getPrimitiveLeavesItemStack() {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public LeavesProperties setDynamicLeavesState(BlockState state) {
+            return this;
+        }
+
+        @Override
+        public BlockState getDynamicLeavesState() {
+            return Blocks.AIR.defaultBlockState();
+        }
+
+        @Override
+        public BlockState getDynamicLeavesState(int hydro) {
+            return Blocks.AIR.defaultBlockState();
+        }
+
+        @Override
+        public CellKit getCellKit() {
+            return CellKit.NULL_CELL_KIT;
+        }
+
+        @Override
+        public int getFlammability() {
+            return 0;
+        }
+
+        @Override
+        public int getFireSpreadSpeed() {
+            return 0;
+        }
+
+        @Override
+        public int getSmotherLeavesMax() {
+            return 0;
+        }
+
+        @Override
+        public int getLightRequirement() {
+            return 15;
+        }
+
+        @Override
+        public boolean updateTick(LevelAccessor level, BlockPos pos, BlockState state, RandomSource rand) {
+            return false;
+        }
+    }.setRegistryName(DynamicTrees.NULL).setBlockRegistryName(DynamicTrees.NULL);
 
     /**
      * Central registry for all {@link LeavesProperties} objects.
@@ -153,15 +161,15 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     public LeavesProperties(@Nullable final BlockState primitiveLeaves, final ResourceLocation registryName) {
-        //this(primitiveLeaves, CellKits.DECIDUOUS, registryName);
+        this(primitiveLeaves, CellKits.DECIDUOUS, registryName);
     }
 
     public LeavesProperties(@Nullable final BlockState primitiveLeaves, final CellKit cellKit, final ResourceLocation registryName) {
         this.family = Family.NULL_FAMILY;
-//        this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : BlockStates.AIR;
-//        this.cellKit = cellKit;
-//        this.setRegistryName(registryName);
-//        this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
+        this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : BlockStates.AIR;
+        this.cellKit = cellKit;
+        this.setRegistryName(registryName);
+        this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());
 //        this.blockLootTableSupplier = new LootTableSupplier("blocks/", blockRegistryName);
 //        this.lootTableSupplier = new LootTableSupplier("trees/leaves/", registryName);
     }
@@ -226,13 +234,13 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 //        return DTLootTableProvider.BlockLoot.createLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES);
 //    }
 //
-//    public List<ItemStack> getDrops(Level level, BlockPos pos, ItemStack tool, Species species) {
+    public List<ItemStack> getDrops(Level level, BlockPos pos, ItemStack tool, Species species) {
 //        if (level.isClientSide) {
-//            return Collections.emptyList();
+            return Collections.emptyList();
 //        }
 //        return getLootTable(level.getServer().getLootData(), species)
 //                .getRandomItems(createLootParams(level, pos, tool, species));
-//    }
+    }
 //
 //    private LootParams createLootParams(Level level, BlockPos pos, ItemStack tool, Species species) {
 //        return new LootParams.Builder(LevelContext.getServerLevelOrThrow(level))
@@ -356,9 +364,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return new DynamicLeavesBlock(this, properties);
     }
 
-//    public void generateDynamicLeaves(final BlockBehaviour.Properties properties) {
-//        RegistryHandler.addBlock(this.blockRegistryName, () -> this.createDynamicLeaves(properties));
-//    }
+    public void generateDynamicLeaves(final BlockBehaviour.Properties properties) {
+        RegistryHandler.addBlock(this.blockRegistryName, () -> this.createDynamicLeaves(properties));
+    }
 
     public LeavesProperties setDynamicLeavesState(BlockState state) {
         //Cache all the blockStates to speed up worldgen
@@ -575,15 +583,15 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.hasTickParticles = hasTickParticles;
     }
 
-//    public List<TagKey<Block>> defaultLeavesTags() {
-//        return Collections.singletonList(DTBlockTags.LEAVES);
-//    }
-//
+    public List<TagKey<Block>> defaultLeavesTags() {
+        return Collections.singletonList(DTBlockTags.LEAVES);
+    }
+
 //    protected final MutableLazyValue<Generator<DTBlockStateProvider, LeavesProperties>> stateGenerator =
 //            MutableLazyValue.supplied(LeavesStateGenerator::new);
 //    protected final MutableLazyValue<Generator<DTLangProvider, LeavesProperties>> langGenerator =
 //            MutableLazyValue.supplied(LeavesPropertiesLangGenerator::new);
-
+//
 //    @Override
 //    public void generateStateData(DTBlockStateProvider provider) {
 //        // Generate leaves block state and model.

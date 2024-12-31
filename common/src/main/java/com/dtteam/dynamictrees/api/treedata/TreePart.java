@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
-//import com.ferreusveritas.dynamictrees.block.rooty.RootyBlock;
+//import com.dtteam.dynamictrees.block.rooty.RootyBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -16,6 +16,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.Nullable;
+import com.dtteam.dynamictrees.block.soil.RootyBlock;
 
 public interface TreePart {
 

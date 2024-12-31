@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.api.registry;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.util.ResourceLocationUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +23,7 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
      * for all other purposes use the constructor with modId.
      */
     public RegistryHandler() {
-        this(DynamicTreesCommon.NULL);
+        this(DynamicTrees.NULL);
     }
 
     /**
@@ -55,7 +55,7 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
      */
     public static RegistryHandler getOrCorrected(final String modId) {
         final RegistryHandler handler = get(modId);
-        return handler.isValid() ? handler : get(DynamicTreesCommon.MOD_ID);
+        return handler.isValid() ? handler : get(DynamicTrees.MOD_ID);
     }
 
 
@@ -70,7 +70,7 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
      */
     public static ResourceLocation correctRegistryName(ResourceLocation registryName) {
         if (!get(registryName.getNamespace()).isValid()) {
-            registryName = ResourceLocationUtils.namespace(registryName, DynamicTreesCommon.MOD_ID);
+            registryName = ResourceLocationUtils.namespace(registryName, DynamicTrees.MOD_ID);
         }
         return registryName;
     }

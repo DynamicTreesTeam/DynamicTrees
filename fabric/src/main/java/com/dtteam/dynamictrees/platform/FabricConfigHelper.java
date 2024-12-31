@@ -8,4 +8,19 @@ public class FabricConfigHelper implements IConfigHelper {
     public <T> T getConfig(String config, Class<T> tClass) {
         return null;
     }
+
+    @Override
+    public boolean isServerConfigLoaded() {
+        return false;
+    }
+
+    @Override
+    public boolean isCommonConfigLoaded() {
+        return false;
+    }
+
+    @Override
+    public boolean isClientConfigLoaded() {
+        return false;
+    }
 }

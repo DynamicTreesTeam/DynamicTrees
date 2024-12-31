@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.util;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.resources.ResourceLocation;
@@ -138,14 +138,14 @@ public final class TreeRegistry {
 
     /**
      * Parses resource location and  processes it via {@link #processResLoc(ResourceLocation)}. If it could not be
-     * parsed, returns {@link DynamicTreesCommon#NULL}.
+     * parsed, returns {@link DynamicTrees#NULL}.
      *
      * @param resourceLocationString The {@link ResourceLocation} {@link String} to parse.
      * @return The parsed and processed {@link ResourceLocation} object.
      */
     public static ResourceLocation parseResLoc(final String resourceLocationString) {
         return Optional.ofNullable(ResourceLocation.tryParse(resourceLocationString))
-                .orElse(DynamicTreesCommon.NULL);
+                .orElse(DynamicTrees.NULL);
     }
 
     /**
@@ -156,8 +156,8 @@ public final class TreeRegistry {
      * @return The {@link ResourceLocation} object.
      */
     public static ResourceLocation processResLoc(final ResourceLocation resourceLocation) {
-        return DynamicTreesCommon.MINECRAFT.equals(resourceLocation.getNamespace()) ?
-                DynamicTreesCommon.location(resourceLocation.getPath()) : resourceLocation;
+        return DynamicTrees.MINECRAFT.equals(resourceLocation.getNamespace()) ?
+                DynamicTrees.location(resourceLocation.getPath()) : resourceLocation;
     }
 
 }

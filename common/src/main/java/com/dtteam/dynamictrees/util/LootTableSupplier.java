@@ -1,6 +1,6 @@
 //package com.dtteam.dynamictrees.util;
 //
-//import com.ferreusveritas.dynamictrees.tree.species.Species;
+//import com.dtteam.dynamictrees.tree.species.Species;
 //import net.minecraft.resources.ResourceLocation;
 //import net.minecraft.world.level.storage.loot.LootDataManager;
 //import net.minecraft.world.level.storage.loot.LootTable;

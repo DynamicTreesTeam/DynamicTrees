@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.mixin;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,7 +14,7 @@ public class MixinTitleScreen {
     @Inject(at = @At("HEAD"), method = "init()V")
     private void init(CallbackInfo info) {
         
-        DynamicTreesCommon.LOG.info("This line is printed by an example mod mixin from Fabric!");
-        DynamicTreesCommon.LOG.info("MC Version: {}", Minecraft.getInstance().getVersionType());
+        DynamicTrees.LOG.info("This line is printed by an example mod mixin from Fabric!");
+        DynamicTrees.LOG.info("MC Version: {}", Minecraft.getInstance().getVersionType());
     }
 }

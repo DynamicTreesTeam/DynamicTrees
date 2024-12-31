@@ -287,15 +287,15 @@ public class SimpleVoxmap {
     }
 
 
-    public static class Cell {
+    public static class VoxmapCell {
         private byte value;
         private final BlockPos.MutableBlockPos pos;
 
-        public Cell() {
+        public VoxmapCell() {
             pos = new BlockPos.MutableBlockPos();
         }
 
-        public Cell setValue(byte value) {
+        public VoxmapCell setValue(byte value) {
             this.value = value;
             return this;
         }
@@ -311,28 +311,28 @@ public class SimpleVoxmap {
     }
 
 
-    public Iterable<Cell> getAllNonZeroCells() {
+    public Iterable<VoxmapCell> getAllNonZeroCells() {
         return getAllNonZeroCells((byte) 0xFF);
     }
 
     /**
      * Create an Iterable that returns all cells(value and position) in the map whose value is non-zero
      */
-    public Iterable<Cell> getAllNonZeroCells(final byte mask) {
+    public Iterable<VoxmapCell> getAllNonZeroCells(final byte mask) {
 
-        return new Iterable<Cell>() {
+        return new Iterable<VoxmapCell>() {
             @Override
-            public Iterator<Cell> iterator() {
-                return new AbstractIterator<Cell>() {
+            public Iterator<VoxmapCell> iterator() {
+                return new AbstractIterator<VoxmapCell>() {
                     private int x = -1;
                     private int y = 0;
                     private int z = 0;
                     private int dataPos = -1;
-                    private final Cell workingCell = new Cell();
+                    private final VoxmapCell workingCell = new VoxmapCell();
                     private final BlockPos.MutableBlockPos dPos = workingCell.getPos();
 
                     @Override
-                    protected Cell computeNext() {
+                    protected VoxmapCell computeNext() {
 
                         main:
                         while (true) {

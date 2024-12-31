@@ -1,0 +1,36 @@
+package com.dtteam.dynamictrees.systems.nodemapper;
+
+import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.tree.family.MangroveFamily;
+import com.dtteam.dynamictrees.util.TreeHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+
+import javax.annotation.Nullable;
+
+public class RootsDestroyerNode extends FindEndsNode {
+
+    final MangroveFamily family;
+    public RootsDestroyerNode(MangroveFamily family) {
+        super();
+        this.family = family;
+    }
+
+    @Override
+    public boolean run(BlockState state, LevelAccessor level, BlockPos pos, @Nullable Direction fromDir) {
+        BranchBlock branch = TreeHelper.getBranch(state);
+
+        if (branch != null) {
+            level.setBlock(pos, branch.getStateForDecay(state, level, pos), 3);//Destroy the branch and notify the client
+        }
+
+        return super.run(state, level, pos, fromDir);
+    }
+
+    @Override
+    public boolean returnRun(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
+        return super.returnRun(state, level, pos, fromDir);
+    }
+}

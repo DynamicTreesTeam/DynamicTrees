@@ -1,26 +1,21 @@
 package com.dtteam.dynamictrees.init;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import org.w3c.dom.Text;
 
 import java.util.LinkedList;
-import java.util.function.Supplier;
 
 public class DTRegistries {
 
     public static final LinkedList<Item> CREATIVE_TAB_ITEMS = new LinkedList<>();
-    public static final CreativeModeTab DT_CREATIVE_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, DynamicTreesCommon.location(DynamicTreesCommon.MOD_ID),
+    public static final CreativeModeTab DT_CREATIVE_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, DynamicTrees.location(DynamicTrees.MOD_ID),
             FabricItemGroup.builder()
                     .icon(() ->  new ItemStack(Items.STICK))
                     .title(Component.translatable("itemGroup.dynamictrees"))

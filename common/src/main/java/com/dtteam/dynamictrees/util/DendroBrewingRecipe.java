@@ -1,8 +1,7 @@
 package com.dtteam.dynamictrees.util;
 
-//import com.ferreusveritas.dynamictrees.item.DendroPotion;
+import com.dtteam.dynamictrees.item.DendroPotion;
 import net.minecraft.world.item.ItemStack;
-//import net.minecraftforge.common.brewing.IBrewingRecipe;
 
 /**
  * An implementation of {@link IBrewingRecipe} for the {@link DendroPotion} item.

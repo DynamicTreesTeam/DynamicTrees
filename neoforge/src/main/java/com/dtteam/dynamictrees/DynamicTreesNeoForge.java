@@ -6,16 +6,13 @@ import com.dtteam.dynamictrees.init.DTConfigs;
 import com.dtteam.dynamictrees.init.DTRegistries;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-import java.util.Set;
-
-@Mod(DynamicTreesCommon.MOD_ID)
+@Mod(DynamicTrees.MOD_ID)
 public class DynamicTreesNeoForge {
 
     public static IEventBus MOD_EVENT_BUS;
@@ -31,7 +28,7 @@ public class DynamicTreesNeoForge {
         container.registerConfig(ModConfig.Type.COMMON, DTConfigs.COMMON_CONFIG);
         container.registerConfig(ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
 
-        DynamicTreesCommon.init();
+        DynamicTrees.init();
 
         DTRegistries.setup(eventBus);
 

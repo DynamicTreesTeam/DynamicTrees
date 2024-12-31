@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.mixin;
 
-import com.dtteam.dynamictrees.DynamicTreesCommon;
+import com.dtteam.dynamictrees.DynamicTrees;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,7 +13,7 @@ public class MixinMinecraft {
     @Inject(at = @At("TAIL"), method = "<init>")
     private void init(CallbackInfo info) {
         
-        DynamicTreesCommon.LOG.info("This line is printed by an example mod common mixin!");
-        DynamicTreesCommon.LOG.info("MC Version: {}", Minecraft.getInstance().getVersionType());
+        DynamicTrees.LOG.info("This line is printed by an example mod common mixin!");
+        DynamicTrees.LOG.info("MC Version: {}", Minecraft.getInstance().getVersionType());
     }
 }
