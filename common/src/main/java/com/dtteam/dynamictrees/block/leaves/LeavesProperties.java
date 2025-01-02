@@ -51,7 +51,7 @@ import java.util.*;
 public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties> {
 
     public static final Codec<LeavesProperties> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString()).forGetter(LeavesProperties::getRegistryName))
+            .group(ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString()).forGetter(LeavesProperties::getRegistryName))
             .apply(instance, LeavesProperties::new));
 
     public static final LeavesProperties NULL = new LeavesProperties() {
@@ -459,7 +459,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     public enum AgeingConfiguration {
         ALWAYS(true, true),
-        WORLDGEN_ONLY(true, false),
+        WORLD_GEN_ONLY(true, false),
         GROWTH_ONLY(false, true),
         NEVER(false, false);
 
@@ -643,7 +643,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
 //    @OnlyIn(Dist.CLIENT)
-//    private void processColor() {
+    private void processColor() {
 //        int color = -1;
 //        if (this.colorNumber != null) {
 //            color = this.colorNumber;
@@ -669,11 +669,11 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 //        }
 //        int c = color;
 //        this.colorMultiplier = (s, w, p, t) -> c == -1 ? Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), w, p, 0) : c;
-//    }
+    }
 
     //@OnlyIn(Dist.CLIENT)
     public static void postInitClient() {
-//        REGISTRY.getAll().forEach(LeavesProperties::processColor);
+        REGISTRY.getAll().forEach(LeavesProperties::processColor);
     }
 
     ///////////////////////////////////////////

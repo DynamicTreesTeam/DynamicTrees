@@ -18,7 +18,6 @@ public class PostGenerationContext extends GenFeatureContext {
     private final Holder<Biome> biome;
     private final int radius;
     private final List<BlockPos> endPoints;
-    private final boolean worldGen;
     private final BlockState initialDirtState;
     private final Float seasonValue;
     private final Float fruitProductionFactor;
@@ -33,7 +32,6 @@ public class PostGenerationContext extends GenFeatureContext {
         this.biome = context.biome();
         this.radius = context.radius();
         this.endPoints = endPoints;
-        this.worldGen = context.isWorldGen();
         this.initialDirtState = initialDirtState;
         this.seasonValue = SeasonHelper.getSeasonValue(context.levelContext(), pos());
         this.fruitProductionFactor = species().seasonalFruitProductionFactor(context.levelContext(), pos());
@@ -68,7 +66,7 @@ public class PostGenerationContext extends GenFeatureContext {
     }
 
     public final boolean isWorldGen() {
-        return worldGen;
+        return true;
     }
 
 }

@@ -1,6 +1,7 @@
 {
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
+	"render_type": "cutout_mipped",
 	"textures": {
 		"roots": "dynamictrees:block/air",
 		"particle": "#side"

@@ -29,6 +29,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -328,11 +330,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     @Override
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
         // Tries to get the face being pounded on.
-//        final double reachDistance = entity instanceof Player ? Objects.requireNonNull(entity.getAttribute(ForgeMod.BLOCK_REACH.get())).getValue() : 5.0D;
-        final double reachDistance = 5;
-        final BlockHitResult ragTraceResult = EntityUtils.playerRayTrace(entity, reachDistance, 1.0F);
-        final Direction toolDir = ragTraceResult != null ? (entity.isShiftKeyDown() ? ragTraceResult.getDirection().getOpposite() : ragTraceResult.getDirection()) : Direction.DOWN;
-
+        final Direction toolDir = EntityUtils.getHitDirection(entity);
         // Play and render block break sound and particles (must be done before block is broken).
         level.levelEvent(null, 2001, cutPos, getId(state));
 

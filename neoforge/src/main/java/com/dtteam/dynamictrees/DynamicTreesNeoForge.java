@@ -1,8 +1,8 @@
 package com.dtteam.dynamictrees;
 
 
-import com.dtteam.dynamictrees.event.handler.EventHandlers;
-import com.dtteam.dynamictrees.event.handler.ClientEventHandler;
+import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.event.handler.OptionalHandlers;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.NeoForgeRegistryLoader;
 import com.dtteam.dynamictrees.treepack.Resources;
@@ -34,14 +34,14 @@ public class DynamicTreesNeoForge {
 
         NeoForgeRegistryLoader.setup(eventBus);
 
-        EventHandlers.registerHandlers();
+        OptionalHandlers.registerHandlers();
 
         //Do not use the mod event bus outside the constructor.
         MOD_EVENT_BUS = null;
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
-        ClientEventHandler.setup();
+        LeavesProperties.postInitClient();
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {

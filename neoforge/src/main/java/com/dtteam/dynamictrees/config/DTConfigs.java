@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.config;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
-import com.dtteam.dynamictrees.event.handler.EventHandlers;
+import com.dtteam.dynamictrees.event.handler.OptionalHandlers;
 import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -104,7 +104,7 @@ public class DTConfigs {
         registerConfig(SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
                 defineInRange("seedPlantRate", 1f / 6f, 0.0, 1.0));
         registerConfig(SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
-                defineInRange("timeToLive", 1200, 0, 6000));
+                defineInRange("seedTimeToLive", 1200, 0, 6000));
         registerConfig(SERVER_BUILDER.comment("If enabled then seeds will only voluntarily plant themselves in forest-like biomes.").
                 define("seedOnlyForest", true));
         registerConfig(SERVER_BUILDER.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional.").
@@ -144,7 +144,7 @@ public class DTConfigs {
         registerConfig(SERVER_BUILDER.comment("If enabled player movement on leaves will not be enhanced").
                 define("vanillaLeavesCollision", false));
         registerConfig(SERVER_BUILDER.comment("If enabled then thinner branches can be climbed").
-                define("enableBranchClimbling", true));
+                define("enableBranchClimbing", true));
         registerConfig(SERVER_BUILDER.comment("If enabled players receive reduced fall damage on leaves at the expense of the block(s) destruction").
                 define("canopyCrash", true));
         registerConfig(SERVER_BUILDER.comment("Damage dealt to the axe item when cutting a tree down. VANILLA: Standard 1 Damage. THICKNESS: By Branch/Trunk Thickness. VOLUME: By Tree Volume.").
@@ -227,13 +227,13 @@ public class DTConfigs {
 
     @SubscribeEvent
     public static void onLoad(final ModConfigEvent.Loading event) {
-        EventHandlers.configReload();
+        OptionalHandlers.configReload();
         SeasonCompatibilityHandler.reloadSeasonManager();
     }
 
     @SubscribeEvent
     public static void onReload(final ModConfigEvent.Reloading event) {
-        EventHandlers.configReload();
+        OptionalHandlers.configReload();
         SeasonCompatibilityHandler.reloadSeasonManager();
     }
 

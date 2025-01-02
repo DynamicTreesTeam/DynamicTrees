@@ -2,6 +2,8 @@ package com.dtteam.dynamictrees.api.resource.loading;
 
 import com.dtteam.dynamictrees.api.resource.loading.preparation.ResourcePreparer;
 import com.dtteam.dynamictrees.deserialization.PropertyAppliers;
+import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.treepack.Resources;
 
 import java.util.function.Function;
 
@@ -17,12 +19,12 @@ public abstract class StagedApplierResourceLoader<I, R> extends AbstractResource
     protected final PropertyAppliers<R, I> loadAppliers;
 
     /**
-     * Appliers that should only be applied on {@link net.minecraftforge.forge.event.lifecycle.GatherDataEvent}.
+     * Appliers that should only be applied on GatherDataEvent or equivalent.
      */
     protected final PropertyAppliers<R, I> gatherDataAppliers;
 
     /**
-     * Appliers that should only be applied on {@link net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent}.
+     * Appliers that should only be applied on FMLCommonSetupEvent or equivalent.
      */
     protected final PropertyAppliers<R, I> setupAppliers;
 
@@ -56,11 +58,15 @@ public abstract class StagedApplierResourceLoader<I, R> extends AbstractResource
      */
     @Override
     public void registerAppliers() {
-//        postApplierEvent(new ApplierRegistryEvent.Load<>(this.loadAppliers, this.appliersIdentifier));
-//        postApplierEvent(new ApplierRegistryEvent.GatherData<>(this.gatherDataAppliers, this.appliersIdentifier));
-//        postApplierEvent(new ApplierRegistryEvent.Setup<>(this.setupAppliers, this.appliersIdentifier));
-//        postApplierEvent(new ApplierRegistryEvent.Reload<>(this.reloadAppliers, this.appliersIdentifier));
-//        postApplierEvent(new ApplierRegistryEvent.Common<>(this.commonAppliers, this.appliersIdentifier));
+        Services.EVENT.postApplierEvent(ApplierStage.LOAD, this.loadAppliers, this.appliersIdentifier);
+        Services.EVENT.postApplierEvent(ApplierStage.GATHER_DATA, this.gatherDataAppliers, this.appliersIdentifier);
+        Services.EVENT.postApplierEvent(ApplierStage.SETUP, this.setupAppliers, this.appliersIdentifier);
+        Services.EVENT.postApplierEvent(ApplierStage.RELOAD, this.reloadAppliers, this.appliersIdentifier);
+        Services.EVENT.postApplierEvent(ApplierStage.COMMON, this.commonAppliers, this.appliersIdentifier);
+    }
+
+    public enum ApplierStage {
+        LOAD, GATHER_DATA, SETUP, RELOAD, COMMON
     }
 
 }

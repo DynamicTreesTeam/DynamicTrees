@@ -31,7 +31,7 @@ public class PalmFamily extends Family {
     public void setCommonSpecies(Species species) {
         super.setCommonSpecies(species);
         if (!(species instanceof PalmSpecies)) {
-            LogManager.getLogger().warn("Common species " + species.getRegistryName() + " for palm family " + getRegistryName() + "is not of type "+ PalmSpecies.class);
+            LogManager.getLogger().warn("Common species {} for palm family {} is not of type {}", species.getRegistryName(), getRegistryName(), PalmSpecies.class);
         }
     }
 

@@ -1,0 +1,35 @@
+package com.dtteam.dynamictrees.platform;
+
+import com.dtteam.dynamictrees.item.Seed;
+import com.dtteam.dynamictrees.platform.services.IInteractionHelper;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.NeoForge;
+
+public class NeoForgeInteractionHelper implements IInteractionHelper {
+
+    @Override
+    public boolean canToolAxeStrip(ItemStack stack) {
+        return stack.canPerformAction(ItemAbilities.AXE_STRIP);
+    }
+
+    @Override
+    public boolean canToolAxeDig(ItemStack stack) {
+        return stack.canPerformAction(ItemAbilities.AXE_DIG);
+    }
+
+    @Override
+    public int setSeedItemEntityLifespan(ItemEntity entityItem, Seed seed) {
+        if (entityItem.lifespan == 6000) { // 6000 (5 minutes) is the default lifespan for an entity item
+            entityItem.lifespan = seed.getTimeToLive(entityItem.getItem()) + 20; // override default lifespan with new value + 20 ticks (1 second)
+            if (entityItem.lifespan == 6000) {
+                entityItem.lifespan = 6001; // Ensure this isn't run again
+            }
+        }
+        return entityItem.lifespan;
+    }
+
+}

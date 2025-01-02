@@ -2,27 +2,42 @@ package com.dtteam.dynamictrees.deserialization;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.CellKit;
+import com.dtteam.dynamictrees.api.configuration.PropertyDefinition;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.block.pod.Pod;
+import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
 import com.dtteam.dynamictrees.deserialization.deserializer.*;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
+import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
+import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
+import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -193,41 +208,41 @@ public final class JsonDeserializers {
             register(CellKit.class, new RegistryEntryDeserializer<>(CellKit.REGISTRY));
     public static final JsonDeserializer<LeavesProperties> LEAVES_PROPERTIES =
             register(LeavesProperties.class, new RegistryEntryDeserializer<>(LeavesProperties.REGISTRY));
-//    public static final JsonDeserializer<GrowthLogicKit> GROWTH_LOGIC_KIT =
-//            register(GrowthLogicKit.class, new RegistryEntryDeserializer<>(GrowthLogicKit.REGISTRY));
-//
-//    public static final JsonDeserializer<GenFeature> GEN_FEATURE =
-//            register(GenFeature.class, new RegistryEntryDeserializer<>(GenFeature.REGISTRY));
+    public static final JsonDeserializer<GrowthLogicKit> GROWTH_LOGIC_KIT =
+            register(GrowthLogicKit.class, new RegistryEntryDeserializer<>(GrowthLogicKit.REGISTRY));
+
+    public static final JsonDeserializer<GenFeature> GEN_FEATURE =
+            register(GenFeature.class, new RegistryEntryDeserializer<>(GenFeature.REGISTRY));
     public static final JsonDeserializer<Family> FAMILY =
             register(Family.class, new RegistryEntryDeserializer<>(Family.REGISTRY));
-//    public static final JsonDeserializer<Fruit> FRUIT =
-//            register(Fruit.class, new RegistryEntryDeserializer<>(Fruit.REGISTRY));
-//    public static final JsonDeserializer<Pod> POD =
-//            register(Pod.class, new RegistryEntryDeserializer<>(Pod.REGISTRY));
+    public static final JsonDeserializer<Fruit> FRUIT =
+            register(Fruit.class, new RegistryEntryDeserializer<>(Fruit.REGISTRY));
+    public static final JsonDeserializer<Pod> POD =
+            register(Pod.class, new RegistryEntryDeserializer<>(Pod.REGISTRY));
     public static final JsonDeserializer<Species> SPECIES =
             register(Species.class, new RegistryEntryDeserializer<>(Species.REGISTRY));
+    public static final JsonDeserializer<SoilProperties> SOIL_PROPERTIES =
+            register(SoilProperties.class, new RegistryEntryDeserializer<>(SoilProperties.REGISTRY));
+    public static final JsonDeserializer<List<SoilProperties>> SOIL_PROPERTIES_LIST =
+            register(ListDeserializer.getListClass(SoilProperties.class), new ListDeserializer<>(SOIL_PROPERTIES));
+
 //    public static final JsonDeserializer<FeatureCanceller> FEATURE_CANCELLER =
 //            register(FeatureCanceller.class, new RegistryEntryDeserializer<>(FeatureCanceller.REGISTRY));
-//    public static final JsonDeserializer<SoilProperties> SOIL_PROPERTIES =
-//            register(SoilProperties.class, new RegistryEntryDeserializer<>(SoilProperties.REGISTRY));
-
-//    public static final JsonDeserializer<List<SoilProperties>> SOIL_PROPERTIES_LIST =
-//            register(ListDeserializer.getListClass(SoilProperties.class), new ListDeserializer<>(SOIL_PROPERTIES));
 
     public static final JsonDeserializer<Map<String, ResourceLocation>> RESOURCE_LOCATION_MAP =
             register(MapDeserializer.getMapClass(String.class, ResourceLocation.class), new MapDeserializer<>(STRING, RESOURCE_LOCATION));
 
 
-//    public static final JsonDeserializer<GenFeatureConfiguration> CONFIGURED_GEN_FEATURE =
-//            register(GenFeatureConfiguration.class,
-//                    new ConfiguredDeserializer<>("Gen Feature", GenFeature.class, GenFeatureConfiguration.TEMPLATES));
-//    public static final JsonDeserializer<GrowthLogicKitConfiguration> CONFIGURED_GROWTH_LOGIC_KIT =
-//            register(GrowthLogicKitConfiguration.class,
-//                    new ConfiguredDeserializer<>("Growth Logic Kit", GrowthLogicKit.class,
-//                            GrowthLogicKitConfiguration.TEMPLATES));
-//
-//    public static final JsonDeserializer<Seed> SEED = register(Seed.class, jsonElement -> ITEM.deserialize(jsonElement)
-//            .mapIfValid(item -> item instanceof Seed, "Item \"{}\" is not a seed.", item -> (Seed) item));
+    public static final JsonDeserializer<GenFeatureConfiguration> CONFIGURED_GEN_FEATURE =
+            register(GenFeatureConfiguration.class,
+                    new ConfiguredDeserializer<>("Gen Feature", GenFeature.class, GenFeatureConfiguration.TEMPLATES));
+    public static final JsonDeserializer<GrowthLogicKitConfiguration> CONFIGURED_GROWTH_LOGIC_KIT =
+            register(GrowthLogicKitConfiguration.class,
+                    new ConfiguredDeserializer<>("Growth Logic Kit", GrowthLogicKit.class,
+                            GrowthLogicKitConfiguration.TEMPLATES));
+
+    public static final JsonDeserializer<Seed> SEED = register(Seed.class, jsonElement -> ITEM.deserialize(jsonElement)
+            .mapIfValid(item -> item instanceof Seed, "Item \"{}\" is not a seed.", item -> (Seed) item));
 
     public static final JsonDeserializer<BranchBlock> BRANCH =
             register(BranchBlock.class, jsonElement -> BLOCK.deserialize(jsonElement)
@@ -238,9 +253,9 @@ public final class JsonDeserializers {
 //            register(VinesGenFeature.VineType.class, new EnumDeserializer<>(VinesGenFeature.VineType.class));
 //    public static final JsonDeserializer<BiomeDatabase.Operation> OPERATION =
 //            register(BiomeDatabase.Operation.class, new EnumDeserializer<>(BiomeDatabase.Operation.class));
-//    public static final JsonDeserializer<GenerationStep.Decoration> DECORATION_STAGE =
-//            register(GenerationStep.Decoration.class, new EnumDeserializer<>(GenerationStep.Decoration.class));
-//
+    public static final JsonDeserializer<GenerationStep.Decoration> DECORATION_STAGE =
+            register(GenerationStep.Decoration.class, new EnumDeserializer<>(GenerationStep.Decoration.class));
+
 //    public static final JsonDeserializer<DTBiomeHolderSet> BIOME_LIST = register(DTBiomeHolderSet.class, new BiomeListDeserializer());
 //    public static final JsonDeserializer<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
 //            BIOME_LIST.deserialize(jsonElement).map(biomeList ->
@@ -253,10 +268,10 @@ public final class JsonDeserializers {
 //            BiomePropertySelectors.DensitySelector.class, new DensitySelectorDeserializer());
 //    public static final JsonDeserializer<BiomePropertySelectors.ChanceSelector> CHANCE_SELECTOR = register(
 //            BiomePropertySelectors.ChanceSelector.class, new ChanceSelectorDeserializer());
-//
-//    public static final JsonDeserializer<SeedSaplingRecipe> SEED_SAPLING_RECIPE = register(
-//            SeedSaplingRecipe.class, new SeedSaplingRecipeDeserializer()
-//    );
+
+    public static final JsonDeserializer<SeedSaplingRecipe> SEED_SAPLING_RECIPE = register(
+            SeedSaplingRecipe.class, new SeedSaplingRecipeDeserializer()
+    );
 
     public static final JsonDeserializer<MapColor> MAP_COLOR =
             register(MapColor.class, new MapColorDeserializer());
@@ -267,31 +282,24 @@ public final class JsonDeserializers {
             BooleanOp.class, new BooleanOpDeserializer()
     );
 
-//    private static final Map<String, ToolType> TOOL_TYPES =
-//            ReflectionHelper.getPrivateFieldUnchecked(ToolType.class, "VALUES");
-//
-//    public static final JsonDeserializer<ToolType> TOOL_TYPE = register(ToolType.class, jsonElement ->
-//            STRING.deserialize(jsonElement).map(TOOL_TYPES::get, "Could not get tool type from \"{}\"."));
-
     public static final JsonDeserializer<Class<?>> DESERIALIZABLE_CLASS = new DeserializableClassDeserializer();
 
-//    public static final JsonDeserializer<PropertyDefinition<?>> VARIABLE_DEFINITION =
-//            register(PropertyDefinition.captureClass(), new PropertyDefinitionDeserializer());
+    public static final JsonDeserializer<PropertyDefinition<?>> VARIABLE_DEFINITION =
+            register(PropertyDefinition.captureClass(), new PropertyDefinitionDeserializer());
 
-//    /**
-//     * Registers {@link ForgeRegistryEntryDeserializer} objects. This should be called after the registries are
-//     * initiated to avoid giving null to the getters.
-//     */
-//    public static void registerForgeEntryGetters() {
-//        BLOCK = register(Block.class,
-//                new ForgeRegistryEntryDeserializer<>(BuiltInRegistries.BLOCKS, "block", Blocks.AIR));
-//        ITEM = register(Item.class, new ForgeRegistryEntryDeserializer<>(ForgeRegistries.ITEMS, "item", Items.AIR));
-//    }
+    /**
+     * Registers {@link BuiltInRegistryEntryDeserializer} objects. This should be called after the registries are
+     * initiated to avoid giving null to the getters.
+     */
+    public static void registerRegistryEntryGetters() {
+        BLOCK = register(Block.class,
+                new BuiltInRegistryEntryDeserializer<>(BuiltInRegistries.BLOCK, "block", Blocks.AIR));
+        ITEM = register(Item.class, new BuiltInRegistryEntryDeserializer<>(BuiltInRegistries.ITEM, "item", Items.AIR));
+    }
 
     public static void postRegistryEvent() {
         Services.EVENT.postJsonDeserializerRegistryEvent();
     }
-//
 
 
 }

@@ -8,6 +8,7 @@ import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.pod.OffsetablePodBlock;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionContext;
@@ -20,10 +21,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -372,16 +375,17 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     // PHYSICAL BOUNDS
     ///////////////////////////////////////////
 
-    // This is only so effective because the center of the player must be inside the block that contains the tree trunk.
-    // The result is that only thin branches and trunks can be climbed.
-    // We do not check if the radius is over 3 since some mods can modify this, and allow you to climb on contact.
-//    @Override
-//    public boolean isLadder(BlockState state, LevelReader level, BlockPos pos, LivingEntity entity) {
-//        return DTConfigs.ENABLE_BRANCH_CLIMBING.get() &&
-//                entity instanceof Player &&
-//                getFamily().branchIsLadder() &&
-//                (!state.hasProperty(WATERLOGGED) || !state.getValue(WATERLOGGED));
-//    }
+//  This is only so effective because the center of the player must be inside the block that contains the tree trunk.
+//  The result is that only thin branches and trunks can be climbed.
+//  We do not check if the radius is over 3 since some mods can modify this, and allow you to climb on contact.
+    /** NeoForge Override */
+    @SuppressWarnings("unused")
+    public boolean isLadder(BlockState state, LevelReader level, BlockPos pos, LivingEntity entity) {
+        return Services.CONFIG.getBoolConfig("enableBranchClimbing") &&
+                entity instanceof Player &&
+                getFamily().branchIsLadder() &&
+                (!state.hasProperty(WATERLOGGED) || !state.getValue(WATERLOGGED));
+    }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {

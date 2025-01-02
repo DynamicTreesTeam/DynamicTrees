@@ -13,7 +13,7 @@ public class Services {
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
     public static final IRegistryHelper REGISTRY = load(IRegistryHelper.class);
     public static final IConfigHelper CONFIG = load(IConfigHelper.class);
-    public static final IItemHelper ITEM = load(IItemHelper.class);
+    public static final IInteractionHelper INTERACTION = load(IInteractionHelper.class);
     public static final ITextureHelper TEXTURE = load(ITextureHelper.class);
     public static final ICompatHelper COMPAT = load(ICompatHelper.class);
     public static final IEventHelper EVENT = load(IEventHelper.class);

@@ -4,13 +4,18 @@ import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.LazyValue;
+import com.dtteam.dynamictrees.util.LevelContext;
+import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
+import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-// TODO: Make compostable via ComposterBlock#registerCompostable
 public class Seed extends Item {//implements IPlantable {
 
     private static final LazyValue<RandomSource> BACKUP_RANDOM = LazyValue.supplied(RandomSource::create);
@@ -61,45 +65,42 @@ public class Seed extends Item {//implements IPlantable {
         return species;
     }
 
-//    @Override
-//    public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
-//        if (entityItem.lifespan == 6000) { // 6000 (5 minutes) is the default lifespan for an entity item
-//            entityItem.lifespan = getTimeToLive(entityItem.getItem()) + 20; // override default lifespan with new value + 20 ticks (1 second)
-//            if (entityItem.lifespan == 6000) {
-//                entityItem.lifespan = 6001; // Ensure this isn't run again
-//            }
-//        }
-//
-//        if (entityItem.tickCount >= entityItem.lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
-//            final Level level = entityItem.level();
-//            if (!level.isClientSide) {//Server side only
-//                final ItemStack seedStack = entityItem.getItem();
-//                final BlockPos pos = new BlockPos(entityItem.blockPosition());
-//                final SeedVoluntaryPlantEvent seedVolEvent = new SeedVoluntaryPlantEvent(entityItem, this.getSpecies().selfOrLocationOverride(level, pos), pos, this.shouldPlant(level, pos, seedStack));
-//                MinecraftForge.EVENT_BUS.post(seedVolEvent);
-//                if (!seedVolEvent.isCanceled() && seedVolEvent.getWillPlant()) {
-//                    this.doPlanting(level, pos, null, seedStack);
-//                }
-//                seedStack.setCount(0);
-//            }
-//            entityItem.kill();
-//        }
-//
-//        return false;
-//    }
+    /** NeoForge Override */
+    @SuppressWarnings("unused")
+    public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
+        int lifespan = Services.INTERACTION.setSeedItemEntityLifespan(entityItem, this);
+
+        if (entityItem.tickCount >= lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
+            final Level level = entityItem.level();
+            if (!level.isClientSide) {//Server side only
+                final ItemStack seedStack = entityItem.getItem();
+                final BlockPos pos = new BlockPos(entityItem.blockPosition());
+                VoluntaryPlantEventResult result = Services.EVENT.postSeedVoluntaryPlantEvent(entityItem, this.getSpecies().selfOrLocationOverride(level, pos), pos, this.shouldPlant(level, pos, seedStack));
+                if (!result.cancelled() && result.willPlant()) {
+                    this.doPlanting(level, pos, null, seedStack);
+                }
+                seedStack.setCount(0);
+            }
+            entityItem.kill();
+        }
+
+        return false;
+    }
+
+    public record VoluntaryPlantEventResult(boolean cancelled, boolean willPlant) { }
 
     public boolean doPlanting(Level level, BlockPos pos, @Nullable Player planter, ItemStack seedStack) {
-//        final Species species = this.getSpecies().selfOrLocationOverride(level, pos);
-//        if (species.plantSapling(level, pos, this.getSpecies() != species)) { // Do the planting
-//            String joCode = getCode(seedStack, level.random);
-//            if (!joCode.isEmpty()) {
-//                level.removeBlock(pos, false); // Remove the newly created dynamic sapling
-//                BlockPos rootPos = pos.below();
-//                GenerationContext context = new GenerationContext(LevelContext.create(level), species, rootPos, rootPos.mutable(), level.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, SafeChunkBounds.ANY);
-//                species.getJoCode(joCode).setCareful(true).generate(context);
-//            }
-//            return true;
-//        }
+        final Species species = this.getSpecies().selfOrLocationOverride(level, pos);
+        if (species.plantSapling(level, pos, this.getSpecies() != species)) { // Do the planting
+            String joCode = getCode(seedStack, level.random);
+            if (!joCode.isEmpty()) {
+                level.removeBlock(pos, false); // Remove the newly created dynamic sapling
+                BlockPos rootPos = pos.below();
+                DynamicTreeGenerationContext context = new DynamicTreeGenerationContext(LevelContext.create(level), species, rootPos, rootPos.mutable(), level.getBiome(pos), planter != null ? planter.getDirection() : Direction.NORTH, 8, false);
+                species.getJoCode(joCode).setCareful(true).generate(context);
+            }
+            return true;
+        }
         return false;
     }
 
@@ -171,10 +172,10 @@ public class Seed extends Item {//implements IPlantable {
         return joCode;
     }
 
-//    @Nullable
-//    private JoCode getJoCodeForRadius(RandomSource random, int radius) {
-//        return JoCodeRegistry.getRandomCode(species.getRegistryName(), Mth.clamp(radius, 2, 8), random);
-//    }
+    @Nullable
+    private JoCode getJoCodeForRadius(RandomSource random, int radius) {
+        return JoCodeRegistry.getRandomCode(species.getRegistryName(), Mth.clamp(radius, 2, 8), random);
+    }
 
     public InteractionResult onItemUseFlowerPot(UseOnContext context) {
 //        final Level level = context.getLevel();
@@ -292,7 +293,6 @@ public class Seed extends Item {//implements IPlantable {
 //            }
 //        }
 //    }
-
 
     ///////////////////////////////////////////
     //IPlantable Interface

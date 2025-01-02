@@ -1,7 +1,10 @@
 package com.dtteam.dynamictrees.api.registry;
 
+import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.treepack.Resources;
+import com.dtteam.dynamictrees.util.TreeRegistry;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -28,6 +31,8 @@ import java.util.function.Function;
  */
 // TODO: Update Javadoc
 public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V> {
+
+    public static final ResourceLocation RESOURCE_LOCATION = DynamicTrees.location("registry_name");
 
     /**
      * A {@link Map} of {@link EntryType} objects and their registry names. These handle construction of the {@link
@@ -91,15 +96,15 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V>
         final AtomicReference<EntryType<V>> type = new AtomicReference<>(this.defaultType);
         final JsonElement typeElement = jsonObject.get("type");
 
-//        if (typeElement != null) {
-//            JsonDeserialisers.RESOURCE_LOCATION.deserialise(typeElement)
-//                    .map(resourceLocation -> this.getType(TreeRegistry.processResLoc(resourceLocation)), "Could not find type for '{}' (will use default).")
-//                    .ifSuccessOrElse(
-//                            type::set,
-//                            error -> LogManager.getLogger().error("Error constructing " + this.name + " '" + registryName + "': " + error),
-//                            warning -> LogManager.getLogger().warn("Warning whilst constructing " + this.name + " '" + registryName + "': " + warning)
-//                    );
-//        }
+        if (typeElement != null) {
+            JsonDeserializers.RESOURCE_LOCATION.deserialize(typeElement)
+                    .map(resourceLocation -> this.getType(TreeRegistry.processResLoc(resourceLocation)), "Could not find type for '{}' (will use default).")
+                    .ifSuccessOrElse(
+                            type::set,
+                            error -> LogManager.getLogger().error("Error constructing " + this.name + " '" + registryName + "': " + error),
+                            warning -> LogManager.getLogger().warn("Warning whilst constructing " + this.name + " '" + registryName + "': " + warning)
+                    );
+        }
 
         return type.get();
     }
@@ -146,9 +151,9 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V>
         public V decode(final JsonObject jsonObject) {
             final DataResult<Pair<V, JsonElement>> dataResult = this.codec.decode(JsonOps.INSTANCE, jsonObject);
 
-            if (!dataResult.result().isPresent()) {
+            if (dataResult.result().isEmpty()) {
                 if (dataResult.error().isPresent()) {
-                    LogManager.getLogger().error("Error constructing " + this.registry.getName() + ": " + dataResult.error().get().message());
+                    LogManager.getLogger().error("Error constructing {}: {}", this.registry.getName(), dataResult.error().get().message());
                 }
                 return null;
             }
@@ -159,13 +164,13 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V>
     }
 
     public synchronized static JsonObject putJsonRegistryName(final JsonObject jsonObject, final ResourceLocation registryName) {
-        jsonObject.add(Resources.RESOURCE_LOCATION.toString(), new JsonPrimitive(registryName.toString()));
+        jsonObject.add(RESOURCE_LOCATION.toString(), new JsonPrimitive(registryName.toString()));
         return jsonObject;
     }
 
     public static <V extends RegistryEntry<V>> Codec<V> createDefaultCodec(final Function<ResourceLocation, V> constructor) {
         return RecordCodecBuilder.create(instance -> instance
-                .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString()).forGetter(RegistryEntry::getRegistryName))
+                .group(ResourceLocation.CODEC.fieldOf(RESOURCE_LOCATION.toString()).forGetter(RegistryEntry::getRegistryName))
                 .apply(instance, constructor));
     }
 

@@ -33,7 +33,7 @@ public class NetherFungusFamily extends Family {
     @Override
     public void setCommonSpecies(Species species) {
         super.setCommonSpecies(species);
-        if (!(species instanceof PalmSpecies)) {
+        if (!(species instanceof NetherFungusSpecies)) {
             DynamicTrees.LOG.warn("Common species {} for nether fungus {} is not of type {}", species.getRegistryName(), getRegistryName(), NetherFungusSpecies.class);
         }
     }

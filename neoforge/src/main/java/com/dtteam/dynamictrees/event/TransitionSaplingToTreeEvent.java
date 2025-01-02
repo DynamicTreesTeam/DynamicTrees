@@ -13,7 +13,7 @@ import net.neoforged.bus.api.ICancellableEvent;
  * <p>
  * This event does not have a result.
  * <p>
- * This event is fired on the {@linkplain net.minecraftforge.common.MinecraftForge#EVENT_BUS Forge bus}.
+ * This event is fired on the NeoForge event bus.
  *
  * @author Harley O'Connor
  */

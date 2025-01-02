@@ -43,7 +43,6 @@ import com.dtteam.dynamictrees.systems.substance.FertilizeSubstance;
 import com.dtteam.dynamictrees.systems.substance.GrowthSubstance;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.util.*;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
@@ -160,7 +159,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public static Codec<Species> createDefaultCodec(final Function3<ResourceLocation, Family, LeavesProperties, Species> constructor) {
         return RecordCodecBuilder.create(instance -> instance
-                .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString())
+                .group(ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString())
                                 .forGetter(Species::getRegistryName),
                         Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
                         LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
@@ -1042,7 +1041,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public final boolean transitionToTree(Level level, BlockPos pos) {
-        return !Services.EVENT.onTransitionSaplingToTree(this, level, pos) && shouldTransitionToTree(level, pos) &&
+        return !Services.EVENT.postTransitionSaplingToTreeEvent(this, level, pos) && shouldTransitionToTree(level, pos) &&
                 transitionToTree(level, pos, getFamily());
     }
 

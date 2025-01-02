@@ -4,13 +4,12 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
 import java.util.List;
 
-@Cancelable
-public class VoluntarySeedDropEvent extends Event {
+public class VoluntarySeedDropEvent extends Event implements ICancellableEvent {
 
     private final Level level;
     private final BlockPos rootPos;

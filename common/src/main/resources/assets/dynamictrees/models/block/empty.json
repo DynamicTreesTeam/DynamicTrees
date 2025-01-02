@@ -1,6 +1,5 @@
 {
-    "textures": {
-    },
-    "elements": [
-    ]
+    "textures": {},
+    "elements": [],
+    "render_type": "cutout"
 }

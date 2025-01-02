@@ -14,7 +14,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 //import net.minecraftforge.common.ToolActions;
 
@@ -69,7 +68,7 @@ public final class ItemUtils {
      * @param forBlockBreak If this function was used for breaking a block, as minecraft already did 1 value of damage.
      */
     public static void damageAxe(final LivingEntity entity, @Nullable final ItemStack heldItem, final int radius, final NetVolumeNode.Volume woodVolume, final boolean forBlockBreak) {
-        if (heldItem == null || !Services.ITEM.canToolAxeDig(heldItem)) {
+        if (heldItem == null || !Services.INTERACTION.canToolAxeDig(heldItem)) {
             return;
         }
 

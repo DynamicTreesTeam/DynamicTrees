@@ -35,24 +35,21 @@ public class DestroyerNode extends FindEndsNode {
         return this;
     }
     @Override
-    public boolean run(BlockState state, LevelAccessor level, BlockPos pos, @Nullable Direction fromDir) {
-//        if (BranchConnectables.getConnectionRadiusForBlock(state, level, pos, fromDir == null ? null : fromDir.getOpposite()) > 0) {
-//            if (player != null && level instanceof Level) {
-//                BlockEntity te = level.getBlockEntity(pos);
-//                state.getBlock().onDestroyedByPlayer(state, (Level) level, pos, player, false, level.getFluidState(pos));
-//                state.getBlock().playerDestroy((Level) level, player, pos, state, te, player.getMainHandItem());
-//            } else {
-//                level.setBlock(pos, BlockStates.AIR, 0);
-//            }
-//        }
-//
-//        BranchBlock branch = TreeHelper.getBranch(state);
-//
-//        if (branch != null && species.getFamily() == branch.getFamily()) {
-//            level.setBlock(pos, branch.getStateForDecay(state, level, pos), 3);//Destroy the branch and notify the client
-//        }
+    public boolean run(BlockState state, LevelAccessor accessor, BlockPos pos, @Nullable Direction fromDir) {
+        if (BranchConnectables.getConnectionRadiusForBlock(state, accessor, pos, fromDir == null ? null : fromDir.getOpposite()) > 0) {
+            if (player != null && accessor instanceof Level level) {
+                BlockEntity te = accessor.getBlockEntity(pos);
+                state.getBlock().playerDestroy(level, player, pos, state, te, player.getMainHandItem());
+            } else accessor.setBlock(pos, BlockStates.AIR, 0);
+        }
 
-        return super.run(state, level, pos, fromDir);
+        BranchBlock branch = TreeHelper.getBranch(state);
+
+        if (branch != null && species.getFamily() == branch.getFamily()) {
+            accessor.setBlock(pos, branch.getStateForDecay(state, accessor, pos), 3);//Destroy the branch and notify the client
+        }
+
+        return super.run(state, accessor, pos, fromDir);
     }
 
     @Override

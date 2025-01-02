@@ -7,8 +7,10 @@ import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
 import com.dtteam.dynamictrees.block.FutureBreakable;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.block.soil.RootyBlock;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.nodemapper.DestroyerNode;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.systems.nodemapper.SpeciesNode;
@@ -23,7 +25,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -32,9 +38,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -163,25 +171,23 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return false;
     }
 
-//    ///////////////////////////////////////////
-//    // INTERACTION
-//    ///////////////////////////////////////////
-//
-//    @Deprecated
-//    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-//        final ItemStack heldItem = player.getItemInHand(hand);
-//        return TreeHelper.getTreePart(state).getFamily(state, level, pos).onTreeActivated(
-//                new Family.TreeActivationContext(
-//                        level, TreeHelper.findRootNode(level, pos), pos, state, player, hand, heldItem, hitResult
-//                )
-//        ) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
-//    }
-//
-    public boolean canBeStripped(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
-        final int stripRadius = getFamily().getMinRadiusForStripping();
-        return stripRadius != 0 && stripRadius <= this.getRadius(state) && this.canBeStripped && Services.ITEM.canToolAxeStrip(heldItem);
+    ///////////////////////////////////////////
+    // INTERACTION
+    ///////////////////////////////////////////
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return TreeHelper.getTreePart(state).getFamily(state, level, pos).onTreeActivated(
+                new Family.TreeActivationContext(
+                        level, TreeHelper.findRootNode(level, pos), pos, state, player, hand, stack, hitResult
+                )
+        ) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
     }
 
+    public boolean canBeStripped(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
+        final int stripRadius = getFamily().getMinRadiusForStripping();
+        return stripRadius != 0 && stripRadius <= this.getRadius(state) && this.canBeStripped && Services.INTERACTION.canToolAxeStrip(heldItem);
+    }
 
     public void stripBranch(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
         final int radius = this.getRadius(state);
@@ -195,14 +201,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     }
 
     public void stripBranch(BlockState state, LevelAccessor level, BlockPos pos, int radius) {
-//        this.getFamily().getStrippedBranch().ifPresent(strippedBranch ->
-//                strippedBranch.setRadius(
-//                        level,
-//                        pos,
-//                        Math.max(1, radius - (getFamily().reduceRadiusWhenStripping() ? 1 : 0)),
-//                        null, 3
-//                )
-//        );
+        this.getFamily().getStrippedBranch().ifPresent(strippedBranch ->
+                strippedBranch.setRadius(
+                        level,
+                        pos,
+                        Math.max(1, radius - (getFamily().reduceRadiusWhenStripping() ? 1 : 0)),
+                        null, 3
+                )
+        );
     }
 
     @Override
@@ -210,11 +216,10 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return this.getFamily().getBranchItem().map(ItemStack::new).orElse(ItemStack.EMPTY);
     }
 
-//
-//    @Override
-//    public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, PathComputationType type) {
-//        return false;
-//    }
+    @Override
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
+        return false;
+    }
 
     public BlockState getStateForDecay (BlockState state, LevelAccessor level, BlockPos pos){
         return Blocks.AIR.defaultBlockState();
@@ -226,15 +231,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      */
     @Override
     public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
-//        if (!(levelReader instanceof Level level)) return false;
-//        BlockPos rootPos = TreeHelper.findRootNode(level, blockPos);
-//        if (rootPos == BlockPos.ZERO) return false;
-//        BlockState rootState = levelReader.getBlockState(rootPos);
-//        RootyBlock root = TreeHelper.getRooty(rootState);
-//        if (root == null) return false;
-//
-//        return root.isValidBonemealTarget(levelReader, rootPos, rootState, pIsClient);
-        return true;
+        if (!(levelReader instanceof Level level)) return false;
+        BlockPos rootPos = TreeHelper.findRootNode(level, blockPos);
+        if (rootPos == BlockPos.ZERO) return false;
+        BlockState rootState = levelReader.getBlockState(rootPos);
+        RootyBlock root = TreeHelper.getRooty(rootState);
+        if (root == null) return false;
+
+        return root.isValidBonemealTarget(levelReader, rootPos, rootState);
     }
 
     @Override
@@ -244,13 +248,13 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
 
     @Override
     public void performBonemeal(ServerLevel pLevel, RandomSource pRandom, BlockPos pPos, BlockState pState){
-//        BlockPos rootPos = TreeHelper.findRootNode(pLevel, pPos);
-//        if (rootPos == BlockPos.ZERO) return;
-//        BlockState rootState = pLevel.getBlockState(rootPos);
-//        RootyBlock root = TreeHelper.getRooty(rootState);
-//        if (root == null) return;
-//
-//        root.performBonemeal(pLevel, pRandom, rootPos, rootState);
+        BlockPos rootPos = TreeHelper.findRootNode(pLevel, pPos);
+        if (rootPos == BlockPos.ZERO) return;
+        BlockState rootState = pLevel.getBlockState(rootPos);
+        RootyBlock root = TreeHelper.getRooty(rootState);
+        if (root == null) return;
+
+        root.performBonemeal(pLevel, pRandom, rootPos, rootState);
     }
 
     ///////////////////////////////////////////
@@ -506,11 +510,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     @Override
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
         // Tries to get the face being pounded on.
-//      final double reachDistance = entity instanceof Player ? entity.getAttribute(ForgeMod.BLOCK_REACH.get()).getValue() : 5.0D;
-        final double reachDistance = 5;
-        final BlockHitResult ragTraceResult = EntityUtils.playerRayTrace(entity, reachDistance, 1.0F);
-        final Direction toolDir = ragTraceResult != null ? (entity.isShiftKeyDown() ? ragTraceResult.getDirection().getOpposite() : ragTraceResult.getDirection()) : Direction.DOWN;
-
+        final Direction toolDir = EntityUtils.getHitDirection(entity);
         // Play and render block break sound and particles (must be done before block is broken).
         level.levelEvent(null, 2001, cutPos, getId(state));
 
@@ -528,25 +528,21 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final float chance = 1.0f;
 
         // Build the final wood drop list taking chance into consideration.
-        final List<ItemStack> woodDropList = woodItems.stream().filter(i -> level.random.nextFloat() <= chance).collect(Collectors.toList());
+        final List<ItemStack> woodDropList = woodItems.stream().filter(i -> level.random.nextFloat() <= chance).toList();
 
         // Drop the FallingTreeEntity into the level.
-        FallingTreeEntity.dropTree(level, destroyData, woodDropList,  FallingTreeEntity.DestroyType.HARVEST);
+//        FallingTreeEntity.dropTree(level, destroyData, woodDropList,  FallingTreeEntity.DestroyType.HARVEST);
 
         // Damage the axe by a prescribed amount.
         this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);
     }
 
-
-//    @Override
-//    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-//        return this.removedByEntity(state, level, pos, player);
-//    }
-//
-//    public boolean removedByEntity(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
-//        FutureBreak.add(new FutureBreak(state, level, cutPos, entity, 0));
-//        return false;
-//    }
+    /** NeoForge Override */
+    @SuppressWarnings("unused")
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid){
+        FutureBreak.add(new FutureBreak(state, level, pos, player, 0));
+        return false;
+    }
 
     protected void sloppyBreak(Level level, BlockPos cutPos, FallingTreeEntity.DestroyType destroyType) {
         // Do the actual destruction.
@@ -581,9 +577,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final Block toBlock = toBlockState.getBlock();
 
         if (toBlock instanceof BranchBlock) //if the toBlock is a branch it probably was probably replaced by the debug stick, therefore we do nothing
-        {
             return;
-        }
 
         boolean foundFire = toBlockState.is(BlockTags.FIRE);
         if (!foundFire){

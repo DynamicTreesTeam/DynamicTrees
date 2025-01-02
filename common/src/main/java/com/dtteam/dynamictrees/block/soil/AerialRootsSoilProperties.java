@@ -25,6 +25,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
@@ -189,12 +191,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
             BranchDestructionData destroyData = null;
             Optional<Direction> toolDir = Optional.empty();
-            if (player != null){
-//                final double reachDistance = Objects.requireNonNull(player.getAttribute(ForgeMod.BLOCK_REACH.get())).getValue();
-                final double reachDistance = 5;
-                final BlockHitResult ragTraceResult = EntityUtils.playerRayTrace(player, reachDistance, 1.0F);
-                toolDir = Optional.of(ragTraceResult != null ? (player.isShiftKeyDown() ? ragTraceResult.getDirection().getOpposite() : ragTraceResult.getDirection()) : Direction.DOWN);
-            }
+            if (player != null) toolDir = Optional.of(EntityUtils.getHitDirection(player));
 
             if (branch.isPresent()) {
                 destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), toolDir.orElse(Direction.DOWN), false, player);
@@ -209,10 +206,10 @@ public class AerialRootsSoilProperties extends SoilProperties {
                 }
             }
             if (destroyData == null){
-//                if (player != null)
-//                    this.spawnDestroyParticles(level, player, rootPos, level.getBlockState(rootPos));
-//                level.gameEvent(GameEvent.BLOCK_DESTROY, rootPos, GameEvent.Context.of(player, level.getBlockState(rootPos)));
-//                level.setBlock(rootPos, Blocks.AIR.defaultBlockState(), 3);
+                if (player != null)
+                    this.spawnDestroyParticles(level, player, rootPos, level.getBlockState(rootPos));
+                level.gameEvent(GameEvent.BLOCK_DESTROY, rootPos, GameEvent.Context.of(player, level.getBlockState(rootPos)));
+                level.setBlock(rootPos, Blocks.AIR.defaultBlockState(), 3);
             } else {
 
                 final ItemStack heldItem = player == null ? ItemStack.EMPTY : player.getMainHandItem();
@@ -222,10 +219,10 @@ public class AerialRootsSoilProperties extends SoilProperties {
                 woodVolume.multiplyVolume(fortuneFactor);
                 final List<ItemStack> woodItems = destroyData.species.getBranchesDrops(level, woodVolume, heldItem);
 
-//                if (player != null)
-//                    this.spawnDestroyParticles(level, player, rootPos, level.getBlockState(rootPos));
-//                level.gameEvent(GameEvent.BLOCK_DESTROY, rootPos, GameEvent.Context.of(player, level.getBlockState(rootPos)));
-//                level.setBlock(rootPos, Blocks.AIR.defaultBlockState(), 3);
+                if (player != null)
+                    this.spawnDestroyParticles(level, player, rootPos, level.getBlockState(rootPos));
+                level.gameEvent(GameEvent.BLOCK_DESTROY, rootPos, GameEvent.Context.of(player, level.getBlockState(rootPos)));
+                level.setBlock(rootPos, Blocks.AIR.defaultBlockState(), 3);
                 FallingTreeEntity.dropTree(level, destroyData, woodItems, FallingTreeEntity.DestroyType.HARVEST);
 
                 if (player != null)

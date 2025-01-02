@@ -32,10 +32,11 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
     @Override
     public void registerAppliers() {
         this.commonAppliers
-                .register("common_species", ResourceLocation.class, (family, registryName) -> {
+                .register("common_species", ResourceLocation.class,
+                        (family, registryName) -> {
                     registryName = TreeRegistry.processResLoc(registryName);
                     Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName,
-                            family::setupCommonSpecies, setCommonWarn(family, registryName)));
+                            family::setCommonSpecies, setCommonWarn(family, registryName)));
                 })
                 .register("common_leaves", LeavesProperties.class, Family::setCommonLeaves)
                 .register("max_branch_radius", Integer.class, Family::setMaxBranchRadius);

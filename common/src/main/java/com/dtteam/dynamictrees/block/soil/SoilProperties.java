@@ -32,7 +32,7 @@ import static com.dtteam.dynamictrees.util.ResourceLocationUtils.prefix;
 public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties> {
 
     public static final Codec<SoilProperties> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(ResourceLocation.CODEC.fieldOf(Resources.RESOURCE_LOCATION.toString()).forGetter(SoilProperties::getRegistryName))
+            .group(ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString()).forGetter(SoilProperties::getRegistryName))
             .apply(instance, SoilProperties::new));
 
     public static final SoilProperties NULL_SOIL_PROPERTIES = new SoilProperties() {

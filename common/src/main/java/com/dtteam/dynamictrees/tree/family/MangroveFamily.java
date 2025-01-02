@@ -53,7 +53,7 @@ public class MangroveFamily extends Family {
     public void setCommonSpecies(Species species) {
         super.setCommonSpecies(species);
         if (!(species instanceof MangroveSpecies)) {
-            LogManager.getLogger().warn("Common species " + species.getRegistryName() + " for mangrove family " + getRegistryName() + "is not of type "+ MangroveSpecies.class);
+            LogManager.getLogger().warn("Common species {} for mangrove family {} is not of type {}", species.getRegistryName(), getRegistryName(), MangroveSpecies.class);
         }
     }
 

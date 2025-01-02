@@ -21,6 +21,7 @@ import com.dtteam.dynamictrees.tree.family.MangroveFamily;
 import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
 import com.dtteam.dynamictrees.tree.family.PalmFamily;
 import com.dtteam.dynamictrees.tree.species.*;
+import com.dtteam.dynamictrees.treepack.Resources;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -31,16 +32,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
-public class TreeRegistryEventHandler {
-
-    @SubscribeEvent
-    public static void registerSpecies(final RegistryEvent<Species> event) {
-//        // Registers fake species for generating mushrooms.
-//        event.getRegistry().registerAll(new FakeMushroomSpecies(true), new FakeMushroomSpecies(false));
-    }
+public class CommonModEventHandler {
 
     @SubscribeEvent
     public static void registerLeavesPropertiesTypes(final TypeRegistryEvent<LeavesProperties> event) {
+        if (!event.isEntryOfType(LeavesProperties.class)) return;
         event.registerType(DynamicTrees.location("solid"), SolidLeavesProperties.TYPE);
         event.registerType(DynamicTrees.location("wart"), WartProperties.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmLeavesProperties.TYPE);
@@ -49,6 +45,7 @@ public class TreeRegistryEventHandler {
 
     @SubscribeEvent
     public static void registerFamilyTypes(final TypeRegistryEvent<Family> event) {
+        if (!event.isEntryOfType(Family.class)) return;
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
         event.registerType(DynamicTrees.location("mangrove"), MangroveFamily.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmFamily.TYPE);
@@ -56,6 +53,7 @@ public class TreeRegistryEventHandler {
 
     @SubscribeEvent
     public static void registerSpeciesTypes(final TypeRegistryEvent<Species> event) {
+        if (!event.isEntryOfType(Species.class)) return;
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusSpecies.TYPE);
         event.registerType(DynamicTrees.location("swamp_oak"), SwampOakSpecies.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmSpecies.TYPE);
@@ -64,6 +62,7 @@ public class TreeRegistryEventHandler {
 
     @SubscribeEvent
     public static void registerSoilPropertiesTypes(final TypeRegistryEvent<SoilProperties> event) {
+        if (!event.isEntryOfType(SoilProperties.class)) return;
         event.registerType(DynamicTrees.location("water"), WaterSoilProperties.TYPE);
         event.registerType(DynamicTrees.location("spreadable"), SpreadableSoilProperties.TYPE);
         event.registerType(DynamicTrees.location("aerial_roots"), AerialRootsSoilProperties.TYPE);
@@ -75,16 +74,19 @@ public class TreeRegistryEventHandler {
 
     @SubscribeEvent
     public static void onCellKitRegistry(final RegistryEvent<CellKit> event) {
+        if (!event.isEntryOfType(CellKit.class)) return;
         CellKits.register(event.getRegistry());
     }
 
     @SubscribeEvent
     public static void onGrowthLogicKitRegistry(final RegistryEvent<GrowthLogicKit> event) {
+        if (!event.isEntryOfType(GrowthLogicKit.class)) return;
         GrowthLogicKits.register(event.getRegistry());
     }
 
     @SubscribeEvent
     public static void onGenFeatureRegistry(final RegistryEvent<GenFeature> event) {
+        if (!event.isEntryOfType(GenFeature.class)) return;
         GenFeatures.register(event.getRegistry());
     }
 
@@ -98,10 +100,10 @@ public class TreeRegistryEventHandler {
         // Post registry events.
         registries.forEach(SimpleRegistry::postRegistryEvent);
 
-//        Resources.setupTreesResourceManager();
-//
-//        // Register Forge registry entry getters and add-on Json object getters.
-//        JsonDeserializers.registerForgeEntryGetters();
+        Resources.setupTreesResourceManager();
+
+        // Register Forge registry entry getters and add-on Json object getters.
+        JsonDeserializers.registerRegistryEntryGetters();
         JsonDeserializers.postRegistryEvent();
 //
 //        // Register feature cancellers.
@@ -114,11 +116,11 @@ public class TreeRegistryEventHandler {
         if (event.getRegistryKey() != BuiltInRegistries.BLOCK.key()) {
             return;
         }
-//        // Register any registry entries from Json files.
-//        Resources.MANAGER.load();
-//        // Lock all the registries.
-//        Registries.REGISTRIES.stream()
-//                .filter(registry -> registry instanceof SimpleRegistry)
-//                .forEach(Registry::lock);
+        // Register any registry entries from Json files.
+        Resources.MANAGER.load();
+        // Lock all the registries.
+        Registries.REGISTRIES.stream()
+                .filter(registry -> registry instanceof SimpleRegistry)
+                .forEach(Registry::lock);
     }
 }

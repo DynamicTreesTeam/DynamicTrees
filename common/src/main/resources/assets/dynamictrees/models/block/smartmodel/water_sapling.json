@@ -1,5 +1,6 @@
 {
   "parent": "block/block",
+  "render_type": "cutout_mipped",
   "textures": {
     "particle": "#leaves",
     "root": "dynamictrees:block/sapling_water_roots"

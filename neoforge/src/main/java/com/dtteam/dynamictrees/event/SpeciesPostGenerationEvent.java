@@ -1,11 +1,10 @@
 package com.dtteam.dynamictrees.event;
 
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.SafeChunkBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 import java.util.List;
 
@@ -21,15 +20,13 @@ public class SpeciesPostGenerationEvent extends Event {
     private final Species species;
     private final BlockPos rootPos;
     private final List<BlockPos> endPoints;
-    private final SafeChunkBounds safeBounds;
     private final BlockState initialDirtState;
 
-    public SpeciesPostGenerationEvent(LevelAccessor level, Species species, BlockPos rootPos, List<BlockPos> endPoints, SafeChunkBounds safeBounds, BlockState initialDirtState) {
+    public SpeciesPostGenerationEvent(LevelAccessor level, Species species, BlockPos rootPos, List<BlockPos> endPoints, BlockState initialDirtState) {
         this.level = level;
         this.species = species;
         this.rootPos = rootPos;
         this.endPoints = endPoints;
-        this.safeBounds = safeBounds;
         this.initialDirtState = initialDirtState;
     }
 
@@ -59,8 +56,8 @@ public class SpeciesPostGenerationEvent extends Event {
      *
      * @return The current safe bounds for placing blocks
      */
-    public SafeChunkBounds getSafeBounds() {
-        return safeBounds;
+    public boolean isWorldGen() {
+        return true;
     }
 
     /**

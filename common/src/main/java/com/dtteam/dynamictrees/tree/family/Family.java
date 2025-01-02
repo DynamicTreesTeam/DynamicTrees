@@ -50,91 +50,20 @@ import java.util.function.Supplier;
 import static com.dtteam.dynamictrees.util.ResourceLocationUtils.prefix;
 import static com.dtteam.dynamictrees.util.ResourceLocationUtils.suffix;
 
-//import com.dtteam.dynamictrees.DynamicTrees;
-//import com.dtteam.dynamictrees.api.TreeHelper;
-//import com.dtteam.dynamictrees.api.data.*;
-//import com.dtteam.dynamictrees.api.registry.RegistryEntry;
-//import com.dtteam.dynamictrees.api.registry.RegistryHandler;
-//import com.dtteam.dynamictrees.api.registry.TypedRegistry;
-//import com.dtteam.dynamictrees.block.branch.BasicBranchBlock;
-//import com.dtteam.dynamictrees.block.branch.BranchBlock;
-//import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
-//import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
-//import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
-//import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-//import com.dtteam.dynamictrees.cell.MetadataCell;
-//import com.dtteam.dynamictrees.compat.waila.WailaOther;
-//import com.dtteam.dynamictrees.data.tags.DTBlockTags;
-//import com.dtteam.dynamictrees.data.tags.DTItemTags;
-//import com.dtteam.dynamictrees.data.provider.BranchLoaderBuilder;
-//import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
-//import com.dtteam.dynamictrees.data.provider.DTItemModelProvider;
-//import com.dtteam.dynamictrees.data.provider.DTLangProvider;
-//import com.dtteam.dynamictrees.entity.FallingTreeEntity;
-//import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
-//import com.dtteam.dynamictrees.init.DTConfigs;
-//import com.dtteam.dynamictrees.init.DTTrees;
-//import com.dtteam.dynamictrees.tree.Resettable;
-//import com.dtteam.dynamictrees.tree.species.Species;
-//import com.dtteam.dynamictrees.util.BlockBounds;
-//import com.dtteam.dynamictrees.util.MutableLazyValue;
-//import com.dtteam.dynamictrees.util.Optionals;
-//import net.minecraft.core.BlockPos;
-//import net.minecraft.core.Direction;
-//import net.minecraft.core.registries.BuiltInRegistries;
-//import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
-//import net.minecraft.resources.ResourceLocation;
-//import net.minecraft.sounds.SoundEvents;
-//import net.minecraft.sounds.SoundSource;
-//import net.minecraft.tags.TagKey;
-//import net.minecraft.util.Mth;
-//import net.minecraft.world.InteractionHand;
-//import net.minecraft.world.entity.Entity;
-//import net.minecraft.world.entity.player.Player;
-//import net.minecraft.world.item.*;
-//import net.minecraft.world.level.BlockGetter;
-//import net.minecraft.world.level.Level;
-//import net.minecraft.world.level.LevelAccessor;
-//import net.minecraft.world.level.LevelReader;
-//import net.minecraft.world.level.block.Block;
-//import net.minecraft.world.level.block.Blocks;
-//import net.minecraft.world.level.block.SoundType;
-//import net.minecraft.world.level.block.state.BlockBehaviour;
-//import net.minecraft.world.level.block.state.BlockState;
-//import net.minecraft.world.level.material.MapColor;
-//import net.minecraft.world.phys.BlockHitResult;
-//import net.minecraftforge.api.distmarker.Dist;
-//import net.minecraftforge.api.distmarker.OnlyIn;
-//import net.minecraftforge.client.model.generators.BlockModelBuilder;
-//import net.minecraftforge.common.data.ExistingFileHelper;
-//import org.apache.commons.lang3.tuple.Pair;
-//import org.apache.logging.log4j.LogManager;
-//
-//import org.jetbrains.annotations.Nullable;
-//import java.util.*;
-//import java.util.concurrent.atomic.AtomicBoolean;
-//import java.util.function.BiConsumer;
-//import java.util.function.BiFunction;
-//import java.util.function.Function;
-//import java.util.function.Supplier;
-//
-//import static com.dtteam.dynamictrees.util.ResourceLocationUtils.prefix;
-//import static com.dtteam.dynamictrees.util.ResourceLocationUtils.suffix;
-//
-///**
-// * This structure describes a Family whose member Species all have a common branch.
-// * <p>
-// * A {@link Family} is more or less just a definition of {@link BranchBlock} blocks. It also defines the cellular
-// * automata function of the {@link BranchBlock}.  It defines the type of wood that the tree is made of and consequently
-// * what kind of log you get when you cut it down.
-// * <p>
-// * A DynamicTree does not contain a reference to a Seed, Leaves, Sapling, or how it should grow(how fast, how tall,
-// * etc). It does not control what drops it produces or what fruit it grows.  It does not control where it should grow.
-// * All of these capabilities lie in the Species class for which a DynamicTree should always contain one default
-// * species(the common species).
-// *
-// * @author ferreusveritas
-// */
+/**
+ * This structure describes a Family whose member Species all have a common branch.
+ * <p>
+ * A {@link Family} is more or less just a definition of {@link BranchBlock} blocks. It also defines the cellular
+ * automata function of the {@link BranchBlock}.  It defines the type of wood that the tree is made of and consequently
+ * what kind of log you get when you cut it down.
+ * <p>
+ * A DynamicTree does not contain a reference to a Seed, Leaves, Sapling, or how it should grow(how fast, how tall,
+ * etc). It does not control what drops it produces or what fruit it grows.  It does not control where it should grow.
+ * All of these capabilities lie in the Species class for which a DynamicTree should always contain one default
+ * species(the common species).
+ *
+ * @author ferreusveritas
+ */
 public class Family extends RegistryEntry<Family> implements Resettable<Family> {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(Family::new);

@@ -1,6 +1,9 @@
 package com.dtteam.dynamictrees.util;
 
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -18,12 +21,18 @@ public class EntityUtils {
      * @param partialTick        The partial ticks.
      * @return The {@link BlockHitResult} created.
      */
-    @Nullable
     public static BlockHitResult playerRayTrace(LivingEntity entity, double blockReachDistance, float partialTick) {
         Vec3 vec3d = entity.getEyePosition(partialTick);
         Vec3 vec3d1 = entity.getViewVector(partialTick);
         Vec3 vec3d2 = vec3d.add(vec3d1.x * blockReachDistance, vec3d1.y * blockReachDistance, vec3d1.z * blockReachDistance);
         return entity.level().clip(new ClipContext(vec3d, vec3d2, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity));
+    }
+
+    public static Direction getHitDirection (LivingEntity entity){
+        AttributeInstance blockInteractionRange = entity.getAttribute(Attributes.BLOCK_INTERACTION_RANGE);
+        final double reachDistance = blockInteractionRange != null ? blockInteractionRange.getValue() : 5D;
+        final BlockHitResult ragTraceResult = playerRayTrace(entity, reachDistance, 1.0F);
+        return entity.isShiftKeyDown() ? ragTraceResult.getDirection().getOpposite() : ragTraceResult.getDirection();
     }
 
 }

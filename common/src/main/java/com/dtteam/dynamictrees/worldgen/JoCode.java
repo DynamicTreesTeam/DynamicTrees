@@ -6,6 +6,8 @@ import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
+import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.nodemapper.CoderNode;
 import com.dtteam.dynamictrees.systems.nodemapper.CollectorNode;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
@@ -154,7 +156,7 @@ public class JoCode {
 
         this.setFacing(context.facing());
 
-//        context.rootPos().set(species.preGeneration(level, context.rootPos(), radius, context.facing(), context.safeBounds(), this));
+        context.rootPos().set(species.preGeneration(level, context.rootPos(), radius, context.facing(), context.isWorldGen(), this));
         BlockPos rootPos = context.rootPos();
 
         if (rootPos == BlockPos.ZERO) {
@@ -206,7 +208,9 @@ public class JoCode {
         }
 
         // Allow for special decorations by the tree itself.
-//        species.postGeneration(new PostGenerationContext(context, endPoints, initialDirtState));
+        PostGenerationContext pgContext = new PostGenerationContext(context, endPoints, initialDirtState);
+        species.postGeneration(pgContext);
+        Services.EVENT.postSpeciesPostGenerationEvent(pgContext);
 //        MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(level, species, rootPos, endPoints, context.safeBounds(), initialDirtState));
 
         // Add snow to parts of the tree in chunks where snow was already placed.

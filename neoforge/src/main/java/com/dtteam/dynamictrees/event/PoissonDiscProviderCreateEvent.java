@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.event;
 
 import com.dtteam.dynamictrees.api.worldgen.PoissonDiscProvider;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraftforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
 public class PoissonDiscProviderCreateEvent extends LevelEvent {
 

@@ -22,9 +22,16 @@ public final class TypeRegistryEvent<V extends RegistryEntry<V>> extends Event i
 
     private final TypedRegistry<V> registry;
 
+    private final Class<V> type;
+
     public TypeRegistryEvent(final TypedRegistry<V> registry) {
         super();
         this.registry = registry;
+        this.type = registry.getType();
+    }
+
+    public boolean isEntryOfType(Class<?> typeTest){
+        return type.isAssignableFrom(typeTest);
     }
 
     /**
@@ -34,7 +41,7 @@ public final class TypeRegistryEvent<V extends RegistryEntry<V>> extends Event i
      * @param registryName The registry name {@link ResourceLocation}.
      * @param type         The {@link TypedRegistry.EntryType} to register.
      */
-    public final void registerType(final ResourceLocation registryName, final TypedRegistry.EntryType<V> type) {
+    public void registerType(final ResourceLocation registryName, final TypedRegistry.EntryType<V> type) {
         this.registry.registerType(registryName, type);
     }
 

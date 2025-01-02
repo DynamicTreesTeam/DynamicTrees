@@ -35,7 +35,6 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
         this.species = species;
     }
 
-
     ///////////////////////////////////////////
     // TREE INFORMATION
     ///////////////////////////////////////////
@@ -49,11 +48,15 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     ///////////////////////////////////////////
 
     //Neoforge override
+
+    /** NeoForge override */
+    @SuppressWarnings("unused")
     public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
         return this.getSpecies().saplingFireSpread();
     }
 
-    //Neoforge override
+    /** NeoForge override */
+    @SuppressWarnings("unused")
     public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
         return this.getSpecies().saplingFlammability();
     }
@@ -96,14 +99,14 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
 
     @Override
     public void performBonemeal(@NotNull ServerLevel level, @NotNull RandomSource rand, @NotNull BlockPos pos, @NotNull BlockState state) {
-//        if (this.canSurvive(state, level, pos)) {
-//            final Species species = this.getSpecies().selfOrLocationOverride(level, pos);;
-//            if (species.canSaplingGrow(level, pos)) {
-//                species.transitionToTree(level, pos);
-//            }
-//        } else {
-//            this.dropBlock(level, state, pos);
-//        }
+        if (this.canSurvive(state, level, pos)) {
+            final Species species = this.getSpecies().selfOrLocationOverride(level, pos);;
+            if (species.canSaplingGrow(level, pos)) {
+                species.transitionToTree(level, pos);
+            }
+        } else {
+            this.dropBlock(level, state, pos);
+        }
     }
 
     @Override

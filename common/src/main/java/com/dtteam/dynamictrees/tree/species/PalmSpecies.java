@@ -32,11 +32,11 @@ public class PalmSpecies extends Species {
 
     public PalmSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
-        if (!(family instanceof MangroveFamily)) {
-            LogManager.getLogger().warn("Family " + family.getRegistryName() + " for palm species " + getRegistryName() + " is not of type "+ PalmFamily.class);
+        if (!(family instanceof PalmFamily)) {
+            LogManager.getLogger().warn("Family {} for palm species {} is not of type {}", family.getRegistryName(), getRegistryName(), PalmFamily.class);
         }
         if (!(leavesProperties instanceof PalmLeavesProperties))
-            LogManager.getLogger().warn("LeavesProperties " + leavesProperties.getRegistryName() + " for palm species " + getRegistryName() + " is not of type "+ PalmLeavesProperties.class);
+            LogManager.getLogger().warn("LeavesProperties {} for palm species {} is not of type {}", leavesProperties.getRegistryName(), getRegistryName(), PalmLeavesProperties.class);
         setGrowthLogicKit(GrowthLogicKits.PALM); //palm growth logic kit by default
     }
 

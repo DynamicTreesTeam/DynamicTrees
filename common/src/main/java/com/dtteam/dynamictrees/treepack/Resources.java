@@ -1,8 +1,14 @@
 package com.dtteam.dynamictrees.treepack;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.configuration.ConfigurationTemplateResourceLoader;
 import com.dtteam.dynamictrees.api.resource.TreeResourceManager;
+import com.dtteam.dynamictrees.data.DTRecipes;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
+import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.treepack.loader.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -12,57 +18,22 @@ import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-//import com.dtteam.dynamictrees.DynamicTrees;
-//import com.dtteam.dynamictrees.api.configuration.ConfigurationTemplateResourceLoader;
-//import com.dtteam.dynamictrees.api.event.Hooks;
-//import com.dtteam.dynamictrees.api.resource.TreeResourceManager;
-//import com.dtteam.dynamictrees.data.DTRecipes;
-//import com.dtteam.dynamictrees.growthlogic.GrowthLogicKit;
-//import com.dtteam.dynamictrees.growthlogic.GrowthLogicKitConfiguration;
-//import com.dtteam.dynamictrees.init.DTConfigs;
-//import com.dtteam.dynamictrees.resources.loader.*;
-//import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
-//import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
-//import com.google.common.collect.ImmutableMap;
-//import net.minecraft.resources.ResourceLocation;
-//import net.minecraft.server.ReloadableServerResources;
-//import net.minecraft.server.packs.resources.PreparableReloadListener;
-//import net.minecraft.server.packs.resources.ResourceManager;
-//import net.minecraft.util.profiling.ProfilerFiller;
-//import net.minecraft.world.item.crafting.Recipe;
-//import net.minecraft.world.item.crafting.RecipeType;
-//import net.minecraftforge.common.crafting.conditions.ICondition;
-//import net.minecraftforge.event.AddReloadListenerEvent;
-//import net.minecraftforge.eventbus.api.SubscribeEvent;
-//import net.minecraftforge.fml.ModList;
-//import net.minecraftforge.fml.common.Mod;
-//import net.minecraftforge.forgespi.language.IModInfo;
-//import net.minecraftforge.forgespi.locating.IModFile;
-//import org.apache.logging.log4j.LogManager;
-//
-//import java.io.File;
-//import java.nio.file.Files;
-//import java.nio.file.Path;
-//import java.util.HashMap;
-//import java.util.Map;
-//import java.util.concurrent.CompletableFuture;
-//import java.util.concurrent.Executor;
-//
-///**
-// * @author Harley O'Connor
-// */
-//@Mod.EventBusSubscriber(modid = DynamicTrees.MOD_ID)
+/**
+ * @author Harley O'Connor
+ */
 public final class Resources {
-
-    public static final ResourceLocation RESOURCE_LOCATION = DynamicTrees.location("registry_name");
 
     public static final String TREES = "trees";
 
@@ -72,19 +43,19 @@ public final class Resources {
     public static final SoilPropertiesResourceLoader SOIL_PROPERTIES_LOADER = new SoilPropertiesResourceLoader();
     public static final FamilyResourceLoader FAMILY_LOADER = new FamilyResourceLoader();
 
-//    public static final ConfigurationTemplateResourceLoader<GenFeatureConfiguration, GenFeature>
-//            GEN_FEATURE_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
-//            "gen_features/configurations",
-//            GenFeature.REGISTRY,
-//            GenFeatureConfiguration.TEMPLATES
-//    );
-//
-//    public static final ConfigurationTemplateResourceLoader<GrowthLogicKitConfiguration, GrowthLogicKit>
-//            GROWTH_LOGIC_KIT_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
-//            "growth_logic_kits/configurations",
-//            GrowthLogicKit.REGISTRY,
-//            GrowthLogicKitConfiguration.TEMPLATES
-//    );
+    public static final ConfigurationTemplateResourceLoader<GenFeatureConfiguration, GenFeature>
+            GEN_FEATURE_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
+            "gen_features/configurations",
+            GenFeature.REGISTRY,
+            GenFeatureConfiguration.TEMPLATES
+    );
+
+    public static final ConfigurationTemplateResourceLoader<GrowthLogicKitConfiguration, GrowthLogicKit>
+            GROWTH_LOGIC_KIT_TEMPLATE_LOADER = new ConfigurationTemplateResourceLoader<>(
+            "growth_logic_kits/configurations",
+            GrowthLogicKit.REGISTRY,
+            GrowthLogicKitConfiguration.TEMPLATES
+    );
 
     public static final FruitResourceLoader FRUIT_LOADER = new FruitResourceLoader();
     public static final PodResourceLoader POD_LOADER = new PodResourceLoader();
@@ -111,8 +82,8 @@ public final class Resources {
                 LEAVES_PROPERTIES_LOADER,
                 SOIL_PROPERTIES_LOADER,
                 FAMILY_LOADER,
-//                GEN_FEATURE_TEMPLATE_LOADER,
-//                GROWTH_LOGIC_KIT_TEMPLATE_LOADER,
+                GEN_FEATURE_TEMPLATE_LOADER,
+                GROWTH_LOGIC_KIT_TEMPLATE_LOADER,
                 FRUIT_LOADER,
                 POD_LOADER,
                 SPECIES_LOADER,
@@ -137,7 +108,7 @@ public final class Resources {
         final Path absTreesPath = treesPath.get().toAbsolutePath();
 
         if (Files.exists(absTreesPath)) {
-            MANAGER.addPack(new TreeResourcePack(
+            MANAGER.addPack(new TreePackResources(
                     new PackLocationInfo(
                             modFile.getModId(),
                             Component.translatable("treePack."+modFile.getModId()+".name"),
@@ -153,7 +124,7 @@ public final class Resources {
     );
     private static void registerFlatTreePack() {
         final File mainTreeFolder = getTreeFolder();
-        MANAGER.addPack(new TreeResourcePack(FLAT_TREE_PACK_INFO, mainTreeFolder.toPath().toAbsolutePath()));
+        MANAGER.addPack(new TreePackResources(FLAT_TREE_PACK_INFO, mainTreeFolder.toPath().toAbsolutePath()));
     }
 
     private static File getTreeFolder() {
@@ -165,18 +136,6 @@ public final class Resources {
         }
         return mainTreeFolder;
     }
-
-//    private static ICondition.IContext conditionContext;
-//
-//    @SubscribeEvent
-//    public static void addReloadListeners(final AddReloadListenerEvent event) {
-//        event.addListener(new ReloadListener(event.getServerResources()));
-//        conditionContext = event.getConditionContext();
-//    }
-//
-//    public static ICondition.IContext getConditionContext() {
-//        return conditionContext;
-//    }
 
     /**
      * Listens for datapack reloads for actions such as reloading the trees resource manager and registering dirt bucket
@@ -211,7 +170,7 @@ public final class Resources {
 //            final Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes = new HashMap<>();
 //
 //            // Put the recipes into the new map and make each type's recipes mutable.
-//            this.dataPackRegistries.getRecipeManager().recipes.forEach(((recipeType, currentRecipes) ->
+//            this.dataPackRegistries.getRecipeManager().getRecipes().forEach(((recipeType) ->
 //                    recipes.put(recipeType, new HashMap<>(currentRecipes))));
 //
 //            // Register dirt bucket recipes.

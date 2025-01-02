@@ -1,5 +1,6 @@
 {
 	"ambientocclusion": false,
+	"render_type": "cutout_mipped",
 	"textures": {
 		"particle": "block/cocoa_stage2",
 		"cocoa": "block/cocoa_stage2"

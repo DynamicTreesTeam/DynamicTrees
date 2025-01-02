@@ -4,11 +4,10 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
-@Cancelable
-public class BiomeSuitabilityEvent extends Event {
+public class BiomeSuitabilityEvent extends Event implements ICancellableEvent {
 
     protected Level level;
     protected Biome biome;

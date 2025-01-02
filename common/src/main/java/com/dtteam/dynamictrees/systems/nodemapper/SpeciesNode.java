@@ -16,20 +16,19 @@ public class SpeciesNode implements NodeInspector {
     @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
 
-//        TreePart treePart = TreeHelper.getTreePart(state);
-//
-//        switch (treePart.getTreePartType()) {
-//            case BRANCH:
-//                if (determination == Species.NULL_SPECIES) {
-//                    determination = TreeHelper.getBranch(treePart).getFamily().getCommonSpecies();
-//                }
-//                break;
-//            case ROOT:
-//                determination = TreeHelper.getRooty(treePart).getSpecies(level.getBlockState(pos), level, pos);
-//                break;
-//            default:
-//                break;
-//        }
+        TreePart treePart = TreeHelper.getTreePart(state);
+
+        switch (treePart.getTreePartType()) {
+            case BRANCH:
+                if (determination == Species.NULL_SPECIES)
+                    determination = TreeHelper.getBranch(treePart).getFamily().getCommonSpecies();
+                break;
+            case ROOT:
+                determination = TreeHelper.getRooty(treePart).getSpecies(level.getBlockState(pos), level, pos);
+                break;
+            default:
+                break;
+        }
 
         return true;
     }

@@ -1,11 +1,13 @@
 package com.dtteam.dynamictrees.event;
 
+import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.PropertyAppliers;
+import com.dtteam.dynamictrees.deserialization.applier.JsonPropertyApplier;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 
 /**
- * An event fired when a {@link JsonPropertyAppliers} is registered. This can be used for registering custom property
+ * An event fired when a {@link JsonPropertyApplier} is registered. This can be used for registering custom property
  * appliers; for example, DT+ uses this to register appliers specific to the cactus species sub-class.
  * <p>
  * This is an {@link IModBusEvent}, and as such is always fired on the mod bus.

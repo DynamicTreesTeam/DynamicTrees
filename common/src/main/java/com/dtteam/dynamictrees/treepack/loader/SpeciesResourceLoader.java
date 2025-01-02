@@ -6,10 +6,12 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.pod.Pod;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
+import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.TagKeyJsonPropertyApplier;
 import com.dtteam.dynamictrees.deserialization.applier.Applier;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
+import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
@@ -42,8 +44,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * A {@link JsonPropertyAppliers} for applying environment factors to {@link Species} objects. (based on {@link
-     * net.minecraftforge.common.BiomeManager.BiomeType}).
+     * A {@link JsonPropertyAppliers} for applying environment factors to {@link Species} objects.
+     * (based on Forge's BiomeType).
      */
     private final JsonPropertyAppliers<Species> environmentFactorAppliers = new JsonPropertyAppliers<>(Species.class);
 
@@ -58,11 +60,13 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         this.environmentFactorAppliers.register(new TagKeyJsonPropertyApplier<>(Registries.BIOME, Species.class,
                 (TriConsumer<TagKey<Biome>, Species, Float>) (tagKey, species, factor) -> species.envFactor(tagKey, factor)));
 
-//        JsonDeserializers.register(Species.CommonOverride.class, input ->
+        JsonDeserializers.register(Species.CommonOverride.class,
+                input-> JsonResult.success(input, (a,b)->false)
+                //input ->
 //                JsonDeserializers.BIOME_PREDICATE.deserialise(input)
 //                        .map(biomePredicate -> (world, pos) -> world instanceof LevelReader &&
-//                                biomePredicate.test(((LevelReader) world).getBiome(pos)))
-//        );
+//                                biomePredicate.test(((LevelReader) world).getBiome(pos)));
+        );
 
         this.loadAppliers
                 .register("seed", ResourceLocation.class, this::setSeed)

@@ -10,6 +10,8 @@
   "growth_rate": 0.6,
   "leaves_properties": "mangrove",
   "roots_growth_logic_kit": "mangrove_roots",
+  "generate_seed": true,
+  "generate_sapling": true,
   "environment_factors" : {
     "#forge:is_cold": 0.75,
     "#forge:is_dry": 0.2

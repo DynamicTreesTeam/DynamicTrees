@@ -17,21 +17,14 @@ import org.joml.Vector3f;
 public class ModelUtils {
 
     public static float[] getUVs(AABB box, Direction face) {
-        switch (face) {
-            default:
-            case DOWN:
-                return new float[]{(float) box.minX, 16f - (float) box.minZ, (float) box.maxX, 16f - (float) box.maxZ};
-            case UP:
-                return new float[]{(float) box.minX, (float) box.minZ, (float) box.maxX, (float) box.maxZ};
-            case NORTH:
-                return new float[]{16f - (float) box.maxX, (float) box.minY, 16f - (float) box.minX, (float) box.maxY};
-            case SOUTH:
-                return new float[]{(float) box.minX, (float) box.minY, (float) box.maxX, (float) box.maxY};
-            case WEST:
-                return new float[]{(float) box.minZ, (float) box.minY, (float) box.maxZ, (float) box.maxY};
-            case EAST:
-                return new float[]{16f - (float) box.maxZ, (float) box.minY, 16f - (float) box.minZ, (float) box.maxY};
-        }
+        return switch (face) {
+            default -> new float[]{(float) box.minX, 16f - (float) box.minZ, (float) box.maxX, 16f - (float) box.maxZ};
+            case UP -> new float[]{(float) box.minX, (float) box.minZ, (float) box.maxX, (float) box.maxZ};
+            case NORTH -> new float[]{16f - (float) box.maxX, (float) box.minY, 16f - (float) box.minX, (float) box.maxY};
+            case SOUTH -> new float[]{(float) box.minX, (float) box.minY, (float) box.maxX, (float) box.maxY};
+            case WEST -> new float[]{(float) box.minZ, (float) box.minY, (float) box.maxZ, (float) box.maxY};
+            case EAST -> new float[]{16f - (float) box.maxZ, (float) box.minY, 16f - (float) box.minZ, (float) box.maxY};
+        };
     }
 
     /**
@@ -45,18 +38,12 @@ public class ModelUtils {
         if (axis == Axis.Y) { //UP / DOWN
             return 0;
         } else if (axis == Axis.Z) {//NORTH / SOUTH
-            switch (face) {
-                case UP:
-                    return 0;
-                case WEST:
-                    return 270;
-                case DOWN:
-                    return 180;
-                case NORTH:
-                    return 270;
-                default:
-                    return 90;
-            }
+            return switch (face) {
+                case UP -> 0;
+                case WEST, NORTH -> 270;
+                case DOWN -> 180;
+                default -> 90;
+            };
         } else { //EAST/WEST
             return (face == Direction.NORTH) ? 270 : 90;
         }

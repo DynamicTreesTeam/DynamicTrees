@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.api.resource.loading.preparation;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.resource.DTResource;
@@ -33,8 +34,6 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     public static final String FAMILY = "family";
     public static final String LEAVES_PROPERTIES = "leaves_properties";
     public static final String SOIL_PROPERTIES = "soil_properties";
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private final TypedRegistry<R> registry;
     private final String registryName;
@@ -231,15 +230,15 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
 
     private void postLoad(LoadData loadData) {
         if (loadData.wasAlreadyRegistered) {
-            LOGGER.debug("Loaded type \"{}\" data: {}.", this.registryName, loadData.resource.toReloadDataString());
+            DynamicTrees.LOG.debug("Loaded type \"{}\" data: {}.", this.registryName, loadData.resource.toReloadDataString());
         } else {
             this.registry.register(loadData.resource);
-            LOGGER.debug("Loaded and registered type \"{}\": {}.", this.registryName, loadData.resource.toLoadDataString());
+            DynamicTrees.LOG.debug("Loaded and registered type \"{}\": {}.", this.registryName, loadData.resource.toLoadDataString());
         }
     }
 
     private void logException(ResourceLocation name, ApplicationException e) {
-        LOGGER.error("Error whilst loading type \"" + this.registryName + "\" with name \"" + name + "\".", e);
+        DynamicTrees.LOG.error("Error whilst loading type \"{}\" with name \"{}\".", this.registryName, name, e);
     }
 
     protected void applyCommonAppliers(LoadData loadData, JsonObject json) {
@@ -250,11 +249,11 @@ public abstract class JsonRegistryResourceLoader<R extends RegistryEntry<R> & Re
     }
 
     protected void logError(ResourceLocation name, String error) {
-        LOGGER.error("Error whilst loading type \"" + this.registryName + "\" with name \"" + name + "\": {}", error);
+        DynamicTrees.LOG.error("Error whilst loading type \"{}\" with name \"{}\": {}", this.registryName, name, error);
     }
 
     protected void logWarning(ResourceLocation name, String warning) {
-        LOGGER.warn("Warning whilst loading type \"" + this.registryName + "\" with name \"" + name + "\": {}", warning);
+        DynamicTrees.LOG.warn("Warning whilst loading type \"{}\" with name \"{}\": {}", this.registryName, name, warning);
     }
 
     public class LoadData {

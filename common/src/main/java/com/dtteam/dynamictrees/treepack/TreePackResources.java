@@ -23,11 +23,11 @@ import java.util.stream.Stream;
  *
  * @author Harley O'Connor
  */
-public class TreeResourcePack extends PathPackResources implements com.dtteam.dynamictrees.api.resource.TreeResourcePack {
+public class TreePackResources extends PathPackResources implements com.dtteam.dynamictrees.api.resource.TreeResourcePack {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Path root;
-    public TreeResourcePack(PackLocationInfo location, Path root) {
+    public TreePackResources(PackLocationInfo location, Path root) {
         super(location, root);
         this.root = root;
     }
@@ -55,12 +55,10 @@ public class TreeResourcePack extends PathPackResources implements com.dtteam.dy
     @Override
     public Set<String> getNamespaces(@Nullable PackType type) {
         try {
-            assert type != null;
-            Path root = this.root.resolve(type.getDirectory());
-            try (Stream<Path> walker = Files.walk(root, 1)) {
+            try (Stream<Path> walker = Files.walk(this.root, 1)) {
                 return walker
                         .filter(Files::isDirectory)
-                        .map(root::relativize)
+                        .map(this.root::relativize)
                         .filter(p -> p.getNameCount() > 0) // Skip the root entry
                         .map(p -> p.toString().replaceAll("/$", "")) // Remove the trailing slash, if present
                         .filter(s -> !s.isEmpty()) // Filter empty strings, otherwise empty strings default to minecraft namespace in ResourceLocations
