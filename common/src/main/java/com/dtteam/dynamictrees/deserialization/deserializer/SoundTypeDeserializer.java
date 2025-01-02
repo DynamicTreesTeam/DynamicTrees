@@ -105,8 +105,8 @@ public final class SoundTypeDeserializer implements JsonDeserializer<SoundType> 
     }
 
     @Override
-    public Result<SoundType, JsonElement> deserialise(JsonElement input) {
-        return JsonDeserializers.RESOURCE_LOCATION.deserialise(input)
+    public Result<SoundType, JsonElement> deserialize(JsonElement input) {
+        return JsonDeserializers.RESOURCE_LOCATION.deserialize(input)
                 .map(SOUND_TYPES::get, "Could not get sound type from \"{}\".");
     }
 }

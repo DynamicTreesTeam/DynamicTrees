@@ -6,6 +6,9 @@ import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.substance.Emptiable;
+import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
+import com.dtteam.dynamictrees.api.substance.SubstanceEffectProvider;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
@@ -13,6 +16,7 @@ import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.pod.Pod;
 import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
+import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.block.soil.RootyBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
@@ -21,7 +25,9 @@ import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.item.Seed;
+import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
@@ -31,11 +37,10 @@ import com.dtteam.dynamictrees.systems.genfeature.context.*;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
-import com.dtteam.dynamictrees.systems.nodemapper.DiseaseNode;
-import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
-import com.dtteam.dynamictrees.systems.nodemapper.InflatorNode;
-import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
+import com.dtteam.dynamictrees.systems.nodemapper.*;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
+import com.dtteam.dynamictrees.systems.substance.FertilizeSubstance;
+import com.dtteam.dynamictrees.systems.substance.GrowthSubstance;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.treepack.Resources;
@@ -57,6 +62,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -67,6 +74,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -74,7 +82,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
@@ -618,13 +625,13 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 properties.getDynamicLeavesBlock().orElse(null) == leavesBlock);
     }
 
-//    public int colorTreeQuads(int defaultColor, FallingTreeEntityModel.TreeQuadData treeQuad) {
-//        return defaultColor;
-//    }
-//
-//    public int leafColorMultiplier(Level level, BlockPos pos) {
-//        return getLeavesProperties().treeFallColorMultiplier(getLeavesProperties().getDynamicLeavesState(), level, pos);
-//    }
+    public int colorTreeQuads(int defaultColor, FallingTreeEntityModel.TreeQuadData treeQuad) {
+        return defaultColor;
+    }
+
+    public int leafColorMultiplier(Level level, BlockPos pos) {
+        return getLeavesProperties().treeFallColorMultiplier(getLeavesProperties().getDynamicLeavesState(), level, pos);
+    }
 
     ///////////////////////////////////////////
     //SEEDS
@@ -759,12 +766,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //        cleanDropsList(drops);
         return drops;
     }
-//
-//    public void processVolume(NetVolumeNode.Volume volume) {
-//        volume.multiplyVolume(DTConfigs.TREE_HARVEST_MULTIPLIER.get()); // For cheaters. you know who you are.
-//        volume.multiplyVolume(getFamily().getLootVolumeMultiplier()); //the family can have a multiplier too
-//    }
-//
+
+    public void processVolume(NetVolumeNode.Volume volume) {
+        volume.multiplyVolume(Services.CONFIG.getDoubleConfig("treeHarvestMultiplier")); // For cheaters. you know who you are.
+        volume.multiplyVolume(getFamily().getLootVolumeMultiplier()); //the family can have a multiplier too
+    }
+
 //    private List<ItemStack> getDropsForBranchType(Level level, ItemStack tool, @Nullable Float explosionRadius,
 //                                                  int branchVolume, BranchBlock branchBlock) {
 //        return branchBlock.getLootTable(level.getServer().getLootData(), this)
@@ -780,25 +787,25 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //                .withOptionalParameter(LootContextParams.EXPLOSION_RADIUS, explosionRadius)
 //                .create(DTLootParameterSets.BRANCHES);
 //    }
-//
-//    /**
-//     * Cleans specified drop list by dividing any stacks with a count exceeding the maximum stack size into multiple
-//     * stacks of the same item.
-//     */
-//    private void cleanDropsList(List<ItemStack> drops) {
-//        for (int i = 0; i < drops.size(); i++) {
-//            ItemStack drop = drops.get(i);
-//            if (drop.getItem() == Items.AIR) {
-//                drops.remove(i--);
-//            }
-//            if (drop.getCount() > drop.getMaxStackSize()) {
-//                final ItemStack copiedStack = drop.copy();
-//                copiedStack.setCount(drop.getCount() - drop.getMaxStackSize());
-//                drops.add(copiedStack);
-//                drop.setCount(drop.getMaxStackSize());
-//            }
-//        }
-//    }
+
+    /**
+     * Cleans specified drop list by dividing any stacks with a count exceeding the maximum stack size into multiple
+     * stacks of the same item.
+     */
+    private void cleanDropsList(List<ItemStack> drops) {
+        for (int i = 0; i < drops.size(); i++) {
+            ItemStack drop = drops.get(i);
+            if (drop.getItem() == Items.AIR) {
+                drops.remove(i--);
+            }
+            if (drop.getCount() > drop.getMaxStackSize()) {
+                final ItemStack copiedStack = drop.copy();
+                copiedStack.setCount(drop.getCount() - drop.getMaxStackSize());
+                drops.add(copiedStack);
+                drop.setCount(drop.getMaxStackSize());
+            }
+        }
+    }
 
     public static class LogsAndSticks {
 
@@ -810,10 +817,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             this.sticks = Services.CONFIG.getBoolConfig("dropSticks") ? sticks : 0;
         }
 
-    }
-
-    public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume) {
-        return getLogsAndSticks(volume, false, 0);
     }
 
     public LogsAndSticks getLogsAndSticks(NetVolumeNode.Volume volume, boolean silkTouch, int fortuneLevel) {
@@ -866,7 +869,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
         return true;
     }
-
 
     ///////////////////////////////////////////
     // SAPLING
@@ -1039,14 +1041,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return 0;
     }
 
-//    public final boolean transitionToTree(Level level, BlockPos pos) {
-//        return !Hooks.onTransitionSaplingToTree(this, level, pos) && shouldTransitionToTree(level, pos) &&
-//                transitionToTree(level, pos, getFamily());
-//    }
-//
-//    protected boolean shouldTransitionToTree(Level level, BlockPos pos) {
-//        return level.isEmptyBlock(pos.above()) && isAcceptableSoil(level, pos.below(), level.getBlockState(pos.below()));
-//    }
+    public final boolean transitionToTree(Level level, BlockPos pos) {
+        return !Services.EVENT.onTransitionSaplingToTree(this, level, pos) && shouldTransitionToTree(level, pos) &&
+                transitionToTree(level, pos, getFamily());
+    }
+
+    protected boolean shouldTransitionToTree(Level level, BlockPos pos) {
+        return level.isEmptyBlock(pos.above()) && isAcceptableSoil(level, pos.below(), level.getBlockState(pos.below()));
+    }
 
     protected boolean transitionToTree(Level level, BlockPos pos, Family family) {
         // Set to a single branch with 1 radius.
@@ -1056,11 +1058,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         // Set to fully fertilized rooty dirt underneath.
         placeRootyDirtBlock(level, pos.below(), 15);
 
-//        if (doesRequireTileEntity(level, pos)) {
-//            SpeciesBlockEntity speciesBlockEntity = DTRegistries.SPECIES_BLOCK_ENTITY.create(pos.below(), level.getBlockState(pos.below()));
-//            level.setBlockEntity(speciesBlockEntity);
-//            speciesBlockEntity.setSpecies(this);
-//        }
+        if (doesRequireTileEntity(level, pos)) {
+            SpeciesBlockEntity speciesBlockEntity = DTRegistries.SPECIES_BLOCK_ENTITY.get().create(pos.below(), level.getBlockState(pos.below()));
+            if (speciesBlockEntity == null) return true;
+            level.setBlockEntity(speciesBlockEntity);
+            speciesBlockEntity.setSpecies(this);
+        }
 
         return true;
     }
@@ -1448,34 +1451,34 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if the branch should rot
      */
     public boolean rot(LevelAccessor level, BlockPos pos, int neighborCount, int radius, int fertility, RandomSource random, boolean rapid, boolean growLeaves) {
-//        if (!doesRot) {
-//            return false;
-//        }
-//        if (radius <= family.getPrimaryThickness()) {
-//            if (!getLeavesProperties().getDynamicLeavesBlock().isPresent()) {
-//                return false;
-//            }
-//
-//            if (growLeaves) {
-//                final DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
-//
-//                for (Direction dir : upFirst) {
-//                    if (leaves.growLeavesIfLocationIsSuitable(level, getLeavesProperties(), pos.relative(dir), 0)) {
-//                        return false;
-//                    }
-//                }
-//            }
-//        }
-//
-//
-//        if (rapid || (DTConfigs.MAX_BRANCH_ROT_RADIUS.get() != 0 && radius <= DTConfigs.MAX_BRANCH_ROT_RADIUS.get())) {
-//            BranchBlock branch = TreeHelper.getBranch(level.getBlockState(pos));
-//            if (branch != null) {
-//                branch.rot(level, pos);
-//            }
-//            this.postRot(new PostRotContext(level, pos, this, radius, neighborCount, fertility, rapid));
-//            return true;
-//        }
+        if (!doesRot) {
+            return false;
+        }
+        if (radius <= family.getPrimaryThickness()) {
+            if (!getLeavesProperties().getDynamicLeavesBlock().isPresent()) {
+                return false;
+            }
+
+            if (growLeaves) {
+                final DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
+
+                for (Direction dir : upFirst) {
+                    if (leaves.growLeavesIfLocationIsSuitable(level, getLeavesProperties(), pos.relative(dir), 0)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        int maxBranchRotRadius = Services.CONFIG.getIntConfig("maxBranchRotRadius");
+        if (rapid || (maxBranchRotRadius != 0 && radius <= maxBranchRotRadius)) {
+            BranchBlock branch = TreeHelper.getBranch(level.getBlockState(pos));
+            if (branch != null) {
+                branch.rot(level, pos);
+            }
+            this.postRot(new PostRotContext(level, pos, this, radius, neighborCount, fertility, rapid));
+            return true;
+        }
 
         return false;
     }
@@ -1526,28 +1529,28 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public boolean grow(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
 
-//        float growthRate = (float) (getGrowthRate(level, rootPos) * DTConfigs.TREE_GROWTH_MULTIPLIER.get() * DTConfigs.TREE_GROWTH_FOLDING.get());
-//        do {
-//            if (fertility > 0) {
-//                if (growthRate > random.nextFloat()) {
-//                    GrowSignal signal = sendGrowthSignal(treeBase, level, treePos, rootPos, rootyDirt.getTrunkDirection(level, rootPos));
-//
-//                    int soilLongevity = getSoilLongevity(level, rootPos) * (signal.success ? 1 : 16);//Don't deplete the soil as much if the growth operation failed
-//
-//                    if (soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
-//                        rootyDirt.setFertility(level, rootPos, fertility - 1);//decrement fertility
-//                    }
-//
-//                    if (signal.choked) {
-//                        fertility = 0;
-//                        rootyDirt.setFertility(level, rootPos, fertility);
-//                        TreeHelper.startAnalysisFromRoot(level, rootPos, new MapSignal(new ShrinkerNode(signal.getSpecies())));
-//                    }
-//                }
-//            }
-//        } while (--growthRate > 0.0f);
-//
-//        this.postGrow(level, rootPos, treePos, fertility, natural);
+        float growthRate = (float) (getGrowthRate(level, rootPos) * Services.CONFIG.getDoubleConfig("treeGrowthMultiplier") * Services.CONFIG.getDoubleConfig("treeGrowthFolding"));
+        do {
+            if (fertility > 0) {
+                if (growthRate > random.nextFloat()) {
+                    GrowSignal signal = sendGrowthSignal(treeBase, level, treePos, rootPos, rootyDirt.getTrunkDirection(level, rootPos));
+
+                    int soilLongevity = getSoilLongevity(level, rootPos) * (signal.success ? 1 : 16);//Don't deplete the soil as much if the growth operation failed
+
+                    if (soilLongevity <= 0 || random.nextInt(soilLongevity) == 0) {//1 in X(soilLongevity) chance to draw nutrients from soil
+                        rootyDirt.setFertility(level, rootPos, fertility - 1);//decrement fertility
+                    }
+
+                    if (signal.choked) {
+                        fertility = 0;
+                        rootyDirt.setFertility(level, rootPos, fertility);
+                        TreeHelper.startAnalysisFromRoot(level, rootPos, new MapSignal(new ShrinkerNode(signal.getSpecies())));
+                    }
+                }
+            }
+        } while (--growthRate > 0.0f);
+
+        this.postGrow(level, rootPos, treePos, fertility, natural);
         return true;
     }
 
@@ -1621,7 +1624,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         return false;
     }
-
 
     //////////////////////////////
     // BIOME HANDLING
@@ -1717,7 +1719,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
         return false;
     }
-
 
     //////////////////////////////
     // SEASONAL
@@ -1836,31 +1837,30 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
 
-//    //////////////////////////////
-//    // INTERACTIVE
-//    //////////////////////////////
-//
-//    @Nullable
-//    public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
-//
-//        // Bonemeal fertilizes the soil and causes a single growth pulse.
-//        if (canBoneMealTree() && itemStack.is(DTItemTags.FERTILIZER)) {
-//            return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(DTConfigs.BONE_MEAL_GROWTH_PULSES::get);
-//        }
-//
-//        // Use substance provider interface if it's available.
-//        if (itemStack.getItem() instanceof SubstanceEffectProvider) {
-//            SubstanceEffectProvider provider = (SubstanceEffectProvider) itemStack.getItem();
-//            return provider.getSubstanceEffect(itemStack);
-//        }
-//
-//        // Enhanced fertilizer applies the Burgeoning potion effect.
-//        if (itemStack.is(DTItemTags.ENHANCED_FERTILIZER)) {
-//            return new GrowthSubstance();
-//        }
-//
-//        return null;
-//    }
+    //////////////////////////////
+    // INTERACTIVE
+    //////////////////////////////
+
+    @Nullable
+    public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
+
+        // Bonemeal fertilizes the soil and causes a single growth pulse.
+        if (canBoneMealTree() && itemStack.is(DTItemTags.FERTILIZER)) {
+            return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(Services.CONFIG.getIntConfig("boneMealGrowthPulses"));
+        }
+
+        // Use substance provider interface if it's available.
+        if (itemStack.getItem() instanceof SubstanceEffectProvider provider) {
+            return provider.getSubstanceEffect(itemStack);
+        }
+
+        // Enhanced fertilizer applies the Burgeoning potion effect.
+        if (itemStack.is(DTItemTags.ENHANCED_FERTILIZER)) {
+            return new GrowthSubstance();
+        }
+
+        return null;
+    }
 
     /**
      * Apply an item to the treepart(e.g. bonemeal). Developer is responsible for decrementing itemStack after
@@ -1873,11 +1873,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if item was used, false otherwise
      */
     public boolean applySubstance(Level level, BlockPos rootPos, BlockPos hitPos, @Nullable Player player, @Nullable InteractionHand hand, ItemStack itemStack) {
-//        final SubstanceEffect effect = getSubstanceEffect(itemStack);
-//
+        final SubstanceEffect effect = getSubstanceEffect(itemStack);
+
 //        if (effect != null) {
 //            boolean applied = effect.apply(level, rootPos);
 //            if (applied && effect.isLingering()) {
+//                DTRegistries.LINGERING_EFFECTOR.get().spawn(level, rootPos, effect)
 //                level.addFreshEntity(new LingeringEffectorEntity(level, rootPos, effect));
 //                return true;
 //            } else {
@@ -1888,42 +1889,41 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return false;
     }
 
-//    /**
-//     * Called when a player right-clicks a {@link Species} of tree anywhere on its branches.
-//     *
-//     * @return True if action was handled, false otherwise.
-//     */
-//    public boolean onTreeActivated(Family.TreeActivationContext context) {
-//        if (context.heldItem != null) { // Ensure there is something in the player's hand.
-//            if (applySubstance(context.level, context.rootPos, context.hitPos, context.player, context.hand,
-//                    context.heldItem)) {
-//                consumePlayerItem(context.player, context.hand, context.heldItem);
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
+    /**
+     * Called when a player right-clicks a {@link Species} of tree anywhere on its branches.
+     *
+     * @return True if action was handled, false otherwise.
+     */
+    public boolean onTreeActivated(Family.TreeActivationContext context) {
+        if (context.heldItem() != null) { // Ensure there is something in the player's hand.
+            if (applySubstance(context.level(), context.rootPos(), context.hitPos(), context.player(), context.hand(),
+                    context.heldItem())) {
+                consumePlayerItem(context.player(), context.hand(), context.heldItem());
+                return true;
+            }
+        }
 
-//    /**
-//     * A convenience function to decrement or otherwise consume an item in use.
-//     *
-//     * @param player   The player
-//     * @param hand     Hand holding the item
-//     * @param heldItem The item to be consumed
-//     */
-//    public static void consumePlayerItem(Player player, InteractionHand hand, ItemStack heldItem) {
-//        if (!player.isCreative()) {
-//            if (heldItem.getItem() instanceof Emptiable) { // A substance deployed from a refillable container.
-//                final Emptiable emptiable = (Emptiable) heldItem.getItem();
-//                player.setItemInHand(hand, emptiable.getEmptyContainer());
-//            } else if (heldItem.getItem() == Items.POTION) { // An actual potion.
-//                player.setItemInHand(hand, new ItemStack(Items.GLASS_BOTTLE));
-//            } else {
-//                heldItem.shrink(1); // Just a regular item like bonemeal.
-//            }
-//        }
-//    }
+        return false;
+    }
+
+    /**
+     * A convenience function to decrement or otherwise consume an item in use.
+     *
+     * @param player   The player
+     * @param hand     Hand holding the item
+     * @param heldItem The item to be consumed
+     */
+    public static void consumePlayerItem(Player player, InteractionHand hand, ItemStack heldItem) {
+        if (!player.isCreative()) {
+            if (heldItem.getItem() instanceof Emptiable emptiable) { // A substance deployed from a refillable container.
+                player.setItemInHand(hand, emptiable.getEmptyContainer());
+            } else if (heldItem.getItem() == Items.POTION) { // An actual potion.
+                player.setItemInHand(hand, new ItemStack(Items.GLASS_BOTTLE));
+            } else {
+                heldItem.shrink(1); // Just a regular item like bonemeal.
+            }
+        }
+    }
 
     /**
      * The Waila body is the part of the Waila display that shows the species and log/stick count This does not have a
@@ -2019,17 +2019,17 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     protected float bigTreeSoundThreshold = 20;
 
-//    public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){
-//        return treeVolume > bigTreeSoundThreshold ?
-//                DTRegistries.FALLING_TREE_BIG_START.get() :
-//                DTRegistries.FALLING_TREE_MEDIUM_START.get();
-//    }
-//
-//    public SoundEvent getFallingTreeEndSound (float treeVolume, boolean hasLeaves){
-//        return treeVolume > bigTreeSoundThreshold ?
-//                DTRegistries.FALLING_TREE_BIG_END.get() :
-//                DTRegistries.FALLING_TREE_MEDIUM_END.get();
-//    }
+    public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){
+        return treeVolume > bigTreeSoundThreshold ?
+                DTRegistries.FALLING_TREE_BIG_START.get() :
+                DTRegistries.FALLING_TREE_MEDIUM_START.get();
+    }
+
+    public SoundEvent getFallingTreeEndSound (float treeVolume, boolean hasLeaves){
+        return treeVolume > bigTreeSoundThreshold ?
+                DTRegistries.FALLING_TREE_BIG_END.get() :
+                DTRegistries.FALLING_TREE_MEDIUM_END.get();
+    }
 
     public float getFallingTreePitch (float treeVolume){
         return treeVolume > bigTreeSoundThreshold ?
@@ -2041,14 +2041,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return 1/treeVolume;
     }
 
-//    public SoundEvent getFallingTreeHitWaterSound (float treeVolume, boolean hasLeaves){
-//        return DTRegistries.FALLING_TREE_HIT_WATER.get();
-//    }
-//
-//    public SoundEvent getFallingBranchEndSound (float treeVolume, boolean hasLeaves, boolean fellOnWater){
-//        return  fellOnWater ? (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_HIT_WATER.get() : SoundEvents.PLAYER_SPLASH) :
-//                (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_END.get() : DTRegistries.FALLING_TREE_SMALL_END_BARE.get());
-//    }
+    public SoundEvent getFallingTreeHitWaterSound (float treeVolume, boolean hasLeaves){
+        return DTRegistries.FALLING_TREE_HIT_WATER.get();
+    }
+
+    public SoundEvent getFallingBranchEndSound (float treeVolume, boolean hasLeaves, boolean fellOnWater){
+        return  fellOnWater ? (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_HIT_WATER.get() : SoundEvents.PLAYER_SPLASH) :
+                (hasLeaves ? DTRegistries.FALLING_TREE_SMALL_END.get() : DTRegistries.FALLING_TREE_SMALL_END_BARE.get());
+    }
 
     public void setBigTreeSoundThreshold(float bigTreeSoundThreshold) {
         this.bigTreeSoundThreshold = bigTreeSoundThreshold;
@@ -2058,15 +2058,15 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     // BONSAI POT
     //////////////////////////////
 
-//    /**
-//     * Provides the {@link PottedSaplingBlock} for this Species. {@link Species} subclasses can derive their own {@link
-//     * PottedSaplingBlock} subclass if they want something custom.
-//     *
-//     * @return The {@link PottedSaplingBlock} for this {@link Species}.
-//     */
-//    public PottedSaplingBlock getPottedSapling() {
-//        return DTRegistries.POTTED_SAPLING.get();
-//    }
+    /**
+     * Provides the {@link PottedSaplingBlock} for this Species. {@link Species} subclasses can derive their own {@link
+     * PottedSaplingBlock} subclass if they want something custom.
+     *
+     * @return The {@link PottedSaplingBlock} for this {@link Species}.
+     */
+    public PottedSaplingBlock getPottedSapling() {
+        return DTRegistries.POTTED_SAPLING.get();
+    }
 
 
     //////////////////////////////
@@ -2176,7 +2176,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param rootPos    The position of {@link RootyBlock} this tree will be planted in
      * @param radius     The radius of the generation area
      * @param facing     The direction the joCode will build the tree
-     * @param safeBounds An object that helps prevent accessing blocks in unloaded chunks
+     * @param worldGen   Weather this is being called during world generation
      * @param joCode     The joCode that will be used to grow the tree
      * @return new blockposition of root block.  BlockPos. ZERO to cancel generation
      */

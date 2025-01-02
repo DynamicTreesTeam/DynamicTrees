@@ -1,0 +1,38 @@
+{
+    "family": "jungle",
+    "tapering": 0.2,
+    "signal_energy": 24.0,
+    "up_probability": 3,
+    "lowest_branch_height": 2,
+    "growth_rate": 1.0,
+    "growth_logic_kit": "jungle",
+    "leaves_properties": "jungle",
+    "environment_factors" : {
+        "#forge:is_cold": 0.15,
+        "#forge:is_dry": 0.2,
+        "#forge:is_hot": 1.1,
+        "#forge:is_wet": 1.1
+    },
+    "perfect_biomes": { "tag": "#minecraft:is_jungle" },
+    "primitive_sapling": "jungle_sapling",
+    "mega_species": "mega_jungle",
+    "features" : [
+        {
+            "name": "vines",
+            "properties": {
+                "quantity": 16,
+                "max_length": 16
+            }
+        },
+        {
+            "name": "undergrowth",
+            "properties": {
+                "undergrowth_species": "dynamictrees:oak_undergrowth",
+                "secondary_undergrowth_species": "dynamictrees:jungle_undergrowth"
+            }
+        }
+    ],
+    "lang_overrides": {
+        "seed": "Jungle Pod"
+    }
+}

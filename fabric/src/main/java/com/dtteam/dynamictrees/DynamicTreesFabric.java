@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees;
 
-import com.dtteam.dynamictrees.init.FabricRegistryLoader;
+import com.dtteam.dynamictrees.config.FabricRegistryLoader;
 import net.fabricmc.api.ModInitializer;
 
 public class DynamicTreesFabric implements ModInitializer {

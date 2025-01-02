@@ -41,7 +41,7 @@ public class ArrayPropertyApplier<T, V, I> extends PropertyApplier<T, List<V>, I
         final List<V> values = new ArrayList<>();
         final Iterator<I> iterator = iteratorResult.get();
         while (iterator.hasNext()) {
-            valueDeserialiser.get().deserialise(iterator.next()).ifSuccessOrElse(values::add, error -> LogManager.getLogger().error(error), warning -> LogManager.getLogger().warn(warning));
+            valueDeserialiser.get().deserialize(iterator.next()).ifSuccessOrElse(values::add, error -> LogManager.getLogger().error(error), warning -> LogManager.getLogger().warn(warning));
         }
         return applier.apply(object, values);
     }
@@ -50,7 +50,7 @@ public class ArrayPropertyApplier<T, V, I> extends PropertyApplier<T, List<V>, I
                                                                       Class<V> valueClass,
                                                                       Applier<T, List<V>> applier) {
         return new ArrayPropertyApplier<>(key, objectClass, applier,
-                element -> JsonDeserializers.JSON_ARRAY.deserialise(element).map(JsonArray::iterator),
+                element -> JsonDeserializers.JSON_ARRAY.deserialize(element).map(JsonArray::iterator),
                 LazyValue.supplied(() -> JsonDeserializers.getOrThrow(valueClass)));
     }
 

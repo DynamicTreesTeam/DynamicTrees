@@ -15,6 +15,8 @@ public class Services {
     public static final IConfigHelper CONFIG = load(IConfigHelper.class);
     public static final IItemHelper ITEM = load(IItemHelper.class);
     public static final ITextureHelper TEXTURE = load(ITextureHelper.class);
+    public static final ICompatHelper COMPAT = load(ICompatHelper.class);
+    public static final IEventHelper EVENT = load(IEventHelper.class);
 
     public static <T> T load(Class<T> clazz) {
         final T loadedService = ServiceLoader.load(clazz)

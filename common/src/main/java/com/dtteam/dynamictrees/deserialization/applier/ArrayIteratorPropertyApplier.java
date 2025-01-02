@@ -56,7 +56,7 @@ public class ArrayIteratorPropertyApplier<T, V, I> extends PropertyApplier<T, V,
                                                                               Class<V> valueClass,
                                                                               PropertyApplier<T, V, JsonElement> applier) {
         return new ArrayIteratorPropertyApplier<>(key, objectClass, valueClass, applier,
-                element -> JsonDeserializers.JSON_ARRAY.deserialise(element).map(JsonArray::iterator));
+                element -> JsonDeserializers.JSON_ARRAY.deserialize(element).map(JsonArray::iterator));
     }
 
 }

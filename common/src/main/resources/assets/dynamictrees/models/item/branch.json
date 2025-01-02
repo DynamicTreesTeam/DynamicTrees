@@ -1,0 +1,51 @@
+{   "parent": "block/block",
+    "textures": {
+        "bark": "block/oak_log",
+        "rings": "block/oak_log_top"
+    },
+    "display": {
+        "fixed": {
+            "rotation": [ 0, 90, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 0.5, 0.5, 0.5 ]
+        }
+    },
+    "elements": [
+         {   "__comment": "Trunk",
+            "from": [ 4, 0, 4 ],
+            "to": [ 12, 16, 12 ],
+            "faces": {
+                "down":  { "uv": [ 4, 4, 12, 12 ], "texture": "#rings"},
+                "up":    { "uv": [ 4, 4, 12, 12 ], "texture": "#rings"},
+                "north": { "uv": [ 4, 0, 12, 16 ], "texture": "#bark"},
+                "south": { "uv": [ 4, 0, 12, 16 ], "texture": "#bark"},
+                "west":  { "uv": [ 4, 0, 12, 16 ], "texture": "#bark"},
+                "east":  { "uv": [ 4, 0, 12, 16 ], "texture": "#bark"}
+            }
+        },
+        {   "__comment": "BranchS",
+            "from": [ 12, 7, 7 ],
+            "to": [ 16, 9, 9 ],
+            "faces": {
+                "down":  { "uv": [ 7, 12, 9, 16 ], "texture": "#bark", "rotation": 90},
+                "up":    { "uv": [ 7, 12, 9, 16 ], "texture": "#bark", "rotation": 90},
+                "north": { "uv": [ 7, 12, 9, 16 ], "texture": "#bark", "rotation": 90},
+                "south": { "uv": [ 7, 12, 9, 16 ], "texture": "#bark", "rotation": 90},
+                "west":  { "uv": [ 7, 7, 9, 9 ], "texture": "#rings"},
+                "east":  { "uv": [ 7, 7, 9, 9 ], "texture": "#rings"}
+            }
+        },
+        {   "__comment": "BranchL",
+            "from": [ 6, 6, 12 ],
+            "to": [ 10, 10, 16 ],
+            "faces": {
+                "down":  { "uv": [ 6, 12, 10, 16 ], "texture": "#bark", "rotation": 90},
+                "up":    { "uv": [ 6, 12, 10, 16 ], "texture": "#bark", "rotation": 90},
+                "north": { "uv": [ 6, 6, 10, 10 ], "texture": "#rings"},
+                "south": { "uv": [ 6, 6, 10, 10 ], "texture": "#rings"},
+                "west":  { "uv": [ 6, 12, 10, 16 ], "texture": "#bark", "rotation": 90},
+                "east":  { "uv": [ 6, 12, 10, 16 ], "texture": "#bark", "rotation": 90}
+            }
+        }
+    ]
+}

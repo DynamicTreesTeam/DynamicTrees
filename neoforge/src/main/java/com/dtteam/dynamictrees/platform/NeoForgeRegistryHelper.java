@@ -1,10 +1,10 @@
 package com.dtteam.dynamictrees.platform;
 
 import com.dtteam.dynamictrees.api.registry.*;
-import com.dtteam.dynamictrees.init.NeoForgeRegistryLoader;
-import com.dtteam.dynamictrees.init.RegistryLoader;
+import com.dtteam.dynamictrees.registry.NeoForgeRegistryLoader;
+import com.dtteam.dynamictrees.registry.RegistryLoader;
 import com.dtteam.dynamictrees.platform.services.IRegistryHelper;
-import net.neoforged.fml.ModLoader;
+import com.dtteam.dynamictrees.registry.NeoForgeRegistryHandler;
 
 public class NeoForgeRegistryHelper implements IRegistryHelper {
 
@@ -15,16 +15,6 @@ public class NeoForgeRegistryHelper implements IRegistryHelper {
             registriesInstance = new NeoForgeRegistryLoader();
         }
         return registriesInstance;
-    }
-
-    @Override
-    public <V extends RegistryEntry<V>> void postRegistryEvent(AbstractRegistry<V> registry) {
-        ModLoader.postEvent(new RegistryEvent<V>(registry));
-    }
-
-    @Override
-    public <V extends RegistryEntry<V>> void postTypedRegistryEvent(TypedRegistry<V> registry) {
-        ModLoader.postEvent(new TypeRegistryEvent<V>(registry));
     }
 
     @Override

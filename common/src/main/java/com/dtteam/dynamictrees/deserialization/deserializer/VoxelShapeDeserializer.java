@@ -23,7 +23,7 @@ import java.util.Locale;
 public final class VoxelShapeDeserializer implements JsonDeserializer<VoxelShape> {
 
     @Override
-    public Result<VoxelShape, JsonElement> deserialise(JsonElement input) {
+    public Result<VoxelShape, JsonElement> deserialize(JsonElement input) {
         return JsonResult.forInput(input)
                 .mapIfType(String.class, name ->
                         CommonVoxelShapes.SHAPES.getOrDefault(name.toLowerCase(Locale.ENGLISH), Shapes.block())
@@ -37,7 +37,7 @@ public final class VoxelShapeDeserializer implements JsonDeserializer<VoxelShape
         VoxelShape shape = Shapes.empty();
         for (JsonElement element : array) {
             shape = Shapes.or(
-                    JsonDeserializers.AABB.deserialise(element)
+                    JsonDeserializers.AABB.deserialize(element)
                             .map(Shapes::create)
                             .orElseThrow(),
                     shape);
@@ -66,9 +66,9 @@ public final class VoxelShapeDeserializer implements JsonDeserializer<VoxelShape
         if (shapes.size() < 1) {
             return Shapes.empty();
         }
-        VoxelShape shape = this.deserialise(shapes.get(0)).orElseThrow();
+        VoxelShape shape = this.deserialize(shapes.get(0)).orElseThrow();
         for (int i = 1; i < shapes.size(); i++) {
-            shape = Shapes.join(shape, this.deserialise(shapes.get(i)).orElseThrow(), operator);
+            shape = Shapes.join(shape, this.deserialize(shapes.get(i)).orElseThrow(), operator);
         }
         return shape;
     }

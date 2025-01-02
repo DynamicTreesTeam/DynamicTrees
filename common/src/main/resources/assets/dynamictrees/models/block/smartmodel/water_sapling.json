@@ -1,0 +1,58 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "#leaves",
+    "root": "dynamictrees:block/sapling_water_roots"
+  },
+  "display": {
+    "fixed": {
+      "rotation": [ 0, 90, 0 ],
+      "translation": [ 0, 0, 0 ],
+      "scale": [ 0.5, 0.5, 0.5 ]
+    }
+  },
+  "elements": [
+    {   "__comment": "Leaves",
+      "from": [ 4, 4, 4 ],
+      "to": [ 12, 12, 12 ],
+      "faces": {
+        "down":  { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 },
+        "up":    { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 },
+        "north": { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 },
+        "south": { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 },
+        "west":  { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 },
+        "east":  { "uv": [ 4, 4, 12, 12 ], "texture": "#leaves", "tintindex": 0 }
+      }
+    },
+    {   "__comment": "Trunk",
+      "from": [ 7, -2, 7 ],
+      "to": [ 9, 5, 9 ],
+      "faces": {
+        "down":  { "uv": [ 7, 7, 9, 9 ], "texture": "#log", "cullface": "down"},
+        "up":    { "uv": [ 7, 7, 9, 9 ], "texture": "#log"},
+        "north": { "uv": [ 7, 0, 9, 7 ], "texture": "#log"},
+        "south": { "uv": [ 7, 0, 9, 7 ], "texture": "#log"},
+        "west":  { "uv": [ 7, 0, 9, 7 ], "texture": "#log"},
+        "east":  { "uv": [ 7, 0, 9, 7 ], "texture": "#log"}
+      }
+    },
+    {	"from": [ 0.8, -16, 8 ],
+      "to": [ 15.2, 0, 8 ],
+      "rotation": { "origin": [ 8, 8, 8 ], "axis": "y", "angle": 45, "rescale": true },
+      "shade": false,
+      "faces": {
+        "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#root", "tintindex": 1 },
+        "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#root", "tintindex": 1 }
+      }
+    },
+    {	"from": [ 8, -16, 0.8 ],
+      "to": [ 8, 0, 15.2 ],
+      "rotation": { "origin": [ 8, 8, 8 ], "axis": "y", "angle": 45, "rescale": true },
+      "shade": false,
+      "faces": {
+        "west": { "uv": [ 0, 0, 16, 16 ], "texture": "#root", "tintindex": 1 },
+        "east": { "uv": [ 0, 0, 16, 16 ], "texture": "#root", "tintindex": 1 }
+      }
+    }
+  ]
+}

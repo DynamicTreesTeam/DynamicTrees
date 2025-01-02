@@ -2,7 +2,6 @@ package com.dtteam.dynamictrees.systems.season;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.season.SeasonManager;
-import com.dtteam.dynamictrees.compat.SereneSeasonsSeasonProvider;
 import com.dtteam.dynamictrees.platform.Services;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +34,7 @@ public final class SeasonCompatibilityHandler {
 
     public static void registerBuiltInSeasonManagers() {
         if (Services.PLATFORM.isModLoaded(DynamicTrees.SERENE_SEASONS)){
-            SereneSeasonsSeasonProvider.registerSereneSeasonsProvider();
+            Services.COMPAT.registerSereneSeasonsSeasonProvider();
         }
     }
 

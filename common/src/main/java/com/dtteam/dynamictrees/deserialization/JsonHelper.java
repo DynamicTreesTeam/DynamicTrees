@@ -56,7 +56,7 @@ public class JsonHelper {
      */
     @SuppressWarnings("Convert2MethodRef") // Can't use method ref, "ambiguous call".
     public static boolean isComment(final JsonElement jsonElement) {
-        return JsonDeserializers.STRING.deserialise(jsonElement)
+        return JsonDeserializers.STRING.deserialize(jsonElement)
                 .map(string -> isComment(string))
                 .orElse(false);
     }
@@ -87,7 +87,7 @@ public class JsonHelper {
             return defaultValue;
         }
 
-        return JsonDeserializers.get(type).deserialise(element).orElse(defaultValue);
+        return JsonDeserializers.get(type).deserialize(element).orElse(defaultValue);
     }
 
     /**
@@ -108,7 +108,7 @@ public class JsonHelper {
             return defaultValue;
         }
 
-        return JsonDeserializers.get(type).deserialise(element)
+        return JsonDeserializers.get(type).deserialize(element)
                 .orElse(
                         defaultValue,
                         errorConsumer,
@@ -119,7 +119,7 @@ public class JsonHelper {
     public static <T> Optional<T> getAsOptional(JsonObject object, String key, JsonDeserializer<T> deserialiser) throws DeserializationException {
         final JsonElement element = object.get(key);
         return element == null ? Optional.empty() :
-                deserialiser.deserialise(element)
+                deserialiser.deserialize(element)
                         .map(Optional::ofNullable)
                         .orElseThrow();
     }
@@ -158,7 +158,7 @@ public class JsonHelper {
     }
 
     private static boolean isModLoaded(JsonElement element){
-        return JsonDeserializers.STRING.deserialise(element)
+        return JsonDeserializers.STRING.deserialize(element)
                 .map(Services.PLATFORM::isModLoaded)
                 .orElse(true);
     }

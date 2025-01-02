@@ -24,10 +24,9 @@ import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.BlockGetter;
@@ -40,6 +39,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -314,48 +314,26 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
         return defaultSpecies;
     }
-//
-//    ///////////////////////////////////////////
-//    // INTERACTION
-//    ///////////////////////////////////////////
-//
-//    public static class TreeActivationContext {
-//        public final Level level;
-//        public final BlockPos rootPos;
-//        public final BlockPos hitPos;
-//        public final BlockState hitState;
-//        public final Player player;
-//        public final InteractionHand hand;
-//        @Nullable
-//        public final ItemStack heldItem;
-//        public final BlockHitResult hitResult;
-//
-//        public TreeActivationContext(Level level, BlockPos rootPos, BlockPos hitPos, BlockState hitState,
-//                                     Player player, InteractionHand hand, @Nullable ItemStack heldItem,
-//                                     BlockHitResult hitResult) {
-//            this.level = level;
-//            this.rootPos = rootPos;
-//            this.hitPos = hitPos;
-//            this.hitState = hitState;
-//            this.player = player;
-//            this.hand = hand;
-//            this.heldItem = heldItem;
-//            this.hitResult = hitResult;
-//        }
-//
-//    }
-//
-//    public boolean onTreeActivated(TreeActivationContext context) {
-//        if (canStripBranch(context.hitState, context.level, context.hitPos, context.player, context.heldItem)) {
-//            return stripBranch(context.hitState, context.level, context.hitPos, context.player, context.heldItem);
-//        }
-//
-//        if (context.rootPos != BlockPos.ZERO) {
-//            return TreeHelper.getExactSpecies(context.level, context.hitPos).onTreeActivated(context);
-//        }
-//
-//        return false;
-//    }
+
+    ///////////////////////////////////////////
+    // INTERACTION
+    ///////////////////////////////////////////
+
+    public record TreeActivationContext(Level level, BlockPos rootPos, BlockPos hitPos, BlockState hitState,
+                                        Player player, InteractionHand hand, @Nullable ItemStack heldItem,
+                                        BlockHitResult hitResult) { }
+
+    public boolean onTreeActivated(TreeActivationContext context) {
+        if (canStripBranch(context.hitState, context.level, context.hitPos, context.player, context.heldItem)) {
+            return stripBranch(context.hitState, context.level, context.hitPos, context.player, context.heldItem);
+        }
+
+        if (context.rootPos != BlockPos.ZERO) {
+            return TreeHelper.getExactSpecies(context.level, context.hitPos).onTreeActivated(context);
+        }
+
+        return false;
+    }
 
     public boolean canStripBranch(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
         BranchBlock branchBlock = TreeHelper.getBranch(state);

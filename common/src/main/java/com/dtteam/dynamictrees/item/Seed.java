@@ -1,10 +1,10 @@
 package com.dtteam.dynamictrees.item;
 
-import com.dtteam.dynamictrees.init.DTRegistries;
-import com.dtteam.dynamictrees.init.RegistryLoader;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.LazyValue;
+import com.dtteam.dynamictrees.worldgen.JoCode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
@@ -42,8 +43,6 @@ public class Seed extends Item {//implements IPlantable {
     //This constructor is only used for the null registration
     public Seed() {
         super(new Properties());
-        // TODO: Set null name? Is this still used? -SizableShrimp
-        // this.setRegistryName("null");
         this.species = Species.NULL_SPECIES;
     }
 
@@ -51,12 +50,13 @@ public class Seed extends Item {//implements IPlantable {
         this(species, new Properties());
     }
 
-    public Seed(Species species, Properties properties) {
+    public Seed(@NotNull Species species, Properties properties) {
         super(properties);
         this.species = species;
         DTRegistries.CREATIVE_TAB_ITEMS.add(this);
     }
 
+    @NotNull
     public Species getSpecies() {
         return species;
     }

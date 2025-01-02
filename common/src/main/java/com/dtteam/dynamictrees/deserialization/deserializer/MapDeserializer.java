@@ -29,12 +29,12 @@ public final class MapDeserializer<K, V> implements JsonDeserializer<Map<K, V>> 
     }
 
     @Override
-    public Result<Map<K, V>, JsonElement> deserialise(JsonElement jsonElement) {
-        return JsonDeserializers.JSON_OBJECT.deserialise(jsonElement).map((object, warningConsumer) -> {
+    public Result<Map<K, V>, JsonElement> deserialize(JsonElement jsonElement) {
+        return JsonDeserializers.JSON_OBJECT.deserialize(jsonElement).map((object, warningConsumer) -> {
             final Map<K, V> map = this.mapSupplier.get();
             for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-                this.valueGetter.deserialise(entry.getValue()).map(
-                        value -> this.keyGetter.deserialise(new JsonPrimitive(entry.getKey()))
+                this.valueGetter.deserialize(entry.getValue()).map(
+                        value -> this.keyGetter.deserialize(new JsonPrimitive(entry.getKey()))
                                 .ifSuccessOrElseThrow(key -> map.put(key, value), warningConsumer)
                 ).orElseThrow();
             }

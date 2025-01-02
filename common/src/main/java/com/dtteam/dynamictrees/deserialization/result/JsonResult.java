@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.deserialization.result;
 import com.dtteam.dynamictrees.deserialization.DeserializationException;
 import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
-import com.dtteam.dynamictrees.deserialization.NoSuchDeserialiserException;
+import com.dtteam.dynamictrees.deserialization.NoSuchDeserializerException;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Pair;
@@ -114,11 +114,11 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
      * @param <V>    the type to attempt to deserialise
      * @param <N>    the type to map to
      * @return the mapped result
-     * @throws NoSuchDeserialiserException if the specified {@code type} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code type} did not have a registered deserialiser
      */
     @Override
     public <V, N> MappedResult<N, JsonElement> mapIfType(Class<V> type, Mapper<V, N> mapper) {
-        return JsonDeserializers.getOrThrow(type).deserialise(this.input).map(mapper);
+        return JsonDeserializers.getOrThrow(type).deserialize(this.input).map(mapper);
     }
 
     /**
@@ -127,16 +127,16 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
      * @param elementType the type of element to map to a list of
      * @param <E>         the type of the element of the list to map to
      * @return the mapped result
-     * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code elementType} did not have a registered deserialiser
      */
     @Override
     public <E> MappedResult<List<E>, JsonElement> mapToListOfType(Class<E> elementType) {
-        return JsonDeserializers.JSON_ARRAY.deserialise(this.input).map(array -> {
+        return JsonDeserializers.JSON_ARRAY.deserialize(this.input).map(array -> {
             final JsonDeserializer<E> deserialiser = JsonDeserializers.getOrThrow(elementType);
             final List<E> list = new LinkedList<>();
 
             for (JsonElement element : array) {
-                list.add(deserialiser.deserialise(element).orElseThrow());
+                list.add(deserialiser.deserialize(element).orElseThrow());
             }
 
             return list;
@@ -151,17 +151,17 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
      * @param elementType the initial type of element to map to a list of
      * @param mapper      a mapper that maps each deserialised value to the {@code mappedType}
      * @return the mapper result
-     * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code elementType} did not have a registered deserialiser
      */
     @Override
     public <V, E> MappedResult<List<E>, JsonElement> mapEachIfArray(Class<V> elementType,
                                                                     Mapper<V, E> mapper) {
-        return JsonDeserializers.JSON_ARRAY.deserialise(this.input).map(array -> {
+        return JsonDeserializers.JSON_ARRAY.deserialize(this.input).map(array -> {
             final JsonDeserializer<V> deserialiser = JsonDeserializers.getOrThrow(elementType);
             final List<E> list = new LinkedList<>();
 
             for (JsonElement element : array) {
-                list.add(mapper.apply(deserialiser.deserialise(element).orElseThrow(), this.warnings::add));
+                list.add(mapper.apply(deserialiser.deserialize(element).orElseThrow(), this.warnings::add));
             }
 
             return list;
@@ -180,7 +180,7 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
      */
     @Override
     public <E, V> MappedResult<V, JsonElement> mapIfContains(String key, Class<E> type, Mapper<E, V> mapper) {
-        return JsonDeserializers.JSON_OBJECT.deserialise(this.input).map(object -> {
+        return JsonDeserializers.JSON_OBJECT.deserialize(this.input).map(object -> {
             final JsonElement element = object.get(key);
 
             if (element == null) {
@@ -188,7 +188,7 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
             }
 
             return mapper.apply(
-                    JsonDeserializers.getOrThrow(type).deserialise(element).orElseThrow(),
+                    JsonDeserializers.getOrThrow(type).deserialize(element).orElseThrow(),
                     this.warnings::add
             );
         });
@@ -197,7 +197,7 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     @Override
     public <E, V> MappedResult<V, JsonElement> mapIfContains(String key, Class<E> type, Mapper<E, V> mapper,
                                                              V defaultValue) {
-        return JsonDeserializers.JSON_OBJECT.deserialise(this.input).map(object -> {
+        return JsonDeserializers.JSON_OBJECT.deserialize(this.input).map(object -> {
             final JsonElement element = object.get(key);
 
             if (element == null) {
@@ -205,7 +205,7 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
             }
 
             return mapper.apply(
-                    JsonDeserializers.getOrThrow(type).deserialise(element).orElseThrow(),
+                    JsonDeserializers.getOrThrow(type).deserialize(element).orElseThrow(),
                     this.warnings::add
             );
         });

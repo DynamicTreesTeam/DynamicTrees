@@ -1,5 +1,9 @@
 package com.dtteam.dynamictrees.platform.services;
 
+import com.dtteam.dynamictrees.treepack.ModFileContainer;
+
+import java.util.List;
+
 public interface IPlatformHelper {
 
     /**
@@ -33,4 +37,6 @@ public interface IPlatformHelper {
 
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    public List<ModFileContainer> getMods();
 }

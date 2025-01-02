@@ -26,8 +26,8 @@ public final class ResourceLocationDeserializer implements JsonDeserializer<Reso
     }
 
     @Override
-    public Result<ResourceLocation, JsonElement> deserialise(JsonElement jsonElement) {
-        return JsonDeserializers.STRING.deserialise(jsonElement)
+    public Result<ResourceLocation, JsonElement> deserialize(JsonElement jsonElement) {
+        return JsonDeserializers.STRING.deserialize(jsonElement)
                 .map(string -> string.toLowerCase(Locale.ENGLISH))
                 .mapIfValid(ResourceLocationDeserializer::isValidResourceLocation,
                         "Invalid resource location '{value}'. Namespace Constraints: [a-z0-9_.-] Path Constraints: [a-z0-9/._-]",

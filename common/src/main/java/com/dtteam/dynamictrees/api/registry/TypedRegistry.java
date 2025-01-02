@@ -114,7 +114,7 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V>
      */
     @Override
     public void postRegistryEvent() {
-        Services.REGISTRY.postTypedRegistryEvent(this);
+        Services.EVENT.postTypedRegistryEvent(this);
         super.postRegistryEvent();
     }
 

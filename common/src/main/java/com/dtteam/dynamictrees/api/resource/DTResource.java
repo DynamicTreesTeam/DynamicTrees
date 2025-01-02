@@ -1,0 +1,19 @@
+package com.dtteam.dynamictrees.api.resource;
+
+import net.minecraft.resources.ResourceLocation;
+
+import java.util.function.Function;
+
+/**
+ * Container for a resource object that is keyed by its location.
+ *
+ * @param <R> the type of the resource object
+ * @author Harley O'Connor
+ */
+public record DTResource<R>(ResourceLocation location, R resource) {
+
+    public <N> DTResource<N> map(Function<R, N> mapper) {
+        return new DTResource<>(this.location, mapper.apply(this.resource));
+    }
+
+}

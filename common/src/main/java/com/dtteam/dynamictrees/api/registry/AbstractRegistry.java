@@ -259,7 +259,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
      */
     @Override
     public void postRegistryEvent() {
-        Services.REGISTRY.postRegistryEvent(this);
+        Services.EVENT.postRegistryEvent(this);
     }
 
     /**

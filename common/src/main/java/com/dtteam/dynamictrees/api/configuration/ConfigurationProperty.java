@@ -58,7 +58,7 @@ public class ConfigurationProperty<T> {
         final JsonDeserializer<T> getter = JsonDeserializers.getOrThrow(this.type, "Tried to get class " +
                 "\"" + this.type.getName() + "\" for gen feature property \"" + this.key + "\", but " +
                 "deserialiser was not registered.");
-        return Optional.of(getter.deserialise(jsonElement));
+        return Optional.of(getter.deserialize(jsonElement));
     }
 
     /**

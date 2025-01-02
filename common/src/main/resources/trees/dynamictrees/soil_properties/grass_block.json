@@ -1,0 +1,4 @@
+{
+  "primitive_soil": "grass_block",
+  "acceptable_soils": [ "dirt_like" ]
+}

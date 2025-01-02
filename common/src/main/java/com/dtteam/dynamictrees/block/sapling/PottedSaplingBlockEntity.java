@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.block.sapling;
 
-import com.dtteam.dynamictrees.init.DTRegistries;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;

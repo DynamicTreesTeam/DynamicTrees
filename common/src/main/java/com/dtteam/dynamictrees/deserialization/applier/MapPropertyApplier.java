@@ -33,7 +33,7 @@ public class MapPropertyApplier<T, V, I> extends PropertyApplier<T, Map<String,V
     protected PropertyApplierResult applyIfShould(T object, I input, Applier<T, Map<String,V>> applier) {
         HashMap<String, V> values = new HashMap<>();
         jsonObjectDeserializer.apply(input).entrySet().forEach((entry)->
-                valueDeserialiser.get().deserialise(entry.getValue()).ifSuccessOrElse(v->values.put(entry.getKey(),v), error -> LogManager.getLogger().error(error), warning -> LogManager.getLogger().warn(warning)));
+                valueDeserialiser.get().deserialize(entry.getValue()).ifSuccessOrElse(v->values.put(entry.getKey(),v), error -> LogManager.getLogger().error(error), warning -> LogManager.getLogger().warn(warning)));
         return applier.apply(object, values);
     }
 
@@ -41,7 +41,7 @@ public class MapPropertyApplier<T, V, I> extends PropertyApplier<T, Map<String,V
                                                                     Class<V> valueClass,
                                                                     Applier<T, Map<String,V>> applier) {
         return new MapPropertyApplier<>(key, objectClass, applier,
-                element -> JsonDeserializers.JSON_OBJECT.deserialise(element).get(),
+                element -> JsonDeserializers.JSON_OBJECT.deserialize(element).get(),
                 LazyValue.supplied(() -> JsonDeserializers.getOrThrow(valueClass)));
     }
 

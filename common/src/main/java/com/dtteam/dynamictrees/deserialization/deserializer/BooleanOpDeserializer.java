@@ -34,8 +34,8 @@ public final class BooleanOpDeserializer implements JsonDeserializer<BooleanOp> 
     });
 
     @Override
-    public Result<BooleanOp, JsonElement> deserialise(JsonElement input) {
-        return JsonDeserializers.STRING.deserialise(input)
+    public Result<BooleanOp, JsonElement> deserialize(JsonElement input) {
+        return JsonDeserializers.STRING.deserialize(input)
                 .map(VALUES::get);
     }
 

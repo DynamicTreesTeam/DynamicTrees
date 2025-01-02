@@ -27,8 +27,8 @@ public final class StaticFieldDeserializer<T> implements JsonDeserializer<T> {
     }
 
     @Override
-    public Result<T, JsonElement> deserialise(JsonElement jsonElement) {
-        return JsonDeserializers.STRING.deserialise(jsonElement)
+    public Result<T, JsonElement> deserialize(JsonElement jsonElement) {
+        return JsonDeserializers.STRING.deserialize(jsonElement)
                 .map(string -> Stream.of(this.type.getFields())
                                 .filter(field -> Modifier.isStatic(field.getModifiers()) && field.getName().equals(string))
                                 .findFirst().map(field -> {

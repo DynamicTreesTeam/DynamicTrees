@@ -1,0 +1,6 @@
+{
+  "primitive_leaves": "minecraft:cherry_leaves",
+  "smother": 5,
+  "light_requirement": 14,
+  "has_tick_particles": true
+}

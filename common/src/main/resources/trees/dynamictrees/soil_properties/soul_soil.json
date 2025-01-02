@@ -1,0 +1,4 @@
+{
+  "primitive_soil": "soul_soil",
+  "acceptable_soils": [ "nether_like", "nether_soil_like" ]
+}

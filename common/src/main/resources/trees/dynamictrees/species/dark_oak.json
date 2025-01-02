@@ -1,0 +1,47 @@
+{
+    "family": "dark_oak",
+    "tapering": 0.3,
+    "signal_energy": 18.0,
+    "up_probability": 4,
+    "lowest_branch_height": 6,
+    "growth_rate": 0.8,
+    "soil_longevity": 14,
+    "max_branch_radius": 24,
+    "growth_logic_kit": "dark_oak",
+    "leaves_properties": "dark_oak",
+    "environment_factors" : {
+        "#forge:is_cold": 0.75,
+        "#forge:is_hot": 0.5,
+        "#forge:is_dry": 0.25,
+        "mushroom": 1.25
+    },
+    "perfect_biomes": { "tag": "#forge:is_spooky", "name": "minecraft:.*" },
+    "primitive_sapling": "dark_oak_sapling",
+    "features" : [
+        {
+            "name": "clear_volume",
+            "properties": {
+                "height": 6
+            }
+        },
+        {
+            "name": "rot_soil",
+            "properties": {
+                "rotten_soil": "podzol"
+            }
+        },
+        {
+            "name": "mushroom_rot",
+            "properties": {
+                "_comment": "An alternate mushroom chance of -1 means that a red mushroom will always be generated.",
+                "alternate_mushroom_chance": -1
+            }
+        },
+        "bottom_flare",
+        "mound",
+        "roots"
+    ],
+    "lang_overrides": {
+        "seed": "Dark Oak Acorn"
+    }
+}

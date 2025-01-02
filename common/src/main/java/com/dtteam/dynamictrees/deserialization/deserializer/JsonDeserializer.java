@@ -25,7 +25,7 @@ public interface JsonDeserializer<O> extends Deserializer<JsonElement, O> {
      */
     @Override
     default boolean deserializeIfValid(JsonElement input, Consumer<Result<O, JsonElement>> consumer) {
-        consumer.accept(this.deserialise(input));
+        consumer.accept(this.deserialize(input));
         return true;
     }
 

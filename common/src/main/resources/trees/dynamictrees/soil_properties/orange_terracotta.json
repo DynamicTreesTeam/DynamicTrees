@@ -1,0 +1,4 @@
+{
+  "primitive_soil": "orange_terracotta",
+  "acceptable_soils": [ "terracotta_like" ]
+}

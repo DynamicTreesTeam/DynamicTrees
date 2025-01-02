@@ -46,7 +46,7 @@ public final class CustomConfigurationTemplate<C extends Configuration<C, ?>> im
 
     private Result<C, JsonElement> deserialiseJson(String json) {
         try {
-            return JsonDeserializers.getOrThrow(this.configurationClass).deserialise(
+            return JsonDeserializers.getOrThrow(this.configurationClass).deserialize(
                     JsonHelper.getGson().fromJson(json, JsonObject.class)
             );
         } catch (JsonSyntaxException e) {

@@ -34,6 +34,24 @@ neoForge {
             sourceSet sourceSets.main
         }
     }
+    repositories {
+        maven {
+            url "https://cursemaven.com"
+            content {
+                includeGroup "curse.maven"
+            }
+        }
+        flatDir {
+            dir 'libs'
+        }
+    }
+    dependencies {
+        implementation "curse.maven:jade-324717:6011258"
+        implementation "curse.maven:jei-238222:5846880"
+
+        implementation "curse.maven:glitchcore-955399:5660740"
+        implementation "curse.maven:serene-seasons-291874:5753503"
+    }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }

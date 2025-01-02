@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees;
 
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
+import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ public class DynamicTrees {
 
     public static final String MINECRAFT = "minecraft";
     public static final String SERENE_SEASONS = "sereneseasons";
+    public static final String FAST_LEAF_DECAY = "fastleafdecay";
 
     public enum AxeDamage {
         VANILLA,
@@ -59,6 +61,7 @@ public class DynamicTrees {
 
         RegistryHandler.setup(MOD_ID);
 
+        SeasonCompatibilityHandler.registerBuiltInSeasonManagers();
     }
 
     public static ResourceLocation location (String name){

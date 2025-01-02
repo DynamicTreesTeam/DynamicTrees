@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.deserialization.result;
 
-import com.dtteam.dynamictrees.deserialization.NoSuchDeserialiserException;
+import com.dtteam.dynamictrees.deserialization.NoSuchDeserializerException;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -23,7 +23,7 @@ public interface MappedResult<T, I> extends Result<T, I> {
      * @param mapper a mapper that maps the deserialised value to a new value
      * @param <V> the type to attempt to deserialise
      * @return the mapped result
-     * @throws NoSuchDeserialiserException if the specified {@code type} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code type} did not have a registered deserialiser
      */
     default <V> MappedResult<T, I> elseMapIfType(Class<V> type, SimpleMapper<V, T> mapper) {
         return this.elseMapIfType(type, mapper.fullMapper());
@@ -38,7 +38,7 @@ public interface MappedResult<T, I> extends Result<T, I> {
      * @param mapper a mapper that maps the deserialised value to a new value
      * @param <V> the type to attempt to deserialise
      * @return the mapped result
-     * @throws NoSuchDeserialiserException if the specified {@code type} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code type} did not have a registered deserialiser
      */
     <V> MappedResult<T, I> elseMapIfType(Class<V> type, Mapper<V, T> mapper);
 

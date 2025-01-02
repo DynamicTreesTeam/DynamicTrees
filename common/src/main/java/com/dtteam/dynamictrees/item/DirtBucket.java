@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.item;
 
-import com.dtteam.dynamictrees.init.DTRegistries;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

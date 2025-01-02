@@ -92,8 +92,8 @@ public final class MapColorDeserializer implements JsonDeserializer<MapColor> {
     }
 
     @Override
-    public Result<MapColor, JsonElement> deserialise(JsonElement input) {
-        return JsonDeserializers.RESOURCE_LOCATION.deserialise(input)
+    public Result<MapColor, JsonElement> deserialize(JsonElement input) {
+        return JsonDeserializers.RESOURCE_LOCATION.deserialize(input)
                 .map(MATERIAL_COLORS::get, "Could not get material color from \"{}\".");
     }
 }

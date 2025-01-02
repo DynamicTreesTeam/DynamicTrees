@@ -1,8 +1,13 @@
 package com.dtteam.dynamictrees.platform;
 
 import com.dtteam.dynamictrees.platform.services.IPlatformHelper;
+import com.dtteam.dynamictrees.treepack.NeoForgeModFileContainer;
+import com.dtteam.dynamictrees.treepack.ModFileContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class NeoForgePlatformHelper implements IPlatformHelper {
 
@@ -22,5 +27,9 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     public boolean isDevelopmentEnvironment() {
 
         return !FMLLoader.isProduction();
+    }
+
+    public List<ModFileContainer> getMods(){
+        return ModList.get().getMods().stream().map((NeoForgeModFileContainer::new)).collect(Collectors.toList());
     }
 }

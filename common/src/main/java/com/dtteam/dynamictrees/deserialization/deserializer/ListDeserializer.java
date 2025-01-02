@@ -23,11 +23,11 @@ public final class ListDeserializer<T> implements JsonDeserializer<List<T>> {
     }
 
     @Override
-    public Result<List<T>, JsonElement> deserialise(JsonElement jsonElement) {
-        return JsonDeserializers.JSON_ARRAY.deserialise(jsonElement).map(array -> {
+    public Result<List<T>, JsonElement> deserialize(JsonElement jsonElement) {
+        return JsonDeserializers.JSON_ARRAY.deserialize(jsonElement).map(array -> {
             final List<T> getterList = this.listSupplier.get();
             array.forEach(elem -> {
-                thisGetter.deserialise(elem).ifSuccess(getterList::add);
+                thisGetter.deserialize(elem).ifSuccess(getterList::add);
             });
             return getterList;
         });

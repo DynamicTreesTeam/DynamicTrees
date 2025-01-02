@@ -21,8 +21,8 @@ public final class RegistryEntryDeserializer<T extends RegistryEntry<T>> impleme
     }
 
     @Override
-    public Result<T, JsonElement> deserialise(JsonElement jsonElement) {
-        return JsonDeserializers.DT_RESOURCE_LOCATION.deserialise(jsonElement)
+    public Result<T, JsonElement> deserialize(JsonElement jsonElement) {
+        return JsonDeserializers.DT_RESOURCE_LOCATION.deserialize(jsonElement)
                 .map(
                         this.registry::get,
                         RegistryEntry::isValid,

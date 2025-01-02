@@ -34,4 +34,22 @@ loom {
             runDir('runs/server')
         }
     }
+    repositories {
+        maven {
+            url "https://cursemaven.com"
+            content {
+                includeGroup "curse.maven"
+            }
+        }
+        flatDir {
+            dir 'libs'
+        }
+    }
+    dependencies {
+        modImplementation "curse.maven:jade-324717:6011268"
+        modImplementation "curse.maven:jei-238222:5846878"
+
+        modImplementation "curse.maven:glitchcore-955399:5660741"
+        modImplementation "curse.maven:serene-seasons-291874:5753502"
+    }
 }

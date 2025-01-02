@@ -1,0 +1,10 @@
+{
+  "name": "Dynamic Trees Manual",
+  "creative_tab": "dynamictrees:dynamictrees",
+  "landing_text": "Dynamic Trees Completely overhauls vanilla trees by replacing them with trees that grow over time and are aware of their surroundings during growth. Dynamic Trees also look more realistic with branches and trunks.",
+  "version": 3,
+  "model": "dynamictrees:manual",
+  "filler_texture": "dynamictrees:textures/patchouli/gui/page_filler.png",
+  "show_progress": "false",
+  "use_resource_pack": true
+}

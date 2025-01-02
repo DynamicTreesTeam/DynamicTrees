@@ -1,9 +1,11 @@
 package com.dtteam.dynamictrees;
 
 
-import com.dtteam.dynamictrees.init.DTClient;
-import com.dtteam.dynamictrees.init.DTConfigs;
-import com.dtteam.dynamictrees.init.NeoForgeRegistryLoader;
+import com.dtteam.dynamictrees.event.handler.EventHandlers;
+import com.dtteam.dynamictrees.event.handler.ClientEventHandler;
+import com.dtteam.dynamictrees.config.DTConfigs;
+import com.dtteam.dynamictrees.registry.NeoForgeRegistryLoader;
+import com.dtteam.dynamictrees.treepack.Resources;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -32,12 +34,14 @@ public class DynamicTreesNeoForge {
 
         NeoForgeRegistryLoader.setup(eventBus);
 
+        EventHandlers.registerHandlers();
+
         //Do not use the mod event bus outside the constructor.
         MOD_EVENT_BUS = null;
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
-        DTClient.setup();
+        ClientEventHandler.setup();
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {
@@ -49,7 +53,7 @@ public class DynamicTreesNeoForge {
 //
 //        DTRegistries.DENDRO_POTION.get().registerRecipes();
 //
-//        Resources.MANAGER.setup();
+        Resources.MANAGER.setup();
     }
 
     private void gatherData(final GatherDataEvent event) {

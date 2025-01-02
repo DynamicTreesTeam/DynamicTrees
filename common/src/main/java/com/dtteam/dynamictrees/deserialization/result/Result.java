@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.deserialization.result;
 
 import com.dtteam.dynamictrees.deserialization.DeserializationException;
-import com.dtteam.dynamictrees.deserialization.NoSuchDeserialiserException;
+import com.dtteam.dynamictrees.deserialization.NoSuchDeserializerException;
 import com.dtteam.dynamictrees.util.function.ThrowableBiFunction;
 import com.dtteam.dynamictrees.util.function.ThrowableFunction;
 
@@ -352,7 +352,7 @@ public interface Result<T, I> {
      * @param <V>    the type to attempt to deserialise
      * @param <N>    the type to map to
      * @return the mapped result
-     * @throws NoSuchDeserialiserException if {@code type} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if {@code type} did not have a registered deserialiser
      */
     default <V, N> MappedResult<N, I> mapIfType(Class<V> type, SimpleMapper<V, N> mapper) {
         return this.mapIfType(type, mapper.fullMapper());
@@ -367,7 +367,7 @@ public interface Result<T, I> {
      * @param <V>    the type to attempt to deserialise
      * @param <N>    the type to map to
      * @return the mapped result
-     * @throws NoSuchDeserialiserException if the specified {@code type} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code type} did not have a registered deserialiser
      */
     <V, N> MappedResult<N, I> mapIfType(Class<V> type, Mapper<V, N> mapper);
 
@@ -377,7 +377,7 @@ public interface Result<T, I> {
      * @param elementType the type of element to map to a list of
      * @param <E>         the type of the element of the list to map to
      * @return the mapped result
-     * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code elementType} did not have a registered deserialiser
      */
     <E> MappedResult<List<E>, I> mapToListOfType(Class<E> elementType);
 
@@ -390,7 +390,7 @@ public interface Result<T, I> {
      * @param <V>         the initial type of element to map to a list of
      * @param <E>         the type to map each element to
      * @return the mapper result
-     * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code elementType} did not have a registered deserialiser
      */
     default <V, E> MappedResult<List<E>, I> mapEachIfArray(Class<V> elementType,
                                                            SimpleMapper<V, E> mapper) {
@@ -406,7 +406,7 @@ public interface Result<T, I> {
      * @param elementType the initial type of element to map to a list of
      * @param mapper      a mapper that maps each deserialised value to the {@code mappedType}
      * @return the mapper result
-     * @throws NoSuchDeserialiserException if the specified {@code elementType} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code elementType} did not have a registered deserialiser
      */
     <V, E> MappedResult<List<E>, I> mapEachIfArray(Class<V> elementType, Mapper<V, E> mapper);
 

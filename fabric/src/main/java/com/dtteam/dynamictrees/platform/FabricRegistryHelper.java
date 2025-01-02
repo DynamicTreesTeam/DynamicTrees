@@ -1,11 +1,8 @@
 package com.dtteam.dynamictrees.platform;
 
-import com.dtteam.dynamictrees.api.registry.AbstractRegistry;
-import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
-import com.dtteam.dynamictrees.api.registry.TypedRegistry;
-import com.dtteam.dynamictrees.init.FabricRegistryLoader;
-import com.dtteam.dynamictrees.init.RegistryLoader;
+import com.dtteam.dynamictrees.config.FabricRegistryLoader;
+import com.dtteam.dynamictrees.registry.RegistryLoader;
 import com.dtteam.dynamictrees.platform.services.IRegistryHelper;
 
 public class FabricRegistryHelper implements IRegistryHelper {
@@ -17,16 +14,6 @@ public class FabricRegistryHelper implements IRegistryHelper {
             registriesInstance = new FabricRegistryLoader();
         }
         return registriesInstance;
-    }
-
-    @Override
-    public <V extends RegistryEntry<V>> void postRegistryEvent(AbstractRegistry<V> registry) {
-        //RegistryEvent.EVENT.invoker().
-    }
-
-    @Override
-    public <V extends RegistryEntry<V>> void postTypedRegistryEvent(TypedRegistry<V> registry) {
-
     }
 
     @Override

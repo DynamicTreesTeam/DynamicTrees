@@ -20,11 +20,11 @@ public interface Deserializer<I, O> {
      * @param input the input object to deserialise
      * @return the deserialization result
      */
-    Result<O, I> deserialise(I input);
+    Result<O, I> deserialize(I input);
 
     /**
      * Returns {@code true} if this {@link Deserializer} is valid. A deserializer is considered invalid if {@link
-     * #deserialise(Object)} always results in a failure.
+     * #deserialize(Object)} always results in a failure.
      *
      * @return {@code true} if this {@link Deserializer} is valid; {@code false} otherwise
      */
@@ -33,7 +33,7 @@ public interface Deserializer<I, O> {
     }
 
     /**
-     * Passes the result of calling {@link #deserialise(Object)} on the specified {@code input} to the specified {@code
+     * Passes the result of calling {@link #deserialize(Object)} on the specified {@code input} to the specified {@code
      * consumer} if this {@link Deserializer} is considered valid.
      *
      * @param input    the input object to deserialise
@@ -43,7 +43,7 @@ public interface Deserializer<I, O> {
      */
     default boolean deserializeIfValid(I input, Consumer<Result<O, I>> consumer) throws DeserializationException {
         if (this.isValid()) {
-            consumer.accept(this.deserialise(input));
+            consumer.accept(this.deserialize(input));
             return true;
         }
         return false;
