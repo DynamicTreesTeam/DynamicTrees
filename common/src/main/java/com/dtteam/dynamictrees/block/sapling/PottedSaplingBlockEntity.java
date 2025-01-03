@@ -2,10 +2,22 @@ package com.dtteam.dynamictrees.block.sapling;
 
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.util.TreeRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A TileEntity that holds a species value.
@@ -17,11 +29,8 @@ public class PottedSaplingBlockEntity extends BlockEntity {
     private static final String POT_MIMIC_TAG = "pot_mimic";
     private static final String SPECIES_TAG = "species";
 
-//    public static final ModelProperty<BlockState> POT_MIMIC = new ModelProperty<>();
-//    public static final ModelProperty<Species> SPECIES = new ModelProperty<>();
-
-    private BlockState potState = Blocks.FLOWER_POT.defaultBlockState();
-    private Species species = Species.NULL_SPECIES;
+    protected BlockState potState = Blocks.FLOWER_POT.defaultBlockState();
+    protected Species species = Species.NULL_SPECIES;
 
     public PottedSaplingBlockEntity(BlockPos pos, BlockState state) {
         super(DTRegistries.POTTED_SAPLING_BLOCK_ENTITY.get(), pos, state); //
@@ -31,72 +40,57 @@ public class PottedSaplingBlockEntity extends BlockEntity {
         return this.species;
     }
 
-//    public void setSpecies(Species species) {
-//        this.species = species;
-//        this.setChanged();
-//        level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
-//    }
-//
-//    public BlockState getPot() {
-//        return potState;
-//    }
-//
-//    public void setPot(BlockState newPotState) {
-//        if (newPotState.getBlock() instanceof FlowerPotBlock) {
-//            this.potState = newPotState.getBlock().defaultBlockState();
-//        } else {
-//            this.potState = Blocks.FLOWER_POT.defaultBlockState();
-//        }
-//        this.setChanged();
-//        level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
-//    }
-//
-//    @Override
-//    public CompoundTag getUpdateTag() {
-//        CompoundTag tag = super.getUpdateTag();
-//        this.saveAdditional(tag);
-//        return tag;
-//    }
-//
-//    @Nullable
-//    @Override
-//    public ClientboundBlockEntityDataPacket getUpdatePacket() {
-//        return ClientboundBlockEntityDataPacket.create(this);
-//    }
-//
-//    @Override
-//    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet) {
-//        BlockState oldPotState = potState;
-//        this.handleUpdateTag(packet.getTag());
-//
-//        if (!oldPotState.equals(potState)) {
-//            level.getModelDataManager().requestRefresh(this);
-//            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
-//        }
-//    }
-//
-//    @Override
-//    public void load(CompoundTag tag) {
-//        if (tag.contains(POT_MIMIC_TAG)) {
-//            Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(tag.getString(POT_MIMIC_TAG)));
-//            potState = block != Blocks.AIR ? block.defaultBlockState() : Blocks.FLOWER_POT.defaultBlockState();
-//        }
-//        if (tag.contains(SPECIES_TAG)) {
-//            this.species = TreeRegistry.findSpecies(tag.getString(SPECIES_TAG));
-//        }
-//        super.load(tag);
-//    }
-//
-//    @Override
-//    protected void saveAdditional(CompoundTag tag) {
-//        tag.putString(POT_MIMIC_TAG, ForgeRegistries.BLOCKS.getKey(potState.getBlock()).toString());
-//        tag.putString(SPECIES_TAG, this.species.getRegistryName().toString());
-//    }
-//
-//    @Nonnull
-//    @Override
-//    public ModelData getModelData() {
-//        return ModelData.builder().with(POT_MIMIC, potState).with(SPECIES, species).build();
-//    }
+    public void setSpecies(Species species) {
+        this.species = species;
+        this.setChanged();
+        if (level != null)
+            level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
+    }
+
+    public BlockState getPot() {
+        return potState;
+    }
+
+    public void setPot(BlockState newPotState) {
+        if (newPotState.getBlock() instanceof FlowerPotBlock) {
+            this.potState = newPotState.getBlock().defaultBlockState();
+        } else {
+            this.potState = Blocks.FLOWER_POT.defaultBlockState();
+        }
+        this.setChanged();
+        if (level != null)
+            level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
+        this.saveAdditional(tag, registries);
+        return tag;
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        if (tag.contains(POT_MIMIC_TAG)) {
+            Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(tag.getString(POT_MIMIC_TAG)));
+            potState = block != Blocks.AIR ? block.defaultBlockState() : Blocks.FLOWER_POT.defaultBlockState();
+        }
+        if (tag.contains(SPECIES_TAG)) {
+            this.species = TreeRegistry.findSpecies(tag.getString(SPECIES_TAG));
+        }
+        super.loadAdditional(tag, registries);
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.putString(POT_MIMIC_TAG, BuiltInRegistries.BLOCK.getKey(potState.getBlock()).toString());
+        tag.putString(SPECIES_TAG, this.species.getRegistryName().toString());
+    }
 
 }

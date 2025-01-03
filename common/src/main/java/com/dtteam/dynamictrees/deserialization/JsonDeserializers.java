@@ -17,6 +17,7 @@ import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
+import com.dtteam.dynamictrees.systems.genfeature.VinesGenFeature;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.tree.family.Family;
@@ -249,12 +250,12 @@ public final class JsonDeserializers {
                     .mapIfValid(block -> block instanceof BranchBlock, "Block \"{}\" is not a branch.",
                             block -> (BranchBlock) block));
 
-//    public static final JsonDeserializer<VinesGenFeature.VineType> VINE_TYPE =
-//            register(VinesGenFeature.VineType.class, new EnumDeserializer<>(VinesGenFeature.VineType.class));
-//    public static final JsonDeserializer<BiomeDatabase.Operation> OPERATION =
-//            register(BiomeDatabase.Operation.class, new EnumDeserializer<>(BiomeDatabase.Operation.class));
+    public static final JsonDeserializer<VinesGenFeature.VineType> VINE_TYPE =
+            register(VinesGenFeature.VineType.class, new EnumDeserializer<>(VinesGenFeature.VineType.class));
     public static final JsonDeserializer<GenerationStep.Decoration> DECORATION_STAGE =
             register(GenerationStep.Decoration.class, new EnumDeserializer<>(GenerationStep.Decoration.class));
+//    public static final JsonDeserializer<BiomeDatabase.Operation> OPERATION =
+//            register(BiomeDatabase.Operation.class, new EnumDeserializer<>(BiomeDatabase.Operation.class));
 
 //    public static final JsonDeserializer<DTBiomeHolderSet> BIOME_LIST = register(DTBiomeHolderSet.class, new BiomeListDeserializer());
 //    public static final JsonDeserializer<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->

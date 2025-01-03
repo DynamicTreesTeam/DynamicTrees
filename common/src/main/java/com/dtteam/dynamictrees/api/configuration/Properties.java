@@ -14,7 +14,7 @@ public final class Properties implements PropertiesAccessor {
 
     private final Map<ConfigurationProperty<?>, Object> map = Maps.newHashMap();
 
-    public <V> void put(ConfigurationProperty<V> property, V value) {
+    public <V> void put(ConfigurationProperty<V> property, @Nullable V value) {
         this.map.put(property, value);
     }
 
@@ -22,8 +22,8 @@ public final class Properties implements PropertiesAccessor {
         properties.forEach(this::put);
     }
 
-    @SuppressWarnings("unchecked")
     @Nullable
+    @SuppressWarnings("unchecked")
     public <V> V get(ConfigurationProperty<V> property) {
         return (V) this.map.get(property);
     }

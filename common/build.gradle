@@ -35,7 +35,12 @@ configurations {
 }
 
 artifacts {
-    commonJava sourceSets.main.java.sourceDirectories.singleFile
-    commonResources sourceSets.main.resources.sourceDirectories.singleFile
-}
+    sourceSets.main.resources {
+        srcDir("src/generated/resources")
+        srcDir("src/localization/resources")
+    }
 
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonResources sourceSets.main.resources.sourceDirectories.files
+
+}

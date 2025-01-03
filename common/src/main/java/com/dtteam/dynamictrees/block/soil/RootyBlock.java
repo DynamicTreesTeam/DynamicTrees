@@ -183,14 +183,15 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     // INTERACTION
     ///////////////////////////////////////////
 
-//    @Nullable
-//    @Override
-//    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-//        if (pState.getValue(IS_VARIANT)) {
-//            return new SpeciesBlockEntity(pPos,pState);
-//        }
-//        return null;
-//    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+        if (pState.getValue(IS_VARIANT)) {
+            return new SpeciesBlockEntity(pPos,pState);
+        }
+        return null;
+    }
 
     @Override
     public boolean hasTileEntity(BlockState state) {
@@ -199,7 +200,13 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
 
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (random.nextInt(Services.CONFIG.getIntConfig("growthFolding")) == 0) {
+        double growthMultiplier = Services.CONFIG.getDoubleConfig("treeGrowthMultiplier");
+        //Growth multiplier lower than 1 causes only some ticks to grow
+        if (random.nextFloat() > growthMultiplier) return;
+
+        //Growth multiplier higher than 1 causes multiple growth per tick.
+        int attempts = (int)Math.ceil(growthMultiplier);
+        for (int i=0; i<attempts; i++){
             updateTree(state, level, pos, random, true);
         }
     }
@@ -531,9 +538,4 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
         return false;
     }
 
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return null;
-    }
 }

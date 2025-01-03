@@ -60,38 +60,36 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     }
 
     @Override
-    public <T extends Block> Supplier<T> registerBlock (String name, com.google.common.base.Supplier<T> newBlock){
-        Supplier<T> sup = Suppliers.memoize(newBlock);
+    public <T extends Block> Supplier<T> registerBlock (String name, Supplier<T> newBlock){
+        Supplier<T> sup = Suppliers.memoize(newBlock::get);
         RegistryHandler.addBlock(DynamicTrees.location(name), sup);
         return sup;
     }
 
     @Override
-    public <T extends Item> Supplier<T> registerItem (String name, com.google.common.base.Supplier<T> newBlock){
-        Supplier<T> sup = Suppliers.memoize(newBlock);
+    public <T extends Item> Supplier<T> registerItem (String name, Supplier<T> newBlock){
+        Supplier<T> sup = Suppliers.memoize(newBlock::get);
         RegistryHandler.addItem(DynamicTrees.location(name), sup);
         return sup;
     }
 
     @Override
-    public Supplier<CreativeModeTab> registerCreativeTab(String name, ItemStack icon, MutableComponent title, CreativeModeTab.DisplayItemsGenerator displayItems) {
-        return CREATIVE_MODE_TABS.register(name, () -> CreativeModeTab.builder()
-                .icon(() -> icon).title(title).displayItems(displayItems).build());
+    public Supplier<CreativeModeTab> registerCreativeTab(String name, Supplier<ItemStack> icon, MutableComponent title, CreativeModeTab.DisplayItemsGenerator displayItems) {
+        return CREATIVE_MODE_TABS.register(name,
+                () -> CreativeModeTab.builder().icon(icon).title(title).displayItems(displayItems).build());
     }
 
     @Override
     public <T extends Entity> Supplier<EntityType<T>> registerEntity(String name, EntityType.Builder<T> builder, boolean isTree) {
         if (isTree)
-            builder.setShouldReceiveVelocityUpdates(true)
-                .setTrackingRange(512)
-                .setUpdateInterval(Integer.MAX_VALUE);
+            builder.setShouldReceiveVelocityUpdates(true).setTrackingRange(512).setUpdateInterval(Integer.MAX_VALUE);
         return ENTITY_TYPES.register(name, () -> builder.build(name));
     }
 
     @Override
     public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String name, BlockEntityType.BlockEntitySupplier<? extends T> newBlockEntity, Supplier<Set<Block>> validBlocks) {
-        return BLOCK_ENTITY_TYPES.register(name, () -> new BlockEntityType<>(
-                        newBlockEntity, validBlocks.get(), null));
+        return BLOCK_ENTITY_TYPES.register(name, () ->
+                new BlockEntityType<>(newBlockEntity, validBlocks.get(), null));
     }
 
     @Override

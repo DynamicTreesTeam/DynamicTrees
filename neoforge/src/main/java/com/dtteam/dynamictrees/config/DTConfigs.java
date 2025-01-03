@@ -113,15 +113,13 @@ public class DTConfigs {
 
         SERVER_BUILDER.comment("Tree Settings").push("trees");
         registerConfig(SERVER_BUILDER.comment("Factor that multiplies the rate at which trees grow. Use at own risk").
-                defineInRange("growthMultiplier", 0.5f, 0, 16f));
+                defineInRange("treeGrowthMultiplier", 0.5f, 0, 16f));
         registerConfig(SERVER_BUILDER.comment("Factor that multiplies the wood returned from harvesting a tree.  You cheat.").
                 defineInRange("harvestMultiplier", 1f, 0f, 128f));
         registerConfig(SERVER_BUILDER.comment("Maximum harvesting hardness that can be calculated. Regardless of tree thickness.").
                 defineInRange("maxTreeHardness", 20f, 1f, 200f));
         registerConfig(SERVER_BUILDER.comment("A multiplier of tree hardness. Higher values make trees slower to chop, lower values makes them faster to chop.").
                 defineInRange("treeHardnessMultiplier", 1, (1/128f), 32f));
-        registerConfig(SERVER_BUILDER.comment("Do X growth cycles at once while ignoring (X-1)/X attempts.  Higher numbers can improve client side performance but too high can make trees grow wierd.").
-                defineInRange("growthFolding", 2, 1, 8));
         registerConfig(SERVER_BUILDER.comment("If enabled then sticks will be dropped for partial logs").
                 define("dropSticks", true));
         registerConfig(SERVER_BUILDER.comment("Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome").

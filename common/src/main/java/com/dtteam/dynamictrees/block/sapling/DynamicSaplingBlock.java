@@ -47,8 +47,6 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     // INTERACTION
     ///////////////////////////////////////////
 
-    //Neoforge override
-
     /** NeoForge override */
     @SuppressWarnings("unused")
     public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
@@ -62,9 +60,9 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     }
 
     @Override
-    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
+    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (this.getSpecies().canSaplingGrowNaturally(level, pos)) {
-            this.performBonemeal(level, rand, pos, state);
+            this.performBonemeal(level, random, pos, state);
         }
     }
 

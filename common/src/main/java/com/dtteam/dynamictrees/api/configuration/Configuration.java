@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.api.configuration;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public abstract class Configuration<T extends Configuration<T, C>, C extends Con
      * @throws ReportedException If the property given is not registered to the {@link Configurable}.
      */
     @SuppressWarnings("unchecked")
-    public <V> T with(ConfigurationProperty<V> property, V value) {
+    public <V> T with(ConfigurationProperty<V> property, @Nullable V value) {
         if (!this.configurable.isPropertyRegistered(property)) {
             final CrashReport crashReport = CrashReport.forThrowable(new IllegalArgumentException(), "Tried to add " +
                     "unregistered property with identifier '" + property.getKey() + "' and type '" +

@@ -1,7 +1,8 @@
 package com.dtteam.dynamictrees.item;
 
-import com.dtteam.dynamictrees.registry.DTRegistries;
+import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.LazyValue;
 import com.dtteam.dynamictrees.util.LevelContext;
@@ -10,6 +11,7 @@ import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -20,8 +22,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -177,35 +185,35 @@ public class Seed extends Item {//implements IPlantable {
         return JoCodeRegistry.getRandomCode(species.getRegistryName(), Mth.clamp(radius, 2, 8), random);
     }
 
-    public InteractionResult onItemUseFlowerPot(UseOnContext context) {
-//        final Level level = context.getLevel();
-//        final BlockPos pos = context.getClickedPos();
-//        final BlockState emptyPotState = level.getBlockState(pos);
-//        final Block emptyPotBlock = emptyPotState.getBlock();
-//
-//        if (!(emptyPotBlock instanceof FlowerPotBlock) || emptyPotState != emptyPotBlock.defaultBlockState() ||
-//                ((FlowerPotBlock) emptyPotBlock).getContent() != Blocks.AIR) {
-//            return InteractionResult.PASS;
-//        }
-//
-//        final PottedSaplingBlock pottingSapling = this.getSpecies().getPottedSapling();
-//        level.setBlockAndUpdate(pos, pottingSapling.defaultBlockState());
-//
-//        if (pottingSapling.setSpecies(level, pos, pottingSapling.defaultBlockState(), this.getSpecies()) && pottingSapling.setPotState(level, emptyPotState, pos)) {
-//            final Player player = context.getPlayer();
-//
-//            if (player != null) {
-//                context.getPlayer().awardStat(Stats.POT_FLOWER);
-//                if (!context.getPlayer().getAbilities().instabuild) {
-//                    context.getItemInHand().shrink(1);
-//                }
-//            }
-//
-//            return InteractionResult.SUCCESS;
-//        }
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        // Handle planting seed on ground
 
+        if (context.getLevel().getFluidState(context.getClickedPos().above()).isEmpty()
+                && onItemUsePlantSeed(context, false) == InteractionResult.SUCCESS) {
+            return InteractionResult.SUCCESS;
+        }
         return InteractionResult.PASS;
     }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand pHand) {
+        // Handle planting seed on water
+        BlockHitResult blockhitresult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
+        BlockPos fluidPos = blockhitresult.getBlockPos();
+        if (getSpecies().selfOrLocationOverride(level, fluidPos).isPlantableOnFluid()){
+            ItemStack itemstack = player.getItemInHand(pHand);
+            if (blockhitresult.getType() == HitResult.Type.BLOCK && !level.getFluidState(fluidPos).isEmpty() &&
+                    level.getFluidState(fluidPos.below()).isEmpty()) {
+                if (onItemUsePlantSeed(new UseOnContext(player, pHand, blockhitresult), true) == InteractionResult.SUCCESS) {
+                    return InteractionResultHolder.success(itemstack);
+                }
+            }
+            return InteractionResultHolder.pass(itemstack);
+        }
+        return super.use(level, player, pHand);
+    }
+
 
     public InteractionResult onItemUsePlantSeed(UseOnContext context, boolean onFluid) {
 
@@ -220,7 +228,7 @@ public class Seed extends Item {//implements IPlantable {
         if (facing == Direction.UP) {//Ensure this seed is only used on the top side of a block
             if (context.getPlayer() != null && context.getPlayer().mayUseItemAt(pos, facing, context.getItemInHand()) && context.getPlayer().mayUseItemAt(pos.above(), facing, context.getItemInHand())) {//Ensure permissions to edit block
                 if (doPlanting(context.getLevel(), pos.above(), context.getPlayer(), context.getItemInHand())) {
-                    context.getItemInHand().shrink(1);
+                    if (!context.getPlayer().isCreative()) context.getItemInHand().shrink(1);
                     return InteractionResult.SUCCESS;
                 }
             }
@@ -229,42 +237,45 @@ public class Seed extends Item {//implements IPlantable {
         return InteractionResult.PASS;
     }
 
-//    @Override
-//    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-//        // Handle flower pot interaction (flower pot cancels on item use so this must be done first).
-//        if (onItemUseFlowerPot(context) == InteractionResult.SUCCESS) {
-//            return InteractionResult.SUCCESS;
-//        }
-//
-//        return InteractionResult.PASS;
-//    }
-
-    @Override
-    public InteractionResult useOn(UseOnContext context) {
-        // Handle planting seed interaction.
-
-        if (context.getLevel().getFluidState(context.getClickedPos().above()).isEmpty()
-                && onItemUsePlantSeed(context, false) == InteractionResult.SUCCESS) {
+    /** NeoForge Override */
+    @SuppressWarnings("unused")
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context){
+        // Handle flower pot interaction (flower pot cancels use so this must be done first).
+        if (onItemUseFlowerPot(context) == InteractionResult.SUCCESS) {
             return InteractionResult.SUCCESS;
         }
 
         return InteractionResult.PASS;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand pHand) {
-//        BlockHitResult blockhitresult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
-//        BlockPos fluidPos = blockhitresult.getBlockPos();
-//        if (getSpecies().selfOrLocationOverride(level, fluidPos).isPlantableOnFluid()){
-//            ItemStack itemstack = player.getItemInHand(pHand);
-//            if (blockhitresult.getType() == HitResult.Type.BLOCK && !level.getFluidState(fluidPos).isEmpty() &&
-//                    level.getFluidState(fluidPos.below()).isEmpty()) {
-//                if (onItemUsePlantSeed(new UseOnContext(player, pHand, blockhitresult), true) == InteractionResult.SUCCESS) {
-//                    return InteractionResultHolder.success(itemstack);
-//                }
-//            }
-//            return InteractionResultHolder.pass(itemstack);
-//        }
-        return super.use(level, player, pHand);
+    public InteractionResult onItemUseFlowerPot(UseOnContext context) {
+        final Level level = context.getLevel();
+        final BlockPos pos = context.getClickedPos();
+        final BlockState emptyPotState = level.getBlockState(pos);
+        final Block emptyPotBlock = emptyPotState.getBlock();
+
+        if (!(emptyPotBlock instanceof FlowerPotBlock) || emptyPotState != emptyPotBlock.defaultBlockState() ||
+                ((FlowerPotBlock) emptyPotBlock).getPotted() != Blocks.AIR) {
+            return InteractionResult.PASS;
+        }
+
+        final PottedSaplingBlock pottingSapling = this.getSpecies().getPottedSapling();
+        level.setBlockAndUpdate(pos, pottingSapling.defaultBlockState());
+
+        if (pottingSapling.setSpecies(level, pos, pottingSapling.defaultBlockState(), this.getSpecies()) && pottingSapling.setPotState(level, emptyPotState, pos)) {
+            final Player player = context.getPlayer();
+
+            if (player != null) {
+                context.getPlayer().awardStat(Stats.POT_FLOWER);
+                if (!context.getPlayer().getAbilities().instabuild) {
+                    context.getItemInHand().shrink(1);
+                }
+            }
+
+            return InteractionResult.SUCCESS;
+        }
+
+        return InteractionResult.PASS;
     }
 
 //    @Override

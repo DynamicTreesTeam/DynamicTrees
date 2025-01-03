@@ -9,16 +9,18 @@ import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.entity.render.FallingTreeRenderer;
 import com.dtteam.dynamictrees.entity.render.LingeringEffectorRenderer;
+import com.dtteam.dynamictrees.models.baked.BakedModelBlockBonsaiPot;
+import com.dtteam.dynamictrees.models.loader.*;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.TooltipHandler;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import com.dtteam.dynamictrees.util.client.TextureUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -35,7 +37,6 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 import java.util.List;
 import java.util.function.Function;
@@ -174,25 +175,29 @@ public class ClientModEventHandler {
 
     //These locs are accessed by the model data generators
     public static final ResourceLocation BRANCH = DynamicTrees.location("branch");
+    public static final ResourceLocation THICK_BRANCH = DynamicTrees.location("thick_branch");
     public static final ResourceLocation SURFACE_ROOT = DynamicTrees.location("surface_root");
     public static final ResourceLocation ROOTS = DynamicTrees.location("roots");
+    public static final ResourceLocation LARGE_PALM_FRONDS = DynamicTrees.location("large_palm_fronds");
+    public static final ResourceLocation MEDIUM_PALM_FRONDS = DynamicTrees.location("medium_palm_fronds");
+    public static final ResourceLocation SMALL_PALM_FRONDS = DynamicTrees.location("small_palm_fronds");
 
     @SubscribeEvent
     public static void onModelRegistryEvent(ModelEvent.RegisterGeometryLoaders event) {
         // Register model loaders for baked models.
-//        event.register("branch", new BranchBlockModelLoader());
-//        event.register("surface_root", new SurfaceRootBlockModelLoader());
-//        event.register("thick_branch", new ThickBranchBlockModelLoader());
-//        event.register("roots", new RootsBlockModelLoader());
-//        event.register("large_palm_fronds", new PalmLeavesModelLoader(0));
-//        event.register("medium_palm_fronds", new PalmLeavesModelLoader(1));
-//        event.register("small_palm_fronds", new PalmLeavesModelLoader(2));
+        event.register(BRANCH, new BranchBlockModelLoader());
+        event.register(SURFACE_ROOT, new SurfaceRootBlockModelLoader());
+        event.register(THICK_BRANCH, new ThickBranchBlockModelLoader());
+        event.register(ROOTS, new RootsBlockModelLoader());
+        event.register(LARGE_PALM_FRONDS, new PalmLeavesModelLoader(0));
+        event.register(MEDIUM_PALM_FRONDS, new PalmLeavesModelLoader(1));
+        event.register(SMALL_PALM_FRONDS, new PalmLeavesModelLoader(2));
     }
 
     @SubscribeEvent
     public static void onModelModifyBakingResultResult(ModelEvent.ModifyBakingResult event) {
         // Put bonsai pot baked model into its model location.
-//        event.getModels().computeIfPresent(new ModelResourceLocation(PottedSaplingBlock.REG_NAME, ""), (k, val) -> new BakedModelBlockBonsaiPot(val));
+        event.getModels().computeIfPresent(new ModelResourceLocation(DynamicTrees.location("potted_sapling"), ""), (k, val) -> new BakedModelBlockBonsaiPot(val));
     }
 
 }

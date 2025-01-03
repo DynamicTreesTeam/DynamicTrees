@@ -1528,7 +1528,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public boolean grow(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
 
-        float growthRate = (float) (getGrowthRate(level, rootPos) * Services.CONFIG.getDoubleConfig("treeGrowthMultiplier") * Services.CONFIG.getDoubleConfig("treeGrowthFolding"));
+        float growthRate = (float) (getGrowthRate(level, rootPos) * Services.CONFIG.getDoubleConfig("treeGrowthMultiplier"));
         do {
             if (fertility > 0) {
                 if (growthRate > random.nextFloat()) {
@@ -1874,16 +1874,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public boolean applySubstance(Level level, BlockPos rootPos, BlockPos hitPos, @Nullable Player player, @Nullable InteractionHand hand, ItemStack itemStack) {
         final SubstanceEffect effect = getSubstanceEffect(itemStack);
 
-//        if (effect != null) {
-//            boolean applied = effect.apply(level, rootPos);
-//            if (applied && effect.isLingering()) {
+        if (effect != null) {
+            boolean applied = effect.apply(level, rootPos);
+            if (applied && effect.isLingering()) {
 //                DTRegistries.LINGERING_EFFECTOR.get().spawn(level, rootPos, effect)
 //                level.addFreshEntity(new LingeringEffectorEntity(level, rootPos, effect));
-//                return true;
-//            } else {
-//                return applied;
-//            }
-//        }
+                return true;
+            } else {
+                return applied;
+            }
+        }
 
         return false;
     }

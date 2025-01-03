@@ -11,6 +11,8 @@ import com.dtteam.dynamictrees.block.soil.RootyBlock;
 import com.dtteam.dynamictrees.block.soil.RootyBlockDecayer;
 import com.dtteam.dynamictrees.systems.nodemapper.TwinkleNode;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.worldgen.JoCode;
+import com.dtteam.dynamictrees.worldgen.RootsJoCode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -56,9 +58,9 @@ public class TreeHelper {
      * @param iterations The number of times to age the volume.
      */
     public static void ageVolume(LevelAccessor level, SimpleVoxmap leafMap, int iterations, boolean worldgen) {
-
+        if (leafMap == null) return;
         //The iterMap is the voxmap we will use as a discardable.  The leafMap must survive for snow
-        SimpleVoxmap iterMap = leafMap != null ? new SimpleVoxmap(leafMap) : null;
+        SimpleVoxmap iterMap = new SimpleVoxmap(leafMap);
         Iterable<BlockPos.MutableBlockPos> iterable = iterMap.getAllNonZero();
 
         for (int i = 0; i < iterations; i++) {
@@ -123,24 +125,24 @@ public class TreeHelper {
 
     }
 
-//    public static Optional<JoCode> getRootsJoCode(Level level, BlockPos pos) {
-//        return getJoCode(level, pos, Direction.SOUTH, true);
-//    }
-//    public static Optional<JoCode> getJoCode(Level level, BlockPos pos) {
-//        return getJoCode(level, pos, Direction.SOUTH, false);
-//    }
-//
-//    public static Optional<JoCode> getJoCode(Level level, BlockPos pos, Direction direction, boolean roots) {
-//        if (pos == null) {
-//            return Optional.empty();
-//        }
-//        pos = dereferenceTrunkShell(level, pos);
-//        BlockPos rootPos = TreeHelper.findRootNode(level, pos);
-//        return rootPos != BlockPos.ZERO ? Optional.of (
-//                roots ? new RootsJoCode(level, rootPos, direction)
-//                        : new JoCode(level, rootPos, direction)
-//        ) : Optional.empty();
-//    }
+    public static Optional<JoCode> getRootsJoCode(Level level, BlockPos pos) {
+        return getJoCode(level, pos, Direction.SOUTH, true);
+    }
+    public static Optional<JoCode> getJoCode(Level level, BlockPos pos) {
+        return getJoCode(level, pos, Direction.SOUTH, false);
+    }
+
+    public static Optional<JoCode> getJoCode(Level level, BlockPos pos, Direction direction, boolean roots) {
+        if (pos == null) {
+            return Optional.empty();
+        }
+        pos = dereferenceTrunkShell(level, pos);
+        BlockPos rootPos = TreeHelper.findRootNode(level, pos);
+        return rootPos != BlockPos.ZERO ? Optional.of (
+                roots ? new RootsJoCode(level, rootPos, direction)
+                        : new JoCode(level, rootPos, direction)
+        ) : Optional.empty();
+    }
 
     public static BlockPos dereferenceTrunkShell(Level level, BlockPos pos) {
 
@@ -176,12 +178,12 @@ public class TreeHelper {
      * @return The {@link Species}, or {@link Species#NULL_SPECIES} if one couldn't be found.
      */
     public static Species getExactSpecies(Level level, BlockPos pos) {
-//        BlockPos rootPos = findRootNode(level, pos);
-//
-//        if (rootPos != BlockPos.ZERO) {
-//            BlockState rootyState = level.getBlockState(rootPos);
-//            return TreeHelper.getRooty(rootyState).getSpecies(rootyState, level, rootPos);
-//        }
+        BlockPos rootPos = findRootNode(level, pos);
+
+        if (rootPos != BlockPos.ZERO) {
+            BlockState rootyState = level.getBlockState(rootPos);
+            return TreeHelper.getRooty(rootyState).getSpecies(rootyState, level, rootPos);
+        }
         return Species.NULL_SPECIES;
     }
 
@@ -295,17 +297,17 @@ public class TreeHelper {
      *                     position of the respective leave block that created this drop.
      */
     public static void destroyTree(Level level, BlockPos cutPos, @Nullable Player player, BiConsumer<BlockPos, ItemStack> dropConsumer) {
-//        BlockPos startPos = dereferenceTrunkShell(level, cutPos);
-//        BranchBlock cutBlock = getBranch(level.getBlockState(startPos));
-//
-//        // Fire event for break sound and particles
-//        level.levelEvent(null, 2001, cutPos, Block.getId(level.getBlockState(cutPos)));
-//
-//        BranchDestructionData destructionData = cutBlock.destroyBranchFromNode(level, cutPos, Direction.DOWN, false, player);
-//
-//        // Allow drop consumer callback to handle drops
-//        destructionData.leavesDrops.forEach(stackData -> dropConsumer.accept(stackData.pos, stackData.stack));
-//        destructionData.species.getBranchesDrops(level, destructionData.woodVolume).forEach(stack -> dropConsumer.accept(startPos, stack));
+        BlockPos startPos = dereferenceTrunkShell(level, cutPos);
+        BranchBlock cutBlock = getBranch(level.getBlockState(startPos));
+
+        // Fire event for break sound and particles
+        level.levelEvent(null, 2001, cutPos, Block.getId(level.getBlockState(cutPos)));
+
+        BranchDestructionData destructionData = cutBlock.destroyBranchFromNode(level, cutPos, Direction.DOWN, false, player);
+
+        // Allow drop consumer callback to handle drops
+        destructionData.leavesDrops.forEach(stackData -> dropConsumer.accept(stackData.pos, stackData.stack));
+        destructionData.species.getBranchesDrops(level, destructionData.woodVolume).forEach(stack -> dropConsumer.accept(startPos, stack));
     }
 
     //Treeparts

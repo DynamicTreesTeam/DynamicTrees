@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.systems.cell.CellKits;
 import com.dtteam.dynamictrees.tree.family.Family;
@@ -17,6 +18,7 @@ import com.dtteam.dynamictrees.util.Optionals;
 import com.dtteam.dynamictrees.util.ResourceLocationUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,7 +42,9 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * This class provides a means of holding individual properties for leaves.  This is necessary since leaves can contain
@@ -644,31 +648,31 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
 //    @OnlyIn(Dist.CLIENT)
     private void processColor() {
-//        int color = -1;
-//        if (this.colorNumber != null) {
-//            color = this.colorNumber;
-//        } else if (this.colorString != null) {
-//            String code = this.colorString;
-//            if (code.startsWith("@")) {
-//                code = code.substring(1);
-//                if ("biome".equals(code)) { // Built in code since we need access to super.
-//                    this.colorMultiplier = (state, level, pos, t) -> ((LevelAccessor) level).getBiome(pos).value().getFoliageColor();
-//                    return;
-//                }
-//
-//                BlockColor blockColor = BlockColorMultipliers.find(code);
-//                if (blockColor != null) {
-//                    colorMultiplier = blockColor;
-//                    return;
-//                } else {
-//                    LogManager.getLogger().error("ColorMultiplier resource '{}' could not be found.", code);
-//                }
-//            } else {
-//                color = Color.decode(code).getRGB();
-//            }
-//        }
-//        int c = color;
-//        this.colorMultiplier = (s, w, p, t) -> c == -1 ? Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), w, p, 0) : c;
+        int color = -1;
+        if (this.colorNumber != null) {
+            color = this.colorNumber;
+        } else if (this.colorString != null) {
+            String code = this.colorString;
+            if (code.startsWith("@")) {
+                code = code.substring(1);
+                if ("biome".equals(code)) { // Built in code since we need access to super.
+                    this.colorMultiplier = (state, level, pos, t) -> ((LevelAccessor) level).getBiome(pos).value().getFoliageColor();
+                    return;
+                }
+
+                BlockColor blockColor = BlockColorMultipliers.find(code);
+                if (blockColor != null) {
+                    colorMultiplier = blockColor;
+                    return;
+                } else {
+                    DynamicTrees.LOG.error("ColorMultiplier resource '{}' could not be found.", code);
+                }
+            } else {
+                color = Color.decode(code).getRGB();
+            }
+        }
+        int c = color;
+        this.colorMultiplier = (s, w, p, t) -> c == -1 ? Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), w, p, 0) : c;
     }
 
     //@OnlyIn(Dist.CLIENT)

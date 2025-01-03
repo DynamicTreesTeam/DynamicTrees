@@ -1,11 +1,15 @@
 package com.dtteam.dynamictrees.block.leaves;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.Cell;
 import com.dtteam.dynamictrees.api.cell.CellNull;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.Ageable;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.data.tags.DTEntityTypeTags;
+import com.dtteam.dynamictrees.item.Seed;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -14,24 +18,26 @@ import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.*;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -101,10 +107,10 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return getProperties().getPrimitiveLeaves().getDestroyProgress(player, level, pos);
     }
 
-//    @Override
-//    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
-//        return getProperties().getPrimitiveLeavesItemStack();
-//    }
+    @Override
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+        return getProperties().getPrimitiveLeavesItemStack();
+    }
 
     ///////////////////////////////////////////
     // GROWTH
@@ -116,33 +122,36 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return updateLeaves(level, pos, state, rand,worldgen,null, 0);
     }
 
+    /**
+     * TODO: fix this up, the growth multiplier is kinda pointless
+     */
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
-//        if (rand.nextInt(DTConfigs.TREE_GROWTH_FOLDING.get()) != 0) {
-//            return;
-//        }
-//
-//        double attempts = DTConfigs.TREE_GROWTH_FOLDING.get() * DTConfigs.TREE_GROWTH_MULTIPLIER.get();
-//
-//        if (attempts >= 1.0f || rand.nextFloat() < attempts) {
-//            if (removeIfLightIsInadequate(state, level, pos, rand)) {
-//                return;
-//            }
-//        }
-//        //Every once in a blue moon, age the leaves
-//        if (rand.nextFloat() < 0.01){
-//            age(level, pos, state, rand, SafeChunkBounds.ANY);
-//        }
+        double growthMultiplier = Services.CONFIG.getDoubleConfig("treeGrowthMultiplier");
+        if (rand.nextFloat() > growthMultiplier) {
+            return;
+        }
+
+        if (growthMultiplier >= 1.0f || rand.nextFloat() < growthMultiplier) {
+            if (removeIfLightIsInadequate(state, level, pos, rand)) {
+                return;
+            }
+        }
+
+        //Every once in a blue moon, age the leaves
+        if (rand.nextFloat() < 0.01){
+            age(level, pos, state, rand, false);
+        }
     }
 
     @NotNull
     public BlockState updateShape(@NotNull BlockState stateIn, Direction facing, BlockState facingState, @NotNull LevelAccessor level, @NotNull BlockPos currentPos, BlockPos facingPos) {
-//        boolean sideIsLeaves = TreeHelper.isLeaves(facingState);
-//        int sideHydro = sideIsLeaves ? facingState.getValue(DISTANCE) : 0;
-//        if (!sideIsLeaves || sideHydro < stateIn.getValue(DISTANCE)){
-//            level.scheduleTick(currentPos, this, 1);
-//        }
-//
+        boolean sideIsLeaves = TreeHelper.isLeaves(facingState);
+        int sideHydro = sideIsLeaves ? facingState.getValue(DISTANCE) : 0;
+        if (!sideIsLeaves || sideHydro < stateIn.getValue(DISTANCE)){
+            level.scheduleTick(currentPos, this, 1);
+        }
+
         return stateIn;
     }
     @Override
@@ -489,14 +498,13 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     // ENTITY INTERACTIONS
     ///////////////////////////////////////////
 
-//    /**
-//     * We will disable landing effects because we crush the blocks on landing and create our own particles in
-//     * crushBlock()
-//     */
-//    @Override
-//    public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
-//        return true;
-//    }
+    /**
+     * We will disable landing effects because we crush the blocks on landing and create our own particles in crushBlock()
+     * NeoForge Override */
+    @SuppressWarnings("unused")
+    public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+        return true;
+    }
 
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
@@ -527,13 +535,12 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     protected boolean isMovementVanilla(){
-        return false;
-        //return DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.VANILLA_LEAVES_COLLISION.get();
+        return Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig("vanillaLeavesCollision");
     }
 
     protected boolean isLeavesPassable() {
-        return false;
-        //return (DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.IS_LEAVES_PASSABLE.get()) || ModList.get().isLoaded(DynamicTrees.PASSABLE_FOLIAGE);
+        return (Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig("isLeavesPassable"))
+                || Services.PLATFORM.isModLoaded(DynamicTrees.PASSABLE_FOLIAGE);
     }
 
     public boolean isEntityPassable(CollisionContext context) {
@@ -544,14 +551,13 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     public boolean isEntityPassable(@Nullable Entity entity) {
-//        if (entity instanceof Projectile) //Projectiles such as arrows fly through leaves
-//            return true;
-//        if (entity instanceof ItemEntity) //Seed items fall through leaves
-//            return ((ItemEntity) entity).getItem().getItem() instanceof Seed;
-//
-//        //Bees fly through leaves, otherwise they get stuck :(
-//        return entity != null && entity.getType().is(DTEntityTypeTags.CAN_PASS_THROUGH_LEAVES);
-        return false;
+        if (entity instanceof Projectile) //Projectiles such as arrows fly through leaves
+            return true;
+        if (entity instanceof ItemEntity itemEntity) //Seed items fall through leaves
+            return itemEntity.getItem().getItem() instanceof Seed;
+
+        //Bees fly through leaves, otherwise they get stuck :(
+        return entity != null && entity.getType().is(DTEntityTypeTags.CAN_PASS_THROUGH_LEAVES);
     }
 
     /**
@@ -562,50 +568,51 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         super.fallOn(level, blockState, pos, entity, fallDistance);
     }
 
-//    @Override
-//    public void fallOn(Level level, BlockState blockState, BlockPos pos, Entity entity, float fallDistance) {
-//        // We are only interested in Living things crashing through the canopy.
-//        if (!DTConfigs.CANOPY_CRASH.get() || !(entity instanceof LivingEntity)) {
-//            return;
-//        }
-//
-//        entity.fallDistance--;
-//
-//        final AABB aabb = entity.getBoundingBox();
-//
-//        final int minX = Mth.floor(aabb.minX + 0.001D);
-//        final int minZ = Mth.floor(aabb.minZ + 0.001D);
-//        final int maxX = Mth.floor(aabb.maxX - 0.001D);
-//        final int maxZ = Mth.floor(aabb.maxZ - 0.001D);
-//
-//        boolean crushing = true;
-//        boolean hasLeaves = true;
-//
-//        final SoundType stepSound = this.getSoundType(level.getBlockState(pos), level, pos, entity);
-//        final float volume = Mth.clamp(stepSound.getVolume() / 16.0f * fallDistance, 0, 3.0f);
-//        level.playLocalSound(entity.getX(), entity.getY(), entity.getZ(), stepSound.getBreakSound(), SoundSource.BLOCKS, volume, stepSound.getPitch(), false);
-//
-//        for (int iy = 0; (entity.fallDistance > 3.0f) && crushing && ((pos.getY() - iy) >= level.getMinBuildHeight()); iy++) {
-//            if (hasLeaves) { // This layer has leaves that can help break our fall
-//                entity.fallDistance *= 0.66f; // For each layer we are crushing break the momentum
-//                hasLeaves = false;
-//            }
-//
-//            for (int ix = minX; ix <= maxX; ix++) {
-//                for (int iz = minZ; iz <= maxZ; iz++) {
-//                    BlockPos iPos = new BlockPos(ix, pos.getY() - iy, iz);
-//                    BlockState state = level.getBlockState(iPos);
-//                    if (TreeHelper.isLeaves(state)) {
-//                        hasLeaves = true; // This layer has leaves
-//                        DTClient.crushLeavesBlock(level, iPos, state, entity);
-//                        level.removeBlock(iPos, false);
-//                    } else if (!level.isEmptyBlock(iPos)) {
-//                        crushing = false; // We hit something solid thus no longer crushing leaves layers
-//                    }
-//                }
-//            }
-//        }
-//    }
+    @Override
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+        // We are only interested in Living things crashing through the canopy.
+        if (!Services.CONFIG.getBoolConfig("canopyCrash") || !(entity instanceof LivingEntity)) {
+            return;
+        }
+
+        entity.fallDistance--;
+
+        final AABB aabb = entity.getBoundingBox();
+
+        final int minX = Mth.floor(aabb.minX + 0.001D);
+        final int minZ = Mth.floor(aabb.minZ + 0.001D);
+        final int maxX = Mth.floor(aabb.maxX - 0.001D);
+        final int maxZ = Mth.floor(aabb.maxZ - 0.001D);
+
+        boolean crushing = true;
+        boolean hasLeaves = true;
+
+        final SoundType stepSound = this.getSoundType(level.getBlockState(pos));
+        final float volume = Mth.clamp(stepSound.getVolume() / 16.0f * fallDistance, 0, 3.0f);
+        level.playLocalSound(entity.getX(), entity.getY(), entity.getZ(), stepSound.getBreakSound(), SoundSource.BLOCKS, volume, stepSound.getPitch(), false);
+
+        for (int iy = 0; (entity.fallDistance > 3.0f) && crushing && ((pos.getY() - iy) >= level.getMinBuildHeight()); iy++) {
+            if (hasLeaves) { // This layer has leaves that can help break our fall
+                entity.fallDistance *= 0.66f; // For each layer we are crushing break the momentum
+                hasLeaves = false;
+            }
+
+            for (int ix = minX; ix <= maxX; ix++) {
+                for (int iz = minZ; iz <= maxZ; iz++) {
+                    BlockPos iPos = new BlockPos(ix, pos.getY() - iy, iz);
+                    BlockState crashState = level.getBlockState(iPos);
+                    if (TreeHelper.isLeaves(crashState)) {
+                        hasLeaves = true; // This layer has leaves
+//                        DTClient.crushLeavesBlock(level, iPos, crashState, entity);
+                        level.removeBlock(iPos, false);
+                    } else if (!level.isEmptyBlock(iPos)) {
+                        crushing = false; // We hit something solid thus no longer crushing leaves layers
+                    }
+                }
+            }
+        }
+    }
+
 
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
@@ -627,6 +634,8 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     //////////////////////////////
     // DROPS
     //////////////////////////////
+
+
 
 //    @Override
 //    public boolean canHarvestBlock(BlockState state, BlockGetter level, BlockPos pos, Player player) {

@@ -178,9 +178,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         return TreeHelper.getTreePart(state).getFamily(state, level, pos).onTreeActivated(
-                new Family.TreeActivationContext(
-                        level, TreeHelper.findRootNode(level, pos), pos, state, player, hand, stack, hitResult
-                )
+                new Family.TreeActivationContext(level, TreeHelper.findRootNode(level, pos), pos, state, player, hand, stack, hitResult)
         ) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
     }
 

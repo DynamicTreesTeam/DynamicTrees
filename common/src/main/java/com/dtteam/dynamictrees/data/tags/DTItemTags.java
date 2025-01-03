@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.data.tags;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.systems.substance.GrowthSubstance;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -23,8 +24,8 @@ public final class DTItemTags {
      */
     public static final TagKey<Item> FERTILIZER = bind("fertilizer");
     /**
-     * Items that apply the {@link com.dtteam.dynamictrees.systems.substance.GrowthSubstance growth substance}
-     * to trees.
+     * Items that apply the {@link GrowthSubstance growth substance} to trees.
+     * This is for modded items such as Create's tree fertilizer.
      */
     public static final TagKey<Item> ENHANCED_FERTILIZER = bind("enhanced_fertilizer");
 

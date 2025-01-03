@@ -1,8 +1,5 @@
 package com.dtteam.dynamictrees.util;
 
-//import com.dtteam.dynamictrees.block.branch.BranchBlock;
-//import com.dtteam.dynamictrees.models.baked.BasicBranchBlockBakedModel;
-//import com.dtteam.dynamictrees.models.modeldata.ModelConnections;
 import net.minecraft.core.Direction;
 
 /**

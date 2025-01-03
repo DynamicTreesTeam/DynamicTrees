@@ -13,7 +13,6 @@ import java.util.Locale;
  */
 public class RootConnections extends Connections {
 
-//    public static final ModelProperty<RootConnections> ROOT_CONNECTIONS_PROPERTY = new ModelProperty<>();
     public static final ConnectionLevel[] PLACEHOLDER_CONNECTION_LEVELS = new ConnectionLevel[]{ConnectionLevel.MID, ConnectionLevel.MID, ConnectionLevel.MID, ConnectionLevel.MID};
 
     /**

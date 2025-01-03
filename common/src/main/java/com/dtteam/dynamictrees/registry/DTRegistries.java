@@ -15,6 +15,7 @@ import com.dtteam.dynamictrees.item.Staff;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.util.TreeRegistry;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -105,7 +106,7 @@ public class DTRegistries {
     public static final LinkedList<Item> CREATIVE_TAB_ITEMS = new LinkedList<>();
     public static final Supplier<CreativeModeTab> DT_CREATIVE_TAB = Services.REGISTRY.getRegistryLoader()
             .registerCreativeTab(DynamicTrees.MOD_ID,
-                    new ItemStack(Items.STICK),
+                    ()->TreeRegistry.findSpecies(DynamicTrees.OAK).getSeedStack(1),
                     Component.translatable("itemGroup.dynamictrees"),
                     (parameters, output) -> {
                         CREATIVE_TAB_ITEMS.forEach(e -> output.accept(e.getDefaultInstance()));
@@ -115,7 +116,6 @@ public class DTRegistries {
                             }
                         }
                     });
-    //TreeRegistry.findSpecies(DTTrees.OAK).getSeedStack(1))
 
     ///////////////////////////////////////////
     // ENTITIES
@@ -136,15 +136,14 @@ public class DTRegistries {
     public static Supplier<BlockEntityType<SpeciesBlockEntity>> SPECIES_BLOCK_ENTITY = Services.REGISTRY.getRegistryLoader()
             .registerBlockEntity("tile_entity_species", SpeciesBlockEntity::new, getAllRootyBlocks());
     public static Supplier<BlockEntityType<PottedSaplingBlockEntity>> POTTED_SAPLING_BLOCK_ENTITY = Services.REGISTRY.getRegistryLoader()
-            .registerBlockEntity("potted_sapling", PottedSaplingBlockEntity::new, ()->Set.of(POTTED_SAPLING.get()));
+            .registerBlockEntity("potted_sapling", Services.REGISTRY.getPottedSaplingBlockEntity(), ()->Set.of(POTTED_SAPLING.get()));
 
     public static Supplier<Set<Block>> getAllRootyBlocks(){
-//        return ()->SoilProperties.REGISTRY.getAll().stream()
-//                .map(SoilProperties::getBlock)
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .collect(Collectors.toSet());
-        return Set::of;
+        return ()->SoilProperties.REGISTRY.getAll().stream()
+                .map(SoilProperties::getBlock)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
     }
 
     ///////////////////////////////////////////
