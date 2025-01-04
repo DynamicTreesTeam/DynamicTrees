@@ -4,14 +4,18 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.systems.cell.LeafClusters;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.nodemapper.CoderNode;
 import com.dtteam.dynamictrees.systems.nodemapper.CollectorNode;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
+import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.util.BlockStates;
 import com.dtteam.dynamictrees.util.SimpleVoxmap;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.ChatFormatting;
@@ -211,7 +215,6 @@ public class JoCode {
         PostGenerationContext pgContext = new PostGenerationContext(context, endPoints, initialDirtState);
         species.postGeneration(pgContext);
         Services.EVENT.postSpeciesPostGenerationEvent(pgContext);
-//        MinecraftForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(level, species, rootPos, endPoints, context.safeBounds(), initialDirtState));
 
         // Add snow to parts of the tree in chunks where snow was already placed.
         this.addSnow(leafMap, level, rootPos, context.biome());
@@ -227,26 +230,22 @@ public class JoCode {
         for (final SimpleVoxmap.VoxmapCell cell : leafMap.getAllNonZeroCells((byte) 0x0F)) { // Iterate through all of the cells that are leaves (not air or branches).
             final BlockPos.MutableBlockPos cellPos = cell.getPos();
 
-//            if (context.safeBounds().inBounds(cellPos, false)) {
-//                final BlockState testBlockState = level.getBlockState(cellPos);
-//                if (isReplaceable(testBlockState, true) || testBlockState.is(BlockTags.LEAVES)) {
-//                    level.setBlock(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2); // Flag 16 to prevent observers from causing cascading lag.
-//                }
-//            } else {
-//                leafMap.setVoxel(cellPos, (byte) 0);
-//            }
+            final BlockState testBlockState = level.getBlockState(cellPos);
+            if (isReplaceable(testBlockState, true) || testBlockState.is(BlockTags.LEAVES)) {
+                level.setBlock(cellPos, leavesProperties.getDynamicLeavesState(cell.getValue()), worldGen ? 16 : 2); // Flag 16 to prevent observers from causing cascading lag.
+            }
         }
 
-        // Shrink the leafMap down by the safeBounds object so that the aging process won't look for neighbors outside of the bounds.
-        for (final SimpleVoxmap.VoxmapCell cell : leafMap.getAllNonZeroCells()) {
-            final BlockPos.MutableBlockPos cellPos = cell.getPos();
+//        // Shrink the leafMap down by the safeBounds object so that the aging process won't look for neighbors outside of the bounds.
+//        for (final SimpleVoxmap.VoxmapCell cell : leafMap.getAllNonZeroCells()) {
+//            final BlockPos.MutableBlockPos cellPos = cell.getPos();
 //            if (!context.safeBounds().inBounds(cellPos, true)) {
 //                leafMap.setVoxel(cellPos, (byte) 0);
 //            }
-        }
+//        }
 
         // Age volume for 3 cycles using a leafmap.
-//        TreeHelper.ageVolume(level, leafMap, species.getWorldGenAgeIterations(), context.safeBounds());
+        TreeHelper.ageVolume(level, leafMap, species.getWorldGenAgeIterations(), worldGen);
 
     }
 
@@ -291,41 +290,39 @@ public class JoCode {
         BranchBlock.destroyMode = DynamicTrees.DestroyMode.IGNORE;
 
         for (BlockPos pos : blocksToDestroy) {
-//            if (safeBounds.inBounds(pos, false)) {
-//                final BlockState branchState = level.getBlockState(pos);
-//                final Optional<BranchBlock> branchBlock = TreeHelper.getBranchOpt(branchState);
-//
-//                if (branchBlock.isEmpty()) {
-//                    continue;
-//                }
-//
-//                int radius = branchBlock.get().getRadius(branchState);
-//                final Family family = branchBlock.get().getFamily();
-//                final Species species = family.getCommonSpecies();
-//
-//                if (family.getPrimaryThickness() == radius) {
-//                    species.getLeavesProperties().ifValid(leavesProperties -> {
-//                        final SimpleVoxmap leafCluster = leavesProperties.getCellKit().getLeafCluster();
-//
-//                        if (leafCluster != LeafClusters.NULL_MAP) {
-//                            for (SimpleVoxmap.VoxmapCell cell : leafCluster.getAllNonZeroCells()) {
-//                                final BlockPos delPos = pos.offset(cell.getPos());
-//                                if (safeBounds.inBounds(delPos, false)) {
-//                                    final BlockState leavesState = level.getBlockState(delPos);
-//                                    if (TreeHelper.isLeaves(leavesState)) {
-//                                        final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
-//                                        if (leavesProperties.getFamily() == leavesBlock.getProperties(leavesState).getFamily()) {
-//                                            level.setBlock(delPos, BlockStates.AIR, 2);
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    });
-//                }
-//
-//                level.setBlock(pos, BlockStates.AIR, 2);
-//            }
+
+            final BlockState branchState = level.getBlockState(pos);
+            final Optional<BranchBlock> branchBlock = TreeHelper.getBranchOpt(branchState);
+
+            if (branchBlock.isEmpty()) {
+                continue;
+            }
+
+            int radius = branchBlock.get().getRadius(branchState);
+            final Family family = branchBlock.get().getFamily();
+            final Species species = family.getCommonSpecies();
+
+            if (family.getPrimaryThickness() == radius) {
+                species.getLeavesProperties().ifValid(leavesProperties -> {
+                    final SimpleVoxmap leafCluster = leavesProperties.getCellKit().getLeafCluster();
+
+                    if (leafCluster != LeafClusters.NULL_MAP) {
+                        for (SimpleVoxmap.VoxmapCell cell : leafCluster.getAllNonZeroCells()) {
+                            final BlockPos delPos = pos.offset(cell.getPos());
+                            final BlockState leavesState = level.getBlockState(delPos);
+                            if (TreeHelper.isLeaves(leavesState)) {
+                                final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
+                                if (leavesProperties.getFamily() == leavesBlock.getProperties().getFamily()) {
+                                    level.setBlock(delPos, BlockStates.AIR, 2);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            level.setBlock(pos, BlockStates.AIR, 2);
+
         }
 
         BranchBlock.destroyMode = DynamicTrees.DestroyMode.HARVEST;

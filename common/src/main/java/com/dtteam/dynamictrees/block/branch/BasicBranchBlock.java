@@ -251,7 +251,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     @Override
     public int getRadius(BlockState state) {
-        return isSameTree(state) ? state.getValue(RADIUS) : 0;
+        return isSameTree(state) && state.hasProperty(RADIUS) ? state.getValue(RADIUS) : 0;
     }
 
     @Override
@@ -281,7 +281,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
         final DynamicLeavesBlock leaves = species.getLeavesBlock().orElse(null);
         if (leaves != null) {
             if (fromRadius == getFamily().getPrimaryThickness()) {// If we came from a twig (and we're not a stripped branch) then just make some leaves
-                signal.success = leaves.growLeavesIfLocationIsSuitable(level, species.getLeavesProperties(), pos, 0);
+                signal.success = 0 != leaves.growLeavesIfLocationIsSuitable(level, species.getLeavesProperties(), pos, 0);
             } else {// Otherwise make a proper branch
                 return leaves.branchOut(level, pos, signal);
             }

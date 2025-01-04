@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.MutableComponent;
@@ -28,6 +29,7 @@ import net.neoforged.neoforge.registries.holdersets.HolderSetType;
 
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 public class NeoForgeRegistryLoader extends RegistryLoader {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, DynamicTrees.MOD_ID);
@@ -40,6 +42,7 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     public static final DeferredRegister<HolderSetType> HOLDER_SET_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.HOLDER_SET_TYPES, DynamicTrees.MOD_ID);
     public static final DeferredRegister<BlockStateProviderType<?>> BLOCK_STATE_PROVIDER_TYPES = DeferredRegister.create(Registries.BLOCK_STATE_PROVIDER_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, DynamicTrees.MOD_ID);
 
     public static void setup(IEventBus modBus) {
         BLOCK_ENTITY_TYPES.register(modBus);
@@ -52,6 +55,8 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         HOLDER_SET_TYPES.register(modBus);
         BLOCK_STATE_PROVIDER_TYPES.register(modBus);
         STRUCTURE_POOL_ELEMENT_TYPES.register(modBus);
+        DATA_COMPONENT_TYPES.register(modBus);
+
 //        DTLootPoolEntries.LOOT_POOL_ENTRY_TYPES.register(modBus);
 //        DTLootConditions.LOOT_CONDITION_TYPES.register(modBus);
 //        DTLootFunctions.LOOT_FUNCTION_TYPES.register(modBus);
@@ -95,6 +100,10 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     @Override
     public Supplier<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(DynamicTrees.location(name)));
+    }
+
+    public <T> Supplier<DataComponentType<T>> registerDataComponentType (String name, UnaryOperator<DataComponentType.Builder<T>> operator){
+        return DATA_COMPONENT_TYPES.register(name, ()->operator.apply(DataComponentType.builder()).build());
     }
 
     ///////////////////////////////////////////

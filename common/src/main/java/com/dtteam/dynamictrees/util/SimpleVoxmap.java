@@ -448,17 +448,17 @@ public class SimpleVoxmap {
      */
     public Iterable<BlockPos.MutableBlockPos> getTops() {
 
-        return new Iterable<BlockPos.MutableBlockPos>() {
+        return new Iterable<>() {
             @Override
             public Iterator<BlockPos.MutableBlockPos> iterator() {
-                return new AbstractIterator<BlockPos.MutableBlockPos>() {
+                return new AbstractIterator<>() {
                     private int x = -1;
                     private int y = 0;
                     private int z = 0;
                     private final int yStart = getStartY();
                     private final BlockPos.MutableBlockPos dPos = new BlockPos.MutableBlockPos();
 
-                    protected int getStartY() {
+                    private int getStartY() {
                         int yi;
                         for (yi = lenY - 1; yi >= 0 && !touched[yi]; yi--) {
                         }
@@ -517,9 +517,7 @@ public class SimpleVoxmap {
                 System.out.println(buffer);
             }
             buffer = new StringBuilder();
-            for (int k = 0; k < lenX; k++) {
-                buffer.append("-");
-            }
+            buffer.append("-".repeat(Math.max(0, lenX)));
             System.out.println(buffer);
         }
     }

@@ -26,8 +26,8 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
     public void registerAppliers() {
         this.loadAppliers
                 .register("substitute_soil", String.class, (soilProperties, substitute) ->
-                soilProperties.setHasSubstitute(true)
-        );
+                        soilProperties.setHasSubstitute(true)
+                ).register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
 
         // Primitive soil is needed before gathering data.
         this.gatherDataAppliers
@@ -37,8 +37,9 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
                 .registerMapApplier("model_overrides", ResourceLocation.class, SoilProperties::setModelOverrides)
                 .registerMapApplier("texture_overrides", ResourceLocation.class, SoilProperties::setTextureOverrides);
 
-        this.setupAppliers
-                .register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
+//        this.setupAppliers
+//
+//                ;
 
         this.reloadAppliers
                 .register("foliage_tint_index", Integer.class, SoilProperties::setFoliageTintIndex)

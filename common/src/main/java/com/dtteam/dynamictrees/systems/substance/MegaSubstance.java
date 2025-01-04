@@ -26,11 +26,11 @@ public class MegaSubstance implements SubstanceEffect {
             blockState = level.getBlockState(rootPos);
             dirt = TreeHelper.getRooty(blockState);
 
-//            if (dirt.getSpecies(blockState, level, rootPos) == megaSpecies) {
+            if (dirt.getSpecies(blockState, level, rootPos) == megaSpecies) {
 //                TreeHelper.treeParticles(level, rootPos, ParticleTypes.DRAGON_BREATH, 8);
 //                WailaOther.invalidateWailaPosition();
-//                return true;
-//            }
+                return true;
+            }
         }
 
         return false;

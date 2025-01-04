@@ -150,7 +150,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     @Override
     public int getRadius(BlockState state) {
-        return state.getValue(RADIUS);
+        return isSameTree(state) && state.hasProperty(RADIUS) ? state.getValue(RADIUS) : 0;
     }
 
     protected int getMaxSignalDepth() {
@@ -346,7 +346,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         final List<ItemStack> woodItems = destroyData.species.getBranchesDrops(level, woodVolume, heldItem);
 
         // Drop the FallingTreeEntity into the level.
-        FallingTreeEntity.dropTree(level, destroyData, woodItems, FallingTreeEntity.DestroyType.HARVEST);
+//        FallingTreeEntity.dropTree(level, destroyData, woodItems, FallingTreeEntity.DestroyType.HARVEST);
 
         // Damage the axe by a prescribed amount.
         this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);

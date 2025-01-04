@@ -11,11 +11,14 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.ChunkRenderTypeSet;
+import net.neoforged.neoforge.client.NamedRenderTypeManager;
 import net.neoforged.neoforge.client.model.IDynamicBakedModel;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
@@ -27,12 +30,12 @@ import java.util.List;
 import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
-public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
+public class BakedModelBlockPottedSapling implements IDynamicBakedModel {
 
     protected BakedModel basePotModel;
     protected Map<Species, List<BakedQuad>> cachedSaplingQuads = new HashMap<>();
 
-    public BakedModelBlockBonsaiPot(BakedModel basePotModel) {
+    public BakedModelBlockPottedSapling(BakedModel basePotModel) {
         this.basePotModel = basePotModel;
     }
 
@@ -48,7 +51,7 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
         final Species species = extraData.get(PottedSaplingBlockEntityNF.SPECIES);
         final BlockState potState = extraData.get(PottedSaplingBlockEntityNF.POT_MIMIC);
 
-        if (species == null || potState == null || !species.isValid() || !species.getSapling().isPresent()) {
+        if (species == null || potState == null || !species.isValid() || species.getSapling().isEmpty()) {
             return quads;
         }
 
@@ -58,7 +61,7 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
         BakedModel potModel = dispatcher.getBlockModel(potState);
         BakedModel saplingModel = dispatcher.getBlockModel(saplingState);
 
-        quads.addAll(potModel.getQuads(potState, side, rand, extraData, renderType));
+        quads.addAll(potModel.getQuads(potState, null, rand, extraData, renderType));
         quads.addAll(cachedSaplingQuads.computeIfAbsent(species, s -> QuadManipulator.getQuads(saplingModel, saplingState, new Vec3(0, 0.25, 0), rand, extraData)));
 
         return quads;
@@ -90,8 +93,18 @@ public class BakedModelBlockBonsaiPot implements IDynamicBakedModel {
     }
 
     @Override
+    public TextureAtlasSprite getParticleIcon(ModelData data) {
+        return this.basePotModel.getParticleIcon(data);
+    }
+
+    @Override
     public ItemOverrides getOverrides() {
         return ItemOverrides.EMPTY;
+    }
+
+    @Override
+    public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data) {
+        return ChunkRenderTypeSet.of(RenderType.CUTOUT_MIPPED);
     }
 
 }

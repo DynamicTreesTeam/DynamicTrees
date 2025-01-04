@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.systems.substance;
 
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
+import com.dtteam.dynamictrees.entity.LingeringEffectorEntity;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,10 +31,10 @@ public class GrowthSubstance implements SubstanceEffect {
 
     @Override
     public boolean apply(Level level, BlockPos rootPos) {
-//        // Don't apply if there is already a growth substance.
-//        if (LingeringEffectorEntity.treeHasEffectorForEffect(level, rootPos, this)) {
-//            return false;
-//        }
+        // Don't apply if there is already a growth substance.
+        if (LingeringEffectorEntity.treeHasEffectorForEffect(level, rootPos, this)) {
+            return false;
+        }
 		if (fillFertility) {
         	new FertilizeSubstance().setAmount(15).setDisplayParticles(false).apply(level, rootPos);
 		}

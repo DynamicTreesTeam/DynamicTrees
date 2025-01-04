@@ -154,6 +154,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     protected boolean connectAnyRadius = false;
     protected boolean requiresShears = true;
     protected boolean hasTickParticles = false;
+    protected boolean waterResistant = false;
 
     private LeavesProperties() {
 //        this.blockLootTableSupplier = new LootTableSupplier("null/", DTTrees.NULL);
@@ -585,6 +586,10 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     public void setHasTickParticles(boolean hasTickParticles) {
         this.hasTickParticles = hasTickParticles;
+    }
+
+    public void setWaterResistant(boolean waterResistant) {
+        this.waterResistant = waterResistant;
     }
 
     public List<TagKey<Block>> defaultLeavesTags() {

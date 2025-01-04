@@ -63,7 +63,7 @@ public class PalmFamily extends Family {
                             signal.success = false;
                             return signal;
                         }
-                        signal.success = leaves.growLeavesIfLocationIsSuitable(world, species.getLeavesProperties(), pos.above(), 0);
+                        signal.success = 0 != leaves.growLeavesIfLocationIsSuitable(world, species.getLeavesProperties(), pos.above(), 0);
                         if (signal.success)
                             return leaves.branchOut(world, pos, signal);
                     } else {// Otherwise make a proper branch

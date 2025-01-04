@@ -5,12 +5,15 @@ import com.dtteam.dynamictrees.api.cell.CellNull;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
+import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.util.BranchDestructionData;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.client.color.block.BlockColors;
@@ -21,6 +24,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -49,6 +53,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A version of Rooty Dirt block that holds on to a species with a TileEntity.
@@ -160,10 +165,10 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
         return getPrimitiveSoilState(state).getDrops(builder);
     }
 
-//    @Override
-//    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
-//        return getPrimitiveSoilBlock().getCloneItemStack(getPrimitiveSoilState(state), target, level, pos, player);
-//    }
+    @Override
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+        return getPrimitiveSoilBlock().getCloneItemStack(level, pos, getPrimitiveSoilState(state));
+    }
 
     @Override
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
@@ -182,7 +187,6 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
     ///////////////////////////////////////////
     // INTERACTION
     ///////////////////////////////////////////
-
 
     @Nullable
     @Override
@@ -286,26 +290,25 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
         return getFertility(blockState, level, pos);
     }
 
-//    @Override
-//    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-//        final ItemStack heldItem = player.getItemInHand(hand);
-//        return getFamily(state, level, pos).onTreeActivated(
-//                new Family.TreeActivationContext(
-//                        level, TreeHelper.findRootNode(level, pos), pos, state, player, hand, heldItem, hitResult
-//                )
-//        ) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
-//    }
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return getFamily(state, level, pos).onTreeActivated(
+                new Family.TreeActivationContext(
+                        level, TreeHelper.findRootNode(level, pos), pos, state, player, hand, stack, hitResult
+                )
+        ) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
+    }
 
     public void destroyTree(Level level, BlockPos rootPos){
         destroyTree(level, rootPos, null);
     }
     public void destroyTree(Level level, BlockPos rootPos, @Nullable Player player) {
-//        Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
-//
-//        if (branch.isPresent()) {
-//            BranchDestructionData destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), Direction.DOWN, true, null);
-//            FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
-//        }
+        Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
+
+        if (branch.isPresent()) {
+            BranchDestructionData destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), Direction.DOWN, true, null);
+            FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
+        }
     }
 
 //    @Override
@@ -451,9 +454,8 @@ public class RootyBlock extends BlockWithDynamicHardness implements TreePart, En
 
     @Override
     public int branchSupport(BlockState state, BlockGetter level, BranchBlock branch, BlockPos pos, Direction dir, int radius) {
-//        Direction supportDir = branch instanceof BasicRootsBlock ? Direction.UP : Direction.DOWN;
-//        return (dir == supportDir) ? BranchBlock.setSupport(1, 1) : 0;
-        return 1;
+        Direction supportDir = branch instanceof BasicRootsBlock ? Direction.UP : Direction.DOWN;
+        return (dir == supportDir) ? BranchBlock.setSupport(1, 1) : 0;
     }
 
     @Override

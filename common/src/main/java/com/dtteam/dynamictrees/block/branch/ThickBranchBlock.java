@@ -1,5 +1,10 @@
 package com.dtteam.dynamictrees.block.branch;
 
+import com.dtteam.dynamictrees.block.fruit.FruitBlock;
+import com.dtteam.dynamictrees.block.pod.PodBlock;
+import com.dtteam.dynamictrees.data.tags.DTBlockTags;
+import com.dtteam.dynamictrees.registry.DTRegistries;
+import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
@@ -19,7 +24,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
 import org.jetbrains.annotations.Nullable;
 
 public class ThickBranchBlock extends BasicBranchBlock implements Musable {
@@ -36,9 +40,9 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         super(name, properties, RADIUS_DOUBLE, MAX_RADIUS_THICK);
     }
 
-//    public TrunkShellBlock getTrunkShell() {
-//        return DTRegistries.TRUNK_SHELL.get();
-//    }
+    public TrunkShellBlock getTrunkShell() {
+        return DTRegistries.TRUNK_SHELL.get();
+    }
 
     @Override
     public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -72,40 +76,40 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     }
 
     private boolean updateTrunkShells(LevelAccessor level, BlockPos pos, int radius, int flags) {
-//        // If the radius is <= 8 then we can just set the block as normal and move on.
-//        if (radius <= MAX_RADIUS) {
-//            return true;
-//        }
-//
-//        boolean setable = true;
-//        final ReplaceableState[] repStates = new ReplaceableState[8];
-//
-//        for (CoordUtils.Surround dir : CoordUtils.Surround.values()) {
-//            final BlockPos dPos = pos.offset(dir.getOffset());
-//            final ReplaceableState rep = getReplaceability(level, dPos, pos);
-//
-//            repStates[dir.ordinal()] = rep;
-//
-//            if (rep == ReplaceableState.BLOCKING) {
-//                setable = false;
-//                break;
-//            }
-//        }
-//
-//        if (setable) {
-//            BlockState trunkState = level.getBlockState(pos);
-//            boolean isWaterlogged = trunkState.hasProperty(WATERLOGGED) && trunkState.getValue(WATERLOGGED);
-//            for (CoordUtils.Surround dir : CoordUtils.Surround.values()) {
-//                final BlockPos dPos = pos.offset(dir.getOffset());
-//                final ReplaceableState rep = repStates[dir.ordinal()];
-//                final boolean replacingWater = isWaterlogged || level.getBlockState(dPos).getFluidState() == Fluids.WATER.getSource(false);
-//
-//                if (rep == ReplaceableState.REPLACEABLE) {
-//                    level.setBlock(dPos, getTrunkShell().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, dir.getOpposite()).setValue(TrunkShellBlock.WATERLOGGED, replacingWater), flags);
-//                }
-//            }
-//            return true;
-//        }
+        // If the radius is <= 8 then we can just set the block as normal and move on.
+        if (radius <= MAX_RADIUS) {
+            return true;
+        }
+
+        boolean setable = true;
+        final ReplaceableState[] repStates = new ReplaceableState[8];
+
+        for (CoordUtils.Surround dir : CoordUtils.Surround.values()) {
+            final BlockPos dPos = pos.offset(dir.getOffset());
+            final ReplaceableState rep = getReplaceability(level, dPos, pos);
+
+            repStates[dir.ordinal()] = rep;
+
+            if (rep == ReplaceableState.BLOCKING) {
+                setable = false;
+                break;
+            }
+        }
+
+        if (setable) {
+            BlockState trunkState = level.getBlockState(pos);
+            boolean isWaterlogged = trunkState.hasProperty(WATERLOGGED) && trunkState.getValue(WATERLOGGED);
+            for (CoordUtils.Surround dir : CoordUtils.Surround.values()) {
+                final BlockPos dPos = pos.offset(dir.getOffset());
+                final ReplaceableState rep = repStates[dir.ordinal()];
+                final boolean replacingWater = isWaterlogged || level.getBlockState(dPos).getFluidState() == Fluids.WATER.getSource(false);
+
+                if (rep == ReplaceableState.REPLACEABLE) {
+                    level.setBlock(dPos, getTrunkShell().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, dir.getOpposite()).setValue(TrunkShellBlock.WATERLOGGED, replacingWater), flags);
+                }
+            }
+            return true;
+        }
         return false;
     }
 
@@ -133,38 +137,38 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     public ReplaceableState getReplaceability(LevelAccessor level, BlockPos pos, BlockPos corePos) {
 
-//        final BlockState state = level.getBlockState(pos);
-//        final Block block = state.getBlock();
-//
-//        if (block instanceof TrunkShellBlock) {
-//            // Determine if this shell belongs to the trunk.  Block otherwise.
-//            Surround surr = state.getValue(TrunkShellBlock.CORE_DIR);
-//            return pos.offset(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;
-//        }
-//
-//        if (state.canBeReplaced() || state.is(DTBlockTags.FOLIAGE)) {
-//            return ReplaceableState.REPLACEABLE;
-//        }
-//
-//        if (TreeHelper.isTreePart(block)) {
-//            return ReplaceableState.TREEPART;
-//        }
-//
-//        if (block instanceof SurfaceRootBlock) {
-//            return ReplaceableState.TREEPART;
-//        }
-//
-//        if (BranchConnectables.isBlockConnectable(block)) {
-//            return ReplaceableState.TREEPART;
-//        }
-//
-//        if (block instanceof FruitBlock || block instanceof PodBlock){
-//            return ReplaceableState.TREEPART;
-//        }
-//
-//        if (this.getFamily().getCommonSpecies().isAcceptableSoilForWorldgen(level, pos, state)) {
-//            return ReplaceableState.REPLACEABLE;
-//        }
+        final BlockState state = level.getBlockState(pos);
+        final Block block = state.getBlock();
+
+        if (block instanceof TrunkShellBlock) {
+            // Determine if this shell belongs to the trunk.  Block otherwise.
+            CoordUtils.Surround surr = state.getValue(TrunkShellBlock.CORE_DIR);
+            return pos.offset(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;
+        }
+
+        if (state.canBeReplaced() || state.is(DTBlockTags.FOLIAGE)) {
+            return ReplaceableState.REPLACEABLE;
+        }
+
+        if (TreeHelper.isTreePart(block)) {
+            return ReplaceableState.TREEPART;
+        }
+
+        if (block instanceof SurfaceRootBlock) {
+            return ReplaceableState.TREEPART;
+        }
+
+        if (BranchConnectables.isBlockConnectable(block)) {
+            return ReplaceableState.TREEPART;
+        }
+
+        if (block instanceof FruitBlock || block instanceof PodBlock){
+            return ReplaceableState.TREEPART;
+        }
+
+        if (this.getFamily().getCommonSpecies().isAcceptableSoilForWorldgen(level, pos, state)) {
+            return ReplaceableState.REPLACEABLE;
+        }
 
         return ReplaceableState.BLOCKING;
     }

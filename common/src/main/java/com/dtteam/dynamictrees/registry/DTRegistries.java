@@ -16,16 +16,21 @@ import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -109,12 +114,12 @@ public class DTRegistries {
                     ()->TreeRegistry.findSpecies(DynamicTrees.OAK).getSeedStack(1),
                     Component.translatable("itemGroup.dynamictrees"),
                     (parameters, output) -> {
-                        CREATIVE_TAB_ITEMS.forEach(e -> output.accept(e.getDefaultInstance()));
                         for (final DendroPotion.DendroPotionType potion : DendroPotion.DendroPotionType.values()) {
                             if (potion.isActive()) {
                                 output.accept(DendroPotion.applyIndexTag(new ItemStack(DENDRO_POTION.get()), potion.getIndex()));
                             }
                         }
+                        CREATIVE_TAB_ITEMS.forEach(e -> output.accept(e.getDefaultInstance()));
                     });
 
     ///////////////////////////////////////////
@@ -162,5 +167,23 @@ public class DTRegistries {
     public static final Supplier<SoundEvent> FALLING_TREE_FUNGUS_END = Services.REGISTRY.getRegistryLoader().registerSoundEvent("falling_tree_fungus_end");
     public static final Supplier<SoundEvent> FALLING_TREE_FUNGUS_SMALL_END = Services.REGISTRY.getRegistryLoader().registerSoundEvent("falling_tree_fungus_small_end");
 
+    ///////////////////////////////////////////
+    // DATA COMPONENTS
+    ///////////////////////////////////////////
+
+    public static final Supplier<DataComponentType<DyedItemColor>> STAFF_HANDLE_COLOR_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("handle_color", builder -> builder.persistent(DyedItemColor.CODEC).networkSynchronized(DyedItemColor.STREAM_CODEC));
+    public static final Supplier<DataComponentType<DyedItemColor>> STAFF_CRYSTAL_COLOR_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("crystal_color", builder -> builder.persistent(DyedItemColor.CODEC).networkSynchronized(DyedItemColor.STREAM_CODEC));
+    public static final Supplier<DataComponentType<String>> JOCODE_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("code", builder -> builder.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+    public static final Supplier<DataComponentType<String>> ROOTS_JOCODE_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("roots_code", builder -> builder.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+    public static final Supplier<DataComponentType<Unit>> READ_ONLY_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("read_only", builder -> builder.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
+    public static final Supplier<DataComponentType<String>> SPECIES_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("species", builder -> builder.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+    public static final Supplier<DataComponentType<Integer>> DENDRO_POTION_INDEX_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("potion_index", builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
 
 }

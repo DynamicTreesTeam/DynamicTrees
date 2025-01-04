@@ -66,38 +66,6 @@ public final class TreeRegistry {
         return new ArrayList<>(Species.REGISTRY.getRegistryNames());
     }
 
-    /**
-     * Returns all {@link Species} registry names for which the {@link Species} if marked {@code transformable}.
-     *
-     * @return A {@link List<ResourceLocation>} for which their {@link Species} can be transformed to other {@link
-     * Species}.
-     */
-    public static List<ResourceLocation> getTransformableSpeciesLocations() {
-        return Species.REGISTRY.getRegistryNames().stream().filter(resLoc ->
-                findSpecies(resLoc).isTransformable()).collect(Collectors.toList());
-    }
-
-    /**
-     * Returns all {@link Species} which are marked {@code transformable}.
-     *
-     * @return A {@link List<Species>} which can be transformed to other {@link Species}.
-     */
-    public static List<Species> getTransformableSpecies() {
-        return getTransformableSpeciesLocations().stream().map(TreeRegistry::findSpecies).collect(Collectors.toList());
-    }
-
-//    /**
-//     * Returns a {@link List} of all transformable {@link Species} which can be transformed by a {@link DendroPotion}.
-//     * This includes any {@link Species} which has a {@link Seed} and is not the common species (or whose seed is
-//     * common).
-//     *
-//     * @return All {@link Species} which are marked {@code transformable} and have their own {@link Seed}.
-//     */
-//    public static List<Species> getPotionTransformableSpecies() {
-//        return getTransformableSpecies().stream().filter(species -> species.hasSeed() &&
-//                (!species.isCommonSpecies() || species.isSeedCommon())).collect(Collectors.toList());
-//    }
-
     //////////////////////////////
     // SAPLING HANDLING
     //////////////////////////////

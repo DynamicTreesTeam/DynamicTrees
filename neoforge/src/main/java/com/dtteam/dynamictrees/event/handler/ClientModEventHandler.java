@@ -9,7 +9,7 @@ import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.entity.render.FallingTreeRenderer;
 import com.dtteam.dynamictrees.entity.render.LingeringEffectorRenderer;
-import com.dtteam.dynamictrees.models.baked.BakedModelBlockBonsaiPot;
+import com.dtteam.dynamictrees.models.baked.BakedModelBlockPottedSapling;
 import com.dtteam.dynamictrees.models.loader.*;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.family.Family;
@@ -17,6 +17,8 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import com.dtteam.dynamictrees.util.client.TextureUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -130,6 +132,8 @@ public class ClientModEventHandler {
         // Register Rooty Colorizers
         for (RootyBlock roots : SoilHelper.getRootyBlocksList()) {
             event.register((state, level, pos, tintIndex) -> roots.colorMultiplier(event.getBlockColors(), state, level, pos, tintIndex), roots);
+            //Unfortunately there's no way around this. We do not own the models to set the renderType there.
+            ItemBlockRenderTypes.setRenderLayer(roots, RenderType.cutoutMipped());
         }
 
         // Register Bonsai Pot Colorizer
@@ -197,7 +201,7 @@ public class ClientModEventHandler {
     @SubscribeEvent
     public static void onModelModifyBakingResultResult(ModelEvent.ModifyBakingResult event) {
         // Put bonsai pot baked model into its model location.
-        event.getModels().computeIfPresent(new ModelResourceLocation(DynamicTrees.location("potted_sapling"), ""), (k, val) -> new BakedModelBlockBonsaiPot(val));
+        event.getModels().computeIfPresent(new ModelResourceLocation(DynamicTrees.location("potted_sapling"), ""), (k, val) -> new BakedModelBlockPottedSapling(val));
     }
 
 }

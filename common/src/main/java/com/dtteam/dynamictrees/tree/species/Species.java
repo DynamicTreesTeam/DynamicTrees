@@ -109,11 +109,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public boolean isTransformable() {
-            return false;
-        }
-
-        @Override
         public boolean plantSapling(LevelAccessor level, BlockPos pos, boolean locationOverride) {
             return false;
         }
@@ -229,12 +224,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     // TODO: Make sure this is implemented properly.
     protected int maxBranchRadius = 8;
-
-    /**
-     * Stores whether this species can be transformed to another, if {@code true} and this species has its own
-     * seed a transformation potion will also be automatically created.
-     */
-    private boolean transformable = true;
 
     /**
      * If this is not empty, saplings will only grow when planted on these blocks.
@@ -518,26 +507,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public boolean doesRequireTileEntity(LevelAccessor level, BlockPos pos) {
         return !this.isCommonSpecies() && !this.shouldOverrideCommon(level, pos);
-    }
-
-    /**
-     * Returns whether this species can be transformed to another. See {@link #transformable} for more details.
-     *
-     * @return True if it can be transformed to, false if not.
-     */
-    public boolean isTransformable() {
-        return this.transformable;
-    }
-
-    /**
-     * Sets whether this species can be transformed to another. See {@link #transformable} for more details.
-     *
-     * @param transformable True if it should be transformable.
-     * @return This {@link Species} for chaining.
-     */
-    public Species setTransformable(boolean transformable) {
-        this.transformable = transformable;
-        return this;
     }
 
     public boolean hasCommonOverride() {
@@ -1462,7 +1431,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 final DynamicLeavesBlock leaves = (DynamicLeavesBlock) getLeavesProperties().getDynamicLeavesState().getBlock();
 
                 for (Direction dir : upFirst) {
-                    if (leaves.growLeavesIfLocationIsSuitable(level, getLeavesProperties(), pos.relative(dir), 0)) {
+                    //Hydro was not 0 so leaves grew
+                    if (0 != leaves.growLeavesIfLocationIsSuitable(level, getLeavesProperties(), pos.relative(dir), 0)) {
                         return false;
                     }
                 }
@@ -2407,7 +2377,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //                Pair.of("lowestBranchHeight", this.lowestBranchHeight), Pair.of("signalEnergy", this.signalEnergy),
 //                Pair.of("growthRate", this.growthRate), Pair.of("soilLongevity", this.soilLongevity),
 //                Pair.of("soilTypeFlags", this.soilTypeFlags), Pair.of("maxBranchRadius", this.maxBranchRadius),
-//                Pair.of("transformable", this.transformable), Pair.of("logicKit", this.logicKit),
 //                Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
 //                Pair.of("megaSpecies", this.megaSpecies), Pair.of("seed", this.seed),
 //                Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream()

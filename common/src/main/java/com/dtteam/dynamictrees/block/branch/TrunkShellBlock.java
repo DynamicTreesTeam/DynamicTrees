@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
-import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictrees.util.Null;
 import net.minecraft.core.BlockPos;
@@ -9,6 +8,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
@@ -17,9 +19,11 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -34,19 +38,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     public static final EnumProperty<CoordUtils.Surround> CORE_DIR = EnumProperty.create("coredir", CoordUtils.Surround.class);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-    public static class ShellMuse {
-        public final BlockState state;
-        public final BlockPos pos;
-        public final BlockPos museOffset;
-        public final CoordUtils.Surround dir;
-
-        public ShellMuse(BlockState state, BlockPos pos, CoordUtils.Surround dir, BlockPos museOffset) {
-            this.state = state;
-            this.pos = pos;
-            this.dir = dir;
-            this.museOffset = museOffset;
-        }
-
+    public record ShellMuse(BlockState state, BlockPos pos, CoordUtils.Surround dir, BlockPos museOffset) {
         public int getRadius() {
             final Block block = this.state.getBlock();
             return block instanceof BranchBlock ? ((BranchBlock) block).getRadius(state) : 0;
@@ -190,7 +182,6 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean p_220069_6_) {
-        System.out.println(Services.CONFIG.getIntConfig("biocharBrewingBase"));
         this.scheduleUpdateTick(level, pos);
     }
 
@@ -199,12 +190,12 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> Shapes.create(muse.state.getShape(level, muse.pos).bounds().move(muse.museOffset)), Shapes.empty());
     }
 
-//    @Override
-//    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
-//        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().getCloneItemStack(muse.state, target, level, muse.pos, player), ItemStack.EMPTY);
-//    }
-//
-//    @Override
+    @Override
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().getCloneItemStack(level, muse.pos, muse.state), ItemStack.EMPTY);
+    }
+
+    //    @Override
 //    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
 //        Null.consumeIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().onBlockExploded(muse.state, level, muse.pos, explosion));
 //    }
@@ -262,10 +253,10 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return (radius - 8) % 16 == 0;
     }
 
-//    @Override
-//    public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, PathComputationType pathType) {
-//        return false;
-//    }
+    @Override
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
+        return false;
+    }
 
     ///////////////////////////////////////////
     // WATER LOGGING
@@ -284,13 +275,13 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return super.updateShape(state, facing, facingState, level, currentPos, facingPos);
     }
 
-//    @Override
-//    public boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
-//        if (isFullBlockShell(level, pos)) {
-//            return false;
-//        }
-//        return SimpleWaterloggedBlock.super.canPlaceLiquid(level, pos, state, fluid);
-//    }
+    @Override
+    public boolean canPlaceLiquid(@Nullable Player player, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
+        if (isFullBlockShell(level, pos)) {
+            return false;
+        }
+        return SimpleWaterloggedBlock.super.canPlaceLiquid(player, level, pos, state, fluid);
+    }
 
     public boolean isWaterLogged(BlockState state) {
         return state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED);
@@ -303,6 +294,11 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.INVISIBLE;
+    }
+
+
+    public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+        return true;
     }
 
 //    @Override

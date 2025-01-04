@@ -98,7 +98,6 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("growth_rate", Float.class, Species::setGrowthRate)
                 .register("soil_longevity", Integer.class, Species::setSoilLongevity)
                 .register("max_branch_radius", Integer.class, Species::setMaxBranchRadius)
-                .register("transformable", Boolean.class, Species::setTransformable)
                 .register("growth_logic_kit", GrowthLogicKitConfiguration.class, Species::setGrowthLogicKit)
                 .register("leaves_properties", LeavesProperties.class, Species::setLeavesProperties)
                 .register("world_gen_leaf_map_height", Integer.class, Species::setWorldGenLeafMapHeight)

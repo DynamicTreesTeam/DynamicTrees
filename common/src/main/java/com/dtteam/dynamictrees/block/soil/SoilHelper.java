@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.block.soil;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
 import com.dtteam.dynamictrees.deserialization.applier.VoidApplier;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
@@ -85,7 +86,7 @@ public class SoilHelper {
             if (adjectiveMap.containsKey(adjName)) {
                 flag |= adjectiveMap.get(adjName);
             } else {
-                LOGGER.error("Adjective \"" + adjName + "\" not found while registering soil block: " + soilBlock);
+                DynamicTrees.LOG.error("Adjective \"{}\" not found while registering soil block: {}", adjName, soilBlock);
                 return SoilProperties.NULL_SOIL_PROPERTIES;
             }
         }

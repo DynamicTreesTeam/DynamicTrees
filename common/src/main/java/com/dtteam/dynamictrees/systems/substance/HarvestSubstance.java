@@ -5,6 +5,10 @@ import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.systems.genfeature.FruitGenFeature;
+import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
+import com.dtteam.dynamictrees.systems.genfeature.PodGenFeature;
+import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.TreeHelper;
@@ -18,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Set;
 
-/**
+/**TODO: revamp this substance, could be useful to allow growth & drops during winter
  * @author Harley O'Connor
  */
 public class HarvestSubstance implements SubstanceEffect {
@@ -141,24 +145,23 @@ public class HarvestSubstance implements SubstanceEffect {
                 });
             }
 
-//            // Force a growth attempt of all fruit gen features.
-//            if (spawnAttempt) {
-//                this.species.getGenFeatures().stream()
-//                        .filter(configuration ->
-//                                configuration.getGenFeature() instanceof FruitGenFeature
-//                        )
-//                        .forEach(configuration -> configuration.generate(
-//                                GenFeature.Type.POST_GROW,
-//                                new PostGrowContext(
-//                                        level,
-//                                        rootPos,
-//                                        species,
-//                                        rootPos.relative(rootyBlock.getTrunkDirection(level, rootPos)),
-//                                        fertility,
-//                                        true
-//                                )
-//                        ));
-//            }
+            // Force a growth attempt of all fruit gen features.
+            if (spawnAttempt) {
+                this.species.getGenFeatures().stream()
+                        .filter(configuration ->
+                                configuration.getGenFeature() instanceof FruitGenFeature || configuration.getGenFeature() instanceof PodGenFeature)
+                        .forEach(configuration -> configuration.generate(
+                                GenFeature.Type.POST_GROW,
+                                new PostGrowContext(
+                                        level,
+                                        rootPos,
+                                        species,
+                                        rootPos.relative(rootyBlock.getTrunkDirection(level, rootPos)),
+                                        fertility,
+                                        true
+                                )
+                        ));
+            }
         }
 
         return true;

@@ -143,9 +143,9 @@ public class WailaBranchHandler implements IBlockComponentProvider {
         if (block instanceof TrunkShellBlock) {
             ShellMuse muse = ((TrunkShellBlock) block).getMuse(level, pos);
             if (muse != null) {
-                state = muse.state;
+                state = muse.state();
                 block = state.getBlock();
-                pos = muse.pos;
+                pos = muse.pos();
             }
         }
 

@@ -6,10 +6,19 @@ import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.util.LevelContext;
 import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
+import com.dtteam.dynamictrees.worldgen.JoCode;
+import com.dtteam.dynamictrees.worldgen.RootsJoCode;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.util.Mth;
+import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -19,6 +28,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -31,16 +41,6 @@ import net.minecraft.world.phys.HitResult;
  * dynamictrees:staff{color:0x88FF00,code:"OUiVpPzkbtJ9uSRPbZP",read_only:1,tree:"dynamictrees:birch",max_uses:16,display:{Name:'[{"text":"Name","italic":false}]'}}}
  */
 public class Staff extends Item {
-
-    public final static String HANDLE = "handle";
-    public final static String COLOR = "color";
-
-    public final static String READ_ONLY = "read_only";
-    public final static String TREE = "tree";
-    public final static String CODE = "code";
-    public final static String ROOTS_CODE = "roots_code";
-    public final static String USES = "uses";
-    public final static String MAX_USES = "max_uses";
 
     public final static float REACH_DISTANCE = 256;
 
@@ -57,7 +57,6 @@ public class Staff extends Item {
         this.attributeModifiers = builder.build();
     }
 
-
     @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
         if (state.getBlock() instanceof BranchBlock || state.getBlock() instanceof TrunkShellBlock) {
@@ -69,7 +68,7 @@ public class Staff extends Item {
     @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity entityLiving) {
         if (state.getBlock() instanceof BranchBlock || state.getBlock() instanceof TrunkShellBlock) {
-            if (decUses(stack)) {
+            if (damage(stack)) {
                 stack.shrink(1);
             }
             return true;
@@ -106,223 +105,172 @@ public class Staff extends Item {
         TreePart treePart = TreeHelper.getTreePart(level.getBlockState(rootPos));
 
         // Get the code from a tree or rooty dirt and set it in the staff
-//        if (!isReadOnly(heldStack) && treePart.isRootNode()) {
-//            Species species = TreeHelper.getExactSpecies(level, rootPos);
-//            if (species.isValid()) {
-//                if (!context.getPlayer().isShiftKeyDown()) {
-//                    String code = new JoCode(level, rootPos, context.getPlayer().getDirection()).toString();
-//                    setCode(heldStack, code);
-//                    String rootCode = new RootsJoCode(level, rootPos, context.getPlayer().getDirection()).toString();
-//                    setRootsCode(heldStack, rootCode);
-//                    if (level.isClientSide) { // Make sure this doesn't run on the server
-//                        Minecraft.getInstance().keyboardHandler.setClipboard(code); // Put the code in the system clipboard to annoy everyone.
-//                    }
-//                }
-//                setSpecies(heldStack, species);
-//                return InteractionResult.SUCCESS;
-//            }
-//        }
-//
-//        //Create a tree from right clicking on soil
-//        Species species = getSpecies(heldStack);
-//        if (species.isValid() && species.isAcceptableSoil(level, pos, state)) {
-//            GenerationContext generationContext = new GenerationContext(LevelContext.create(level), species, pos, pos.mutable(), level.getBiome(pos), context.getPlayer().getDirection(), 8, SafeChunkBounds.ANY);
-//            species.getJoCode(getCode(heldStack)).setCareful(true).generate(generationContext);
-//            String rootsCode = getRootsCode(heldStack);
-//            if (!rootsCode.isEmpty())
-//                species.getRootsJoCode(rootsCode).setCareful(true).generate(generationContext);
-//            if (hasMaxUses(heldStack)) {
-//                if (decUses(heldStack)) {
-//                    heldStack.shrink(1);//If the player is in creative this will have no effect.
-//                }
-//            } else {
-//                heldStack.shrink(1);//If the player is in creative this will have no effect.
-//            }
-//            return InteractionResult.SUCCESS;
-//        }
+        if (!isReadOnly(heldStack) && treePart.isRootNode()) {
+            Species species = TreeHelper.getExactSpecies(level, rootPos);
+            if (species.isValid()) {
+                if (!context.getPlayer().isShiftKeyDown()) {
+                    String code = new JoCode(level, rootPos, context.getPlayer().getDirection()).toString();
+                    setCode(heldStack, code);
+                    String rootCode = new RootsJoCode(level, rootPos, context.getPlayer().getDirection()).toString();
+                    setRootsCode(heldStack, rootCode);
+                    if (level.isClientSide) { // Make sure this doesn't run on the server
+                        Minecraft.getInstance().keyboardHandler.setClipboard(code); // Put the code in the system clipboard to annoy everyone.
+                    }
+                }
+                setSpecies(heldStack, species);
+                return InteractionResult.SUCCESS;
+            }
+        }
+
+        //Create a tree from right clicking on soil
+        Species species = getSpecies(heldStack);
+        if (species.isValid() && species.isAcceptableSoil(level, pos, state)) {
+            DynamicTreeGenerationContext generationContext = new DynamicTreeGenerationContext(LevelContext.create(level), species, pos, pos.mutable(), level.getBiome(pos), context.getPlayer().getDirection(), 8, false);
+            species.getJoCode(getCode(heldStack)).setCareful(true).generate(generationContext);
+            String rootsCode = getRootsCode(heldStack);
+            if (!rootsCode.isEmpty())
+                species.getRootsJoCode(rootsCode).setCareful(true).generate(generationContext);
+            if (hasMaxDamage(heldStack)) {
+                if (damage(heldStack)) {
+                    heldStack.shrink(1);//If the player is in creative this will have no effect.
+                }
+            } else {
+                heldStack.shrink(1);//If the player is in creative this will have no effect.
+            }
+            return InteractionResult.SUCCESS;
+        }
 
         return InteractionResult.FAIL;
     }
 
     @Override
     public boolean isBarVisible(ItemStack pStack) {
-        return hasMaxUses(pStack);
+        return hasMaxDamage(pStack);
     }
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        int damage = getUses(stack) / getMaxUses(stack);
+        int damage = getDamage(stack) / getMaxDamage(stack);
         return 1 - damage;
     }
 
     public boolean isReadOnly(ItemStack itemStack) {
-//        return itemStack.getOrCreateTag().getBoolean(READ_ONLY);
-        return false;
+        return itemStack.has(DTRegistries.READ_ONLY_DATA_COMPONENT.get());
     }
 
     public Staff setReadOnly(ItemStack itemStack, boolean readonly) {
-//        itemStack.getOrCreateTag().putBoolean(READ_ONLY, readonly);
+        itemStack.set(DTRegistries.READ_ONLY_DATA_COMPONENT.get(), Unit.INSTANCE);
         return this;
     }
 
-    public Staff setSpecies(ItemStack itemStack, Species species) {
-        String name;
-
-        if (species == Species.NULL_SPECIES) {
-            name = "null";
-        } else {
-            name = species.getRegistryName().toString();
-        }
-
-//        itemStack.getOrCreateTag().putString(TREE, name);
-        return this;
+    public void setSpecies(ItemStack itemStack, Species species) {
+        String name = species.getRegistryName().toString();
+        itemStack.set(DTRegistries.SPECIES_DATA_COMPONENT.get(), name);
     }
 
-    public Staff setCode(ItemStack itemStack, String code) {
-//        itemStack.getOrCreateTag().putString(CODE, code);
-        return this;
+    public void setCode(ItemStack itemStack, String code) {
+        itemStack.set(DTRegistries.JOCODE_DATA_COMPONENT.get(), code);
     }
 
-    public Staff setRootsCode(ItemStack itemStack, String code) {
-//        itemStack.getOrCreateTag().putString(ROOTS_CODE, code);
-        return this;
+    public void setRootsCode(ItemStack itemStack, String code) {
+        itemStack.set(DTRegistries.ROOTS_JOCODE_DATA_COMPONENT.get(), code);
     }
 
     public Species getSpecies(ItemStack itemStack) {
-//        CompoundTag nbt = itemStack.getOrCreateTag();
-//
-//        if (nbt.contains(TREE)) {
-//            return TreeRegistry.findSpecies(nbt.getString(TREE));
-//        } else {
-//            Species species = TreeRegistry.findSpeciesSloppy("oak");
-//            setSpecies(itemStack, species);
-//            return species;
-//        }
-        return Species.NULL_SPECIES;
+        if (itemStack.has(DTRegistries.SPECIES_DATA_COMPONENT.get())) {
+            return TreeRegistry.findSpecies(itemStack.get(DTRegistries.SPECIES_DATA_COMPONENT.get()));
+        } else {
+            Species species = TreeRegistry.findSpeciesSloppy("oak");
+            setSpecies(itemStack, species);
+            return species;
+        }
     }
 
-    public int getUses(ItemStack itemStack) {
-//        CompoundTag nbt = itemStack.getOrCreateTag();
-//
-//        if (nbt.contains(USES)) {
-//            return nbt.getInt(USES);
-//        } else {
-//            int uses = getMaxUses(itemStack);
-//            setUses(itemStack, uses);
-//            return uses;
-//        }
-        return getMaxUses(itemStack);
+    /** NeoForge Override */
+    public int getDamage(ItemStack itemStack) {
+        return Mth.clamp(itemStack.getOrDefault(DataComponents.DAMAGE, 0), 0, itemStack.getMaxDamage());
     }
 
-    public Staff setUses(ItemStack itemStack, int value) {
-//        itemStack.getOrCreateTag().putInt(USES, value);
-        return this;
+    /** NeoForge Override */
+    public void setDamage(ItemStack itemStack, int value) {
+        itemStack.set(DataComponents.DAMAGE, value);
     }
 
-    public int getMaxUses(ItemStack itemStack) {
-//        CompoundTag nbt = itemStack.getOrCreateTag();
-//
-//        if (nbt.contains(MAX_USES)) {
-//            return nbt.getInt(MAX_USES);
-//        }
-
-        return 0;
+    /** NeoForge Override */
+    public int getMaxDamage(ItemStack itemStack) {
+        return itemStack.getOrDefault(DataComponents.MAX_DAMAGE, 0);
     }
 
-    public Staff setMaxUses(ItemStack itemStack, int value) {
-//        itemStack.getOrCreateTag().putInt(MAX_USES, value);
-        return this;
+    public void setMaxDamage(ItemStack itemStack, int value) {
+        itemStack.set(DataComponents.MAX_DAMAGE, value);
     }
 
-    public boolean hasMaxUses(ItemStack itemStack) {
-//        return itemStack.getOrCreateTag().contains(MAX_USES);
+    public boolean hasMaxDamage(ItemStack itemStack) {
+        if (itemStack.has(DataComponents.MAX_DAMAGE)) {
+            return getMaxDamage(itemStack) != 0;
+        }
         return false;
     }
 
-    public boolean decUses(ItemStack itemStack) {
-        int uses = Math.max(0, getUses(itemStack) - 1);
-        setUses(itemStack, uses);
-        return uses == 0;
+    public boolean damage(ItemStack itemStack) {
+        int maxDmg = getMaxDamage(itemStack);
+        int dmg = Math.min(maxDmg, getDamage(itemStack) + 1);
+        setDamage(itemStack, dmg);
+        return dmg == maxDmg;
     }
 
     public int getColor(ItemStack itemStack, int tint) {
-//        final CompoundTag tag = itemStack.getOrCreateTag();
-//
-//        if (tint == 0) {
-//            int color = 0x005b472f; // Original brown wood color
-//
-//            Species species = getSpecies(itemStack);
-//
-//            if (tag.contains(HANDLE)) {
-//                try {
-//                    color = Color.decode(tag.getString(HANDLE)).getRGB();
-//                } catch (NumberFormatException e) {
-//                    tag.remove(HANDLE);
-//                }
-//            } else if (species.isValid()) {
-//                color = species.getFamily().woodBarkColor;
-//            }
-//
-//            return color;
-//        } else if (tint == 1) {
-//            int color = 0x0000FFFF; // Cyan crystal like Radagast the Brown's staff.
-//
-//            if (tag.contains(COLOR)) {
-//                // Convert legacy string tag to int tag if tag type is String.
-//                if (tag.getTagType(COLOR) == Tag.TAG_STRING) {
-//                    this.tryConvertLegacyTag(tag);
-//                }
-//                color = tag.getInt(COLOR);
-//            }
-//
-//            return color;
-//        }
+        if (tint == 0) {
+            int color = 0xFF5b472f; // Original brown wood color
 
+            Species species = getSpecies(itemStack);
+
+            if (itemStack.has(DTRegistries.STAFF_HANDLE_COLOR_DATA_COMPONENT.get())) {
+                color = itemStack.getOrDefault(DTRegistries.STAFF_HANDLE_COLOR_DATA_COMPONENT.get(), new DyedItemColor(color, false)).rgb();
+            } else if (species.isValid()) {
+                color = species.getFamily().woodBarkColor;
+            }
+
+            return color;
+        } else if (tint == 1) {
+            int color = 0xFF00FFFF; // Cyan crystal like Radagast the Brown's staff.
+
+            if (itemStack.has(DTRegistries.STAFF_CRYSTAL_COLOR_DATA_COMPONENT.get())) {
+                color = itemStack.get(DTRegistries.STAFF_CRYSTAL_COLOR_DATA_COMPONENT.get()).rgb();
+            }
+
+            return color;
+        }
 
         return 0xFFFFFFFF; // white
     }
 
-//    /**
-//     * The {@link #COLOR} tag used to store a Hex String, such as {@code #FFFFFF}, but was recently changed to store an
-//     * int instead. This attempts to convert the legacy tag to an int.
-//     *
-//     * @param tag The {@link CompoundTag} tag containing the {@link #COLOR} string.
-//     * @deprecated This will no longer be necessary in 1.17.
-//     */
-//    @Deprecated
-//    private void tryConvertLegacyTag(final CompoundTag tag) {
-//        final String color = tag.getString(COLOR);
-//        tag.remove(COLOR);
-//
-//        try {
-//            tag.putInt(COLOR, Color.decode(color).getRGB());
-//        } catch (final NumberFormatException ignored) {
-//        }
-//    }
+    public Staff setColor(ItemStack itemStack, int color) {
+        itemStack.set(DTRegistries.STAFF_CRYSTAL_COLOR_DATA_COMPONENT.get(), new DyedItemColor(color, false));
+        return this;
+    }
 
-//    public Staff setColor(ItemStack itemStack, int color) {
-//        itemStack.getOrCreateTag().putInt(COLOR, color);
-//        return this;
-//    }
-//
-//    public String getCode(ItemStack itemStack) {
-//        String code = "P";//Code of a sapling
-//
-//        if (itemStack.getOrCreateTag().contains(CODE)) {
-//            code = itemStack.getTag().getString(CODE);
-//        } else {
-//            itemStack.getTag().putString(CODE, code);
-//        }
-//
-//        return code;
-//    }
-//
-//    public String getRootsCode(ItemStack itemStack) {
-//        if (itemStack.getOrCreateTag().contains(ROOTS_CODE)) {
-//            return itemStack.getTag().getString(ROOTS_CODE);
-//        }
-//        return "";
-//    }
+
+    public String getCode(ItemStack itemStack) {
+        String code = "P";//Code of a sapling
+
+        if (itemStack.has(DTRegistries.JOCODE_DATA_COMPONENT.get())) {
+            String newCode = itemStack.get(DTRegistries.JOCODE_DATA_COMPONENT.get());
+            if (newCode != null) code = newCode;
+        } else {
+            itemStack.set(DTRegistries.JOCODE_DATA_COMPONENT.get(), code);
+        }
+
+        return code;
+    }
+
+    public String getRootsCode(ItemStack itemStack) {
+        if (itemStack.has(DTRegistries.ROOTS_JOCODE_DATA_COMPONENT.get())) {
+            String newCode = itemStack.get(DTRegistries.ROOTS_JOCODE_DATA_COMPONENT.get());
+            if (newCode != null) return newCode;
+        }
+        return "";
+    }
 
 //    @OnlyIn(Dist.CLIENT)
 //    @Override
