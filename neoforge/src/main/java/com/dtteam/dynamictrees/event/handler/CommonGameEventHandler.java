@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.command.DTCommand;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
@@ -95,7 +96,7 @@ public class CommonGameEventHandler {
 
     @SubscribeEvent
     public static void registerCommands(final RegisterCommandsEvent event) {
-//        new DTCommand().registerDTCommand(event.getDispatcher());
+        new DTCommand().registerDTCommand(event.getDispatcher());
     }
 
     ///////////////////////////////////////////

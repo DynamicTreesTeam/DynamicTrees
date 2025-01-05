@@ -1,9 +1,13 @@
 package com.dtteam.dynamictrees.config;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.registry.RegistryLoader;
+import com.mojang.brigadier.arguments.ArgumentType;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -19,11 +23,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 public class FabricRegistryLoader extends RegistryLoader {
 
     public static void setup (){
 
+        DTRegistries.setup();
     }
 
     @Override
@@ -54,6 +60,16 @@ public class FabricRegistryLoader extends RegistryLoader {
 
     @Override
     public Supplier<SoundEvent> registerSoundEvent(String name) {
+        return null;
+    }
+
+    @Override
+    public <T> Supplier<DataComponentType<T>> registerDataComponentType(String name, UnaryOperator<DataComponentType.Builder<T>> operator) {
+        return null;
+    }
+
+    @Override
+    public <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>, I extends ArgumentTypeInfo<A, T>> Supplier<I> registerCommandArgumentType(String name, Class<A> infoClass, I argumentTypeInfo) {
         return null;
     }
 

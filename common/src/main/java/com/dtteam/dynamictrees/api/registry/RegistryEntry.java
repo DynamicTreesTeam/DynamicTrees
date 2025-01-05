@@ -131,7 +131,7 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     protected Component formatComponent(final Component component, final ChatFormatting colour) {
         return component.copy().withStyle(style -> style.withColor(colour)
                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                        Component.translatable("chat.registry_name", this.getRegistryName())))
+                        Component.translatable("chat.registry_name", this.getRegistryName().toString())))
                 .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD,
                         this.getRegistryName().toString())));
     }

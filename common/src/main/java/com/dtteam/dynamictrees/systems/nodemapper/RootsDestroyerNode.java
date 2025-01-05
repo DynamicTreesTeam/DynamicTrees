@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.systems.nodemapper;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.tree.family.MangroveFamily;
+import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -12,8 +12,8 @@ import javax.annotation.Nullable;
 
 public class RootsDestroyerNode extends FindEndsNode {
 
-    final MangroveFamily family;
-    public RootsDestroyerNode(MangroveFamily family) {
+    final UndergroundRootsFamily family;
+    public RootsDestroyerNode(UndergroundRootsFamily family) {
         super();
         this.family = family;
     }

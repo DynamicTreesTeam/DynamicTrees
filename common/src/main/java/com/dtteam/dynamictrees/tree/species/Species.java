@@ -2063,7 +2063,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return false;
         }
 
-        if (!JoCodeRegistry.getCodes(this.getRegistryName()).isEmpty()) {
+        if (!JoCodeRegistry.getCodes(this.getRegistryName(), false).isEmpty()) {
             final JoCode code = JoCodeRegistry.getRandomCode(this.getRegistryName(), context.radius(), context.random());
             if (code != null) {
                 code.generate(context);
@@ -2096,7 +2096,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public Collection<JoCode> getJoCodes() {
-        return JoCodeRegistry.getCodes(this.getRegistryName()).values().stream().flatMap(Collection::stream)
+        return JoCodeRegistry.getCodes(this.getRegistryName(), false).values().stream().flatMap(Collection::stream)
+                .collect(Collectors.toList());
+    }
+
+    public Collection<JoCode> getRootsJoCodes() {
+        return JoCodeRegistry.getCodes(this.getRegistryName(), true).values().stream().flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 

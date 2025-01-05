@@ -41,11 +41,8 @@ public final class JoCodeRegistry {
      * @return an unmodifiable map of radii to the list of {@link JoCode} objects for that radius, or an empty map if
      * none were found for the specified {@code speciesName}
      */
-    public static Map<Integer, List<JoCode>> getCodes(ResourceLocation speciesName) {
-        return getCodes(speciesName, false);
-    }
-    public static Map<Integer, List<JoCode>> getCodes(ResourceLocation speciesName, boolean root) {
-        return Collections.unmodifiableMap((root?ROOTS_CODES:CODES).getOrDefault(speciesName, new HashMap<>()));
+    public static Map<Integer, List<JoCode>> getCodes(ResourceLocation speciesName, boolean roots) {
+        return Collections.unmodifiableMap((roots?ROOTS_CODES:CODES).getOrDefault(speciesName, new HashMap<>()));
     }
 
     /**

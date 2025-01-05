@@ -32,9 +32,9 @@ import java.util.function.Supplier;
 
 import static com.dtteam.dynamictrees.util.ResourceLocationUtils.suffix;
 
-public class MangroveFamily extends Family {
+public class UndergroundRootsFamily extends Family {
 
-    public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(MangroveFamily::new);
+    public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(UndergroundRootsFamily::new);
     private AerialRootsSoilProperties defaultSoil;
     private Supplier<BranchBlock> roots;
     private Supplier<Item> rootsItem;
@@ -45,7 +45,7 @@ public class MangroveFamily extends Family {
 //    protected final MutableLazyValue<Generator<DTItemModelProvider, Family>> rootsItemModelGenerator =
 //            MutableLazyValue.supplied(RootsItemModelGenerator::new);
 
-    public MangroveFamily(ResourceLocation name) {
+    public UndergroundRootsFamily(ResourceLocation name) {
         super(name);
     }
 
@@ -53,7 +53,7 @@ public class MangroveFamily extends Family {
     public void setCommonSpecies(Species species) {
         super.setCommonSpecies(species);
         if (!(species instanceof MangroveSpecies)) {
-            LogManager.getLogger().warn("Common species {} for mangrove family {} is not of type {}", species.getRegistryName(), getRegistryName(), MangroveSpecies.class);
+            LogManager.getLogger().warn("Common species {} for Underground Roots Family {} is not of type {}", species.getRegistryName(), getRegistryName(), MangroveSpecies.class);
         }
     }
 
@@ -63,7 +63,7 @@ public class MangroveFamily extends Family {
 
     public void setDefaultSoil(SoilProperties defaultSoil) {
         if (!(defaultSoil instanceof AerialRootsSoilProperties))
-            throw new RuntimeException("Soil "+ defaultSoil.toString() +" for mangrove family "+ this +" is not of type "+ AerialRootsSoilProperties.class);
+            throw new RuntimeException("Soil "+ defaultSoil.toString() +" for Underground Roots Family "+ this +" is not of type "+ AerialRootsSoilProperties.class);
         this.defaultSoil = (AerialRootsSoilProperties) defaultSoil;
         this.defaultSoil.setFamily(this);
     }
@@ -154,12 +154,17 @@ public class MangroveFamily extends Family {
 
     @Override
     public boolean isAcceptableSoilForRootSystem(BlockState soilBlockState){
-        return SoilHelper.isSoilAcceptable(soilBlockState, rootSystemSoilTypeFlags);
+        return soilBlockState.getBlock() instanceof AerialRootsSoilProperties.RootRootyBlock || SoilHelper.isSoilAcceptable(soilBlockState, rootSystemSoilTypeFlags);
     }
 
     public Family addAcceptableSoilsForRootSystem(String... soilTypes) {
         rootSystemSoilTypeFlags |= SoilHelper.getSoilFlags(soilTypes);
         return this;
+    }
+
+    @Override
+    public boolean hasRootSystem() {
+        return true;
     }
 
     ///////////////////////////////////////////

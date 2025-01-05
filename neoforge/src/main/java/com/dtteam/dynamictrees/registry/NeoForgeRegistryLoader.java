@@ -3,7 +3,11 @@ package com.dtteam.dynamictrees.registry;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.google.common.base.Suppliers;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.commands.synchronization.ArgumentTypeInfos;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -43,6 +47,7 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     public static final DeferredRegister<BlockStateProviderType<?>> BLOCK_STATE_PROVIDER_TYPES = DeferredRegister.create(Registries.BLOCK_STATE_PROVIDER_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTrees.MOD_ID);
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENT_TYPES = DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, DynamicTrees.MOD_ID);
 
     public static void setup(IEventBus modBus) {
         BLOCK_ENTITY_TYPES.register(modBus);
@@ -56,6 +61,7 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         BLOCK_STATE_PROVIDER_TYPES.register(modBus);
         STRUCTURE_POOL_ELEMENT_TYPES.register(modBus);
         DATA_COMPONENT_TYPES.register(modBus);
+        ARGUMENT_TYPES.register(modBus);
 
 //        DTLootPoolEntries.LOOT_POOL_ENTRY_TYPES.register(modBus);
 //        DTLootConditions.LOOT_CONDITION_TYPES.register(modBus);
@@ -104,6 +110,10 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
 
     public <T> Supplier<DataComponentType<T>> registerDataComponentType (String name, UnaryOperator<DataComponentType.Builder<T>> operator){
         return DATA_COMPONENT_TYPES.register(name, ()->operator.apply(DataComponentType.builder()).build());
+    }
+
+    public <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>, I extends ArgumentTypeInfo<A, T>> Supplier<I> registerCommandArgumentType (String name, Class<A> infoClass, I argumentTypeInfo){
+        return ARGUMENT_TYPES.register(name, () -> ArgumentTypeInfos.registerByClass(infoClass, argumentTypeInfo));
     }
 
     ///////////////////////////////////////////

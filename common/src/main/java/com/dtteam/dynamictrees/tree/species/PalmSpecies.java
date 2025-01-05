@@ -9,7 +9,6 @@ import com.dtteam.dynamictrees.block.leaves.PalmLeavesProperties;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKits;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.family.MangroveFamily;
 import com.dtteam.dynamictrees.tree.family.PalmFamily;
 import com.dtteam.dynamictrees.util.BranchDestructionData;
 import com.dtteam.dynamictrees.util.CoordUtils;

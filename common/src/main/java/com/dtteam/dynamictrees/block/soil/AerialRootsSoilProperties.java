@@ -9,7 +9,7 @@ import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.systems.nodemapper.RootIntegrityNode;
-import com.dtteam.dynamictrees.tree.family.MangroveFamily;
+import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.util.BranchDestructionData;
 import com.dtteam.dynamictrees.util.EntityUtils;
 import com.dtteam.dynamictrees.util.ItemUtils;
@@ -36,7 +36,6 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -50,17 +49,17 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
     public static final TypedRegistry.EntryType<SoilProperties> TYPE = TypedRegistry.newType(AerialRootsSoilProperties::new);
 
-    protected MangroveFamily family;
+    protected UndergroundRootsFamily family;
     public AerialRootsSoilProperties(final ResourceLocation registryName) {
         super(registryName);
 //        this.soilStateGenerator.reset(AerialRootsSoilGenerator::new);
     }
 
-    public void setFamily(MangroveFamily family) {
+    public void setFamily(UndergroundRootsFamily family) {
         this.family = family;
     }
 
-    public MangroveFamily getFamily() {
+    public UndergroundRootsFamily getFamily() {
         return family;
     }
 

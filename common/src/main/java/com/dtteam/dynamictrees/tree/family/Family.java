@@ -737,6 +737,10 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return getCommonSpecies().isAcceptableSoil(soilBlockState);
     }
 
+    public boolean hasRootSystem(){
+        return false;
+    }
+
     ///////////////////////////////////////////
     // FALL ANIMATION HANDLING
     ///////////////////////////////////////////

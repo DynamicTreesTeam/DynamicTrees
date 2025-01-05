@@ -12,7 +12,7 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.family.MangroveFamily;
+import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -58,13 +58,13 @@ public class MangroveSpecies extends Species {
 
     public MangroveSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
-        if (!(family instanceof MangroveFamily)) {
-            throw new RuntimeException("Family " + family.getRegistryName() + " for mangrove species " + getRegistryName() + " is not of type "+ MangroveFamily.class);
+        if (!(family instanceof UndergroundRootsFamily)) {
+            throw new RuntimeException("Family " + family.getRegistryName() + " for mangrove species " + getRegistryName() + " is not of type "+ UndergroundRootsFamily.class);
         }
     }
 
-    public MangroveFamily getFamily() {
-        return (MangroveFamily) family;
+    public UndergroundRootsFamily getFamily() {
+        return (UndergroundRootsFamily) family;
     }
 
     //////////////////////

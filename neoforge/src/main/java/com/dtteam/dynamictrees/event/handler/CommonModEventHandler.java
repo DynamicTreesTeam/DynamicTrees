@@ -17,7 +17,7 @@ import com.dtteam.dynamictrees.systems.genfeature.GenFeatures;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKits;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.family.MangroveFamily;
+import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
 import com.dtteam.dynamictrees.tree.family.PalmFamily;
 import com.dtteam.dynamictrees.tree.species.*;
@@ -47,7 +47,7 @@ public class CommonModEventHandler {
     public static void registerFamilyTypes(final TypeRegistryEvent<Family> event) {
         if (!event.isEntryOfType(Family.class)) return;
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
-        event.registerType(DynamicTrees.location("mangrove"), MangroveFamily.TYPE);
+        event.registerType(DynamicTrees.location("mangrove"), UndergroundRootsFamily.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmFamily.TYPE);
     }
 

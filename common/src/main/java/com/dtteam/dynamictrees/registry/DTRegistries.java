@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlockEntity;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
+import com.dtteam.dynamictrees.command.HexColorArgument;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.entity.LingeringEffectorEntity;
 import com.dtteam.dynamictrees.item.DendroPotion;
@@ -17,6 +18,7 @@ import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import com.dtteam.dynamictrees.util.TreeRegistry;
 import com.mojang.serialization.Codec;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
@@ -185,5 +187,12 @@ public class DTRegistries {
             registerDataComponentType("species", builder -> builder.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
     public static final Supplier<DataComponentType<Integer>> DENDRO_POTION_INDEX_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
             registerDataComponentType("potion_index", builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
+
+    ///////////////////////////////////////////
+    // COMMAND ARGUMENTS
+    ///////////////////////////////////////////
+
+    public static final Supplier<SingletonArgumentInfo<HexColorArgument>> HEX_COLOR = Services.REGISTRY.getRegistryLoader()
+            .registerCommandArgumentType("hex_color", HexColorArgument.class, SingletonArgumentInfo.contextFree(HexColorArgument::hex));
 
 }
