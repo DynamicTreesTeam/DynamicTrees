@@ -14,7 +14,7 @@ public class Services {
     public static final IRegistryHelper REGISTRY = load(IRegistryHelper.class);
     public static final IConfigHelper CONFIG = load(IConfigHelper.class);
     public static final IInteractionHelper INTERACTION = load(IInteractionHelper.class);
-    public static final ITextureHelper TEXTURE = load(ITextureHelper.class);
+    public static final IMiscHelper MISC = load(IMiscHelper.class);
     public static final ICompatHelper COMPAT = load(ICompatHelper.class);
     public static final IEventHelper EVENT = load(IEventHelper.class);
 

@@ -18,6 +18,6 @@ public interface AnimationHandler {
     void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack);
 
 //    @OnlyIn(Dist.CLIENT)
-    boolean shouldRender(FallingTreeEntity entity);
+    boolean shouldRender(FallingTreeEntity entity, double x, double y, double z);
 
 }

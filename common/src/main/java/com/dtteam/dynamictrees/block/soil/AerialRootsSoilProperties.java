@@ -64,25 +64,30 @@ public class AerialRootsSoilProperties extends SoilProperties {
     }
 
     @Override
-    protected RootyBlock createBlock(BlockBehaviour.Properties blockProperties) {
-        return new RootRootyBlock(this, blockProperties);
+    protected SoilBlock createBlock(BlockBehaviour.Properties blockProperties) {
+        return new RootSoilBlock(this, blockProperties);
     }
 
     @Override
     public BlockState getSoilState(BlockState primitiveSoilState, int fertility, boolean requireTileEntity){
         BlockState rootyState = super.getSoilState(primitiveSoilState, fertility, requireTileEntity);
-        if (rootyState.getBlock() instanceof RootRootyBlock){
-            return rootyState.setValue(RootRootyBlock.WATERLOGGED, primitiveSoilState.getFluidState().is(Fluids.WATER));
+        if (rootyState.getBlock() instanceof RootSoilBlock){
+            return rootyState.setValue(RootSoilBlock.WATERLOGGED, primitiveSoilState.getFluidState().is(Fluids.WATER));
         }
         return rootyState;
     }
 
-    public static class RootRootyBlock extends RootyBlock implements SimpleWaterloggedBlock {
+    @Override
+    public boolean inheritsPrimitiveProperties() {
+        return false;
+    }
+
+    public static class RootSoilBlock extends SoilBlock implements SimpleWaterloggedBlock {
 
         protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, 8);
         public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-        public RootRootyBlock(SoilProperties properties, Properties blockProperties) {
+        public RootSoilBlock(SoilProperties properties, Properties blockProperties) {
             super(properties, blockProperties);
             registerDefaultState(defaultBlockState().setValue(RADIUS, 8).setValue(WATERLOGGED, false));
         }
@@ -170,19 +175,19 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return super.getDecayBlockState(state, level, pos);
         }
 
-//        /**
-//         * Called when a player removes a block.
-//         * This is responsible for actually destroying the block, and the block is intact at time of call.
-//         * This is called regardless of whether the player can harvest the block or not.
-//         * @return true if the block is actually destroyed.
-//         * Note: When used in multiplayer, this is called on both client and server sides!
-//         */
-//        @Override
-//        public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-//            if (!level.isClientSide)
-//                this.dropWholeTree(level, pos, player);
-//            return false;
-//        }
+        /**
+         * Called when a player removes a block.
+         * This is responsible for actually destroying the block, and the block is intact at time of call.
+         * This is called regardless of whether the player can harvest the block or not.
+         * @return true if the block is actually destroyed.
+         * Note: When used in multiplayer, this is called on both client and server sides!
+         */
+        @Override
+        public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+            if (!level.isClientSide)
+                this.dropWholeTree(level, pos, player);
+            return level.isClientSide() ? level.setBlock(pos, fluid.createLegacyBlock(), 11) : level.removeBlock(pos, false);
+        }
 
         public void dropWholeTree(Level level, BlockPos rootPos, @Nullable Player player){
             Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
@@ -231,13 +236,13 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
         @Override
         public int updateRadius (LevelAccessor level, BlockState state, BlockPos pos, int flags, boolean force) {
-            if (!(state.getBlock() instanceof RootRootyBlock)) return 8;
+            if (!(state.getBlock() instanceof RootSoilBlock)) return 8;
             int upRad = TreeHelper.getRadius(level, pos.above());
             if (upRad > 0){
-                int thisRad = state.getValue(RootRootyBlock.RADIUS);
+                int thisRad = state.getValue(RootSoilBlock.RADIUS);
                 if (upRad != thisRad || force){
                     int newRadius = Math.min(upRad, 8);
-                    level.setBlock(pos, state.setValue(RootRootyBlock.RADIUS, newRadius), flags);
+                    level.setBlock(pos, state.setValue(RootSoilBlock.RADIUS, newRadius), flags);
                     return newRadius;
                 }
                 return upRad;

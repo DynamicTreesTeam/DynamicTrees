@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.api.cell.Cell;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
@@ -16,7 +17,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.Nullable;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
 
 public interface TreePart {
 
@@ -130,7 +130,7 @@ public interface TreePart {
          */
         NULL,
         /**
-         * A rooty block, extending {@link RootyBlock}.
+         * A rooty block, extending {@link SoilBlock}.
          */
         ROOT,
         /**

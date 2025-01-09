@@ -1,0 +1,119 @@
+package com.dtteam.dynamictrees.registry;
+
+import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.entity.FallingTreeEntity;
+import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
+import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
+import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.util.BranchDestructionData;
+import com.dtteam.dynamictrees.util.QuadManipulator;
+import com.dtteam.dynamictrees.util.TreeHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.model.data.ModelData;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class FallingTreeEntityModelNF extends FallingTreeEntityModel {
+
+    public FallingTreeEntityModelNF(FallingTreeEntity entity) {
+        super(entity);
+    }
+
+    @Override
+    public List<TreeQuadData> generateTreeQuads(FallingTreeEntity entity) {
+        BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
+        BranchDestructionData destructionData = entity.getDestroyData();
+        Direction cutDir = destructionData.cutDir;
+
+        ArrayList<TreeQuadData> treeQuads = new ArrayList<>();
+
+        int[] connectionArray = new int[6];
+
+        if (destructionData.getNumBranches() > 0) {
+            BlockState exState = destructionData.getBranchBlockState(0);
+            BlockPos cutPos = destructionData.cutPos;
+            if (exState != null) {
+                Species species = destructionData.species;
+
+                //Draw the rooty block if it is set to fall too
+                BlockPos rootPos = cutPos.below();
+                BlockState bottomState = entity.level().getBlockState(rootPos);
+                boolean rootyBlockAdded = false;
+                if (TreeHelper.isRooty(bottomState)) {
+                    SoilBlock soilBlock = TreeHelper.getRooty(bottomState);
+                    if (soilBlock != null && soilBlock.fallWithTree(bottomState, entity.level(), rootPos, !destructionData.getRelativeCutPos().equals(BlockPos.ZERO))) {
+                        BakedModel rootyModel = dispatcher.getBlockModel(bottomState);
+                        BlockPos cutOffset = destructionData.getRelativeCutPos();
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, bottomState, new Vec3(cutOffset.getX(), cutOffset.getY()-1, cutOffset.getZ()), entity.getRandom(), ModelData.EMPTY),
+                                destructionData.species.getFamily().getRootColor(bottomState, soilBlock.getColorFromBark()),
+                                bottomState));
+                        rootyBlockAdded = true;
+                    }
+                }
+
+                BakedModel branchModel = dispatcher.getBlockModel(exState);
+                //Draw the ring texture cap on the cut block if the bottom connection is above 0
+                destructionData.getConnections(0, connectionArray);
+                boolean bottomRingsAdded = false;
+                if (!rootyBlockAdded && connectionArray[cutDir.get3DDataValue()] > 0) {
+                    BlockPos offsetPos = destructionData.getRelativeCutPos().relative(cutDir);
+                    float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.MAX_RADIUS)) / 16f;
+                    treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), new Direction[]{null}, entity.getRandom(),
+                                    new ModelConnections(cutDir).setFamily(TreeHelper.getBranch(exState)).toModelData()),
+                            exState));
+                    bottomRingsAdded = true;
+                }
+
+                //Draw the rest of the tree/branch
+                for (int index = 0; index < destructionData.getNumBranches(); index++) {
+                    Block previousBranch = exState.getBlock();
+                    exState = destructionData.getBranchBlockState(index);
+                    if (!previousBranch.equals(exState.getBlock())) //Update the branch model only if the block is different
+                    {
+                        branchModel = dispatcher.getBlockModel(exState);
+                    }
+                    BlockPos relPos = destructionData.getBranchRelPos(index);
+                    destructionData.getConnections(index, connectionArray);
+                    ModelConnections modelConnections = new ModelConnections(connectionArray).setFamily(TreeHelper.getBranch(exState));
+                    if (index == 0 && bottomRingsAdded) {
+                        modelConnections.setForceRing(cutDir);
+                    }
+                    treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(branchModel, exState, new Vec3(relPos.getX(), relPos.getY(), relPos.getZ()), entity.getRandom(), modelConnections.toModelData()),
+                            exState));
+                }
+
+                //Draw the leaves
+                final HashMap<BlockPos, BlockState> leavesClusters = species.getFellingLeavesClusters(destructionData);
+                if (leavesClusters != null) {
+                    for (Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
+                        BlockState leafState = leafLoc.getValue();
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(dispatcher.getBlockModel(leafState), leafState, new Vec3(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), entity.getRandom(), ModelData.EMPTY),
+                                species.leafColorMultiplier(entity.level(), cutPos.offset(leafLoc.getKey())), leafState));
+                    }
+                } else {
+                    for (int index = 0; index < destructionData.getNumLeaves(); index++) {
+                        BlockPos relPos = destructionData.getLeavesRelPos(index);
+                        BlockState leafState = destructionData.getLeavesBlockState(index);
+                        BakedModel leavesModel = dispatcher.getBlockModel(leafState);
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, leafState, new Vec3(relPos.getX(), relPos.getY(), relPos.getZ()), entity.getRandom(), ModelData.EMPTY),
+                                destructionData.getLeavesProperties(index).treeFallColorMultiplier(leafState, entity.level(), cutPos.offset(relPos)), leafState));
+                    }
+                }
+
+            }
+        }
+
+        return treeQuads;
+    }
+}

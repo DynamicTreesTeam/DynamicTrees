@@ -7,8 +7,8 @@ import com.dtteam.dynamictrees.block.NullTreePart;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
-import com.dtteam.dynamictrees.block.soil.RootyBlockDecayer;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlockDecayer;
 import com.dtteam.dynamictrees.systems.nodemapper.TwinkleNode;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.JoCode;
@@ -42,7 +42,7 @@ public class TreeHelper {
      */
     public static void growPulse(Level level, BlockPos rootPos) {
         BlockState rootyState = level.getBlockState(rootPos);
-        RootyBlock dirt = TreeHelper.getRooty(rootyState);
+        SoilBlock dirt = TreeHelper.getRooty(rootyState);
         if (dirt != null) {
             dirt.updateTree(rootyState, level, rootPos, level.random, false);
             ageVolume(level, rootPos, 8, 32, 1, false);//blindly age a cuboid volume
@@ -234,19 +234,19 @@ public class TreeHelper {
      * Sets a custom rooty block decay (what dirt it becomes when the tree is gone) algorithm for mods that have special
      * requirements.
      *
-     * @param decay The {@link RootyBlockDecayer} implementation.
+     * @param decay The {@link SoilBlockDecayer} implementation.
      */
-    public static void setCustomRootBlockDecay(RootyBlockDecayer decay) {
-        RootyBlock.rootyBlockDecayer = decay;
+    public static void setCustomRootBlockDecay(SoilBlockDecayer decay) {
+        SoilBlock.soilBlockDecayer = decay;
     }
 
     /**
      * Provided as a means for an implementation to chain the handlers.
      *
-     * @return The currently defined {@link RootyBlockDecayer} handler.
+     * @return The currently defined {@link SoilBlockDecayer} handler.
      */
-    public static RootyBlockDecayer getCustomRootBlockDecay() {
-        return RootyBlock.rootyBlockDecayer;
+    public static SoilBlockDecayer getCustomRootBlockDecay() {
+        return SoilBlock.soilBlockDecayer;
     }
 
     /**
@@ -276,7 +276,7 @@ public class TreeHelper {
      * @return true if a root block was found.
      */
     public static boolean startAnalysisFromRoot(LevelAccessor level, BlockPos rootPos, MapSignal signal) {
-        RootyBlock dirt = TreeHelper.getRooty(level.getBlockState(rootPos));
+        SoilBlock dirt = TreeHelper.getRooty(level.getBlockState(rootPos));
         if (dirt != null) {
             dirt.startAnalysis(level, rootPos, signal);
             return true;
@@ -404,7 +404,7 @@ public class TreeHelper {
     //Rooty
 
     public static boolean isRooty(Block block) {
-        return block instanceof RootyBlock;
+        return block instanceof SoilBlock;
     }
 
     public static boolean isRooty(BlockState state) {
@@ -412,23 +412,23 @@ public class TreeHelper {
     }
 
     @Nullable
-    public static RootyBlock getRooty(Block block) {
-        return isRooty(block) ? (RootyBlock) block : null;
+    public static SoilBlock getRooty(Block block) {
+        return isRooty(block) ? (SoilBlock) block : null;
     }
 
     @Nullable
-    public static RootyBlock getRooty(TreePart treePart) {
-        return treePart instanceof RootyBlock ? (RootyBlock) treePart : null;
+    public static SoilBlock getRooty(TreePart treePart) {
+        return treePart instanceof SoilBlock ? (SoilBlock) treePart : null;
     }
 
     @Nullable
-    public static RootyBlock getRooty(BlockState state) {
+    public static SoilBlock getRooty(BlockState state) {
         return getRooty(state.getBlock());
     }
 
-    public static Optional<RootyBlock> getRootyOpt(BlockState state) {
+    public static Optional<SoilBlock> getRootyOpt(BlockState state) {
         Block block = state.getBlock();
-        return isRooty(block) ? Optional.of((RootyBlock) block) : Optional.empty();
+        return isRooty(block) ? Optional.of((SoilBlock) block) : Optional.empty();
     }
 
 }

@@ -17,7 +17,7 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.pod.Pod;
 import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
@@ -139,7 +139,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         @Override
-        public boolean update(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean rapid) {
+        public boolean update(Level level, SoilBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean rapid) {
             return false;
         }
     };
@@ -1100,14 +1100,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         BlockState dirtState = level.getBlockState(rootPos);
         Block dirt = dirtState.getBlock();
 
-        if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof RootyBlock)) {
+        if (!SoilHelper.isSoilRegistered(dirt) && !(dirt instanceof SoilBlock)) {
             //soil is not valid so we default to dirt
             DynamicTrees.LOG.warn("Rooty Dirt block NOT FOUND for soil {}", BuiltInRegistries.BLOCK.getKey(dirt)); //default to dirt and print error
             this.placeRootyDirtBlock(level, rootPos, Blocks.DIRT.defaultBlockState(), fertility);
             return false;
         }
 
-        if (dirt instanceof RootyBlock) {
+        if (dirt instanceof SoilBlock) {
             //dirt block is already a soil, so we just update it
             this.updateRootyDirtBlock(level, rootPos, dirtState, fertility);
         } else if (SoilHelper.isSoilRegistered(dirt)) {
@@ -1130,8 +1130,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     private void updateRootyDirtBlock(LevelAccessor level, BlockPos rootPos, BlockState soilState, int fertility) {
-        if (soilState.getBlock() instanceof RootyBlock) {
-            level.setBlock(rootPos, soilState.setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, this.doesRequireTileEntity(level, rootPos)), 3);
+        if (soilState.getBlock() instanceof SoilBlock) {
+            level.setBlock(rootPos, soilState.setValue(SoilBlock.FERTILITY, fertility).setValue(SoilBlock.IS_VARIANT, this.doesRequireTileEntity(level, rootPos)), 3);
         }
     }
 
@@ -1315,16 +1315,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * This should never be run by the level generator.
      *
      * @param level     The level
-     * @param rootyDirt The {@link RootyBlock} that is supporting this tree
-     * @param rootPos   The {@link BlockPos} of the {@link RootyBlock} type in the level
+     * @param rootyDirt The {@link SoilBlock} that is supporting this tree
+     * @param rootPos   The {@link BlockPos} of the {@link SoilBlock} type in the level
      * @param fertility The fertility of the soil. 0: Depleted -> 15: Full
      * @param treePos   The {@link BlockPos} of the {@link Family} trunk base.
      * @param random    A random number generator
      * @param natural   Set this to true if this member is being used to naturally grow the tree(create drops or fruit)
-     * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
+     * @return true if network is viable.  false if network is not viable(will destroy the {@link SoilBlock} this tree
      * is on)
      */
-    public boolean update(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
+    public boolean update(Level level, SoilBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
 
         //Analyze structure to gather all the endpoints.  They will be useful for this entire update
         List<BlockPos> ends = getEnds(level, treePos, treeBase);
@@ -1366,9 +1366,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      *
      * @param level      The level
      * @param ends       A {@link List} of {@link BlockPos}s of {@link BranchBlock} endpoints.
-     * @param rootPos    The {@link BlockPos} of the {@link RootyBlock} for this {@link Family}
+     * @param rootPos    The {@link BlockPos} of the {@link SoilBlock} for this {@link Family}
      * @param treePos    The {@link BlockPos} of the trunk base for this {@link Family}
-     * @param fertility  The fertility of the {@link RootyBlock}
+     * @param fertility  The fertility of the {@link SoilBlock}
      * @param worldGen   Weather this is happening during worldgen
      * @return true if last piece of tree rotted away.
      */
@@ -1485,18 +1485,18 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * The growth handler.
      *
      * @param level     The level
-     * @param rootyDirt The {@link RootyBlock} that is supporting this tree
-     * @param rootPos   The {@link BlockPos} of the {@link RootyBlock} type in the level
+     * @param rootyDirt The {@link SoilBlock} that is supporting this tree
+     * @param rootPos   The {@link BlockPos} of the {@link SoilBlock} type in the level
      * @param fertility The fertility of the soil. 0: Depleted -> 15: Full
      * @param treePos   The {@link BlockPos} of the {@link Family} trunk base.
      * @param random    A random number generator
      * @param natural   If true then this member is being used to grow the tree naturally(create drops or fruit). If
      *                  false then this member is being used to grow a tree with a growth accelerant like bonemeal or
      *                  the potion of burgeoning
-     * @return true if network is viable.  false if network is not viable(will destroy the {@link RootyBlock} this tree
+     * @return true if network is viable.  false if network is not viable(will destroy the {@link SoilBlock} this tree
      * is on)
      */
-    public boolean grow(Level level, RootyBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
+    public boolean grow(Level level, SoilBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
 
         float growthRate = (float) (getGrowthRate(level, rootPos) * Services.CONFIG.getDoubleConfig("treeGrowthMultiplier"));
         do {
@@ -1727,7 +1727,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * Pulls data from the {@link NormalSeasonManager} to determine the rate of
      * tree growth for the current season.
      *
-     * @param rootPos the {@link BlockPos} of the {@link RootyBlock}.
+     * @param rootPos the {@link BlockPos} of the {@link SoilBlock}.
      * @return Factor from 0.0 (no growth) to 1.0 (full growth).
      */
     public float seasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos) {
@@ -2147,7 +2147,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * trunk that could be in the way.
      *
      * @param level      The level
-     * @param rootPos    The position of {@link RootyBlock} this tree will be planted in
+     * @param rootPos    The position of {@link SoilBlock} this tree will be planted in
      * @param radius     The radius of the generation area
      * @param facing     The direction the joCode will build the tree
      * @param worldGen   Weather this is being called during world generation

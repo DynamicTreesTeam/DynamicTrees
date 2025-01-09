@@ -36,7 +36,7 @@ public class VoidAnimationHandler implements AnimationHandler {
 
     @Override
 //    @OnlyIn(Dist.CLIENT)
-    public boolean shouldRender(FallingTreeEntity entity) {
+    public boolean shouldRender(FallingTreeEntity entity, double x, double y, double z) {
         return false;
     }
 

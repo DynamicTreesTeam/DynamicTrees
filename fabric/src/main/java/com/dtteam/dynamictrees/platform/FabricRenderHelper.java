@@ -1,0 +1,25 @@
+package com.dtteam.dynamictrees.platform;
+
+import com.dtteam.dynamictrees.entity.FallingTreeEntity;
+import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
+import com.dtteam.dynamictrees.platform.services.IMiscHelper;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.world.level.Level;
+
+public class FabricRenderHelper implements IMiscHelper {
+
+    @Override
+    public int getPixelRGBA(TextureAtlasSprite sprite, int x, int y) {
+        return 0;
+    }
+
+    @Override
+    public FallingTreeEntityModel newFallingTreeEntityModel(FallingTreeEntity entity) {
+        return new FallingTreeEntityModel(entity);
+    }
+
+    @Override
+    public boolean isLevelRestoringBlockSnapshots(Level level) {
+        return false;
+    }
+}

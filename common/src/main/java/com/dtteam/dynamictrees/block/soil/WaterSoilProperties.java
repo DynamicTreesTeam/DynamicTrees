@@ -3,12 +3,9 @@ package com.dtteam.dynamictrees.block.soil;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -25,7 +22,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -44,8 +40,8 @@ public class WaterSoilProperties extends SoilProperties {
     }
 
     @Override
-    protected RootyBlock createBlock(BlockBehaviour.Properties blockProperties) {
-        return new RootyWaterBlock(this, blockProperties);
+    protected SoilBlock createBlock(BlockBehaviour.Properties blockProperties) {
+        return new SoilWaterBlock(this, blockProperties);
     }
 
     @Override
@@ -58,12 +54,12 @@ public class WaterSoilProperties extends SoilProperties {
         return BlockBehaviour.Properties.ofFullCopy(Blocks.WATER);
     }
 
-    public static class RootyWaterBlock extends RootyBlock implements SimpleWaterloggedBlock {
+    public static class SoilWaterBlock extends SoilBlock implements SimpleWaterloggedBlock {
 
         protected static final AABB WATER_ROOTS_AABB = new AABB(0.1, 0.0, 0.1, 0.9, 1.0, 0.9);
         public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-        public RootyWaterBlock(SoilProperties properties, Properties blockProperties) {
+        public SoilWaterBlock(SoilProperties properties, Properties blockProperties) {
             super(properties, blockProperties);
             registerDefaultState(defaultBlockState().setValue(WATERLOGGED, true));
         }

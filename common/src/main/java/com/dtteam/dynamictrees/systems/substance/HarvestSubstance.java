@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.fruit.FruitBlock;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.systems.genfeature.FruitGenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.PodGenFeature;
@@ -14,7 +14,6 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -51,29 +50,29 @@ public class HarvestSubstance implements SubstanceEffect {
     @Override
     public boolean apply(Level level, BlockPos rootPos) {
         final BlockState rootState = level.getBlockState(rootPos);
-        final RootyBlock rootyBlock = TreeHelper.getRooty(rootState);
+        final SoilBlock soilBlock = TreeHelper.getRooty(rootState);
 
-        if (rootyBlock == null) {
+        if (soilBlock == null) {
             return false;
         }
 
-        this.species = rootyBlock.getSpecies(rootState, level, rootPos);
+        this.species = soilBlock.getSpecies(rootState, level, rootPos);
 
         // If the species doesn't have any fruit, don't apply substance.
         if (!species.hasFruits()) {
             return false;
         }
 
-        this.recalculateFruitPositions(level, rootPos, rootyBlock);
+        this.recalculateFruitPositions(level, rootPos, soilBlock);
 
         return true;
     }
 
-    private void recalculateFruitPositions(final LevelAccessor level, final BlockPos rootPos, final RootyBlock rootyBlock) {
+    private void recalculateFruitPositions(final LevelAccessor level, final BlockPos rootPos, final SoilBlock soilBlock) {
         this.fruitPositions.clear();
 
         final FindEndsNode findEndsNode = new FindEndsNode();
-        rootyBlock.startAnalysis(level, rootPos, new MapSignal(findEndsNode));
+        soilBlock.startAnalysis(level, rootPos, new MapSignal(findEndsNode));
 
         findEndsNode.getEnds().forEach(endPos ->
                 BlockPos.betweenClosedStream(
@@ -103,16 +102,16 @@ public class HarvestSubstance implements SubstanceEffect {
             return false;
         }
 
-        final RootyBlock rootyBlock = TreeHelper.getRooty(level.getBlockState(rootPos));
+        final SoilBlock soilBlock = TreeHelper.getRooty(level.getBlockState(rootPos));
 
-        if (rootyBlock == null) {
+        if (soilBlock == null) {
             return false;
         }
 
         if (level.isClientSide) {
             if (deltaTicks % this.ticksPerParticlePulse == 0) {
                 // Recalculate fruit positions every time in case new fruit spawned.
-                this.recalculateFruitPositions(level, rootPos, rootyBlock);
+                this.recalculateFruitPositions(level, rootPos, soilBlock);
 
 //                this.fruitPositions.forEach(fruitPos ->
 //                        DTClient.spawnParticles(level, ParticleTypes.EFFECT, fruitPos.getX(), fruitPos.getY(),
@@ -125,7 +124,7 @@ public class HarvestSubstance implements SubstanceEffect {
 
             // Only recalculate fruit positions if necessary, and don't do it twice.
             if (growPulse || spawnAttempt) {
-                this.recalculateFruitPositions(level, rootPos, rootyBlock);
+                this.recalculateFruitPositions(level, rootPos, soilBlock);
             }
 
             if (growPulse) {
@@ -156,7 +155,7 @@ public class HarvestSubstance implements SubstanceEffect {
                                         level,
                                         rootPos,
                                         species,
-                                        rootPos.relative(rootyBlock.getTrunkDirection(level, rootPos)),
+                                        rootPos.relative(soilBlock.getTrunkDirection(level, rootPos)),
                                         fertility,
                                         true
                                 )

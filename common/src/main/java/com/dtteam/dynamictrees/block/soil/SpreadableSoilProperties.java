@@ -1,21 +1,10 @@
 package com.dtteam.dynamictrees.block.soil;
 
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -46,8 +35,8 @@ public class SpreadableSoilProperties extends SoilProperties {
     }
 
     @Override
-    protected RootyBlock createBlock(BlockBehaviour.Properties blockProperties) {
-        return new SpreadableRootyBlock(this, blockProperties);
+    protected SoilBlock createBlock(BlockBehaviour.Properties blockProperties) {
+        return new SpreadableSoilBlock(this, blockProperties);
     }
 
     public void addSpreadableSoils(Block... blocks) {
@@ -63,9 +52,9 @@ public class SpreadableSoilProperties extends SoilProperties {
         spreadable_soils.addAll(Arrays.asList(props));
     }
 
-    public static class SpreadableRootyBlock extends RootyBlock {
+    public static class SpreadableSoilBlock extends SoilBlock {
 
-        public SpreadableRootyBlock(SpreadableSoilProperties properties, Properties blockProperties) {
+        public SpreadableSoilBlock(SpreadableSoilProperties properties, Properties blockProperties) {
             super(properties, blockProperties);
         }
 
@@ -74,7 +63,7 @@ public class SpreadableSoilProperties extends SoilProperties {
             return (SpreadableSoilProperties) super.getSoilProperties();
         }
 
-        private Optional<RootyBlock> getRootyBlock(Block block) {
+        private Optional<SoilBlock> getRootyBlock(Block block) {
             return SoilHelper.getProperties(block).getBlock();
         }
 

@@ -36,12 +36,6 @@ public class DynamicTrees {
         OVERFLOW
     }
 
-    public enum SwampOakWaterState {
-        ROOTED,
-        SUNK,
-        DISABLED
-    }
-
     public static final ResourceLocation NULL = DynamicTrees.location("null");
 
     public static final ResourceLocation OAK = DynamicTrees.location("oak");

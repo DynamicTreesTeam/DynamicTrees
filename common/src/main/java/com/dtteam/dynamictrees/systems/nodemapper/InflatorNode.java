@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.systems.nodemapper;
 import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.SimpleVoxmap;
 import com.dtteam.dynamictrees.util.TreeHelper;
@@ -116,7 +116,7 @@ public class InflatorNode implements NodeInspector {
             last = pos;
 
         } else {
-            RootyBlock rooty = TreeHelper.getRooty(state);
+            SoilBlock rooty = TreeHelper.getRooty(state);
             if (rooty != null){
                 rooty.updateRadius(level, state, pos, 2, false);
             }

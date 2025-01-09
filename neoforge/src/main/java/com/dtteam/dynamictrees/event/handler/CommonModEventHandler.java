@@ -47,7 +47,7 @@ public class CommonModEventHandler {
     public static void registerFamilyTypes(final TypeRegistryEvent<Family> event) {
         if (!event.isEntryOfType(Family.class)) return;
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
-        event.registerType(DynamicTrees.location("mangrove"), UndergroundRootsFamily.TYPE);
+        event.registerType(DynamicTrees.location("underground_roots"), UndergroundRootsFamily.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmFamily.TYPE);
     }
 
@@ -55,9 +55,9 @@ public class CommonModEventHandler {
     public static void registerSpeciesTypes(final TypeRegistryEvent<Species> event) {
         if (!event.isEntryOfType(Species.class)) return;
         event.registerType(DynamicTrees.location("nether_fungus"), NetherFungusSpecies.TYPE);
-        event.registerType(DynamicTrees.location("swamp_oak"), SwampOakSpecies.TYPE);
+        event.registerType(DynamicTrees.location("swamp"), SwampSpecies.TYPE);
         event.registerType(DynamicTrees.location("palm"), PalmSpecies.TYPE);
-        event.registerType(DynamicTrees.location("mangrove"), MangroveSpecies.TYPE);
+        event.registerType(DynamicTrees.location("underground_roots"), UndergroundRootsSpecies.TYPE);
     }
 
     @SubscribeEvent

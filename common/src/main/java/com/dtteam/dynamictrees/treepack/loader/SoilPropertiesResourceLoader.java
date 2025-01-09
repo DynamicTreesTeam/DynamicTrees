@@ -12,6 +12,9 @@ import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Max Hyper and Harley O'Connor
@@ -118,13 +121,22 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
     }
 
     private void generateSoilBlock(SoilProperties soilProperties, JsonObject json) {
-        soilProperties.generateBlock(JsonHelper.getBlockProperties(
-                json,
-                soilProperties.getDefaultMapColor(),
-                soilProperties::getDefaultBlockProperties,
-                error -> this.logError(soilProperties.getRegistryName(), error),
-                warning -> this.logWarning(soilProperties.getRegistryName(), warning)
-        ));
+        AtomicBoolean generated = new AtomicBoolean(false);
+        if (soilProperties.inheritsPrimitiveProperties())
+            soilProperties.getPrimitiveSoilBlockOptional().ifPresent(primitive -> {
+                soilProperties.generateBlock(BlockBehaviour.Properties.ofFullCopy(primitive));
+                generated.set(true);
+            });
+        if (!generated.get()){
+            soilProperties.generateBlock(JsonHelper.getBlockProperties(
+                    json,
+                    soilProperties.getDefaultMapColor(),
+                    soilProperties::getDefaultBlockProperties,
+                    error -> this.logError(soilProperties.getRegistryName(), error),
+                    warning -> this.logWarning(soilProperties.getRegistryName(), warning)
+            ));
+        }
+
     }
 
 }

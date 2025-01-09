@@ -2,14 +2,12 @@ package com.dtteam.dynamictrees.platform;
 
 import com.dtteam.dynamictrees.api.registry.*;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlockEntity;
-import com.dtteam.dynamictrees.models.PottedSaplingBlockEntityNF;
-import com.dtteam.dynamictrees.registry.NeoForgeRegistryLoader;
-import com.dtteam.dynamictrees.registry.RegistryLoader;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.block.soil.SoilProperties;
+import com.dtteam.dynamictrees.registry.*;
 import com.dtteam.dynamictrees.platform.services.IRegistryHelper;
-import com.dtteam.dynamictrees.registry.NeoForgeRegistryHandler;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-
-import java.util.function.Supplier;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class NeoForgeRegistryHelper implements IRegistryHelper {
 
@@ -34,6 +32,11 @@ public class NeoForgeRegistryHelper implements IRegistryHelper {
     @Override
     public BlockEntityType.BlockEntitySupplier<PottedSaplingBlockEntity> getPottedSaplingBlockEntity() {
         return PottedSaplingBlockEntityNF::new;
+    }
+
+    @Override
+    public SoilBlock newSoilBlock(SoilProperties soilProperties, BlockBehaviour.Properties blockProperties) {
+        return new SoilBlockNF(soilProperties, blockProperties);
     }
 
 }

@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
 import com.dtteam.dynamictrees.block.FutureBreakable;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.FutureBreak;
@@ -28,8 +28,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -38,7 +36,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
@@ -233,7 +230,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         BlockPos rootPos = TreeHelper.findRootNode(level, blockPos);
         if (rootPos == BlockPos.ZERO) return false;
         BlockState rootState = levelReader.getBlockState(rootPos);
-        RootyBlock root = TreeHelper.getRooty(rootState);
+        SoilBlock root = TreeHelper.getRooty(rootState);
         if (root == null) return false;
 
         return root.isValidBonemealTarget(levelReader, rootPos, rootState);
@@ -249,7 +246,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         BlockPos rootPos = TreeHelper.findRootNode(pLevel, pPos);
         if (rootPos == BlockPos.ZERO) return;
         BlockState rootState = pLevel.getBlockState(rootPos);
-        RootyBlock root = TreeHelper.getRooty(rootState);
+        SoilBlock root = TreeHelper.getRooty(rootState);
         if (root == null) return;
 
         root.performBonemeal(pLevel, pRandom, rootPos, rootState);
@@ -448,7 +445,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
             if (family.isCompatibleGenericLeaves(species, state, level, pos)) {
                 dropList.clear();
                 LeavesProperties leaves = Optional.ofNullable(TreeHelper.getLeaves(state))
-                        .map(DynamicLeavesBlock::getProperties)
+                        .map(DynamicLeavesBlock::getLeavesProperties)
                         .orElse(LeavesProperties.NULL);
                 dropList.addAll(leaves.getDrops(level, pos, tool, species));
                 final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
@@ -529,7 +526,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final List<ItemStack> woodDropList = woodItems.stream().filter(i -> level.random.nextFloat() <= chance).toList();
 
         // Drop the FallingTreeEntity into the level.
-//        FallingTreeEntity.dropTree(level, destroyData, woodDropList,  FallingTreeEntity.DestroyType.HARVEST);
+        FallingTreeEntity.dropTree(level, destroyData, woodDropList,  FallingTreeEntity.DestroyType.HARVEST);
 
         // Damage the axe by a prescribed amount.
         this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);

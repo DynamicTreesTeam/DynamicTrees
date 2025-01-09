@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.systems.substance;
 
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -13,7 +13,7 @@ public class DepleteSubstance implements SubstanceEffect {
 
     @Override
     public boolean apply(Level level, BlockPos rootPos) {
-        final RootyBlock dirt = TreeHelper.getRooty(level.getBlockState(rootPos));
+        final SoilBlock dirt = TreeHelper.getRooty(level.getBlockState(rootPos));
 
         if (dirt.fertilize(level, rootPos, -amount)) {
             TreeHelper.treeParticles(level, rootPos, ParticleTypes.ANGRY_VILLAGER, 8);

@@ -5,20 +5,24 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
 import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import com.dtteam.dynamictrees.block.pod.PodBlock;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.systems.nodemapper.CollectorNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -65,7 +69,7 @@ public class ChunkTreeHelper {
 
             // There is at least one root block in the network
             BlockState rootyState = level.getBlockState(rootPos);
-            Optional<RootyBlock> rootyBlock = TreeHelper.getRootyOpt(rootyState);
+            Optional<SoilBlock> rootyBlock = TreeHelper.getRootyOpt(rootyState);
             if (rootyBlock.isEmpty()) {
                 continue; // This theoretically shouldn't ever happen
             }
@@ -134,8 +138,8 @@ public class ChunkTreeHelper {
     private static void doTreeDestroy(Level level, BranchBlock branchBlock, BlockPos pos) {
         BranchDestructionData destroyData = branchBlock.destroyBranchFromNode(level, pos, Direction.DOWN, true, null);
         destroyData.leavesDrops.clear(); // Prevent dropped seeds from planting themselves again
-//        FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0),
-//                FallingTreeEntity.DestroyType.ROOT); // Destroy the tree client side without fancy effects
+        FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0),
+                FallingTreeEntity.DestroyType.ROOT); // Destroy the tree client side without fancy effects
         cleanupNeighbors(level, destroyData);
     }
 
@@ -209,6 +213,12 @@ public class ChunkTreeHelper {
             level.setBlock(mblock, BlockStates.AIR, Block.UPDATE_CLIENTS);
             mblock.move(Direction.DOWN);
         }
+    }
+
+    public static boolean canCheckSurroundings(LevelAccessor accessor, BlockPos pos, int r) {
+        return accessor.getBlockStatesIfLoaded(
+                AABB.encapsulatingFullBlocks(pos.offset(-r, -r, -r), pos.offset(r, r, r))
+        ).findAny().isPresent();
     }
 
 }

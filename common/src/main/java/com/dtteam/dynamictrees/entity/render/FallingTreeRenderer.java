@@ -10,10 +10,13 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-//@OnlyIn(Dist.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 
     public FallingTreeRenderer(EntityRendererProvider.Context renderManager) {
@@ -29,7 +32,7 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
     public void render(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
 
-        if (!entity.isClientBuilt() || !entity.shouldRender()) {
+        if (!entity.isClientBuilt() || !entity.shouldRender(entity.getX(), entity.getY(), entity.getX())) {
             return;
         }
 
@@ -47,7 +50,7 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 
         entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTick, poseStack);
 
-//        treeModel.renderToBuffer(poseStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1.0F);
+        treeModel.renderToBuffer(poseStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1);
 
         poseStack.popPose();
     }

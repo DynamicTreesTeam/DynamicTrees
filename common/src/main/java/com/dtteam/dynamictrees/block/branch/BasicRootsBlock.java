@@ -7,13 +7,14 @@ import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
+import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.systems.nodemapper.RootsDestroyerNode;
 import com.dtteam.dynamictrees.systems.nodemapper.SpeciesNode;
 import com.dtteam.dynamictrees.systems.nodemapper.StateNode;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
-import com.dtteam.dynamictrees.tree.species.MangroveSpecies;
+import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.*;
 import net.minecraft.core.BlockPos;
@@ -331,7 +332,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         final List<ItemStack> woodItems = destroyData.species.getBranchesDrops(level, woodVolume, heldItem);
 
         // Drop the FallingTreeEntity into the level.
-//        FallingTreeEntity.dropTree(level, destroyData, woodItems, FallingTreeEntity.DestroyType.HARVEST);
+        FallingTreeEntity.dropTree(level, destroyData, woodItems, FallingTreeEntity.DestroyType.HARVEST);
 
         // Damage the axe by a prescribed amount.
         this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);
@@ -382,7 +383,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     }
 
     private void DropTreeIfUnsupported (Level level, BlockPos cutPos, BlockPos rootPos, @Nullable Player player){
-        if (level.getBlockState(rootPos).getBlock() instanceof AerialRootsSoilProperties.RootRootyBlock rootyBlock){
+        if (level.getBlockState(rootPos).getBlock() instanceof AerialRootsSoilProperties.RootSoilBlock rootyBlock){
             if (!rootyBlock.isStructurallyStable(level, rootPos)){
                 rootyBlock.dropWholeTree(level, rootPos, player);
             }
@@ -591,7 +592,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         final BlockState currBlockState = level.getBlockState(pos);
         final Species species = signal.getSpecies();
         //Family must be "mangrove" for trees to have roots
-        if (!(species instanceof MangroveSpecies speciesMangrove)) return signal;
+        if (!(species instanceof UndergroundRootsSpecies speciesMangrove)) return signal;
 
 //        final Direction originDir = signal.dir.getOpposite();// Direction this signal originated from
 //        Direction targetDir = speciesMangrove.getRootsGrowthLogicKit().selectNewDirection( // This must be cached on the stack for proper recursion

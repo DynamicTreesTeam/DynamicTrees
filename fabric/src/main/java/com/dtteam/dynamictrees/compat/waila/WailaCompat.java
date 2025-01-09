@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import com.dtteam.dynamictrees.block.pod.PodBlock;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.WaterSoilProperties;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaPlugin;
@@ -21,8 +21,8 @@ public class WailaCompat implements IWailaPlugin {
 
         registration.registerBlockComponent(new WailaFruitHandler(), FruitBlock.class);
         registration.registerBlockComponent(new WailaPodHandler(), PodBlock.class);
-        registration.registerBlockComponent(new WailaRootyHandler(), RootyBlock.class);
-        registration.registerBlockComponent(new WailaRootyWaterHandler(), WaterSoilProperties.RootyWaterBlock.class);
+        registration.registerBlockComponent(new WailaRootyHandler(), SoilBlock.class);
+        registration.registerBlockComponent(new WailaRootyWaterHandler(), WaterSoilProperties.SoilWaterBlock.class);
     }
 
 }

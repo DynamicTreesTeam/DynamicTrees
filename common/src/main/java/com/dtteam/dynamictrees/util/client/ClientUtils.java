@@ -60,7 +60,7 @@ public class ClientUtils {
             RandomSource random = level.random;
             TreePart treePart = TreeHelper.getTreePart(blockState);
             if (treePart instanceof DynamicLeavesBlock leaves) {
-                LeavesProperties leavesProperties = leaves.getProperties();
+                LeavesProperties leavesProperties = leaves.getLeavesProperties();
                 int color = getFoliageColor(leavesProperties, level, blockState, pos);
                 float r = (color >> 16 & 255) / 255.0F;
                 float g = (color >> 8 & 255) / 255.0F;

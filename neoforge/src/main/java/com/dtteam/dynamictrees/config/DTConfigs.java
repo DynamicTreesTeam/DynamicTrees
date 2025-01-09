@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.event.handler.OptionalHandlers;
 import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
+import com.dtteam.dynamictrees.tree.species.SwampSpecies;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
@@ -131,7 +132,7 @@ public class DTConfigs {
         registerConfig(SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
                 defineInRange("rootyBlockHardnessMultiplier", 40f, 0f, 128f));
         registerConfig(SERVER_BUILDER.comment("Options for how oak trees generate in swamps. ROOTED: Swamp oak trees will generate on shallow water with mangrove-like roots. SUNK: Swamp oak trees will generate on shallow water one block under the surface. DISABLED: Swamp oaks will not generate on water.").
-                defineEnum("swampOaksInWater", DynamicTrees.SwampOakWaterState.ROOTED));
+                defineEnum("swampOaksInWater", SwampSpecies.WaterSurfaceGenerationState.ROOTED));
         registerConfig(SERVER_BUILDER.comment("The amount of growth pulses to send when bone meal is applied to a tree. Warning: setting values higher than 64 is not recommended other than for testing purposes. ").
                 defineInRange("boneMealGrowthPulses", 1, 1, 512));
         SERVER_BUILDER.pop();

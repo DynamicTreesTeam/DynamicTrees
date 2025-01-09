@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.core.BlockPos;
@@ -33,12 +34,12 @@ public class NullTreePart implements TreePart {
     @Override
     public int getRadiusForConnection(BlockState state, BlockGetter level, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         // Connectable blocks such as bee nests and shroomlight will be handled here.
-//        if (BranchConnectables.isBlockConnectable(state.getBlock())) {
-//            int rad = BranchConnectables.getConnectionRadiusForBlock(state, level, pos, side);
-//            if (rad > 0) {
-//                return rad;
-//            }
-//        }
+        if (BranchConnectables.isBlockConnectable(state.getBlock())) {
+            int rad = BranchConnectables.getConnectionRadiusForBlock(state, level, pos, side);
+            if (rad > 0) {
+                return rad;
+            }
+        }
 
         return 0;
     }
@@ -55,8 +56,7 @@ public class NullTreePart implements TreePart {
 
     @Override
     public boolean shouldAnalyse(BlockState state, BlockGetter level, BlockPos pos) {
-        //return BranchConnectables.isBlockConnectable(state.getBlock());
-        return false;
+        return BranchConnectables.isBlockConnectable(state.getBlock());
     }
 
     @Override

@@ -1,11 +1,10 @@
 package com.dtteam.dynamictrees.systems.substance;
 
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -15,7 +14,7 @@ public class MegaSubstance implements SubstanceEffect {
     public boolean apply(Level level, BlockPos rootPos) {
 
         BlockState blockState = level.getBlockState(rootPos);
-        RootyBlock dirt = TreeHelper.getRooty(blockState);
+        SoilBlock dirt = TreeHelper.getRooty(blockState);
         final Species species = dirt.getSpecies(blockState, level, rootPos);
         final Species megaSpecies = species.getMegaSpecies();
 

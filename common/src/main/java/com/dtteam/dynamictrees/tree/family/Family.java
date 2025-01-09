@@ -24,6 +24,8 @@ import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -40,6 +42,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -78,10 +81,10 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
             return Species.NULL_SPECIES;
         }
 
-//        @Override
-//        public boolean onTreeActivated(TreeActivationContext context) {
-//            return false;
-//        }
+        @Override
+        public boolean onTreeActivated(TreeActivationContext context) {
+            return false;
+        }
 
         @Override
         public ItemStack getStick(int qty) {
@@ -274,13 +277,13 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     public boolean stripBranch(BlockState state, Level level, BlockPos pos, Player player, ItemStack heldItem) {
         if (this.hasStrippedBranch()) {
-//            this.getBranch().ifPresent(branch -> {
-//                branch.stripBranch(state, level, pos, player, heldItem);
-//                if (level.isClientSide) {
-//                    level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
-//                    WailaOther.invalidateWailaPosition();
-//                }
-//            });
+            this.getBranch().ifPresent(branch -> {
+                branch.stripBranch(state, level, pos, player, heldItem);
+                if (level.isClientSide) {
+                    level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    //WailaOther.invalidateWailaPosition();
+                }
+            });
             return this.getBranch().isPresent();
         } else {
             return false;
@@ -968,31 +971,31 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 //    public void generateLangData(DTLangProvider provider) {
 //        this.familyLangGenerator.get().generate(provider, this);
 //    }
-//
-//    //////////////////////////////
-//    // JAVA OBJECT STUFF
-//    //////////////////////////////
-//
-//    @Override
-//    public String toLoadDataString() {
-//        return this.getString(
-//                Pair.of("commonLeaves", this.commonLeaves),
-//                Pair.of("maxBranchRadius", this.maxBranchRadius),
-//                Pair.of("hasSurfaceRoot", this.hasSurfaceRoot),
-//                Pair.of("hasStrippedBranch", this.hasStrippedBranch)
-//        );
-//    }
-//
-//    @Override
-//    public String toReloadDataString() {
-//        return this.getString(
-//                Pair.of("commonLeaves", this.commonLeaves),
-//                Pair.of("maxBranchRadius", this.maxBranchRadius),
-//                Pair.of("commonSpecies", this.commonSpecies),
-//                Pair.of("primitiveLog", this.primitiveLog),
-//                Pair.of("primitiveStrippedLog", this.primitiveStrippedLog),
-//                Pair.of("stick", this.stick),
-//                Pair.of("minRadiusForStrip", this.minRadiusForStripping)
-//        );
-//    }
+
+    //////////////////////////////
+    // JAVA OBJECT STUFF
+    //////////////////////////////
+
+    @Override
+    public String toLoadDataString() {
+        return this.getString(
+                Pair.of("commonLeaves", this.commonLeaves),
+                Pair.of("maxBranchRadius", this.maxBranchRadius),
+                Pair.of("hasSurfaceRoot", this.hasSurfaceRoot),
+                Pair.of("hasStrippedBranch", this.hasStrippedBranch)
+        );
+    }
+
+    @Override
+    public String toReloadDataString() {
+        return this.getString(
+                Pair.of("commonLeaves", this.commonLeaves),
+                Pair.of("maxBranchRadius", this.maxBranchRadius),
+                Pair.of("commonSpecies", this.commonSpecies),
+                Pair.of("primitiveLog", this.primitiveLog),
+                Pair.of("primitiveStrippedLog", this.primitiveStrippedLog),
+                Pair.of("stick", this.stick),
+                Pair.of("minRadiusForStrip", this.minRadiusForStripping)
+        );
+    }
 }

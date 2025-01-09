@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.systems.genfeature;
 
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
@@ -91,7 +91,7 @@ public class PodzolGenFeature extends GenFeature {
             BlockPos deltaPos = pos.relative(dir);
             Block testBlock = level.getBlockState(deltaPos).getBlock();
             podzolish += (testBlock == Blocks.PODZOL) ? 1 : 0;
-            podzolish += testBlock instanceof RootyBlock ? 1 : 0;
+            podzolish += testBlock instanceof SoilBlock ? 1 : 0;
             if (podzolish >= 3) {
                 level.setBlock(pos, BlockStates.PODZOL, Block.UPDATE_ALL);
                 break;

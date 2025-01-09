@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.worldgen;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.systems.nodemapper.CoderNode;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -58,7 +58,7 @@ public class RootsJoCode extends JoCode {
 
         int rootRadius;
         BlockState rootState = level.getBlockState(context.rootPos());
-        if (rootState.getBlock() instanceof RootyBlock rooty){
+        if (rootState.getBlock() instanceof SoilBlock rooty){
             rootRadius = rooty.updateRadius(level, rootState, context.rootPos(), 2, false);
         } else rootRadius = 8;
 

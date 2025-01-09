@@ -4,13 +4,13 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.entity.render.FallingTreeRenderer;
 import com.dtteam.dynamictrees.entity.render.LingeringEffectorRenderer;
-import com.dtteam.dynamictrees.models.baked.BakedModelBlockPottedSapling;
-import com.dtteam.dynamictrees.models.loader.*;
+import com.dtteam.dynamictrees.model.baked.BakedModelBlockPottedSapling;
+import com.dtteam.dynamictrees.model.loader.*;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -130,7 +130,7 @@ public class ClientModEventHandler {
         final int magenta = 0x00FF00FF;//for errors.. because magenta sucks.
 
         // Register Rooty Colorizers
-        for (RootyBlock roots : SoilHelper.getRootyBlocksList()) {
+        for (SoilBlock roots : SoilHelper.getRootyBlocksList()) {
             event.register((state, level, pos, tintIndex) -> roots.colorMultiplier(event.getBlockColors(), state, level, pos, tintIndex), roots);
             //Unfortunately there's no way around this. We do not own the models to set the renderType there.
             ItemBlockRenderTypes.setRenderLayer(roots, RenderType.cutoutMipped());
@@ -154,7 +154,7 @@ public class ClientModEventHandler {
         for (DynamicLeavesBlock leaves : LeavesProperties.REGISTRY.getAll().stream().filter(lp -> lp.getDynamicLeavesBlock().isPresent()).map(lp -> lp.getDynamicLeavesBlock().get()).collect(Collectors.toSet())) {
             event.register((state, level, pos, tintIndex) ->
                             isValidPos(level, pos) && TreeHelper.isLeaves(state.getBlock()) ?
-                                    ((DynamicLeavesBlock) state.getBlock()).getProperties().foliageColorMultiplier(state, level, pos) : magenta,
+                                    ((DynamicLeavesBlock) state.getBlock()).getLeavesProperties().foliageColorMultiplier(state, level, pos) : magenta,
                     leaves);
         }
     }

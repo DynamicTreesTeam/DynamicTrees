@@ -100,8 +100,8 @@ public class SoilHelper {
 
     public static boolean isSoilAcceptable(BlockState soilState, int soilFlags) {
         Block soilBlock = soilState.getBlock();
-        if (soilBlock instanceof RootyBlock) {
-            soilBlock = ((RootyBlock) soilBlock).getPrimitiveSoilBlock();
+        if (soilBlock instanceof SoilBlock) {
+            soilBlock = ((SoilBlock) soilBlock).getPrimitiveSoilBlock();
         }
         //underwater foliage is taken as just water
         if ((soilState.getFluidState().is(Fluids.WATER) && soilState.is(DTBlockTags.FOLIAGE))){
@@ -119,7 +119,7 @@ public class SoilHelper {
         return dirtMap.getOrDefault(block, SoilProperties.NULL_SOIL_PROPERTIES);
     }
 
-    public static Set<RootyBlock> getRootyBlocksList() {
+    public static Set<SoilBlock> getRootyBlocksList() {
         return dirtMap.values().stream()
                 .map(SoilProperties::getBlock)
                 .filter(Optional::isPresent)

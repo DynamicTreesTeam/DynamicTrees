@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.systems.genfeature.context;
 
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -17,11 +17,11 @@ public class PostGrowContext extends GenFeatureContext {
     /**
      * Instantiates a new {@link PostGrowContext} object.
      *
-     * @param rootPos   The {@link BlockPos} of the {@link RootyBlock} the generated tree is planted on.
+     * @param rootPos   The {@link BlockPos} of the {@link SoilBlock} the generated tree is planted on.
      * @param treePos   The {@link BlockPos} of the base trunk block of the tree (usually directly above the rooty dirt
      *                  block).
      * @param species   The {@link Species} being grown.
-     * @param fertility The fertility of the {@link RootyBlock} the tree is planted in.
+     * @param fertility The fertility of the {@link SoilBlock} the tree is planted in.
      * @param natural   If {@code true}, this member is being used to grow the tree naturally (create drops or fruit),
      *                  otherwise this member is being used to grow a tree with a growth accelerant like bonemeal or the
      *                  potion of burgeoning.

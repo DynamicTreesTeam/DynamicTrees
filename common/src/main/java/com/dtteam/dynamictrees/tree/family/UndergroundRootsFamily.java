@@ -9,7 +9,7 @@ import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
-import com.dtteam.dynamictrees.tree.species.MangroveSpecies;
+import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.Optionals;
 import net.minecraft.core.BlockPos;
@@ -52,8 +52,8 @@ public class UndergroundRootsFamily extends Family {
     @Override
     public void setCommonSpecies(Species species) {
         super.setCommonSpecies(species);
-        if (!(species instanceof MangroveSpecies)) {
-            LogManager.getLogger().warn("Common species {} for Underground Roots Family {} is not of type {}", species.getRegistryName(), getRegistryName(), MangroveSpecies.class);
+        if (!(species instanceof UndergroundRootsSpecies)) {
+            LogManager.getLogger().warn("Common species {} for Underground Roots Family {} is not of type {}", species.getRegistryName(), getRegistryName(), UndergroundRootsSpecies.class);
         }
     }
 
@@ -154,7 +154,7 @@ public class UndergroundRootsFamily extends Family {
 
     @Override
     public boolean isAcceptableSoilForRootSystem(BlockState soilBlockState){
-        return soilBlockState.getBlock() instanceof AerialRootsSoilProperties.RootRootyBlock || SoilHelper.isSoilAcceptable(soilBlockState, rootSystemSoilTypeFlags);
+        return soilBlockState.getBlock() instanceof AerialRootsSoilProperties.RootSoilBlock || SoilHelper.isSoilAcceptable(soilBlockState, rootSystemSoilTypeFlags);
     }
 
     public Family addAcceptableSoilsForRootSystem(String... soilTypes) {

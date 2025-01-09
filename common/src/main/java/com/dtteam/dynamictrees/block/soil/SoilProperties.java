@@ -5,8 +5,8 @@ import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.util.Optionals;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.mojang.serialization.Codec;
@@ -42,7 +42,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         }
 
         @Override
-        public Optional<RootyBlock> getBlock() {
+        public Optional<SoilBlock> getBlock() {
             return Optional.empty();
         }
 
@@ -62,7 +62,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     public static final TypedRegistry<SoilProperties> REGISTRY = new TypedRegistry<>(SoilProperties.class, NULL_SOIL_PROPERTIES, new TypedRegistry.EntryType<>(CODEC));
 
     protected Block primitiveSoilBlock;
-    protected Supplier<RootyBlock> block;
+    protected Supplier<SoilBlock> block;
     protected Integer soilFlags = 0;
     private ResourceLocation blockRegistryName;
     protected boolean hasSubstitute;
@@ -123,7 +123,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
      * @return the BlockState of the rooty soil.
      */
     public BlockState getSoilState(BlockState primitiveSoilState, int fertility, boolean requireTileEntity){
-        return block.get().defaultBlockState().setValue(RootyBlock.FERTILITY, fertility).setValue(RootyBlock.IS_VARIANT, requireTileEntity);
+        return block.get().defaultBlockState().setValue(SoilBlock.FERTILITY, fertility).setValue(SoilBlock.IS_VARIANT, requireTileEntity);
     }
 
     /**
@@ -131,6 +131,10 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
      */
     public BlockState getPrimitiveSoilState (BlockState currentSoilState){
         return primitiveSoilBlock.defaultBlockState();
+    }
+
+    public boolean inheritsPrimitiveProperties() {
+        return true;
     }
 
     ///////////////////////////////////////////
@@ -156,7 +160,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         }
     }
 
-    public Optional<RootyBlock> getBlock() {
+    public Optional<SoilBlock> getBlock() {
         if (block == null) return Optional.empty();
         return Optionals.ofBlock(block.get());
     }
@@ -166,12 +170,12 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         this.block = RegistryHandler.addBlock(this.blockRegistryName, () -> this.createBlock(blockProperties));
     }
 
-    protected RootyBlock createBlock(BlockBehaviour.Properties blockProperties) {
-        return new RootyBlock(this, blockProperties);
+    protected SoilBlock createBlock(BlockBehaviour.Properties blockProperties) {
+        return new SoilBlock(this, blockProperties);
     }
 
-    public void setBlock(RootyBlock rootyBlock) {
-        this.block = () -> rootyBlock;
+    public void setBlock(SoilBlock soilBlock) {
+        this.block = () -> soilBlock;
     }
 
     public boolean hasSubstitute() {

@@ -5,11 +5,14 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
+import com.dtteam.dynamictrees.registry.DTRegistries;
+import com.dtteam.dynamictrees.systems.genfeature.GenFeatures;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
 import com.dtteam.dynamictrees.util.CommonVoxelShapes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.LevelAccessor;
@@ -63,9 +66,9 @@ public class NetherFungusSpecies extends Species {
 
     @Override
     public Species setPostReloadDefaults() {
-//        if (!this.hasGenFeatures()) {
-//            this.addGenFeature(GenFeatures.CLEAR_VOLUME).addGenFeature(GenFeatures.SHROOMLIGHT);
-//        }
+        if (!this.hasGenFeatures()) {
+            this.addGenFeature(GenFeatures.CLEAR_VOLUME).addGenFeature(GenFeatures.SHROOMLIGHT);
+        }
         return super.setPostReloadDefaults();
     }
 
@@ -100,17 +103,17 @@ public class NetherFungusSpecies extends Species {
         textureConsumer.accept("cap", capLoc);
     }
 
-//    public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){
-//        return DTRegistries.FALLING_TREE_FUNGUS_START.get();
-//    }
-//
-//    public SoundEvent getFallingTreeEndSound (float treeVolume, boolean hasLeaves){
-//        return DTRegistries.FALLING_TREE_FUNGUS_END.get();
-//    }
-//
-//    public SoundEvent getFallingBranchEndSound (float treeVolume, boolean hasLeaves, boolean fellOnWater){
-//        return  hasLeaves ? DTRegistries.FALLING_TREE_FUNGUS_SMALL_END.get() : DTRegistries.FALLING_TREE_SMALL_END_BARE.get();
-//    }
+    public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){
+        return DTRegistries.FALLING_TREE_FUNGUS_START.get();
+    }
+
+    public SoundEvent getFallingTreeEndSound (float treeVolume, boolean hasLeaves){
+        return DTRegistries.FALLING_TREE_FUNGUS_END.get();
+    }
+
+    public SoundEvent getFallingBranchEndSound (float treeVolume, boolean hasLeaves, boolean fellOnWater){
+        return  hasLeaves ? DTRegistries.FALLING_TREE_FUNGUS_SMALL_END.get() : DTRegistries.FALLING_TREE_SMALL_END_BARE.get();
+    }
 
     public float getFallingTreePitch (float treeVolume){
         return 1.5f/(1+treeVolume*0.04f);

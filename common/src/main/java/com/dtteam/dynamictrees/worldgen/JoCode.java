@@ -312,7 +312,7 @@ public class JoCode {
                             final BlockState leavesState = level.getBlockState(delPos);
                             if (TreeHelper.isLeaves(leavesState)) {
                                 final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
-                                if (leavesProperties.getFamily() == leavesBlock.getProperties().getFamily()) {
+                                if (leavesProperties.getFamily() == leavesBlock.getLeavesProperties().getFamily()) {
                                     level.setBlock(delPos, BlockStates.AIR, 2);
                                 }
                             }

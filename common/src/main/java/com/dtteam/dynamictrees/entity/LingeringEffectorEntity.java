@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.entity;
 
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
-import com.dtteam.dynamictrees.block.soil.RootyBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -90,8 +90,8 @@ public class LingeringEffectorEntity extends Entity {// implements IEntityAdditi
 
         final BlockState blockState = this.level().getBlockState(this.blockPos);
 
-        if (blockState.getBlock() instanceof RootyBlock) {
-            if (!this.effect.update(this.level(), this.blockPos, this.tickCount, blockState.getValue(RootyBlock.FERTILITY))) {
+        if (blockState.getBlock() instanceof SoilBlock) {
+            if (!this.effect.update(this.level(), this.blockPos, this.tickCount, blockState.getValue(SoilBlock.FERTILITY))) {
                 this.kill();
             }
         } else {

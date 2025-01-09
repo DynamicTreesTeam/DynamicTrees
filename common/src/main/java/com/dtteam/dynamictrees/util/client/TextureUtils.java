@@ -25,7 +25,7 @@ public class TextureUtils {
             pixels = new int[w * h];
             for (int x = 0; x < w; x++) {
                 for (int y = 0; y < h; y++) {
-                    pixels[calcPos(x, y)] = Services.TEXTURE.getPixelRGBA(sprite, x, y);
+                    pixels[calcPos(x, y)] = Services.MISC.getPixelRGBA(sprite, x, y);
                 }
             }
 

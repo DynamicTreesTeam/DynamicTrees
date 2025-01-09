@@ -58,7 +58,7 @@ public class FreezerNode implements NodeInspector {
                 return;
             }
 
-            world.setBlock(leavesPos, leaves.getProperties().getPrimitiveLeaves()
+            world.setBlock(leavesPos, leaves.getLeavesProperties().getPrimitiveLeaves()
                     .setValue(LeavesBlock.PERSISTENT, true), 2);
         });
     }

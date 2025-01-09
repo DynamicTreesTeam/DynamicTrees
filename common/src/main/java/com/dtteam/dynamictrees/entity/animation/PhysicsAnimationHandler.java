@@ -3,11 +3,14 @@ package com.dtteam.dynamictrees.entity.animation;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
+import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
@@ -38,15 +41,15 @@ public class PhysicsAnimationHandler implements AnimationHandler {
     }
 
     protected void playEndSound(FallingTreeEntity entity, boolean onWater){
-//        if (!getData(entity).endSoundPlayed && !entity.level().isClientSide()){
-//            SoundInstance fallingInstance = getData(entity).fallingSoundInstance;
-//            if (fallingInstance != null)
-//                Minecraft.getInstance().getSoundManager().stop(fallingInstance);
-//            Species species = entity.getSpecies();
-//            SoundEvent sound = species.getFallingBranchEndSound(entity.getVolume(), entity.hasLeaves(), onWater);
-//            entity.playSound(sound, 1, species.getFallingBranchPitch(entity.getVolume()));
-//            getData(entity).endSoundPlayed = true;
-//        }
+        if (!getData(entity).endSoundPlayed && !entity.level().isClientSide()){
+            SoundInstance fallingInstance = getData(entity).fallingSoundInstance;
+            if (fallingInstance != null)
+                Minecraft.getInstance().getSoundManager().stop(fallingInstance);
+            Species species = entity.getSpecies();
+            SoundEvent sound = species.getFallingBranchEndSound(entity.getVolume(), entity.hasLeaves(), onWater);
+            entity.playSound(sound, 1, species.getFallingBranchPitch(entity.getVolume()));
+            getData(entity).endSoundPlayed = true;
+        }
     }
 
     @Override
@@ -178,7 +181,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
 
     @Override
 //    @OnlyIn(Dist.CLIENT)
-    public boolean shouldRender(FallingTreeEntity entity) {
+    public boolean shouldRender(FallingTreeEntity entity, double x, double y, double z) {
         return true;
     }
 }

@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.leaves.PalmLeavesProperties;
+import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKits;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.tree.family.Family;
@@ -17,6 +18,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 
@@ -73,26 +76,26 @@ public class PalmSpecies extends Species {
         return true;
     }
 
-//    @Override
-//    public void postGeneration(PostGenerationContext context) {
-//        final LevelAccessor level = context.level();
-//
-//        for (BlockPos endPoint : context.endPoints()) {
-//            BlockPos tip = endPoint.above(2);
-//            //if (context.bounds().inBounds(tip, true)) {
-//                if (level.getBlockState(tip).getBlock() instanceof DynamicLeavesBlock) {
-//                    for (CoordUtils.Surround surr : CoordUtils.Surround.values()) {
-//                        BlockPos leafPos = tip.offset(surr.getOffset());
-//                        BlockState leafState = level.getBlockState(leafPos);
-//                        if (leafState.getBlock() instanceof DynamicLeavesBlock block) {
-//                            level.setBlock(leafPos, block.getLeavesBlockStateForPlacement(level, leafPos, leafState, leafState.getValue(LeavesBlock.DISTANCE), true), 2);
-//                        }
-//                    }
-//                }
-//            //}
-//        }
-//        super.postGeneration(context);
-//    }
+    @Override
+    public void postGeneration(PostGenerationContext context) {
+        final LevelAccessor level = context.level();
+
+        for (BlockPos endPoint : context.endPoints()) {
+            BlockPos tip = endPoint.above(2);
+            //if (context.bounds().inBounds(tip, true)) {
+                if (level.getBlockState(tip).getBlock() instanceof DynamicLeavesBlock) {
+                    for (CoordUtils.Surround surr : CoordUtils.Surround.values()) {
+                        BlockPos leafPos = tip.offset(surr.getOffset());
+                        BlockState leafState = level.getBlockState(leafPos);
+                        if (leafState.getBlock() instanceof DynamicLeavesBlock block) {
+                            level.setBlock(leafPos, block.getLeavesBlockStateForPlacement(level, leafPos, leafState, leafState.getValue(LeavesBlock.DISTANCE), true), 2);
+                        }
+                    }
+                }
+            //}
+        }
+        super.postGeneration(context);
+    }
 
     @Nullable
     @Override

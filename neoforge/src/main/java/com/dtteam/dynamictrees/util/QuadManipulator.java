@@ -27,28 +27,8 @@ public class QuadManipulator {
 
     public static final Direction[] everyFace = {Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null};
 
-    public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, ModelData modelData) {
-        return getQuads(modelIn, stateIn, Vec3.ZERO, everyFace, RandomSource.create(), modelData);
-    }
-
-    public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, Direction[] sides, ModelData modelData) {
-        return getQuads(modelIn, stateIn, Vec3.ZERO, sides, RandomSource.create(), modelData);
-    }
-
-    public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, RandomSource rand, ModelData modelData) {
-        return getQuads(modelIn, stateIn, Vec3.ZERO, everyFace, rand, modelData);
-    }
-
     public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, Vec3 offset, RandomSource rand, ModelData modelData) {
         return getQuads(modelIn, stateIn, offset, everyFace, rand, modelData);
-    }
-
-    public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, Vec3 offset, ModelData modelData) {
-        return getQuads(modelIn, stateIn, offset, everyFace, RandomSource.create(), modelData);
-    }
-
-    public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, Vec3 offset, Direction[] sides, ModelData modelData) {
-        return getQuads(modelIn, stateIn, offset, sides, RandomSource.create(), modelData);
     }
 
     public static List<BakedQuad> getQuads(BakedModel modelIn, BlockState stateIn, Vec3 offset, Direction[] sides, RandomSource rand, ModelData modelData) {
@@ -69,7 +49,7 @@ public class QuadManipulator {
         for (BakedQuad inQuad : inQuads) {
             BakedQuad quadCopy = new BakedQuad(inQuad.getVertices().clone(), inQuad.getTintIndex(), inQuad.getDirection(), inQuad.getSprite(), inQuad.isShade());
             int[] vertexData = quadCopy.getVertices();
-            for (int i = 0; i < vertexData.length; i += DefaultVertexFormat.BLOCK.getVertexSize()) {
+            for (int i = 0; i < vertexData.length; i += (DefaultVertexFormat.BLOCK.getVertexSize()/4)) {
                 int pos = 0;
                 for (VertexFormatElement vfe : DefaultVertexFormat.BLOCK.getElements()) {
                     if (vfe.usage() == VertexFormatElement.Usage.POSITION) {
@@ -164,7 +144,7 @@ public class QuadManipulator {
 
             int[] vertexData = quad.get().getVertices();
             int numVertices = 0;
-            for (int i = 0; i < vertexData.length; i += DefaultVertexFormat.BLOCK.getVertexSize()) {
+            for (int i = 0; i < vertexData.length; i += (DefaultVertexFormat.BLOCK.getVertexSize()/4)) {
                 int pos = 0;
                 for (VertexFormatElement vfe : DefaultVertexFormat.BLOCK.getElements()) {
                     if (vfe.usage() == VertexFormatElement.Usage.UV) {

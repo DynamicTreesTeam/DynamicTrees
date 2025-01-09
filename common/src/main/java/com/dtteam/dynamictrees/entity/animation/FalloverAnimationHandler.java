@@ -1,9 +1,11 @@
 package com.dtteam.dynamictrees.entity.animation;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.client.SoundInstanceHandler;
 import com.dtteam.dynamictrees.data.tags.DTEntityTypeTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.BranchDestructionData;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -12,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -47,31 +50,31 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     protected void playStartSound(FallingTreeEntity entity){
-//        if (!getData(entity).startSoundPlayed && entity.level().isClientSide()){
-//            Species species = entity.getSpecies();
-//            SoundEvent sound = species.getFallingTreeStartSound(entity.getVolume(), entity.hasLeaves());
-//            SoundInstanceHandler.playSoundInstance(sound, species.getFallingTreePitch(entity.getVolume()), entity.position(), entity);
-//        }
+        if (!getData(entity).startSoundPlayed && entity.level().isClientSide()){
+            Species species = entity.getSpecies();
+            SoundEvent sound = species.getFallingTreeStartSound(entity.getVolume(), entity.hasLeaves());
+            SoundInstanceHandler.playSoundInstance(sound, species.getFallingTreePitch(entity.getVolume()), entity.position(), entity);
+        }
     }
     protected void playEndSound(FallingTreeEntity entity){
-//        if (!getData(entity).endSoundPlayed){
-//            if (entity.level().isClientSide){
-//                SoundInstanceHandler.stopSoundInstance(entity);
-//            } else {
-//                Species species = entity.getSpecies();
-//                SoundEvent sound = species.getFallingTreeEndSound(entity.getVolume(), entity.hasLeaves());
-//                entity.playSound(sound, 1.5f, species.getFallingTreePitch(entity.getVolume()));
-//                getData(entity).endSoundPlayed = true;
-//            }
-//
-//        }
+        if (!getData(entity).endSoundPlayed){
+            if (entity.level().isClientSide){
+                SoundInstanceHandler.stopSoundInstance(entity);
+            } else {
+                Species species = entity.getSpecies();
+                SoundEvent sound = species.getFallingTreeEndSound(entity.getVolume(), entity.hasLeaves());
+                entity.playSound(sound, 1.5f, species.getFallingTreePitch(entity.getVolume()));
+                getData(entity).endSoundPlayed = true;
+            }
+
+        }
     }
 
     protected void playFallThroughWaterSound(FallingTreeEntity entity){
-//        if (!getData(entity).fallThroughWaterSoundPlayed && !entity.level().isClientSide()){
-//            entity.playSound(entity.getSpecies().getFallingTreeHitWaterSound(entity.getVolume(), entity.hasLeaves()), 2, 1);
-//            getData(entity).fallThroughWaterSoundPlayed = true;
-//        }
+        if (!getData(entity).fallThroughWaterSoundPlayed && !entity.level().isClientSide()){
+            entity.playSound(entity.getSpecies().getFallingTreeHitWaterSound(entity.getVolume(), entity.hasLeaves()), 2, 1);
+            getData(entity).fallThroughWaterSoundPlayed = true;
+        }
     }
 
     private Vec3 rotateAroundAxis(Vec3 in, Vec3 axis, double theta){
@@ -364,11 +367,11 @@ public class FalloverAnimationHandler implements AnimationHandler {
                         entity.tickCount > 120 + (entity.getDestroyData().trunkHeight);
 
         //Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
-//        if (dead) {
-//            entity.cleanupRootyDirt();
-//            if (entity.level().isClientSide)
-//                SoundInstanceHandler.stopSoundInstance(entity);
-//        }
+        if (dead) {
+            entity.cleanupRootyDirt();
+            if (entity.level().isClientSide)
+                SoundInstanceHandler.stopSoundInstance(entity);
+        }
 
         return dead;
     }
@@ -398,7 +401,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
     @Override
 //    @OnlyIn(Dist.CLIENT)
-    public boolean shouldRender(FallingTreeEntity entity) {
+    public boolean shouldRender(FallingTreeEntity entity, double x, double y, double z) {
         return true;
     }
 
