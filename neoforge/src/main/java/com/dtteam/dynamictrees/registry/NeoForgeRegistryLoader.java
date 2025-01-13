@@ -7,7 +7,6 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
-import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -25,6 +24,13 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
+import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -48,6 +54,9 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTrees.MOD_ID);
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENT_TYPES = DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<LootItemConditionType> LOOT_CONDITION_TYPES = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<LootPoolEntryType> LOOT_POOL_ENTRY_TYPES = DeferredRegister.create(Registries.LOOT_POOL_ENTRY_TYPE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<LootItemFunctionType<?>> LOOT_FUNCTION_TYPES = DeferredRegister.create(Registries.LOOT_FUNCTION_TYPE, DynamicTrees.MOD_ID);
 
     public static void setup(IEventBus modBus) {
         BLOCK_ENTITY_TYPES.register(modBus);
@@ -62,10 +71,9 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         STRUCTURE_POOL_ELEMENT_TYPES.register(modBus);
         DATA_COMPONENT_TYPES.register(modBus);
         ARGUMENT_TYPES.register(modBus);
-
-//        DTLootPoolEntries.LOOT_POOL_ENTRY_TYPES.register(modBus);
-//        DTLootConditions.LOOT_CONDITION_TYPES.register(modBus);
-//        DTLootFunctions.LOOT_FUNCTION_TYPES.register(modBus);
+        LOOT_POOL_ENTRY_TYPES.register(modBus);
+        LOOT_CONDITION_TYPES.register(modBus);
+        LOOT_FUNCTION_TYPES.register(modBus);
 
         DTRegistries.setup();
     }
@@ -114,6 +122,18 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
 
     public <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>, I extends ArgumentTypeInfo<A, T>> Supplier<I> registerCommandArgumentType (String name, Class<A> infoClass, I argumentTypeInfo){
         return ARGUMENT_TYPES.register(name, () -> ArgumentTypeInfos.registerByClass(infoClass, argumentTypeInfo));
+    }
+
+    public Supplier<LootItemConditionType> registerLootConditionType(String name, MapCodec<? extends LootItemCondition> serializerFactory) {
+        return LOOT_CONDITION_TYPES.register(name, () -> new LootItemConditionType(serializerFactory));
+    }
+
+    public Supplier<LootPoolEntryType> registerLootPoolEntryType(String name, MapCodec<? extends LootPoolEntryContainer> serializerFactory) {
+        return LOOT_POOL_ENTRY_TYPES.register(name, () -> new LootPoolEntryType(serializerFactory));
+    }
+
+    public <L extends LootItemFunction> Supplier<LootItemFunctionType<L>> registerLootFunctionType(String name, MapCodec<L> serializerFactory) {
+        return LOOT_FUNCTION_TYPES.register(name, () -> new LootItemFunctionType<>(serializerFactory));
     }
 
     ///////////////////////////////////////////

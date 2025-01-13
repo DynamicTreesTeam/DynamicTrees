@@ -13,6 +13,15 @@ import com.dtteam.dynamictrees.entity.LingeringEffectorEntity;
 import com.dtteam.dynamictrees.item.DendroPotion;
 import com.dtteam.dynamictrees.item.DirtBucket;
 import com.dtteam.dynamictrees.item.Staff;
+import com.dtteam.dynamictrees.loot.condition.SeasonalSeedDropChance;
+import com.dtteam.dynamictrees.loot.condition.SpeciesMatches;
+import com.dtteam.dynamictrees.loot.condition.VoluntarySeedDropChance;
+import com.dtteam.dynamictrees.loot.entry.ItemBySpeciesLootPoolEntry;
+import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
+import com.dtteam.dynamictrees.loot.entry.WeightedItemLootPoolEntry;
+import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
+import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
+import com.dtteam.dynamictrees.loot.function.MultiplyCount;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.util.TreeHelper;
@@ -37,6 +46,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -194,5 +206,32 @@ public class DTRegistries {
 
     public static final Supplier<SingletonArgumentInfo<HexColorArgument>> HEX_COLOR = Services.REGISTRY.getRegistryLoader()
             .registerCommandArgumentType("hex_color", HexColorArgument.class, SingletonArgumentInfo.contextFree(HexColorArgument::hex));
+
+    ///////////////////////////////////////////
+    // LOOT
+    ///////////////////////////////////////////
+
+    public static final Supplier<LootItemConditionType> SPECIES_MATCHES = Services.REGISTRY.getRegistryLoader()
+            .registerLootConditionType("species_matches", SpeciesMatches.CODEC);
+    public static final Supplier<LootItemConditionType> SEASONAL_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
+            .registerLootConditionType("seasonal_seed_drop_chance", SeasonalSeedDropChance.CODEC);
+    public static final Supplier<LootItemConditionType> VOLUNTARY_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
+            .registerLootConditionType("voluntary_seed_drop_chance", VoluntarySeedDropChance.CODEC);
+
+    public static final Supplier<LootPoolEntryType> ITEM_BY_SPECIES = Services.REGISTRY.getRegistryLoader()
+            .registerLootPoolEntryType("item_by_species", ItemBySpeciesLootPoolEntry.CODEC);
+    public static final Supplier<LootPoolEntryType> SEED_ITEM = Services.REGISTRY.getRegistryLoader()
+            .registerLootPoolEntryType("seed_item", SeedItemLootPoolEntry.CODEC);
+    public static final Supplier<LootPoolEntryType> WEIGHTED_ITEM = Services.REGISTRY.getRegistryLoader()
+            .registerLootPoolEntryType("weighted_item", WeightedItemLootPoolEntry.CODEC);
+
+    public static final Supplier<LootItemFunctionType<MultiplyCount>> MULTIPLY_COUNT = Services.REGISTRY.getRegistryLoader()
+            .registerLootFunctionType("multiply_count", MultiplyCount.CODEC);
+    public static final Supplier<LootItemFunctionType<MultiplyByLogsCount>> MULTIPLY_LOGS_COUNT = Services.REGISTRY.getRegistryLoader()
+            .registerLootFunctionType("multiply_logs_count", MultiplyByLogsCount.CODEC);
+    public static final Supplier<LootItemFunctionType<MultiplyBySticksCount>> MULTIPLY_STICKS_COUNT = Services.REGISTRY.getRegistryLoader()
+            .registerLootFunctionType("multiply_sticks_count", MultiplyBySticksCount.CODEC);
+
+
 
 }

@@ -201,7 +201,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         int newHydro = updateHydro(level, pos, state, worldGen);
         if (newHydro == 0) return 0; //If the leaves died don't bother
 
-        if (removeIfInvalid(state, level, pos, rand)) {
+        if (!worldGen && removeIfInvalid(state, level, pos, rand)) {
             return 0;
         }
 
@@ -213,8 +213,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         }
         return newHydro;
     }
-
-
 
     //RANDOM TICK -> Destroy leaves if invalid
     //NEIGHBOR UPDATE -> recalculate hydro

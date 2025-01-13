@@ -1,7 +1,9 @@
 //package com.dtteam.dynamictrees.data.provider;
 //
 //import com.dtteam.dynamictrees.block.branch.BranchBlock;
+//import com.dtteam.dynamictrees.block.fruit.Fruit;
 //import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+//import com.dtteam.dynamictrees.block.pod.Pod;
 //import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 //import com.dtteam.dynamictrees.loot.condition.SeasonalSeedDropChance;
 //import com.dtteam.dynamictrees.loot.condition.VoluntarySeedDropChance;
@@ -15,9 +17,12 @@
 //import net.minecraft.advancements.critereon.ItemPredicate;
 //import net.minecraft.advancements.critereon.MinMaxBounds;
 //import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+//import net.minecraft.core.HolderLookup;
+//import net.minecraft.core.registries.BuiltInRegistries;
 //import net.minecraft.data.PackOutput;
 //import net.minecraft.data.loot.BlockLootSubProvider;
 //import net.minecraft.data.loot.LootTableProvider;
+//import net.minecraft.resources.ResourceKey;
 //import net.minecraft.resources.ResourceLocation;
 //import net.minecraft.server.packs.PackType;
 //import net.minecraft.world.flag.FeatureFlagSet;
@@ -40,12 +45,11 @@
 //import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 //import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 //import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
-//import net.minecraftforge.common.data.ExistingFileHelper;
-//import net.minecraftforge.fml.ModLoader;
-//import net.minecraftforge.registries.ForgeRegistries;
+//import org.jetbrains.annotations.NotNull;
 //
 //import java.util.List;
 //import java.util.Set;
+//import java.util.concurrent.CompletableFuture;
 //import java.util.function.BiConsumer;
 //
 ///**
@@ -53,7 +57,7 @@
 // */
 //public class DTLootTableProvider extends LootTableProvider {
 //    private static final LootItemCondition.Builder HAS_SILK_TOUCH = MatchTool.toolMatches(ItemPredicate.Builder.item()
-//            .hasEnchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.Ints.atLeast(1))));
+//            .hasComponents(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.Ints.atLeast(1))));
 //    private static final LootItemCondition.Builder HAS_SHEARS = MatchTool.toolMatches(ItemPredicate.Builder.item()
 //            .of(Items.SHEARS));
 //    private static final LootItemCondition.Builder HAS_SHEARS_OR_SILK_TOUCH = HAS_SHEARS.or(HAS_SILK_TOUCH);
@@ -62,15 +66,10 @@
 //    private final String modId;
 //    private final ExistingFileHelper existingFileHelper;
 //
-//    public DTLootTableProvider(PackOutput output, String modId, ExistingFileHelper existingFileHelper) {
-//        super(output, Set.of(), List.of());
+//    public DTLootTableProvider(PackOutput output, String modId, ExistingFileHelper existingFileHelper, CompletableFuture<HolderLookup.Provider> registries) {
+//        super(output, Set.of(), List.of(new SubProviderEntry(BlockLoot::new, LootContextParamSets.BLOCK)), registries);
 //        this.modId = modId;
 //        this.existingFileHelper = existingFileHelper;
-//    }
-//
-//    @Override
-//    public List<SubProviderEntry> getTables() {
-//        return List.of(new SubProviderEntry(BlockLoot::new, LootContextParamSets.BLOCK));
 //    }
 //
 //    public class BlockLoot extends BlockLootSubProvider {
@@ -82,10 +81,10 @@
 //        protected void generate() {
 //            Species.REGISTRY.dataGenerationStream(modId).forEach(this::addVoluntaryTable);
 //
-//            ForgeRegistries.BLOCKS.getValues().stream()
+//            BuiltInRegistries.BLOCK.stream()
 //                    .filter(block -> block instanceof BranchBlock)
 //                    .map(block -> (BranchBlock) block)
-//                    .filter(block -> ForgeRegistries.BLOCKS.getKey(block).getNamespace().equals(modId))
+//                    .filter(block -> BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(modId))
 //                    .forEach(this::addBranchTable);
 //
 //            LeavesProperties.REGISTRY.dataGenerationStream(modId).forEach(leavesProperties -> {
@@ -100,10 +99,10 @@
 //        }
 //
 //        @Override
-//        public void generate(BiConsumer<ResourceLocation, LootTable.Builder> saver) {
+//        public void generate(@NotNull BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
 //            this.generate();
 //
-//            this.map.forEach(saver::accept);
+//            this.map.forEach(output);
 //        }
 //
 //        private void addVoluntaryTable(Species species) {

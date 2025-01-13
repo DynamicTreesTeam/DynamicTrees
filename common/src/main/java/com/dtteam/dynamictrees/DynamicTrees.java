@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees;
 
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
+import com.dtteam.dynamictrees.loot.DTLoot;
 import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ public class DynamicTrees {
     // write the majority of your code here and load it from your loader specific projects. This example has some
     // code that gets invoked by the entry point of the loader specific projects.
     public static void init() {
+        DTLoot.load();
 
         RegistryHandler.setup(MOD_ID);
 
