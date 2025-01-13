@@ -8,21 +8,25 @@ import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.systems.nodemapper.RootsDestroyerNode;
 import com.dtteam.dynamictrees.systems.nodemapper.SpeciesNode;
 import com.dtteam.dynamictrees.systems.nodemapper.StateNode;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
-import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -34,6 +38,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -45,12 +50,13 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -190,14 +196,12 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     // SOUNDS
     //////////////////////////////
 
-//    @Override
-//    public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, @Nullable Entity entity) {
-//        Optional<Block> primitive = state.getValue(LAYER).getPrimitive(getFamily());
-//        if (primitive.isPresent()){
-//            return primitive.get().getSoundType(state, level, pos, entity);
-//        } else
-//            return super.getSoundType(state, level, pos, entity);
-//    }
+    @Override
+    protected SoundType getSoundType(BlockState state) {
+        Optional<Block> primitive = state.getValue(LAYER).getPrimitive(getFamily());
+        return primitive.map(block -> block.defaultBlockState().getSoundType())
+                .orElseGet(() -> super.getSoundType(state));
+    }
 
     //////////////////////////////
     // WATER LOGGING
@@ -265,32 +269,33 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return pState.canSurvive(level, clickedPos) && level.isUnobstructed(pState, clickedPos, collisioncontext);
     }
 
-//    @Override
-//    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-//        if (!isFullBlock(state)) {
-//            Layer layer = Layer.COVERED;
-//            if (state.getValue(RADIUS) >= 8){
-//                if (state.getValue(LAYER) == Layer.EXPOSED)
-//                    layer = Layer.FILLED;
-//                else layer = null;
-//            }
-//            if (layer != null){
-//                ItemStack handStack = player.getItemInHand(hand);
-//                Block coverBlock = getFamily().getPrimitiveCoveredRoots().orElse(null);
-//                if (coverBlock != null && handStack.getItem() == coverBlock.asItem()){
-//                    BlockState newState = state.setValue(LAYER, layer).setValue(WATERLOGGED, false);
-//                    if (canPlace(player, level, pos, newState)){
-//                        level.setBlock(pos, newState, 3);
-//                        if (!player.isCreative()) handStack.shrink(1);
-//                        level.playSound(null, pos, coverBlock.getSoundType(state, level, pos, player).getPlaceSound(), SoundSource.BLOCKS, 1f, 0.8f);
-//                        return InteractionResult.SUCCESS;
-//                    }
-//                }
-//            }
-//        }
-//        return super.use(state, level, pos , player, hand, hitResult);
-//    }
-//
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+                if (!isFullBlock(state)) {
+            Layer layer = Layer.COVERED;
+            if (state.getValue(RADIUS) >= 8){
+                if (state.getValue(LAYER) == Layer.EXPOSED)
+                    layer = Layer.FILLED;
+                else layer = null;
+            }
+            if (layer != null){
+                ItemStack handStack = player.getItemInHand(hand);
+                Block coverBlock = getFamily().getPrimitiveCoveredRoots().orElse(null);
+                if (coverBlock != null && handStack.getItem() == coverBlock.asItem()){
+                    BlockState newState = state.setValue(LAYER, layer).setValue(WATERLOGGED, false);
+                    if (canPlace(player, level, pos, newState)){
+                        level.setBlock(pos, newState, 3);
+                        if (!player.isCreative()) handStack.shrink(1);
+                        level.playSound(null, pos, coverBlock.defaultBlockState().getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1f, 0.8f);
+                        return ItemInteractionResult.SUCCESS;
+                    }
+                }
+            }
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+
+
 //    @Override
 //    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
 //        if (isFullBlock(state)){
@@ -388,17 +393,15 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
                 rootyBlock.dropWholeTree(level, rootPos, player);
             }
         }
-
     }
 
     @Override
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-//        if (isFullBlock(state)) return getFamily().getPrimitiveCoveredRoots().orElse(Blocks.AIR).defaultDestroyTime();
-//        final int radius = this.getRadius(level.getBlockState(pos));
-//        final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
-//                .getDestroySpeed(level, pos) * DTConfigs.TREE_HARDNESS_MULTIPLIER.get().floatValue() * (radius * radius) / 64.0f * 8.0f;
-//        return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
-        return 2;
+        if (isFullBlock(state)) return getFamily().getPrimitiveCoveredRoots().orElse(Blocks.AIR).defaultDestroyTime();
+        final int radius = this.getRadius(level.getBlockState(pos));
+        final double hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
+                .getDestroySpeed(level, pos) * Services.CONFIG.getDoubleConfig("TreeHardnessMultiplier") * (radius * radius) / 64.0f * 8.0f;
+        return (float) Math.min(hardness, Services.CONFIG.getDoubleConfig("maxTreeHardness")); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
     }
 
     //This is the state that will replace the root when the tree is felled.
@@ -413,10 +416,10 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     //This allows for the correct tool to be used in the root covering (shovel instead of axe, for example).
     @Deprecated
     public float getDestroyProgress(BlockState pState, Player pPlayer, BlockGetter pLevel, BlockPos pPos) {
-//        Optional<Block> covered = getFamily().getPrimitiveCoveredRoots();
-//        if (pState.hasProperty(LAYER) && pState.getValue(LAYER) == Layer.COVERED && covered.isPresent()){
-//            return covered.get().getDestroyProgress(covered.get().defaultBlockState(), pPlayer, pLevel, pPos);
-//        }
+        Optional<Block> covered = getFamily().getPrimitiveCoveredRoots();
+        if (pState.hasProperty(LAYER) && pState.getValue(LAYER) == Layer.COVERED && covered.isPresent()){
+            return covered.get().getDestroyProgress(covered.get().defaultBlockState(), pPlayer, pLevel, pPos);
+        }
         return super.getDestroyProgress(pState, pPlayer, pLevel, pPos);
     }
 

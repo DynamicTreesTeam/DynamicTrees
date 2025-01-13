@@ -202,23 +202,24 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     @Override
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-//        final int radius = this.getRadius(level.getBlockState(pos));
-//        final float hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
-//                .getDestroySpeed(level, pos) * DTConfigs.TREE_HARDNESS_MULTIPLIER.get().floatValue() * (radius * radius) / 64.0f * 8.0f;
-//        return (float) Math.min(hardness, DTConfigs.MAX_TREE_HARDNESS.get()); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
-        return 2;
+        final int radius = this.getRadius(level.getBlockState(pos));
+        final double hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
+                .getDestroySpeed(level, pos) * Services.CONFIG.getDoubleConfig("TreeHardnessMultiplier") * (radius * radius) / 64.0f * 8.0f;
+        return (float) Math.min(hardness, Services.CONFIG.getDoubleConfig("maxTreeHardness")); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
     }
 
-//    @Override
-//    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-//        int radius = getRadius(level.getBlockState(pos));
-//        return (fireSpreadSpeed * radius) / 8;
-//    }
-//
-//    @Override
-//    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-//        return flammability;
-//    }
+    /** NeoForge override */
+    @SuppressWarnings("unused")
+    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        int radius = getRadius(level.getBlockState(pos));
+        return (fireSpreadSpeed * radius) / 8;
+    }
+
+    /** NeoForge override */
+    @SuppressWarnings("unused")
+    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return flammability;
+    }
 
     public BasicBranchBlock setFlammability(int flammability) {
         this.flammability = flammability;
