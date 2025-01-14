@@ -5,11 +5,17 @@ import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.Growable;
+import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.util.AgeProperties;
+import com.dtteam.dynamictrees.util.LazyValue;
 import com.dtteam.dynamictrees.util.LevelContext;
+import com.dtteam.dynamictrees.util.ResourceLocationUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -22,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.logging.log4j.LogManager;
@@ -308,23 +315,23 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
         return true;
     }
 
-//    private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
-//            ResourceLocationUtils.prefix(ForgeRegistries.BLOCKS.getKey(block.get()),"blocks/"));
-//
-//    public ResourceLocation getBlockDropsPath() {
-//        return blockDropsPath.get();
-//    }
+    private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
+            ResourceLocationUtils.prefix(BuiltInRegistries.BLOCK.getKey(block.get()),"blocks/"));
 
-//    public LootTable.Builder createBlockDrops() {
-//        if (minDropCount > maxDropCount || maxDropCount <= 0)
-//            throw new IllegalArgumentException("Attempted to create loot tables for "+getRegistryName()+" with an invalid drop count range ["+minDropCount+","+maxDropCount+"].");
-//        return DTLootTableProvider.BlockLoot.createFruitPodDrops(block.get(), getItemStack().getItem(), ageProperty, maxAge, minDropCount, maxDropCount);
-//    }
+    public ResourceLocation getBlockDropsPath() {
+        return blockDropsPath.get();
+    }
+
+    public LootTable.Builder createBlockDrops(HolderLookup.Provider registries) {
+        if (minDropCount > maxDropCount || maxDropCount <= 0)
+            throw new IllegalArgumentException("Attempted to create loot tables for "+getRegistryName()+" with an invalid drop count range ["+minDropCount+","+maxDropCount+"].");
+        return DTLootTableBuilder.createFruitPodDrops(block.get(), getItemStack().getItem(), ageProperty, maxAge, minDropCount, maxDropCount, registries);
+    }
 
     @NotNull
     @Override
     public Fruit reset() {
-        canBoneMeal = Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig("canBoneMealFruit");
+        canBoneMeal = Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig(IConfigHelper.CAN_BONE_MEAL_FRUIT);
         seasonOffset = 0.0F;
         flowerHoldPeriodLength = 0.5F;
         minProductionFactor = 0.3F;

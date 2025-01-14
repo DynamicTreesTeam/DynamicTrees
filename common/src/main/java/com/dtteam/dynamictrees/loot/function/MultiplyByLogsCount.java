@@ -8,6 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
@@ -37,6 +38,10 @@ public final class MultiplyByLogsCount extends LootItemConditionalFunction {
         assert volume != null;
         stack.setCount(stack.getCount() * (int) Math.floor((float) volume / NetVolumeNode.Volume.VOXELSPERLOG));
         return stack;
+    }
+
+    public static LootItemFunction.Builder multiplyByLogsCount() {
+        return () -> new MultiplyByLogsCount(List.of());
     }
 
 }

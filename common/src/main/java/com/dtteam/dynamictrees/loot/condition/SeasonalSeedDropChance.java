@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.loot.condition;
 
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.Codec;
@@ -35,7 +36,11 @@ public final class SeasonalSeedDropChance implements LootItemCondition {
         assert seasonalSeedDropFactor != null;
         // Adjusted to a minimum of 0.15 to ensure there are at least some seed drops all year round.
         float adjustedSeasonalSeedDropFactor = Math.min(seasonalSeedDropFactor + 0.15F, 1.0F);
-       return Services.CONFIG.getDoubleConfig("seedDropRate") * adjustedSeasonalSeedDropFactor > context.getRandom().nextFloat();
+       return Services.CONFIG.getDoubleConfig(IConfigHelper.LEAVES_SEED_DROP_RATE) * adjustedSeasonalSeedDropFactor > context.getRandom().nextFloat();
+    }
+
+    public static LootItemCondition.Builder seasonalSeedDropChance() {
+        return () -> new SeasonalSeedDropChance(Unit.INSTANCE);
     }
 
 }

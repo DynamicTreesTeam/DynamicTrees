@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.systems.season;
 
 import com.dtteam.dynamictrees.api.season.SeasonManager;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.util.LevelContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -47,7 +48,7 @@ public class SeasonHelper {
     }
 
     static public float globalSeasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos, float offset) {
-        return Services.CONFIG.getBoolConfig("enableSeasonalSeedDropFactor") ? seasonManager.getGrowthFactor(levelContext.level(), rootPos, offset) : 1.0F;
+        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_GROWTH_FACTOR) ? seasonManager.getGrowthFactor(levelContext.level(), rootPos, offset) : 1.0F;
     }
 
     static public float globalSeasonalSeedDropFactor(LevelContext levelContext, BlockPos pos) {
@@ -55,7 +56,7 @@ public class SeasonHelper {
     }
 
     static public float globalSeasonalSeedDropFactor(LevelContext levelContext, BlockPos pos, float offset) {
-        return Services.CONFIG.getBoolConfig("enableSeasonalSeedDropFactor") ? seasonManager.getSeedDropFactor(levelContext.level(), pos, offset) : 1.0F;
+        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_DROP_FACTOR) ? seasonManager.getSeedDropFactor(levelContext.level(), pos, offset) : 1.0F;
     }
 
     static public float globalSeasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos, boolean getAsScan) {
@@ -63,7 +64,7 @@ public class SeasonHelper {
     }
 
     static public float globalSeasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos, float offset, boolean getAsScan) {
-        return Services.CONFIG.getBoolConfig("enableSeasonalSeedDropFactor") ? seasonManager.getFruitProductionFactor(levelContext.level(), pos, offset, getAsScan) : 1.0F;
+        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION_FACTOR) ? seasonManager.getFruitProductionFactor(levelContext.level(), pos, offset, getAsScan) : 1.0F;
     }
 
     /**

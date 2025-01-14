@@ -38,4 +38,8 @@ public final class SpeciesMatches implements LootItemCondition {
         return String.valueOf(species.getRegistryName()).matches(regex);
     }
 
+    public static LootItemCondition.Builder speciesMatches(String regex) {
+        return () -> new SpeciesMatches(regex);
+    }
+
 }

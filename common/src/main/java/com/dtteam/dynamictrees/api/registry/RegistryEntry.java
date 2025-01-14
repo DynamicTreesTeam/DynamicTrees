@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.api.registry;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.data.DataProvider;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -112,13 +113,14 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
         this.generateData = generateData;
     }
 
-//    public void generateStateData(DTBlockStateProvider provider) {
-//    }
-//
-//    public void generateItemModelData(DTItemModelProvider provider) {
-//    }
-//    public void generateLangData(DTLangProvider provider) {
-//    }
+    public void generateStateData(DataProvider provider) {
+    }
+
+    public void generateItemModelData(DataProvider provider) {
+    }
+
+    public void generateLangData(DataProvider provider) {
+    }
 
     public final ResourceLocation getRegistryName() {
         return this.registryName;

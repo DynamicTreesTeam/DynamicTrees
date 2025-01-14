@@ -78,7 +78,7 @@ public class PalmLeavesProperties extends LeavesProperties {
 //    /**
 //     * @return a constructor for the relevant branch block model builder for the corresponding loader
 //     */
-//    public BiFunction<BlockModelBuilder, ExistingFileHelper, PalmLeavesLoaderBuilder> getFrondsLoaderConstructor() {
+//    public BiFunction<BlockModelBuilder, FileHelper, PalmLeavesLoaderBuilder> getFrondsLoaderConstructor() {
 //        return (b,e)->PalmLeavesLoaderBuilder.fronds(frondLoader, b,e);
 //    }
 

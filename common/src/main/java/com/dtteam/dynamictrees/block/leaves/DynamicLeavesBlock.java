@@ -9,11 +9,14 @@ import com.dtteam.dynamictrees.block.Ageable;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.data.tags.DTEntityTypeTags;
 import com.dtteam.dynamictrees.item.Seed;
+import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.ChunkTreeHelper;
+import com.dtteam.dynamictrees.util.LevelContext;
 import com.dtteam.dynamictrees.util.RayTraceCollision;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
@@ -35,7 +38,12 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,22 +86,17 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         return getLeavesProperties().getFamily();
     }
 
-//    // Get Leaves-specific flammability
-//    @Override
-//    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-//        return this.getProperties().getFlammability();
-//    }
-//
-//    // Get Leaves-specific fire spread speed
-//    @Override
-//    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-//        return this.getProperties().getFireSpreadSpeed();
-//    }
-//
-//    @Override
-//    public boolean isFlammable(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-//        return this.getFlammability(state, level, pos, face) > 0;
-//    }
+    /** NeoForge override */
+    @SuppressWarnings("unused")
+    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return this.getLeavesProperties().getFlammability();
+    }
+
+    /** NeoForge override */
+    @SuppressWarnings("unused")
+    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return this.getLeavesProperties().getFireSpreadSpeed();
+    }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
@@ -124,7 +127,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      */
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
-        double growthMultiplier = Services.CONFIG.getDoubleConfig("treeGrowthMultiplier");
+        double growthMultiplier = Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_GROWTH_MULTIPLIER);
         if (rand.nextFloat() > growthMultiplier) {
             return;
         }
@@ -230,16 +233,16 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         if (oldHydro != newHydro) { // Only update if the hydro has changed. A little performance gain.
             BlockState placeState = getLeavesBlockStateForPlacement(accessor, pos, leavesProperties.getDynamicLeavesState(newHydro), oldHydro, worldGen);
             boolean decayed = newHydro == 0;
-            // We do not use the 0x02 flag(update client) for performance reasons. The clients do not need to know the hydration level of the leaves blocks as it
-            // does not affect appearance or behavior, unless appearanceChangesWithHydro. For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
-            // however if the new hydro is 0, it means the leaves were removed and we do need to update, so the flag is 3.
-           if (decayed && !worldGen && (accessor instanceof Level level)
-                    //if the old hydro is the default then its most likely a block that was just placed and failed
-                    && oldHydro != getLeavesProperties().getCellKit().getDefaultHydration()) {
-                dropResources(state, level, pos);
-            }
+//           if (decayed && !worldGen && (accessor instanceof Level level)
+//                    //if the old hydro is the default then its most likely a block that was just placed and failed
+//                    && oldHydro != getLeavesProperties().getCellKit().getDefaultHydration()) {
+//                dropResources(state, level, pos);
+//            }
             int flag = decayed ? 3 : (appearanceChangesWithHydro(oldHydro, newHydro) ? 2 : 4);
             accessor.setBlock(pos, placeState, flag);
+            /* We do not use the 0x02 flag(update client) for performance reasons. The clients do not need to know the hydration level of the leaves blocks as it
+             does not affect appearance or behavior, unless appearanceChangesWithHydro. For the same reason we use the 0x04 flag to prevent the block from being re-rendered.
+             however if the new hydro is 0, it means the leaves were removed, and we do need to update, so the flag is 3. */
         }
         return newHydro;
     }
@@ -550,11 +553,11 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     protected boolean isMovementVanilla(){
-        return Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig("vanillaLeavesCollision");
+        return Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig(IConfigHelper.VANILLA_LEAVES_COLLISION);
     }
 
     protected boolean isLeavesPassable() {
-        return (Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig("isLeavesPassable"))
+        return (Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig(IConfigHelper.IS_LEAVES_PASSABLE))
                 || Services.PLATFORM.isModLoaded(DynamicTrees.PASSABLE_FOLIAGE);
     }
 
@@ -586,7 +589,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     @Override
     public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
         // We are only interested in Living things crashing through the canopy.
-        if (!Services.CONFIG.getBoolConfig("canopyCrash") || !(entity instanceof LivingEntity)) {
+        if (!Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_CANOPY_CRASH) || !(entity instanceof LivingEntity)) {
             return;
         }
 
@@ -650,8 +653,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     // DROPS
     //////////////////////////////
 
-
-
 //    @Override
 //    public boolean canHarvestBlock(BlockState state, BlockGetter level, BlockPos pos, Player player) {
 //        return true; // We'll handle this in #getDrops as some leave drops may not require a tool.
@@ -668,48 +669,41 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 //    }
 
     /**
-     * Gets the drops for this {@link DynamicLeavesBlock}. Default implementation simply returns the primitive leaves
-     * stack.
+     * Gets the drops for this {@link DynamicLeavesBlock}.
      *
-     * @param player  The {@link Player} who destroyed the {@link DynamicLeavesBlock}.
-     * @param item    The {@link ItemStack} used to destroy the {@link DynamicLeavesBlock}.
-     * @param pos     The {@link BlockPos} of the {@link DynamicLeavesBlock}.
-     * @param fortune The {@code fortune} on the tool used.
+     * @param state The current block state of the leaves block.
+     * @param builder The loot param builder.
      * @return The {@link List} of {@link ItemStack}s to drop.
      */
-    public List<ItemStack> getDrops(@Nullable Player player, ItemStack item, Level level, BlockPos pos, int fortune) {
-        return new ArrayList<>(Collections.singletonList(this.getLeavesProperties().getPrimitiveLeavesItemStack()));
-    }
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+        final Vec3 originPos = builder.getOptionalParameter(LootContextParams.ORIGIN);
+        final LootTable lootTable;
+        Species species = Species.NULL_SPECIES;
+        BlockPos pos = BlockPos.ZERO;
+        ServerLevel level = builder.getLevel();
 
-//    @Override
-//    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
-//        final Vec3 originPos = builder.getOptionalParameter(LootContextParams.ORIGIN);
-//        final LootTable lootTable;
-//        Species species = Species.NULL_SPECIES;
-//        BlockPos pos = BlockPos.ZERO;
-//        ServerLevel level = builder.getLevel();
-//
-//        if (originPos == null) {
-//            lootTable = level.getServer().getLootData().getLootTable(getLootTable());
-//        } else {
-//            pos = BlockPos.containing(originPos.x, originPos.y, originPos.z);
-//            LeavesProperties leavesProperties = getProperties();
-//            species = getExactSpecies(level, pos, leavesProperties);
-//            lootTable = leavesProperties.getBlockLootTable(level.getServer().getLootData(), species);
-//        }
-//
-//        if (lootTable == LootTable.EMPTY || lootTable.getLootTableId() == BuiltInLootTables.EMPTY) {
-//            return Collections.emptyList();
-//        } else {
-//            LootParams context = builder
-//                    .withParameter(LootContextParams.BLOCK_STATE, state)
-//                    .withParameter(DTLootContextParams.SPECIES, species)
-//                    .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR,
-//                            species.seasonalSeedDropFactor(LevelContext.create(level), pos))
-//                    .create(LootContextParamSets.BLOCK);
-//            return lootTable.getRandomItems(context);
-//        }
-//    }
+        if (originPos == null) {
+            lootTable = level.getServer().reloadableRegistries().getLootTable(getLootTable());
+        } else {
+            pos = BlockPos.containing(originPos.x, originPos.y, originPos.z);
+            LeavesProperties leavesProperties = getLeavesProperties();
+            species = getExactSpecies(level, pos, leavesProperties);
+            lootTable = leavesProperties.getBlockLootTable(level.getServer().reloadableRegistries(), species);
+        }
+
+        if (lootTable == LootTable.EMPTY) {
+            return Collections.emptyList();
+        } else {
+            LootParams context = builder
+                    .withParameter(LootContextParams.BLOCK_STATE, state)
+                    .withParameter(DTLootContextParams.SPECIES, species)
+                    .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR,
+                            species.seasonalSeedDropFactor(LevelContext.create(level), pos))
+                    .create(LootContextParamSets.BLOCK);
+            return lootTable.getRandomItems(context);
+        }
+    }
 
     /**
      * Gets the exact {@link Species} for these leaves (if able to find branches nearby). Warning! Resource intensive
@@ -749,7 +743,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         }
 
         // Find the closest one
-        BlockPos closest = branchList.get(0);
+        BlockPos closest = branchList.getFirst();
         double minDist = 999;
 
         for (BlockPos dPos : branchList) {

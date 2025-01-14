@@ -1,17 +1,10 @@
 //package com.dtteam.dynamictrees.data.provider;
 //
-//import com.dtteam.dynamictrees.api.TreeRegistry;
-//import com.dtteam.dynamictrees.init.DTRegistries;
-//import com.dtteam.dynamictrees.init.DTTrees;
-//import com.dtteam.dynamictrees.worldgen.CaveRootedTreePlacement;
-//import com.dtteam.dynamictrees.worldgen.DTFeatures;
-//import com.dtteam.dynamictrees.worldgen.feature.DTReplaceNyliumFungiBlockStateProvider;
-//import com.dtteam.dynamictrees.worldgen.structure.VillageTreeReplacement;
+//import com.dtteam.dynamictrees.data.DTDataProvider;
 //import net.minecraft.core.*;
 //import net.minecraft.core.registries.BuiltInRegistries;
 //import net.minecraft.core.registries.Registries;
 //import net.minecraft.data.PackOutput;
-//import net.minecraft.data.worldgen.BootstapContext;
 //import net.minecraft.data.worldgen.features.NetherFeatures;
 //import net.minecraft.data.worldgen.placement.PlacementUtils;
 //import net.minecraft.resources.ResourceKey;
@@ -33,9 +26,9 @@
 //import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 //import net.minecraft.world.level.levelgen.placement.RandomOffsetPlacement;
 //import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
-//import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
-//import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-//import net.minecraftforge.registries.DataPackRegistriesHooks;
+//import net.neoforged.fml.util.ObfuscationReflectionHelper;
+//import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
+//import net.neoforged.neoforge.registries.DataPackRegistriesHooks;
 //
 //import java.lang.reflect.Field;
 //import java.util.HashSet;

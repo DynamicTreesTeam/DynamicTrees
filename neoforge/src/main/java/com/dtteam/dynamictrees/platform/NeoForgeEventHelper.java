@@ -17,6 +17,8 @@ import net.minecraft.world.level.Level;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.common.NeoForge;
 
+import java.util.Map;
+
 public class NeoForgeEventHelper implements IEventHelper {
 
     @Override

@@ -10,19 +10,24 @@ import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.data.DTDataProvider;
+import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.util.BlockBounds;
+import com.dtteam.dynamictrees.util.MutableLazyValue;
 import com.dtteam.dynamictrees.util.Optionals;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -637,7 +642,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public int getMinRadiusForStripping() {
-        if (minRadiusForStripping == null) return Services.CONFIG.getIntConfig("minRadiusForStrip");
+        if (minRadiusForStripping == null) return Services.CONFIG.getIntConfig(IConfigHelper.MIN_RADIUS_FOR_STRIP);
         return minRadiusForStripping;
     }
 
@@ -646,7 +651,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public boolean reduceRadiusWhenStripping() {
-        if (Services.CONFIG.getBoolConfig("enableStripRadiusReduction"))
+        if (Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_STRIP_RADIUS_REDUCTION))
             return reduceRadiusWhenStripping;
         return false;
     }
@@ -849,21 +854,21 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 //    /**
 //     * @return a constructor for the relevant branch block model builder for the corresponding loader
 //     */
-//    public BiFunction<BlockModelBuilder, ExistingFileHelper, BranchLoaderBuilder> getBranchLoaderConstructor() {
+//    public BiFunction<BlockModelBuilder, FileHelper, BranchLoaderBuilder> getBranchLoaderConstructor() {
 //        return BranchLoaderBuilder::branch;
 //    }
-//
-//    protected final MutableLazyValue<Generator<DTBlockStateProvider, Family>> branchStateGenerator =
+
+//    protected final MutableLazyValue<Generator<DTDataProvider, Family>> branchStateGenerator =
 //            MutableLazyValue.supplied(BranchStateGenerator::new);
 //
-//    protected final MutableLazyValue<Generator<DTBlockStateProvider, Family>> strippedBranchStateGenerator =
+//    protected final MutableLazyValue<Generator<DTDataProvider, Family>> strippedBranchStateGenerator =
 //            MutableLazyValue.supplied(StrippedBranchStateGenerator::new);
 //
-//    protected final MutableLazyValue<Generator<DTBlockStateProvider, Family>> surfaceRootStateGenerator =
+//    protected final MutableLazyValue<Generator<? extends DTDataProvider, Family>> surfaceRootStateGenerator =
 //            MutableLazyValue.supplied(SurfaceRootStateGenerator::new);
 //
 //    @Override
-//    public void generateStateData(DTBlockStateProvider provider) {
+//    public void generateStateData(DataProvider provider) {
 //        // Generate branch block state and model.
 //        this.branchStateGenerator.get().generate(provider, this);
 //        this.strippedBranchStateGenerator.get().generate(provider, this);
@@ -871,7 +876,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 //        // Generate surface root block state and model.
 //        this.surfaceRootStateGenerator.get().generate(provider, this);
 //    }
-//
+
 //    public ResourceLocation getBranchItemParentLocation() {
 //        return DynamicTrees.location("item/branch");
 //    }
@@ -885,6 +890,17 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 //
 //    protected final MutableLazyValue<Generator<DTLangProvider, Family>> familyLangGenerator =
 //            MutableLazyValue.supplied(FamilyLangGenerator::new);
+//
+//    @Override
+//    public void generateItemModelData(DTItemModelProvider provider) {
+//        // Generate branch item models.
+//        this.branchItemModelGenerator.get().generate(provider, this);
+//    }
+//
+//    @Override
+//    public void generateLangData(DTLangProvider provider) {
+//        this.familyLangGenerator.get().generate(provider, this);
+//    }
 
     protected List<String> onlyIfLoaded = new ArrayList<>();
     //Texture overrides
@@ -960,17 +976,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         textureConsumer.accept("bark", bark);
         textureConsumer.accept("rings", rings);
     }
-
-//    @Override
-//    public void generateItemModelData(DTItemModelProvider provider) {
-//        // Generate branch item models.
-//        this.branchItemModelGenerator.get().generate(provider, this);
-//    }
-//
-//    @Override
-//    public void generateLangData(DTLangProvider provider) {
-//        this.familyLangGenerator.get().generate(provider, this);
-//    }
 
     //////////////////////////////
     // JAVA OBJECT STUFF

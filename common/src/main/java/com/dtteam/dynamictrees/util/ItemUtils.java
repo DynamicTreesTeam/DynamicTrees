@@ -2,8 +2,10 @@ package com.dtteam.dynamictrees.util;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -72,7 +74,7 @@ public final class ItemUtils {
             return;
         }
 
-        int damage = switch (Services.CONFIG.getConfig("axeDamageMode", DynamicTrees.AxeDamage.class)) {
+        int damage = switch (Services.CONFIG.getConfig(IConfigHelper.AXE_DAMAGE_MODE, DynamicTrees.AxeDamage.class)) {
             case VANILLA -> 1;
             case THICKNESS -> Math.max(1, radius) / 2;
             case VOLUME -> (int) woodVolume.getVolume();
@@ -88,8 +90,12 @@ public final class ItemUtils {
     }
 
     public static int getEnchantmentLevel (ResourceKey<Enchantment> enchantment, ItemStack stack, RegistryAccess registryAccess){
+        return EnchantmentHelper.getItemEnchantmentLevel(getEnchantment(enchantment, registryAccess), stack);
+    }
+
+    public static Holder.Reference<Enchantment> getEnchantment (ResourceKey<Enchantment> enchantment, HolderLookup.Provider registryAccess){
         HolderLookup.RegistryLookup<Enchantment> registrylookup = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
-        return EnchantmentHelper.getItemEnchantmentLevel(registrylookup.getOrThrow(enchantment), stack);
+        return registrylookup.getOrThrow(enchantment);
     }
 
 }

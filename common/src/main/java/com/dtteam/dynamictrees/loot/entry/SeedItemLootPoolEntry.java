@@ -42,4 +42,8 @@ public final class SeedItemLootPoolEntry extends LootPoolSingletonContainer {
         stackConsumer.accept(species.shouldDropSeeds() ? species.getSeedStack(1) : ItemStack.EMPTY);
     }
 
+    public static LootPoolSingletonContainer.Builder<?> lootTableSeedItem() {
+        return simpleBuilder(SeedItemLootPoolEntry::new);
+    }
+
 }

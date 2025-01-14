@@ -10,8 +10,13 @@ import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
+import net.minecraft.data.loot.LootTableSubProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.LootTable;
+
+import java.util.Map;
 
 public interface IEventHelper {
 

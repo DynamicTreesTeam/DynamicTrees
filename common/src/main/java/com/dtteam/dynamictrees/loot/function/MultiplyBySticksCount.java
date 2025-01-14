@@ -8,6 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
@@ -38,6 +39,10 @@ public final class MultiplyBySticksCount extends LootItemConditionalFunction {
         stack.setCount(stack.getCount() * 8 * (volume % NetVolumeNode.Volume.VOXELSPERLOG) /
                 NetVolumeNode.Volume.VOXELSPERLOG);
         return stack;
+    }
+
+    public static LootItemFunction.Builder multiplyBySticksCount() {
+        return () -> new MultiplyBySticksCount(List.of());
     }
 
 }

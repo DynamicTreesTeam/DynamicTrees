@@ -5,7 +5,9 @@ import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.Growable;
+import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.util.*;
@@ -13,6 +15,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -27,6 +30,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.logging.log4j.LogManager;
@@ -356,11 +360,11 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         return blockDropsPath.get();
     }
 
-//    public LootTable.Builder createBlockDrops() {
-//        if (minDropCount > maxDropCount || maxDropCount <= 0)
-//            throw new IllegalArgumentException("Attempted to create loot tables for "+getRegistryName()+" with an invalid drop count range ["+minDropCount+","+maxDropCount+"].");
-//        return DTLootTableProvider.BlockLoot.createFruitPodDrops(block.get(), itemStack.getItem(), ageProperty, maxAge, minDropCount, maxDropCount);
-//    }
+    public LootTable.Builder createBlockDrops(HolderLookup.Provider registries) {
+        if (minDropCount > maxDropCount || maxDropCount <= 0)
+            throw new IllegalArgumentException("Attempted to create loot tables for "+getRegistryName()+" with an invalid drop count range ["+minDropCount+","+maxDropCount+"].");
+        return DTLootTableBuilder.createFruitPodDrops(block.get(), itemStack.getItem(), ageProperty, maxAge, minDropCount, maxDropCount, registries);
+    }
 
     public void setMaxRadius(int maxRadius) {
         this.maxRadius = maxRadius;
@@ -387,7 +391,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     @NotNull
     @Override
     public Pod reset() {
-        canBoneMeal = Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig("canBoneMealPods");
+        canBoneMeal = Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig(IConfigHelper.CAN_BONE_MEAL_PODS);
         seasonOffset = 0.0F;
         flowerHoldPeriodLength = 0.5F;
         minProductionFactor = 0.3F;

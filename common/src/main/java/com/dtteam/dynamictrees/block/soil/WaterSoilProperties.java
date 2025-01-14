@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.block.soil;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -87,7 +88,7 @@ public class WaterSoilProperties extends SoilProperties {
 
         @Override
         public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-            return (float) (0.5 * Services.CONFIG.getDoubleConfig("rootyBlockHardnessMultiplier"));
+            return (float) (0.5 * Services.CONFIG.getDoubleConfig(IConfigHelper.ROOTY_BLOCK_HARDNESS_MULTIPLIER));
         }
 
         @Override

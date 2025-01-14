@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.systems.season;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.season.SeasonManager;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 
@@ -42,7 +43,7 @@ public final class SeasonCompatibilityHandler {
     public static final String ANY = "*";
 
     public static void reloadSeasonManager() {
-        final String modId = Services.CONFIG.getStringConfig("preferredSeasonMod");
+        final String modId = Services.CONFIG.getStringConfig(IConfigHelper.PREFERRED_SEASON_MOD);
 
         // If disabled, use null manager.
         if (Objects.equals(modId, DISABLED)) {

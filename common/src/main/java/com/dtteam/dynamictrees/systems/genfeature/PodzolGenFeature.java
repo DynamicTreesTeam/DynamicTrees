@@ -5,6 +5,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.util.BlockStates;
@@ -33,7 +34,7 @@ public class PodzolGenFeature extends GenFeature {
 
     @Override
     protected boolean postGrow(GenFeatureConfiguration configuration, PostGrowContext context) {
-        if (!Services.CONFIG.getBoolConfig("podzolGen")) {
+        if (!Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_PODZOL)) {
             return false;
         }
 

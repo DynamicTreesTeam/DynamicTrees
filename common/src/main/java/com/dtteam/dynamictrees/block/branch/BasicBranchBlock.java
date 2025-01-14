@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.pod.OffsetablePodBlock;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionContext;
@@ -381,7 +382,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     /** NeoForge Override */
     @SuppressWarnings("unused")
     public boolean isLadder(BlockState state, LevelReader level, BlockPos pos, LivingEntity entity) {
-        return Services.CONFIG.getBoolConfig("enableBranchClimbing") &&
+        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_BRANCH_CLIMBING) &&
                 entity instanceof Player &&
                 getFamily().branchIsLadder() &&
                 (!state.hasProperty(WATERLOGGED) || !state.getValue(WATERLOGGED));

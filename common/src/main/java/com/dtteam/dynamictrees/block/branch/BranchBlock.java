@@ -8,8 +8,10 @@ import com.dtteam.dynamictrees.block.FutureBreakable;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.nodemapper.DestroyerNode;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
@@ -20,7 +22,9 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -40,6 +44,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -73,7 +78,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      */
     public BranchBlock(ResourceLocation name, Properties properties) {
         super(properties); //removes drops from block
-        //lootTableSupplier = new LootTableSupplier("trees/branches/", name);
+        lootTableSupplier = new LootTableSupplier("trees/branches/", name);
     }
 
     public BranchBlock setCanBeStripped(boolean truth) {
@@ -221,7 +226,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     }
 
     /**
-     * The following 3 methods are overridden by {@link #use(BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)}
+     * The following 3 methods are overridden by {@link #useItemOn(ItemStack, BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)}
      * and they are not normally called. However, they are here for mod compatibility.
      */
     @Override
@@ -465,23 +470,23 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     // DROPS AND HARVESTING
     ///////////////////////////////////////////
 
-//    private final LootTableSupplier lootTableSupplier;
-//
-//    public boolean shouldGenerateBranchDrops() {
-//        return getPrimitiveLog().isPresent();
-//    }
-//
-//    public ResourceLocation getLootTableName() {
-//        return lootTableSupplier.getName();
-//    }
-//
-//    public LootTable getLootTable(LootDataManager lootTables, Species species) {
-//        return lootTableSupplier.get(lootTables, species);
-//    }
-//
-//    public LootTable.Builder createBranchDrops() {
-//        return DTLootTableProvider.BlockLoot.createBranchDrops(getPrimitiveLog().get(), family.getStick(1).getItem());
-//    }
+    private final LootTableSupplier lootTableSupplier;
+
+    public boolean shouldGenerateBranchDrops() {
+        return getPrimitiveLog().isPresent();
+    }
+
+    public ResourceLocation getLootTableName() {
+        return lootTableSupplier.getName();
+    }
+
+    public LootTable getLootTable(ReloadableServerRegistries.Holder lootTables, Species species) {
+        return lootTableSupplier.get(lootTables, species);
+    }
+
+    public LootTable.Builder createBranchDrops(HolderLookup.Provider registries) {
+        return DTLootTableBuilder.createBranchDrops(getPrimitiveLog().get(), family.getStick(1).getItem(), registries);
+    }
 
     public float getPrimitiveLogs(float volumeIn, List<ItemStack> drops) {
         int numLogs = (int) volumeIn;
@@ -547,7 +552,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         final List<ItemStack> woodDropList = destroyData.species.getBranchesDrops(level, destroyData.woodVolume);
 
         // If sloppy break drops are off clear all drops.
-        if (!Services.CONFIG.getBoolConfig("sloppyBreakDrops")) {
+        if (!Services.CONFIG.getBoolConfig(IConfigHelper.SLOPPY_BREAK_DROPS)) {
             destroyData.leavesDrops.clear();
             woodDropList.clear();
         }

@@ -11,6 +11,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -144,7 +145,7 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     @Override
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-        return (float) (getPrimitiveSoilState(state).getDestroySpeed(level, pos) * Services.CONFIG.getDoubleConfig("treeHardnessMultiplier"));
+        return (float) (getPrimitiveSoilState(state).getDestroySpeed(level, pos) * Services.CONFIG.getDoubleConfig(IConfigHelper.ROOTY_BLOCK_HARDNESS_MULTIPLIER));
     }
 
     ///////////////////////////////////////////
@@ -176,7 +177,7 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        double growthMultiplier = Services.CONFIG.getDoubleConfig("treeGrowthMultiplier");
+        double growthMultiplier = Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_GROWTH_MULTIPLIER);
         //Growth multiplier lower than 1 causes only some ticks to grow
         if (random.nextFloat() > growthMultiplier) return;
 

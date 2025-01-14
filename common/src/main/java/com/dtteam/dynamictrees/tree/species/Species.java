@@ -21,10 +21,15 @@ import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
+import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
+import com.dtteam.dynamictrees.loot.DTLootContextParams;
+import com.dtteam.dynamictrees.loot.DTLootParameterSets;
+import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
@@ -57,10 +62,14 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -81,8 +90,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -90,6 +103,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -688,27 +702,28 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public List<ItemStack> getVoluntaryDrops(Level level, BlockPos rootPos, int fertility) {
-//        if (level.isClientSide) {
+        if (level.isClientSide) {
             return Collections.emptyList();
-//        }
-//        return getLootTable(level.getServer().getLootData(), species -> species.voluntaryDropsPath.get())
-//                .getRandomItems(createVoluntaryLootParams(level, rootPos, fertility));
+        }
+        if (level.getServer() == null) return List.of();
+        return getLootTable(level.getServer().reloadableRegistries(), species -> species.voluntaryDropsPath.get())
+                .getRandomItems(createVoluntaryLootParams(level, rootPos, fertility));
     }
 
-//    private LootParams createVoluntaryLootParams(Level level, BlockPos rootPos, int fertility) {
-//        return new LootParams.Builder(LevelContext.getServerLevelOrThrow(level))
-//                .withParameter(LootContextParams.BLOCK_STATE, level.getBlockState(rootPos))
-//                .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR,
-//                        seasonalSeedDropFactor(LevelContext.create(level), rootPos))
-//                .withParameter(DTLootContextParams.FERTILITY, fertility)
-//                .create(DTLootParameterSets.VOLUNTARY);
-//    }
-//
-//    public LootTable getLootTable(LootDataManager lootTables, Function<Species, ResourceLocation> nameFunction) {
-//        final LootTable table = lootTables.getLootTable(nameFunction.apply(this));
-//        return table == EMPTY ? (this.isCommonSpecies() ? lootTables.getLootTable(nameFunction.apply(getCommonSpecies())) : EMPTY) : table;
-//    }
-//
+    private LootParams createVoluntaryLootParams(Level level, BlockPos rootPos, int fertility) {
+        return new LootParams.Builder(LevelContext.getServerLevelOrThrow(level))
+                .withParameter(LootContextParams.BLOCK_STATE, level.getBlockState(rootPos))
+                .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR,
+                        seasonalSeedDropFactor(LevelContext.create(level), rootPos))
+                .withParameter(DTLootContextParams.FERTILITY, fertility)
+                .create(DTLootParameterSets.VOLUNTARY);
+    }
+
+    public LootTable getLootTable(ReloadableServerRegistries.Holder lootTables, Function<Species, ResourceLocation> nameFunction) {
+        final LootTable table = lootTables.getLootTable(ResourceKey.create(Registries.LOOT_TABLE, nameFunction.apply(this)));
+        return table == LootTable.EMPTY ? (this.isCommonSpecies() ? lootTables.getLootTable(ResourceKey.create(Registries.LOOT_TABLE, nameFunction.apply(getCommonSpecies()))) : LootTable.EMPTY) : table;
+    }
+
     public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume) {
         return getBranchesDrops(level, volume, ItemStack.EMPTY);
     }
@@ -719,19 +734,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume,
                                             ItemStack tool, @Nullable Float explosionRadius) {
-//        processVolume(volume);
+        processVolume(volume);
         if (level.isClientSide) {
             return Collections.emptyList();
         }
         final List<ItemStack> drops = new ArrayList<>();
-//        for (int i = 0; i < family.getNumberOfValidBranchBlocks(); i++) {
-//            int branchVolume = volume.getRawVolume(i);
-//            if (branchVolume > 0) {
-//                final BranchBlock branchBlock = family.getValidBranchBlock(i);
-//                drops.addAll(getDropsForBranchType(level, tool, explosionRadius, branchVolume, branchBlock));
-//            }
-//        }
-//        cleanDropsList(drops);
+        for (int i = 0; i < family.getNumberOfValidBranchBlocks(); i++) {
+            int branchVolume = volume.getRawVolume(i);
+            if (branchVolume > 0) {
+                final BranchBlock branchBlock = family.getValidBranchBlock(i);
+                drops.addAll(getDropsForBranchType(level, tool, explosionRadius, branchVolume, branchBlock));
+            }
+        }
+        cleanDropsList(drops);
         return drops;
     }
 
@@ -740,21 +755,22 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         volume.multiplyVolume(getFamily().getLootVolumeMultiplier()); //the family can have a multiplier too
     }
 
-//    private List<ItemStack> getDropsForBranchType(Level level, ItemStack tool, @Nullable Float explosionRadius,
-//                                                  int branchVolume, BranchBlock branchBlock) {
-//        return branchBlock.getLootTable(level.getServer().getLootData(), this)
-//                .getRandomItems(createBranchesLootParams(level, branchVolume, tool, explosionRadius));
-//    }
-//
-//    private LootParams createBranchesLootParams(Level level, int volume, ItemStack tool,
-//                                                  @Nullable Float explosionRadius) {
-//        return new LootParams.Builder(LevelContext.getServerLevelOrThrow(level))
-//                .withParameter(LootContextParams.TOOL, tool)
-//                .withParameter(DTLootContextParams.SPECIES, this)
-//                .withParameter(DTLootContextParams.VOLUME, volume)
-//                .withOptionalParameter(LootContextParams.EXPLOSION_RADIUS, explosionRadius)
-//                .create(DTLootParameterSets.BRANCHES);
-//    }
+    private List<ItemStack> getDropsForBranchType(Level level, ItemStack tool, @Nullable Float explosionRadius,
+                                                  int branchVolume, BranchBlock branchBlock) {
+        if (level.getServer() == null) return List.of();
+        return branchBlock.getLootTable(level.getServer().reloadableRegistries(), this)
+                .getRandomItems(createBranchesLootParams(level, branchVolume, tool, explosionRadius));
+    }
+
+    private LootParams createBranchesLootParams(Level level, int volume, ItemStack tool,
+                                                  @Nullable Float explosionRadius) {
+        return new LootParams.Builder(LevelContext.getServerLevelOrThrow(level))
+                .withParameter(LootContextParams.TOOL, tool)
+                .withParameter(DTLootContextParams.SPECIES, this)
+                .withParameter(DTLootContextParams.VOLUME, volume)
+                .withOptionalParameter(LootContextParams.EXPLOSION_RADIUS, explosionRadius)
+                .create(DTLootParameterSets.BRANCHES);
+    }
 
     /**
      * Cleans specified drop list by dividing any stacks with a count exceeding the maximum stack size into multiple
@@ -782,7 +798,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         public LogsAndSticks(List<ItemStack> logs, int sticks) {
             this.logs = logs;
-            this.sticks = Services.CONFIG.getBoolConfig("dropSticks") ? sticks : 0;
+            this.sticks = Services.CONFIG.getBoolConfig(IConfigHelper.DROP_STICKS) ? sticks : 0;
         }
 
     }
@@ -1586,7 +1602,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if the tree became diseased
      */
     public boolean handleDisease(Level level, TreePart baseTreePart, BlockPos treePos, RandomSource random, int fertility) {
-        if (fertility == 0 && Services.CONFIG.getDoubleConfig("diseaseChance") > random.nextFloat()) {
+        if (fertility == 0 && Services.CONFIG.getDoubleConfig(IConfigHelper.DESEASE_CHANCE) > random.nextFloat()) {
             baseTreePart.analyse(level.getBlockState(treePos), level, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
             return true;
         }
@@ -2355,9 +2371,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return voluntaryDropsPath.get();
     }
 
-//    public LootTable.Builder createVoluntaryDrops() {
-//        return DTLootTableProvider.BlockLoot.createVoluntaryDrops(seed.get());
-//    }
+    public LootTable.Builder createVoluntaryDrops(HolderLookup.Provider registries) {
+        return DTLootTableBuilder.createVoluntaryDrops(seed.get(), registries);
+    }
 
     public void setDropSeeds(boolean dropSeeds) {
         this.dropSeeds = dropSeeds;
@@ -2367,30 +2383,30 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return Optional.ofNullable(dropSeeds).orElse(!this.hasFruits());
     }
 
-//    @Override
-//    public String toLoadDataString() {
-//        final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
-//        return this.getString(Pair.of("seed", this.seed != null ? ForgeRegistries.ITEMS.getKey(this.seed.get()) : null),
-//                Pair.of("sapling",
-//                        this.saplingBlock != null ? "Block{" + ForgeRegistries.BLOCKS.getKey(this.saplingBlock.get()) + "}" :
-//                                null));
-//    }
-//
-//    @Override
-//    public String toReloadDataString() {
-//        return this.getString(Pair.of("tapering", this.tapering), Pair.of("upProbability", this.upProbability),
-//                Pair.of("lowestBranchHeight", this.lowestBranchHeight), Pair.of("signalEnergy", this.signalEnergy),
-//                Pair.of("growthRate", this.growthRate), Pair.of("soilLongevity", this.soilLongevity),
-//                Pair.of("soilTypeFlags", this.soilTypeFlags), Pair.of("maxBranchRadius", this.maxBranchRadius),
-//                Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
-//                Pair.of("megaSpecies", this.megaSpecies), Pair.of("seed", this.seed),
-//                Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream()
-//                        .filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny()
-//                        .orElse(Blocks.AIR)),
+    @Override
+    public String toLoadDataString() {
+        final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
+        return this.getString(Pair.of("seed", this.seed != null ? BuiltInRegistries.ITEM.getKey(this.seed.get()) : null),
+                Pair.of("sapling",
+                        this.saplingBlock != null ? "Block{" + BuiltInRegistries.BLOCK.getKey(this.saplingBlock.get()) + "}" :
+                                null));
+    }
+
+    @Override
+    public String toReloadDataString() {
+        return this.getString(Pair.of("tapering", this.tapering), Pair.of("upProbability", this.upProbability),
+                Pair.of("lowestBranchHeight", this.lowestBranchHeight), Pair.of("signalEnergy", this.signalEnergy),
+                Pair.of("growthRate", this.growthRate), Pair.of("soilLongevity", this.soilLongevity),
+                Pair.of("soilTypeFlags", this.soilTypeFlags), Pair.of("maxBranchRadius", this.maxBranchRadius),
+                Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
+                Pair.of("megaSpecies", this.megaSpecies), Pair.of("seed", this.seed),
+                Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream()
+                        .filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny()
+                        .orElse(Blocks.AIR)),
 //                Pair.of("perfectBiomes", this.perfectBiomes),
-//                Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
-//                Pair.of("genFeatures", this.genFeatures));
-//    }
+                Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
+                Pair.of("genFeatures", this.genFeatures));
+    }
 
 //    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
 //        // Create dynamic sapling block tags.

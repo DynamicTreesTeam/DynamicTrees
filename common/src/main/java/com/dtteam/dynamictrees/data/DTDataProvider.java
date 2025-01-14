@@ -1,4 +1,4 @@
-package com.dtteam.dynamictrees.data.provider;
+package com.dtteam.dynamictrees.data;
 
 import net.minecraft.resources.ResourceLocation;
 

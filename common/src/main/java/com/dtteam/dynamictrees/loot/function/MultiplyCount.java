@@ -7,6 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
@@ -38,6 +39,10 @@ public final class MultiplyCount extends LootItemConditionalFunction {
     protected ItemStack run(ItemStack stack, LootContext context) {
         stack.setCount((int) (stack.getCount() * multiplier));
         return stack;
+    }
+
+    public static LootItemFunction.Builder multiplyCount() {
+        return () -> new MultiplyCount(List.of(), 1.0F);
     }
 
 }

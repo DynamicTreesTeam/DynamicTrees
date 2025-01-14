@@ -1,11 +1,11 @@
 //package com.dtteam.dynamictrees.data.provider;
 //
 //import com.dtteam.dynamictrees.api.registry.Registry;
+//import com.dtteam.dynamictrees.data.DTDataProvider;
 //import com.google.common.collect.ImmutableList;
 //import net.minecraft.data.PackOutput;
 //import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
-//import net.minecraftforge.client.model.generators.BlockStateProvider;
-//import net.minecraftforge.common.data.ExistingFileHelper;
+//import net.neoforged.neoforge.common.data.ExistingFileHelper;
 //
 //import java.util.Collection;
 //import java.util.List;
@@ -18,9 +18,9 @@
 //    private final String modId;
 //    private final List<Registry<?>> registries;
 //
-//    public DTBlockStateProvider(PackOutput output, String modId, ExistingFileHelper existingFileHelper,
+//    public DTBlockStateProvider(PackOutput output, String modId, ExistingFileHelper fileHelper,
 //                                Collection<Registry<?>> registries) {
-//        super(output, modId, existingFileHelper);
+//        super(output, modId, fileHelper);
 //        this.modId = modId;
 //        this.registries = ImmutableList.copyOf(registries);
 //    }
