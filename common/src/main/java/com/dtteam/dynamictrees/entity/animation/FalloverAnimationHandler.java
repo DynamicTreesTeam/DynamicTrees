@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 
 public class FalloverAnimationHandler implements AnimationHandler {
 
+    public static final int TICKS_BEFORE_CHECKING_COLLISION = 10;
+
     @Override
     public String getName() {
         return "fallover";
@@ -206,7 +208,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
         }
 
         //Wait at least ten ticks before calculating falling stuff, to avoid crashing into dirty blocks from the tree itself.
-        if (entity.tickCount > 10 && fallSpeed > 0 && testCollision(entity)) {
+        if (entity.tickCount > TICKS_BEFORE_CHECKING_COLLISION && fallSpeed > 0 && testCollision(entity)) {
             playEndSound(entity);
             flingLeavesParticles(entity, fallSpeed);
             addRotation(entity, -fallSpeed);//pull back to before the collision

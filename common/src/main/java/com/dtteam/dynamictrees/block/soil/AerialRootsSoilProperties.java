@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
+import com.dtteam.dynamictrees.entity.animation.FalloverAnimationHandler;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
@@ -15,7 +16,6 @@ import com.dtteam.dynamictrees.util.BranchDestructionData;
 import com.dtteam.dynamictrees.util.EntityUtils;
 import com.dtteam.dynamictrees.util.ItemUtils;
 import com.dtteam.dynamictrees.util.TreeHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -29,7 +29,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,12 +36,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.ticks.TickPriority;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -98,6 +95,11 @@ public class AerialRootsSoilProperties extends SoilProperties {
         }
 
         @Override
+        public AerialRootsSoilProperties getSoilProperties() {
+            return (AerialRootsSoilProperties) super.getSoilProperties();
+        }
+
+        @Override
         protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
             super.createBlockStateDefinition(builder.add(RADIUS, WATERLOGGED));
         }
@@ -136,13 +138,13 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return state.getValue(RADIUS);
         }
 
-        public boolean isStructurallyStable(LevelAccessor level, BlockPos rootPos){
+        public boolean isStructurallyUnstable(LevelAccessor level, BlockPos rootPos){
             BlockPos belowPos = rootPos.below();
             final RootIntegrityNode node = new RootIntegrityNode();
             BlockState belowState = level.getBlockState(belowPos);
-            if (!TreeHelper.isTreePart(belowState)) return false;
+            if (!TreeHelper.isTreePart(belowState)) return true;
             TreeHelper.getTreePart(belowState).analyse(belowState, level, belowPos, null, new MapSignal(node)); // Analyze entire tree network to find root node and species.
-            return !node.getStable().isEmpty();
+            return node.getStable().isEmpty();
         }
 
         @Override
@@ -151,6 +153,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
             super.neighborChanged(pState, pLevel, pPos, pBlock, pFromPos, pIsMoving);
         }
 
+        @Override
         public void destroyTree(Level level, BlockPos rootPos, @Nullable Player player) {
             Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
             Optional<BranchBlock> root = TreeHelper.getBranchOpt(level.getBlockState(rootPos.below()));
@@ -165,29 +168,50 @@ public class AerialRootsSoilProperties extends SoilProperties {
             }
         }
 
+        @Override
         public boolean fallWithTree(BlockState state, Level level, BlockPos pos, boolean hasRoots) {
-            //if (hasRoots){
-                //The block is removed when this is checked because it means it got attached to a tree
-                Services.MISC.getCurrentServer().getLevel(level.dimension()).scheduleTick(pos, this,0);
+            if (hasRoots && level.isClientSide()){
+                //This only removes the block on the client side!
+                //The actual removal of the root block is handled by tick.
+                level.setBlock(pos, getDecayBlockStateAir(state, level, pos), 2);
                 return true;
-            //}
-            //return false;
+            }
+            return false;
         }
 
         @Override
         protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-            super.tick(state, level, pos, random);
+            if (!state.is(this)) return; //The root has already been destroyed / removed.
+            //If no roots support it then drop the whole tree.
+            if (isStructurallyUnstable(level, pos)){
+                dropWholeTree(level, pos, null, FallingTreeEntity.DestroyType.HARVEST);
+            }
             //if the species is not valid then this block should be removed asap
             if (!getSpecies(state, level, pos).isValid()){
-                level.setBlockAndUpdate(pos, getDecayBlockState(state, level, pos));
+                level.setBlockAndUpdate(pos, getDecayBlockStateAir(state, level, pos));
             }
+            super.tick(state, level, pos, random);
         }
 
-        public BlockState getDecayBlockState(BlockState state, BlockGetter level, BlockPos pos) {
+        //This makes the block decay like normal, usually just as air
+        public BlockState getDecayBlockStateAir(BlockState state, BlockGetter level, BlockPos pos){
             if (state.hasProperty(WATERLOGGED)) {
                 return getFluidState(state).createLegacyBlock();
             }
             return super.getDecayBlockState(state, level, pos);
+        }
+
+        @Override
+        public BlockState getDecayBlockState(BlockState state, BlockGetter level, BlockPos pos) {
+            BranchBlock branch = getSoilProperties().getFamily().getBranch().orElse(null);
+            if (branch == null) return super.getDecayBlockState(state, level, pos);
+
+            //Decay into the family's branch block. Might act weird but it looks nice.
+            BlockState decay = branch.getStateForRadius(getRadius(state));
+            if (state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED) && decay.hasProperty(WATERLOGGED)) {
+                return decay.setValue(WATERLOGGED, true);
+            }
+            return decay;
         }
 
         /**
@@ -200,27 +224,28 @@ public class AerialRootsSoilProperties extends SoilProperties {
         @Override
         public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
             if (!level.isClientSide)
-                this.dropWholeTree(level, pos, player);
+                this.dropWholeTree(level, pos, player, FallingTreeEntity.DestroyType.HARVEST);
             return level.isClientSide() ? level.setBlock(pos, fluid.createLegacyBlock(), 11) : level.removeBlock(pos, false);
         }
 
-        public void dropWholeTree(Level level, BlockPos rootPos, @Nullable Player player){
+        public void dropWholeTree(Level level, BlockPos rootPos, @Nullable Player player, FallingTreeEntity.DestroyType destroyType){
             Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
             Optional<BranchBlock> roots = TreeHelper.getBranchOpt(level.getBlockState(rootPos.below()));
 
             BranchDestructionData destroyData = null;
             Optional<Direction> toolDir = Optional.empty();
             if (player != null) toolDir = Optional.of(EntityUtils.getHitDirection(player));
+            if (toolDir.isPresent() && (toolDir.get().getAxis() == Direction.Axis.Y)) toolDir = Optional.empty();
+            Direction fallingDir = toolDir.orElse(Direction.Plane.HORIZONTAL.getRandomDirection(level.getRandom()));
 
             if (branch.isPresent()) {
-                destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), toolDir.orElse(Direction.DOWN), false, player);
+                destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), fallingDir, false, player);
             }
             if (roots.isPresent()) {
-                BranchDestructionData rootDestroyData = roots.get().destroyBranchFromNode(level, rootPos.below(), toolDir.orElse(Direction.UP), false, player);
+                BranchDestructionData rootDestroyData = roots.get().destroyBranchFromNode(level, rootPos.below(), fallingDir, false, player);
                 if (destroyData == null){
                     destroyData = rootDestroyData;
                 } else {
-                    System.out.println(destroyData.getNumBranches() + " " +rootDestroyData.getNumBranches());
                     destroyData = destroyData.merge(rootDestroyData);
                 }
             }
@@ -233,12 +258,14 @@ public class AerialRootsSoilProperties extends SoilProperties {
                 woodVolume.multiplyVolume(fortuneFactor);
                 final List<ItemStack> woodItems = destroyData.species.getBranchesDrops(level, woodVolume, heldItem);
 
-                FallingTreeEntity.dropTree(level, destroyData, woodItems, FallingTreeEntity.DestroyType.HARVEST);
+                FallingTreeEntity.dropTree(level, destroyData, woodItems, destroyType);
 
                 BlockState rootState = level.getBlockState(rootPos);
                 if (player != null)
                     ItemUtils.damageAxe(player, heldItem, getRadius(rootState), woodVolume, true);
-
+                //The root is removed as soon as the tree spawns.
+                //Give it a few ticks to allow the tree model to grab it first.
+                level.scheduleTick(rootPos, this, FalloverAnimationHandler.TICKS_BEFORE_CHECKING_COLLISION - 1);
             }
         }
 
@@ -257,6 +284,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
             }
             return 0;
         }
+
     }
 
     public List<TagKey<Block>> defaultSoilBlockTags() {

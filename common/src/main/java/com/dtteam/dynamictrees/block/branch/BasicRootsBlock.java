@@ -6,11 +6,14 @@ import com.dtteam.dynamictrees.api.cell.CellNull;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.block.pod.OffsetablePodBlock;
 import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.GrowSignal;
+import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionContext;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.systems.nodemapper.RootsDestroyerNode;
 import com.dtteam.dynamictrees.systems.nodemapper.SpeciesNode;
@@ -23,7 +26,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
@@ -47,9 +52,11 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -91,7 +98,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public BasicRootsBlock(ResourceLocation name, BlockBehaviour.Properties properties) {
         super(name, properties);
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(LAYER, Layer.EXPOSED));
-//        rootLootTableSupplier = new LootTableSupplier("trees/roots/", name);
+        rootLootTableSupplier = new LootTableSupplier("trees/roots/", name);
     }
 
     public boolean isFullBlock (BlockState state){
@@ -101,16 +108,18 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return (UndergroundRootsFamily) super.getFamily();
     }
 
-//    @Override
-//    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-//        int radius = getRadius(level.getBlockState(pos));
-//        return (fireSpreadSpeed * radius) / 8;
-//    }
-//
-//    @Override
-//    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-//        return flammability;
-//    }
+    /** NeoForge override */
+    @SuppressWarnings("unused")
+    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        int radius = getRadius(level.getBlockState(pos));
+        return (fireSpreadSpeed * radius) / 8;
+    }
+
+    /** NeoForge override */
+    @SuppressWarnings("unused")
+    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return flammability;
+    }
 
     public BasicRootsBlock setFlammability(int flammability) {
         this.flammability = flammability;
@@ -245,17 +254,17 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     //////////////////////////////
     // DROPS
     //////////////////////////////
-//
-//    private final LootTableSupplier rootLootTableSupplier;
-//
-//    public ResourceLocation getLootTableName() {
-//        return rootLootTableSupplier.getName();
-//    }
-//
-//    @Override
-//    public LootTable getLootTable(LootDataManager lootTables, Species species) {
-//        return rootLootTableSupplier.get(lootTables, species);
-//    }
+
+    private final LootTableSupplier rootLootTableSupplier;
+
+    public ResourceLocation getLootTableName() {
+        return rootLootTableSupplier.getName();
+    }
+
+    @Override
+    public LootTable getLootTable(ReloadableServerRegistries.Holder lootTables, Species species) {
+        return rootLootTableSupplier.get(lootTables, species);
+    }
 
     public Optional<Block> getPrimitiveLog() {
         return getFamily().getPrimitiveRoots();
@@ -296,28 +305,41 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+        if (isFullBlock(state)){
+            level.setBlock(pos, state.setValue(LAYER, Layer.FILLED), level.isClientSide ? 11 : 3);
+            this.spawnDestroyParticles(level, player, pos, state);
+            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+            Block primitive = state.getValue(LAYER).getPrimitive(getFamily()).orElse(null);
+            if (!player.isCreative() && primitive != null) dropResources(primitive.defaultBlockState(), level, pos);
+            return false;
+        }
 
-//    @Override
-//    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-//        if (isFullBlock(state)){
-//            level.setBlock(pos, state.setValue(LAYER, Layer.FILLED), level.isClientSide ? 11 : 3);
-//            this.spawnDestroyParticles(level, player, pos, state);
-//            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-//            Block primitive = state.getValue(LAYER).getPrimitive(getFamily()).orElse(null);
-//            if (!player.isCreative() && primitive != null) dropResources(primitive.defaultBlockState(), level, pos);
-//            return false;
-//        }
-//        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
-//    }
-//
-//    public boolean removedByEntity(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
-//        //the topmost root block will drop the whole tree
-//        if (level.getBlockState(cutPos.above()).getBlock() instanceof AerialRootsSoilProperties.RootRootyBlock aerialRootyBlock){
-//            aerialRootyBlock.dropWholeTree(level, cutPos.above(), entity instanceof Player ? (Player) entity : null);
-//        } else
-//            FutureBreak.add(new FutureBreak(state, level, cutPos, entity, 0));
-//        return false;
-//    }
+        if (!level.isClientSide()){
+            //If the root block is directly above just drop the tree now.
+            if (level.getBlockState(pos.above()).getBlock() instanceof AerialRootsSoilProperties.RootSoilBlock aerialSoil){
+                aerialSoil.dropWholeTree(level, pos.above(), player, FallingTreeEntity.DestroyType.HARVEST);
+                return false;
+            }
+            //Find the root node and schedule a tick, this will allow check structural stability.
+            final SpeciesNode speciesNode = new SpeciesNode();
+            final MapSignal signal = analyse(state, level, pos, null, new MapSignal(speciesNode));
+            if (signal.foundRoot){
+                level.scheduleTick(signal.root, level.getBlockState(signal.root).getBlock(), 2);
+            }
+        }
+        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+    }
+
+
+    private void DropTreeIfUnsupported (Level level, BlockPos rootPos, @Nullable Player player, FallingTreeEntity.DestroyType destroyType){
+        if (level.getBlockState(rootPos).getBlock() instanceof AerialRootsSoilProperties.RootSoilBlock rootyBlock){
+            if (rootyBlock.isStructurallyUnstable(level, rootPos)){
+                rootyBlock.dropWholeTree(level, rootPos, player, destroyType);
+            }
+        }
+    }
 
     @Override
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
@@ -344,7 +366,8 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         this.damageAxe(entity, heldItem, this.getRadius(state), woodVolume, true);
     }
 
-    public BranchDestructionData destroyBranchFromNode(Level level, BlockPos cutPos, Direction toolDir, boolean wholeTree, @org.jetbrains.annotations.Nullable final LivingEntity entity) {
+    @Override
+    public BranchDestructionData destroyBranchFromNode(Level level, BlockPos cutPos, Direction toolDir, boolean wholeTree, @Nullable final LivingEntity entity) {
         final BlockState blockState = level.getBlockState(cutPos);
         final SpeciesNode speciesNode = new SpeciesNode();
         final MapSignal signal = analyse(blockState, level, cutPos, null, new MapSignal(speciesNode)); // Analyze entire tree network to find root node and species.
@@ -381,19 +404,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             }
         }
 
-        if (signal.foundRoot){
-            DropTreeIfUnsupported(level, cutPos, signal.root, entity instanceof Player ? (Player) entity : null);
-        }
-
         return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), new HashMap<>(), new ArrayList<>(), destroyer.getEnds(), volumeSum.getVolume(), cutPos, basePos, cutDir, toolDir, trunkHeight);
-    }
-
-    private void DropTreeIfUnsupported (Level level, BlockPos cutPos, BlockPos rootPos, @Nullable Player player){
-        if (level.getBlockState(rootPos).getBlock() instanceof AerialRootsSoilProperties.RootSoilBlock rootyBlock){
-            if (!rootyBlock.isStructurallyStable(level, rootPos)){
-                rootyBlock.dropWholeTree(level, rootPos, player);
-            }
-        }
     }
 
     @Override
@@ -482,12 +493,12 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     @Override
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-//        if (isFullBlock(pState)) {
-//            VoxelShape fullShape = Shapes.block();
-//            if (getFamily().getPrimitiveCoveredRoots().isPresent())
-//                fullShape = getFamily().getPrimitiveCoveredRoots().get().getCollisionShape(pState, pLevel, pPos, pContext);
-//            return fullShape;
-//        }
+        if (isFullBlock(pState)) {
+            VoxelShape fullShape = Shapes.block();
+            if (getFamily().getPrimitiveCoveredRoots().isPresent())
+                fullShape = getFamily().getPrimitiveCoveredRoots().get().defaultBlockState().getCollisionShape(pLevel, pPos, pContext);
+            return fullShape;
+        }
         return super.getCollisionShape(pState, pLevel, pPos, pContext);
     }
 
@@ -559,7 +570,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return isFree || state.getBlock() instanceof BasicRootsBlock;
     }
 
-    private boolean isNextToRooty(Level level, BlockPos pos, Direction originDir) {
+    private boolean isNextToSoil(Level level, BlockPos pos, Direction originDir) {
         for (Direction dir : Direction.values()) {
             if (!dir.equals(originDir)) {
                 if (TreeHelper.isRooty(level.getBlockState(pos.relative(dir)))) {
@@ -571,7 +582,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     }
 
     public GrowSignal growIntoAir(Level level, BlockPos pos, GrowSignal signal, int fromRadius, boolean fromGround) {
-        if (isNextToBranch(level, pos, signal.dir.getOpposite()) || isNextToRooty(level, pos, signal.dir.getOpposite())) {
+        if (isNextToBranch(level, pos, signal.dir.getOpposite()) || isNextToSoil(level, pos, signal.dir.getOpposite())) {
             signal.success = false;
             return signal;
         }
@@ -598,73 +609,73 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         //Family must be "mangrove" for trees to have roots
         if (!(species instanceof UndergroundRootsSpecies speciesMangrove)) return signal;
 
-//        final Direction originDir = signal.dir.getOpposite();// Direction this signal originated from
-//        Direction targetDir = speciesMangrove.getRootsGrowthLogicKit().selectNewDirection( // This must be cached on the stack for proper recursion
-//                new DirectionSelectionContext(level, pos, species, this, signal)
-//        );
-//
-//        signal.doTurn(targetDir);
-//        {
-//            final BlockPos deltaPos = pos.relative(targetDir);
-//            final BlockState deltaState = level.getBlockState(deltaPos);
-//
-//            // Pass grow signal to next block in path
-//            final TreePart treepart = TreeHelper.getTreePart(deltaState);
-//            if (treepart != TreeHelper.NULL_TREE_PART) {
-//                signal = treepart.growSignal(level, deltaPos, signal);// Recurse
-//            } else if (canGrowInto(level, deltaPos)) {
-//                signal = growIntoAir(level, deltaPos, signal, getRadius(currBlockState), isFullBlock(currBlockState));
-//            }
-//        }
-//
-//        // Calculate Branch Thickness based on neighboring branches
-//        float areaAccum = signal.radius * signal.radius;// Start by accumulating the branch we just came from
-//
-//        boolean theresPods = false;
-//        for (Direction dir : Direction.values()) {
-//            if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
-//                BlockPos deltaPos = pos.relative(dir);
-//
-//                // If it is decided to implement a special block(like a squirrel hole, tree
-//                // swing, rotting, burned or infested branch, etc) then this new block could be
-//                // derived from BlockBranch and this works perfectly. Should even work with
-//                // tileEntity blocks derived from BlockBranch.
-//                BlockState blockState = level.getBlockState(deltaPos);
-//                TreePart treepart = TreeHelper.getTreePart(blockState);
-//                if (isSameTree(treepart)) {
-//                    int branchRadius = treepart.getRadius(blockState);
-//                    areaAccum += branchRadius * branchRadius;
-//                }
-//                if (blockState.getBlock() instanceof OffsetablePodBlock) theresPods = true;
-//            }
-//        }
-//
-//        //Only continue to set radii if the tree growth isn't choked out
-//        if (!signal.choked) {
-//            // Ensure that the roots are not thicker than the size of the aerial root block.  Also enforce species max thickness
-//            int rootThickness = MAX_RADIUS;
-//            BlockState rootState = level.getBlockState(signal.rootPos);
-//            if (rootState.getBlock() instanceof AerialRootsSoilProperties.RootRootyBlock rootyRoot){
-//                rootThickness = Math.min(rootyRoot.getRadius(rootState), MAX_RADIUS);
-//            } else if (rootState.getBlock() instanceof RootyBlock rooty){
-//                Direction dir = rooty.getTrunkDirection(level, signal.rootPos);
-//                BlockPos treePos = signal.rootPos.relative(dir);
-//                if (TreeHelper.isBranch(level.getBlockState(treePos)))
-//                    rootThickness = TreeHelper.getRadius(level, treePos);
-//            }
-//            int maxRadius = Math.min(MAX_RADIUS, Math.min(species.getMaxBranchRadius(), rootThickness));
-//
-//            // The new branch should be the square root of all the sums of the areas of the branches coming into it.
-//            // But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
-//            signal.radius = Mth.clamp((float) Math.sqrt(areaAccum) + speciesMangrove.getRootTapering(), getRadius(currBlockState), maxRadius);// WOW!
-//            int targetRadius = (int) Math.floor(signal.radius);
-//            //if the tree has pods then growth needs to cause updates, otherwise don't bother (for performance)
-//            int flags = theresPods ? 3 : 2;
-//            int setRad = setRadius(level, pos, targetRadius, originDir, flags);
-//            if (setRad < targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
-//                signal.choked = true; //If something is in the way then it means that the tree growth is choked
-//            }
-//        }
+        final Direction originDir = signal.dir.getOpposite();// Direction this signal originated from
+        Direction targetDir = speciesMangrove.getRootsGrowthLogicKit().selectNewDirection( // This must be cached on the stack for proper recursion
+                new DirectionSelectionContext(level, pos, species, this, signal)
+        );
+
+        signal.doTurn(targetDir);
+        {
+            final BlockPos deltaPos = pos.relative(targetDir);
+            final BlockState deltaState = level.getBlockState(deltaPos);
+
+            // Pass grow signal to next block in path
+            final TreePart treepart = TreeHelper.getTreePart(deltaState);
+            if (treepart != TreeHelper.NULL_TREE_PART) {
+                signal = treepart.growSignal(level, deltaPos, signal);// Recurse
+            } else if (canGrowInto(level, deltaPos)) {
+                signal = growIntoAir(level, deltaPos, signal, getRadius(currBlockState), isFullBlock(currBlockState));
+            }
+        }
+
+        // Calculate Branch Thickness based on neighboring branches
+        float areaAccum = signal.radius * signal.radius;// Start by accumulating the branch we just came from
+
+        boolean theresPods = false;
+        for (Direction dir : Direction.values()) {
+            if (!dir.equals(originDir) && !dir.equals(targetDir)) {// Don't count where the signal originated from or the branch we just came back from
+                BlockPos deltaPos = pos.relative(dir);
+
+                // If it is decided to implement a special block(like a squirrel hole, tree
+                // swing, rotting, burned or infested branch, etc) then this new block could be
+                // derived from BlockBranch and this works perfectly. Should even work with
+                // tileEntity blocks derived from BlockBranch.
+                BlockState blockState = level.getBlockState(deltaPos);
+                TreePart treepart = TreeHelper.getTreePart(blockState);
+                if (isSameTree(treepart)) {
+                    int branchRadius = treepart.getRadius(blockState);
+                    areaAccum += branchRadius * branchRadius;
+                }
+                if (blockState.getBlock() instanceof OffsetablePodBlock) theresPods = true;
+            }
+        }
+
+        //Only continue to set radii if the tree growth isn't choked out
+        if (!signal.choked) {
+            // Ensure that the roots are not thicker than the size of the aerial root block.  Also enforce species max thickness
+            int rootThickness = MAX_RADIUS;
+            BlockState rootState = level.getBlockState(signal.rootPos);
+            if (rootState.getBlock() instanceof AerialRootsSoilProperties.RootSoilBlock rootyRoot){
+                rootThickness = Math.min(rootyRoot.getRadius(rootState), MAX_RADIUS);
+            } else if (rootState.getBlock() instanceof SoilBlock rooty){
+                Direction dir = rooty.getTrunkDirection(level, signal.rootPos);
+                BlockPos treePos = signal.rootPos.relative(dir);
+                if (TreeHelper.isBranch(level.getBlockState(treePos)))
+                    rootThickness = TreeHelper.getRadius(level, treePos);
+            }
+            int maxRadius = Math.min(MAX_RADIUS, Math.min(species.getMaxBranchRadius(), rootThickness));
+
+            // The new branch should be the square root of all the sums of the areas of the branches coming into it.
+            // But it shouldn't be smaller than it's current size(prevents the instant slimming effect when chopping off branches)
+            signal.radius = Mth.clamp((float) Math.sqrt(areaAccum) + speciesMangrove.getRootTapering(), getRadius(currBlockState), maxRadius);// WOW!
+            int targetRadius = (int) Math.floor(signal.radius);
+            //if the tree has pods then growth needs to cause updates, otherwise don't bother (for performance)
+            int flags = theresPods ? 3 : 2;
+            int setRad = setRadius(level, pos, targetRadius, originDir, flags);
+            if (setRad < targetRadius) { //We tried to set a radius but it didn't comply because something is in the way.
+                signal.choked = true; //If something is in the way then it means that the tree growth is choked
+            }
+        }
 
         return signal;
     }

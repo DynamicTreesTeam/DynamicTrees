@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlockDecayer;
+import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.systems.nodemapper.TwinkleNode;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.JoCode;

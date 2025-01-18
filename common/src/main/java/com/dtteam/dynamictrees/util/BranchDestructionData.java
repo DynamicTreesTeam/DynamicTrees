@@ -80,9 +80,6 @@ public class BranchDestructionData {
         unencodedLeaves = leaves;
         unencodedEnds = ends;
     }
-    public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, NetVolumeNode.Volume volume, BlockPos cutPos, Direction cutDir, Direction toolDir, int trunkHeight) {
-        this(species, branches, leaves, leavesDrops, ends, volume, cutPos, cutPos, cutDir, toolDir, trunkHeight);
-    }
 
     public BranchDestructionData merge (BranchDestructionData other){
         //All the positions are relative to the cutPos, so when merging they must all be offset by their difference

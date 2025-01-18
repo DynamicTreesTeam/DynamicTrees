@@ -82,7 +82,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public enum DestroyType {
         VOID,
         HARVEST,
-        BLAST,
+        EXPLODE,
         FIRE,
         ROOT
     }
@@ -344,7 +344,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
             return AnimationHandlers.voidAnimationHandler;
         }
 
-        if (destroyType == DestroyType.BLAST) {
+        if (destroyType == DestroyType.EXPLODE) {
             return AnimHandlerBlast;
         }
 

@@ -46,6 +46,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -380,7 +381,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
             cutDir = Direction.DOWN;
         }
 
-        return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutDir, toolDir, trunkHeight);
+        return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutPos, cutDir, toolDir, trunkHeight);
     }
 
     /**
@@ -653,39 +654,45 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         destroyMode = DynamicTrees.DestroyMode.SLOPPY;
     }
 
-//    ///////////////////////////////////////////
-//    // EXPLOSIONS AND FIRE
-//    ///////////////////////////////////////////
-//
-//    /**
-//     * Handles destroying the {@link BranchBlock} when it's exploded. This is likely to result in mostly sticks but that
-//     * kind of makes sense anyway.
-//     *
-//     * @param state     The {@link BlockState} of the {@link BranchBlock} being exploded.
-//     * @param level     The {@link Level} instance.
-//     * @param pos       The {@link BlockPos} of the {@link BranchBlock} being exploded.
-//     * @param explosion The {@link Explosion} destroying the {@link BranchBlock}.
-//     */
-//    @Override
-//    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
-//        final Species species = TreeHelper.getExactSpecies(level, pos);
-//        final BranchDestructionData destroyData = destroyBranchFromNode(level, pos, Direction.DOWN, false, null);
-//        final NetVolumeNode.Volume woodVolume = destroyData.woodVolume;
-//        final List<ItemStack> woodDropList = species.getBranchesDrops(level, woodVolume, ItemStack.EMPTY, explosion.radius);
-//        final FallingTreeEntity treeEntity = FallingTreeEntity.dropTree(level, destroyData, woodDropList, DestroyType.BLAST);
-//
-//        if (treeEntity != null) {
-//            final Vec3 expPos = explosion.getPosition();
-//            final double distance = Math.sqrt(treeEntity.distanceToSqr(expPos.x, expPos.y, expPos.z));
-//
-//            if (distance / explosion.radius <= 1.0D && distance != 0.0D) {
-//                treeEntity.push((treeEntity.getX() - expPos.x) / distance, (treeEntity.getY() - expPos.y) / distance,
-//                        (treeEntity.getZ() - expPos.z) / distance);
-//            }
-//        }
-//
-//        this.wasExploded(level, pos, explosion);
-//    }
+    ///////////////////////////////////////////
+    // EXPLOSIONS AND FIRE
+    ///////////////////////////////////////////
+
+    /**
+     * Handles destroying the {@link BranchBlock} when it's exploded. This is likely to result in mostly sticks but that
+     * kind of makes sense anyway.
+     *
+     * @param state     The {@link BlockState} of the {@link BranchBlock} being exploded.
+     * @param level     The {@link Level} instance.
+     * @param pos       The {@link BlockPos} of the {@link BranchBlock} being exploded.
+     * @param explosion The {@link Explosion} destroying the {@link BranchBlock}.
+     *
+     * NeoForge Override */
+    @SuppressWarnings("unused")
+    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
+        final SpeciesNode speciesNode = new SpeciesNode();
+        final MapSignal signal = analyse(state, level, pos, null, new MapSignal(speciesNode));
+        if (signal.foundRoot){ //Some root blocks may need to be reminded the tree exploded (Cough cough AerialRoots cough)
+            level.scheduleTick(signal.root, level.getBlockState(signal.root).getBlock(), 2);
+        }
+        final Species species = speciesNode.getSpecies();
+        final BranchDestructionData destroyData = destroyBranchFromNode(level, pos, Direction.DOWN, false, null);
+        final NetVolumeNode.Volume woodVolume = destroyData.woodVolume;
+        final List<ItemStack> woodDropList = species.getBranchesDrops(level, woodVolume, ItemStack.EMPTY, explosion.radius());
+        final FallingTreeEntity treeEntity = FallingTreeEntity.dropTree(level, destroyData, woodDropList, FallingTreeEntity.DestroyType.EXPLODE);
+
+        if (treeEntity != null) {
+            final Vec3 expPos = explosion.center();
+            final double distance = Math.sqrt(treeEntity.distanceToSqr(expPos.x, expPos.y, expPos.z));
+
+            if (distance / explosion.radius() <= 1.0D && distance != 0.0D) {
+                treeEntity.push((treeEntity.getX() - expPos.x) / distance, (treeEntity.getY() - expPos.y) / distance,
+                        (treeEntity.getZ() - expPos.z) / distance);
+            }
+        }
+
+        this.wasExploded(level, pos, explosion);
+    }
 
     @Override
     public final TreePartType getTreePartType() {
