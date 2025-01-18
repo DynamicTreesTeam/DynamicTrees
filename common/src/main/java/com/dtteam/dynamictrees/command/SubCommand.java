@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.command;
 
+import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.CommandHelper;
 import com.dtteam.dynamictrees.util.ThrowableRunnable;
@@ -26,6 +27,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collection;
 import java.util.List;
@@ -129,6 +131,11 @@ public abstract class SubCommand {
 
     protected static BlockPos rootPosArgument(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         final BlockPos pos = blockPosArgument(context);
+        //Grow the sapling if one was targeted
+        BlockState sourceState = context.getSource().getLevel().getBlockState(pos);
+        if (sourceState.getBlock() instanceof DynamicSaplingBlock sapling){
+            sapling.performBonemeal(context.getSource().getLevel(), context.getSource().getLevel().getRandom(), pos, sourceState);
+        }
         final BlockPos rootPos = TreeHelper.findRootNode(context.getSource().getLevel(), pos);
 
         if (rootPos == BlockPos.ZERO) {
