@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.CellKit;
+import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.event.RegistryEvent;
 import com.dtteam.dynamictrees.event.TypeRegistryEvent;
@@ -22,6 +23,7 @@ import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
 import com.dtteam.dynamictrees.tree.family.PalmFamily;
 import com.dtteam.dynamictrees.tree.species.*;
 import com.dtteam.dynamictrees.treepack.Resources;
+import com.dtteam.dynamictrees.worldgen.featurecancellation.FeatureCancellers;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -91,6 +93,12 @@ public class CommonModEventHandler {
     }
 
     @SubscribeEvent
+    public static void onFeatureCancellerRegistry(final RegistryEvent<FeatureCanceller> event) {
+        if (!event.isEntryOfType(FeatureCanceller.class)) return;
+        FeatureCancellers.register(event.getRegistry());
+    }
+
+    @SubscribeEvent
     public static void newRegistry(NewRegistryEvent event) {
         final List<SimpleRegistry<?>> registries = Registries.REGISTRIES.stream()
                 .filter(registry -> registry instanceof SimpleRegistry)
@@ -105,10 +113,10 @@ public class CommonModEventHandler {
         // Register Forge registry entry getters and add-on Json object getters.
         JsonDeserializers.registerRegistryEntryGetters();
         JsonDeserializers.postRegistryEvent();
-//
-//        // Register feature cancellers.
-//        FeatureCanceller.REGISTRY.postRegistryEvent();
-//        FeatureCanceller.REGISTRY.lock();
+
+        // Register feature cancellers.
+        FeatureCanceller.REGISTRY.postRegistryEvent();
+        FeatureCanceller.REGISTRY.lock();
     }
 
     @SubscribeEvent

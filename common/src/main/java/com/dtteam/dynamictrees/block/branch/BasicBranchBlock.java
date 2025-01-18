@@ -15,6 +15,7 @@ import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionContext;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.util.ChunkTreeHelper;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
@@ -416,7 +417,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     protected int getSideConnectionRadius(BlockGetter level, BlockPos pos, int radius, Direction side) {
         final BlockPos deltaPos = pos.relative(side);
-        final BlockState blockState = CoordUtils.getStateSafe(level, deltaPos);
+        final BlockState blockState = ChunkTreeHelper.getStateSafe(level, deltaPos);
 
         // If adjacent block is not loaded assume there is no connection.
         return blockState == null ? 0 : TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, level, deltaPos, this, side, radius);

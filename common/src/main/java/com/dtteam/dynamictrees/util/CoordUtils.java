@@ -80,41 +80,6 @@ public final class CoordUtils {
         }
     }
 
-    public static boolean isSurroundedByLoadedChunks(Level level, BlockPos pos) {
-        for (Surround surr : Surround.values()) {
-            Vec3i dir = surr.getOffset();
-            if (!((ServerLevel) level).isPositionEntityTicking(pos.offset(dir))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @SuppressWarnings("deprecation")
-    public static boolean canAccessStateSafely(BlockGetter level, BlockPos pos) {
-        if (level instanceof LevelReader) { // Handles most cases.
-            return ((LevelReader) level).hasChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
-        } else if (level instanceof PathNavigationRegion pathLevel) { // Handles Region.
-            return !(pathLevel.getChunk(pos) instanceof EmptyLevelChunk);
-        }
-        // Otherwise assume we can access state safely. In most cases this is true, and if not we know it is a
-        // mod compatibility issue and a crash or logging will be more helpful in solving the problem.
-        return true;
-    }
-
-    /**
-     * Gets the {@link BlockState} object at the given position, or null if the block wasn't loaded. This is safer
-     * because calling getBlockState on an unloaded block can cause a crash.
-     *
-     * @param level The {@link BlockGetter} object.
-     * @return The {@link BlockState} object, or null if it's not loaded.
-     */
-    @Nullable
-    public static BlockState getStateSafe(BlockGetter level, BlockPos blockPos) {
-        return canAccessStateSafely(level, blockPos) ? level.getBlockState(blockPos) : null;
-    }
-
     public static Direction getRandomDir(RandomSource rand) {
         return Direction.values()[2 + rand.nextInt(4)];//Return NSWE
     }

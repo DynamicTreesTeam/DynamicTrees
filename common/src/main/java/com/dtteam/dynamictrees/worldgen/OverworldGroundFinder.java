@@ -3,6 +3,9 @@ package com.dtteam.dynamictrees.worldgen;
 import com.dtteam.dynamictrees.api.worldgen.GroundFinder;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.levelgen.Heightmap;
 
@@ -19,15 +22,15 @@ public final class OverworldGroundFinder implements GroundFinder {
     public List<BlockPos> findGround(LevelAccessor level, BlockPos start, @Nullable Heightmap.Types heightmap) {
 		//We start of by getting the surface ground
 		LinkedList<BlockPos> surfaceGround = new LinkedList<>(SURFACE.findGround(level, start, heightmap));
-		BlockPos surfaceBlock = surfaceGround.get(0);
+		BlockPos surfaceBlock = surfaceGround.getFirst();
 		//Then we do a very sparse check to find underground biomes
 		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(start.getX(), 0, start.getZ());
 		boolean caveBiomeFound = false;
 		while (CoordUtils.inRange(pos, level.getMinBuildHeight(), surfaceBlock.getY())) {
-//			if (level.getBiome(pos).is(Tags.Biomes.IS_UNDERGROUND)){
-//				caveBiomeFound = true;
-//				break;
-//			}
+			if (level.getBiome(pos).is(TagKey.create(Registries.BIOME, ResourceLocation.parse("c:is_underground")))){
+				caveBiomeFound = true;
+				break;
+			}
 			pos.move(0,-10,0);
 		}
 		//If underground biomes are present, we want to include them

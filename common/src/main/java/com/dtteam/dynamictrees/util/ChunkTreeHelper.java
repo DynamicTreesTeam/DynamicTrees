@@ -10,14 +10,16 @@ import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.systems.nodemapper.CollectorNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.core.SectionPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
@@ -219,6 +221,41 @@ public class ChunkTreeHelper {
         return accessor.getBlockStatesIfLoaded(
                 AABB.encapsulatingFullBlocks(pos.offset(-r, -r, -r), pos.offset(r, r, r))
         ).findAny().isPresent();
+    }
+
+    public static boolean isSurroundedByLoadedChunks(Level level, BlockPos pos) {
+        for (CoordUtils.Surround surr : CoordUtils.Surround.values()) {
+            Vec3i dir = surr.getOffset();
+            if (!((ServerLevel) level).isPositionEntityTicking(pos.offset(dir))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static boolean canAccessStateSafely(BlockGetter level, BlockPos pos) {
+        if (level instanceof LevelReader) { // Handles most cases.
+            return ((LevelReader) level).hasChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
+        } else if (level instanceof PathNavigationRegion pathLevel) { // Handles Region.
+            return !(pathLevel.getChunk(pos) instanceof EmptyLevelChunk);
+        }
+        // Otherwise assume we can access state safely. In most cases this is true, and if not we know it is a
+        // mod compatibility issue and a crash or logging will be more helpful in solving the problem.
+        return true;
+    }
+
+    /**
+     * Gets the {@link BlockState} object at the given position, or null if the block wasn't loaded. This is safer
+     * because calling getBlockState on an unloaded block can cause a crash.
+     *
+     * @param level The {@link BlockGetter} object.
+     * @return The {@link BlockState} object, or null if it's not loaded.
+     */
+    @Nullable
+    public static BlockState getStateSafe(BlockGetter level, BlockPos blockPos) {
+        return canAccessStateSafely(level, blockPos) ? level.getBlockState(blockPos) : null;
     }
 
 }

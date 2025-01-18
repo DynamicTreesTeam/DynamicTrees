@@ -1,23 +1,26 @@
 package com.dtteam.dynamictrees.util.holderset;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.HolderOwner;
-import net.minecraft.core.Registry;
+import net.minecraft.core.*;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
+import net.neoforged.neoforge.registries.holdersets.CompositeHolderSet;
 import net.neoforged.neoforge.registries.holdersets.ICustomHolderSet;
+import net.neoforged.neoforge.registries.holdersets.OrHolderSet;
 
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public abstract class RegexMatchHolderSet<T> extends StreamBackedHolderSet<T> implements ICustomHolderSet<T> {
-    protected static <T> Codec<? extends ICustomHolderSet<T>> codec(ResourceKey<? extends Registry<T>> registryKey,
-            BiFunction<HolderLookup.RegistryLookup<T>, String, RegexMatchHolderSet<T>> factory) {
-        return RecordCodecBuilder.<RegexMatchHolderSet<T>>create(builder -> builder.group(
+
+    protected static <T> MapCodec<? extends ICustomHolderSet<T>> mapCodec(ResourceKey<? extends Registry<T>> registryKey, BiFunction<HolderLookup.RegistryLookup<T>, String, RegexMatchHolderSet<T>> factory) {
+        return RecordCodecBuilder.<RegexMatchHolderSet<T>>mapCodec(builder -> builder.group(
                 RegistryOps.retrieveRegistryLookup(registryKey).forGetter(RegexMatchHolderSet::registryLookup),
                 Codec.STRING.fieldOf("regex").forGetter(RegexMatchHolderSet::regex)
         ).apply(builder, factory));

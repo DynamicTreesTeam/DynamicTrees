@@ -49,10 +49,7 @@ import com.dtteam.dynamictrees.systems.substance.GrowthSubstance;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.util.*;
-import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
-import com.dtteam.dynamictrees.worldgen.JoCode;
-import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
-import com.dtteam.dynamictrees.worldgen.RootsJoCode;
+import com.dtteam.dynamictrees.worldgen.*;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
@@ -62,6 +59,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -280,7 +278,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     protected Map<TagKey<Biome>, Float> envFactors = new HashMap<>();//Environmental factors
 
-//    protected DTBiomeHolderSet  perfectBiomes = new DTBiomeHolderSet();
+    protected IDTBiomeHolderSet  perfectBiomes = Services.MISC.newDTBiomeHolderSet();
 
     protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
 
@@ -341,7 +339,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.genFeatures.clear();
         this.acceptableBlocksForGrowth.clear();
         this.primitiveSaplingRecipe.clear();
-//        this.perfectBiomes.clear();
+        this.perfectBiomes.clear();
 
         this.clearAcceptableSoils();
 
@@ -533,10 +531,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public boolean shouldOverrideCommon(final BlockGetter level, final BlockPos trunkPos) {
         //Common Override test will fail if the server has not loaded yet
-//        if (ServerLifecycleHooks.getCurrentServer() == null) {
-//            DynamicTrees.LOG.warn("shouldOverrideCommon was called before the server was loaded, will return false for now.");
-//            return false;
-//        }
+        if (Services.MISC.getCurrentServer() == null) {
+            DynamicTrees.LOG.warn("shouldOverrideCommon was called before the server was loaded, will return false for now.");
+            return false;
+        }
         return this.hasCommonOverride() && this.commonOverride.test(level, trunkPos);
     }
 
@@ -1625,46 +1623,34 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return range from 0.0 - 1.0.  (0.0f for completely unsuited. 1.0f for perfectly suited)
      */
     public float biomeSuitability(Level level, BlockPos pos) {
-//
-//        Holder<Biome> biomeHolder = level.getBiome(pos);
-//        Biome biome = biomeHolder.value();
-//
+
+        Holder<Biome> biomeHolder = level.getBiome(pos);
+        Biome biome = biomeHolder.value();
+
 //        //An override to allow other mods to change the behavior of the suitability for a level location. Such as Terrafirmacraft.
 //        BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(level, biome, this, pos);
 //        MinecraftForge.EVENT_BUS.post(suitabilityEvent);
 //        if (suitabilityEvent.isHandled()) {
 //            return suitabilityEvent.getSuitability();
 //        }
-//
-//        float ugs = (float) (double) DTConfigs.SCALE_BIOME_GROWTH_RATE.get(); // Universal growth scalar.
-//
-//        if (ugs == 1.0f || this.isBiomePerfect(biomeHolder)) {
-//            return 1.0f;
-//        }
-//
-//        float suit = defaultSuitability();
-//
-//        for (TagKey<Biome> t : biomeHolder.tags().toList()) {
-//            suit *= envFactors.getOrDefault(t, 1.0f);
-//        }
-//
-//        //Linear interpolation of suitability with universal growth scalar
-//        suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
-//
-//        return Mth.clamp(suit, 0.0f, 1.0f);
-        return 1;
-    }
 
-//    /**
-//     * Used to determine if the provided {@link Biome} argument will yield unhindered growth to Maximum potential. This
-//     * has the affect of the suitability being 100%(or 1.0f)
-//     *
-//     * @param biome The biome being tested
-//     * @return True if biome is "perfect" false otherwise.
-//     */
-//    public boolean isBiomePerfect(final Holder<Biome> biome) {
-//        return this.perfectBiomes.contains(biome);
-//    }
+        float ugs = (float) (double) Services.CONFIG.getDoubleConfig(IConfigHelper.SCALE_BIOME_GROWTH_RATE); // Universal growth scalar.
+
+        if (ugs == 1.0f || this.isBiomePerfect(biomeHolder)) {
+            return 1.0f;
+        }
+
+        float suit = defaultSuitability();
+
+        for (TagKey<Biome> t : biomeHolder.tags().toList()) {
+            suit *= envFactors.getOrDefault(t, 1.0f);
+        }
+
+        //Linear interpolation of suitability with universal growth scalar
+        suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
+
+        return Mth.clamp(suit, 0.0f, 1.0f);
+    }
 
     /**
      * Used to determine if the provided {@link Biome} argument will yield unhindered growth to Maximum potential. This
@@ -1673,36 +1659,20 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @param biome The biome being tested
      * @return True if biome is "perfect" false otherwise.
      */
-    public boolean isBiomePerfect(ResourceKey<Biome> biome) {
-        return false;
+    public boolean isBiomePerfect(Holder<Biome> biome) {
+        return this.perfectBiomes.contains(biome);
     }
 
-//    public DTBiomeHolderSet getPerfectBiomes() {
-//        return perfectBiomes;
-//    }
+
+    public IDTBiomeHolderSet getPerfectBiomes() {
+        return perfectBiomes;
+    }
 
     /**
      * A value that determines what a tree's suitability is before climate manipulation occurs.
      */
     public static float defaultSuitability() {
         return 0.85f;
-    }
-
-    /**
-     * A convenience function to test if a biome is one of the many options passed.
-     *
-     * @param biomeToCheck The biome we are matching
-     * @param biomes       Multiple biomes to match against
-     * @return True if a match is found. False if not.
-     */
-    @SafeVarargs
-    public static boolean isOneOfBiomes(ResourceKey<Biome> biomeToCheck, ResourceKey<Biome>... biomes) {
-        for (ResourceKey<Biome> biome : biomes) {
-            if (biomeToCheck.equals(biome)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     //////////////////////////////
@@ -2403,7 +2373,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream()
                         .filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny()
                         .orElse(Blocks.AIR)),
-//                Pair.of("perfectBiomes", this.perfectBiomes),
+                Pair.of("perfectBiomes", this.perfectBiomes),
                 Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
                 Pair.of("genFeatures", this.genFeatures));
     }

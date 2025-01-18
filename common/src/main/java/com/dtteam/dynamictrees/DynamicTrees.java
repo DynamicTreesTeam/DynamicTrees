@@ -2,7 +2,11 @@ package com.dtteam.dynamictrees;
 
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.loot.DTLoot;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
+import com.dtteam.dynamictrees.treepack.Resources;
+import com.dtteam.dynamictrees.util.CommonSetup;
+import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,11 +58,24 @@ public class DynamicTrees {
     // write the majority of your code here and load it from your loader specific projects. This example has some
     // code that gets invoked by the entry point of the loader specific projects.
     public static void init() {
-        DTLoot.load();
 
         RegistryHandler.setup(MOD_ID);
 
         SeasonCompatibilityHandler.registerBuiltInSeasonManagers();
+    }
+
+    public static void commonSetup() {
+        DTLoot.load();
+        DynamicTreeFeature.setup();
+
+        // Clears and locks registry handlers to free them from memory.
+        RegistryHandler.REGISTRY.clear();
+
+        DTRegistries.DENDRO_POTION.get().registerRecipes();
+
+        Resources.MANAGER.setup();
+
+        CommonSetup.onCommonSetup();
     }
 
     public static ResourceLocation location (String name){

@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.event;
 import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.PropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.applier.JsonPropertyApplier;
+import com.google.gson.JsonElement;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 
@@ -43,7 +44,7 @@ public class ApplierRegistryEvent<O, I> extends Event implements IModBusEvent {
      * @see Reload
      * @see Common
      */
-    public static class Load<O, I> extends ApplierRegistryEvent<O, I> {
+    public static final class Load<O, I> extends ApplierRegistryEvent<O, I> {
         public Load(PropertyAppliers<O, I> appliers, String applierListIdentifier) {
             super(appliers, applierListIdentifier);
         }
@@ -60,7 +61,7 @@ public class ApplierRegistryEvent<O, I> extends Event implements IModBusEvent {
      * @see Reload
      * @see Common
      */
-    public static class GatherData<O, I> extends ApplierRegistryEvent<O, I> {
+    public static final class GatherData<O, I> extends ApplierRegistryEvent<O, I> {
         public GatherData(PropertyAppliers<O, I> appliers, String applierListIdentifier) {
             super(appliers, applierListIdentifier);
         }
@@ -77,7 +78,7 @@ public class ApplierRegistryEvent<O, I> extends Event implements IModBusEvent {
      * @see Reload
      * @see Common
      */
-    public static class Setup<O, I> extends ApplierRegistryEvent<O, I> {
+    public static final class Setup<O, I> extends ApplierRegistryEvent<O, I> {
         public Setup(PropertyAppliers<O, I> appliers, String applierListIdentifier) {
             super(appliers, applierListIdentifier);
         }
@@ -94,7 +95,7 @@ public class ApplierRegistryEvent<O, I> extends Event implements IModBusEvent {
      * @see Setup
      * @see Common
      */
-    public static class Reload<O, I> extends ApplierRegistryEvent<O, I> {
+    public static final class Reload<O, I> extends ApplierRegistryEvent<O, I> {
         public Reload(PropertyAppliers<O, I> appliers, String applierListIdentifier) {
             super(appliers, applierListIdentifier);
         }
@@ -111,7 +112,7 @@ public class ApplierRegistryEvent<O, I> extends Event implements IModBusEvent {
      * @see Setup
      * @see Reload
      */
-    public static class Common<O, I> extends ApplierRegistryEvent<O, I> {
+    public static final class Common<O, I> extends ApplierRegistryEvent<O, I> {
         public Common(PropertyAppliers<O, I> appliers, String applierListIdentifier) {
             super(appliers, applierListIdentifier);
         }

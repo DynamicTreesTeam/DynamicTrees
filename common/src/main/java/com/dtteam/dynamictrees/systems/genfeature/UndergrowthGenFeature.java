@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.util.TreeHelper;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
@@ -93,10 +94,10 @@ public class UndergrowthGenFeature extends GenFeature {
             BlockPos offsetRootPos = newRootPos.above(i);
             if (species.isAcceptableSoil(level.getBlockState(offsetRootPos))) {
 
-                if (level instanceof WorldGenRegion)
+                if (level instanceof WorldGenRegion worldGenRegion)
                     species.generate(new DynamicTreeGenerationContext(
                             levelContext, species, offsetRootPos, offsetRootPos.mutable(),
-                            level.getNoiseBiome(offsetRootPos.getX(), offsetRootPos.getY(), offsetRootPos.getZ()),
+                            worldGenRegion.getBiome(offsetRootPos),
                             Direction.Plane.HORIZONTAL.getRandomDirection(level.getRandom()), 2, true
                     ));
                 return true;

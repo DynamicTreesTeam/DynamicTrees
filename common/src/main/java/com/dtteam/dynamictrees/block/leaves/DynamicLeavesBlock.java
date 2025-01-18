@@ -487,10 +487,10 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         //Pulse through the leaves to update the canopy shape and their hydro values
         boolean survived = updateAllLeaves(level, pos, level.getBlockState(pos), signal.rand, false);
         //if hydro was 0 then the leaves have been removed
-        if (!survived){
-            signal.success = false;
-            return signal;
-        }
+//        if (!survived){
+//            signal.success = false;
+//            return signal;
+//        }
 
         if (hasLeaves) {
             //Finally set the leaves block to a branch

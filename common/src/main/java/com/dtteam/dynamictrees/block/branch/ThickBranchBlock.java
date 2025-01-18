@@ -5,6 +5,7 @@ import com.dtteam.dynamictrees.block.pod.PodBlock;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
+import com.dtteam.dynamictrees.util.ChunkTreeHelper;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
@@ -124,7 +125,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     @Override
     protected int getSideConnectionRadius(BlockGetter level, BlockPos pos, int radius, Direction side) {
         final BlockPos deltaPos = pos.relative(side);
-        final BlockState blockState = CoordUtils.getStateSafe(level, deltaPos);
+        final BlockState blockState = ChunkTreeHelper.getStateSafe(level, deltaPos);
 
         if (blockState == null) {
             return 0;

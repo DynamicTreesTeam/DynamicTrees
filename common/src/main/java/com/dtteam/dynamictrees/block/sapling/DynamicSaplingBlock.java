@@ -1,10 +1,13 @@
 package com.dtteam.dynamictrees.block.sapling;
 
+import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
@@ -17,8 +20,12 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootDataType;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
@@ -125,7 +132,7 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
 
     protected void dropBlock(Level level, BlockState state, BlockPos pos) {
         if (level instanceof ServerLevel serverLevel){
-            getDrops(state, new LootParams.Builder(serverLevel)).forEach((drop) -> popResource(level, pos, drop));
+            getDrops(state, new LootParams.Builder(serverLevel).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY)).forEach((drop) -> popResource(level, pos, drop));
             level.removeBlock(pos, false);
         }
     }
@@ -135,17 +142,18 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
         return this.getSpecies().getSeedStack(1);
     }
 
-//    @Override
-//    public List<ItemStack> getDrops(@NotNull BlockState state, @NotNull LootParams.Builder builder) {
-//        // If a loot table has been added load those drops instead (until drop creators).
-//        if (builder.getLevel().getServer().getLootData().getElement(LootDataType.TABLE, this.getLootTable()) != null) {
-//            return super.getDrops(state, builder);
-//        }
-//
-//        return DTConfigs.DYNAMIC_SAPLING_DROPS.get() ?
-//                Collections.singletonList(this.getSpecies().getSeedStack(1)) :
-//                Collections.emptyList();
-//    }
+    @Override
+    public List<ItemStack> getDrops(@NotNull BlockState state, @NotNull LootParams.Builder builder) {
+        // Drop nothing if sapling drops are disabled, nuthin'!
+        if (!Services.CONFIG.getBoolConfig(IConfigHelper.DYNAMIC_SAPLING_DROPS))
+            return Collections.emptyList();
+        // If a loot table has been added load those drops instead.
+        LootTable loottable = builder.getLevel().getServer().reloadableRegistries().getLootTable(getLootTable());
+        if (loottable == LootTable.EMPTY)
+            return Collections.singletonList(this.getSpecies().getSeedStack(1));
+
+        return super.getDrops(state, builder);
+    }
 
     ///////////////////////////////////////////
     // PHYSICAL BOUNDS

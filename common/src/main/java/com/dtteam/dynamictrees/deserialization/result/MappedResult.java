@@ -15,30 +15,30 @@ import java.util.function.Predicate;
 public interface MappedResult<T, I> extends Result<T, I> {
 
     /**
-     * If this is not already successful, attempts to deserialise the original input value as the specified {@code
+     * If this is not already successful, attempts to deserialize the original input value as the specified {@code
      * type}, mapping it using the specified {@code mapper} if successful and returning the resulting {@link
      * MappedResult}.
      *
-     * @param type the type to attempt to deserialise
-     * @param mapper a mapper that maps the deserialised value to a new value
-     * @param <V> the type to attempt to deserialise
+     * @param type the type to attempt to deserialize
+     * @param mapper a mapper that maps the deserialized value to a new value
+     * @param <V> the type to attempt to deserialize
      * @return the mapped result
-     * @throws NoSuchDeserializerException if the specified {@code type} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code type} did not have a registered deserializer
      */
     default <V> MappedResult<T, I> elseMapIfType(Class<V> type, SimpleMapper<V, T> mapper) {
         return this.elseMapIfType(type, mapper.fullMapper());
     }
 
     /**
-     * If this is not already successful, attempts to deserialise the original input value as the specified {@code
+     * If this is not already successful, attempts to deserialize the original input value as the specified {@code
      * type}, mapping it using the specified {@code mapper} if successful and returning the resulting {@link
      * MappedResult}.
      *
-     * @param type the type to attempt to deserialise
-     * @param mapper a mapper that maps the deserialised value to a new value
-     * @param <V> the type to attempt to deserialise
+     * @param type the type to attempt to deserialize
+     * @param mapper a mapper that maps the deserialized value to a new value
+     * @param <V> the type to attempt to deserialize
      * @return the mapped result
-     * @throws NoSuchDeserializerException if the specified {@code type} did not have a registered deserialiser
+     * @throws NoSuchDeserializerException if the specified {@code type} did not have a registered deserializer
      */
     <V> MappedResult<T, I> elseMapIfType(Class<V> type, Mapper<V, T> mapper);
 
@@ -49,8 +49,8 @@ public interface MappedResult<T, I> extends Result<T, I> {
      *
      * @param key the key for the value to map
      * @param type the required type to be mapped
-     * @param mapper a mapper that maps the deserialised value to type {@link T}
-     * @param <V> the type to map the deserialised value to
+     * @param mapper a mapper that maps the deserialized value to type {@link T}
+     * @param <V> the type to map the deserialized value to
      * @return the mapped result
      */
     default <V> MappedResult<T, I> elseMapIfContains(String key, Class<V> type, SimpleMapper<V, T> mapper) {
@@ -64,8 +64,8 @@ public interface MappedResult<T, I> extends Result<T, I> {
      *
      * @param key the key for the value to map
      * @param type the required type to be mapped
-     * @param mapper a mapper that maps the deserialised value to type {@link T}
-     * @param <V> the type to map the deserialised value to
+     * @param mapper a mapper that maps the deserialized value to type {@link T}
+     * @param <V> the type to map the deserialized value to
      * @return the mapped result
      */
     <V> MappedResult<T, I> elseMapIfContains(String key, Class<V> type, Mapper<V, T> mapper);
@@ -77,9 +77,9 @@ public interface MappedResult<T, I> extends Result<T, I> {
      *
      * @param key the key for the value to map
      * @param type the required type to be mapped
-     * @param mapper a mapper that maps the deserialised value to type {@link T}
+     * @param mapper a mapper that maps the deserialized value to type {@link T}
      * @param defaultValue the value to use if the map-like structure doesn't contain the {@code key}
-     * @param <V> the type to map the deserialised value to
+     * @param <V> the type to map the deserialized value to
      * @return the mapped result
      */
     default <V> MappedResult<T, I> elseMapIfContains(String key, Class<V> type, SimpleMapper<V, T> mapper,
@@ -94,28 +94,27 @@ public interface MappedResult<T, I> extends Result<T, I> {
      *
      * @param key the key for the value to map
      * @param type the required type to be mapped
-     * @param mapper a mapper that maps the deserialised value to type {@link T}
+     * @param mapper a mapper that maps the deserialized value to type {@link T}
      * @param defaultValue the value to use if the map-like structure doesn't contain the {@code key}
-     * @param <V> the type to map the deserialised value to
+     * @param <V> the type to map the deserialized value to
      * @return the mapped result
      */
     <V> MappedResult<T, I> elseMapIfContains(String key, Class<V> type, Mapper<V, T> mapper, T defaultValue);
 
     /**
-     * Sets a type error as this result's error if a value could not be deserialised from the input.
+     * Sets a type error as this result's error if a value could not be deserialized from the input.
      *
      * @return the mapped result
      */
     default MappedResult<T, I> elseTypeError() {
-        return this.elseError(Objects::nonNull, "Unsupported type for input \"" + this.getInput() +
-                "\".");
+        return this.elseError(Objects::nonNull, "Unsupported type for input " + this.getInput() + ".");
     }
 
     /**
-     * Sets the specified {@code invalidError} as this result's error if the deserialised value does not pass the
+     * Sets the specified {@code invalidError} as this result's error if the deserialized value does not pass the
      * specified {@code validator}.
      *
-     * @param validator the predicate by which to test the deserialised value
+     * @param validator the predicate by which to test the deserialized value
      * @param invalidError the error message to set if the {@code validator} is not passed
      * @return the mapped result
      */

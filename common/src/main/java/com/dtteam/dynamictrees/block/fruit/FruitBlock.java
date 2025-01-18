@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.block.fruit;
 
 import com.dtteam.dynamictrees.block.Growable;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.util.LevelContext;
 import net.minecraft.core.BlockPos;
@@ -90,13 +91,13 @@ public class FruitBlock extends Block implements BonemealableBlock, Growable {
 
     private void tryGrow(BlockState state, Level level, BlockPos pos, RandomSource random, int age,
                          @Nullable Float season) {
-//        final boolean doGrow = random.nextFloat() < getGrowthChance(level, pos);
-//        final boolean eventGrow = ForgeHooks.onCropsGrowPre(level, pos, state, doGrow);
-//        // Prevent a seasons mod from canceling the growth, we handle that ourselves.
-//        if (season != null ? doGrow || eventGrow : eventGrow) {
-//            setAge(level, pos, state, age + 1);
-//            ForgeHooks.onCropsGrowPost(level, pos, state);
-//        }
+        final boolean doGrow = random.nextFloat() < getGrowthChance(level, pos);
+        final boolean eventGrow = Services.EVENT.canCropGrow(level, pos, state, doGrow);
+        // Prevent a seasons mod from canceling the growth, we handle that ourselves.
+        if (season != null ? doGrow || eventGrow : eventGrow) {
+            setAge(level, pos, state, age + 1);
+            Services.EVENT.cropGrowPost(level, pos, state);
+        }
     }
 
     private float getGrowthChance(Level level, BlockPos pos) {

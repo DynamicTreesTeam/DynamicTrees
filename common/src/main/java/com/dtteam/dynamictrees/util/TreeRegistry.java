@@ -1,14 +1,15 @@
 package com.dtteam.dynamictrees.util;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.cell.CellKit;
 import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
+import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Contains various utility functions relating to {@link Object}s with a {@link SimpleRegistry}.
@@ -40,19 +41,19 @@ public final class TreeRegistry {
      * @return The tree that was found or null if not found
      */
     public static Species findSpeciesSloppy(final String name) {
-//        final ResourceLocation resourceLocation = getResLoc(name);
-//
-//        // Search specific domain first.
-//        if (Species.REGISTRY.has(resourceLocation)) {
-//            return findSpecies(resourceLocation);
-//        }
-//
-//        // Search all domains.
-//        for (Species species : Species.REGISTRY) {
-//            if (species.getRegistryName().getPath().equals(resourceLocation.getPath())) {
-//                return species;
-//            }
-//        }
+        final ResourceLocation resourceLocation = getResLoc(name);
+
+        // Search specific domain first.
+        if (Species.REGISTRY.has(resourceLocation)) {
+            return findSpecies(resourceLocation);
+        }
+
+        // Search all domains.
+        for (Species species : Species.REGISTRY) {
+            if (species.getRegistryName().getPath().equals(resourceLocation.getPath())) {
+                return species;
+            }
+        }
 
         return Species.NULL_SPECIES;
     }
@@ -76,29 +77,29 @@ public final class TreeRegistry {
         SAPLING_REPLACERS.put(state.getBlock(), species);
     }
 
-//    //////////////////////////////
-//    // CELL KIT HANDLING
-//    //////////////////////////////
-//
-//    public static CellKit findCellKit(String name) {
-//        return findCellKit(getResLoc(name));
-//    }
-//
-//    public static CellKit findCellKit(ResourceLocation name) {
-//        return CellKit.REGISTRY.get(name);
-//    }
-//
-//    //////////////////////////////
-//    // GROWTH LOGIC KIT HANDLING
-//    //////////////////////////////
-//
-//    public static GrowthLogicKit findGrowthLogicKit(final String name) {
-//        return findGrowthLogicKit(getResLoc(name));
-//    }
-//
-//    public static GrowthLogicKit findGrowthLogicKit(final ResourceLocation name) {
-//        return GrowthLogicKit.REGISTRY.get(name);
-//    }
+    //////////////////////////////
+    // CELL KIT HANDLING
+    //////////////////////////////
+
+    public static CellKit findCellKit(String name) {
+        return findCellKit(getResLoc(name));
+    }
+
+    public static CellKit findCellKit(ResourceLocation name) {
+        return CellKit.REGISTRY.get(name);
+    }
+
+    //////////////////////////////
+    // GROWTH LOGIC KIT HANDLING
+    //////////////////////////////
+
+    public static GrowthLogicKit findGrowthLogicKit(final String name) {
+        return findGrowthLogicKit(getResLoc(name));
+    }
+
+    public static GrowthLogicKit findGrowthLogicKit(final ResourceLocation name) {
+        return GrowthLogicKit.REGISTRY.get(name);
+    }
 
     public static ResourceLocation getResLoc(final String resLocStr) {
         return processResLoc(ResourceLocation.parse(resLocStr));

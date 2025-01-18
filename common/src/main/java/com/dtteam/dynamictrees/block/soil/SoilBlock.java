@@ -16,6 +16,7 @@ import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.BranchDestructionData;
+import com.dtteam.dynamictrees.util.ChunkTreeHelper;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.client.color.block.BlockColors;
@@ -194,7 +195,7 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     public void updateTree(BlockState rootyState, Level level, BlockPos rootPos, RandomSource random, boolean natural) {
 
-        if (CoordUtils.isSurroundedByLoadedChunks(level, rootPos)) {
+        if (ChunkTreeHelper.isSurroundedByLoadedChunks(level, rootPos)) {
 
             boolean viable = false;
 

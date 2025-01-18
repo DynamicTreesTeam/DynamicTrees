@@ -18,12 +18,17 @@ import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.util.CommonSetup;
 import com.dtteam.dynamictrees.util.JsonMapWrapper;
 import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.gson.JsonObject;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ComposterBlock;
@@ -60,12 +65,10 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         this.environmentFactorAppliers.register(new TagKeyJsonPropertyApplier<>(Registries.BIOME, Species.class,
                 (TriConsumer<TagKey<Biome>, Species, Float>) (tagKey, species, factor) -> species.envFactor(tagKey, factor)));
 
-        JsonDeserializers.register(Species.CommonOverride.class,
-                input-> JsonResult.success(input, (a,b)->false)
-                //input ->
-//                JsonDeserializers.BIOME_PREDICATE.deserialise(input)
-//                        .map(biomePredicate -> (world, pos) -> world instanceof LevelReader &&
-//                                biomePredicate.test(((LevelReader) world).getBiome(pos)));
+        JsonDeserializers.register(Species.CommonOverride.class, input ->
+                JsonDeserializers.BIOME_PREDICATE.deserialize(input)
+                        .map(biomePredicate -> (world, pos) -> world instanceof LevelReader &&
+                                biomePredicate.test(((LevelReader) world).getBiome(pos)))
         );
 
         this.loadAppliers
@@ -110,8 +113,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("primitive_sapling", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .registerArrayApplier("primitive_saplings", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .register("common_override", Species.CommonOverride.class, Species::setCommonOverride)
-//                .register("perfect_biomes", DTBiomeHolderSet.class,
-//                        (species, biomeList) -> species.getPerfectBiomes().getIncludeComponents().add(biomeList))
+                .register("perfect_biomes", IDTBiomeHolderSet.class,
+                        (species, biomeList) -> species.getPerfectBiomes().getIncludeComponents().add(biomeList))
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (Applier<Species, String>) this::addAcceptableSoil)
@@ -153,14 +156,14 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         final ResourceLocation processedSeedName = TreeRegistry.processResLoc(seedName);
         species.setShouldGenerateSeed(false);
         species.setShouldGenerateSapling(false);
-//        CommonSetup.runOnCommonSetup(event -> {
-//            final Item seed = BuiltInRegistries.ITEM.get(processedSeedName);
-//            if (seed instanceof Seed) {
-//                species.setSeed(() -> (Seed) seed);
-//            } else {
-//                LOGGER.warn("Could not find valid seed item from registry name \"" + seedName + "\".");
-//            }
-//        });
+        CommonSetup.runOnCommonSetup(() -> {
+            final Item seed = BuiltInRegistries.ITEM.get(processedSeedName);
+            if (seed instanceof Seed) {
+                species.setSeed(() -> (Seed) seed);
+            } else {
+                LOGGER.warn("Could not find valid seed item from registry name \"{}\".", seedName);
+            }
+        });
     }
 
     private void applyEnvironmentFactors(Species species, JsonObject jsonObject) {

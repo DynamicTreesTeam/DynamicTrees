@@ -8,17 +8,9 @@
     }
   },
   {
-    "select": { "name": "minecraft:.*", "tag": "#forge:is_lush" },
+    "select": { "name": "minecraft:lush_caves" },
     "cancellers": {
       "type": "rooted_tree",
-      "namespace": "minecraft"
-    }
-  },
-  {
-    "_comment": "Cancel regular mushroom generation from the mushroom fields biome.",
-    "select": { "name": "minecraft:.*", "tag": "#forge:is_mushroom" },
-    "cancellers": {
-      "type": "mushroom",
       "namespace": "minecraft"
     }
   },

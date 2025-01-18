@@ -1,6 +1,8 @@
 package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
+import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.util.ChunkTreeHelper;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictrees.util.Null;
 import net.minecraft.core.BlockPos;
@@ -8,12 +10,19 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.*;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -24,14 +33,16 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.ScheduledTick;
 import net.minecraft.world.ticks.TickPriority;
-
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiConsumer;
 
 public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleWaterloggedBlock {
 
@@ -74,22 +85,32 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     // INTERACTION
     ///////////////////////////////////////////
 
-//    @Override
-//    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-//        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().onDestroyedByPlayer(muse.state, level, muse.pos, player, willHarvest, level.getFluidState(pos)), false);
-//    }
+    /** NeoForge override */
+    @SuppressWarnings("unused")
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> Services.INTERACTION.blockDestroyByPlayer(muse.state, level, muse.pos, player, willHarvest, level.getFluidState(pos)), false);
+    }
 
-//    @Override
-//    public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-//        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().getDestroyProgress(muse.state, player, level, muse.pos), 0f);
-//    }
+    @Override
+    protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
+        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getDestroyProgress(player, level, muse.pos), 0f);
+    }
+
+    @Override
+    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
+    }
+
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        return state;
+    }
 
     @Override
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
         return Null.applyIfNonnull(this.getMuse(level, pos), muse -> ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(state, level, muse.pos), super.getHardness(state, level, pos));
     }
 
-//    @Override
+    //    @Override
 //    public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, @Nullable Entity entity) {
 //        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().getSoundType(muse.state, level, muse.pos, entity), SoundType.WOOD);
 //    }
@@ -116,7 +137,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     public boolean museDoesNotExist(BlockGetter level, BlockState state, BlockPos pos) {
         final BlockPos musePos = pos.offset(this.getMuseDir(state, pos).getOffset());
-        return CoordUtils.getStateSafe(level, musePos) == null;
+        return ChunkTreeHelper.getStateSafe(level, musePos) == null;
     }
 
     @Nullable
@@ -133,7 +154,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     public ShellMuse getMuseUnchecked(BlockGetter level, BlockState state, BlockPos pos, BlockPos originalPos) {
         final CoordUtils.Surround museDir = getMuseDir(state, pos);
         final BlockPos musePos = pos.offset(museDir.getOffset());
-        final BlockState museState = CoordUtils.getStateSafe(level, musePos);
+        final BlockState museState = ChunkTreeHelper.getStateSafe(level, musePos);
 
         if (museState == null) {
             return null;
@@ -195,10 +216,10 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().getCloneItemStack(level, muse.pos, muse.state), ItemStack.EMPTY);
     }
 
-    //    @Override
-//    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
-//        Null.consumeIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().onBlockExploded(muse.state, level, muse.pos, explosion));
-//    }
+    @Override
+    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
+        Null.consumeIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.onExplosionHit(level, muse.pos, explosion, dropConsumer));
+    }
 
     //TODO: This may not even be necessary
     @Nullable
@@ -226,20 +247,27 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
                 surround -> level.setBlock(pos, defaultBlockState().setValue(CORE_DIR, surround), 1));
     }
 
-//    @Override
-//    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
-//        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().use(muse.state, level, muse.pos, playerIn, hand, hit), InteractionResult.FAIL);
-//    }
-//
-//    @Override
-//    public boolean isFlammable(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-//        return false; // This is the simple solution to the problem.  Maybe I'll work it out later.
-//    }
-//
-//    @Override
-//    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-//        return 0; // This is the simple solution to the problem.  Maybe I'll work it out later.
-//    }
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.useItemOn(stack, level, player, hand, hitResult), ItemInteractionResult.FAIL);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.useWithoutItem(level, player, hitResult), InteractionResult.FAIL);
+    }
+
+    /** NeoForge override */
+    @SuppressWarnings("unused")
+    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return 0; // This is the simple solution to the problem.  Maybe I'll work it out later.
+    }
+
+    /** NeoForge override */
+    @SuppressWarnings("unused")
+    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return 0; // This is the simple solution to the problem.  Maybe I'll work it out later.
+    }
 
     public boolean isFullBlockShell(BlockGetter level, BlockPos pos) {
         return isFullBlockShell(getMuse(level, pos));
@@ -296,17 +324,12 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return RenderShape.INVISIBLE;
     }
 
-
+    /** NeoForge override */
+    @SuppressWarnings("unused")
     public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
         return true;
     }
 
-//    @Override
-//    public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
-//        return true;
-//    }
-//
-//
 //    @Override
 //    public void initializeClient(Consumer<IClientBlockExtensions> consumer) {
 //        consumer.accept(new IClientBlockExtensions() {

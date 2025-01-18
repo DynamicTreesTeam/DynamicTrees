@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.event.handler.OptionalHandlers;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.NeoForgeRegistryLoader;
 import com.dtteam.dynamictrees.treepack.Resources;
+import com.dtteam.dynamictrees.util.CommonSetup;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -45,15 +46,7 @@ public class DynamicTreesNeoForge {
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {
-//        DTLoot.load();
-//        DynamicTreeFeature.setup();
-//
-//        // Clears and locks registry handlers to free them from memory.
-//        RegistryHandler.REGISTRY.clear();
-//
-//        DTRegistries.DENDRO_POTION.get().registerRecipes();
-//
-        Resources.MANAGER.setup();
+        DynamicTrees.commonSetup();
     }
 
     private void gatherData(final GatherDataEvent event) {

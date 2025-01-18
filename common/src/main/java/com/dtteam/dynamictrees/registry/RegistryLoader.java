@@ -15,6 +15,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
+import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
@@ -51,5 +58,13 @@ public abstract class RegistryLoader {
     abstract public Supplier<LootPoolEntryType> registerLootPoolEntryType(String name, MapCodec<? extends LootPoolEntryContainer> serializerFactory);
 
     abstract public <L extends LootItemFunction> Supplier<LootItemFunctionType<L>> registerLootFunctionType(String name, MapCodec<L> serializerFactory);
+
+    abstract public <T extends PlacementModifier> Supplier<PlacementModifierType<T>> registerPlacementModifierType (String name, Supplier<PlacementModifierType<T>> supplier);
+
+    abstract public <T extends Feature<?>> Supplier<T> registerFeature (String name, Supplier<T> supplier);
+
+    abstract public <T extends BlockStateProvider> Supplier<BlockStateProviderType<T>> registerBlockStateProviderType (String name, Supplier<BlockStateProviderType<T>> supplier);
+
+    abstract public <T extends StructurePoolElement> Supplier<StructurePoolElementType<T>> registerStructurePoolElementType (String name, Supplier<StructurePoolElementType<T>> supplier);
 
 }

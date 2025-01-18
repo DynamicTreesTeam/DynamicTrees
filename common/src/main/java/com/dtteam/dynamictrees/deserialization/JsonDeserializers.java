@@ -3,6 +3,8 @@ package com.dtteam.dynamictrees.deserialization;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.CellKit;
 import com.dtteam.dynamictrees.api.configuration.PropertyDefinition;
+import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
+import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
@@ -10,6 +12,9 @@ import com.dtteam.dynamictrees.block.pod.Pod;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
 import com.dtteam.dynamictrees.deserialization.deserializer.*;
+import com.dtteam.dynamictrees.deserialization.deserializer.worldgen.ChanceSelectorDeserializer;
+import com.dtteam.dynamictrees.deserialization.deserializer.worldgen.DensitySelectorDeserializer;
+import com.dtteam.dynamictrees.deserialization.deserializer.worldgen.SpeciesSelectorDeserializer;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.dtteam.dynamictrees.item.Seed;
@@ -22,6 +27,9 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.util.function.BiomePredicate;
+import com.dtteam.dynamictrees.worldgen.BiomeDatabase;
+import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -227,8 +235,8 @@ public final class JsonDeserializers {
     public static final JsonDeserializer<List<SoilProperties>> SOIL_PROPERTIES_LIST =
             register(ListDeserializer.getListClass(SoilProperties.class), new ListDeserializer<>(SOIL_PROPERTIES));
 
-//    public static final JsonDeserializer<FeatureCanceller> FEATURE_CANCELLER =
-//            register(FeatureCanceller.class, new RegistryEntryDeserializer<>(FeatureCanceller.REGISTRY));
+    public static final JsonDeserializer<FeatureCanceller> FEATURE_CANCELLER =
+            register(FeatureCanceller.class, new RegistryEntryDeserializer<>(FeatureCanceller.REGISTRY));
 
     public static final JsonDeserializer<Map<String, ResourceLocation>> RESOURCE_LOCATION_MAP =
             register(MapDeserializer.getMapClass(String.class, ResourceLocation.class), new MapDeserializer<>(STRING, RESOURCE_LOCATION));
@@ -254,21 +262,21 @@ public final class JsonDeserializers {
             register(VinesGenFeature.VineType.class, new EnumDeserializer<>(VinesGenFeature.VineType.class));
     public static final JsonDeserializer<GenerationStep.Decoration> DECORATION_STAGE =
             register(GenerationStep.Decoration.class, new EnumDeserializer<>(GenerationStep.Decoration.class));
-//    public static final JsonDeserializer<BiomeDatabase.Operation> OPERATION =
-//            register(BiomeDatabase.Operation.class, new EnumDeserializer<>(BiomeDatabase.Operation.class));
+    public static final JsonDeserializer<BiomeDatabase.Operation> OPERATION =
+            register(BiomeDatabase.Operation.class, new EnumDeserializer<>(BiomeDatabase.Operation.class));
 
-//    public static final JsonDeserializer<DTBiomeHolderSet> BIOME_LIST = register(DTBiomeHolderSet.class, new BiomeListDeserializer());
-//    public static final JsonDeserializer<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
-//            BIOME_LIST.deserialize(jsonElement).map(biomeList ->
-//                    biome -> biomeList.stream().anyMatch(currentBiomeHolder -> currentBiomeHolder.equals(biome) || biome.unwrapKey().map(currentBiomeHolder::is).orElse(false))
-//            ));
-//
-//    public static final JsonDeserializer<BiomePropertySelectors.SpeciesSelector> SPECIES_SELECTOR = register(
-//            BiomePropertySelectors.SpeciesSelector.class, new SpeciesSelectorDeserializer());
-//    public static final JsonDeserializer<BiomePropertySelectors.DensitySelector> DENSITY_SELECTOR = register(
-//            BiomePropertySelectors.DensitySelector.class, new DensitySelectorDeserializer());
-//    public static final JsonDeserializer<BiomePropertySelectors.ChanceSelector> CHANCE_SELECTOR = register(
-//            BiomePropertySelectors.ChanceSelector.class, new ChanceSelectorDeserializer());
+    public static final JsonDeserializer<IDTBiomeHolderSet> BIOME_LIST = register(IDTBiomeHolderSet.class, new BiomeListDeserializer());
+    public static final JsonDeserializer<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
+            BIOME_LIST.deserialize(jsonElement).map(biomeList ->
+                    biome -> biomeList.stream().anyMatch(currentBiomeHolder -> currentBiomeHolder.equals(biome) || biome.unwrapKey().map(currentBiomeHolder::is).orElse(false))
+            ));
+
+    public static final JsonDeserializer<BiomePropertySelectors.SpeciesSelector> SPECIES_SELECTOR = register(
+            BiomePropertySelectors.SpeciesSelector.class, new SpeciesSelectorDeserializer());
+    public static final JsonDeserializer<BiomePropertySelectors.DensitySelector> DENSITY_SELECTOR = register(
+            BiomePropertySelectors.DensitySelector.class, new DensitySelectorDeserializer());
+    public static final JsonDeserializer<BiomePropertySelectors.ChanceSelector> CHANCE_SELECTOR = register(
+            BiomePropertySelectors.ChanceSelector.class, new ChanceSelectorDeserializer());
 
     public static final JsonDeserializer<SeedSaplingRecipe> SEED_SAPLING_RECIPE = register(
             SeedSaplingRecipe.class, new SeedSaplingRecipeDeserializer()

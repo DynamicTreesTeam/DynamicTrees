@@ -1,0 +1,4 @@
+@ParametersAreNonnullByDefault
+package com.dtteam.dynamictrees.worldgen.featurecancellation;
+
+import javax.annotation.ParametersAreNonnullByDefault;

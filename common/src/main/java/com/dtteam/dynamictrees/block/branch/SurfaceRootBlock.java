@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.tree.family.Family;
+import com.dtteam.dynamictrees.util.ChunkTreeHelper;
 import com.dtteam.dynamictrees.util.CoordUtils;
 import com.dtteam.dynamictrees.util.RootConnections;
 import com.dtteam.dynamictrees.util.TreeHelper;
@@ -198,15 +199,15 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
         }
 
         BlockPos dPos = pos.relative(side);
-        BlockState state = CoordUtils.getStateSafe(level, dPos);
-        final BlockState upState = CoordUtils.getStateSafe(level, pos.above());
+        BlockState state = ChunkTreeHelper.getStateSafe(level, dPos);
+        final BlockState upState = ChunkTreeHelper.getStateSafe(level, pos.above());
 
         final RootConnections.ConnectionLevel connectionLevel = (upState != null && isAirOrWater(upState) && state != null && state.isRedstoneConductor(level, dPos)) ?
                 RootConnections.ConnectionLevel.HIGH : (state != null && isAirOrWater(state) ? RootConnections.ConnectionLevel.LOW : RootConnections.ConnectionLevel.MID);
 
         if (connectionLevel != RootConnections.ConnectionLevel.MID) {
             dPos = dPos.above(connectionLevel.getYOffset());
-            state = CoordUtils.getStateSafe(level, dPos);
+            state = ChunkTreeHelper.getStateSafe(level, dPos);
         }
 
         if (state != null && state.getBlock() instanceof SurfaceRootBlock) {

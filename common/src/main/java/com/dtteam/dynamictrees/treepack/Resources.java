@@ -63,8 +63,8 @@ public final class Resources {
     public static final SpeciesResourceLoader SPECIES_LOADER = new SpeciesResourceLoader();
 
     public static final JoCodeResourceLoader JO_CODE_LOADER = new JoCodeResourceLoader();
-//    public static final FeatureCancellationResourceLoader FEATURE_CANCELLATION_LOADER = new FeatureCancellationResourceLoader();
-//    public static final BiomePopulatorsResourceLoader BIOME_POPULATORS_LOADER = new BiomePopulatorsResourceLoader();
+    public static final FeatureCancellationResourceLoader FEATURE_CANCELLATION_LOADER = new FeatureCancellationResourceLoader();
+    public static final BiomePopulatorsResourceLoader BIOME_POPULATORS_LOADER = new BiomePopulatorsResourceLoader();
 
     public static void setupTreesResourceManager() {
         addDefaultLoaders();
@@ -87,9 +87,9 @@ public final class Resources {
                 FRUIT_LOADER,
                 POD_LOADER,
                 SPECIES_LOADER,
-                JO_CODE_LOADER//,
-//                FEATURE_CANCELLATION_LOADER,
-//                BIOME_POPULATORS_LOADER
+                JO_CODE_LOADER,
+                FEATURE_CANCELLATION_LOADER,
+                BIOME_POPULATORS_LOADER
         );
     }
 

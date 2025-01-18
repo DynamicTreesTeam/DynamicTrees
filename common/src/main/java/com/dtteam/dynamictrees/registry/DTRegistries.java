@@ -26,13 +26,21 @@ import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.worldgen.feature.CaveRootedTreeFeature;
+import com.dtteam.dynamictrees.worldgen.feature.CaveRootedTreePlacement;
+import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
+import com.dtteam.dynamictrees.worldgen.feature.DTReplaceNyliumFungiBlockStateProvider;
+import com.dtteam.dynamictrees.worldgen.structure.DTCancelVanillaTreePoolElement;
+import com.dtteam.dynamictrees.worldgen.structure.TreePoolElement;
 import com.mojang.serialization.Codec;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
@@ -46,6 +54,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
@@ -232,6 +245,31 @@ public class DTRegistries {
     public static final Supplier<LootItemFunctionType<MultiplyBySticksCount>> MULTIPLY_STICKS_COUNT = Services.REGISTRY.getRegistryLoader()
             .registerLootFunctionType("multiply_sticks_count", MultiplyBySticksCount.CODEC);
 
+    ///////////////////////////////////////////
+    // WORLDGEN
+    ///////////////////////////////////////////
 
+    public static final ResourceKey<ConfiguredFeature<?, ?>> DYNAMIC_TREE_CONFIGURED_FEATURE = ResourceKey.create(Registries.CONFIGURED_FEATURE, DynamicTrees.location("dynamic_tree"));
+    public static final ResourceKey<ConfiguredFeature<?, ?>> CAVE_ROOTED_TREE_CONFIGURED_FEATURE = ResourceKey.create(Registries.CONFIGURED_FEATURE,DynamicTrees.location("cave_rooted_tree"));
+    public static final ResourceKey<PlacedFeature> DYNAMIC_TREE_PLACED_FEATURE = ResourceKey.create(Registries.PLACED_FEATURE,DynamicTrees.location("dynamic_tree"));
+    /** Placement for trees that generate on the surface above the target biome. This is used for trees like the azalea. */
+    public static final ResourceKey<PlacedFeature> CAVE_ROOTED_TREE_PLACED_FEATURE = ResourceKey.create(Registries.PLACED_FEATURE,DynamicTrees.location("cave_rooted_tree"));
+
+    public static final Supplier<PlacementModifierType<CaveRootedTreePlacement>> CAVE_ROOTED_TREE_PLACEMENT_MODIFIER_TYPE = Services.REGISTRY.getRegistryLoader()
+            .registerPlacementModifierType("cave_rooted_tree", () -> () -> CaveRootedTreePlacement.CODEC);
+
+    public static final Supplier<DynamicTreeFeature> DYNAMIC_TREE_FEATURE = Services.REGISTRY.getRegistryLoader()
+            .registerFeature("tree", DynamicTreeFeature::new);
+    public static final Supplier<CaveRootedTreeFeature> CAVE_ROOTED_TREE_FEATURE = Services.REGISTRY.getRegistryLoader()
+            .registerFeature("cave_rooted_tree", CaveRootedTreeFeature::new);
+
+    public static final Supplier<BlockStateProviderType<DTReplaceNyliumFungiBlockStateProvider>> REPLACE_NYLIUM_FUNGI_BLOCK_STATE_PROVIDER_TYPE = Services.REGISTRY.getRegistryLoader()
+            .registerBlockStateProviderType("replace_nylium_fungi", () -> new BlockStateProviderType<>(DTReplaceNyliumFungiBlockStateProvider.CODEC));
+
+    public static final Supplier<StructurePoolElementType<DTCancelVanillaTreePoolElement>> CANCEL_VANILLA_VILLAGE_TREE_STRUCTURE_POOL_ELEMENT_TYPE = Services.REGISTRY.getRegistryLoader()
+            .registerStructurePoolElementType("cancel_vanilla_village_tree_element", () -> () -> DTCancelVanillaTreePoolElement.CODEC);
+
+    public static final Supplier<StructurePoolElementType<TreePoolElement>> TREE_STRUCTURE_POOL_ELEMENT_TYPE = Services.REGISTRY.getRegistryLoader()
+            .registerStructurePoolElementType("tree_pool_element", () -> () -> TreePoolElement.CODEC);
 
 }

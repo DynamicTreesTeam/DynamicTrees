@@ -2,6 +2,11 @@ package com.dtteam.dynamictrees.registry;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
+import com.dtteam.dynamictrees.util.holderset.IncludesExcludesHolderSet;
+import com.dtteam.dynamictrees.util.holderset.NameRegexMatchHolderSet;
+import com.dtteam.dynamictrees.util.holderset.TagsRegexMatchHolderSet;
+import com.dtteam.dynamictrees.worldgen.biomemodifier.AddDynamicTreesBiomeModifier;
+import com.dtteam.dynamictrees.worldgen.biomemodifier.RunFeatureCancellersBiomeModifier;
 import com.google.common.base.Suppliers;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
@@ -21,12 +26,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
-import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -41,6 +48,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import static com.ibm.icu.text.PluralRules.Operand.c;
+
 public class NeoForgeRegistryLoader extends RegistryLoader {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, DynamicTrees.MOD_ID);
@@ -48,8 +57,6 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     public static final DeferredRegister<PlacementModifierType<?>> PLACEMENT_MODIFIER_TYPES = DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(Registries.FEATURE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, DynamicTrees.MOD_ID);
-    public static final DeferredRegister<MapCodec<? extends BiomeModifier>> BIOME_MODIFIER_SERIALIZERS = DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, DynamicTrees.MOD_ID);
-    public static final DeferredRegister<HolderSetType> HOLDER_SET_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.HOLDER_SET_TYPES, DynamicTrees.MOD_ID);
     public static final DeferredRegister<BlockStateProviderType<?>> BLOCK_STATE_PROVIDER_TYPES = DeferredRegister.create(Registries.BLOCK_STATE_PROVIDER_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTrees.MOD_ID);
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, DynamicTrees.MOD_ID);
@@ -65,8 +72,6 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         FEATURES.register(modBus);
         PLACEMENT_MODIFIER_TYPES.register(modBus);
         SOUND_EVENTS.register(modBus);
-        BIOME_MODIFIER_SERIALIZERS.register(modBus);
-        HOLDER_SET_TYPES.register(modBus);
         BLOCK_STATE_PROVIDER_TYPES.register(modBus);
         STRUCTURE_POOL_ELEMENT_TYPES.register(modBus);
         DATA_COMPONENT_TYPES.register(modBus);
@@ -74,6 +79,10 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         LOOT_POOL_ENTRY_TYPES.register(modBus);
         LOOT_CONDITION_TYPES.register(modBus);
         LOOT_FUNCTION_TYPES.register(modBus);
+
+        //NeoForge
+        BIOME_MODIFIER_SERIALIZERS.register(modBus);
+        HOLDER_SET_TYPES.register(modBus);
 
         DTRegistries.setup();
     }
@@ -116,22 +125,27 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(DynamicTrees.location(name)));
     }
 
+    @Override
     public <T> Supplier<DataComponentType<T>> registerDataComponentType (String name, UnaryOperator<DataComponentType.Builder<T>> operator){
         return DATA_COMPONENT_TYPES.register(name, ()->operator.apply(DataComponentType.builder()).build());
     }
 
+    @Override
     public <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>, I extends ArgumentTypeInfo<A, T>> Supplier<I> registerCommandArgumentType (String name, Class<A> infoClass, I argumentTypeInfo){
         return ARGUMENT_TYPES.register(name, () -> ArgumentTypeInfos.registerByClass(infoClass, argumentTypeInfo));
     }
 
+    @Override
     public Supplier<LootItemConditionType> registerLootConditionType(String name, MapCodec<? extends LootItemCondition> serializerFactory) {
         return LOOT_CONDITION_TYPES.register(name, () -> new LootItemConditionType(serializerFactory));
     }
 
+    @Override
     public Supplier<LootPoolEntryType> registerLootPoolEntryType(String name, MapCodec<? extends LootPoolEntryContainer> serializerFactory) {
         return LOOT_POOL_ENTRY_TYPES.register(name, () -> new LootPoolEntryType(serializerFactory));
     }
 
+    @Override
     public <L extends LootItemFunction> Supplier<LootItemFunctionType<L>> registerLootFunctionType(String name, MapCodec<L> serializerFactory) {
         return LOOT_FUNCTION_TYPES.register(name, () -> new LootItemFunctionType<>(serializerFactory));
     }
@@ -140,57 +154,39 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     // WORLD GEN
     ///////////////////////////////////////////
 
-//    public static final Supplier<PlacementModifierType<CaveRootedTreePlacement>> CAVE_ROOTED_TREE_PLACEMENT_MODIFIER_TYPE = PLACEMENT_MODIFIER_TYPES.register("cave_rooted_tree",
-//            () -> () -> CaveRootedTreePlacement.CODEC);
+    @Override
+    public <T extends PlacementModifier> Supplier<PlacementModifierType<T>> registerPlacementModifierType (String name, Supplier<PlacementModifierType<T>> supplier){
+        return PLACEMENT_MODIFIER_TYPES.register(name, supplier);
+    }
 
-//    public static final Supplier<DynamicTreeFeature> DYNAMIC_TREE_FEATURE = FEATURES.register("tree", DynamicTreeFeature::new);
-//    public static final Supplier<CaveRootedTreeFeature> CAVE_ROOTED_TREE_FEATURE = FEATURES.register("cave_rooted_tree", CaveRootedTreeFeature::new);
+    @Override
+    public <T extends Feature<?>> Supplier<T> registerFeature (String name, Supplier<T> supplier){
+        return FEATURES.register(name, supplier);
+    }
 
-//    public static final Supplier<Codec<AddDynamicTreesBiomeModifier>> ADD_DYNAMIC_TREES_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("add_dynamic_trees",
-//            () -> Codec.unit(AddDynamicTreesBiomeModifier::new));
-//    public static final Supplier<Codec<RunFeatureCancellersBiomeModifier>> RUN_FEATURE_CANCELLERS_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("run_feature_cancellers",
-//            () -> Codec.unit(RunFeatureCancellersBiomeModifier::new));
-//    public static final Supplier<HolderSetType> INCLUDES_EXCLUDES_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("includes_excludes", () -> IncludesExcludesHolderSet::codec);
-//    public static final Supplier<HolderSetType> NAME_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("name_regex_match", () -> NameRegexMatchHolderSet::codec);
-//    public static final Supplier<HolderSetType> TAGS_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("tags_regex_match", () -> NameRegexMatchHolderSet::codec);
+    @Override
+    public <T extends BlockStateProvider> Supplier<BlockStateProviderType<T>> registerBlockStateProviderType (String name, Supplier<BlockStateProviderType<T>> supplier){
+        return BLOCK_STATE_PROVIDER_TYPES.register(name, supplier);
+    }
 
-//    public static final Supplier<BlockStateProviderType<DTReplaceNyliumFungiBlockStateProvider>> REPLACE_NYLIUM_FUNGI_BLOCK_STATE_PROVIDER_TYPE = BLOCK_STATE_PROVIDER_TYPES.register(
-//        "replace_nylium_fungi", () -> new BlockStateProviderType<>(DTReplaceNyliumFungiBlockStateProvider.CODEC));
-//
-//    public static final Supplier<StructurePoolElementType<DTCancelVanillaTreePoolElement>> CANCEL_VANILLA_VILLAGE_TREE_STRUCTURE_POOL_ELEMENT_TYPE = STRUCTURE_POOL_ELEMENT_TYPES.register(
-//            "cancel_vanilla_village_tree_element", () -> () -> DTCancelVanillaTreePoolElement.CODEC);
-//    public static final Supplier<StructurePoolElementType<TreePoolElement>> TREE_STRUCTURE_POOL_ELEMENT_TYPE = STRUCTURE_POOL_ELEMENT_TYPES.register(
-//            "tree_pool_element", () -> () -> TreePoolElement.CODEC);
+    @Override
+    public <T extends StructurePoolElement> Supplier<StructurePoolElementType<T>> registerStructurePoolElementType (String name, Supplier<StructurePoolElementType<T>> supplier){
+        return STRUCTURE_POOL_ELEMENT_TYPES.register(name, supplier);
+    }
 
-//    public static final FeatureCanceller TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.location("tree"), TreeConfiguration.class);
-//
-//    public static final FeatureCanceller ROOTED_TREE_CANCELLER = new TreeFeatureCanceller<>(DynamicTrees.location("rooted_tree"), RootSystemConfiguration.class);
-//
-//    public static final FeatureCanceller FUNGUS_CANCELLER = new FungusFeatureCanceller<>(DynamicTrees.location("fungus"), HugeFungusConfiguration.class);
-//
-//    public static final FeatureCanceller MUSHROOM_CANCELLER = new MushroomFeatureCanceller<>(DynamicTrees.location("mushroom"), HugeMushroomFeatureConfiguration.class);
+    ///////////////////////////////////////////
+    // NEO FORGE ONLY
+    ///////////////////////////////////////////
 
-//    @SubscribeEvent
-//    public static void onFeatureCancellerRegistry(final com.dtteam.dynamictrees.registry.RegistryEvent<FeatureCanceller> event) {
-//        event.getRegistry().registerAll(TREE_CANCELLER, ROOTED_TREE_CANCELLER, FUNGUS_CANCELLER, MUSHROOM_CANCELLER);
-//    }
-//
-//
-//    ///////////////////////////////////////////
-//    // SOUNDS
-//    ///////////////////////////////////////////
-//
-//    public static final Supplier<SoundEvent> FALLING_TREE_HIT_WATER = registerSoundEvent("falling_tree_hit_water");
-//    public static final Supplier<SoundEvent> FALLING_TREE_BIG_START = registerSoundEvent("falling_tree_big_start");
-//    public static final Supplier<SoundEvent> FALLING_TREE_BIG_END = registerSoundEvent("falling_tree_big_end");
-//    public static final Supplier<SoundEvent> FALLING_TREE_MEDIUM_START = registerSoundEvent("falling_tree_medium_start");
-//    public static final Supplier<SoundEvent> FALLING_TREE_MEDIUM_END = registerSoundEvent("falling_tree_medium_end");
-//    public static final Supplier<SoundEvent> FALLING_TREE_SMALL_HIT_WATER = registerSoundEvent("falling_tree_small_hit_water");
-//    public static final Supplier<SoundEvent> FALLING_TREE_SMALL_END = registerSoundEvent("falling_tree_small_end");
-//    public static final Supplier<SoundEvent> FALLING_TREE_SMALL_END_BARE = registerSoundEvent("falling_tree_small_end_bare");
-//    public static final Supplier<SoundEvent> FALLING_TREE_FUNGUS_START = registerSoundEvent("falling_tree_fungus_start");
-//    public static final Supplier<SoundEvent> FALLING_TREE_FUNGUS_END = registerSoundEvent("falling_tree_fungus_end");
-//    public static final Supplier<SoundEvent> FALLING_TREE_FUNGUS_SMALL_END = registerSoundEvent("falling_tree_fungus_small_end");
-//
+    public static final DeferredRegister<MapCodec<? extends BiomeModifier>> BIOME_MODIFIER_SERIALIZERS = DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<HolderSetType> HOLDER_SET_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.HOLDER_SET_TYPES, DynamicTrees.MOD_ID);
+
+    public static final Supplier<MapCodec<AddDynamicTreesBiomeModifier>> ADD_DYNAMIC_TREES_BIOME_MODIFIER =
+            BIOME_MODIFIER_SERIALIZERS.register("add_dynamic_trees", () -> MapCodec.unit(AddDynamicTreesBiomeModifier::new));
+    public static final Supplier<MapCodec<RunFeatureCancellersBiomeModifier>> RUN_FEATURE_CANCELLERS_BIOME_MODIFIER =
+            BIOME_MODIFIER_SERIALIZERS.register("run_feature_cancellers", () -> MapCodec.unit(RunFeatureCancellersBiomeModifier::new));
+    public static final Supplier<HolderSetType> INCLUDES_EXCLUDES_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("includes_excludes", IncludesExcludesHolderSet.Type::new);
+    public static final Supplier<HolderSetType> NAME_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("name_regex_match", NameRegexMatchHolderSet.Type::new);
+    public static final Supplier<HolderSetType> TAGS_REGEX_MATCH_HOLDER_SET_TYPE = HOLDER_SET_TYPES.register("tags_regex_match", TagsRegexMatchHolderSet.Type::new);
 
 }

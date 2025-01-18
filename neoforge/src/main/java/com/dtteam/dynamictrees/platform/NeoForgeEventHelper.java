@@ -5,6 +5,8 @@ import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.resource.TreeResourceManager;
 import com.dtteam.dynamictrees.api.resource.loading.StagedApplierResourceLoader;
+import com.dtteam.dynamictrees.api.worldgen.PoissonDiscProvider;
+import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.PropertyAppliers;
 import com.dtteam.dynamictrees.event.*;
 import com.dtteam.dynamictrees.item.Seed;
@@ -14,10 +16,12 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.ModLoader;
+import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.NeoForge;
-
-import java.util.Map;
+import net.neoforged.neoforge.event.level.BlockEvent;
 
 public class NeoForgeEventHelper implements IEventHelper {
 
@@ -53,6 +57,16 @@ public class NeoForgeEventHelper implements IEventHelper {
     }
 
     @Override
+    public <O> void postBiomeEntryApplierEvent(JsonPropertyAppliers<O> appliers, String identifier) {
+        ModLoader.postEvent(new BiomeEntryApplierRegistryEvent<>(appliers, identifier));
+    }
+
+    @Override
+    public <O> void postCancellationApplierEvent(JsonPropertyAppliers<O> appliers, String identifier) {
+        ModLoader.postEvent(new CancellationApplierRegistryEvent<>(appliers, identifier));
+    }
+
+    @Override
     public void postSpeciesPostGenerationEvent(PostGenerationContext context) {
         NeoForge.EVENT_BUS.post(new SpeciesPostGenerationEvent(context.level(), context.species(), context.pos(), context.endPoints(), context.initialDirtState()));
     }
@@ -65,9 +79,26 @@ public class NeoForgeEventHelper implements IEventHelper {
         return NeoForge.EVENT_BUS.post(new TransitionSaplingToTreeEvent(species, level, pos)).isCanceled();
     }
 
+    @Override
+    public boolean canCropGrow(Level level, BlockPos pos, BlockState state, boolean doGrow) {
+        return CommonHooks.canCropGrow(level, pos, state, doGrow);
+    }
+
+    @Override
+    public void cropGrowPost(Level level, BlockPos pos, BlockState state) {
+        CommonHooks.fireCropGrowPost(level, pos, state);
+    }
+
     public Seed.VoluntaryPlantEventResult postSeedVoluntaryPlantEvent (ItemEntity entityItem, Species species, BlockPos pos, boolean willPlant){
         SeedVoluntaryPlantEvent event = NeoForge.EVENT_BUS.post(new SeedVoluntaryPlantEvent(entityItem, species, pos, willPlant));
         return new Seed.VoluntaryPlantEventResult(event.isCanceled(), event.getWillPlant());
+    }
+
+    @Override
+    public PoissonDiscProvider postPoissonDiscProviderCreateEvent(LevelAccessor level, PoissonDiscProvider poissonDiscProvider) {
+        final PoissonDiscProviderCreateEvent poissonDiscProviderCreateEvent = new PoissonDiscProviderCreateEvent(level, poissonDiscProvider);
+        NeoForge.EVENT_BUS.post(poissonDiscProviderCreateEvent);
+        return poissonDiscProviderCreateEvent.getPoissonDiscProvider();
     }
 
 }

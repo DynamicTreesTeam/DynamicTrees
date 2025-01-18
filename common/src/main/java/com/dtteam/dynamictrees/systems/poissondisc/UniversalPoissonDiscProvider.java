@@ -1,7 +1,9 @@
 package com.dtteam.dynamictrees.systems.poissondisc;
 
 import com.dtteam.dynamictrees.api.worldgen.PoissonDiscProvider;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.util.LevelContext;
+import com.dtteam.dynamictrees.worldgen.BiomeRadiusCoordinator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
@@ -15,12 +17,10 @@ public class UniversalPoissonDiscProvider {
     private final Map<ResourceLocation, PoissonDiscProvider> providerMap = new ConcurrentHashMap<>();
 
     protected PoissonDiscProvider createCircleProvider(LevelContext levelContext) {
-//        final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(levelContext.dimensionName(), levelContext.accessor());
-//        final PoissonDiscProviderCreateEvent poissonDiscProviderCreateEvent = new PoissonDiscProviderCreateEvent(levelContext.accessor(),
-//                new LevelPoissonDiscProvider(radiusCoordinator).setSeed(levelContext.seed()));
-//        MinecraftForge.EVENT_BUS.post(poissonDiscProviderCreateEvent);
-//        return poissonDiscProviderCreateEvent.getPoissonDiscProvider();
-        return null;
+        final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(levelContext.dimensionName(), levelContext.accessor());
+        return Services.EVENT.postPoissonDiscProviderCreateEvent( //This event allows the disc provider to be modified.
+                levelContext.accessor(),
+                new LevelPoissonDiscProvider(radiusCoordinator).setSeed(levelContext.seed()));
     }
 
     public PoissonDiscProvider getProvider(LevelContext levelContext) {

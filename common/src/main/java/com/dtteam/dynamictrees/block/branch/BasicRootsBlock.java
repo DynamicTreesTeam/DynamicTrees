@@ -418,7 +418,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public float getDestroyProgress(BlockState pState, Player pPlayer, BlockGetter pLevel, BlockPos pPos) {
         Optional<Block> covered = getFamily().getPrimitiveCoveredRoots();
         if (pState.hasProperty(LAYER) && pState.getValue(LAYER) == Layer.COVERED && covered.isPresent()){
-            return covered.get().getDestroyProgress(covered.get().defaultBlockState(), pPlayer, pLevel, pPos);
+            return covered.get().defaultBlockState().getDestroyProgress(pPlayer, pLevel, pPos);
         }
         return super.getDestroyProgress(pState, pPlayer, pLevel, pPos);
     }
@@ -515,7 +515,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     protected int getSideConnectionRadius(BlockGetter level, BlockPos pos, int radius, Direction side) {
         final BlockPos deltaPos = pos.relative(side);
-        final BlockState blockState = CoordUtils.getStateSafe(level, deltaPos);
+        final BlockState blockState = ChunkTreeHelper.getStateSafe(level, deltaPos);
 
         // If adjacent block is not loaded assume there is no connection.
         return blockState == null ? 0 : TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, level, deltaPos, this, side, radius);
