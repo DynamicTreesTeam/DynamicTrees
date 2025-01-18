@@ -206,8 +206,8 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
         final int radius = this.getRadius(level.getBlockState(pos));
         final double hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
-                .getDestroySpeed(level, pos) * Services.CONFIG.getDoubleConfig("TreeHardnessMultiplier") * (radius * radius) / 64.0f * 8.0f;
-        return (float) Math.min(hardness, Services.CONFIG.getDoubleConfig("maxTreeHardness")); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
+                .getDestroySpeed(level, pos) * Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_HARDNESS_MULTIPLIER) * (radius * radius) / 64.0f * 8.0f;
+        return (float) Math.min(hardness, Services.CONFIG.getDoubleConfig(IConfigHelper.MAX_TREE_HARDNESS)); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
     }
 
     /** NeoForge override */

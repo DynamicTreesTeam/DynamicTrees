@@ -21,12 +21,6 @@ public class NeoForgeConfigHelper implements IConfigHelper {
     }
 
     @Override
-    public <T extends Enum<T>> T getEnumConfig(String config, Class<T> tClass) {
-        String val = getStringConfig(config);
-        return Enum.valueOf(tClass, val);
-    }
-
-    @Override
     public boolean isServerConfigLoaded() {
         return DTConfigs.SERVER_CONFIG.isLoaded();
     }

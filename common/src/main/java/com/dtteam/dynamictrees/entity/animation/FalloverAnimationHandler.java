@@ -21,6 +21,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -204,7 +205,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
             }
         }
 
-        if (fallSpeed > 0 && testCollision(entity)) {
+        //Wait at least ten ticks before calculating falling stuff, to avoid crashing into dirty blocks from the tree itself.
+        if (entity.tickCount > 10 && fallSpeed > 0 && testCollision(entity)) {
             playEndSound(entity);
             flingLeavesParticles(entity, fallSpeed);
             addRotation(entity, -fallSpeed);//pull back to before the collision

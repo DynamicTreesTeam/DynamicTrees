@@ -15,10 +15,13 @@ import com.dtteam.dynamictrees.util.BranchDestructionData;
 import com.dtteam.dynamictrees.util.EntityUtils;
 import com.dtteam.dynamictrees.util.ItemUtils;
 import com.dtteam.dynamictrees.util.TreeHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -39,6 +42,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.ticks.TickPriority;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -136,6 +140,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
             BlockPos belowPos = rootPos.below();
             final RootIntegrityNode node = new RootIntegrityNode();
             BlockState belowState = level.getBlockState(belowPos);
+            if (!TreeHelper.isTreePart(belowState)) return false;
             TreeHelper.getTreePart(belowState).analyse(belowState, level, belowPos, null, new MapSignal(node)); // Analyze entire tree network to find root node and species.
             return !node.getStable().isEmpty();
         }
@@ -161,12 +166,21 @@ public class AerialRootsSoilProperties extends SoilProperties {
         }
 
         public boolean fallWithTree(BlockState state, Level level, BlockPos pos, boolean hasRoots) {
-            if (hasRoots){
+            //if (hasRoots){
                 //The block is removed when this is checked because it means it got attached to a tree
-                level.setBlockAndUpdate(pos, getDecayBlockState(state, level, pos));
+                Services.MISC.getCurrentServer().getLevel(level.dimension()).scheduleTick(pos, this,0);
                 return true;
+            //}
+            //return false;
+        }
+
+        @Override
+        protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+            super.tick(state, level, pos, random);
+            //if the species is not valid then this block should be removed asap
+            if (!getSpecies(state, level, pos).isValid()){
+                level.setBlockAndUpdate(pos, getDecayBlockState(state, level, pos));
             }
-            return false;
         }
 
         public BlockState getDecayBlockState(BlockState state, BlockGetter level, BlockPos pos) {
@@ -192,7 +206,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
         public void dropWholeTree(Level level, BlockPos rootPos, @Nullable Player player){
             Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
-            Optional<BranchBlock> root = TreeHelper.getBranchOpt(level.getBlockState(rootPos.below()));
+            Optional<BranchBlock> roots = TreeHelper.getBranchOpt(level.getBlockState(rootPos.below()));
 
             BranchDestructionData destroyData = null;
             Optional<Direction> toolDir = Optional.empty();
@@ -201,8 +215,8 @@ public class AerialRootsSoilProperties extends SoilProperties {
             if (branch.isPresent()) {
                 destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), toolDir.orElse(Direction.DOWN), false, player);
             }
-            if (root.isPresent()) {
-                BranchDestructionData rootDestroyData = root.get().destroyBranchFromNode(level, rootPos.below(), toolDir.orElse(Direction.UP), false, player);
+            if (roots.isPresent()) {
+                BranchDestructionData rootDestroyData = roots.get().destroyBranchFromNode(level, rootPos.below(), toolDir.orElse(Direction.UP), false, player);
                 if (destroyData == null){
                     destroyData = rootDestroyData;
                 } else {
@@ -210,12 +224,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
                     destroyData = destroyData.merge(rootDestroyData);
                 }
             }
-            if (destroyData == null){
-                if (player != null)
-                    this.spawnDestroyParticles(level, player, rootPos, level.getBlockState(rootPos));
-                level.gameEvent(GameEvent.BLOCK_DESTROY, rootPos, GameEvent.Context.of(player, level.getBlockState(rootPos)));
-                level.setBlock(rootPos, Blocks.AIR.defaultBlockState(), 3);
-            } else {
+            if (destroyData != null){
 
                 final ItemStack heldItem = player == null ? ItemStack.EMPTY : player.getMainHandItem();
                 final int fortune = ItemUtils.getEnchantmentLevel(Enchantments.FORTUNE, heldItem, level.registryAccess());
@@ -224,14 +233,12 @@ public class AerialRootsSoilProperties extends SoilProperties {
                 woodVolume.multiplyVolume(fortuneFactor);
                 final List<ItemStack> woodItems = destroyData.species.getBranchesDrops(level, woodVolume, heldItem);
 
-                if (player != null)
-                    this.spawnDestroyParticles(level, player, rootPos, level.getBlockState(rootPos));
-                level.gameEvent(GameEvent.BLOCK_DESTROY, rootPos, GameEvent.Context.of(player, level.getBlockState(rootPos)));
-                level.setBlock(rootPos, Blocks.AIR.defaultBlockState(), 3);
                 FallingTreeEntity.dropTree(level, destroyData, woodItems, FallingTreeEntity.DestroyType.HARVEST);
 
+                BlockState rootState = level.getBlockState(rootPos);
                 if (player != null)
-                    ItemUtils.damageAxe(player, heldItem, getRadius(level.getBlockState(rootPos)), woodVolume, true);
+                    ItemUtils.damageAxe(player, heldItem, getRadius(rootState), woodVolume, true);
+
             }
         }
 

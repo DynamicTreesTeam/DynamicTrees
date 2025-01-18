@@ -28,7 +28,7 @@ public class SwampSpecies extends Species {
     @Override
     public boolean generate(DynamicTreeGenerationContext context) {
         if (isWater(context.level().getBlockState(context.rootPos()))) {
-            switch (Services.CONFIG.getEnumConfig(IConfigHelper.SWAMP_OAKS_IN_WATER, WaterSurfaceGenerationState.class)) {
+            switch (Services.CONFIG.getConfig(IConfigHelper.SWAMP_OAKS_IN_WATER, WaterSurfaceGenerationState.class)) {
                 case WaterSurfaceGenerationState.SUNK: //generate 1 block down
                     if (context.radius() >= minRadiusForSunkGeneration) {
                         context.rootPos().move(Direction.DOWN, countWaterBlocksBelow(context.level(), context.rootPos(), getAllowedWaterHeightForWorldgen()));
