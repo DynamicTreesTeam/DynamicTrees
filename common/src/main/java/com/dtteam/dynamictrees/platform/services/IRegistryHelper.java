@@ -18,5 +18,6 @@ public interface IRegistryHelper {
     RegistryHandler newRegistryHandler(String modId);
 
     BlockEntityType.BlockEntitySupplier<PottedSaplingBlockEntity> getPottedSaplingBlockEntity();
-    SoilBlock newSoilBlock(SoilProperties soilProperties, BlockBehaviour.Properties blockProperties);
+
+
 }

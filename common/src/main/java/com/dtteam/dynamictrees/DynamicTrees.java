@@ -71,8 +71,6 @@ public class DynamicTrees {
         // Clears and locks registry handlers to free them from memory.
         RegistryHandler.REGISTRY.clear();
 
-        DTRegistries.DENDRO_POTION.get().registerRecipes();
-
         Resources.MANAGER.setup();
 
         CommonSetup.onCommonSetup();

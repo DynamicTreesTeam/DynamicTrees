@@ -34,9 +34,4 @@ public class NeoForgeRegistryHelper implements IRegistryHelper {
         return PottedSaplingBlockEntityNF::new;
     }
 
-    @Override
-    public SoilBlock newSoilBlock(SoilProperties soilProperties, BlockBehaviour.Properties blockProperties) {
-        return new SoilBlockNF(soilProperties, blockProperties);
-    }
-
 }

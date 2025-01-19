@@ -9,15 +9,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.world.item.crafting.*;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -26,9 +22,9 @@ import java.util.stream.Collectors;
  *
  * @author Harley O'Connor
  */
-public final class DTRecipes {
+public final class DirtBucketRecipeHandler {
 
-    public static void registerDirtBucketRecipes(final Map<ResourceLocation, Recipe<?>> craftingRecipes) {
+    public static void registerDirtBucketRecipes(final Collection<RecipeHolder<?>> craftingRecipes) {
         for (final Species species : Species.REGISTRY.getAll()) {
             // If the species doesn't have a seed it doesn't need any recipes.
             if (!species.hasSeed()) {
@@ -53,9 +49,9 @@ public final class DTRecipes {
                     List<Item> ingredients = saplingRecipe.getIngredientsForSaplingToSeed();
                     ingredients.add(DTRegistries.DIRT_BUCKET.get());
                     ingredients.add(saplingItem);
-                    craftingRecipes.putIfAbsent(saplingToSeed, createShapeless(saplingToSeed,
+                    craftingRecipes.add(new RecipeHolder<>(saplingToSeed, createShapeless(saplingToSeed,
                             species.getSeedStack(1), //result
-                            ingredients(ingredients))); //ingredients
+                            ingredients(ingredients)))); //ingredients
                 }
 
                 if (saplingRecipe.canCraftSeedToSapling()) {
@@ -65,9 +61,9 @@ public final class DTRecipes {
                     List<Item> ingredients = saplingRecipe.getIngredientsForSeedToSapling();
                     ingredients.add(DTRegistries.DIRT_BUCKET.get());
                     ingredients.add(species.getSeed().map(Item.class::cast).orElse(Items.AIR));
-                    craftingRecipes.putIfAbsent(seedToSapling, createShapeless(seedToSapling,
+                    craftingRecipes.add(new RecipeHolder<>(seedToSapling, createShapeless(seedToSapling,
                             new ItemStack(saplingItem), //result
-                            ingredients(ingredients))); //ingredients
+                            ingredients(ingredients)))); //ingredients
                 }
 
             });

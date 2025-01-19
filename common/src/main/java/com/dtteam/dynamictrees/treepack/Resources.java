@@ -3,29 +3,30 @@ package com.dtteam.dynamictrees.treepack;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.configuration.ConfigurationTemplateResourceLoader;
 import com.dtteam.dynamictrees.api.resource.TreeResourceManager;
-import com.dtteam.dynamictrees.data.DTRecipes;
+import com.dtteam.dynamictrees.data.DirtBucketRecipeHandler;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.treepack.loader.*;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -158,31 +159,27 @@ public final class Resources {
             return CompletableFuture.allOf(futures)
                     .thenCompose(stage::wait)
                     .thenAcceptAsync(v -> MANAGER.reload(futures), gameExecutor)
-//                    .thenRunAsync(this::registerDirtBucketRecipes, gameExecutor)
+                    .thenRunAsync(this::registerDirtBucketRecipes, gameExecutor)
                     ;
         }
 
-//        private void registerDirtBucketRecipes() {
-//            if (!DTConfigs.GENERATE_DIRT_BUCKET_RECIPES.get()) {
-//                return;
-//            }
-//
-//            final Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes = new HashMap<>();
-//
-//            // Put the recipes into the new map and make each type's recipes mutable.
-//            this.dataPackRegistries.getRecipeManager().getRecipes().forEach(((recipeType) ->
-//                    recipes.put(recipeType, new HashMap<>(currentRecipes))));
-//
-//            // Register dirt bucket recipes.
-//            DTRecipes.registerDirtBucketRecipes(recipes.get(RecipeType.CRAFTING));
-//
-//            // Revert each type's recipes back to immutable.
-//            recipes.forEach(
-//                    ((recipeType, currentRecipes) -> recipes.put(recipeType, ImmutableMap.copyOf(currentRecipes))));
-//
-//            // Set the new recipes.
-//            dataPackRegistries.getRecipeManager().recipes = ImmutableMap.copyOf(recipes);
-//        }
+        private void registerDirtBucketRecipes() {
+            if (!Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_DIRT_BUCKET_RECIPES)) {
+                return;
+            }
+
+            //Hash multimap to be able to modify it
+            final Multimap<RecipeType<?>, RecipeHolder<?>> recipes = HashMultimap.create();
+
+            // Put the recipes into the new map and make each type's recipes mutable.
+            this.dataPackRegistries.getRecipeManager().byType.forEach((recipes::put));
+
+            // Register dirt bucket recipes.
+            DirtBucketRecipeHandler.registerDirtBucketRecipes(recipes.get(RecipeType.CRAFTING));
+
+            // Set the new recipes, turning back into an immutable map.
+            dataPackRegistries.getRecipeManager().byType = ImmutableMultimap.copyOf(recipes);
+        }
     }
 
 }

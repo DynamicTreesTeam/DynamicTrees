@@ -28,17 +28,8 @@ public class DirtBucket extends Item {
     public DirtBucket() {
         super(new Properties().stacksTo(1));
         DTRegistries.CREATIVE_TAB_ITEMS.add(this);
+        craftingRemainingItem = this;
     }
-
-//    @Override
-//    public boolean hasCraftingRemainingItem(ItemStack stack) {
-//        return true;
-//    }
-//
-//    @Override
-//    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
-//        return itemStack.copy();
-//    }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {

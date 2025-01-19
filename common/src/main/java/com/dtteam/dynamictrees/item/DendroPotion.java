@@ -4,9 +4,10 @@ import com.dtteam.dynamictrees.api.substance.Emptiable;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffectProvider;
 import com.dtteam.dynamictrees.registry.DTRegistries;
-import com.dtteam.dynamictrees.systems.substance.*;
-import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.systems.substance.DepleteSubstance;
+import com.dtteam.dynamictrees.systems.substance.GrowthSubstance;
+import com.dtteam.dynamictrees.systems.substance.HarvestSubstance;
+import com.dtteam.dynamictrees.systems.substance.MegaSubstance;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -16,8 +17,6 @@ import net.minecraft.world.item.Items;
 import javax.annotation.Nullable;
 
 public class DendroPotion extends Item implements SubstanceEffectProvider, Emptiable {
-
-//    public static final List<DendroBrewingRecipe> brewingRecipes = new ArrayList<>();
 
     public enum DendroPotionType {
         BIOCHAR(0, true, "biochar", 0xFF27231c, Items.CHARCOAL),
@@ -94,81 +93,18 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
     @Override
     public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
         return switch (getPotionType(itemStack)) {
-            default -> null;
             case BURGEONING -> new GrowthSubstance();
             case MEGA -> new MegaSubstance();
             case DEPLETION -> new DepleteSubstance().setAmount(15);
             case HARVEST -> new HarvestSubstance();
+            default -> null;
         };
-    }
-
-//    public Species getTargetSpecies(ItemStack itemStack) {
-//        if (itemStack.has(DTRegistries.SPECIES_DATA_COMPONENT.get())) {
-//            return TreeRegistry.findSpecies(itemStack.get(DTRegistries.SPECIES_DATA_COMPONENT.get()));
-//        } else {
-//            return Species.NULL_SPECIES;
-//        }
-//    }
-//
-//    public ItemStack setTargetSpecies(ItemStack itemStack, Species species) {
-//        itemStack.set(DTRegistries.SPECIES_DATA_COMPONENT.get(), species.getRegistryName().toString());
-//        return itemStack;
-//    }
-
-    public void registerRecipes() {
-//        final ItemStack baseStack = PotionUtils.setPotion(new ItemStack(Items.POTION), Potion.byName(DTConfigs.BIOCHAR_BASE_BREWING_BASE.get()));
-//
-//        //Biochar potion
-//        brewingRecipes.add(this.getRecipe(baseStack, new ItemStack(Items.CHARCOAL), this.getPotionStack(DendroPotionType.BIOCHAR)));
-//
-//        //Regular potions
-//        for (int i = 1; i < DendroPotionType.values().length; i++) {
-//            final DendroPotionType type = DendroPotionType.values()[i];
-//
-//            if (!type.isActive()) continue;
-//
-//            brewingRecipes.add(this.getRecipe(type.getIngredient(), type));
-//        }
-//
-//        //Transformation potions
-//        for (Species species : TreeRegistry.getPotionTransformableSpecies()) {
-//            brewingRecipes.add(new DendroBrewingRecipe(this.getPotionStack(DendroPotionType.TRANSFORM), species.getSeedStack(1),
-//                    this.setTargetSpecies(this.getPotionStack(DendroPotionType.TRANSFORM), species)));
-//        }
-//
-//        brewingRecipes.forEach(BrewingRecipeRegistry::addRecipe);
-    }
-
-//    private DendroBrewingRecipe getRecipe(ItemStack ingredient, DendroPotionType typeOut) {
-//        return this.getRecipe(this.getPotionStack(typeOut.getBasePotionType()), ingredient, this.getPotionStack(typeOut));
-//    }
-//
-//    private DendroBrewingRecipe getRecipe(ItemStack stackIn, ItemStack ingredientStack, ItemStack stackOut) {
-//        return new DendroBrewingRecipe(stackIn, ingredientStack, stackOut);
-//    }
-
-    private ItemStack getPotionStack(DendroPotionType type) {
-        return applyIndexTag(new ItemStack(this), type.getIndex());
     }
 
     @Override
     public String getDescriptionId(ItemStack stack) {
         return this.getDescriptionId() + "." + getPotionType(stack).getName();
     }
-
-//    @Override
-//    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flagIn) {
-//        final DendroPotionType potionType = getPotionType(stack);
-//
-//        if (potionType != DendroPotionType.TRANSFORM || !this.getTargetSpecies(stack).isValid()) {
-//            tooltip.add(getPotionType(stack).getDescription());
-//            return;
-//        }
-//
-//        final Species species = this.getTargetSpecies(stack);
-//        tooltip.add(Component.translatable("potion.transform.description", species.getTextComponent())
-//                .withStyle(style -> style.withColor(ChatFormatting.GRAY)));
-//    }
 
     public int getColor(ItemStack stack, int tint) {
         return tint == 0 ? getPotionType(stack).getColor() : 0xFFFFFFFF;

@@ -2,14 +2,18 @@ package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.command.DTCommand;
+import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
+import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.level.ChunkDataEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
@@ -46,9 +50,9 @@ public class CommonGameEventHandler {
     @SubscribeEvent
     public static void onLevelUnload(LevelEvent.Unload event) {
         final LevelAccessor level = event.getLevel();
-//        if (!level.isClientSide()) {
-//            DynamicTreeFeature.DISC_PROVIDER.unloadWorld((ServerLevel) level);//clears the circles
-//        }
+        if (!level.isClientSide()) {
+            DynamicTreeFeature.DISC_PROVIDER.unloadWorld((ServerLevel) level);//clears the circles
+        }
     }
 
     @SubscribeEvent
@@ -106,6 +110,16 @@ public class CommonGameEventHandler {
     @SubscribeEvent
     public static void addReloadListeners(final AddReloadListenerEvent event) {
         event.addListener(new Resources.ReloadListener(event.getServerResources()));
+    }
+
+    ///////////////////////////////////////////
+    // REGISTRY
+    ///////////////////////////////////////////
+
+    @SubscribeEvent
+    public static void registerBrewingRecipes(final RegisterBrewingRecipesEvent event) {
+        DendroPotionRecipeHandler.getAllDendroRecipes().forEach(
+                recipe -> event.getBuilder().addRecipe(recipe));
     }
 
 }
