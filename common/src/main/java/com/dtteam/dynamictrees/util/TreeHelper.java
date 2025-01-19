@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlockDecayer;
+import com.dtteam.dynamictrees.client.ParticleHelper;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.systems.nodemapper.TwinkleNode;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -260,12 +261,12 @@ public class TreeHelper {
     }
 
     public static void rootParticles(Level level, BlockPos rootPos, Direction offset, SimpleParticleType type, int num) {
-//        if (level.isClientSide) {
-//            if (level.isClientSide() && level.getBlockState(rootPos).getBlock() instanceof RootyBlock) {
-//                final BlockPos particlePos = rootPos.offset(offset.getNormal());
-//                DTClient.spawnParticles(level, type, particlePos.getX(), particlePos.getY(), particlePos.getZ(), num, level.getRandom());
-//            }
-//        }
+        if (level.isClientSide) {
+            if (level.isClientSide() && level.getBlockState(rootPos).getBlock() instanceof SoilBlock) {
+                final BlockPos particlePos = rootPos.offset(offset.getNormal());
+                ParticleHelper.spawnParticles(level, type, particlePos.getX(), particlePos.getY(), particlePos.getZ(), num, level.getRandom());
+            }
+        }
     }
 
     /**

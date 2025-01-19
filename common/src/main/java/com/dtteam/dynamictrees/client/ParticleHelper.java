@@ -1,4 +1,4 @@
-package com.dtteam.dynamictrees.util.client;
+package com.dtteam.dynamictrees.client;
 
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
@@ -16,14 +16,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class ClientUtils {
-
-    ///////////////////////////////////////////
-    // PARTICLES
-    ///////////////////////////////////////////
+public class ParticleHelper {
 
     private static void addDustParticle(Level level, double fx, double fy, double fz, double mx, double my, double mz, BlockState blockState, float r, float g, float b) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             Particle particle = Minecraft.getInstance().particleEngine.createParticle(new BlockParticleOption(ParticleTypes.BLOCK, blockState), fx, fy, fz, mx, my, mz);
             assert particle != null;
             particle.setColor(r, g, b);
@@ -35,20 +31,13 @@ public class ClientUtils {
     }
 
     public static void spawnParticles(LevelAccessor level, SimpleParticleType particleType, int x, int y, int z, int numParticles, RandomSource random) {
-        for (int i1 = 0; i1 < numParticles; ++i1) {
-            double mx = random.nextGaussian() * 0.02D;
-            double my = random.nextGaussian() * 0.02D;
-            double mz = random.nextGaussian() * 0.02D;
-            spawnParticle(level, particleType, x + random.nextFloat(), (double) y + (double) random.nextFloat(), (double) z + random.nextFloat(), mx, my, mz);
-        }
-    }
-
-    /**
-     * Not strictly necessary. But adds a little more isolation to the server for particle effects
-     */
-    public static void spawnParticle(LevelAccessor level, SimpleParticleType particleType, double x, double y, double z, double mx, double my, double mz) {
         if (level.isClientSide()) {
-            level.addParticle(particleType, x, y, z, mx, my, mz);
+            for (int i1 = 0; i1 < numParticles; ++i1) {
+                double mx = random.nextGaussian() * 0.02D;
+                double my = random.nextGaussian() * 0.02D;
+                double mz = random.nextGaussian() * 0.02D;
+                level.addParticle(particleType, x + random.nextFloat(), (double) y + (double) random.nextFloat(), (double) z + random.nextFloat(), mx, my, mz);
+            }
         }
     }
 
@@ -56,8 +45,8 @@ public class ClientUtils {
         return leavesProperties.foliageColorMultiplier(blockState, level, pos);
     }
     public static void crushLeavesBlock(Level level, BlockPos pos, BlockState blockState, Entity entity) {
-        if (level.isClientSide) {
-            RandomSource random = level.random;
+        if (level.isClientSide()) {
+            RandomSource random = level.getRandom();
             TreePart treePart = TreeHelper.getTreePart(blockState);
             if (treePart instanceof DynamicLeavesBlock leaves) {
                 LeavesProperties leavesProperties = leaves.getLeavesProperties();

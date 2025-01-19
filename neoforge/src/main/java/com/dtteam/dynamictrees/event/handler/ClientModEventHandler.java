@@ -15,7 +15,7 @@ import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.TreeHelper;
-import com.dtteam.dynamictrees.util.client.TextureUtils;
+import com.dtteam.dynamictrees.client.TextureHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -99,9 +99,9 @@ public class ClientModEventHandler {
             return 0;
         }
         TextureAtlasSprite sprite = quads.getFirst().getSprite();
-        final TextureUtils.PixelBuffer pixelBuffer = new TextureUtils.PixelBuffer(sprite);
+        final TextureHelper.PixelBuffer pixelBuffer = new TextureHelper.PixelBuffer(sprite);
         final int u = pixelBuffer.w / 16;
-        final TextureUtils.PixelBuffer center = new TextureUtils.PixelBuffer(u * 8, u * 8);
+        final TextureHelper.PixelBuffer center = new TextureHelper.PixelBuffer(u * 8, u * 8);
         pixelBuffer.blit(center, u * -8, u * -8);
 
         return center.averageColor();

@@ -25,6 +25,7 @@ import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
+import com.dtteam.dynamictrees.entity.LingeringEffectorEntity;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
@@ -539,9 +540,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     @FunctionalInterface
-    public interface CommonOverride extends BiPredicate<BlockGetter, BlockPos> {
-
-    }
+    public interface CommonOverride extends BiPredicate<BlockGetter, BlockPos> { }
 
     ///////////////////////////////////////////
     //LEAVES
@@ -1832,9 +1831,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         if (effect != null) {
             boolean applied = effect.apply(level, rootPos);
-            if (applied && effect.isLingering()) {
-//                DTRegistries.LINGERING_EFFECTOR.get().spawn(level, rootPos, effect)
-//                level.addFreshEntity(new LingeringEffectorEntity(level, rootPos, effect));
+            if (applied && effect.isLingering() && !level.isClientSide()) {
+                LingeringEffectorEntity entity = DTRegistries.LINGERING_EFFECTOR.get().create(level);
+                if (entity != null){
+                    entity.setData(level, rootPos, effect);
+                    if (entity.isAlive()) {
+                        level.addFreshEntity(entity);
+                    }
+                }
                 return true;
             } else {
                 return applied;

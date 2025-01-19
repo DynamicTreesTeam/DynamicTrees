@@ -1,6 +1,8 @@
 package com.dtteam.dynamictrees.systems.nodemapper;
 
 import com.dtteam.dynamictrees.api.network.NodeInspector;
+import com.dtteam.dynamictrees.client.ParticleHelper;
+import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -19,9 +21,9 @@ public class TwinkleNode implements NodeInspector {
 
     @Override
     public boolean run(BlockState state, LevelAccessor level, BlockPos pos, Direction fromDir) {
-//        if (level.isClientSide() && TreeHelper.isBranch(state)) {
-//            DTClient.spawnParticles(level, this.particleType, pos.getX(), pos.getY(), pos.getZ(), this.numParticles, level.getRandom());
-//        }
+        if (level.isClientSide() && TreeHelper.isBranch(state)) {
+            ParticleHelper.spawnParticles(level, this.particleType, pos.getX(), pos.getY(), pos.getZ(), this.numParticles, level.getRandom());
+        }
         return false;
     }
 

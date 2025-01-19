@@ -1,4 +1,4 @@
-package com.dtteam.dynamictrees.util.client;
+package com.dtteam.dynamictrees.client;
 
 import com.dtteam.dynamictrees.platform.Services;
 import com.mojang.blaze3d.platform.NativeImage;
@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import java.util.Arrays;
 
-public class TextureUtils {
+public class TextureHelper {
 
     public static class PixelBuffer {
         public int[] pixels; //final

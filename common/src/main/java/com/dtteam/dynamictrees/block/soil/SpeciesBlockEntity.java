@@ -2,8 +2,12 @@ package com.dtteam.dynamictrees.block.soil;
 
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.util.TreeRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -31,36 +35,36 @@ public class SpeciesBlockEntity extends BlockEntity {
         this.setChanged();
     }
 
-//    @Override
-//    public void load(CompoundTag tag) {
-//        if (tag.contains("species")) {
-//            ResourceLocation speciesName = ResourceLocation.parse(tag.getString("species"));
-//            species = TreeRegistry.findSpecies(speciesName);
-//        }
-//        super.load(tag);
-//    }
-//
-//    @Nonnull
-//    @Override
-//    public void saveAdditional(CompoundTag tag) {
-//        tag.putString("species", species.getRegistryName().toString());
-//    }
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        if (tag.contains("species")) {
+            ResourceLocation speciesName = ResourceLocation.parse(tag.getString("species"));
+            species = TreeRegistry.findSpecies(speciesName);
+        }
+        super.loadAdditional(tag, registries);
+    }
 
-    @Nullable
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.putString("species", species.getRegistryName().toString());
+    }
+
+    @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-//    @Override
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
+        this.saveAdditional(tag, registries);
+        return tag;
+    }
+
+    //    @Override
 //    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet) {
 //        load(packet.getTag());
 //    }
 //
-//    @Override
-//    public CompoundTag getUpdateTag() {
-//        CompoundTag tag = super.getUpdateTag();
-//        this.saveAdditional(tag);
-//        return tag;
-//    }
 
 }

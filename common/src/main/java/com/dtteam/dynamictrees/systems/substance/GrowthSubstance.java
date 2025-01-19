@@ -52,7 +52,7 @@ public class GrowthSubstance implements SubstanceEffect {
             return false;
         }
 
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             if (deltaTicks % this.ticksPerParticlePulse == 0) {
                 TreeHelper.rootParticles(level, rootPos, Direction.UP, ParticleTypes.EFFECT, 1);
             }

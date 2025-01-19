@@ -500,7 +500,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     public static FallingTreeEntity dropTree(Level level, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
         //Spawn the appropriate item entities into the level
-        if (!level.isClientSide) {// Only spawn entities server side
+        if (!level.isClientSide()) {// Only spawn entities server side
             FallingTreeEntity entity = DTRegistries.FALLING_TREE.get().create(level);
             if (entity == null) return null;
             entity.setData(destroyData, woodDropList, destroyType);

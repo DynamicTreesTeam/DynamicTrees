@@ -5,6 +5,7 @@ import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.client.ParticleHelper;
 import com.dtteam.dynamictrees.systems.genfeature.FruitGenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.PodGenFeature;
@@ -14,6 +15,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -113,10 +115,10 @@ public class HarvestSubstance implements SubstanceEffect {
                 // Recalculate fruit positions every time in case new fruit spawned.
                 this.recalculateFruitPositions(level, rootPos, soilBlock);
 
-//                this.fruitPositions.forEach(fruitPos ->
-//                        DTClient.spawnParticles(level, ParticleTypes.EFFECT, fruitPos.getX(), fruitPos.getY(),
-//                                fruitPos.getZ(), 3, level.getRandom())
-//                );
+                this.fruitPositions.forEach(fruitPos ->
+                        ParticleHelper.spawnParticles(level, ParticleTypes.EFFECT, fruitPos.getX(), fruitPos.getY(),
+                                fruitPos.getZ(), 3, level.getRandom())
+                );
             }
         } else {
             final boolean growPulse = deltaTicks % this.ticksPerGrowthPulse == 0;

@@ -6,4 +6,6 @@ public interface ICompatHelper {
 
     void registerSereneSeasonsSeasonProvider();
 
+    void invalidateWailaPosition();
+
 }

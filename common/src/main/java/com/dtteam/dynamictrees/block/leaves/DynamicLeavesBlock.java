@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.Ageable;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.client.ParticleHelper;
 import com.dtteam.dynamictrees.data.tags.DTEntityTypeTags;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
@@ -621,7 +622,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
                     BlockState crashState = level.getBlockState(iPos);
                     if (TreeHelper.isLeaves(crashState)) {
                         hasLeaves = true; // This layer has leaves
-//                        DTClient.crushLeavesBlock(level, iPos, crashState, entity);
+                        ParticleHelper.crushLeavesBlock(level, iPos, crashState, entity);
                         level.removeBlock(iPos, false);
                     } else if (!level.isEmptyBlock(iPos)) {
                         crushing = false; // We hit something solid thus no longer crushing leaves layers
