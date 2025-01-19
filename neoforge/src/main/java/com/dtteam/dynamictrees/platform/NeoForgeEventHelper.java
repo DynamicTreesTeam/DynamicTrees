@@ -17,11 +17,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
 public class NeoForgeEventHelper implements IEventHelper {
 
@@ -87,6 +87,13 @@ public class NeoForgeEventHelper implements IEventHelper {
     @Override
     public void cropGrowPost(Level level, BlockPos pos, BlockState state) {
         CommonHooks.fireCropGrowPost(level, pos, state);
+    }
+
+    @Override
+    public Species.BiomeSuitabilityEventResult postBiomeSuitabilityEvent(Level level, Biome biome, Species species, BlockPos pos) {
+        BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(level, biome, species, pos);
+        NeoForge.EVENT_BUS.post(suitabilityEvent);
+        return new Species.BiomeSuitabilityEventResult(suitabilityEvent.isHandled(), suitabilityEvent.getSuitability());
     }
 
     public Seed.VoluntaryPlantEventResult postSeedVoluntaryPlantEvent (ItemEntity entityItem, Species species, BlockPos pos, boolean willPlant){

@@ -51,6 +51,7 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.util.*;
 import com.dtteam.dynamictrees.worldgen.*;
+import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
@@ -815,11 +816,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * @param level
-     * @param endPoints
-     * @param rootPos
-     * @param treePos
-     * @param fertility
      * @return true if seed was dropped
      */
     public boolean handleVoluntaryDrops(Level level, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
@@ -1617,8 +1613,15 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
+     * The result of posting a BiomeSuitabilityEvent
+     * @param handled       If the suitability was handled. returns false by default.
+     * @param suitability   The resulting suitability
+     */
+    public record BiomeSuitabilityEventResult(boolean handled, float suitability) {}
+
+    /**
      * @param level The {@link Level} object.
-     * @param pos
+     * @param pos the position of the root block
      * @return range from 0.0 - 1.0.  (0.0f for completely unsuited. 1.0f for perfectly suited)
      */
     public float biomeSuitability(Level level, BlockPos pos) {
@@ -1626,12 +1629,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         Holder<Biome> biomeHolder = level.getBiome(pos);
         Biome biome = biomeHolder.value();
 
-//        //An override to allow other mods to change the behavior of the suitability for a level location. Such as Terrafirmacraft.
-//        BiomeSuitabilityEvent suitabilityEvent = new BiomeSuitabilityEvent(level, biome, this, pos);
-//        MinecraftForge.EVENT_BUS.post(suitabilityEvent);
-//        if (suitabilityEvent.isHandled()) {
-//            return suitabilityEvent.getSuitability();
-//        }
+        //An override to allow other mods to change the behavior of the suitability for a level location. Such as Terrafirmacraft.
+        BiomeSuitabilityEventResult result = Services.EVENT.postBiomeSuitabilityEvent(level, biome, this, pos);
+        if (result.handled()) {
+            return result.suitability();
+        }
 
         float ugs = (float) (double) Services.CONFIG.getDoubleConfig(IConfigHelper.SCALE_BIOME_GROWTH_RATE); // Universal growth scalar.
 
@@ -2067,13 +2069,13 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     private boolean shouldGenerate(LevelContext levelContext, BlockPos rootPos) {
         // World gen would be slowed down if we did as extensive a check as vanilla. This is good enough to at least
         // prevent trees generating if there's a structure/mountain overhang above.
-//        BlockPos.MutableBlockPos pos = rootPos.above().mutable();
-//        for (int i = 0; i < signalEnergy; i++) {
-//            if (!DynamicTreeFeature.validTreePos(levelContext.accessor(), pos)) {
-//                return false;
-//            }
-//            pos.move(Direction.UP);
-//        }
+        BlockPos.MutableBlockPos pos = rootPos.above().mutable();
+        for (int i = 0; i < signalEnergy; i++) {
+            if (!DynamicTreeFeature.validTreePos(levelContext.accessor(), pos)) {
+                return false;
+            }
+            pos.move(Direction.UP);
+        }
         return true;
     }
 
@@ -2294,7 +2296,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //
 //    protected final MutableLazyValue<Generator<DTLangProvider,Species>> speciesLangProvider =
 //            MutableLazyValue.supplied(SpeciesLangGenerator::new);
-//
+
     public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
                                    ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
         ResourceLocation leavesLoc = getLeavesProperties().getTexturePath(LeavesProperties.LEAVES).orElse(leavesTextureLocation);
@@ -2332,6 +2334,36 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //    @Override
 //    public void generateLangData(DTLangProvider provider){
 //        this.speciesLangProvider.get().generate(provider, this);
+//    }
+//
+//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
+//        // Create dynamic sapling block tags.
+//        getSapling().ifPresent(sapling ->
+//                defaultSaplingTags().forEach(tag -> {
+//                    if (!isOnlyIfLoaded()) {
+//                        tagAppender.apply(tag).add(sapling);
+//                    } else {
+//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(sapling));
+//                    }
+//                })
+//        );
+//    }
+//
+//    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
+//        // Some species return the common seed, so only return if the species has its own seed.
+//        if (!hasSeed()) {
+//            return;
+//        }
+//        // Create seed item tag.
+//        getSeed().ifPresent(seed ->
+//                defaultSeedTags().forEach(tag ->{
+//                    if (!isOnlyIfLoaded()) {
+//                        tagAppender.apply(tag).add(seed);
+//                    } else {
+//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(seed));
+//                    }
+//                })
+//        );
 //    }
 
     public boolean shouldGenerateVoluntaryDrops() {
@@ -2381,35 +2413,5 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
                 Pair.of("genFeatures", this.genFeatures));
     }
-
-//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-//        // Create dynamic sapling block tags.
-//        getSapling().ifPresent(sapling ->
-//                defaultSaplingTags().forEach(tag -> {
-//                    if (!isOnlyIfLoaded()) {
-//                        tagAppender.apply(tag).add(sapling);
-//                    } else {
-//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(sapling));
-//                    }
-//                })
-//        );
-//    }
-//
-//    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
-//        // Some species return the common seed, so only return if the species has its own seed.
-//        if (!hasSeed()) {
-//            return;
-//        }
-//        // Create seed item tag.
-//        getSeed().ifPresent(seed ->
-//                defaultSeedTags().forEach(tag ->{
-//                    if (!isOnlyIfLoaded()) {
-//                        tagAppender.apply(tag).add(seed);
-//                    } else {
-//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(seed));
-//                    }
-//                })
-//        );
-//    }
 
 }

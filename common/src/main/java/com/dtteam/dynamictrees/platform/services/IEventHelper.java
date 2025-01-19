@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 
 public interface IEventHelper {
@@ -32,6 +33,7 @@ public interface IEventHelper {
     boolean canCropGrow(Level level, BlockPos pos, BlockState state, boolean doGrow);
     void cropGrowPost(Level level, BlockPos pos, BlockState state);
 
+    Species.BiomeSuitabilityEventResult postBiomeSuitabilityEvent (Level level, Biome biome, Species species, BlockPos pos);
     Seed.VoluntaryPlantEventResult postSeedVoluntaryPlantEvent (ItemEntity entityItem, Species species, BlockPos pos, boolean willPlant);
     PoissonDiscProvider postPoissonDiscProviderCreateEvent (LevelAccessor level, PoissonDiscProvider poissonDiscProvider);
 }

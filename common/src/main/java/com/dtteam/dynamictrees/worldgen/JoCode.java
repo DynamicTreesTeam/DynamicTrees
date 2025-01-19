@@ -18,6 +18,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.BlockStates;
 import com.dtteam.dynamictrees.util.SimpleVoxmap;
 import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -377,11 +378,11 @@ public class JoCode {
     }
 
     protected boolean isFreeToSetBlock(LevelAccessor level, BlockPos pos, Species species) {
-//        if (DynamicTreeFeature.validTreePos(level, pos) || level.isStateAtPosition(pos, (blockState) -> blockState.is(BlockTags.LOGS)))
-//            return true;
+        if (DynamicTreeFeature.validTreePos(level, pos) || level.isStateAtPosition(pos, (blockState) -> blockState.is(BlockTags.LOGS)))
+            return true;
 
         BlockState blockState = level.getBlockState(pos);
-        return blockState.liquid() || isReplaceable(blockState, false);
+        return !blockState.getFluidState().isEmpty() || isReplaceable(blockState, false);
     }
 
     protected boolean isReplaceable(BlockState state, boolean airOnly) {

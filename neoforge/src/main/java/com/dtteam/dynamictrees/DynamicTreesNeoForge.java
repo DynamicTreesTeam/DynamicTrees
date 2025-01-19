@@ -2,6 +2,8 @@ package com.dtteam.dynamictrees;
 
 
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.client.BlockColorMultipliers;
+import com.dtteam.dynamictrees.data.GatherDataHelper;
 import com.dtteam.dynamictrees.event.handler.OptionalHandlers;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.NeoForgeRegistryLoader;
@@ -43,6 +45,7 @@ public class DynamicTreesNeoForge {
 
     private void clientSetup(final FMLClientSetupEvent event) {
         LeavesProperties.postInitClient();
+        BlockColorMultipliers.cleanUp();
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {
@@ -51,7 +54,7 @@ public class DynamicTreesNeoForge {
 
     private void gatherData(final GatherDataEvent event) {
         //Generate the tree block and item data
-//        Resources.MANAGER.gatherData();
+        Resources.MANAGER.gatherData();
 //        GatherDataHelper.addLangGenerator(MOD_ID, new DTExtraLangGenerator());
 //        GatherDataHelper.gatherAllData(
 //                MOD_ID,
