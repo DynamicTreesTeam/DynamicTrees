@@ -636,7 +636,8 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (isMovementVanilla() || isEntityPassable(entity)) {
+        if (isMovementVanilla() || isEntityPassable(entity) || //Allow creative flying players through
+                (entity instanceof Player player && player.isCreative() && player.getAbilities().flying)) {
             super.entityInside(state, level, pos, entity);
         } else {
             if (entity.getDeltaMovement().y < 0.0D && (isLeavesPassable() || entity.fallDistance < 2.0f)) {
