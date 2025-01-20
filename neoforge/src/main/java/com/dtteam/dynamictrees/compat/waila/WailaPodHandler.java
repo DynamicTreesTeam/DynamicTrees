@@ -12,6 +12,7 @@ import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
 public class WailaPodHandler implements IBlockComponentProvider {
+
     private static final ResourceLocation POD_UID = DynamicTrees.location("pod");
 
     /* Used to switch off component for cocoa, since Jade already supports this. */
@@ -22,9 +23,9 @@ public class WailaPodHandler implements IBlockComponentProvider {
         if (accessor.getBlock() instanceof PodBlock podBlock && !BuiltInRegistries.BLOCK.getKey(accessor.getBlock()).equals(COCOA)) {
             float ageAsPercentage = podBlock.getAgeAsPercentage(accessor.getBlockState());
             tooltip.add(Component.translatable(
-                    "tooltip.waila.crop_growth",
+                    "tooltip.jade.crop_growth",
                     ageAsPercentage < 100F ? String.format("%.0f%%", ageAsPercentage) :
-                            Component.translatable("tooltip.waila.crop_mature").withStyle(ChatFormatting.GREEN)
+                            Component.translatable("tooltip.jade.crop_mature").withStyle(ChatFormatting.GREEN)
             ));
         }
     }

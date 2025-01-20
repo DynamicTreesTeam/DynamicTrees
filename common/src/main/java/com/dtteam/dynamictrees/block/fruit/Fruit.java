@@ -8,6 +8,7 @@ import com.dtteam.dynamictrees.block.Growable;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.util.AgeProperties;
 import com.dtteam.dynamictrees.util.LazyValue;
@@ -36,6 +37,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
+
+import static com.dtteam.dynamictrees.systems.season.SeasonHelper.isSeasonBetween;
 
 /**
  * Stores properties and implements functionality of fruits which grow from the leaves of a tree.
@@ -69,7 +72,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     };
 
     /**
-     * Sets whether the fruit can be bone-mealed to accelerate growth. Defaults to {@link DTConfigs#CAN_BONE_MEAL_FRUIT}.
+     * Sets whether the fruit can be bone-mealed to accelerate growth. Defaults to {@link IConfigHelper#CAN_BONE_MEAL_FRUIT}.
      */
     private boolean canBoneMeal;
 
@@ -191,7 +194,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      */
     public final ItemStack getItemStack() {
         if (itemStack == null) {
-            LogManager.getLogger().warn("Invoked too early or item was not set on \"" + getRegistryName() + "\".");
+            LogManager.getLogger().warn("Invoked too early or item was not set on \"{}\".", getRegistryName());
             return new ItemStack(Items.AIR);
         }
         return itemStack.copy();
@@ -210,18 +213,17 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     }
 
     public final boolean isInFlowerHoldPeriod(LevelAccessor level, BlockPos rootPos, Float seasonValue) {
-//        if (seasonOffset == null) {
-//            return false;
-//        }
-//        final Float peakSeasonValue = SeasonHelper.getSeasonManager()
-//                .getPeakFruitProductionSeasonValue(LevelContext.create(level).level(), rootPos, seasonOffset);
-//        if (peakSeasonValue == null || flowerHoldPeriodLength == 0.0F) {
-//            return false;
-//        }
-//        final float min = peakSeasonValue - 1.5F;
-//        final float max = min + flowerHoldPeriodLength;
-//        return isSeasonBetween(seasonValue, min, max);
-        return false;
+        if (seasonOffset == null) {
+            return false;
+        }
+        final Float peakSeasonValue = SeasonHelper.getSeasonManager()
+                .getPeakFruitProductionSeasonValue(LevelContext.create(level).level(), rootPos, seasonOffset);
+        if (peakSeasonValue == null || flowerHoldPeriodLength == 0.0F) {
+            return false;
+        }
+        final float min = peakSeasonValue - 1.5F;
+        final float max = min + flowerHoldPeriodLength;
+        return isSeasonBetween(seasonValue, min, max);
     }
 
     @Nullable
@@ -241,10 +243,9 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     }
 
     public float seasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos) {
-//        return seasonOffset != null ?
-//                SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -seasonOffset, false)
-//                : 1.0F;
-        return 1;
+        return seasonOffset != null ?
+                SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -seasonOffset, false)
+                : 1.0F;
     }
 
     public float getFlowerHoldPeriodLength() {

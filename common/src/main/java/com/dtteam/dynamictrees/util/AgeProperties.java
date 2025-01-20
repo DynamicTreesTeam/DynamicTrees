@@ -15,6 +15,8 @@ public final class AgeProperties {
     private AgeProperties() {
     }
 
+    public static final int[] defaultAges = {1,2,3,5,7,15,25};
+
     /**
      * A map of maximum ages to their respective age {@link IntegerProperty property}.
      */

@@ -43,8 +43,7 @@ public final class ShapeFunctions {
 
     private static <P> DataResult<VoxelShape> calculateShape(ShapeFunction<P> shapeFunction, JsonElement parametersJson) {
         DataResult<Pair<P, JsonElement>> parametersResult = shapeFunction.getParameters(parametersJson);
-        DataResult<VoxelShape> shapeResult = parametersResult.map(pair -> shapeFunction.calculateShape(pair.getFirst()));
-        return shapeResult;
+        return parametersResult.map(pair -> shapeFunction.calculateShape(pair.getFirst()));
     }
 
     public interface ShapeFunction<P> {
@@ -68,7 +67,7 @@ public final class ShapeFunctions {
         @Override
         public VoxelShape calculateShape(Parameters parameters) {
             final float fraction = parameters.fraction;
-            final float radius = parameters.radius;
+            final float radius = parameters.width / 2;
             final float topHeight = fraction - parameters.stemLength;
             final float bottomHeight = topHeight - parameters.height;
             return Shapes.create(createFruitShape(fraction, radius, topHeight, bottomHeight));
@@ -84,10 +83,10 @@ public final class ShapeFunctions {
             );
         }
 
-        public record Parameters(float radius, float height, float stemLength, float fraction) {
+        public record Parameters(float width, float height, float stemLength, float fraction) {
 
             public static final Codec<Parameters> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                    Codec.FLOAT.fieldOf("radius").forGetter(Parameters::radius),
+                    Codec.FLOAT.fieldOf("width").forGetter(Parameters::width),
                     Codec.FLOAT.fieldOf("height").forGetter(Parameters::height),
                     Codec.FLOAT.fieldOf("stem_length").forGetter(Parameters::stemLength),
                     Codec.FLOAT.optionalFieldOf("fraction", 16.0F).forGetter(Parameters::fraction)
@@ -110,7 +109,7 @@ public final class ShapeFunctions {
         @Override
         public VoxelShape calculateShape(Parameters parameters) {
             final float fraction = parameters.fraction;
-            final float radius = parameters.radius;
+            final float radius = parameters.width / 2;
             final float topHeight = fraction - parameters.stemLength;
             final float bottomHeight = topHeight - parameters.height;
             final float sideOffset = parameters.sideOffset / fraction;
@@ -132,13 +131,13 @@ public final class ShapeFunctions {
             return box.move(dir.getStepX() * offset, dir.getStepY() * offset, dir.getStepZ() * offset);
         }
 
-        public record Parameters(float radius, float height, float stemLength, float fraction, float sideOffset,
+        public record Parameters(float width, float height, float stemLength, float fraction, float sideOffset,
                                  Direction side) {
 
             public static final Codec<Direction> SIDE_CODEC = Codec.STRING.comapFlatMap(side -> DataResult.success(Optional.ofNullable(Direction.byName(side)).orElse(Direction.NORTH)), Direction::name);
 
             public static final Codec<Parameters> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                    Codec.FLOAT.fieldOf("radius").forGetter(Parameters::radius),
+                    Codec.FLOAT.fieldOf("width").forGetter(Parameters::width),
                     Codec.FLOAT.fieldOf("height").forGetter(Parameters::height),
                     Codec.FLOAT.fieldOf("stem_length").forGetter(Parameters::stemLength),
                     Codec.FLOAT.optionalFieldOf("fraction", 16.0F).forGetter(Parameters::fraction),
