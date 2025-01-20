@@ -5,9 +5,11 @@ import com.dtteam.dynamictrees.api.configuration.ConfigurableRegistry;
 import com.dtteam.dynamictrees.api.configuration.ConfigurableRegistryEntry;
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
 import com.dtteam.dynamictrees.systems.genfeature.context.*;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.function.BiomePredicate;
 import com.dtteam.dynamictrees.util.function.CanGrowPredicate;
+import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -25,7 +27,7 @@ import org.apache.commons.lang3.function.TriFunction;
  *     <li>{@linkplain #generate(GenFeatureConfiguration, FullGenerationContext) Full-generation}</li>
  * </ul>
  * <p>
- * Each of these should be invoked by {@link GenFeature#generate(GenFeatureConfiguration, Type, GenerationContext)} with
+ * Each of these should be invoked by {@link GenFeature#generate(GenFeatureConfiguration, FullGenerationContext)} with
  * their corresponding type.
  *
  * @author Harley O'Connor
@@ -105,7 +107,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
 
     /**
      * Performs a pre-generation action on a tree. This is invoked before any blocks have been placed, and returns the
-     * position at which the {@linkplain RootyBlock root block} should be placed.
+     * position at which the {@linkplain SoilBlock root block} should be placed.
      *
      * @param configuration the configuration
      * @param context       the context
@@ -117,7 +119,7 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
 
     /**
      * Performs a post-generation action on a tree. This is invoked after the entire tree has generated and before the
-     * {@link SpeciesPostGenerationEvent post generation event} is fired.
+     * SpeciesPostGenerationEvent post generation event is fired.
      *
      * @param configuration the configuration
      * @param context       the context
@@ -151,9 +153,9 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
     }
 
     /**
-     * Performs a full generation action of a tree. This is invoked before the {@link JoCode#generate(Level, LevelAccessor,
-     * Species, BlockPos, Biome, Direction, int, SafeChunkBounds, boolean)} and acts as a replacement for it. The
-     * implementor should therefore note that other methods in this class will not be invoked by default.
+     * Performs a full generation action of a tree. This is invoked before the
+     * {@link JoCode#generate(DynamicTreeGenerationContext)} and acts as a replacement for it.
+     * The implementor should therefore note that other methods in this class will not be invoked by default.
      *
      * @param configuration the configuration
      * @param context       the context

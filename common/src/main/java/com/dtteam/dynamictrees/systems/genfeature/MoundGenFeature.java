@@ -10,7 +10,9 @@ import com.dtteam.dynamictrees.util.SimpleVoxmap;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class MoundGenFeature extends GenFeature {
@@ -55,16 +57,6 @@ public class MoundGenFeature extends GenFeature {
         if (context.radius() >= configuration.get(MOUND_CUTOFF_RADIUS) && context.isWorldGen()) {
             BlockState initialDirtState = level.getBlockState(rootPos);
             BlockState initialUnderState = level.getBlockState(rootPos.below());
-
-//             if (initialUnderState.isAir() || (!initialUnderState.is(BlockTags.DIRT) && !initialUnderState.is(Tags.Blocks.STONE))) {
-//                 final Biome biome = level.getUncachedNoiseBiome(
-//                         rootPos.getX() >> 2,
-//                         rootPos.getY() >> 2,
-//                         rootPos.getZ() >> 2
-//                 ).value();
-//                 //todo: figure out if needs replacement
-// //                initialUnderState = biome.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
-//             }
 
             rootPos = rootPos.above();
 

@@ -73,7 +73,7 @@ public class HugeMushroomUndergrowthGenFeature extends HugeMushroomGenFeature {
             if (ChunkTreeHelper.canCheckSurroundings(level, mushPos, 3)) {
                 int maxHeight = lowest.getY() - mushPos.getY();
                 if (maxHeight >= 2) {
-                    int height = Mth.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight);
+                    int height = Math.min(Mth.clamp(rand.nextInt(maxHeight) + 3, 3, maxHeight), maxHeightBase+maxHeightVar - 1);
 
                     if (this.setHeight(height).generateMushrooms(configuration, new FullGenerationContext(
                             context.level(),

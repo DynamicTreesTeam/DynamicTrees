@@ -175,9 +175,11 @@ public class HugeMushroomGenFeature extends GenFeature {
         };
     }
 
+    protected int maxHeightBase = 5;
+    protected int maxHeightVar = 6;
     //Override this for custom mushroom heights
     protected int getMushroomHeight(LevelAccessor level, BlockPos rootPos, Biome biome, RandomSource random, int radius) {
-        return this.height > 0 ? this.height : random.nextInt(6) + 5;
+        return this.height > 0 ? this.height : random.nextInt(maxHeightVar) + maxHeightBase;
     }
 
     @Override
