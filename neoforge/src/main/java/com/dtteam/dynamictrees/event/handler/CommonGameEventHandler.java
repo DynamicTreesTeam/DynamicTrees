@@ -2,13 +2,21 @@ package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.command.DTCommand;
+import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
+import com.dtteam.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
+import com.dtteam.dynamictrees.util.LevelContext;
+import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
@@ -30,7 +38,7 @@ public class CommonGameEventHandler {
 
     @SubscribeEvent
     public static void onPreLevelTick(LevelTickEvent.Pre event) {
-        if (!event.getLevel().isClientSide) {
+        if (!event.getLevel().isClientSide()) {
             FutureBreak.process(event.getLevel());
         }
         SeasonHelper.updateTick(event.getLevel(), event.getLevel().getDayTime());
@@ -41,7 +49,7 @@ public class CommonGameEventHandler {
         if (event.getLevel().isClientSide()) {
             ClientModEventHandler.discoverWoodColors();
         }
-        //        BiomeDatabases.populateBlacklistFromConfig();
+        BiomeDatabases.populateBlacklistFromConfig();
     }
 
     /**
@@ -57,36 +65,36 @@ public class CommonGameEventHandler {
 
     @SubscribeEvent
     public static void onChunkDataLoad(ChunkDataEvent.Load event) {
-//        if (!DTConfigs.WORLD_GEN.get()) return;
-//
-//        final LevelAccessor level = event.getLevel();
-//
-//		if (level.isClientSide()) {
-//			return;
-//		}
-//
-//        final byte[] circleData = event.getData().getByteArray(CIRCLE_DATA_ID);
-//        final UniversalPoissonDiscProvider discProvider = DynamicTreeFeature.DISC_PROVIDER;
-//
-//        final ChunkPos chunkPos = event.getChunk().getPos();
-//        discProvider.setChunkPoissonData(LevelContext.create(level), chunkPos, circleData);
+        if (!Services.CONFIG.getBoolConfig(IConfigHelper.WORLD_GEN)) return;
+
+        final LevelAccessor level = event.getLevel();
+
+		if (level == null || level.isClientSide()) {
+			return;
+		}
+
+        final byte[] circleData = event.getData().getByteArray(CIRCLE_DATA_ID);
+        final UniversalPoissonDiscProvider discProvider = DynamicTreeFeature.DISC_PROVIDER;
+
+        final ChunkPos chunkPos = event.getChunk().getPos();
+        discProvider.setChunkPoissonData(LevelContext.create(level), chunkPos, circleData);
     }
 
     @SubscribeEvent
     public static void onChunkDataSave(ChunkDataEvent.Save event) {
-//        if (!DTConfigs.WORLD_GEN.get()) return;
-//
-//        final LevelContext levelContext = LevelContext.create(event.getLevel());
-//        final UniversalPoissonDiscProvider discProvider = DynamicTreeFeature.DISC_PROVIDER;
-//        final ChunkAccess chunk = event.getChunk();
-//        final ChunkPos chunkPos = chunk.getPos();
-//
-//        final byte[] circleData = discProvider.getChunkPoissonData(levelContext, chunkPos);
-//        event.getData().putByteArray(CIRCLE_DATA_ID, circleData); // Set circle data.
-//
-//		if (chunk instanceof LevelChunk && !((LevelChunk) chunk).loaded) {
-//			discProvider.unloadChunkPoissonData(levelContext, chunkPos);
-//		}
+        if (!Services.CONFIG.getBoolConfig(IConfigHelper.WORLD_GEN)) return;
+
+        final LevelContext levelContext = LevelContext.create(event.getLevel());
+        final UniversalPoissonDiscProvider discProvider = DynamicTreeFeature.DISC_PROVIDER;
+        final ChunkAccess chunk = event.getChunk();
+        final ChunkPos chunkPos = chunk.getPos();
+
+        final byte[] circleData = discProvider.getChunkPoissonData(levelContext, chunkPos);
+        event.getData().putByteArray(CIRCLE_DATA_ID, circleData); // Set circle data.
+
+		if (chunk instanceof LevelChunk && !((LevelChunk) chunk).loaded) {
+			discProvider.unloadChunkPoissonData(levelContext, chunkPos);
+		}
     }
 
     ///////////////////////////////////////////

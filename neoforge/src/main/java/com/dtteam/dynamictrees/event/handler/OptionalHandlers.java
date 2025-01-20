@@ -38,7 +38,7 @@ public final class OptionalHandlers {
     }
 
     /**
-     * Registers or unregisters the given object to the {@link MinecraftForge#EVENT_BUS}, depending on the boolean
+     * Registers or unregisters the given object to the {@link NeoForge#EVENT_BUS}, depending on the boolean
      * given.
      *
      * @param handler  The handler object to register/unregisters.

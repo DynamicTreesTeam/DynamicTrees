@@ -2,7 +2,6 @@ package com.dtteam.dynamictrees.systems.genfeature;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.Registry;
-import net.minecraft.resources.ResourceLocation;
 
 /**
  * Stores all {@link GenFeature} objects created by Dynamic Trees.
@@ -34,13 +33,13 @@ public final class GenFeatures {
 
     public static final GenFeature BUSH = new BushGenFeature(DynamicTrees.location("bush"));
 
-//    public static final GenFeature HUGE_MUSHROOM = new HugeMushroomGenFeature(DynamicTrees.location("huge_mushroom"));
-//    public static final GenFeature HUGE_MUSHROOMS = new HugeMushroomsGenFeature(DynamicTrees.location("huge_mushrooms"));
+    public static final GenFeature HUGE_MUSHROOM = new HugeMushroomGenFeature(DynamicTrees.location("huge_mushroom"));
+    public static final GenFeature HUGE_MUSHROOMS = new HugeMushroomUndergrowthGenFeature(DynamicTrees.location("huge_mushroom_undergrowth"));
 
     public static final GenFeature MUSHROOM_ROT = new MushroomRotGenFeature(DynamicTrees.location("mushroom_rot"));
     public static final GenFeature ROT_SOIL = new RotSoilGenFeature(DynamicTrees.location("rot_soil"));
 
-//    public static final GenFeature BIOME_PREDICATE = new BiomePredicateGenFeature(DynamicTrees.location("biome_predicate"));
+    public static final GenFeature BIOME_PREDICATE = new BiomePredicateGenFeature(DynamicTrees.location("biome_predicate"));
     public static final GenFeature RANDOM_PREDICATE = new RandomPredicateGenFeature(DynamicTrees.location("random_predicate"));
 
     public static final GenFeature ALTERNATIVE_LEAVES = new AlternativeLeavesGenFeature(DynamicTrees.location("alt_leaves"));
@@ -53,7 +52,7 @@ public final class GenFeatures {
                 BEE_NEST, SHROOMLIGHT, CONIFER_TOPPER, MOUND,
                 ROOTS, CLEAR_VOLUME, BOTTOM_FLARE, UNDERGROWTH,
                 ROT_SOIL, VINES, PODZOL, BUSH, MUSHROOM_ROT,
-                //HUGE_MUSHROOM, HUGE_MUSHROOMS,  BIOME_PREDICATE,
+                HUGE_MUSHROOM, HUGE_MUSHROOMS,  BIOME_PREDICATE,
                 RANDOM_PREDICATE,
                 ALTERNATIVE_LEAVES, ROOT_SYSTEM);
     }

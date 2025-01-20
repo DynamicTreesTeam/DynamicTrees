@@ -64,6 +64,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -74,6 +76,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, 8);
     public static final EnumProperty<Layer> LAYER = EnumProperty.create("layer", Layer.class);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    private static final Logger log = LoggerFactory.getLogger(BasicRootsBlock.class);
 
     public enum Layer implements StringRepresentable {
         EXPOSED (UndergroundRootsFamily::getPrimitiveRoots),
@@ -434,16 +437,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         }
         return super.getDestroyProgress(pState, pPlayer, pLevel, pPos);
     }
-
-//    @Override
-//    public boolean canSustainPlant(BlockState state, BlockGetter world, BlockPos pos, Direction facing, IPlantable plantable) {
-//        if (state.getValue(LAYER) == Layer.COVERED){
-//            AtomicBoolean canSustain = new AtomicBoolean(false);
-//            Layer.COVERED.getPrimitive(getFamily()).ifPresent(block -> canSustain.set(block.canSustainPlant(block.defaultBlockState(), world, pos, facing, plantable)));
-//            return canSustain.get();
-//        }
-//        return super.canSustainPlant(state, world, pos, facing, plantable);
-//    }
 
     //////////////////////////////
     // ROT

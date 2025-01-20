@@ -1,9 +1,9 @@
 package com.dtteam.dynamictrees.systems.genfeature;
 
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
-import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
-import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
+import com.dtteam.dynamictrees.systems.genfeature.context.*;
 import com.dtteam.dynamictrees.util.CoordUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 
 public class RandomPredicateGenFeature extends GenFeature {
@@ -29,6 +29,32 @@ public class RandomPredicateGenFeature extends GenFeature {
     }
 
     @Override
+    protected BlockPos preGenerate(GenFeatureConfiguration configuration, PreGenerationContext context) {
+        if (configuration.get(ONLY_WORLD_GEN) && !context.isWorldGen() ||
+                Math.abs(CoordUtils.coordHashCode(context.pos(), 2) / (float) 0xFFFF) > configuration.get(PLACE_CHANCE)) {
+            // If the chance is not met, do nothing.
+            return context.pos();
+        }
+
+        final GenFeatureConfiguration configurationToPlace = configuration.get(GEN_FEATURE);
+        if (!configuration.getGenFeature().isValid()) return context.pos();
+        return configurationToPlace.generate(Type.PRE_GENERATION, context);
+    }
+
+    @Override
+    protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
+        if (configuration.get(ONLY_WORLD_GEN) && !context.isWorldGen() ||
+                Math.abs(CoordUtils.coordHashCode(context.pos(), 2) / (float) 0xFFFF) > configuration.get(PLACE_CHANCE)) {
+            // If the chance is not met, do nothing.
+            return false;
+        }
+
+        final GenFeatureConfiguration configurationToPlace = configuration.get(GEN_FEATURE);
+        return configuration.getGenFeature().isValid() &&
+                configurationToPlace.generate(Type.FULL, context);
+    }
+
+    @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         if (configuration.get(ONLY_WORLD_GEN) && !context.isWorldGen() ||
                 Math.abs(CoordUtils.coordHashCode(context.pos(), 2) / (float) 0xFFFF) > configuration.get(PLACE_CHANCE)) {
@@ -38,7 +64,7 @@ public class RandomPredicateGenFeature extends GenFeature {
 
         final GenFeatureConfiguration configurationToPlace = configuration.get(GEN_FEATURE);
         return configuration.getGenFeature().isValid() &&
-                configurationToPlace.getGenFeature().postGenerate(configurationToPlace, context);
+                configurationToPlace.generate(Type.POST_GENERATION, context);
     }
 
     @Override
@@ -51,7 +77,19 @@ public class RandomPredicateGenFeature extends GenFeature {
 
         final GenFeatureConfiguration configurationToPlace = configuration.get(GEN_FEATURE);
         return configuration.getGenFeature().isValid() &&
-                configurationToPlace.getGenFeature().postGrow(configurationToPlace, context);
+                configurationToPlace.generate(Type.POST_GROW, context);
     }
 
+    @Override
+    protected boolean postRot(GenFeatureConfiguration configuration, PostRotContext context) {
+        if (configuration.get(ONLY_WORLD_GEN)
+                || Math.abs(CoordUtils.coordHashCode(context.pos(), 2) / (float) 0xFFFF) > configuration.get(PLACE_CHANCE)) {
+            // If the chance is not met, or its only for world gen, do nothing.
+            return false;
+        }
+
+        final GenFeatureConfiguration configurationToPlace = configuration.get(GEN_FEATURE);
+        return configuration.getGenFeature().isValid() &&
+                configurationToPlace.generate(Type.POST_ROT, context);
+    }
 }

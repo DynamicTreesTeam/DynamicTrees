@@ -3,7 +3,6 @@ package com.dtteam.dynamictrees.platform;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.platform.services.IInteractionHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -11,7 +10,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.common.ItemAbilities;
-import net.neoforged.neoforge.common.NeoForge;
 
 public class NeoForgeInteractionHelper implements IInteractionHelper {
 

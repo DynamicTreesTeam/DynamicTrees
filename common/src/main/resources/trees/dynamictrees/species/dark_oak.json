@@ -41,7 +41,35 @@
         },
         "bottom_flare",
         "mound",
-        "roots"
+        "roots",
+        {
+            "name": "biome_predicate",
+            "properties": {
+                "_comment": "Smaller giant mushrooms under the canopy",
+                "gen_feature": {
+                    "name": "random_predicate",
+                    "properties": {
+                        "gen_feature": "huge_mushroom_undergrowth",
+                        "place_chance": 0.2
+                    }
+                },
+                "biome_predicate": "minecraft:dark_forest"
+            }
+        },
+        {
+            "name": "random_predicate",
+            "properties": {
+                "_comment": "Fully replace the tree with a giant mushroom",
+                "gen_feature": {
+                    "name": "biome_predicate",
+                    "properties": {
+                        "gen_feature": "huge_mushroom",
+                        "biome_predicate": "minecraft:dark_forest"
+                    }
+                },
+                "place_chance": 0.1
+            }
+        }
     ],
     "lang_overrides": {
         "seed": "Dark Oak Acorn"

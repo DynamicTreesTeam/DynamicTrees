@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.phys.AABB;
 
 import java.util.Iterator;
 import java.util.List;
@@ -185,6 +186,10 @@ public class BlockBounds implements Iterable<BlockPos> {
 
     public int getZSize() {
         return this.maxZ - this.minZ + 1;
+    }
+
+    public AABB toAABB (){
+        return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @Override

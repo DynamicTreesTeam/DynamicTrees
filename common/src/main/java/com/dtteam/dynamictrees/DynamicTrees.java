@@ -25,6 +25,7 @@ public class DynamicTrees {
     public static final String SERENE_SEASONS = "sereneseasons";
     public static final String FAST_LEAF_DECAY = "fastleafdecay";
     public static final String PASSABLE_FOLIAGE = "passablefoliage";
+    public static final String DYNAMIC_TREES_PLUS = "dynamictreesplus";
 
     public enum AxeDamage {
         VANILLA,

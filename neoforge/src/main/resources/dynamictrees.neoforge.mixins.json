@@ -3,10 +3,10 @@
   "minVersion": "0.8",
   "package": "com.dtteam.dynamictrees.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
-  "client": [
-    "MixinTitleScreen"
+  "mixins": [
+    "MixinBushBlock"
   ],
+  "client": [],
   "server": [],
   "injectors": {
     "defaultRequire": 1
