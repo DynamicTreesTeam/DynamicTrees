@@ -90,7 +90,7 @@ public final class ShapeFunctions {
                     Codec.FLOAT.fieldOf("radius").forGetter(Parameters::radius),
                     Codec.FLOAT.fieldOf("height").forGetter(Parameters::height),
                     Codec.FLOAT.fieldOf("stem_length").forGetter(Parameters::stemLength),
-                    Codec.FLOAT.optionalFieldOf("fraction", 20.0F).forGetter(Parameters::fraction)
+                    Codec.FLOAT.optionalFieldOf("fraction", 16.0F).forGetter(Parameters::fraction)
             ).apply(instance, Parameters::new));
 
         }

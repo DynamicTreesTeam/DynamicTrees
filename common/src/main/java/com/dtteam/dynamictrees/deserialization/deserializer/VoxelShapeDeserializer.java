@@ -28,12 +28,12 @@ public final class VoxelShapeDeserializer implements JsonDeserializer<VoxelShape
                 .mapIfType(String.class, name ->
                         CommonVoxelShapes.SHAPES.getOrDefault(name.toLowerCase(Locale.ENGLISH), Shapes.block())
                 ).elseMapIfType(AABB.class, Shapes::create)
-                .elseMapIfType(JsonArray.class, this::deserialiseArray)
-                .elseMapIfType(JsonObject.class, this::deserialiseObject)
+                .elseMapIfType(JsonArray.class, this::deserializeArray)
+                .elseMapIfType(JsonObject.class, this::deserializeObject)
                 .elseTypeError();
     }
 
-    private VoxelShape deserialiseArray(JsonArray array) throws DeserializationException {
+    private VoxelShape deserializeArray(JsonArray array) throws DeserializationException {
         VoxelShape shape = Shapes.empty();
         for (JsonElement element : array) {
             shape = Shapes.or(
@@ -45,7 +45,7 @@ public final class VoxelShapeDeserializer implements JsonDeserializer<VoxelShape
         return shape;
     }
 
-    private VoxelShape deserialiseObject(JsonObject json) throws DeserializationException {
+    private VoxelShape deserializeObject(JsonObject json) throws DeserializationException {
         return JsonResult.forInput(json)
                 .mapIfContains("function", String.class, functionId -> ShapeFunctions.calculateShape(
                         functionId,
@@ -53,7 +53,7 @@ public final class VoxelShapeDeserializer implements JsonDeserializer<VoxelShape
                 ).getOrThrow())
                 .elseMapIfContains("shapes", JsonArray.class, shapes -> {
                     final BooleanOp operator = JsonHelper.getOrDefault(json, "operator", BooleanOp.class, BooleanOp.OR);
-                    return deserialiseShapes(operator, shapes);
+                    return deserializeShapes(operator, shapes);
                 })
                 .elseTypeError().orElseThrow();
     }
@@ -62,8 +62,8 @@ public final class VoxelShapeDeserializer implements JsonDeserializer<VoxelShape
         return JsonHelper.getOrDefault(json, "parameters", JsonObject.class, new JsonObject());
     }
 
-    private VoxelShape deserialiseShapes(BooleanOp operator, JsonArray shapes) throws DeserializationException {
-        if (shapes.size() < 1) {
+    private VoxelShape deserializeShapes(BooleanOp operator, JsonArray shapes) throws DeserializationException {
+        if (shapes.isEmpty()) {
             return Shapes.empty();
         }
         VoxelShape shape = this.deserialize(shapes.get(0)).orElseThrow();
