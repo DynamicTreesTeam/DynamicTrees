@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.systems.substance;
 
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
-import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.compat.WailaHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
@@ -29,7 +29,7 @@ public class MegaSubstance implements SubstanceEffect {
 
             if (dirt.getSpecies(blockState, level, rootPos) == megaSpecies) {
                 TreeHelper.treeParticles(level, rootPos, ParticleTypes.DRAGON_BREATH, 8);
-                Services.COMPAT.invalidateWailaPosition();
+                WailaHelper.invalidateWailaPosition();
                 return true;
             }
         }

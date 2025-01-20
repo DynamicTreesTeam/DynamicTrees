@@ -1,6 +1,6 @@
-package com.dtteam.dynamictrees.compat.waila;
+package com.dtteam.dynamictrees.compat;
 
-public class WailaOther {
+public class WailaHelper {
 
     public static boolean invalid = false;
 

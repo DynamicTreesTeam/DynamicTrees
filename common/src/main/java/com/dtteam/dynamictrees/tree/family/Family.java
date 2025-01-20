@@ -10,8 +10,7 @@ import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-import com.dtteam.dynamictrees.data.DTDataProvider;
-import com.dtteam.dynamictrees.data.Generator;
+import com.dtteam.dynamictrees.compat.WailaHelper;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
@@ -22,12 +21,10 @@ import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.util.BlockBounds;
-import com.dtteam.dynamictrees.util.MutableLazyValue;
 import com.dtteam.dynamictrees.util.Optionals;
 import com.dtteam.dynamictrees.util.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -286,7 +283,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
                 branch.stripBranch(state, level, pos, player, heldItem);
                 if (level.isClientSide) {
                     level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    Services.COMPAT.invalidateWailaPosition();
+                    WailaHelper.invalidateWailaPosition();
                 }
             });
             return this.getBranch().isPresent();

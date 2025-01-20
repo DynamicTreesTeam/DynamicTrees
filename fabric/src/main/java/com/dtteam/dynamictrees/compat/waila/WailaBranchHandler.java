@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock.ShellMuse;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.pod.Pod;
+import com.dtteam.dynamictrees.compat.WailaHelper;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.tree.species.Species.LogsAndSticks;
@@ -43,12 +44,12 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-        if (WailaOther.invalid) {
+        if (WailaHelper.invalid) {
             lastPos = BlockPos.ZERO;
             lastSpecies = Species.NULL_SPECIES;
             lastVolume = new NetVolumeNode.Volume();
 
-            WailaOther.invalid = false;
+            WailaHelper.invalid = false;
         }
 
         CompoundTag nbtData = accessor.getServerData();

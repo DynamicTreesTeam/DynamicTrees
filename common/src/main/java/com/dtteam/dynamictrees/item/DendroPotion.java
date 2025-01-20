@@ -21,8 +21,8 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
     public enum DendroPotionType {
         BIOCHAR(0, true, "biochar", 0xFF27231c, Items.CHARCOAL),
         DEPLETION(1, true, "depletion", 0xFF76be6d, Items.SLIME_BALL),
-        MEGA(2, true, "mega", 0xFFe3901d, Items.PUMPKIN_SEEDS),
-        BURGEONING(3, true, "burgeoning", 0xFFa9bebe, Items.GHAST_TEAR),
+        MEGA(2, true, "mega", 0xFFe3901d, Items.BROWN_MUSHROOM),
+        BURGEONING(3, true, "burgeoning", 0xFFa9bebe, Items.BONE_BLOCK),
         HARVEST(4, false, "harvest", 0xFFe7c164, Items.GLISTERING_MELON_SLICE);
 
         private final int index;

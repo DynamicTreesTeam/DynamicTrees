@@ -21,8 +21,11 @@ import java.util.Optional;
 
 public class DendroPotionRecipeHandler {
 
+    private static final List<DendroBrewingRecipe> brewingRecipes = new ArrayList<>();
+
     public static List<DendroBrewingRecipe> getAllDendroRecipes() {
-        List<DendroBrewingRecipe> brewingRecipes = new ArrayList<>();
+        //If they have already been processed then don't process them again
+        if (!brewingRecipes.isEmpty()) return brewingRecipes;
 
         //Biochar potion
         final ItemStack baseStack = setPotion(new ItemStack(Items.POTION), Services.CONFIG.getStringConfig(IConfigHelper.BIOCHAR_BREWING_BASE));
