@@ -441,7 +441,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
             if (TreeHelper.isRooty(belowState)) {
                 final SoilBlock soilBlock = (SoilBlock) belowState.getBlock();
-                soilBlock.doDecay(this.level(), rootPos, belowState, getDestroyData().species);
+                soilBlock.doDecay(this.level(), rootPos, belowState, getDestroyData().species, false);
             }
         }
     }

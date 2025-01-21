@@ -236,12 +236,16 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
      * @param rootyState The {@link BlockState} of the {@link SoilBlock}.
      * @param species    The {@link Species} of the tree that was removed.
      */
-    public void doDecay(Level level, BlockPos rootPos, BlockState rootyState, Species species) {
+    public void doDecay(Level level, BlockPos rootPos, BlockState rootyState, Species species, boolean forceDecay) {
         if (level.isClientSide || !TreeHelper.isRooty(rootyState)) {
             return;
         }
 
-        this.updateTree(rootyState, level, rootPos, level.random, true); // This will turn the rooty dirt back to it's default soil block.
+        if (forceDecay){
+            level.setBlock(rootPos, getDecayBlockState(rootyState, level, rootPos), 3);
+        } else {
+            this.updateTree(rootyState, level, rootPos, level.random, true); // This will turn the rooty dirt back to it's default soil block.
+        }
         final BlockState newState = level.getBlockState(rootPos);
 
         // Make sure we're not still a rooty block and return if custom decay returns true.
@@ -429,6 +433,23 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
         signal.foundRoot = true;
 
         return signal;
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        if (neighborPos.equals(pos.offset(getTrunkDirection(level, pos).getNormal()))){
+            level.scheduleTick(pos, this, 1); 
+        }
+        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
+    }
+
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (!state.is(this)) return; //The root has already been destroyed / removed.
+        if (!TreeHelper.isBranch(level.getBlockState(pos.offset(getTrunkDirection(level, pos).getNormal())))){
+            doDecay(level, pos, state, getSpecies(state, level, pos), true);
+        }
+        super.tick(state, level, pos, random);
     }
 
     @Override
