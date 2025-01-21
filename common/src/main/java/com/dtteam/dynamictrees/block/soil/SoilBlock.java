@@ -281,10 +281,14 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
         destroyTree(level, rootPos, null);
     }
     public void destroyTree(Level level, BlockPos rootPos, @Nullable Player player) {
-        Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
+        destroyTree(level, rootPos, player, getTrunkDirection(level, rootPos)); //Tree
+        destroyTree(level, rootPos, player, getTrunkDirection(level, rootPos).getOpposite()); //Roots
+    }
+    public void destroyTree(Level level, BlockPos rootPos, @Nullable Player player, Direction dir) {
+        Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.offset(dir.getNormal())));
 
         if (branch.isPresent()) {
-            BranchDestructionData destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), Direction.DOWN, true, null);
+            BranchDestructionData destroyData = branch.get().destroyBranchFromNode(level, rootPos.offset(dir.getNormal()), dir.getOpposite(), true, player);
             FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
         }
     }

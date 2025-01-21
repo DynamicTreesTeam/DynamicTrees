@@ -148,27 +148,6 @@ public class AerialRootsSoilProperties extends SoilProperties {
         }
 
         @Override
-        public void neighborChanged(BlockState pState, Level pLevel, BlockPos pPos, Block pBlock, BlockPos pFromPos, boolean pIsMoving) {
-            updateRadius(pLevel, pState, pPos, 3, false);
-            super.neighborChanged(pState, pLevel, pPos, pBlock, pFromPos, pIsMoving);
-        }
-
-        @Override
-        public void destroyTree(Level level, BlockPos rootPos, @Nullable Player player) {
-            Optional<BranchBlock> branch = TreeHelper.getBranchOpt(level.getBlockState(rootPos.above()));
-            Optional<BranchBlock> root = TreeHelper.getBranchOpt(level.getBlockState(rootPos.below()));
-
-            if (branch.isPresent()) {
-                BranchDestructionData destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), Direction.DOWN, true, null);
-                FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
-            }
-            if (root.isPresent()) {
-                BranchDestructionData destroyData = root.get().destroyBranchFromNode(level, rootPos.below(), Direction.UP, true, null);
-                FallingTreeEntity.dropTree(level, destroyData, new ArrayList<>(0), FallingTreeEntity.DestroyType.ROOT);
-            }
-        }
-
-        @Override
         public boolean fallWithTree(BlockState state, Level level, BlockPos pos, boolean hasRoots) {
             if (hasRoots && level.isClientSide()){
                 //This only removes the block on the client side!
@@ -182,15 +161,30 @@ public class AerialRootsSoilProperties extends SoilProperties {
         @Override
         protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
             if (!state.is(this)) return; //The root has already been destroyed / removed.
+            boolean removed = false;
             //If no roots support it then drop the whole tree.
             if (isStructurallyUnstable(level, pos)){
                 dropWholeTree(level, pos, null, FallingTreeEntity.DestroyType.HARVEST);
+                removed = true;
             }
             //if the species is not valid then this block should be removed asap
             if (!getSpecies(state, level, pos).isValid()){
                 level.setBlockAndUpdate(pos, getDecayBlockStateAir(state, level, pos));
+                removed = true;
+            }
+            if (!removed){
+                updateRadius(level, state, pos, 3, false);
             }
             super.tick(state, level, pos, random);
+        }
+
+        @Override
+        public void updateTree(BlockState rootyState, Level level, BlockPos rootPos, RandomSource random, boolean natural) {
+            int radOld = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getNormal()));
+            super.updateTree(rootyState, level, rootPos, random, natural);
+            int radNew = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getNormal()));
+            //If the radius was updated, tick the root block
+            if (radOld != radNew) level.scheduleTick(rootPos, this, 1);
         }
 
         //This makes the block decay like normal, usually just as air

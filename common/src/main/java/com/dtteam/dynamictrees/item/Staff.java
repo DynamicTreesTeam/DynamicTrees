@@ -12,28 +12,33 @@ import com.dtteam.dynamictrees.util.TreeRegistry;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.RootsJoCode;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+
+import java.util.List;
 
 
 /**
@@ -42,19 +47,17 @@ import net.minecraft.world.phys.HitResult;
  */
 public class Staff extends Item {
 
-    public final static float REACH_DISTANCE = 256;
-
-    private final Multimap<Attribute, AttributeModifier> attributeModifiers;
+    public final static float REACH_DISTANCE = 512;
 
     public Staff() {
-        super(new Properties().stacksTo(1));
-
+        super(new Properties().stacksTo(1).component(DataComponents.RARITY, Rarity.RARE).component(DataComponents.ATTRIBUTE_MODIFIERS,
+                ItemAttributeModifiers.builder()
+                        //.add(Attributes.BLOCK_INTERACTION_RANGE, new AttributeModifier(DynamicTrees.location("dynamictrees_staff_range"), REACH_DISTANCE, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.HAND)
+                        .add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 5.0, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+                        .add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -2.4, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
+                        .build()
+        ));
         DTRegistries.CREATIVE_TAB_ITEMS.add(this);
-
-        ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-//        builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 5.0, AttributeModifier.Operation.ADDITION));
-//        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
-        this.attributeModifiers = builder.build();
     }
 
     @Override
@@ -272,22 +275,14 @@ public class Staff extends Item {
         return "";
     }
 
-//    @OnlyIn(Dist.CLIENT)
-//    @Override
-//    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flagIn) {
-//        tooltip.add(Component.translatable("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
-//        tooltip.add(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
-//        String rootsCode = getRootsCode(stack);
-//        if (!rootsCode.isEmpty())
-//            tooltip.add(Component.translatable("tooltip.dynamictrees.roots_jo_code", new RootsJoCode(rootsCode).getTextComponent()));
-//    }
-
-//    /**
-//     * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
-//     */
-//    @Override
-//    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-//        return slot == EquipmentSlot.MAINHAND ? this.attributeModifiers : super.getAttributeModifiers(slot, stack);
-//    }
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.translatable("tooltip.dynamictrees.species", this.getSpecies(stack).getTextComponent()));
+        tooltipComponents.add(Component.translatable("tooltip.dynamictrees.jo_code", new JoCode(this.getCode(stack)).getTextComponent()));
+        String rootsCode = getRootsCode(stack);
+        if (!rootsCode.isEmpty())
+            tooltipComponents.add(Component.translatable("tooltip.dynamictrees.roots_jo_code", new RootsJoCode(rootsCode).getTextComponent()));
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+    }
 
 }
