@@ -5,9 +5,8 @@ import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.tree.species.NetherFungusSpecies;
-import com.dtteam.dynamictrees.tree.species.PalmSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BlockBounds;
+import com.dtteam.dynamictrees.utility.BlockPosBounds;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -61,7 +60,7 @@ public class NetherFungusFamily extends Family {
         return true;
     }
 
-    public BlockBounds expandLeavesBlockBounds(BlockBounds bounds) {
+    public BlockPosBounds expandLeavesBlockBounds(BlockPosBounds bounds) {
         return bounds.expand(1).expand(Direction.DOWN, 3);
     }
 

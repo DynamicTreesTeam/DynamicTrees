@@ -2,9 +2,9 @@ package com.dtteam.dynamictrees.systems.nodemapper;
 
 import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.util.BranchConnectionData;
-import com.dtteam.dynamictrees.util.Connections;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.api.network.BranchConnectionData;
+import com.dtteam.dynamictrees.api.network.Connections;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;

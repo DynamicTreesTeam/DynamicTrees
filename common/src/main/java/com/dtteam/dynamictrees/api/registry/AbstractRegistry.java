@@ -1,8 +1,8 @@
 package com.dtteam.dynamictrees.api.registry;
 
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.util.CommonCollectors;
-import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.utility.helper.CommonCollectors;
+import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.resources.ResourceLocation;
@@ -136,7 +136,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
 
     @Override
     public final DataResult<V> getAsDataResult(final ResourceLocation registryName) {
-        return this.getOptional(TreeRegistry.processResLoc(registryName)).map(DataResult::success)
+        return this.getOptional(TreeRegistryHelper.processResLoc(registryName)).map(DataResult::success)
                 .orElse(DataResult.error(() -> "Could not find " + this.name + " '" + registryName + "'."));
     }
 

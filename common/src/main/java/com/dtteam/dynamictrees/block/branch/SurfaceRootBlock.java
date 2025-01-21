@@ -1,10 +1,10 @@
 package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.util.ChunkTreeHelper;
-import com.dtteam.dynamictrees.util.CoordUtils;
-import com.dtteam.dynamictrees.util.RootConnections;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.helper.ChunkTreeHelper;
+import com.dtteam.dynamictrees.utility.helper.CoordUtils;
+import com.dtteam.dynamictrees.api.network.RootConnections;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;

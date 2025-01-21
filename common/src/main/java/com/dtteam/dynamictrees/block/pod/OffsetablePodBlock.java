@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.block.pod;
 
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;

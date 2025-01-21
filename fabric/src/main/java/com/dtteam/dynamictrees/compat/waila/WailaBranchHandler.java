@@ -11,9 +11,9 @@ import com.dtteam.dynamictrees.compat.WailaHelper;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.tree.species.Species.LogsAndSticks;
-import com.dtteam.dynamictrees.util.ItemUtils;
-import com.dtteam.dynamictrees.util.TreeHelper;
-import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.utility.helper.ItemUtils;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
+import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -58,7 +58,7 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
         //Attempt to get species from server via NBT data
         if (nbtData.contains("species")) {
-            species = TreeRegistry.findSpecies(ResourceLocation.parse(nbtData.getString("species")));
+            species = TreeRegistryHelper.findSpecies(ResourceLocation.parse(nbtData.getString("species")));
         }
 
         //Attempt to get species by checking if we're still looking at the same block

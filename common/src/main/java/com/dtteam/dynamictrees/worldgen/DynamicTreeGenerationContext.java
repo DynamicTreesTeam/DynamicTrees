@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.worldgen;
 
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.LevelContext;
+import com.dtteam.dynamictrees.utility.LevelContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;

@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.deserialization.applier;
 
 import com.dtteam.dynamictrees.deserialization.deserializer.Deserializer;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
-import com.dtteam.dynamictrees.util.LazyValue;
+import com.dtteam.dynamictrees.utility.lazyvalue.LazyValue;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;

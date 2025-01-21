@@ -8,8 +8,8 @@ import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BlockBounds;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.BlockPosBounds;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelAccessor;
@@ -52,7 +52,7 @@ public class AlternativeLeavesGenFeature extends GenFeature {
 
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
-        final BlockBounds bounds = context.species().getFamily().expandLeavesBlockBounds(new BlockBounds(context.endPoints()));
+        final BlockPosBounds bounds = context.species().getFamily().expandLeavesBlockBounds(new BlockPosBounds(context.endPoints()));
         return this.setAltLeaves(configuration, context.level(), bounds, context.isWorldGen(), context.species());
     }
 
@@ -73,7 +73,7 @@ public class AlternativeLeavesGenFeature extends GenFeature {
         }
 
         final BlockPos chosenEndPoint = endPoints.get(world.getRandom().nextInt(endPoints.size()));
-        final BlockBounds bounds = species.getFamily().expandLeavesBlockBounds(new BlockBounds(chosenEndPoint));
+        final BlockPosBounds bounds = species.getFamily().expandLeavesBlockBounds(new BlockPosBounds(chosenEndPoint));
 
         return setAltLeaves(configuration, world, bounds, false, species);
     }
@@ -104,7 +104,7 @@ public class AlternativeLeavesGenFeature extends GenFeature {
         return state;
     }
 
-    private boolean setAltLeaves(GenFeatureConfiguration configuration, LevelAccessor world, BlockBounds leafPositions, boolean worldGen, Species species) {
+    private boolean setAltLeaves(GenFeatureConfiguration configuration, LevelAccessor world, BlockPosBounds leafPositions, boolean worldGen, Species species) {
 
         if (worldGen) {
             AtomicBoolean isSet = new AtomicBoolean(false);

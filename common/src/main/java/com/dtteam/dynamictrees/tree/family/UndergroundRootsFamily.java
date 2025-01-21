@@ -11,7 +11,7 @@ import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.Optionals;
+import com.dtteam.dynamictrees.utility.helper.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtteam.dynamictrees.util.ResourceLocationUtils.suffix;
+import static com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils.suffix;
 
 public class UndergroundRootsFamily extends Family {
 

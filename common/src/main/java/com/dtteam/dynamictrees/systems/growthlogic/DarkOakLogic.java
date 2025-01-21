@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.systems.growthlogic;
 
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionManipulationContext;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
-import com.dtteam.dynamictrees.util.CoordUtils;
+import com.dtteam.dynamictrees.utility.helper.CoordUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 

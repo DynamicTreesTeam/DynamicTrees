@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.command;
 
+import com.dtteam.dynamictrees.command.subcommand.*;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;

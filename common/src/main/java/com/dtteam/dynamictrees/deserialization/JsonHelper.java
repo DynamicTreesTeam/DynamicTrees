@@ -2,8 +2,8 @@ package com.dtteam.dynamictrees.deserialization;
 
 import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.util.IgnoreThrowable;
-import com.dtteam.dynamictrees.util.JsonMapWrapper;
+import com.dtteam.dynamictrees.utility.function.IgnoreThrowable;
+import com.dtteam.dynamictrees.utility.JsonMapWrapper;
 import com.google.gson.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -154,7 +154,6 @@ public class JsonHelper {
         if (!continueLoading.get()) {
             throw IgnoreThrowable.INSTANCE;
         }
-
     }
 
     private static boolean isModLoaded(JsonElement element){

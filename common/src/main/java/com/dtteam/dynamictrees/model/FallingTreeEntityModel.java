@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.model;
 
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BranchDestructionData;
+import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;

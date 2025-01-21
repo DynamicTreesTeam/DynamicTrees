@@ -4,11 +4,10 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.genfeature.context.FullGenerationContext;
-import com.dtteam.dynamictrees.systems.genfeature.context.PreGenerationContext;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BlockBounds;
-import com.dtteam.dynamictrees.util.ChunkTreeHelper;
-import com.dtteam.dynamictrees.util.SimpleVoxmap;
+import com.dtteam.dynamictrees.utility.BlockPosBounds;
+import com.dtteam.dynamictrees.utility.helper.ChunkTreeHelper;
+import com.dtteam.dynamictrees.utility.SimpleVoxmap;
 import com.google.common.collect.Iterables;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -205,7 +204,7 @@ public class HugeMushroomGenFeature extends GenFeature {
             final SimpleVoxmap capMap = this.getCapForHeight(mushroomBlock, height);
 
             final BlockPos capPos = genPos.above(height - 1); // Determine the cap position(top block of mushroom cap)
-            final BlockBounds capBounds = capMap.getBounds().move(capPos); // Get a bounding box for the entire cap
+            final BlockPosBounds capBounds = capMap.getBounds().move(capPos); // Get a bounding box for the entire cap
 
             if (ChunkTreeHelper.canCheckSurroundings(level, capBounds.toAABB())) {//Check to see if the cap can be generated in safeBounds
 

@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.worldgen.feature;
 
 import com.dtteam.dynamictrees.api.worldgen.GroundFinder;
 import com.dtteam.dynamictrees.systems.poissondisc.PoissonDisc;
-import com.dtteam.dynamictrees.util.LevelContext;
+import com.dtteam.dynamictrees.utility.LevelContext;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabase;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
 import net.minecraft.core.BlockPos;

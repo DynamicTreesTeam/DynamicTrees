@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.loot.condition.VoluntarySeedDropChance;
 import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
 import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
-import com.dtteam.dynamictrees.util.ItemUtils;
+import com.dtteam.dynamictrees.utility.helper.ItemUtils;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;

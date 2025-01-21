@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.treepack.loader;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
@@ -11,16 +12,14 @@ import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.TagKeyJsonPropertyApplier;
 import com.dtteam.dynamictrees.deserialization.applier.Applier;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
-import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.CommonSetup;
-import com.dtteam.dynamictrees.util.JsonMapWrapper;
-import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.utility.JsonMapWrapper;
+import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -153,10 +152,10 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     }
 
     private void setSeed(Species species, ResourceLocation seedName) {
-        final ResourceLocation processedSeedName = TreeRegistry.processResLoc(seedName);
+        final ResourceLocation processedSeedName = TreeRegistryHelper.processResLoc(seedName);
         species.setShouldGenerateSeed(false);
         species.setShouldGenerateSapling(false);
-        CommonSetup.runOnCommonSetup(() -> {
+        DynamicTrees.runOnCommonSetup(() -> {
             final Item seed = BuiltInRegistries.ITEM.get(processedSeedName);
             if (seed instanceof Seed) {
                 species.setSeed(() -> (Seed) seed);
@@ -177,7 +176,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     }
 
     private void setMegaSpecies(Species species, ResourceLocation registryName) {
-        final ResourceLocation processedRegName = TreeRegistry.processResLoc(registryName);
+        final ResourceLocation processedRegName = TreeRegistryHelper.processResLoc(registryName);
         Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(processedRegName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '" +
                 species + "' as Species '" + processedRegName + "' was not found.")));
     }

@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.api.cell;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
-import com.dtteam.dynamictrees.util.SimpleVoxmap;
+import com.dtteam.dynamictrees.utility.SimpleVoxmap;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class CellKit extends RegistryEntry<CellKit> {

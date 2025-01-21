@@ -2,9 +2,9 @@ package com.dtteam.dynamictrees.registry;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
-import com.dtteam.dynamictrees.util.holderset.IncludesExcludesHolderSet;
-import com.dtteam.dynamictrees.util.holderset.NameRegexMatchHolderSet;
-import com.dtteam.dynamictrees.util.holderset.TagsRegexMatchHolderSet;
+import com.dtteam.dynamictrees.utility.holderset.IncludesExcludesHolderSet;
+import com.dtteam.dynamictrees.utility.holderset.NameRegexMatchHolderSet;
+import com.dtteam.dynamictrees.utility.holderset.TagsRegexMatchHolderSet;
 import com.dtteam.dynamictrees.worldgen.biomemodifier.AddDynamicTreesBiomeModifier;
 import com.dtteam.dynamictrees.worldgen.biomemodifier.RunFeatureCancellersBiomeModifier;
 import com.google.common.base.Suppliers;
@@ -47,8 +47,6 @@ import net.neoforged.neoforge.registries.holdersets.HolderSetType;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-
-import static com.ibm.icu.text.PluralRules.Operand.c;
 
 public class NeoForgeRegistryLoader extends RegistryLoader {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, DynamicTrees.MOD_ID);

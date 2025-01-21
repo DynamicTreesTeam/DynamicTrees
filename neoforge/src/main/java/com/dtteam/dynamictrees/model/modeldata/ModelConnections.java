@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.model.modeldata;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.util.Connections;
+import com.dtteam.dynamictrees.api.network.Connections;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.client.model.data.ModelProperty;

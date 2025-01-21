@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.worldgen;
 
 import com.dtteam.dynamictrees.api.worldgen.GroundFinder;
-import com.dtteam.dynamictrees.util.CoordUtils;
+import com.dtteam.dynamictrees.utility.helper.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;

@@ -8,9 +8,8 @@ import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
-import com.dtteam.dynamictrees.util.BlockStates;
-import com.dtteam.dynamictrees.util.CoordUtils;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.helper.CoordUtils;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -74,7 +73,7 @@ public class PodzolGenFeature extends GenFeature {
                 } else if (SoilHelper.isSoilAcceptable(state, SoilHelper.getSoilFlags(SoilHelper.DIRT_LIKE))) {
                     // Convert grass or dirt to podzol.
                     if (level.getBrightness(LightLayer.SKY, offPos.above()) <= darkThreshold) {
-                        level.setBlock(offPos, BlockStates.PODZOL, Block.UPDATE_ALL);
+                        level.setBlock(offPos, Blocks.PODZOL.defaultBlockState(), Block.UPDATE_ALL);
                     } else {
                         spreadPodzol(level, pos);
                     }
@@ -94,7 +93,7 @@ public class PodzolGenFeature extends GenFeature {
             podzolish += (testBlock == Blocks.PODZOL) ? 1 : 0;
             podzolish += testBlock instanceof SoilBlock ? 1 : 0;
             if (podzolish >= 3) {
-                level.setBlock(pos, BlockStates.PODZOL, Block.UPDATE_ALL);
+                level.setBlock(pos, Blocks.PODZOL.defaultBlockState(), Block.UPDATE_ALL);
                 break;
             }
         }

@@ -2,12 +2,11 @@ package com.dtteam.dynamictrees.block.sapling;
 
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -82,7 +81,7 @@ public class PottedSaplingBlockEntity extends BlockEntity {
             potState = block != Blocks.AIR ? block.defaultBlockState() : Blocks.FLOWER_POT.defaultBlockState();
         }
         if (tag.contains(SPECIES_TAG)) {
-            this.species = TreeRegistry.findSpecies(tag.getString(SPECIES_TAG));
+            this.species = TreeRegistryHelper.findSpecies(tag.getString(SPECIES_TAG));
         }
         super.loadAdditional(tag, registries);
     }

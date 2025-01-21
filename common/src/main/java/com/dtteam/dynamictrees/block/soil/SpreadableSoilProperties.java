@@ -2,14 +2,13 @@ package com.dtteam.dynamictrees.block.soil;
 
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.client.ParticleHelper;
-import com.dtteam.dynamictrees.util.ChunkTreeHelper;
+import com.dtteam.dynamictrees.utility.helper.ChunkTreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;

@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.model.baked;
 
 import com.dtteam.dynamictrees.registry.PottedSaplingBlockEntityNF;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.QuadManipulator;
+import com.dtteam.dynamictrees.utility.QuadManipulator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

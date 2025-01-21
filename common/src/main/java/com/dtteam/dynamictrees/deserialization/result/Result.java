@@ -2,8 +2,8 @@ package com.dtteam.dynamictrees.deserialization.result;
 
 import com.dtteam.dynamictrees.deserialization.DeserializationException;
 import com.dtteam.dynamictrees.deserialization.NoSuchDeserializerException;
-import com.dtteam.dynamictrees.util.function.ThrowableBiFunction;
-import com.dtteam.dynamictrees.util.function.ThrowableFunction;
+import com.dtteam.dynamictrees.utility.function.ThrowableBiFunction;
+import com.dtteam.dynamictrees.utility.function.ThrowableFunction;
 
 import javax.annotation.Nullable;
 import java.util.List;

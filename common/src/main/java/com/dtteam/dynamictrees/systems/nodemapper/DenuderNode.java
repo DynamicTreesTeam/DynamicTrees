@@ -4,12 +4,12 @@ import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BlockStates;
-import com.dtteam.dynamictrees.util.SimpleVoxmap;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.SimpleVoxmap;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -67,7 +67,7 @@ public class DenuderNode implements NodeInspector {
 
             final BlockState state = world.getBlockState(testPos);
             if (this.family.isCompatibleGenericLeaves(this.species, state, world, testPos)) {
-                world.setBlock(testPos, BlockStates.AIR, 3);
+                world.setBlock(testPos, Blocks.AIR.defaultBlockState(), 3);
             }
         });
     }

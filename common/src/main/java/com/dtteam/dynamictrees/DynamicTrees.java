@@ -2,14 +2,15 @@ package com.dtteam.dynamictrees;
 
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.loot.DTLoot;
-import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import com.dtteam.dynamictrees.treepack.Resources;
-import com.dtteam.dynamictrees.util.CommonSetup;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
@@ -65,6 +66,12 @@ public class DynamicTrees {
         SeasonCompatibilityHandler.registerBuiltInSeasonManagers();
     }
 
+    private static final List<Runnable> SETUP_HANDLERS = new ArrayList<>();
+
+    public static void runOnCommonSetup(Runnable handler) {
+        SETUP_HANDLERS.add(handler);
+    }
+
     public static void commonSetup() {
         DTLoot.load();
         DynamicTreeFeature.setup();
@@ -74,7 +81,7 @@ public class DynamicTrees {
 
         Resources.MANAGER.setup();
 
-        CommonSetup.onCommonSetup();
+        SETUP_HANDLERS.forEach(Runnable::run);
     }
 
     public static ResourceLocation location (String name){

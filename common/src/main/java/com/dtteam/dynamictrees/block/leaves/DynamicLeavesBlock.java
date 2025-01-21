@@ -16,10 +16,9 @@ import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.ChunkTreeHelper;
-import com.dtteam.dynamictrees.util.LevelContext;
-import com.dtteam.dynamictrees.util.RayTraceCollision;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.helper.ChunkTreeHelper;
+import com.dtteam.dynamictrees.utility.LevelContext;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -50,7 +49,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable, RayTraceCollision {
+public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable {
 
     public LeavesProperties properties = LeavesProperties.NULL;
 
@@ -797,11 +796,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     @Override
     public final TreePartType getTreePartType() {
         return TreePartType.LEAVES;
-    }
-
-    @Override
-    public boolean isRayTraceCollidable() {
-        return true;
     }
 
     @Override

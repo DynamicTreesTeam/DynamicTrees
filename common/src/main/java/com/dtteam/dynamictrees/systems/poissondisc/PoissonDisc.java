@@ -1,6 +1,5 @@
 package com.dtteam.dynamictrees.systems.poissondisc;
 
-import com.dtteam.dynamictrees.util.SimpleBitmap;
 import net.minecraft.core.BlockPos;
 
 public class PoissonDisc extends Vec2i {

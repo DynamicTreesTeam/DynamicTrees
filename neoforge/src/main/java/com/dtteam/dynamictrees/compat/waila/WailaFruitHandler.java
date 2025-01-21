@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.compat.waila;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.fruit.FruitBlock;
-import com.dtteam.dynamictrees.util.AgeProperties;
+import com.dtteam.dynamictrees.utility.BlockProperties;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +21,7 @@ public class WailaFruitHandler implements IBlockComponentProvider {
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         if (accessor.getBlock() instanceof FruitBlock fruitBlock) {
             /* Used to switch off component for fruit with pre-made ages, since Jade already supports these. */
-            if (Arrays.stream(AgeProperties.defaultAges).anyMatch(a -> fruitBlock.getMaxAge() == a)) return;
+            if (Arrays.stream(BlockProperties.defaultAges).anyMatch(a -> fruitBlock.getMaxAge() == a)) return;
             float ageAsPercentage = fruitBlock.getAgeAsPercentage(accessor.getBlockState());
             tooltip.add(Component.translatable(
                     "tooltip.jade.crop_growth",

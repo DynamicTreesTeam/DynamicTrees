@@ -15,9 +15,8 @@ import com.dtteam.dynamictrees.systems.nodemapper.CollectorNode;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BlockStates;
-import com.dtteam.dynamictrees.util.SimpleVoxmap;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.SimpleVoxmap;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -314,7 +313,7 @@ public class JoCode {
                             if (TreeHelper.isLeaves(leavesState)) {
                                 final DynamicLeavesBlock leavesBlock = (DynamicLeavesBlock) leavesState.getBlock();
                                 if (leavesProperties.getFamily() == leavesBlock.getLeavesProperties().getFamily()) {
-                                    level.setBlock(delPos, BlockStates.AIR, 2);
+                                    level.setBlock(delPos, Blocks.AIR.defaultBlockState(), 2);
                                 }
                             }
                         }
@@ -322,7 +321,7 @@ public class JoCode {
                 });
             }
 
-            level.setBlock(pos, BlockStates.AIR, 2);
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
 
         }
 

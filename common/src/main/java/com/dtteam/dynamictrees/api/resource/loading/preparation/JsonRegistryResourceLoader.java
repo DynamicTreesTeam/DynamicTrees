@@ -10,14 +10,12 @@ import com.dtteam.dynamictrees.api.resource.loading.StagedApplierResourceLoader;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.util.IgnoreThrowable;
-import com.dtteam.dynamictrees.util.JsonMapWrapper;
+import com.dtteam.dynamictrees.utility.function.IgnoreThrowable;
+import com.dtteam.dynamictrees.utility.JsonMapWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import static com.dtteam.dynamictrees.deserialization.JsonHelper.throwIfNotJsonObject;
 import static com.dtteam.dynamictrees.deserialization.JsonHelper.throwIfShouldNotLoad;

@@ -5,14 +5,12 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.systems.genfeature.context.GenFeatureContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PreGenerationContext;
-import com.dtteam.dynamictrees.util.CoordUtils.Surround;
-import com.dtteam.dynamictrees.util.SimpleVoxmap;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.helper.CoordUtils.Surround;
+import com.dtteam.dynamictrees.utility.SimpleVoxmap;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class MoundGenFeature extends GenFeature {

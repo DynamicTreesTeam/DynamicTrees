@@ -1,9 +1,9 @@
 package com.dtteam.dynamictrees.model.baked;
 
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
-import com.dtteam.dynamictrees.util.CoordUtils;
-import com.dtteam.dynamictrees.util.ModelUtils;
-import com.dtteam.dynamictrees.util.RootConnections;
+import com.dtteam.dynamictrees.utility.helper.CoordUtils;
+import com.dtteam.dynamictrees.utility.ModelUtils;
+import com.dtteam.dynamictrees.api.network.RootConnections;
 import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;

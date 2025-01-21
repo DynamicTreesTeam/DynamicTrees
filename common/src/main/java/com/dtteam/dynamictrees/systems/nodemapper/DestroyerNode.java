@@ -4,13 +4,13 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BlockStates;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -42,7 +42,7 @@ public class DestroyerNode extends FindEndsNode {
                 BlockEntity te = accessor.getBlockEntity(pos);
                 Services.INTERACTION.blockDestroyByPlayer(state, level, pos, player, false, level.getFluidState(pos));
                 state.getBlock().playerDestroy(level, player, pos, state, te, player.getMainHandItem());
-            } else accessor.setBlock(pos, BlockStates.AIR, 0);
+            } else accessor.setBlock(pos, Blocks.AIR.defaultBlockState(), 0);
         }
 
         BranchBlock branch = TreeHelper.getBranch(state);

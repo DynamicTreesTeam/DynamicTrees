@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.tree.species;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
@@ -49,7 +50,9 @@ import com.dtteam.dynamictrees.systems.substance.FertilizeSubstance;
 import com.dtteam.dynamictrees.systems.substance.GrowthSubstance;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.util.*;
+import com.dtteam.dynamictrees.utility.*;
+import com.dtteam.dynamictrees.utility.helper.*;
+import com.dtteam.dynamictrees.utility.lazyvalue.LazyValue;
 import com.dtteam.dynamictrees.worldgen.*;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import com.google.common.collect.Lists;
@@ -65,7 +68,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -858,7 +860,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe) {
         if (recipe.shouldReplaceSaplingWhenPlaced()){
-            recipe.getSaplingBlock().ifPresent(block -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), this));
+            recipe.getSaplingBlock().ifPresent(block -> TreeRegistryHelper.registerSaplingReplacer(block.defaultBlockState(), this));
         }
         primitiveSaplingRecipe.add(recipe);
     }
@@ -2406,7 +2408,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 Pair.of("soilTypeFlags", this.soilTypeFlags), Pair.of("maxBranchRadius", this.maxBranchRadius),
                 Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
                 Pair.of("megaSpecies", this.megaSpecies), Pair.of("seed", this.seed),
-                Pair.of("primitive_sapling", TreeRegistry.SAPLING_REPLACERS.entrySet().stream()
+                Pair.of("primitive_sapling", TreeRegistryHelper.SAPLING_REPLACERS.entrySet().stream()
                         .filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny()
                         .orElse(Blocks.AIR)),
                 Pair.of("perfectBiomes", this.perfectBiomes),

@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.treepack.loader;
 import com.dtteam.dynamictrees.api.resource.ResourceAccessor;
 import com.dtteam.dynamictrees.api.resource.loading.AbstractResourceLoader;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
 import com.dtteam.dynamictrees.worldgen.RootsJoCode;
@@ -39,7 +39,7 @@ public final class JoCodeResourceLoader extends AbstractResourceLoader<List<Stri
     }
 
     private void registerCodes(ResourceLocation location, List<String> lines) {
-        final Species species = TreeRegistry.findSpecies(location);
+        final Species species = TreeRegistryHelper.findSpecies(location);
         lines.forEach(line -> this.registerCodeForLine(species, line));
         LOGGER.debug("Successfully loaded JoCodes for species \"{}\".", location);
     }

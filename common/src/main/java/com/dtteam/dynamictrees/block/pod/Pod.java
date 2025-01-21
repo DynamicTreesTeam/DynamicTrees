@@ -10,7 +10,9 @@ import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.util.*;
+import com.dtteam.dynamictrees.utility.*;
+import com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.lazyvalue.LazyValue;
 import com.google.common.collect.Maps;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -186,7 +188,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
     public void setMaxAge(int maxAge) {
         this.maxAge = maxAge;
-        this.ageProperty = AgeProperties.getOrCreate(maxAge);
+        this.ageProperty = BlockProperties.getOrCreateAge(maxAge);
     }
 
     public void setDropCount(int dropCount) {
@@ -384,7 +386,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
     public IntegerProperty getOffsetProperty (){
         if (offsetProperty == null)
-            offsetProperty = OffsetProperties.getOrCreate(minRadius, maxRadius);
+            offsetProperty = BlockProperties.getOrCreateOffset(minRadius, maxRadius);
         return offsetProperty;
     }
 

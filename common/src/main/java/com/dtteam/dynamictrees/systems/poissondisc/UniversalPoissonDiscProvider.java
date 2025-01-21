@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.systems.poissondisc;
 
 import com.dtteam.dynamictrees.api.worldgen.PoissonDiscProvider;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.util.LevelContext;
+import com.dtteam.dynamictrees.utility.LevelContext;
 import com.dtteam.dynamictrees.worldgen.BiomeRadiusCoordinator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;

@@ -27,7 +27,7 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.function.BiomePredicate;
+import com.dtteam.dynamictrees.api.worldgen.BiomePredicate;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabase;
 import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.common.collect.Maps;

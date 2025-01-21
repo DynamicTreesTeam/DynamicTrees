@@ -10,10 +10,10 @@ import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.util.AgeProperties;
-import com.dtteam.dynamictrees.util.LazyValue;
-import com.dtteam.dynamictrees.util.LevelContext;
-import com.dtteam.dynamictrees.util.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.BlockProperties;
+import com.dtteam.dynamictrees.utility.lazyvalue.LazyValue;
+import com.dtteam.dynamictrees.utility.LevelContext;
+import com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -152,7 +152,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
 
     public void setMaxAge(int maxAge) {
         this.maxAge = maxAge;
-        this.ageProperty = AgeProperties.getOrCreate(maxAge);
+        this.ageProperty = BlockProperties.getOrCreateAge(maxAge);
     }
 
     public void setDropCount(int dropCount) {

@@ -3,12 +3,10 @@ package com.dtteam.dynamictrees;
 
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
-import com.dtteam.dynamictrees.data.GatherDataHelper;
 import com.dtteam.dynamictrees.event.handler.OptionalHandlers;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.NeoForgeRegistryLoader;
 import com.dtteam.dynamictrees.treepack.Resources;
-import com.dtteam.dynamictrees.util.CommonSetup;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;

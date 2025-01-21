@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.block.soil;
 
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -10,8 +10,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-
-import javax.annotation.Nullable;
 
 /**
  * A TileEntity that holds a species value.
@@ -39,7 +37,7 @@ public class SpeciesBlockEntity extends BlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         if (tag.contains("species")) {
             ResourceLocation speciesName = ResourceLocation.parse(tag.getString("species"));
-            species = TreeRegistry.findSpecies(speciesName);
+            species = TreeRegistryHelper.findSpecies(speciesName);
         }
         super.loadAdditional(tag, registries);
     }

@@ -3,8 +3,6 @@ package com.dtteam.dynamictrees.entity;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.systems.substance.LingeringSubstances;
-import com.dtteam.dynamictrees.util.BlockBounds;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;

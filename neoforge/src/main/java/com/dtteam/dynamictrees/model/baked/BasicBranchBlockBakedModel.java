@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.model.baked;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
-import com.dtteam.dynamictrees.util.ModelUtils;
+import com.dtteam.dynamictrees.utility.ModelUtils;
 import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;

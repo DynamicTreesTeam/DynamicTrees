@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
-import com.dtteam.dynamictrees.util.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;

@@ -2,9 +2,8 @@ package com.dtteam.dynamictrees.block.sapling;
 
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BlockStates;
-import com.dtteam.dynamictrees.util.ItemUtils;
-import com.dtteam.dynamictrees.util.Null;
+import com.dtteam.dynamictrees.utility.helper.ItemUtils;
+import com.dtteam.dynamictrees.utility.helper.NullHelper;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,22 +43,22 @@ public class PottedSaplingBlock extends BaseEntityBlock {
     //////////////////////////////
 
     public Species getSpecies(BlockGetter level, BlockPos pos) {
-        return Null.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
+        return NullHelper.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
                 PottedSaplingBlockEntity::getSpecies, Species.NULL_SPECIES);
     }
 
     public boolean setSpecies(Level level, BlockPos pos, BlockState state, Species species) {
-        return Null.consumeIfNonnull(this.getTileEntityPottedSapling(level, pos),
+        return NullHelper.consumeIfNonnull(this.getTileEntityPottedSapling(level, pos),
                 pottedSaplingBlockEntity -> pottedSaplingBlockEntity.setSpecies(species));
     }
 
     public BlockState getPotState(Level level, BlockPos pos) {
-        return Null.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
+        return NullHelper.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
                 PottedSaplingBlockEntity::getPot, Blocks.FLOWER_POT.defaultBlockState());
     }
 
     public boolean setPotState(Level level, BlockState potState, BlockPos pos) {
-        return Null.consumeIfNonnull(this.getTileEntityPottedSapling(level, pos),
+        return NullHelper.consumeIfNonnull(this.getTileEntityPottedSapling(level, pos),
                 pottedSaplingBlockEntity -> pottedSaplingBlockEntity.setPot(potState));
     }
 
@@ -148,8 +147,8 @@ public class PottedSaplingBlock extends BaseEntityBlock {
             }
         }
 
-        final BlockState potState = Null.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
-                PottedSaplingBlockEntity::getPot, BlockStates.AIR);
+        final BlockState potState = NullHelper.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
+                PottedSaplingBlockEntity::getPot, Blocks.AIR.defaultBlockState());
 
         if (potState.getBlock() == Blocks.FLOWER_POT) {
             return new ItemStack(Items.FLOWER_POT);
@@ -162,17 +161,11 @@ public class PottedSaplingBlock extends BaseEntityBlock {
         return new ItemStack(Items.FLOWER_POT);
     }
 
-        //    @Override
-//    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
-//
-
-//    }
-
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
         if (!level.getBlockState(pos.below()).isFaceSturdy(level, pos, Direction.UP)) {
             this.spawnDrops(level, pos);
-            level.setBlockAndUpdate(pos, BlockStates.AIR);
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
     }
 

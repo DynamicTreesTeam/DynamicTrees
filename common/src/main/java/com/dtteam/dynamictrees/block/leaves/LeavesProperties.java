@@ -11,11 +11,14 @@ import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
+import com.dtteam.dynamictrees.loot.LootTableSupplier;
 import com.dtteam.dynamictrees.systems.cell.CellKits;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.util.*;
+import com.dtteam.dynamictrees.utility.*;
+import com.dtteam.dynamictrees.utility.helper.Optionals;
+import com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
@@ -177,7 +180,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     public LeavesProperties(@Nullable final BlockState primitiveLeaves, final CellKit cellKit, final ResourceLocation registryName) {
         this.family = Family.NULL_FAMILY;
-        this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : BlockStates.AIR;
+        this.primitiveLeaves = primitiveLeaves != null ? primitiveLeaves : Blocks.AIR.defaultBlockState();
         this.cellKit = cellKit;
         this.setRegistryName(registryName);
         this.blockRegistryName = ResourceLocationUtils.suffix(registryName, this.getBlockRegistryNameSuffix());

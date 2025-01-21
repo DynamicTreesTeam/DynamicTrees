@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.data;
 
 import net.minecraft.resources.ResourceLocation;
 
-import static com.dtteam.dynamictrees.util.ResourceLocationUtils.prefix;
+import static com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils.prefix;
 
 /**
  * @author Harley O'Connor

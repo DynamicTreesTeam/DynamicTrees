@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.block.fruit;
 import com.dtteam.dynamictrees.block.Growable;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
-import com.dtteam.dynamictrees.util.LevelContext;
+import com.dtteam.dynamictrees.utility.LevelContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;

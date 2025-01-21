@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.block.leaves;
 
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
-import com.dtteam.dynamictrees.util.CoordUtils;
+import com.dtteam.dynamictrees.utility.helper.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelAccessor;

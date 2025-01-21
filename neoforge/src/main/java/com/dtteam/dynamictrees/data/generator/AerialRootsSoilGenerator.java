@@ -6,7 +6,7 @@
 //import com.dtteam.dynamictrees.block.rooty.SoilProperties;
 //import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
 //import com.dtteam.dynamictrees.tree.family.Family;
-//import com.dtteam.dynamictrees.util.ResourceLocationUtils;
+//import com.dtteam.dynamictrees.util.helper.ResourceLocationUtils;
 //import net.minecraft.resources.ResourceLocation;
 //import net.minecraft.world.level.block.Block;
 //import net.minecraftforge.client.model.generators.BlockModelBuilder;

@@ -20,9 +20,9 @@ import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.util.BlockBounds;
-import com.dtteam.dynamictrees.util.Optionals;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.BlockPosBounds;
+import com.dtteam.dynamictrees.utility.helper.Optionals;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -52,8 +52,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import static com.dtteam.dynamictrees.util.ResourceLocationUtils.prefix;
-import static com.dtteam.dynamictrees.util.ResourceLocationUtils.suffix;
+import static com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils.prefix;
+import static com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils.suffix;
 
 /**
  * This structure describes a Family whose member Species all have a common branch.
@@ -764,7 +764,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      *
      * @return the expanded block bounds.
      */
-    public BlockBounds expandLeavesBlockBounds(BlockBounds bounds) {
+    public BlockPosBounds expandLeavesBlockBounds(BlockPosBounds bounds) {
         return bounds.expand(3);
     }
 

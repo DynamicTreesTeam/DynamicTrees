@@ -2,8 +2,8 @@ package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.ItemUtils;
-import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.utility.helper.ItemUtils;
+import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -18,7 +18,7 @@ public class VanillaSaplingEventHandler {
     public void onPlayerPlaceBlock(BlockEvent.EntityPlaceEvent event) {
         final Block block = event.getPlacedBlock().getBlock();
 
-        if (!(event.getLevel() instanceof Level level) || !TreeRegistry.SAPLING_REPLACERS.containsKey(block)) {
+        if (!(event.getLevel() instanceof Level level) || !TreeRegistryHelper.SAPLING_REPLACERS.containsKey(block)) {
             return;
         }
 
@@ -28,7 +28,7 @@ public class VanillaSaplingEventHandler {
         }
 
         final BlockPos pos = event.getPos();
-        final Species targetSpecies = TreeRegistry.SAPLING_REPLACERS.get(block);
+        final Species targetSpecies = TreeRegistryHelper.SAPLING_REPLACERS.get(block);
 
         // If we should be overriding for this location, then correct the species to the override.
         final Species species = targetSpecies.selfOrLocationOverride(level, pos);
@@ -46,11 +46,11 @@ public class VanillaSaplingEventHandler {
         final BlockPos pos = event.getPos();
         final Block block = levelAccess.getBlockState(pos).getBlock();
 
-        if (!(levelAccess instanceof Level level) || !TreeRegistry.SAPLING_REPLACERS.containsKey(block)) {
+        if (!(levelAccess instanceof Level level) || !TreeRegistryHelper.SAPLING_REPLACERS.containsKey(block)) {
             return;
         }
 
-        final Species species = TreeRegistry.SAPLING_REPLACERS.get(block)
+        final Species species = TreeRegistryHelper.SAPLING_REPLACERS.get(block)
                 .selfOrLocationOverride(level, pos);
 
         level.removeBlock(pos, false); // Remove the block so the plantTree function won't automatically fail.

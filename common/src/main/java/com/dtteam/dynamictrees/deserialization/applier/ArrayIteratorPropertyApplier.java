@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.deserialization.applier;
 
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.result.Result;
-import com.dtteam.dynamictrees.util.Null;
+import com.dtteam.dynamictrees.utility.helper.NullHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
@@ -41,7 +41,7 @@ public class ArrayIteratorPropertyApplier<T, V, I> extends PropertyApplier<T, V,
         final List<String> warnings = new ArrayList<>();
         final Iterator<I> iterator = iteratorResult.get();
         while (iterator.hasNext()) {
-            Null.consumeIfNonnull(
+            NullHelper.consumeIfNonnull(
                     this.propertyApplier.applyIfShould(object, iterator.next(), applier),
                     result -> {
                         result.getError().ifPresent(warnings::add);

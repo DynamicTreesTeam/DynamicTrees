@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.TreeRegistry;
+import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -34,7 +34,7 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
         this.commonAppliers
                 .register("common_species", ResourceLocation.class,
                         (family, registryName) -> {
-                    registryName = TreeRegistry.processResLoc(registryName);
+                    registryName = TreeRegistryHelper.processResLoc(registryName);
                     Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName,
                             family::setCommonSpecies, setCommonWarn(family, registryName)));
                 })

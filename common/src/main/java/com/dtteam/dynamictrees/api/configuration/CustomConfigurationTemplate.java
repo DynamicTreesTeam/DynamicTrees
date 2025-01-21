@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.api.configuration;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.dtteam.dynamictrees.deserialization.result.Result;
-import com.dtteam.dynamictrees.util.CommonCollectors;
+import com.dtteam.dynamictrees.utility.helper.CommonCollectors;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;

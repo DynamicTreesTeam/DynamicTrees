@@ -12,10 +12,10 @@ import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.model.ModelTracker;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BlockBounds;
-import com.dtteam.dynamictrees.util.BranchDestructionData;
-import com.dtteam.dynamictrees.util.CoordUtils.Surround;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.utility.BlockPosBounds;
+import com.dtteam.dynamictrees.api.network.BranchDestructionData;
+import com.dtteam.dynamictrees.utility.helper.CoordUtils.Surround;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import com.google.common.collect.Iterables;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -196,7 +196,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
             System.out.println("Error: No species tag has been set");
         }
 
-        BlockBounds renderBounds = new BlockBounds(destroyData.cutPos);
+        BlockPosBounds renderBounds = new BlockPosBounds(destroyData.cutPos);
 
         cleanupShellBlocks(destroyData);
 

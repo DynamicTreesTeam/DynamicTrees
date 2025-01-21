@@ -7,8 +7,9 @@ import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.BranchDestructionData;
-import com.dtteam.dynamictrees.util.TreeHelper;
+import com.dtteam.dynamictrees.api.network.BranchDestructionData;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
+import com.dtteam.dynamictrees.utility.helper.MathHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.core.BlockPos;
@@ -21,7 +22,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -385,8 +385,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
 //    @OnlyIn(Dist.CLIENT)
     public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack) {
 
-        float yaw = Mth.wrapDegrees(com.dtteam.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTick));
-        float pit = Mth.wrapDegrees(com.dtteam.dynamictrees.util.MathHelper.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTick));
+        float yaw = Mth.wrapDegrees(MathHelper.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTick));
+        float pit = Mth.wrapDegrees(MathHelper.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTick));
 
         //Vec3d mc = entity.getMassCenter();
 

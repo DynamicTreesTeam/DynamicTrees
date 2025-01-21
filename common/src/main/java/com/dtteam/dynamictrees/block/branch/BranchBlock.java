@@ -1,6 +1,8 @@
 package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.network.BranchDestructionData;
+import com.dtteam.dynamictrees.api.network.Connections;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
@@ -10,6 +12,7 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
+import com.dtteam.dynamictrees.loot.LootTableSupplier;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.FutureBreak;
@@ -19,7 +22,10 @@ import com.dtteam.dynamictrees.systems.nodemapper.SpeciesNode;
 import com.dtteam.dynamictrees.systems.nodemapper.StateNode;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.*;
+import com.dtteam.dynamictrees.utility.*;
+import com.dtteam.dynamictrees.utility.helper.EntityUtils;
+import com.dtteam.dynamictrees.utility.helper.ItemUtils;
+import com.dtteam.dynamictrees.utility.helper.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -414,14 +420,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
             return;
         }
         // Make a bounding volume that holds all of the endpoints and expand the volume for the leaves radius.
-        final BlockBounds bounds = getFamily().expandLeavesBlockBounds(new BlockBounds(endPoints));
+        final BlockPosBounds bounds = getFamily().expandLeavesBlockBounds(new BlockPosBounds(endPoints));
 
         // Create a voxmap to store the leaf destruction map.
         final SimpleVoxmap leafMap = new SimpleVoxmap(bounds);
 
         // For each of the endpoints add an expanded destruction volume around it.
         for (final BlockPos endPos : endPoints) {
-            for (final BlockPos leafPos : getFamily().expandLeavesBlockBounds(new BlockBounds(endPos))) {
+            for (final BlockPos leafPos : getFamily().expandLeavesBlockBounds(new BlockPosBounds(endPos))) {
                 leafMap.setVoxel(leafPos, (byte) 1); // Flag this position for destruction.
             }
             leafMap.setVoxel(endPos, (byte) 0); // We know that the endpoint does not have a leaves block in it because it was a branch.
@@ -456,7 +462,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
                 dropList.addAll(leaves.getDrops(level, pos, tool, species));
                 final BlockPos imPos = pos.immutable(); // We are storing this so it must be immutable
                 final BlockPos relPos = imPos.subtract(cutPos);
-                level.setBlock(imPos, BlockStates.AIR, 3);
+                level.setBlock(imPos, Blocks.AIR.defaultBlockState(), 3);
                 destroyedLeaves.put(relPos, state);
                 dropList.forEach(i -> drops.add(new ItemStackPos(i, relPos)));
             }
@@ -595,12 +601,12 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
             level.setBlock(pos, state, 0); // Set the branch block back and attempt a proper breaking.
             this.sloppyBreak(level, pos, FallingTreeEntity.DestroyType.FIRE); // Applies fire effects to falling branches.
             //this.setBlockStateIgnored(level, pos, Blocks.FIRE.getDefaultState(), 2); // Disabled because the fire is too aggressive.
-            this.setBlockStateIgnored(level, pos, BlockStates.AIR, 2); // Set back to air instead.
+            this.setBlockStateIgnored(level, pos, Blocks.AIR.defaultBlockState(), 2); // Set back to air instead.
             return;
         } else if (toBlock == Blocks.AIR){
             level.setBlock(pos, state, 0); // Set the block back and attempt a proper breaking.
             this.sloppyBreak(level, pos, FallingTreeEntity.DestroyType.VOID);
-            this.setBlockStateIgnored(level, pos, BlockStates.AIR, 2); // Set back to air in case the sloppy break failed to do so.
+            this.setBlockStateIgnored(level, pos, Blocks.AIR.defaultBlockState(), 2); // Set back to air in case the sloppy break failed to do so.
             return;
         }
 

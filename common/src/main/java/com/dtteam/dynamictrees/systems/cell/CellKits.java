@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.api.cell.CellKit;
 import com.dtteam.dynamictrees.api.cell.CellNull;
 import com.dtteam.dynamictrees.api.cell.CellSolver;
 import com.dtteam.dynamictrees.api.registry.Registry;
-import com.dtteam.dynamictrees.util.SimpleVoxmap;
+import com.dtteam.dynamictrees.utility.SimpleVoxmap;
 import net.minecraft.core.Direction;
 
 public class CellKits {

@@ -9,7 +9,7 @@ import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatures;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
-import com.dtteam.dynamictrees.util.CommonVoxelShapes;
+import com.dtteam.dynamictrees.utility.CommonVoxelShapes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import static com.dtteam.dynamictrees.util.ResourceLocationUtils.surround;
+import static com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils.surround;
 
 /**
  * @author Harley O'Connor

@@ -4,16 +4,18 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.configuration.ConfigurableRegistry;
 import com.dtteam.dynamictrees.api.configuration.ConfigurableRegistryEntry;
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
-import com.dtteam.dynamictrees.systems.genfeature.context.*;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.systems.genfeature.context.*;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.util.function.BiomePredicate;
-import com.dtteam.dynamictrees.util.function.CanGrowPredicate;
+import com.dtteam.dynamictrees.api.worldgen.BiomePredicate;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
 import org.apache.commons.lang3.function.TriFunction;
+
+import java.util.function.BiPredicate;
 
 /**
  * Base class for all gen features. These are features that grow on/in/around a tree on generation, or whilst growing,
@@ -198,6 +200,16 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
         public R generate(GenFeatureConfiguration configuration, C context) {
             return generateConsumer.apply(configuration.getGenFeature(), configuration, context);
         }
+    }
+
+    /**
+     * A {@link BiPredicate} that tests if something should grow based on the {@link LevelAccessor} and {@link BlockPos}. Mainly
+     * used as a {@link ConfigurationProperty}.
+     *
+     * @author Harley O'Connor
+     */
+    @FunctionalInterface
+    public interface CanGrowPredicate extends BiPredicate<LevelAccessor, BlockPos> {
     }
 
 }

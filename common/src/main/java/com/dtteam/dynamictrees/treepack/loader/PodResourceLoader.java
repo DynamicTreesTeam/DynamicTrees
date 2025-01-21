@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.block.pod.Pod;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.dtteam.dynamictrees.deserialization.deserializer.ResourceLocationDeserializer;
-import com.dtteam.dynamictrees.util.Null;
+import com.dtteam.dynamictrees.utility.helper.NullHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.core.Direction;
@@ -84,7 +84,7 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
 
     @Nullable
     private JsonObject getBlockPropertiesJson(JsonObject json) {
-        return Null.applyIfNonnull(json.get("block_properties"), element ->
+        return NullHelper.applyIfNonnull(json.get("block_properties"), element ->
                 JsonDeserializers.JSON_OBJECT.deserialize(element).orElse(null)
         );
     }
@@ -110,7 +110,7 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
      */
     @Nullable
     private ResourceLocation getBlockRegistryName(Pod pod, JsonObject json) {
-        return Null.applyIfNonnull(json.get("block_registry_name"), element ->
+        return NullHelper.applyIfNonnull(json.get("block_registry_name"), element ->
                 ResourceLocationDeserializer.create(pod.getRegistryName().getNamespace())
                         .deserialize(element)
                         .orElse(null)
