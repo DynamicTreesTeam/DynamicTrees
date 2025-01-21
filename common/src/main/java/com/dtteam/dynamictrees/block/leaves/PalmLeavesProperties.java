@@ -131,8 +131,9 @@ public class PalmLeavesProperties extends LeavesProperties {
 
         public static BlockState getDirectionState(BlockState state, CoordUtils.Surround surround) {
             if (state == null) {
-                return null;
+                return Blocks.AIR.defaultBlockState();
             }
+            if (!state.hasProperty(DIRECTION)) return state;
             return state.setValue(DIRECTION, surround == null ? 0 : surround.ordinal() + 1);
         }
 

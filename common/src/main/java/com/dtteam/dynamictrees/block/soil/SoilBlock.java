@@ -438,7 +438,7 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
         if (neighborPos.equals(pos.offset(getTrunkDirection(level, pos).getNormal()))){
-            level.scheduleTick(pos, this, 1); 
+            level.scheduleTick(pos, this, 1);
         }
         super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
     }

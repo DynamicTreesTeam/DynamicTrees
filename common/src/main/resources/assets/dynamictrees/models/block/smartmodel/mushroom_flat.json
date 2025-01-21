@@ -20,13 +20,13 @@
 		},
 		{
 			"name": "Stem",
-			"from": [7, 0, 7],
+			"from": [7, -1, 7],
 			"to": [9, 5, 9],
 			"faces": {
-				"north": {"uv": [11, 11, 13, 16], "texture": "#stem"},
-				"east": {"uv": [11, 11, 13, 16], "texture": "#stem"},
-				"south": {"uv": [11, 11, 13, 16], "texture": "#stem"},
-				"west": {"uv": [11, 11, 13, 16], "texture": "#stem"},
+				"north": {"uv": [11, 10, 13, 16], "texture": "#stem"},
+				"east": {"uv": [11, 10, 13, 16], "texture": "#stem"},
+				"south": {"uv": [11, 10, 13, 16], "texture": "#stem"},
+				"west": {"uv": [11, 10, 13, 16], "texture": "#stem"},
 				"up": {"uv": [11, 11, 13, 13], "texture": "#stem"},
 				"down": {"uv": [11, 14, 13, 16], "texture": "#stem", "cullface": "down"}
 			}

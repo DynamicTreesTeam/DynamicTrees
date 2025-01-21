@@ -26,12 +26,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @OnlyIn(Dist.CLIENT)
 public class BakedModelBlockPottedSapling implements IDynamicBakedModel {
 
     protected BakedModel basePotModel;
-    protected Map<Species, List<BakedQuad>> cachedSaplingQuads = new HashMap<>();
+    protected Map<Species, List<BakedQuad>> cachedSaplingQuads = new ConcurrentHashMap<>();
 
     public BakedModelBlockPottedSapling(BakedModel basePotModel) {
         this.basePotModel = basePotModel;
@@ -42,25 +43,29 @@ public class BakedModelBlockPottedSapling implements IDynamicBakedModel {
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData, @Nullable RenderType renderType) {
         List<BakedQuad> quads = new ArrayList<>();
 
-        if (side != null || state == null || !extraData.has(PottedSaplingBlockEntityNF.SPECIES) || !extraData.has(PottedSaplingBlockEntityNF.POT_MIMIC)) {
+        if (state == null || !extraData.has(PottedSaplingBlockEntityNF.SPECIES) || !extraData.has(PottedSaplingBlockEntityNF.POT_MIMIC)) {
             return quads;
         }
 
-        final Species species = extraData.get(PottedSaplingBlockEntityNF.SPECIES);
         final BlockState potState = extraData.get(PottedSaplingBlockEntityNF.POT_MIMIC);
 
-        if (species == null || potState == null || !species.isValid() || species.getSapling().isEmpty()) {
+        if (potState == null) {
             return quads;
         }
-
-        final BlockState saplingState = species.getSapling().get().defaultBlockState();
 
         BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
         BakedModel potModel = dispatcher.getBlockModel(potState);
-        BakedModel saplingModel = dispatcher.getBlockModel(saplingState);
+        quads.addAll(potModel.getQuads(potState, side, rand, extraData, renderType));
 
-        quads.addAll(potModel.getQuads(potState, null, rand, extraData, renderType));
-        quads.addAll(cachedSaplingQuads.computeIfAbsent(species, s -> QuadManipulator.getQuads(saplingModel, saplingState, new Vec3(0, 0.25, 0), rand, extraData)));
+        if (side == null){
+            final Species species = extraData.get(PottedSaplingBlockEntityNF.SPECIES);
+            if (species == null || !species.isValid() || species.getSapling().isEmpty()) {
+                return quads;
+            }
+            final BlockState saplingState = species.getSapling().get().defaultBlockState();
+            BakedModel saplingModel = dispatcher.getBlockModel(saplingState);
+            quads.addAll(cachedSaplingQuads.computeIfAbsent(species, s -> QuadManipulator.getQuads(saplingModel, saplingState, new Vec3(0, 0.25, 0), new Direction[]{null}, rand, extraData)));
+        }
 
         return quads;
     }

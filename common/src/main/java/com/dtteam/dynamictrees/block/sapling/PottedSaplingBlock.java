@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.block.sapling;
 
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.util.BlockStates;
 import com.dtteam.dynamictrees.util.ItemUtils;
@@ -76,7 +77,7 @@ public class PottedSaplingBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new PottedSaplingBlockEntity(pPos,pState);
+        return Services.REGISTRY.newPottedSaplingBlockEntity(pPos,pState);
     }
 
 
