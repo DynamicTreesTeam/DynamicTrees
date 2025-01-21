@@ -14,8 +14,8 @@ public class Connections {
 
     /**
      * An array of connection radii. These radii use the equivalent index of their {@link Direction}, and their value
-     * depends on the adjacent branch's radius in that direction - for example, if a branch in <tt>Direction.UP</tt> has
-     * radius <tt>5</tt> then <tt>radii[1]</tt> will equal <tt>5</tt>.
+     * depends on the adjacent branch's radius in that direction - for example, if a branch in <code>Direction.UP</code> has
+     * radius <code>5</code> then <code>radii[1]</code> will equal <code>5</code>.
      */
     protected int[] radii;
 

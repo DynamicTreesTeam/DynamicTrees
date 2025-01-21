@@ -23,7 +23,7 @@ public final class SeasonCompatibilityHandler {
      * Registers the specified {@link NormalSeasonManager} supplier for the specified {@code modId}. Given as a supplier for
      * lazy initialisation.
      *
-     * <p>The season manager to use is then selected by {@link DTConfigs#PREFERRED_SEASON_MOD}
+     * <p>The season manager to use is then selected by {@link IConfigHelper#PREFERRED_SEASON_MOD}
      * on config reload.</p>
      *
      * @param modId    The mod ID the season manager handles.

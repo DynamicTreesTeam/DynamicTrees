@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.api.registry.Registry;
 /**
  * Stores all {@link GenFeature} objects created by Dynamic Trees.
  *
- * <p>Add-ons can register new {@link GenFeature} objects using <tt>GenFeature.REGISTRY.register</tt>.</p>
+ * <p>Add-ons can register new {@link GenFeature} objects using <code>GenFeature.REGISTRY.register</code>.</p>
  *
  * @author Harley O'Connor
  */

@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.api.registry;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.utility.helper.CommonCollectors;
 import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
@@ -271,11 +272,11 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
     }
 
     /**
-     * Dumps all entries with their registry names in the debug log, based off the {@link ForgeRegistry} dump method.
+     * Dumps all entries with their registry names in the debug log, based off the ForgeRegistry dump method.
      */
     @Override
     public final void dump() {
-//        LogManager.getLogger().debug(REGISTRY_DUMP, () -> new LogMessageAdapter(builder -> {
+//        DynamicTrees.LOG.debug(REGISTRY_DUMP, () -> new LogMessageAdapter(builder -> {
 //            builder.append("Name: ").append(this.name).append('\n');
 //            this.getAll().stream().sorted(this.comparator).forEach(entry -> builder.append("\tEntry: ")
 //                    .append(entry.getRegistryName()).append(", ").append(entry).append('\n'));

@@ -113,7 +113,7 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V>
     }
 
     /**
-     * Posts a Type Registry Event to the mod event bus and then calls {@link super#postRegistryEvent()} to
+     * Posts a Type Registry Event to the mod event bus and then calls {@link SimpleRegistry#postRegistryEvent()} to
      * register all entries.
      */
     @Override

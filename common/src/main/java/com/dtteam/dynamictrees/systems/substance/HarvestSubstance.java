@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Set;
 
-/**TODO: revamp this substance, could be useful to allow growth & drops during winter
+/**TODO: revamp this substance, could be useful to allow growth &amp; drops during winter
  * @author Harley O'Connor
  */
 public class HarvestSubstance implements SubstanceEffect {

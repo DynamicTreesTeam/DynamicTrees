@@ -22,7 +22,7 @@ public abstract class SimpleSubCommand extends SubCommand {
     /**
      * This will be called when the command is executed. Should be implemented to perform the command's logic.
      *
-     * @param context The {@link CommandContext<CommandSource>} for the executed command.
+     * @param context The {@link CommandContext<CommandSourceStack>} for the executed command.
      */
     protected abstract void execute(final CommandContext<CommandSourceStack> context);
 

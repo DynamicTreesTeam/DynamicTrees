@@ -61,7 +61,7 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     /**
      * Ensures the given registry name is 'correct'. This will change the namespace to
-     * <tt>dynamictrees</tt> if the namespace for the given {@link ResourceLocation}
+     * <code>dynamictrees</code> if the namespace for the given {@link ResourceLocation}
      * doesn't have a {@link RegistryHandler} registered, so that we don't register blocks or items to mod without a
      * {@link RegistryHandler} (non-add-on mods).
      *

@@ -4,17 +4,17 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * <h1>Chunk Poison Disc Set</h1>
- * <p>
+ * <h2>Chunk Poison Disc Set</h2>
+ *
  * A class that handles a group of non-overlapping discs that exist within a single chunk.<br>
  * <ul>
  * <li>Each chunk disc set contains 16 4x4 block areas(tiles) that can contain either exactly one disc or nothing.</li>
  * <li>Discs can have a radius of 2 to 8 blocks.</li>
  * <li>Discs are not permitted to intersect with any other disc.</li>
- * <li>There are 16 disc positions per chunk but it's impossible to use them all because of crowding.</li>
+ * <li>There are 16 disc positions per chunk, but it's impossible to use them all because of crowding.</li>
  * </ul>
- * </p>
- * <p><pre><tt>
+ *
+ * <pre><code>
  * <b>◀───Chunk───▶</b>
  * -------------
  * │00│01│02│03│
@@ -24,22 +24,21 @@ import java.util.List;
  * │08│09│10│11│
  * -------------
  * │12│13│14│15│
- * -------------</tt></pre>
- * </p>
- * <p><pre><tt>
+ * -------------</code></pre>
+ *
+ * <pre><code>
  * Each of the 16 tiles are encoded as a single byte.  Bits are encoded thusly:
  * -------------------------
  * │07│06│05│04│03│02│01│00│
  * -------------------------<b>
  * │Ex│ Radius │  X  │  Z  │</b>
- * -------------------------</tt></pre>
+ * -------------------------</code></pre>
  * <ul>
  * <li><b>X:</b> The X offset of the disc center within the tile. (0-3)</li>
  * <li><b>Z:</b> The Z offset of the disc center within the tile. (0-3)</li>
  * <li><b>Radius:</b> The radius of the disc - 1. (0-7) Zero means no disc, any other value will have 1 added to it before use.</li>
  * <li><b>Ex:</b>Extended bit.</li>
  * </ul>
- * </p>
  *
  * @author ferreusveritas
  */

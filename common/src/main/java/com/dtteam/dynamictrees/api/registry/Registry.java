@@ -12,8 +12,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
- * A custom registry which can be safely unlocked at any point. Largely based off {@link
- * net.minecraftforge.registries.IForgeRegistry}.
+ * A custom registry which can be safely unlocked at any point. Largely based off IForgeRegistry.
  *
  * @author Harley O'Connor
  * @see AbstractRegistry
@@ -30,7 +29,7 @@ public interface Registry<V extends RegistryEntry<V>> extends Iterable<V> {
      * #has(ResourceLocation)} should be checked before calling if either conditions are uncertain.</p>
      *
      * <p>If you're thinking of using this you should probably be doing it from a
-     * {@link RegistryEvent}, in which case you don't have to worry about locking.</p>
+     * RegistryEvent, in which case you don't have to worry about locking.</p>
      *
      * @param value The {@link RegistryEntry} to register.
      * @return This {@link Registry} object for chaining.
@@ -115,8 +114,8 @@ public interface Registry<V extends RegistryEntry<V>> extends Iterable<V> {
     Runnable generateIfValidRunnable(ResourceLocation registryName, Consumer<V> consumer, Runnable elseRunnable);
 
     /**
-     * Posts a {@link RegistryEvent} to the mod event bus. Note that this is posted using {@link
-     * ModLoader#postEvent(Event)} and as such should only be called during the initial loading phase.
+     * Posts a RegistryEvent to the mod event bus. Note that this is posted using
+     * ModLoader#postEvent(Event) and as such should only be called during the initial loading phase.
      */
     void postRegistryEvent();
 
@@ -126,7 +125,7 @@ public interface Registry<V extends RegistryEntry<V>> extends Iterable<V> {
     Comparator<V> getComparator();
 
     /**
-     * Dumps all entries with their registry names in the debug log, based off the {@link ForgeRegistry} dump method.
+     * Dumps all entries with their registry names in the debug log, based off the ForgeRegistry dump method.
      */
     void dump();
 

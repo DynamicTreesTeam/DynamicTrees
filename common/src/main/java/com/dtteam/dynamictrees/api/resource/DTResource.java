@@ -7,7 +7,8 @@ import java.util.function.Function;
 /**
  * Container for a resource object that is keyed by its location.
  *
- * @param <R> the type of the resource object
+ * @param location the location of the resource object
+ * @param resource the type of the resource object
  * @author Harley O'Connor
  */
 public record DTResource<R>(ResourceLocation location, R resource) {

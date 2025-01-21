@@ -120,7 +120,7 @@ public interface TreePart {
      * @param pos    The {@link BlockPos} of this {@link TreePart}.
      * @param dir    The {@link Direction} of the request (opposite to the direction of the requester).
      * @param radius The radius of the {@link BranchBlock} requesting support.
-     * @return The neighbor values in Nybble pair ( (#branches & 0xF0) | (#treeparts & 0x0F) ).
+     * @return The neighbor values in Nybble pair ( (#branches &amp; 0xF0) | (#treeparts &amp; 0x0F) ).
      */
     int branchSupport(BlockState state, BlockGetter level, BranchBlock branch, BlockPos pos, Direction dir, int radius);
 

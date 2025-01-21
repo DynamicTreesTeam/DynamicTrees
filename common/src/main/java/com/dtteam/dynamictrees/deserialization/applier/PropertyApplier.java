@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import javax.annotation.Nullable;
 
 /**
- * Manages applying a property (of type <tt>V</tt>) to an object (of type <tt>T</tt>).
+ * Manages applying a property (of type <code>V</code>) to an object (of type <code>T</code>).
  *
  * @param <O> the object the property should be applied to
  * @param <V> the type of the value of the property to apply

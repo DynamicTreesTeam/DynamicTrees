@@ -17,10 +17,10 @@ public interface JsonDeserializer<O> extends Deserializer<JsonElement, O> {
     /**
      * {@inheritDoc}
      *
-     * @param input    the input object to deserialise
-     * @param consumer the consumer for the deserialisation result if this {@link Deserializer} is valid
+     * @param input    the input object to deserialize
+     * @param consumer the consumer for the deserialization result if this {@link Deserializer} is valid
      * @return {@code true} if this {@link Deserializer} is valid; {@code false} otherwise
-     * @implNote This implementation assumes this is always valid. Implementing invalid deserialisers should override
+     * This implementation assumes this is always valid. Implementing invalid deserializers should override
      * and return {@code false}.
      */
     @Override

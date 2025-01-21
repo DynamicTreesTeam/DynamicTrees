@@ -74,7 +74,7 @@ public final class ConcurrentRegistry<V extends RegistryEntry<V>> extends Abstra
      * #has(ResourceLocation)} should be checked before calling if either conditions are uncertain.</p>
      *
      * <p>If you're thinking of using this you should probably be doing it from a
-     * {@link RegistryEvent}, in which case you don't have to worry about locking.</p>
+     * RegistryEvent, in which case you don't have to worry about locking.</p>
      *
      * @param value The {@link RegistryEntry} to register.
      * @return This {@link SimpleRegistry} object for chaining.

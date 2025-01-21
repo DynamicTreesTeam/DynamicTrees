@@ -62,8 +62,7 @@ public class BiomeDatabase {
 
     /**
      * Resets all entries in the database.
-     *
-     * @implNote does not reset cancellers, since they are only applied once on initial load
+     * Does not reset cancellers, since they are only applied once on initial load
      */
     public void reset() {
         this.jsonEntries.clear();
