@@ -2,6 +2,7 @@ plugins {
     id 'multiloader-loader'
     id 'fabric-loom'
 }
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered {

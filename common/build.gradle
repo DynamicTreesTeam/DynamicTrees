@@ -1,6 +1,11 @@
 plugins {
     id 'multiloader-common'
     id 'net.neoforged.moddev'
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id 'com.matthewprenger.cursegradle' version "1.4.0"
+    id 'com.modrinth.minotaur' version "2.8.+"
 }
 
 neoForge {
@@ -44,3 +49,61 @@ artifacts {
     commonResources sourceSets.main.resources.sourceDirectories.files
 
 }
+
+//var changelogFile = file("temp/changelog.txt")
+//
+//subprojects {
+//    publishing {
+//        curseforge {
+//            curseApiKey = optionalProperty("curseApiKey") ?: System.getenv("CURSEFORGE_API_KEY")
+//            if (curseApiKey == null) {
+//                project.logger.warn("API Key for CurseForge not detected; uploading will be disabled.")
+//                return
+//            }
+//            apiKey = curseApiKey
+//
+//            project {
+//                id = "252818"
+//
+//                addGameVersion(minecraft_version)
+//
+//                changelog = changelogFile
+//                changelogType = "markdown"
+//                releaseType = optionalProperty("versionType") ?: "release"
+//
+//                addArtifact(tasks.named("sourcesJar"))
+//
+//                mainArtifact(tasks.named("jar")) {
+//                    relations {
+//                        optionalDependency("dynamictreesplus")
+//                    }
+//                }
+//            }
+//        }
+//
+//        modrinth {
+//            modrinthToken = optionalProperty("modrinthToken") ?: System.getenv("MODRINTH_TOKEN")
+//            if (modrinthToken == null) {
+//                project.logger.warn("Token for Modrinth not detected; uploading will be disabled.")
+//                return
+//            }
+//
+//            token.set(modrinthToken)
+//            projectId.set(mod_id)
+//            versionNumber.set("$minecraft_version-$version")
+//            versionType.set(optionalProperty("versionType") ?: "release")
+//            uploadFile.set(tasks.jar)
+//            gameVersions.add(minecraft_version)
+//            dependencies {
+//                optional.project "dynamictreesplus"
+//            }
+//            if (changelogFile.exists()) {
+//                changelog.set(changelogFile.toString())
+//            }
+//        }
+//    }
+//}
+//
+//def optionalProperty(String key) {
+//    return project.findProperty(key)?.toString()
+//}
