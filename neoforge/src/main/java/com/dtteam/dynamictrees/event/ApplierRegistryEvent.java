@@ -52,7 +52,7 @@ public class ApplierRegistryEvent<O, I> extends Event implements IModBusEvent {
 
     /**
      * An {@link ApplierRegistryEvent} that is fired when registering appliers that are invoked on gather data. This
-     * refers to when {@link net.minecraftforge.forge.event.lifecycle.GatherDataEvent} is fired.
+     * refers to when GatherDataEvent is fired.
      *
      * @param <O> the type of object the appliers being registered handle applying to
      * @see ApplierRegistryEvent
@@ -69,7 +69,7 @@ public class ApplierRegistryEvent<O, I> extends Event implements IModBusEvent {
 
     /**
      * An {@link ApplierRegistryEvent} that is fired when registering appliers that are only invoked on initial setup.
-     * Initial setup refers to when {@link FMLCommonSetupEvent} is fired.
+     * Initial setup refers to when FMLCommonSetupEvent is fired.
      *
      * @param <O> the type of object the appliers being registered handle applying to
      * @see ApplierRegistryEvent

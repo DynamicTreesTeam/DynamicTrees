@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * <h2>Chunk Poison Disc Set</h2>
- *
+ * <p>
  * A class that handles a group of non-overlapping discs that exist within a single chunk.<br>
  * <ul>
  * <li>Each chunk disc set contains 16 4x4 block areas(tiles) that can contain either exactly one disc or nothing.</li>
@@ -13,8 +13,7 @@ import java.util.List;
  * <li>Discs are not permitted to intersect with any other disc.</li>
  * <li>There are 16 disc positions per chunk, but it's impossible to use them all because of crowding.</li>
  * </ul>
- *
- * <pre><code>
+ * <p><pre><code>
  * <b>◀───Chunk───▶</b>
  * -------------
  * │00│01│02│03│
@@ -25,8 +24,7 @@ import java.util.List;
  * -------------
  * │12│13│14│15│
  * -------------</code></pre>
- *
- * <pre><code>
+ * <p><pre><code>
  * Each of the 16 tiles are encoded as a single byte.  Bits are encoded thusly:
  * -------------------------
  * │07│06│05│04│03│02│01│00│

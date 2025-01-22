@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.model;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,13 +14,18 @@ public class FallingTreeEntityModelTrackerCache {
 
     private static ConcurrentMap<Integer, FallingTreeEntityModel> models = new ConcurrentHashMap<>();
 
+    @Nullable
     public static FallingTreeEntityModel getOrCreateModel(FallingTreeEntity entity) {
-        return models.computeIfAbsent(entity.getId(), i -> Services.MISC.newFallingTreeEntityModel(entity));
+        if (entity.level().isClientSide())
+            return models.computeIfAbsent(entity.getId(), i -> Services.MISC.newFallingTreeEntityModel(entity));
+        return null;
     }
 
     public static void cleanupModels(Level level, FallingTreeEntity entity) {
-        models.remove(entity.getId());
-        cleanupModels(level);
+        if (level.isClientSide()){
+            models.remove(entity.getId());
+            cleanupModels(level);
+        }
     }
 
     public static void cleanupModels(Level level) {

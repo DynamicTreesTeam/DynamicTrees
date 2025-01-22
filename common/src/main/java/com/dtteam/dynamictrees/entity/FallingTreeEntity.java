@@ -365,7 +365,9 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     @Override
     public void modelCleanup() {
-        FallingTreeEntityModelTrackerCache.cleanupModels(level(), this);
+        if (level().isClientSide()){
+            FallingTreeEntityModelTrackerCache.cleanupModels(level(), this);
+        }
     }
 
     public void handleMotion() {

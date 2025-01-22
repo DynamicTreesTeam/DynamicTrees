@@ -39,6 +39,7 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
         RenderSystem.setShaderTexture(0, this.getTextureLocation(entity));
 
         final FallingTreeEntityModel treeModel = FallingTreeEntityModelTrackerCache.getOrCreateModel(entity);
+        if (treeModel == null) return;
 
         poseStack.pushPose();
 

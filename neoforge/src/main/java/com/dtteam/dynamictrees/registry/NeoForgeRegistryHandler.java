@@ -27,7 +27,7 @@ import java.util.function.Supplier;
  * constructor by calling {@link #setup(String)} with their mod ID.
  *
  * <p>The main purpose of this is to prevent Forge from complaining about blocks and items
- * for a different mod ID having their registry names set when the active mod container is <tt>dynamictrees</tt>, but it
+ * for a different mod ID having their registry names set when the active mod container is <code>dynamictrees</code>, but it
  * also provides an easy way to register items and blocks.</p>
  *
  * @author Harley O'Connor

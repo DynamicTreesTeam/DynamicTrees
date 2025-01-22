@@ -9,6 +9,8 @@ import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 public class NeoForgeMiscHelper implements IMiscHelper {
@@ -18,7 +20,7 @@ public class NeoForgeMiscHelper implements IMiscHelper {
         return sprite.getPixelRGBA(0, x, y);
     }
 
-    @Override
+    @Override @OnlyIn(Dist.CLIENT)
     public FallingTreeEntityModel newFallingTreeEntityModel(FallingTreeEntity entity) {
         return new FallingTreeEntityModelNF(entity);
     }
