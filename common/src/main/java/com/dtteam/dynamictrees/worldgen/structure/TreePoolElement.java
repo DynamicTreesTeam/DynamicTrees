@@ -3,7 +3,6 @@ package com.dtteam.dynamictrees.worldgen.structure;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.common.collect.Lists;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -28,14 +27,12 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSetting
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.function.Function;
 
 /**
  * @author Harley O'Connor
  */
-@ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class TreePoolElement extends StructurePoolElement {
 

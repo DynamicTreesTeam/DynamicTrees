@@ -661,7 +661,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 //    }
 //
 //    @Override
-//    public boolean isShearable(@Nonnull ItemStack item, Level level, BlockPos pos) {
+//    public boolean isShearable(@NotNull ItemStack item, Level level, BlockPos pos) {
 //        return this.getProperties().doRequireShears();
 //    }
 

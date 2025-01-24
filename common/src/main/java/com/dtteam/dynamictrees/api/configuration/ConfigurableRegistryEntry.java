@@ -1,10 +1,11 @@
 package com.dtteam.dynamictrees.api.configuration;
 
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
+import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.google.common.collect.Sets;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -65,7 +66,7 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
      * @return {@code true} if it is registered, {@code false} if not.
      */
     @Override
-    public boolean isPropertyRegistered(@Nonnull ConfigurationProperty<?> property) {
+    public boolean isPropertyRegistered(@NotNull ConfigurationProperty<?> property) {
         return this.properties.contains(property);
     }
 

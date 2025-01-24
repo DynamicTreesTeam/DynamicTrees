@@ -74,6 +74,7 @@ public class DTRegistries {
     public static void setup(){
         setupConnectables();
     }
+    public static final LinkedList<Item> CREATIVE_TAB_ITEMS = new LinkedList<>();
 
     ///////////////////////////////////////////
     // BLOCKS
@@ -135,7 +136,6 @@ public class DTRegistries {
     // CREATIVE TAB
     ///////////////////////////////////////////
 
-    public static final LinkedList<Item> CREATIVE_TAB_ITEMS = new LinkedList<>();
     public static final Supplier<CreativeModeTab> DT_CREATIVE_TAB = Services.REGISTRY.getRegistryLoader()
             .registerCreativeTab(DynamicTrees.MOD_ID,
                     ()-> TreeRegistryHelper.findSpecies(DynamicTrees.OAK).getSeedStack(1),

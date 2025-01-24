@@ -8,6 +8,11 @@ accessible method net/minecraft/world/level/levelgen/feature/stateproviders/Bloc
 accessible field net/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool rawTemplates Ljava/util/List;
 accessible field net/minecraft/world/level/levelgen/structure/pools/StructureTemplatePool templates Lit/unimi/dsi/fastutil/objects/ObjectArrayList;
 accessible field net/minecraft/world/item/crafting/RecipeManager byType Lcom/google/common/collect/Multimap;
+
+accessible field net/minecraft/world/item/Item craftingRemainingItem Lnet/minecraft/world/item/Item;
 mutable field net/minecraft/world/item/Item craftingRemainingItem Lnet/minecraft/world/item/Item;
+
 accessible field net/minecraft/world/level/chunk/LevelChunk loaded Z
 accessible field net/minecraft/world/level/levelgen/feature/stateproviders/WeightedStateProvider weightedList Lnet/minecraft/util/random/SimpleWeightedRandomList;
+
+accessible field net/minecraft/commands/synchronization/ArgumentTypeInfos BY_CLASS Ljava/util/Map;

@@ -29,7 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class UndergroundRootsSpecies extends Species {
@@ -119,7 +119,7 @@ public class UndergroundRootsSpecies extends Species {
         return super.postGrow(level, rootPos, treePos, fertility, natural);
     }
 
-    public boolean soilDestroyAction(Level level, @Nonnull BlockPos rootPos, BlockState state, @Nonnull Player player){
+    public boolean soilDestroyAction(Level level, @NotNull BlockPos rootPos, BlockState state, @NotNull Player player){
         if (state.hasProperty(SoilBlock.FERTILITY)) {
             return replaceSoilBlock(state, level, rootPos, state.getValue(SoilBlock.FERTILITY));
         }

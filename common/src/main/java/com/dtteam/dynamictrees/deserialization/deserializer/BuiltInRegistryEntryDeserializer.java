@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.google.gson.JsonElement;
 import net.minecraft.core.Registry;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;

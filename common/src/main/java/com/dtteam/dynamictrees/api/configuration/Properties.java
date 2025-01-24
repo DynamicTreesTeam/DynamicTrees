@@ -1,8 +1,8 @@
 package com.dtteam.dynamictrees.api.configuration;
 
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 /**

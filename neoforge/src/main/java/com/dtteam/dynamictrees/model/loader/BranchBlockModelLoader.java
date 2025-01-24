@@ -12,7 +12,7 @@ import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Loads a branch block model from a Json file, with useful warnings when things aren't found.

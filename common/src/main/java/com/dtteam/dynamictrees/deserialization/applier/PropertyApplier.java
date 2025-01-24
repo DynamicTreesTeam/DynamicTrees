@@ -1,8 +1,7 @@
 package com.dtteam.dynamictrees.deserialization.applier;
 
 import com.google.gson.JsonElement;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Manages applying a property (of type <code>V</code>) to an object (of type <code>T</code>).

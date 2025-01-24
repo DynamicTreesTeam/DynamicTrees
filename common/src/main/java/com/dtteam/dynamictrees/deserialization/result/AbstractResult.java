@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.deserialization.result;
 import com.dtteam.dynamictrees.deserialization.DeserializationException;
 import com.google.common.collect.Lists;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;

@@ -27,8 +27,8 @@ import net.neoforged.neoforge.client.model.IModelBuilder;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import org.joml.Vector3f;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
@@ -174,9 +174,9 @@ public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
         return builder.build();
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull RandomSource rand, @Nonnull ModelData extraData, @Nullable RenderType renderType) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData, @Nullable RenderType renderType) {
         if (side != null || state == null) {
             return Collections.emptyList();
         }
@@ -233,9 +233,9 @@ public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
         return quads;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData) {
+    public ModelData getModelData(@NotNull BlockAndTintGetter world, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull ModelData tileData) {
         RootConnections rootConnections = state.getBlock() instanceof SurfaceRootBlock surfaceRootBlock
                 ? new RootConnections(surfaceRootBlock.getConnectionData(world, pos))
                 : new RootConnections();

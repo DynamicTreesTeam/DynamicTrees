@@ -9,4 +9,5 @@ public class FabricCompatHelper implements ICompatHelper {
     public void registerSereneSeasonsSeasonProvider() {
         SereneSeasonsSeasonProvider.registerSereneSeasonsProvider();
     }
+
 }

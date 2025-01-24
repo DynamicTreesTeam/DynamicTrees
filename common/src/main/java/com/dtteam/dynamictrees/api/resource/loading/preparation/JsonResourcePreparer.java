@@ -8,9 +8,8 @@ import com.google.gson.JsonParseException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.util.GsonHelper;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -35,19 +34,13 @@ public final class JsonResourcePreparer extends AbstractResourcePreparer<JsonEle
         this.resourceCollector.put(new DTResource<>(resourceName, jsonElement));
     }
 
-    @Nonnull
+    @NotNull
     static JsonElement readResource(Resource resource) throws PreparationException, IOException {
         final Reader reader = resource.openAsReader();
-        final JsonElement json = tryParseJson(reader);
-
-        if (json == null) {
-            throw new PreparationException("Couldn't load file as it's null or empty");
-        }
-        return json;
+        return parseJson(reader);
     }
 
-    @Nullable
-    private static JsonElement tryParseJson(Reader reader) throws PreparationException {
+    private static JsonElement parseJson(Reader reader) throws PreparationException {
         try {
             return GsonHelper.fromJson(JsonHelper.getGson(), reader, JsonElement.class);
         } catch (JsonParseException e) {

@@ -9,7 +9,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.levelgen.Heightmap;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.LinkedList;
 import java.util.List;
 

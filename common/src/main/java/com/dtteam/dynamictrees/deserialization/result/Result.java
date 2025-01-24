@@ -4,8 +4,8 @@ import com.dtteam.dynamictrees.deserialization.DeserializationException;
 import com.dtteam.dynamictrees.deserialization.NoSuchDeserializerException;
 import com.dtteam.dynamictrees.utility.function.ThrowableBiFunction;
 import com.dtteam.dynamictrees.utility.function.ThrowableFunction;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;

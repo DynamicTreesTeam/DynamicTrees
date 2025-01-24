@@ -22,8 +22,8 @@ import net.neoforged.neoforge.client.model.IDynamicBakedModel;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
@@ -46,9 +46,9 @@ public abstract class PalmLeavesBakedModel implements IDynamicBakedModel {
     //This method defines the model and shapes of the fronds. Each implementation must define its own.
     public abstract void initModels();
 
-    @Nonnull
+    @NotNull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull RandomSource rand, @Nonnull ModelData extraData, @Nullable RenderType renderType) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData, @Nullable RenderType renderType) {
         if (state == null || side != null)
             return Collections.emptyList();
 
@@ -83,13 +83,13 @@ public abstract class PalmLeavesBakedModel implements IDynamicBakedModel {
         return true;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public TextureAtlasSprite getParticleIcon() {
         return frondsTexture;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public ItemOverrides getOverrides() {
         return ItemOverrides.EMPTY;

@@ -1,6 +1,4 @@
-@MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 package com.dtteam.dynamictrees.treepack;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;

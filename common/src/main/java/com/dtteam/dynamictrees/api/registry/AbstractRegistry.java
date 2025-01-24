@@ -9,8 +9,8 @@ import com.mojang.serialization.DataResult;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -296,7 +296,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
                 .filter(RegistryEntry::shouldGenerateData);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public final Iterator<V> iterator() {
         return this.getAll().iterator();

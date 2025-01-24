@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.deserialization.applier;
 
 import com.google.common.collect.Lists;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;

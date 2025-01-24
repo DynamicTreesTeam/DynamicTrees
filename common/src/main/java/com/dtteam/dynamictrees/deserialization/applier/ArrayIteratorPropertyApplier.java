@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.utility.helper.NullHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

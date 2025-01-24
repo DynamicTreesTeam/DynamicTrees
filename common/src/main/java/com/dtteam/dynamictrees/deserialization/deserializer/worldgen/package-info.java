@@ -1,7 +1,4 @@
-@ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 package com.dtteam.dynamictrees.deserialization.deserializer.worldgen;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;

@@ -7,7 +7,7 @@ import net.minecraft.core.Direction;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.client.model.data.ModelProperty;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Extension of {@link Connections} for storing and transferring model data to baked models.

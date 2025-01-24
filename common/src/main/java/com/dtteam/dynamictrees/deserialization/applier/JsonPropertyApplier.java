@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.utility.lazyvalue.LazyValue;
 import com.google.gson.JsonElement;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Harley O'Connor

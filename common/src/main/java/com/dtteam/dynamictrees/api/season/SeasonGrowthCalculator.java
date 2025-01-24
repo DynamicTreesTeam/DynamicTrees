@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.api.season;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides a means to calculate temperate and tropical growth rate values.

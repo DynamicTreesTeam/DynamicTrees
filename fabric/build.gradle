@@ -50,6 +50,10 @@ loom {
         modImplementation "curse.maven:jade-324717:6011268"
         modImplementation "curse.maven:jei-238222:5846878"
 
+        modImplementation ":core-3.6.7"
+        modImplementation ":toml-3.6.7"
+        modImplementation ":typetools-0.6.3"
+
         modImplementation "curse.maven:glitchcore-955399:5660741"
         modImplementation "curse.maven:serene-seasons-291874:5753502"
     }

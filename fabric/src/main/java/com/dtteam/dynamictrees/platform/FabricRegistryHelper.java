@@ -2,13 +2,13 @@ package com.dtteam.dynamictrees.platform;
 
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlockEntity;
-import com.dtteam.dynamictrees.block.soil.SoilBlock;
-import com.dtteam.dynamictrees.block.soil.SoilProperties;
-import com.dtteam.dynamictrees.config.FabricRegistryLoader;
+import com.dtteam.dynamictrees.registry.FabricRegistryHandler;
+import com.dtteam.dynamictrees.registry.FabricRegistryLoader;
 import com.dtteam.dynamictrees.registry.RegistryLoader;
 import com.dtteam.dynamictrees.platform.services.IRegistryHelper;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FabricRegistryHelper implements IRegistryHelper {
 
@@ -23,12 +23,12 @@ public class FabricRegistryHelper implements IRegistryHelper {
 
     @Override
     public RegistryHandler newRegistryHandler() {
-        return null;
+        return new FabricRegistryHandler();
     }
 
     @Override
     public RegistryHandler newRegistryHandler(String modId) {
-        return null;
+        return new FabricRegistryHandler(modId);
     }
 
     @Override
@@ -37,8 +37,8 @@ public class FabricRegistryHelper implements IRegistryHelper {
     }
 
     @Override
-    public SoilBlock newSoilBlock(SoilProperties soilProperties, BlockBehaviour.Properties blockProperties) {
-        return new SoilBlock(soilProperties, blockProperties);
+    public PottedSaplingBlockEntity newPottedSaplingBlockEntity(BlockPos pPos, BlockState pState) {
+        return new PottedSaplingBlockEntity(pPos, pState);
     }
 
 }
