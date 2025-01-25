@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class SimpleConfig {
@@ -124,7 +125,7 @@ public class SimpleConfig {
     }
 
     private void parseConfigEntry( String entry, int line ) {
-        if( !entry.isEmpty() && !(entry.startsWith( "#" ) || entry.startsWith( "   #" )) ) {
+        if( !entry.isEmpty() && !(entry.trim().startsWith( "#" ) || (entry.trim().startsWith("[") && entry.trim().endsWith("]"))) ) {
             String[] parts = entry.split("=", 2);
             if( parts.length == 2 ) {
                 config.put( parts[0].trim(), parts[1].trim() );
@@ -174,6 +175,10 @@ public class SimpleConfig {
         return config.get( key );
     }
 
+    public boolean containsConfig (String key){
+        return get(key) != null;
+    }
+
     /**
      * Returns string value from config corresponding to the given
      * key, or the default string if the key is missing.
@@ -191,8 +196,9 @@ public class SimpleConfig {
      *
      * @return  value corresponding to the given key, or the default value
      */
-    public int getOrDefault( String key, int def ) {
+    public Integer getOrDefault( String key, Integer def ) {
         try {
+            if (Objects.equals(get(key), "null")) return null;
             return Integer.parseInt( get(key) );
         } catch (Exception e) {
             return def;
@@ -205,7 +211,8 @@ public class SimpleConfig {
      *
      * @return  value corresponding to the given key, or the default value
      */
-    public boolean getOrDefault( String key, boolean def ) {
+    public Boolean getOrDefault( String key, Boolean def ) {
+        if (Objects.equals(get(key), "null")) return null;
         String val = get(key);
         if( val != null ) {
             return val.equalsIgnoreCase("true");
@@ -220,8 +227,9 @@ public class SimpleConfig {
      *
      * @return  value corresponding to the given key, or the default value
      */
-    public double getOrDefault( String key, double def ) {
+    public Double getOrDefault( String key, Double def ) {
         try {
+            if (Objects.equals(get(key), "null")) return null;
             return Double.parseDouble( get(key) );
         } catch (Exception e) {
             return def;

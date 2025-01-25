@@ -4,10 +4,11 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 
+import java.util.List;
+
 public class NeoForgeConfigHelper implements IConfigHelper {
 
-    @Override
-    public <T> T getConfig(String config, Class<T> tClass) {
+    private <T> T getConfig(String config, Class<T> tClass) {
         if (!DTConfigs.CONFIGS.containsKey(config)){
             DynamicTrees.LOG.error("Failed to get configuration \"{}\" of {} as it does not exist.", config, tClass);
             return null;
@@ -18,6 +19,32 @@ public class NeoForgeConfigHelper implements IConfigHelper {
             return null;
         }
         return tClass.cast(DTConfigs.CONFIGS.get(config).get());
+    }
+
+    @Override
+    public Boolean getBoolConfig(String config){
+        return getConfig(config, Boolean.class);
+    }
+    @Override
+    public Integer getIntConfig(String config){
+        return getConfig(config, Integer.class);
+    }
+    @Override
+    public Double getDoubleConfig(String config){
+        return getConfig(config, Double.class);
+    }
+    @Override
+    public String getStringConfig(String config){
+        return getConfig(config, String.class);
+    }
+    @Override
+    public <T extends Enum<T>> T getEnumConfig(String config, Class<T> tClass) {
+        return getConfig(config, tClass);
+    }
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<String> getStringListConfig(String config){
+        return getConfig(config, List.class);
     }
 
     @Override

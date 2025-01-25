@@ -74,7 +74,7 @@ public final class ItemUtils {
             return;
         }
 
-        int damage = switch (Services.CONFIG.getConfig(IConfigHelper.AXE_DAMAGE_MODE, DynamicTrees.AxeDamage.class)) {
+        int damage = switch (Services.CONFIG.getEnumConfig(IConfigHelper.AXE_DAMAGE_MODE, DynamicTrees.AxeDamage.class)) {
             case VANILLA -> 1;
             case THICKNESS -> Math.max(1, radius) / 2;
             case VOLUME -> (int) woodVolume.getVolume();
