@@ -4,7 +4,9 @@
   "package": "com.dtteam.dynamictrees.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "MixinChunkSerializer"
+  ],
   "client": [],
   "server": [],
   "injectors": {

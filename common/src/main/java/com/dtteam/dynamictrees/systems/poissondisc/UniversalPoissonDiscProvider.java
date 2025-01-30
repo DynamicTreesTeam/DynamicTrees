@@ -14,6 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UniversalPoissonDiscProvider {
 
+    public static final String CIRCLE_DATA_ID = "GTCD"; // ID for "Growing Trees Circle Data" NBT tag.
+
     private final Map<ResourceLocation, PoissonDiscProvider> providerMap = new ConcurrentHashMap<>();
 
     protected PoissonDiscProvider createCircleProvider(LevelContext levelContext) {

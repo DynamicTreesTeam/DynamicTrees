@@ -34,8 +34,6 @@ public class CommonGameEventHandler {
     // LEVEL
     ///////////////////////////////////////////
 
-    public static final String CIRCLE_DATA_ID = "GTCD"; // ID for "Growing Trees Circle Data" NBT tag.
-
     @SubscribeEvent
     public static void onPreLevelTick(LevelTickEvent.Pre event) {
         if (!event.getLevel().isClientSide()) {
@@ -73,7 +71,7 @@ public class CommonGameEventHandler {
 			return;
 		}
 
-        final byte[] circleData = event.getData().getByteArray(CIRCLE_DATA_ID);
+        final byte[] circleData = event.getData().getByteArray(UniversalPoissonDiscProvider.CIRCLE_DATA_ID);
         final UniversalPoissonDiscProvider discProvider = DynamicTreeFeature.DISC_PROVIDER;
 
         final ChunkPos chunkPos = event.getChunk().getPos();
@@ -90,7 +88,7 @@ public class CommonGameEventHandler {
         final ChunkPos chunkPos = chunk.getPos();
 
         final byte[] circleData = discProvider.getChunkPoissonData(levelContext, chunkPos);
-        event.getData().putByteArray(CIRCLE_DATA_ID, circleData); // Set circle data.
+        event.getData().putByteArray(UniversalPoissonDiscProvider.CIRCLE_DATA_ID, circleData); // Set circle data.
 
 		if (chunk instanceof LevelChunk && !((LevelChunk) chunk).loaded) {
 			discProvider.unloadChunkPoissonData(levelContext, chunkPos);
