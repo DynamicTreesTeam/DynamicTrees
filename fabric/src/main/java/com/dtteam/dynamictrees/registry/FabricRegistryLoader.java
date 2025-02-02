@@ -1,9 +1,12 @@
 package com.dtteam.dynamictrees.registry;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
+import net.fabricmc.fabric.mixin.content.registry.BrewingRecipeRegistryBuilderMixin;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.core.Registry;
@@ -18,6 +21,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -43,6 +47,7 @@ public class FabricRegistryLoader extends RegistryLoader {
 
     public static void setup (){
         DTRegistries.setup();
+        DendroPotionRecipeHandler.getAllDendroRecipes();
     }
 
     @Override

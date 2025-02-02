@@ -20,9 +20,10 @@ public class UniversalPoissonDiscProvider {
 
     protected PoissonDiscProvider createCircleProvider(LevelContext levelContext) {
         final BiomeRadiusCoordinator radiusCoordinator = new BiomeRadiusCoordinator(levelContext.dimensionName(), levelContext.accessor());
-        return Services.EVENT.postPoissonDiscProviderCreateEvent( //This event allows the disc provider to be modified.
-                levelContext.accessor(),
-                new LevelPoissonDiscProvider(radiusCoordinator).setSeed(levelContext.seed()));
+//        return Services.EVENT.postPoissonDiscProviderCreateEvent( //This event allows the disc provider to be modified.
+//                levelContext.accessor(),
+//                new LevelPoissonDiscProvider(radiusCoordinator).setSeed(levelContext.seed()));
+        return new LevelPoissonDiscProvider(radiusCoordinator).setSeed(levelContext.seed());
     }
 
     public PoissonDiscProvider getProvider(LevelContext levelContext) {

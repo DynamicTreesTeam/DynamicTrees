@@ -16,3 +16,5 @@ accessible field net/minecraft/world/level/chunk/LevelChunk loaded Z
 accessible field net/minecraft/world/level/levelgen/feature/stateproviders/WeightedStateProvider weightedList Lnet/minecraft/util/random/SimpleWeightedRandomList;
 
 accessible field net/minecraft/commands/synchronization/ArgumentTypeInfos BY_CLASS Ljava/util/Map;
+
+accessible class net/minecraft/world/inventory/BrewingStandMenu$PotionSlot

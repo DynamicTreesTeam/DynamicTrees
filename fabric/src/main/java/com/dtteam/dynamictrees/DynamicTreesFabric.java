@@ -17,4 +17,5 @@ public class DynamicTreesFabric implements ModInitializer {
 
         FabricRegistryLoader.setup();
     }
+
 }

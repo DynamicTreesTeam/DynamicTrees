@@ -30,7 +30,6 @@ public class MixinBushBlock {
                 Block block = BasicRootsBlock.Layer.COVERED.getPrimitive(roots.getFamily()).orElse(null);
                 if (block == null) return;
                 cir.setReturnValue(mayPlaceOn(block.defaultBlockState(), level, blockpos));
-                cir.cancel();
             }
         }
     }
