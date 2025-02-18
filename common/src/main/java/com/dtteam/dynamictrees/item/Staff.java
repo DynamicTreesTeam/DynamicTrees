@@ -6,9 +6,8 @@ import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.LevelContext;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
+import com.dtteam.dynamictrees.api.worldgen.LevelContext;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.RootsJoCode;
@@ -181,9 +180,9 @@ public class Staff extends Item {
 
     public Species getSpecies(ItemStack itemStack) {
         if (itemStack.has(DTRegistries.SPECIES_DATA_COMPONENT.get())) {
-            return TreeRegistryHelper.findSpecies(itemStack.get(DTRegistries.SPECIES_DATA_COMPONENT.get()));
+            return Species.findSpecies(itemStack.get(DTRegistries.SPECIES_DATA_COMPONENT.get()));
         } else {
-            Species species = TreeRegistryHelper.findSpeciesSloppy("oak");
+            Species species = Species.findSpeciesSloppy("oak");
             setSpecies(itemStack, species);
             return species;
         }

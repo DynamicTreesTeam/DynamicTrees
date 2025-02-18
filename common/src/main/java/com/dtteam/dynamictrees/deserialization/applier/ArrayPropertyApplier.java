@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.deserialization.applier;
 import com.dtteam.dynamictrees.deserialization.deserializer.Deserializer;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.result.Result;
-import com.dtteam.dynamictrees.utility.lazyvalue.LazyValue;
+import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import org.apache.logging.log4j.LogManager;

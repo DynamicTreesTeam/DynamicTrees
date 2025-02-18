@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.api.registry;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;

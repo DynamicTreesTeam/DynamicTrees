@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.loot;
 
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

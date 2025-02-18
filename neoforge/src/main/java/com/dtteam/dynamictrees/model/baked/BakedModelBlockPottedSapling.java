@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.model.baked;
 
 import com.dtteam.dynamictrees.registry.PottedSaplingBlockEntityNF;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.QuadManipulator;
+import com.dtteam.dynamictrees.model.QuadManipulator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;

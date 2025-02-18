@@ -4,8 +4,8 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
-import com.dtteam.dynamictrees.utility.helper.MathHelper;
+import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.utility.MathUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -169,8 +169,8 @@ public class PhysicsAnimationHandler implements AnimationHandler {
     @Override
 //    @OnlyIn(Dist.CLIENT)
     public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack) {
-        final float yaw = Mth.wrapDegrees(MathHelper.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTick));
-        final float pit = Mth.wrapDegrees(MathHelper.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTick));
+        final float yaw = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTick));
+        final float pit = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTick));
 
         final Vec3 mc = entity.getMassCenter();
         poseStack.translate(mc.x, mc.y, mc.z);

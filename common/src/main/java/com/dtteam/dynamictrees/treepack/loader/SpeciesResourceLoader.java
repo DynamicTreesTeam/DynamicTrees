@@ -18,8 +18,8 @@ import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.JsonMapWrapper;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
+import com.dtteam.dynamictrees.deserialization.JsonMapWrapper;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -152,7 +152,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     }
 
     private void setSeed(Species species, ResourceLocation seedName) {
-        final ResourceLocation processedSeedName = TreeRegistryHelper.processResLoc(seedName);
+        final ResourceLocation processedSeedName = ResourceLocationUtils.parseDTLocation(seedName);
         species.setShouldGenerateSeed(false);
         species.setShouldGenerateSapling(false);
         DynamicTrees.runOnCommonSetup(() -> {
@@ -176,7 +176,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     }
 
     private void setMegaSpecies(Species species, ResourceLocation registryName) {
-        final ResourceLocation processedRegName = TreeRegistryHelper.processResLoc(registryName);
+        final ResourceLocation processedRegName = ResourceLocationUtils.parseDTLocation(registryName);
         Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(processedRegName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '" +
                 species + "' as Species '" + processedRegName + "' was not found.")));
     }

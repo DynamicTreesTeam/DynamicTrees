@@ -3,8 +3,8 @@ package com.dtteam.dynamictrees.systems.growthlogic;
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionManipulationContext;
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionContext;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
-import com.dtteam.dynamictrees.utility.helper.MathHelper;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
+import com.dtteam.dynamictrees.utility.MathUtils;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -59,7 +59,7 @@ public class MangroveRootsLogic extends GrowthLogicKit {
         );
 
         // Select a direction from the probability map.
-        final int choice = MathHelper.selectRandomFromDistribution(context.signal().rand, probMap);
+        final int choice = MathUtils.selectRandomFromDistribution(context.signal().rand, probMap);
         return Direction.values()[choice != -1 ? choice : 1]; // Default to up if it failed.
     }
 

@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.model.loader;
 
 import com.dtteam.dynamictrees.model.geometry.BranchBlockModelGeometry;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -36,7 +36,7 @@ public class BranchBlockModelLoader implements IGeometryLoader<BranchBlockModelG
         final ResourceLocation familyName = this.getLocation(modelObject);
 
         return this.getModelGeometry(this.getBarkTextureLocation(textures), this.getRingsTextureLocation(textures),
-                familyName == null ? null : TreeRegistryHelper.processResLoc(familyName));
+                familyName == null ? null : ResourceLocationUtils.parseDTLocation(familyName));
     }
 
     protected JsonObject getTexturesObject(final JsonObject modelContents) {

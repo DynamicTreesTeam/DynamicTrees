@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.systems.poissondisc;
 import com.dtteam.dynamictrees.api.worldgen.PoissonDebug;
 import com.dtteam.dynamictrees.api.worldgen.PoissonDiscProvider;
 import com.dtteam.dynamictrees.api.worldgen.RadiusCoordinator;
-import com.dtteam.dynamictrees.utility.helper.CoordUtils;
+import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.api.worldgen.RandomXOR;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;

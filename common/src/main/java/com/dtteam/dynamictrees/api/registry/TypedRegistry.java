@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.api.registry;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -97,7 +97,7 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V>
 
         if (typeElement != null) {
             JsonDeserializers.RESOURCE_LOCATION.deserialize(typeElement)
-                    .map(resourceLocation -> this.getType(TreeRegistryHelper.processResLoc(resourceLocation)), "Could not find type for '{}' (will use default).")
+                    .map(resourceLocation -> this.getType(ResourceLocationUtils.parseDTLocation(resourceLocation)), "Could not find type for '{}' (will use default).")
                     .ifSuccessOrElse(
                             type::set,
                             error -> LogManager.getLogger().error("Error constructing " + this.name + " '" + registryName + "': " + error),

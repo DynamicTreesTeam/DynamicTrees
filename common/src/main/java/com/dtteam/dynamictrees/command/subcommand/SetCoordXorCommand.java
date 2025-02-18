@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.command.subcommand;
 
 import com.dtteam.dynamictrees.command.CommandConstants;
-import com.dtteam.dynamictrees.utility.helper.CoordUtils;
+import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;

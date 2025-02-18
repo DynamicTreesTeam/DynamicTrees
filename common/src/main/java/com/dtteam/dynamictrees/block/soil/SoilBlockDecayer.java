@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 
 /**
  * Implementations of this {@code interface} allow for custom logic when decaying {@link SoilBlock}s after a tree has

@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.systems.cell;
 
-import com.dtteam.dynamictrees.utility.SimpleVoxmap;
+import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
 import net.minecraft.core.BlockPos;
 
 /**

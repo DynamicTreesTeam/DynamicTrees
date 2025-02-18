@@ -1,11 +1,11 @@
 package com.dtteam.dynamictrees.command.subcommand;
 
+import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.command.CommandConstants;
 import com.dtteam.dynamictrees.command.CommandHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.*;
-import com.dtteam.dynamictrees.utility.helper.NullHelper;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
+import com.dtteam.dynamictrees.utility.NullUtils;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -69,7 +69,7 @@ public final class SetTreeCommand extends SubCommand {
         joCode.generate(context);
 
         // Try to set the fertility.
-        NullHelper.consumeIfNonnull(TreeHelper.getRooty(level.getBlockState(rootPos)),
+        NullUtils.consumeIfNonnull(TreeHelper.getRooty(level.getBlockState(rootPos)),
                 rootyBlock -> rootyBlock.setFertility(level, rootPos, fertility));
 
         return 1;
@@ -93,7 +93,7 @@ public final class SetTreeCommand extends SubCommand {
         rootsJoCode.generate(context);
 
         // Try to set the fertility.
-        NullHelper.consumeIfNonnull(TreeHelper.getRooty(level.getBlockState(rootPos)),
+        NullUtils.consumeIfNonnull(TreeHelper.getRooty(level.getBlockState(rootPos)),
                 rootyBlock -> rootyBlock.setFertility(level, rootPos, fertility));
 
         return 1;

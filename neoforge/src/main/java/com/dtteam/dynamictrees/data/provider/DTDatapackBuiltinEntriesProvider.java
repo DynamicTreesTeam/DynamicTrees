@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.data.provider;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.registry.DTRegistries;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
+import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.feature.CaveRootedTreePlacement;
 import com.dtteam.dynamictrees.worldgen.feature.DTReplaceNyliumFungiBlockStateProvider;
 import com.dtteam.dynamictrees.worldgen.structure.VillageTreeReplacement;
@@ -104,8 +104,8 @@ public class DTDatapackBuiltinEntriesProvider extends DatapackBuiltinEntriesProv
     }
 
     private static void replaceNyliumFungiFeatures(HolderLookup.Provider vanillaProvider, BootstrapContext<ConfiguredFeature<?, ?>> context) {
-        TreeRegistryHelper.findSpecies(DynamicTrees.CRIMSON).getSapling().ifPresent(crimsonSapling ->
-                TreeRegistryHelper.findSpecies(DynamicTrees.WARPED).getSapling().ifPresent(warpedSapling -> {
+        Species.findSpecies(DynamicTrees.CRIMSON).getSapling().ifPresent(crimsonSapling ->
+                Species.findSpecies(DynamicTrees.WARPED).getSapling().ifPresent(warpedSapling -> {
                     var configuredFeatures = vanillaProvider.lookup(Registries.CONFIGURED_FEATURE).orElseThrow();
                     List.of(NetherFeatures.CRIMSON_FOREST_VEGETATION, NetherFeatures.CRIMSON_FOREST_VEGETATION_BONEMEAL,
                                     NetherFeatures.WARPED_FOREST_VEGETION, NetherFeatures.WARPED_FOREST_VEGETATION_BONEMEAL)

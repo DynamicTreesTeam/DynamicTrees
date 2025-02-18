@@ -9,8 +9,9 @@ import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionManipulation
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionContext;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.helper.MathHelper;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
+import com.dtteam.dynamictrees.utility.MathUtils;
+import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -81,7 +82,7 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
         );
 
         // Select a direction from the probability map.
-        final int choice = MathHelper.selectRandomFromDistribution(context.signal().rand, probMap);
+        final int choice = MathUtils.selectRandomFromDistribution(context.signal().rand, probMap);
         return Direction.values()[choice != -1 ? choice : 1]; // Default to up if it failed.
     }
 
@@ -151,6 +152,18 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
      */
     public int getLowestBranchHeight(GrowthLogicKitConfiguration configuration, PositionalSpeciesContext context) {
         return context.species().getLowestBranchHeight();
+    }
+
+    //////////////////////////////
+    // REGISTRY
+    //////////////////////////////
+
+    public static GrowthLogicKit findGrowthLogicKit(final String name) {
+        return findGrowthLogicKit(ResourceLocationUtils.parseDTLocation(name));
+    }
+
+    public static GrowthLogicKit findGrowthLogicKit(final ResourceLocation name) {
+        return GrowthLogicKit.REGISTRY.get(name);
     }
 
 }

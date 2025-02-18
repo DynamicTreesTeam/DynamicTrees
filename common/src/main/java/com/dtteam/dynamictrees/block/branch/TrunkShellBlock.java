@@ -2,9 +2,9 @@ package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.utility.helper.ChunkTreeHelper;
-import com.dtteam.dynamictrees.utility.helper.CoordUtils;
-import com.dtteam.dynamictrees.utility.helper.NullHelper;
+import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
+import com.dtteam.dynamictrees.utility.CoordUtils;
+import com.dtteam.dynamictrees.utility.NullUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -88,12 +88,12 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     /** NeoForge override */
     @SuppressWarnings("unused")
     public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        return NullHelper.applyIfNonnull(this.getMuse(level, state, pos), muse -> Services.INTERACTION.blockDestroyByPlayer(muse.state, level, muse.pos, player, willHarvest, level.getFluidState(pos)), false);
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> Services.INTERACTION.blockDestroyByPlayer(muse.state, level, muse.pos, player, willHarvest, level.getFluidState(pos)), false);
     }
 
     @Override
     protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-        return NullHelper.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getDestroyProgress(player, level, muse.pos), 0f);
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getDestroyProgress(player, level, muse.pos), 0f);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     @Override
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-        return NullHelper.applyIfNonnull(this.getMuse(level, pos), muse -> ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(state, level, muse.pos), super.getHardness(state, level, pos));
+        return NullUtils.applyIfNonnull(this.getMuse(level, pos), muse -> ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(state, level, muse.pos), super.getHardness(state, level, pos));
     }
 
     //    @Override
@@ -208,17 +208,17 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return NullHelper.applyIfNonnull(this.getMuse(level, state, pos), muse -> Shapes.create(muse.state.getShape(level, muse.pos).bounds().move(muse.museOffset)), Shapes.empty());
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> Shapes.create(muse.state.getShape(level, muse.pos).bounds().move(muse.museOffset)), Shapes.empty());
     }
 
     @Override
     public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
-        return NullHelper.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().getCloneItemStack(level, muse.pos, muse.state), ItemStack.EMPTY);
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().getCloneItemStack(level, muse.pos, muse.state), ItemStack.EMPTY);
     }
 
     @Override
     protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
-        NullHelper.consumeIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.onExplosionHit(level, muse.pos, explosion, dropConsumer));
+        NullUtils.consumeIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.onExplosionHit(level, muse.pos, explosion, dropConsumer));
     }
 
     //TODO: This may not even be necessary
@@ -243,18 +243,18 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
             return;
         }
 
-        NullHelper.consumeIfNonnull(this.findDetachedMuse((Level) level, pos),
+        NullUtils.consumeIfNonnull(this.findDetachedMuse((Level) level, pos),
                 surround -> level.setBlock(pos, defaultBlockState().setValue(CORE_DIR, surround), 1));
     }
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        return NullHelper.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.useItemOn(stack, level, player, hand, hitResult), ItemInteractionResult.FAIL);
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.useItemOn(stack, level, player, hand, hitResult), ItemInteractionResult.FAIL);
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        return NullHelper.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.useWithoutItem(level, player, hitResult), InteractionResult.FAIL);
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.useWithoutItem(level, player, hitResult), InteractionResult.FAIL);
     }
 
     /** NeoForge override */

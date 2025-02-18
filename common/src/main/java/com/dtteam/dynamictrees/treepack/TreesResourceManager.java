@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.api.resource.TreeResourceManager;
 import com.dtteam.dynamictrees.api.resource.TreeResourcePack;
 import com.dtteam.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.dtteam.dynamictrees.api.resource.loading.ResourceLoader;
-import com.dtteam.dynamictrees.utility.helper.CommonCollectors;
+import com.dtteam.dynamictrees.utility.CommonCollectors;
 import com.google.common.collect.Lists;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;

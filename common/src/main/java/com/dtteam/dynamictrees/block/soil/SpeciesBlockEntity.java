@@ -2,7 +2,6 @@ package com.dtteam.dynamictrees.block.soil;
 
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -37,7 +36,7 @@ public class SpeciesBlockEntity extends BlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         if (tag.contains("species")) {
             ResourceLocation speciesName = ResourceLocation.parse(tag.getString("species"));
-            species = TreeRegistryHelper.findSpecies(speciesName);
+            species = Species.findSpecies(speciesName);
         }
         super.loadAdditional(tag, registries);
     }

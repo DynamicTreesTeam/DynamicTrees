@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.model.baked;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
-import com.dtteam.dynamictrees.utility.ModelUtils;
+import com.dtteam.dynamictrees.model.ModelHelper;
 import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
@@ -30,7 +30,6 @@ import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -124,11 +123,11 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
     public BakedModel bakeSleeve(int radius, Direction dir, TextureAtlasSprite bark) {
 
         BlockElement part = generateSleevePart(radius, dir, false);
-        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, bark);
+        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, bark);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), bark, face, BlockModelRotation.X0_Y0));
+            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, e.getValue(), bark, face, BlockModelRotation.X0_Y0));
         }
 
         return builder.build();
@@ -155,11 +154,11 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
     public BakedModel bakeCore(int radius, Axis axis, TextureAtlasSprite icon) {
 
         BlockElement part = generateCorePart(radius, axis, false);
-        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, icon);
+        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, icon);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0));
+            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0));
         }
 
         return builder.build();

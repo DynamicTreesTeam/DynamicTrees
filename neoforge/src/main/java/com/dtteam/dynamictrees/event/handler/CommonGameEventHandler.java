@@ -9,7 +9,7 @@ import com.dtteam.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
-import com.dtteam.dynamictrees.utility.LevelContext;
+import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import net.minecraft.server.level.ServerLevel;

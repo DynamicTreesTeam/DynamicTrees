@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.deserialization;
 
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.RandomSource;
@@ -68,8 +67,8 @@ public class JsonMath {
                         MathOperator var = getVariable(name);
                         if (var != NULL_OPERATOR) {
                             m = var;
-                        } else if (TreeRegistryHelper.findSpeciesSloppy(name) != Species.NULL_SPECIES) {
-                            speciesArg = TreeRegistryHelper.findSpeciesSloppy(name);
+                        } else if (Species.findSpeciesSloppy(name) != Species.NULL_SPECIES) {
+                            speciesArg = Species.findSpeciesSloppy(name);
                         }
                     }
                 }

@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.command.subcommand;
 
 import com.dtteam.dynamictrees.command.CommandConstants;
-import com.dtteam.dynamictrees.utility.helper.ChunkTreeHelper;
+import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.ChunkPos;

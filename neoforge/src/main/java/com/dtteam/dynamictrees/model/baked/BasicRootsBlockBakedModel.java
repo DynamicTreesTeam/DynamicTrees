@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.model.baked;
 
 import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
-import com.dtteam.dynamictrees.utility.ModelUtils;
+import com.dtteam.dynamictrees.model.ModelHelper;
 import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -59,12 +59,12 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
         boolean isTransparent = getRenderType() != RenderType.solid();
         BlockElement part = generateSleevePart(radius, dir, false);
         BlockElement reversePart = isTransparent ? generateSleevePart(radius, dir, true) : null;
-        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, bark);
+        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, bark);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), bark, face, BlockModelRotation.X0_Y0));
-            if (isTransparent) builder.addCulledFace(face, ModelUtils.makeBakedQuad(reversePart, e.getValue(), bark, face.getOpposite(), BlockModelRotation.X0_Y0));
+            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, e.getValue(), bark, face, BlockModelRotation.X0_Y0));
+            if (isTransparent) builder.addCulledFace(face, ModelHelper.makeBakedQuad(reversePart, e.getValue(), bark, face.getOpposite(), BlockModelRotation.X0_Y0));
         }
 
         return builder.build();
@@ -74,12 +74,12 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
         boolean isTransparent = getRenderType() != RenderType.solid();
         BlockElement part = generateCorePart(radius, axis, false);
         BlockElement reversePart = isTransparent ? generateCorePart(radius, axis, true) : null;
-        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, icon);
+        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, icon);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0));
-            if (isTransparent) builder.addCulledFace(face, ModelUtils.makeBakedQuad(reversePart, e.getValue(), icon, face.getOpposite(), BlockModelRotation.X0_Y0));
+            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0));
+            if (isTransparent) builder.addCulledFace(face, ModelHelper.makeBakedQuad(reversePart, e.getValue(), icon, face.getOpposite(), BlockModelRotation.X0_Y0));
         }
 
         return builder.build();
@@ -105,11 +105,11 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
         mapFacesIn.put(dir, new BlockElementFace(dir, -1, null, uvface));
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, rings);
+        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, rings);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), rings, face, BlockModelRotation.X0_Y0));
+            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, e.getValue(), rings, face, BlockModelRotation.X0_Y0));
         }
 
         return builder.build();

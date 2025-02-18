@@ -2,15 +2,14 @@ package com.dtteam.dynamictrees.api.treedata;
 
 import com.dtteam.dynamictrees.tree.species.Species;
 //import com.dtteam.dynamictrees.api.TreeRegistry;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 
 /**
- * Provides the suitability factor for a tree at a given biome or position. Mods should implement this interface and
- * register it via the {@link TreeRegistryHelper} to control the suitability of a tree in a {@link Biome}.
+ * Provides the suitability factor for a tree at a given biome or position. Mods should implement this interface
+ * to control the suitability of a tree in a {@link Biome}.
  *
  * @author ferreusveritas
  */

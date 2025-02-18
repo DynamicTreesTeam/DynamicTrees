@@ -24,8 +24,8 @@ import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyCount;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
+import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.feature.CaveRootedTreeFeature;
 import com.dtteam.dynamictrees.worldgen.feature.CaveRootedTreePlacement;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
@@ -138,7 +138,7 @@ public class DTRegistries {
 
     public static final Supplier<CreativeModeTab> DT_CREATIVE_TAB = Services.REGISTRY.getRegistryLoader()
             .registerCreativeTab(DynamicTrees.MOD_ID,
-                    ()-> TreeRegistryHelper.findSpecies(DynamicTrees.OAK).getSeedStack(1),
+                    ()-> Species.findSpecies(DynamicTrees.OAK).getSeedStack(1),
                     Component.translatable("itemGroup.dynamictrees"),
                     (parameters, output) -> {
                         for (final DendroPotion.DendroPotionType potion : DendroPotion.DendroPotionType.values()) {

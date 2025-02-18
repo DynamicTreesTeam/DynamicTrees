@@ -11,7 +11,7 @@ import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
 import com.dtteam.dynamictrees.deserialization.deserializer.ResourceLocationDeserializer;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
@@ -47,7 +47,7 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
         // Primitive leaves are needed both client and server (so cannot be done on load).
         this.setupAppliers.register("primitive_leaves", Block.class, LeavesProperties::setPrimitiveLeaves)
                 .register("family", ResourceLocation.class, (leavesProperties, registryName) -> {
-                    final ResourceLocation processedRegName = TreeRegistryHelper.processResLoc(registryName);
+                    final ResourceLocation processedRegName = ResourceLocationUtils.parseDTLocation(registryName);
                     Family.REGISTRY.runOnNextLock(Family.REGISTRY.generateIfValidRunnable(
                             processedRegName,
                             leavesProperties::setFamily,

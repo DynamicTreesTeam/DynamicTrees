@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.systems.genfeature.context;
 
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.LevelContext;
+import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;

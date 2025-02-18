@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.systems;
 
-import com.dtteam.dynamictrees.utility.helper.Optionals;
+import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;

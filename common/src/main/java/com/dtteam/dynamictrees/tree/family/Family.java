@@ -20,9 +20,9 @@ import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.utility.BlockPosBounds;
-import com.dtteam.dynamictrees.utility.helper.Optionals;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
+import com.dtteam.dynamictrees.api.voxmap.BlockPosBounds;
+import com.dtteam.dynamictrees.utility.Optionals;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -52,8 +52,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-import static com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils.prefix;
-import static com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils.suffix;
+import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.prefix;
+import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.suffix;
 
 /**
  * This structure describes a Family whose member Species all have a common branch.

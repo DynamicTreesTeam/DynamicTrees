@@ -3,7 +3,8 @@ package com.dtteam.dynamictrees.api.cell;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
-import com.dtteam.dynamictrees.utility.SimpleVoxmap;
+import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class CellKit extends RegistryEntry<CellKit> {
@@ -62,4 +63,17 @@ public abstract class CellKit extends RegistryEntry<CellKit> {
      * The default hydration level of a newly created leaf block [default = 4]
      **/
     public abstract int getDefaultHydration();
+
+    //////////////////////////////
+    // REGISTRY
+    //////////////////////////////
+
+    public static CellKit findCellKit(String name) {
+        return findCellKit(ResourceLocationUtils.parseDTLocation(name));
+    }
+
+    public static CellKit findCellKit(ResourceLocation name) {
+        return CellKit.REGISTRY.get(name);
+    }
+
 }

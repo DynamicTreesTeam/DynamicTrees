@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.item.Staff;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.command.CommandHelper;
-import com.dtteam.dynamictrees.utility.helper.ItemUtils;
+import com.dtteam.dynamictrees.utility.ItemUtils;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;

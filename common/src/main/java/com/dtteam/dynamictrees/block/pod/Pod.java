@@ -4,15 +4,16 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.worldgen.LevelContext;
+import com.dtteam.dynamictrees.block.DynamicBlockProperties;
 import com.dtteam.dynamictrees.block.Growable;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.utility.*;
-import com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils;
-import com.dtteam.dynamictrees.utility.lazyvalue.LazyValue;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.google.common.collect.Maps;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -188,7 +189,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
     public void setMaxAge(int maxAge) {
         this.maxAge = maxAge;
-        this.ageProperty = BlockProperties.getOrCreateAge(maxAge);
+        this.ageProperty = DynamicBlockProperties.getOrCreateAge(maxAge);
     }
 
     public void setDropCount(int dropCount) {
@@ -386,7 +387,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
     public IntegerProperty getOffsetProperty (){
         if (offsetProperty == null)
-            offsetProperty = BlockProperties.getOrCreateOffset(minRadius, maxRadius);
+            offsetProperty = DynamicBlockProperties.getOrCreateOffset(minRadius, maxRadius);
         return offsetProperty;
     }
 

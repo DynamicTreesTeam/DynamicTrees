@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.mixin;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
-import com.dtteam.dynamictrees.utility.LevelContext;
+import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;

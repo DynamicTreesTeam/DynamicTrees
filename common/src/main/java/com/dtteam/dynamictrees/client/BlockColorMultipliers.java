@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.client;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.resources.ResourceLocation;
 

@@ -4,9 +4,9 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.utility.helper.CoordUtils;
-import com.dtteam.dynamictrees.utility.helper.CoordUtils.Surround;
-import com.dtteam.dynamictrees.utility.ModelUtils;
+import com.dtteam.dynamictrees.utility.CoordUtils;
+import com.dtteam.dynamictrees.utility.CoordUtils.Surround;
+import com.dtteam.dynamictrees.model.ModelHelper;
 import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -35,7 +35,6 @@ import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,12 +71,12 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
     }
 
     private boolean isTextureNull(@Nullable TextureAtlasSprite sprite) {
-        return sprite == null || sprite.equals(ModelUtils.getTexture(ResourceLocation.parse("")));
+        return sprite == null || sprite.equals(ModelHelper.getTexture(ResourceLocation.parse("")));
     }
 
     public BakedModel bakeTrunkBark(int radius, TextureAtlasSprite bark, boolean side) {
 
-        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, bark);
+        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, bark);
         AABB wholeVolume = new AABB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
 
         final Direction[] run = side ? CoordUtils.HORIZONTALS : new Direction[]{Direction.UP, Direction.DOWN};
@@ -96,15 +95,15 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
                     Vec3 scaledOffset = new Vec3(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);//Scale the dimensions to match standard minecraft texels
                     AABB partBoundary = new AABB(0, 0, 0, 16, 16, 16).move(scaledOffset).intersect(wholeVolume);
 
-                    Vector3f[] limits = ModelUtils.AABBLimits(partBoundary);
+                    Vector3f[] limits = ModelHelper.AABBLimits(partBoundary);
 
                     Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 
-                    BlockFaceUV uvface = new BlockFaceUV(ModelUtils.modUV(ModelUtils.getUVs(partBoundary, face)), getFaceAngle(Axis.Y, face));
+                    BlockFaceUV uvface = new BlockFaceUV(ModelHelper.modUV(ModelHelper.getUVs(partBoundary, face)), getFaceAngle(Axis.Y, face));
                     mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
 
                     BlockElement part = new BlockElement(limits[0], limits[1], mapFacesIn, null, true);
-                    builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), bark, face, BlockModelRotation.X0_Y0));
+                    builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, part.faces.get(face), bark, face, BlockModelRotation.X0_Y0));
                 }
 
             }
@@ -114,7 +113,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
     }
 
     public BakedModel bakeTrunkRings(int radius, TextureAtlasSprite ring, Direction face) {
-        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, ring);
+        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, ring);
         AABB wholeVolume = new AABB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
         int wholeVolumeWidth = 48;
 
@@ -139,7 +138,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
             mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvFace));
 
             BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), ring, face, BlockModelRotation.X0_Y0));
+            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, part.faces.get(face), ring, face, BlockModelRotation.X0_Y0));
         }
 
         return builder.build();

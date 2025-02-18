@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.systems;
 
-import com.dtteam.dynamictrees.utility.function.TetraFunction;
+import com.dtteam.dynamictrees.api.function.TetraFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;

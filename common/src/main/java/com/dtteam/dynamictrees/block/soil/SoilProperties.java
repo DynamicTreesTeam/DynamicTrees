@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.utility.helper.Optionals;
+import com.dtteam.dynamictrees.utility.Optionals;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static com.dtteam.dynamictrees.utility.helper.ResourceLocationUtils.prefix;
+import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.prefix;
 
 /**
  * @author Max Hyper

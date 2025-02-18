@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.tree.species;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.network.NodeInspector;
@@ -11,6 +12,8 @@ import com.dtteam.dynamictrees.api.substance.Emptiable;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffectProvider;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
+import com.dtteam.dynamictrees.api.worldgen.LevelContext;
+import com.dtteam.dynamictrees.block.CommonVoxelShapes;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
@@ -48,11 +51,13 @@ import com.dtteam.dynamictrees.systems.nodemapper.*;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.systems.substance.FertilizeSubstance;
 import com.dtteam.dynamictrees.systems.substance.GrowthSubstance;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.utility.*;
-import com.dtteam.dynamictrees.utility.helper.*;
-import com.dtteam.dynamictrees.utility.lazyvalue.LazyValue;
+import com.dtteam.dynamictrees.utility.CoordUtils;
+import com.dtteam.dynamictrees.utility.Optionals;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.dtteam.dynamictrees.worldgen.*;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import com.google.common.collect.Lists;
@@ -860,7 +865,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe) {
         if (recipe.shouldReplaceSaplingWhenPlaced()){
-            recipe.getSaplingBlock().ifPresent(block -> TreeRegistryHelper.registerSaplingReplacer(block.defaultBlockState(), this));
+            recipe.getSaplingBlock().ifPresent(block -> DynamicSaplingBlock.registerSaplingReplacer(block.defaultBlockState(), this));
         }
         primitiveSaplingRecipe.add(recipe);
     }
@@ -2408,12 +2413,55 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 Pair.of("soilTypeFlags", this.soilTypeFlags), Pair.of("maxBranchRadius", this.maxBranchRadius),
                 Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
                 Pair.of("megaSpecies", this.megaSpecies), Pair.of("seed", this.seed),
-                Pair.of("primitive_sapling", TreeRegistryHelper.SAPLING_REPLACERS.entrySet().stream()
+                Pair.of("primitive_sapling", DynamicSaplingBlock.SAPLING_REPLACERS.entrySet().stream()
                         .filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny()
                         .orElse(Blocks.AIR)),
                 Pair.of("perfectBiomes", this.perfectBiomes),
                 Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
                 Pair.of("genFeatures", this.genFeatures));
+    }
+
+    //////////////////////////////
+    // REGISTRY
+    //////////////////////////////
+
+    public static Species findSpecies(final String name) {
+        return findSpecies(ResourceLocationUtils.parseDTLocation(name));
+    }
+
+    public static Species findSpecies(final ResourceLocation name) {
+        return Species.REGISTRY.get(name);
+    }
+
+    /**
+     * Searches first for the full tree name.  If that fails then it will find the first tree matching the simple name
+     * and return it instead otherwise null
+     *
+     * @param name The name of the tree.  Either the simple name or the full name
+     * @return The tree that was found or null if not found
+     */
+    public static Species findSpeciesSloppy(final String name) {
+        final ResourceLocation resourceLocation = ResourceLocationUtils.parseDTLocation(name);
+        // Search specific domain first.
+        if (Species.REGISTRY.has(resourceLocation)) {
+            return findSpecies(resourceLocation);
+        }
+        // Search all domains.
+        for (Species species : Species.REGISTRY) {
+            if (species.getRegistryName().getPath().equals(resourceLocation.getPath())) {
+                return species;
+            }
+        }
+        return Species.NULL_SPECIES;
+    }
+
+    /**
+     * Returns a new {@link ArrayList<ResourceLocation>} from the {@link Species#REGISTRY} values.
+     *
+     * @return A new {@link List} from the {@link Species#REGISTRY}.
+     */
+    public static List<ResourceLocation> getSpeciesDirectory() {
+        return new ArrayList<>(Species.REGISTRY.getRegistryNames());
     }
 
 }

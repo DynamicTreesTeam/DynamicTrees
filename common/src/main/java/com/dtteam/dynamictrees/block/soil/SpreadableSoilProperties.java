@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.block.soil;
 
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.client.ParticleHelper;
-import com.dtteam.dynamictrees.utility.helper.ChunkTreeHelper;
+import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;

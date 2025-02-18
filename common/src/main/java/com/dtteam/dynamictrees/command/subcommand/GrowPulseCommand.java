@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.command.subcommand;
 
 import com.dtteam.dynamictrees.command.CommandConstants;
 import com.dtteam.dynamictrees.command.CommandHelper;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.ChatFormatting;

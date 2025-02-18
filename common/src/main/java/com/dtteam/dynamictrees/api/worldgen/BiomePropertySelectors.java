@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.api.worldgen;
 
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import com.dtteam.dynamictrees.worldgen.BiomeGenSettingsBuilderWrapper;
 import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
@@ -16,8 +15,8 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * Provides the forest density for a given biome. Mods should implement these interfaces and register them via the {@link
- * TreeRegistryHelper} to control how densely populated a {@link net.minecraft.world.level.biome.Biome} is.
+ * Provides the forest density for a given biome. Mods should implement these interfaces
+ * to control how densely populated a {@link net.minecraft.world.level.biome.Biome} is.
  *
  * @author ferreusveritas
  */

@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.model.baked;
 
-import com.dtteam.dynamictrees.utility.helper.CoordUtils;
+import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.google.common.primitives.Ints;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.FaceBakery;

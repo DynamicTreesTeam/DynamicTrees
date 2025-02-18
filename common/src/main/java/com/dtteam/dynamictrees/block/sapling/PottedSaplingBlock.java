@@ -2,8 +2,8 @@ package com.dtteam.dynamictrees.block.sapling;
 
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.helper.ItemUtils;
-import com.dtteam.dynamictrees.utility.helper.NullHelper;
+import com.dtteam.dynamictrees.utility.ItemUtils;
+import com.dtteam.dynamictrees.utility.NullUtils;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,22 +43,22 @@ public class PottedSaplingBlock extends BaseEntityBlock {
     //////////////////////////////
 
     public Species getSpecies(BlockGetter level, BlockPos pos) {
-        return NullHelper.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
+        return NullUtils.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
                 PottedSaplingBlockEntity::getSpecies, Species.NULL_SPECIES);
     }
 
     public boolean setSpecies(Level level, BlockPos pos, BlockState state, Species species) {
-        return NullHelper.consumeIfNonnull(this.getTileEntityPottedSapling(level, pos),
+        return NullUtils.consumeIfNonnull(this.getTileEntityPottedSapling(level, pos),
                 pottedSaplingBlockEntity -> pottedSaplingBlockEntity.setSpecies(species));
     }
 
     public BlockState getPotState(Level level, BlockPos pos) {
-        return NullHelper.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
+        return NullUtils.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
                 PottedSaplingBlockEntity::getPot, Blocks.FLOWER_POT.defaultBlockState());
     }
 
     public boolean setPotState(Level level, BlockState potState, BlockPos pos) {
-        return NullHelper.consumeIfNonnull(this.getTileEntityPottedSapling(level, pos),
+        return NullUtils.consumeIfNonnull(this.getTileEntityPottedSapling(level, pos),
                 pottedSaplingBlockEntity -> pottedSaplingBlockEntity.setPot(potState));
     }
 
@@ -147,7 +147,7 @@ public class PottedSaplingBlock extends BaseEntityBlock {
             }
         }
 
-        final BlockState potState = NullHelper.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
+        final BlockState potState = NullUtils.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
                 PottedSaplingBlockEntity::getPot, Blocks.AIR.defaultBlockState());
 
         if (potState.getBlock() == Blocks.FLOWER_POT) {

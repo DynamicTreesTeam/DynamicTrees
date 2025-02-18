@@ -2,8 +2,7 @@ package com.dtteam.dynamictrees.deserialization;
 
 import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.utility.function.IgnoreThrowable;
-import com.dtteam.dynamictrees.utility.JsonMapWrapper;
+import com.dtteam.dynamictrees.api.function.IgnoreThrowable;
 import com.google.gson.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;

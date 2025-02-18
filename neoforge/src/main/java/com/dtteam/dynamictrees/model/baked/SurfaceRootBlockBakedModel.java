@@ -1,8 +1,8 @@
 package com.dtteam.dynamictrees.model.baked;
 
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
-import com.dtteam.dynamictrees.utility.helper.CoordUtils;
-import com.dtteam.dynamictrees.utility.ModelUtils;
+import com.dtteam.dynamictrees.utility.CoordUtils;
+import com.dtteam.dynamictrees.model.ModelHelper;
 import com.dtteam.dynamictrees.api.network.RootConnections;
 import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.RenderType;
@@ -96,9 +96,9 @@ public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
                 BlockFaceUV uvface = null;
                 if (face.getAxis().isHorizontal()) {
                     boolean facePositive = face.getAxisDirection() == Direction.AxisDirection.POSITIVE;
-                    uvface = new BlockFaceUV(new float[]{facePositive ? 16 - radialHeight : 0, (sleeveNegative ? 16 - halfSize : 0), facePositive ? 16 : radialHeight, (sleeveNegative ? 16 : halfSize)}, ModelUtils.getFaceAngle(dir.getAxis(), face));
+                    uvface = new BlockFaceUV(new float[]{facePositive ? 16 - radialHeight : 0, (sleeveNegative ? 16 - halfSize : 0), facePositive ? 16 : radialHeight, (sleeveNegative ? 16 : halfSize)}, ModelHelper.getFaceAngle(dir.getAxis(), face));
                 } else {
-                    uvface = new BlockFaceUV(new float[]{8 - radius, sleeveNegative ? 16 - halfSize : 0, 8 + radius, sleeveNegative ? 16 : halfSize}, ModelUtils.getFaceAngle(dir.getAxis(), face));
+                    uvface = new BlockFaceUV(new float[]{8 - radius, sleeveNegative ? 16 - halfSize : 0, 8 + radius, sleeveNegative ? 16 : halfSize}, ModelHelper.getFaceAngle(dir.getAxis(), face));
                 }
                 if (uvface != null) {
                     mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
@@ -107,11 +107,11 @@ public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, this.barkTexture);
+        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, this.barkTexture);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), this.barkTexture, face, BlockModelRotation.X0_Y0));
+            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, e.getValue(), this.barkTexture, face, BlockModelRotation.X0_Y0));
         }
 
         return builder.build();
@@ -119,7 +119,7 @@ public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
 
     private BakedModel bakeVert(int radius, Direction dir) {
         int radialHeight = getRadialHeight(radius);
-        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, this.barkTexture);
+        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, this.barkTexture);
 
         AABB partBoundary = new AABB(8 - radius, radialHeight, 8 - radius, 8 + radius, 16 + radialHeight, 8 + radius)
                 .move(dir.getStepX() * 7, 0, dir.getStepZ() * 7);
@@ -130,13 +130,13 @@ public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
             for (Direction face : Direction.values()) {
                 Map<Direction, BlockElementFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 
-                BlockFaceUV uvface = new BlockFaceUV(ModelUtils.modUV(ModelUtils.getUVs(pieceBoundary, face)), ModelUtils.getFaceAngle(Direction.Axis.Y, face));
+                BlockFaceUV uvface = new BlockFaceUV(ModelHelper.modUV(ModelHelper.getUVs(pieceBoundary, face)), ModelHelper.getFaceAngle(Direction.Axis.Y, face));
                 mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
 
-                Vector3f[] limits = ModelUtils.AABBLimits(pieceBoundary);
+                Vector3f[] limits = ModelHelper.AABBLimits(pieceBoundary);
 
                 BlockElement part = new BlockElement(limits[0], limits[1], mapFacesIn, null, true);
-                builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, part.faces.get(face), this.barkTexture, face, BlockModelRotation.X0_Y0));
+                builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, part.faces.get(face), this.barkTexture, face, BlockModelRotation.X0_Y0));
             }
         }
 
@@ -155,20 +155,20 @@ public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
             BlockFaceUV uvface;
             if (face.getAxis().isHorizontal()) {
                 boolean positive = face.getAxisDirection() == Direction.AxisDirection.POSITIVE;
-                uvface = new BlockFaceUV(new float[]{positive ? 16 - radialHeight : 0, 8 - radius, positive ? 16 : radialHeight, 8 + radius}, ModelUtils.getFaceAngle(axis, face));
+                uvface = new BlockFaceUV(new float[]{positive ? 16 - radialHeight : 0, 8 - radius, positive ? 16 : radialHeight, 8 + radius}, ModelHelper.getFaceAngle(axis, face));
             } else {
-                uvface = new BlockFaceUV(new float[]{8 - radius, 8 - radius, 8 + radius, 8 + radius}, ModelUtils.getFaceAngle(axis, face));
+                uvface = new BlockFaceUV(new float[]{8 - radius, 8 - radius, 8 + radius, 8 + radius}, ModelHelper.getFaceAngle(axis, face));
             }
 
             mapFacesIn.put(face, new BlockElementFace(null, -1, null, uvface));
         }
 
         BlockElement part = new BlockElement(posFrom, posTo, mapFacesIn, null, true);
-        IModelBuilder<?> builder = ModelUtils.getModelBuilder(this.blockModel.customData, icon);
+        IModelBuilder<?> builder = ModelHelper.getModelBuilder(this.blockModel.customData, icon);
 
         for (Map.Entry<Direction, BlockElementFace> e : part.faces.entrySet()) {
             Direction face = e.getKey();
-            builder.addCulledFace(face, ModelUtils.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0));
+            builder.addCulledFace(face, ModelHelper.makeBakedQuad(part, e.getValue(), icon, face, BlockModelRotation.X0_Y0));
         }
 
         return builder.build();
@@ -187,7 +187,7 @@ public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
 
         int[] connections = new int[]{0, 0, 0, 0};
         RootConnections.ConnectionLevel[] connectionLevels = RootConnections.PLACEHOLDER_CONNECTION_LEVELS.clone();
-        RootConnections connectionData = extraData.get(ModelUtils.ROOT_CONNECTIONS_PROPERTY);
+        RootConnections connectionData = extraData.get(ModelHelper.ROOT_CONNECTIONS_PROPERTY);
         if (connectionData != null) {
             connections = connectionData.getAllRadii();
             connectionLevels = connectionData.getConnectionLevels();
@@ -239,7 +239,7 @@ public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
         RootConnections rootConnections = state.getBlock() instanceof SurfaceRootBlock surfaceRootBlock
                 ? new RootConnections(surfaceRootBlock.getConnectionData(world, pos))
                 : new RootConnections();
-        return ModelData.builder().with(ModelUtils.ROOT_CONNECTIONS_PROPERTY, rootConnections).build();
+        return ModelData.builder().with(ModelHelper.ROOT_CONNECTIONS_PROPERTY, rootConnections).build();
     }
 
     /**

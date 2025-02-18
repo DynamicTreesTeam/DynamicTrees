@@ -3,8 +3,8 @@ package com.dtteam.dynamictrees.block.sapling;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.helper.CoordUtils;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
+import com.dtteam.dynamictrees.utility.CoordUtils;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -28,9 +28,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DynamicSaplingBlock extends Block implements BonemealableBlock {
+
+    public final static Map<Block, Species> SAPLING_REPLACERS = new HashMap<>();
 
     protected Species species;
 
@@ -159,6 +163,14 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return this.getSpecies().getSaplingShape();
+    }
+
+    ///////////////////////////////////////////
+    // SAPLING REPLACEMENT
+    ///////////////////////////////////////////
+
+    public static void registerSaplingReplacer(BlockState state, Species species) {
+        SAPLING_REPLACERS.put(state.getBlock(), species);
     }
 
 }

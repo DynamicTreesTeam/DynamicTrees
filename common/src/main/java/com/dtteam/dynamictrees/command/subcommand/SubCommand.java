@@ -4,9 +4,8 @@ import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
 import com.dtteam.dynamictrees.command.CommandConstants;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.command.CommandHelper;
-import com.dtteam.dynamictrees.utility.function.ThrowableRunnable;
-import com.dtteam.dynamictrees.utility.helper.TreeHelper;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
+import com.dtteam.dynamictrees.api.function.ThrowableRunnable;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -156,7 +155,7 @@ public abstract class SubCommand {
 
     protected static Species speciesArgument(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         final ResourceLocation registryName = ResourceLocationArgument.getId(context, CommandConstants.SPECIES);
-        final Species species = TreeRegistryHelper.findSpecies(registryName);
+        final Species species = Species.findSpecies(registryName);
 
         if (!species.isValid()) {
             throw SPECIES_UNKNOWN.create(registryName.toString());

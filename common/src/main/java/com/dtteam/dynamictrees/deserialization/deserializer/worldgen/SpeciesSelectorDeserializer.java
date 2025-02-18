@@ -6,7 +6,6 @@ import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.helper.TreeRegistryHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -77,7 +76,7 @@ public final class SpeciesSelectorDeserializer implements JsonBiomeDatabaseDeser
                         if (this.isDefault(speciesName)) {
                             randomSelector.add(weight);
                         } else {
-                            TreeRegistryHelper.findSpeciesSloppy(speciesName).ifValid(species ->
+                            Species.findSpeciesSloppy(speciesName).ifValid(species ->
                                     randomSelector.add(species, weight)
                             );
                         }
