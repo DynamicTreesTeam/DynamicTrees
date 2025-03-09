@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.platform;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
 import com.dtteam.dynamictrees.platform.services.IMiscHelper;
@@ -17,7 +18,12 @@ public class NeoForgeMiscHelper implements IMiscHelper {
 
     @Override
     public int getPixelRGBA(TextureAtlasSprite sprite, int x, int y) {
-        return sprite.getPixelRGBA(0, x, y);
+        try{
+            return sprite.getPixelRGBA(0, x, y);
+        } catch (IllegalStateException e){
+            DynamicTrees.LOG.warn("Image {} is not allocated.", sprite);
+            return 0;
+        }
     }
 
     @Override @OnlyIn(Dist.CLIENT)
