@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees;
 
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.event.handler.CommonEventHandler;
+import com.dtteam.dynamictrees.event.handler.ModEventHandler;
 import com.dtteam.dynamictrees.registry.FabricRegistryLoader;
 import net.fabricmc.api.ModInitializer;
 
@@ -12,6 +13,7 @@ public class DynamicTreesFabric implements ModInitializer {
         DTConfigs.registerConfigs(); //Must be first
 
         CommonEventHandler.RegisterEvents();
+        ModEventHandler.RegisterEvents();
 
         DynamicTrees.init();
 

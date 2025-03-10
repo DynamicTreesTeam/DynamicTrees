@@ -15,13 +15,14 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.ReloadableServerResources;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 
 import java.io.File;
@@ -142,11 +143,11 @@ public final class Resources {
      * Listens for datapack reloads for actions such as reloading the trees resource manager and registering dirt bucket
      * recipes.
      */
-    public static final class ReloadListener implements PreparableReloadListener {
-        private final ReloadableServerResources dataPackRegistries;
+    public static class ReloadListener implements PreparableReloadListener {
+        private RecipeManager recipeManager;
 
-        public ReloadListener(ReloadableServerResources dataPackRegistries) {
-            this.dataPackRegistries = dataPackRegistries;
+        public ReloadListener(RecipeManager recipeManager) {
+            this.recipeManager = recipeManager;
         }
 
         @Override
@@ -168,17 +169,23 @@ public final class Resources {
                 return;
             }
 
+            if (recipeManager == null){
+                MinecraftServer server = Services.MISC.getCurrentServer();
+                if (server == null) return; //TO-DO: figure out later, in fabric this doesn't work.
+                recipeManager = server.getRecipeManager();
+            }
+
             //Hash multimap to be able to modify it
             final Multimap<RecipeType<?>, RecipeHolder<?>> recipes = HashMultimap.create();
 
             // Put the recipes into the new map and make each type's recipes mutable.
-            this.dataPackRegistries.getRecipeManager().byType.forEach((recipes::put));
+            this.recipeManager.byType.forEach((recipes::put));
 
             // Register dirt bucket recipes.
             DirtBucketRecipeHandler.registerDirtBucketRecipes(recipes.get(RecipeType.CRAFTING));
 
             // Set the new recipes, turning back into an immutable map.
-            dataPackRegistries.getRecipeManager().byType = ImmutableMultimap.copyOf(recipes);
+            recipeManager.byType = ImmutableMultimap.copyOf(recipes);
         }
     }
 

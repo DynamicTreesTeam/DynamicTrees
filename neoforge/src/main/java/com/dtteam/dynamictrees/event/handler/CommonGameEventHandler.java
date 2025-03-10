@@ -115,7 +115,7 @@ public class CommonGameEventHandler {
 
     @SubscribeEvent
     public static void addReloadListeners(final AddReloadListenerEvent event) {
-        event.addListener(new Resources.ReloadListener(event.getServerResources()));
+        event.addListener(new Resources.ReloadListener(event.getServerResources().getRecipeManager()));
     }
 
     ///////////////////////////////////////////
