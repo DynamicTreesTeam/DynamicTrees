@@ -35,7 +35,10 @@ public class DTLootTableProvider extends LootTableProvider {
     private final ExistingFileHelper fileHelper;
 
     public DTLootTableProvider(PackOutput output, String modId, ExistingFileHelper fileHelper, CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, Set.of(), List.of(), registries);
+        super(output, Set.of(), List.of(new SubProviderEntry(
+                BlockLoot::new,
+                LootContextParamSets.BLOCK
+        ), registries);
         this.modId = modId;
         this.fileHelper = fileHelper;
     }
