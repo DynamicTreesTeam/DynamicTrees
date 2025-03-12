@@ -51,6 +51,7 @@ neoForge {
 
         implementation "curse.maven:glitchcore-955399:5660740"
         implementation "curse.maven:serene-seasons-291874:5753503"
+        implementation "curse.maven:patchouli-306770:6164617"
     }
 }
 

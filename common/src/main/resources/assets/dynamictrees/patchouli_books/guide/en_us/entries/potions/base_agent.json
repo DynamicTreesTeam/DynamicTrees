@@ -1,0 +1,25 @@
+{
+  "name": "Biochar Base Agent",
+  "icon": "dynamictrees:dendro_potion",
+  "category": "dynamictrees:potions",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "dynamictrees:brewing",
+      "title": "Biochar Base Agent",
+      "ingredient": "minecraft:charcoal",
+      "bottle": "minecraft:potion[minecraft:potion_contents={potion:'minecraft:thick'}]",
+      "output": "dynamictrees:dendro_potion",
+      "text": "This is the brewing recipe for the base agent.$(br)All other agents from dynamic trees use this during brewing.$(br2)Note: This recipe uses the Thick Potion instead of the Awkward Potion."
+    },
+    {
+      "type": "patchouli:relations",
+      "title": "Uses",
+      "entries": [
+        "dynamictrees:potions/burgeoning_agent",
+        "dynamictrees:potions/depletion_agent",
+        "dynamictrees:potions/mega_agent"
+      ]
+    }
+  ]
+} 
