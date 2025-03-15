@@ -83,17 +83,17 @@ public class DTBlockTagsProvider extends VanillaBlockTagsProvider {
     }
 
     protected void addDTTags() {
-//        LeavesProperties.REGISTRY.dataGenerationStream(this.modId).forEach(leavesProperties ->
-//                leavesProperties.addGeneratedBlockTags(this::tag));
-//
-//        Family.REGISTRY.dataGenerationStream(this.modId).forEach(family ->
-//                family.addGeneratedBlockTags(this::tag));
-//
-//        Species.REGISTRY.dataGenerationStream(this.modId).forEach(species ->
-//                species.addGeneratedBlockTags(this::tag));
-//
-//        SoilProperties.REGISTRY.dataGenerationStream(this.modId).forEach(soilProperties ->
-//                soilProperties.addGeneratedBlockTags(this::tag));
+        LeavesProperties.REGISTRY.dataGenerationStream(this.modId).forEach(leavesProperties ->
+                leavesProperties.addGeneratedBlockTags(this::tag));
+
+        Family.REGISTRY.dataGenerationStream(this.modId).forEach(family ->
+                family.addGeneratedBlockTags(this::tag));
+
+        Species.REGISTRY.dataGenerationStream(this.modId).forEach(species ->
+                species.addGeneratedBlockTags(this::tag));
+
+        SoilProperties.REGISTRY.dataGenerationStream(this.modId).forEach(soilProperties ->
+                soilProperties.addGeneratedBlockTags(this::tag));
 
         LeavesProperties.REGISTRY.dataGenerationStream(this.modId).forEach(leavesProperties ->
                 leavesProperties.defaultLeavesTags().forEach(blockTagKey ->  tag(blockTagKey).addOptional(leavesProperties.getBlockRegistryName())));

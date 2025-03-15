@@ -1,9 +1,11 @@
 package com.dtteam.dynamictrees.tree.family;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.voxmap.BlockPosBounds;
 import com.dtteam.dynamictrees.block.branch.BasicBranchBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
@@ -11,6 +13,11 @@ import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.compat.WailaHelper;
+import com.dtteam.dynamictrees.data.DTDataProvider;
+import com.dtteam.dynamictrees.data.DataGenerators;
+import com.dtteam.dynamictrees.data.Generator;
+import com.dtteam.dynamictrees.data.generator.BranchItemModelGenerator;
+import com.dtteam.dynamictrees.data.generator.FamilyLangGenerator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
@@ -18,13 +25,14 @@ import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.cell.MetadataCell;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.api.voxmap.BlockPosBounds;
 import com.dtteam.dynamictrees.utility.Optionals;
-import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -41,7 +49,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import org.apache.commons.lang3.tuple.Pair;
@@ -50,6 +57,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.prefix;
@@ -802,102 +810,111 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
                 Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN);
     }
 
-//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-//        getBranch().ifPresent(branch -> {
-//            tierTag(getDefaultBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(branch));
-//            defaultBranchTags().forEach(tag -> {
-//                if (!isOnlyIfLoaded()) {
-//                    tagAppender.apply(tag).add(branch);
-//                } else {
-//                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(branch));
-//                }
-//            });
-//        });
-//
-//        // Create stripped branch tag and harvest tag if the family has a stripped branch.
-//        getStrippedBranch().ifPresent(strippedBranch -> {
-//            tierTag(getDefaultStrippedBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(strippedBranch));
-//            defaultStrippedBranchTags().forEach(tag ->
-//            {
-//                if (!isOnlyIfLoaded()) {
-//                    tagAppender.apply(tag).add(strippedBranch);
-//                } else {
-//                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(strippedBranch));
-//                }
-//            });
-//        });
-//    }
-//
-//    protected Optional<IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tierTag(@Nullable Tier tier, Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender) {
-//        if (tier == null)
-//            return Optional.empty();
-//
-//        TagKey<Block> tag = tier.getTag();
-//
-//        return tag == null ? Optional.empty() : Optional.of(tagAppender.apply(tag));
-//    }
-//
-//    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
-//        getBranchItem().ifPresent(item -> {
-//                    if (!isOnlyIfLoaded()) {
-//                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).add(item));
-//                    } else {
-//                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(item)));
-//                    }
-//                }
-//        );
-//    }
-//
-//    /**
-//     * @return a constructor for the relevant branch block model builder for the corresponding loader
-//     */
-//    public BiFunction<BlockModelBuilder, FileHelper, BranchLoaderBuilder> getBranchLoaderConstructor() {
-//        return BranchLoaderBuilder::branch;
-//    }
+    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
+        getBranch().ifPresent(branch -> {
+            tierTag(getDefaultBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(branch));
+            defaultBranchTags().forEach(tag -> {
+                if (!isOnlyIfLoaded()) {
+                    tagAppender.apply(tag).add(branch);
+                } else {
+                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(branch));
+                }
+            });
+        });
 
-//    protected final MutableLazyValue<Generator<DTDataProvider, Family>> branchStateGenerator =
-//            MutableLazyValue.supplied(BranchStateGenerator::new);
-//
-//    protected final MutableLazyValue<Generator<DTDataProvider, Family>> strippedBranchStateGenerator =
-//            MutableLazyValue.supplied(StrippedBranchStateGenerator::new);
-//
-//    protected final MutableLazyValue<Generator<? extends DTDataProvider, Family>> surfaceRootStateGenerator =
-//            MutableLazyValue.supplied(SurfaceRootStateGenerator::new);
-//
-//    @Override
-//    public void generateStateData(DataProvider provider) {
-//        // Generate branch block state and model.
-//        this.branchStateGenerator.get().generate(provider, this);
-//        this.strippedBranchStateGenerator.get().generate(provider, this);
-//
-//        // Generate surface root block state and model.
-//        this.surfaceRootStateGenerator.get().generate(provider, this);
-//    }
+        // Create stripped branch tag and harvest tag if the family has a stripped branch.
+        getStrippedBranch().ifPresent(strippedBranch -> {
+            tierTag(getDefaultStrippedBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(strippedBranch));
+            defaultStrippedBranchTags().forEach(tag ->
+            {
+                if (!isOnlyIfLoaded()) {
+                    tagAppender.apply(tag).add(strippedBranch);
+                } else {
+                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(strippedBranch));
+                }
+            });
+        });
+    }
 
-//    public ResourceLocation getBranchItemParentLocation() {
-//        return DynamicTrees.location("item/branch");
-//    }
-//
-//    public ResourceLocation getRootItemParentLocation() {
-//        return DynamicTrees.location("item/root_branch");
-//    }
-//
-//    protected final MutableLazyValue<Generator<DTItemModelProvider, Family>> branchItemModelGenerator =
-//            MutableLazyValue.supplied(BranchItemModelGenerator::new);
-//
-//    protected final MutableLazyValue<Generator<DTLangProvider, Family>> familyLangGenerator =
-//            MutableLazyValue.supplied(FamilyLangGenerator::new);
-//
-//    @Override
-//    public void generateItemModelData(DTItemModelProvider provider) {
-//        // Generate branch item models.
-//        this.branchItemModelGenerator.get().generate(provider, this);
-//    }
-//
-//    @Override
-//    public void generateLangData(DTLangProvider provider) {
-//        this.familyLangGenerator.get().generate(provider, this);
-//    }
+    protected Optional<IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tierTag(@Nullable Tier tier, Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender) {
+        if (tier == null)
+            return Optional.empty();
+
+        TagKey<Block> tag = tier.getIncorrectBlocksForDrops();
+
+        return Optional.of(tagAppender.apply(tag));
+    }
+
+    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
+        getBranchItem().ifPresent(item -> {
+                    if (!isOnlyIfLoaded()) {
+                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).add(item));
+                    } else {
+                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(item)));
+                    }
+                }
+        );
+    }
+
+    /**
+     * @return a constructor for the relevant branch block model builder for the corresponding loader
+     */
+    public BiFunction<BlockModelBuilder, FileHelper, BranchLoaderBuilder> getBranchLoaderConstructor() {
+        return BranchLoaderBuilder::branch;
+    }
+
+    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> branchStateGenerator =
+            MutableLazyValue.supplied(DataGenerators.getGenerator(
+                    DynamicTrees.location("branch"), Family.class, DTDataProvider.BlockState.class
+            ));
+
+    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> strippedBranchStateGenerator =
+            MutableLazyValue.supplied(DataGenerators.getGenerator(
+                    DynamicTrees.location("stripped_branch"), Family.class, DTDataProvider.BlockState.class
+            ));
+
+    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> surfaceRootStateGenerator =
+            MutableLazyValue.supplied(DataGenerators.getGenerator(
+                    DynamicTrees.location("surface_root"), Family.class, DTDataProvider.BlockState.class
+            ));
+
+    @Override
+    public void generateStateData(DTDataProvider.BlockState provider) {
+        // Generate branch block state and model.
+        this.branchStateGenerator.get().generate(provider, this);
+        this.strippedBranchStateGenerator.get().generate(provider, this);
+
+        // Generate surface root block state and model.
+        this.surfaceRootStateGenerator.get().generate(provider, this);
+    }
+
+    public ResourceLocation getBranchItemParentLocation() {
+        return DynamicTrees.location("item/branch");
+    }
+
+    public ResourceLocation getRootItemParentLocation() {
+        return DynamicTrees.location("item/root_branch");
+    }
+
+    protected final MutableLazyValue<Generator<DTDataProvider.ItemModel, Family>> branchItemModelGenerator =
+            MutableLazyValue.supplied(DataGenerators.getGenerator(
+                    DynamicTrees.location("branch_item"), Family.class, DTDataProvider.ItemModel.class
+            ));
+    protected final MutableLazyValue<Generator<DTDataProvider.Language, Family>> familyLangGenerator =
+            MutableLazyValue.supplied(DataGenerators.getGenerator(
+                    DynamicTrees.location("family_lang"), Family.class, DTDataProvider.Language.class
+            ));
+
+    @Override
+    public void generateItemModelData(DTDataProvider.ItemModel provider) {
+        // Generate branch item models.
+        this.branchItemModelGenerator.get().generate(provider, this);
+    }
+
+    @Override
+    public void generateLangData(DTDataProvider.Language provider) {
+        this.familyLangGenerator.get().generate(provider, this);
+    }
 
     protected List<String> onlyIfLoaded = new ArrayList<>();
     //Texture overrides

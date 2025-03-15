@@ -11,7 +11,7 @@ import net.neoforged.neoforge.common.data.LanguageProvider;
 import java.util.Collection;
 import java.util.List;
 
-public class DTLangProvider extends LanguageProvider implements DTDataProvider {
+public class DTLangProvider extends LanguageProvider implements DTDataProvider.Language {
     private final String modId;
     private final List<Registry<?>> registries;
 
@@ -28,7 +28,7 @@ public class DTLangProvider extends LanguageProvider implements DTDataProvider {
                         entry.generateLangData(this)
                 )
         );
-        Generator<DTLangProvider, String> generator = GatherDataHelper.getExtraLangGenerators().get(modId);
+        Generator<com.dtteam.dynamictrees.data.provider.DTLangProvider, String> generator = GatherDataHelper.getExtraLangGenerators().get(modId);
         if (generator != null) {
             generator.generate(this, "", new Generator.Dependencies());
         }

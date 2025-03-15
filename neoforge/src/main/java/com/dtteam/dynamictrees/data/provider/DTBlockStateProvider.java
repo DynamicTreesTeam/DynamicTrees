@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author Harley O'Connor
  */
-public class DTBlockStateProvider extends BlockStateProvider implements DTDataProvider {
+public class DTBlockStateProvider extends BlockStateProvider implements DTDataProvider.BlockState {
 
     private final String modId;
     private final List<Registry<?>> registries;

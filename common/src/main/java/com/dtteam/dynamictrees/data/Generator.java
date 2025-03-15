@@ -16,7 +16,7 @@ import java.util.Optional;
  * @param <I> the type of the input to get the dependencies from
  * @author Harley O'Connor
  */
-public interface Generator<P extends DataProvider & DTDataProvider, I> {
+public interface Generator<P extends DTDataProvider, I> {
 
     /**
      * Gathers dependencies from the specified {@code input}, then generating the relevant files if dependencies and
@@ -35,7 +35,7 @@ public interface Generator<P extends DataProvider & DTDataProvider, I> {
     }
 
     /**
-     * Handles generating the relevant files. External invokers should prefer using {@link #generate(DataProvider, Object)}
+     * Handles generating the relevant files. External invokers should prefer using {@link #generate(DTDataProvider, Object)}
      * to this method since it gathers dependencies automatically.
      *
      * @param provider the provider to use to generate

@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.tree.species;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
+import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.network.NodeInspector;
@@ -12,6 +12,7 @@ import com.dtteam.dynamictrees.api.substance.Emptiable;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffectProvider;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
+import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.CommonVoxelShapes;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
@@ -31,14 +32,14 @@ import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.entity.LingeringEffectorEntity;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
+import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
-import com.dtteam.dynamictrees.registry.DTRegistries;
-import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
 import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
@@ -48,6 +49,7 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.systems.nodemapper.*;
+import com.dtteam.dynamictrees.systems.season.NormalSeasonManager;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.systems.substance.FertilizeSubstance;
 import com.dtteam.dynamictrees.systems.substance.GrowthSubstance;
@@ -57,7 +59,6 @@ import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.utility.Optionals;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
-import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.dtteam.dynamictrees.worldgen.*;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import com.google.common.collect.Lists;
@@ -73,6 +74,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -113,8 +115,6 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import com.dtteam.dynamictrees.systems.season.NormalSeasonManager;
 
 public class Species extends RegistryEntry<Species> implements Resettable<Species> {
 
@@ -2342,36 +2342,36 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //    public void generateLangData(DTLangProvider provider){
 //        this.speciesLangProvider.get().generate(provider, this);
 //    }
-//
-//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-//        // Create dynamic sapling block tags.
-//        getSapling().ifPresent(sapling ->
-//                defaultSaplingTags().forEach(tag -> {
-//                    if (!isOnlyIfLoaded()) {
-//                        tagAppender.apply(tag).add(sapling);
-//                    } else {
-//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(sapling));
-//                    }
-//                })
-//        );
-//    }
-//
-//    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
-//        // Some species return the common seed, so only return if the species has its own seed.
-//        if (!hasSeed()) {
-//            return;
-//        }
-//        // Create seed item tag.
-//        getSeed().ifPresent(seed ->
-//                defaultSeedTags().forEach(tag ->{
-//                    if (!isOnlyIfLoaded()) {
-//                        tagAppender.apply(tag).add(seed);
-//                    } else {
-//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(seed));
-//                    }
-//                })
-//        );
-//    }
+
+    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
+        // Create dynamic sapling block tags.
+        getSapling().ifPresent(sapling ->
+                defaultSaplingTags().forEach(tag -> {
+                    if (!isOnlyIfLoaded()) {
+                        tagAppender.apply(tag).add(sapling);
+                    } else {
+                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(sapling));
+                    }
+                })
+        );
+    }
+
+    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
+        // Some species return the common seed, so only return if the species has its own seed.
+        if (!hasSeed()) {
+            return;
+        }
+        // Create seed item tag.
+        getSeed().ifPresent(seed ->
+                defaultSeedTags().forEach(tag ->{
+                    if (!isOnlyIfLoaded()) {
+                        tagAppender.apply(tag).add(seed);
+                    } else {
+                        tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(seed));
+                    }
+                })
+        );
+    }
 
     public boolean shouldGenerateVoluntaryDrops() {
         return this.seed != null;

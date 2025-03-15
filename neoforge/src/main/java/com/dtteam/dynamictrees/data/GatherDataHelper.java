@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
  * @author Harley O'Connor
  */
 public final class GatherDataHelper {
-    private static final Map<String, Generator<DTLangProvider, String>> extraLangGenerators = new HashMap<>();
+    private static final Map<String, Generator<DTDataProvider.Language, String>> extraLangGenerators = new HashMap<>();
 
     public static void gatherAllData(final String modId, final GatherDataEvent event, Registry<?>... registries) {
         gatherTagData(modId, event);
@@ -24,6 +24,11 @@ public final class GatherDataHelper {
         gatherItemModelData(modId, event, registries);
         gatherLootData(modId, event);
         gatherLangData(modId, event, registries);
+    }
+
+    public static void gatherAllData(final String modId, final GatherDataEvent event, Generator<DTDataProvider.Language, String> generator, Registry<?>... registries) {
+        addLangGenerator(modId, generator);
+        gatherAllData(modId, event, registries);
     }
 
     public static void gatherTagData(final String modId, final GatherDataEvent event) {
@@ -59,10 +64,10 @@ public final class GatherDataHelper {
         );
     }
 
-    public static void addLangGenerator(String modId,Generator<DTLangProvider, String> generator) {
+    public static void addLangGenerator(String modId, Generator<DTDataProvider.Language, String> generator) {
         GatherDataHelper.extraLangGenerators.put(modId,generator);
     }
-    public static Map<String,Generator<DTLangProvider, String>> getExtraLangGenerators() {
+    public static Map<String,Generator<DTDataProvider.Language, String>> getExtraLangGenerators() {
         return GatherDataHelper.extraLangGenerators;
     }
 }

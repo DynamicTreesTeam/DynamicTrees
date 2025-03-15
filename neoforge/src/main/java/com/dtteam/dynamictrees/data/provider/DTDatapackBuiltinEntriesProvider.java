@@ -43,10 +43,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class DTDatapackBuiltinEntriesProvider extends DatapackBuiltinEntriesProvider implements DTDataProvider {
+public class DTDatapackBuiltinEntriesProvider extends DatapackBuiltinEntriesProvider {
 
-    public DTDatapackBuiltinEntriesProvider(PackOutput output, CompletableFuture<RegistrySetBuilder.PatchedRegistries> registries, Set<String> modIds) {
-        super(output, registries.thenApply(p -> constructRegistries(p.full(), getBuilder(p.full()))), modIds);
+    public DTDatapackBuiltinEntriesProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Set<String> modIds) {
+        super(output, registries.thenApply(p -> constructRegistries(p, getBuilder(p))), modIds);
     }
 
     @SuppressWarnings({"unchecked", "UnstableApiUsage"})

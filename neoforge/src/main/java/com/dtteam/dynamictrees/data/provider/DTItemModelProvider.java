@@ -2,16 +2,23 @@ package com.dtteam.dynamictrees.data.provider;
 
 import com.dtteam.dynamictrees.api.registry.Registry;
 import com.dtteam.dynamictrees.data.DTDataProvider;
+import com.google.common.base.Preconditions;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.client.model.generators.*;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Harley O'Connor
  */
-public class DTItemModelProvider extends ItemModelProvider implements DTDataProvider {
+public class DTItemModelProvider extends ItemModelProvider implements DTDataProvider.ItemModel {
 
     private final List<Registry<?>> registries;
 

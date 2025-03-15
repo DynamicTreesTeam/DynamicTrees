@@ -45,11 +45,11 @@ public class DTItemTagsProvider extends ItemTagsProvider {
     }
 
     protected void addDTTags() {
-//        Family.REGISTRY.dataGenerationStream(this.modId).forEach(family ->
-//                family.addGeneratedItemTags(this::tag));
-//
-//        Species.REGISTRY.dataGenerationStream(this.modId).forEach(species ->
-//                species.addGeneratedItemTags(this::tag));
+        Family.REGISTRY.dataGenerationStream(this.modId).forEach(family ->
+                family.addGeneratedItemTags(this::tag));
+
+        Species.REGISTRY.dataGenerationStream(this.modId).forEach(species ->
+                species.addGeneratedItemTags(this::tag));
 
         Family.REGISTRY.dataGenerationStream(this.modId).forEach(family ->
         {
