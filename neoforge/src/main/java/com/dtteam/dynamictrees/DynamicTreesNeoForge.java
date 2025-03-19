@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.GatherDataHelper;
 import com.dtteam.dynamictrees.data.generator.DTExtraLangGenerator;
+import com.dtteam.dynamictrees.data.generator.DataGenerators;
 import com.dtteam.dynamictrees.data.provider.DTDatapackBuiltinEntriesProvider;
 import com.dtteam.dynamictrees.event.handler.OptionalHandlers;
 import com.dtteam.dynamictrees.registry.NeoForgeRegistryLoader;
@@ -45,6 +46,8 @@ public class DynamicTreesNeoForge {
         NeoForgeRegistryLoader.setup(eventBus);
 
         OptionalHandlers.registerHandlers();
+
+        DataGenerators.register();
 
         //Do not use the mod event bus outside the constructor.
         MOD_EVENT_BUS = null;

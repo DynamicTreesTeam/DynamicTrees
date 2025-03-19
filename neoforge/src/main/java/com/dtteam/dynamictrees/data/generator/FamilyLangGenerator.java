@@ -13,19 +13,21 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class FamilyLangGenerator implements Generator<DTLangProvider, Family> {
+public class FamilyLangGenerator implements Generator<DTDataProvider.Language, Family> {
     DTLangProvider provider;
 
     @Override
-    public void generate(DTLangProvider provider, Family input, Dependencies dependencies) {
-        this.provider = provider;
-        input.getBranch().ifPresent(branch -> treeLang(branch, input, input.getLangOverride("branch")));
+    public void generate(DTDataProvider.Language prov, Family input, Dependencies dependencies) {
+        if (prov instanceof DTLangProvider provider1) {
+            this.provider = provider1;
+            input.getBranch().ifPresent(branch -> treeLang(branch, input, input.getLangOverride("branch")));
 //        if(input.hasSurfaceRoot()){
 //            blockLang(input.getSurfaceRoot().get(), input.getLangOverride("surface_root"));
 //        }
-        if(input instanceof UndergroundRootsFamily mgf){
-            mgf.getRoots().ifPresent(root -> treeLang(root, input, input.getLangOverride("roots")));
-            //mgf.getDefaultSoil().getBlock().ifPresent(soil -> blockLang(soil, input.getLangOverride("soil")));
+            if(input instanceof UndergroundRootsFamily mgf){
+                mgf.getRoots().ifPresent(root -> treeLang(root, input, input.getLangOverride("roots")));
+                //mgf.getDefaultSoil().getBlock().ifPresent(soil -> blockLang(soil, input.getLangOverride("soil")));
+            }
         }
     }
 

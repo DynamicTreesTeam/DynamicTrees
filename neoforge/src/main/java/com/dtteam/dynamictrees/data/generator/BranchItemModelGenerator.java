@@ -12,23 +12,25 @@ import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 /**
  * @author Harley O'Connor
  */
-public class BranchItemModelGenerator implements Generator<DTItemModelProvider, Family> {
+public class BranchItemModelGenerator implements Generator<DTDataProvider.ItemModel, Family> {
 
     public static final DependencyKey<Block> PRIMITIVE_LOG_BLOCK = new DependencyKey<>("primitive_log_block");
     public static final DependencyKey<Item> PRIMITIVE_LOG_ITEM = new DependencyKey<>("primitive_log_item");
 
     @Override
-    public void generate(DTItemModelProvider provider, Family input, Dependencies dependencies) {
-        final ItemModelBuilder builder = provider.withExistingParent(
-                String.valueOf(BuiltInRegistries.ITEM.getKey(dependencies.get(PRIMITIVE_LOG_ITEM))),
-                input.getBranchItemParentLocation()
-        );
-        Block block = dependencies.get(PRIMITIVE_LOG_BLOCK);
-        input.addBranchTextures(
-                builder::texture,
-                provider.block(BuiltInRegistries.BLOCK.getKey(block)),
-                block
-        );
+    public void generate(DTDataProvider.ItemModel prov, Family input, Dependencies dependencies) {
+        if (prov instanceof DTItemModelProvider provider){
+            final ItemModelBuilder builder = provider.withExistingParent(
+                    String.valueOf(BuiltInRegistries.ITEM.getKey(dependencies.get(PRIMITIVE_LOG_ITEM))),
+                    input.getBranchItemParentLocation()
+            );
+            Block block = dependencies.get(PRIMITIVE_LOG_BLOCK);
+            input.addBranchTextures(
+                    builder::texture,
+                    provider.block(BuiltInRegistries.BLOCK.getKey(block)),
+                    block
+            );
+        }
     }
 
     @Override

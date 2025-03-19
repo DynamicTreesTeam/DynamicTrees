@@ -14,10 +14,7 @@ import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.compat.WailaHelper;
 import com.dtteam.dynamictrees.data.DTDataProvider;
-import com.dtteam.dynamictrees.data.DataGenerators;
 import com.dtteam.dynamictrees.data.Generator;
-import com.dtteam.dynamictrees.data.generator.BranchItemModelGenerator;
-import com.dtteam.dynamictrees.data.generator.FamilyLangGenerator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
@@ -78,6 +75,10 @@ import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.suffix;
  * @author ferreusveritas
  */
 public class Family extends RegistryEntry<Family> implements Resettable<Family> {
+
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.BlockState, Family>>> blockStateGenerators = new HashMap<>();
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.ItemModel, Family>>> itemModelGenerators = new HashMap<>();
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.Language, Family>>> languageGenerators = new HashMap<>();
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(Family::new);
 
@@ -795,6 +796,10 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         properties.setFamily(this);
     }
 
+    ///////////////////////////////////////////
+    // TAG GENERATION
+    ///////////////////////////////////////////
+
     public List<TagKey<Block>> defaultBranchTags() {
         return this.isFireProof ? Collections.singletonList(DTBlockTags.BRANCHES) :
                 Collections.singletonList(DTBlockTags.BRANCHES_THAT_BURN);
@@ -856,26 +861,30 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         );
     }
 
-    /**
-     * @return a constructor for the relevant branch block model builder for the corresponding loader
-     */
-    public BiFunction<BlockModelBuilder, FileHelper, BranchLoaderBuilder> getBranchLoaderConstructor() {
-        return BranchLoaderBuilder::branch;
-    }
+    ///////////////////////////////////////////
+    // DATA GENERATION
+    ///////////////////////////////////////////
+
+//    /**
+//     * @return a constructor for the relevant branch block model builder for the corresponding loader
+//     */
+//    public BiFunction<BlockModelBuilder, FileHelper, BranchLoaderBuilder> getBranchLoaderConstructor() {
+//        return BranchLoaderBuilder::branch;
+//    }
 
     protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> branchStateGenerator =
-            MutableLazyValue.supplied(DataGenerators.getGenerator(
-                    DynamicTrees.location("branch"), Family.class, DTDataProvider.BlockState.class
+            MutableLazyValue.supplied(blockStateGenerators.get(
+                    DynamicTrees.location("branch")
             ));
 
     protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> strippedBranchStateGenerator =
-            MutableLazyValue.supplied(DataGenerators.getGenerator(
-                    DynamicTrees.location("stripped_branch"), Family.class, DTDataProvider.BlockState.class
+            MutableLazyValue.supplied(blockStateGenerators.get(
+                    DynamicTrees.location("stripped_branch")
             ));
 
     protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> surfaceRootStateGenerator =
-            MutableLazyValue.supplied(DataGenerators.getGenerator(
-                    DynamicTrees.location("surface_root"), Family.class, DTDataProvider.BlockState.class
+            MutableLazyValue.supplied(blockStateGenerators.get(
+                    DynamicTrees.location("surface_root")
             ));
 
     @Override
@@ -888,21 +897,12 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.surfaceRootStateGenerator.get().generate(provider, this);
     }
 
-    public ResourceLocation getBranchItemParentLocation() {
-        return DynamicTrees.location("item/branch");
-    }
-
-    public ResourceLocation getRootItemParentLocation() {
-        return DynamicTrees.location("item/root_branch");
-    }
+    public ResourceLocation getBranchItemParentLocation() {return DynamicTrees.location("item/branch");}
+    public ResourceLocation getRootItemParentLocation() {return DynamicTrees.location("item/root_branch");}
 
     protected final MutableLazyValue<Generator<DTDataProvider.ItemModel, Family>> branchItemModelGenerator =
-            MutableLazyValue.supplied(DataGenerators.getGenerator(
-                    DynamicTrees.location("branch_item"), Family.class, DTDataProvider.ItemModel.class
-            ));
-    protected final MutableLazyValue<Generator<DTDataProvider.Language, Family>> familyLangGenerator =
-            MutableLazyValue.supplied(DataGenerators.getGenerator(
-                    DynamicTrees.location("family_lang"), Family.class, DTDataProvider.Language.class
+            MutableLazyValue.supplied(itemModelGenerators.get(
+                    DynamicTrees.location("branch_item")
             ));
 
     @Override
@@ -910,6 +910,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         // Generate branch item models.
         this.branchItemModelGenerator.get().generate(provider, this);
     }
+
+    protected final MutableLazyValue<Generator<DTDataProvider.Language, Family>> familyLangGenerator =
+            MutableLazyValue.supplied(languageGenerators.get(
+                    DynamicTrees.location("family_lang")
+            ));
 
     @Override
     public void generateLangData(DTDataProvider.Language provider) {
@@ -928,7 +933,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public static final String ROOTS_SIDE = "roots_side";
     public static final String ROOTS_TOP = "roots_top";
     public static final String COVERED_ROOTS_BLOCK = "covered_roots_block";
-
 
     public void setOnlyIfLoaded(String onlyIfLoaded) {
         this.onlyIfLoaded.add(onlyIfLoaded);

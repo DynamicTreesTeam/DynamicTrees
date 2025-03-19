@@ -1,4 +1,4 @@
-package com.dtteam.dynamictrees.data.provider;
+package com.dtteam.dynamictrees.data.builder;
 
 import com.dtteam.dynamictrees.event.handler.ClientModEventHandler;
 import com.google.gson.JsonObject;
