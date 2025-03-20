@@ -52,17 +52,17 @@ public class DTDatapackBuiltinEntriesProvider extends DatapackBuiltinEntriesProv
     @SuppressWarnings({"unchecked", "UnstableApiUsage"})
     private static RegistrySetBuilder.PatchedRegistries constructRegistries(HolderLookup.Provider original, RegistrySetBuilder datapackEntriesBuilder) {
         try {
-            // We don't need SRG mappings; this is for in-dev datagen only
-            Field ownerField = ObfuscationReflectionHelper.findField(Holder.Reference.class, "owner");
-            Object holderOwner = ownerField.get(original.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.BADLANDS));
-            Class<?> compositeOwnerClass = Class.forName("net.minecraft.core.RegistrySetBuilder$CompositeOwner");
-            Field ownersField = ObfuscationReflectionHelper.findField(compositeOwnerClass, "owners");
-            Set<HolderOwner<?>> owners = (Set<HolderOwner<?>>) ownersField.get(holderOwner);
-            var builderKeys = new HashSet<>(datapackEntriesBuilder.getEntryKeys());
-            DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().filter(data -> !builderKeys.contains(data.key())).forEach(data -> datapackEntriesBuilder.add(data.key(), context -> {}));
-            RegistrySetBuilder.PatchedRegistries provider = datapackEntriesBuilder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), original, new Cloner.Factory());
-            Object newHolderOwner = ownerField.get(provider.full().lookupOrThrow(Registries.CONFIGURED_FEATURE).getOrThrow(DTRegistries.DYNAMIC_TREE_CONFIGURED_FEATURE));
-            owners.addAll((Set<HolderOwner<?>>) ownersField.get(newHolderOwner));
+//            // We don't need SRG mappings; this is for in-dev datagen only
+//            Field ownerField = ObfuscationReflectionHelper.findField(Holder.Reference.class, "owner");
+//            Object holderOwner = ownerField.get(original.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.BADLANDS));
+//            Class<?> universalOwnerClass = Class.forName("net.minecraft.core.RegistrySetBuilder$UniversalOwner");
+//            Field ownersField = ObfuscationReflectionHelper.findField(universalOwnerClass, "owners");
+//            Set<HolderOwner<?>> owners = (Set<HolderOwner<?>>) ownersField.get(holderOwner);
+//            var builderKeys = new HashSet<>(datapackEntriesBuilder.getEntryKeys());
+//            DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().filter(data -> !builderKeys.contains(data.key())).forEach(data -> datapackEntriesBuilder.add(data.key(), context -> {}));
+            RegistrySetBuilder.PatchedRegistries provider = datapackEntriesBuilder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), original, new Cloner.Factory()); //Where to get the cloner factory?
+//            Object newHolderOwner = ownerField.get(provider.full().lookupOrThrow(Registries.CONFIGURED_FEATURE).getOrThrow(DTRegistries.DYNAMIC_TREE_CONFIGURED_FEATURE));
+//            owners.addAll((Set<HolderOwner<?>>) ownersField.get(newHolderOwner));
             return provider;
         } catch (Exception e) {
             throw new RuntimeException(e);

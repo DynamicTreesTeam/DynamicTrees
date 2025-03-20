@@ -74,10 +74,10 @@ public class DynamicTreesNeoForge {
                 LeavesProperties.REGISTRY
         );
         //Generate the feature replacement data
-        DataGenerator dataGen = event.getGenerator();
-        dataGen.addProvider(event.includeServer(), new DTDatapackBuiltinEntriesProvider(
-                dataGen.getPackOutput(), event.getLookupProvider(), Set.of(DynamicTrees.MOD_ID, DynamicTrees.MINECRAFT)
-        ));
+//        DataGenerator dataGen = event.getGenerator();
+//        dataGen.addProvider(event.includeServer(), new DTDatapackBuiltinEntriesProvider(
+//                dataGen.getPackOutput(), event.getLookupProvider(), Set.of(DynamicTrees.MOD_ID, DynamicTrees.MINECRAFT)
+//        ));
     }
 
 }

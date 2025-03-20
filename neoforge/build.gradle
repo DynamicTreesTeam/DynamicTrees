@@ -7,6 +7,8 @@ neoForge {
     version = neoforge_version
     // Automatically enable neoforge AccessTransformers if the file exists
     def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    def mainResources = project(":common").file("src/main/resources")
+    def genResources = project(":common").file("src/generated/resources")
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
@@ -24,6 +26,13 @@ neoForge {
         }
         data {
             data()
+            programArgument ('--all')
+            programArgument ('--existing')
+            programArgument (mainResources.absolutePath)
+            programArgument ('--output')
+            programArgument (genResources.absolutePath)
+            programArgument ('--mod')
+            programArgument ("${mod_id}")
         }
         server {
             server()
