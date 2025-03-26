@@ -1,8 +1,11 @@
 package com.dtteam.dynamictrees.block.leaves;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.data.DTDataProvider;
+import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
@@ -37,14 +40,29 @@ public class PalmLeavesProperties extends LeavesProperties {
         return new DynamicPalmLeavesBlock(this, properties);
     }
 
-//    protected final MutableLazyValue<Generator<DTBlockStateProvider, LeavesProperties>> palmStateGenerator =
-//            MutableLazyValue.supplied(PalmLeavesStateGenerator::new);
-//
-//    @Override
-//    public void generateStateData(DTBlockStateProvider provider) {
-//        // Generate leaves block state and model.
-//        this.palmStateGenerator.get().generate(provider, this);
+//    /**
+//     * @return a constructor for the relevant branch block model builder for the corresponding loader
+//     */
+//    public BiFunction<BlockModelBuilder, FileHelper, PalmLeavesLoaderBuilder> getFrondsLoaderConstructor() {
+//        return (b,e)->PalmLeavesLoaderBuilder.fronds(frondLoader, b,e);
 //    }
+
+    ResourceLocation frondLoader = DynamicTrees.location("large_palm_fronds");
+    public void setFrondLoader(ResourceLocation frondLoader) {
+        this.frondLoader = frondLoader;
+    }
+    public ResourceLocation getFrondLoader () { return frondLoader; }
+
+    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, LeavesProperties>> frondsStateGenerator =
+            MutableLazyValue.supplied(blockStateGenerators.get(
+                    DynamicTrees.location("palm_fronds")
+            ));
+
+    @Override
+    public void generateStateData(DTDataProvider.BlockState provider) {
+        // Generate leaves block state and model.
+        this.frondsStateGenerator.get().generate(provider, this);
+    }
 
     public String getFrondsModelName(){
         return "block/palm_leaves/" + getRegistryName().getPath() + "_frond";
@@ -69,18 +87,6 @@ public class PalmLeavesProperties extends LeavesProperties {
         ResourceLocation coreLoc = getTexturePath(CORE_BOTTOM).orElse(coreTextureLocation);
         textureConsumer.accept("core_bottom", coreLoc);
     }
-
-    ResourceLocation frondLoader = DynamicTrees.location("large_palm_fronds");
-    public void setFrondLoader(ResourceLocation frondLoader) {
-        this.frondLoader = frondLoader;
-    }
-
-//    /**
-//     * @return a constructor for the relevant branch block model builder for the corresponding loader
-//     */
-//    public BiFunction<BlockModelBuilder, FileHelper, PalmLeavesLoaderBuilder> getFrondsLoaderConstructor() {
-//        return (b,e)->PalmLeavesLoaderBuilder.fronds(frondLoader, b,e);
-//    }
 
     public ResourceLocation getCoreTopSmartModelLocation() {
         if (modelOverrides.containsKey(CORE_TOP)) return modelOverrides.get(CORE_TOP);

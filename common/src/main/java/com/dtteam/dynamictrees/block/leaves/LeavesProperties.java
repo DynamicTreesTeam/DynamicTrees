@@ -2,13 +2,16 @@ package com.dtteam.dynamictrees.block.leaves;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.CellKit;
+import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
+import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
+import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
@@ -58,6 +61,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * This class provides a means of holding individual properties for leaves.  This is necessary since leaves can contain
@@ -66,6 +70,10 @@ import java.util.function.Function;
  * @author ferreusveritas
  */
 public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties> {
+
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.BlockState, LeavesProperties>>> blockStateGenerators = new HashMap<>();
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.ItemModel, LeavesProperties>>> itemModelGenerators = new HashMap<>();
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.Language, LeavesProperties>>> languageGenerators = new HashMap<>();
 
     public static final Codec<LeavesProperties> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString()).forGetter(LeavesProperties::getRegistryName))
@@ -193,7 +201,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     ///////////////////////////////////////////
-    // LOOT
+    // DATA GENERATION
     ///////////////////////////////////////////
 
     /**
@@ -268,6 +276,26 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
                 .withParameter(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR, species.seasonalSeedDropFactor(LevelContext.create(level), pos))
                 .withParameter(LootContextParams.TOOL, tool)
                 .create(DTLootParameterSets.LEAVES);
+    }
+
+    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, LeavesProperties>> leavesStateGenerator =
+            MutableLazyValue.supplied(blockStateGenerators.get(
+                    DynamicTrees.location("leaves")
+            ));
+    protected final MutableLazyValue<Generator<DTDataProvider.Language, LeavesProperties>> leavesLangGenerator =
+            MutableLazyValue.supplied(languageGenerators.get(
+                    DynamicTrees.location("leaves_lang")
+            ));
+
+    @Override
+    public void generateStateData(DTDataProvider.BlockState provider) {
+        // Generate leaves block state and model.
+        this.leavesStateGenerator.get().generate(provider, this);
+    }
+
+    @Override
+    public void generateLangData(DTDataProvider.Language provider) {
+        this.leavesLangGenerator.get().generate(provider, this);
     }
 
     ///////////////////////////////////////////
@@ -608,22 +636,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     public List<TagKey<Block>> defaultLeavesTags() {
         return Collections.singletonList(DTBlockTags.LEAVES);
     }
-
-//    protected final MutableLazyValue<Generator<DTBlockStateProvider, LeavesProperties>> stateGenerator =
-//            MutableLazyValue.supplied(LeavesStateGenerator::new);
-//    protected final MutableLazyValue<Generator<DTLangProvider, LeavesProperties>> langGenerator =
-//            MutableLazyValue.supplied(LeavesPropertiesLangGenerator::new);
-//
-//    @Override
-//    public void generateStateData(DTBlockStateProvider provider) {
-//        // Generate leaves block state and model.
-//        this.stateGenerator.get().generate(provider, this);
-//    }
-//
-//    @Override
-//    public void generateLangData(DTLangProvider provider) {
-//        //this.langGenerator.get().generate(provider, this);
-//    }
 
     public boolean isCompatibleLeaves(LeavesProperties leaves){
         return this.getFamily() == leaves.getFamily();

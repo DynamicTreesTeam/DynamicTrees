@@ -9,18 +9,20 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.VanillaBlockTagsProvider;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.common.data.BlockTagsProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Harley O'Connor
  */
-public class DTBlockTagsProvider extends VanillaBlockTagsProvider {
-    public DTBlockTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, lookupProvider);
+public class DTBlockTagsProvider extends BlockTagsProvider {
+    public DTBlockTagsProvider(PackOutput output, String modid, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper fileHelper) {
+        super(output, lookupProvider, modid, fileHelper);
     }
 
     @Override
@@ -94,22 +96,6 @@ public class DTBlockTagsProvider extends VanillaBlockTagsProvider {
 
         SoilProperties.REGISTRY.dataGenerationStream(this.modId).forEach(soilProperties ->
                 soilProperties.addGeneratedBlockTags(this::tag));
-
-        LeavesProperties.REGISTRY.dataGenerationStream(this.modId).forEach(leavesProperties ->
-                leavesProperties.defaultLeavesTags().forEach(blockTagKey ->  tag(blockTagKey).addOptional(leavesProperties.getBlockRegistryName())));
-
-        Family.REGISTRY.dataGenerationStream(this.modId).forEach(family ->
-        {
-            family.defaultBranchTags().forEach(blockTagKey -> tag(blockTagKey).add(family.getBranch().get()));
-            family.defaultStrippedBranchTags().forEach(blockTagKey -> tag(blockTagKey).add(family.getStrippedBranch().get()));
-        });
-
-        Species.REGISTRY.dataGenerationStream(this.modId).forEach(species ->
-                species.defaultSaplingTags().forEach(blockTagKey ->  tag(blockTagKey).addOptional(species.getSaplingRegName())));
-
-        SoilProperties.REGISTRY.dataGenerationStream(this.modId).forEach(soilProperties ->
-                soilProperties.defaultSoilBlockTags().forEach(blockTagKey ->  tag(blockTagKey).addOptional(soilProperties.getBlockRegistryName())));
-
     }
 
     @Override

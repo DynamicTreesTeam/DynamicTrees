@@ -50,15 +50,6 @@ public class DTItemTagsProvider extends ItemTagsProvider {
 
         Species.REGISTRY.dataGenerationStream(this.modId).forEach(species ->
                 species.addGeneratedItemTags(this::tag));
-
-        Family.REGISTRY.dataGenerationStream(this.modId).forEach(family ->
-        {
-            family.defaultBranchItemTags().forEach(itemTagKey -> tag(itemTagKey).add(family.getBranchItem().get()));
-        });
-
-        Species.REGISTRY.dataGenerationStream(this.modId).forEach(species ->
-                species.defaultSeedTags().forEach(itemTagKey ->  tag(itemTagKey).addOptional(species.getSeedName())));
-
     }
 
     @Override

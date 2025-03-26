@@ -1,9 +1,12 @@
 package com.dtteam.dynamictrees.block.soil;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.data.DTDataProvider;
+import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.Optionals;
@@ -32,6 +35,10 @@ import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.prefix;
  * @author Max Hyper
  */
 public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties> {
+
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.BlockState, SoilProperties>>> blockStateGenerators = new HashMap<>();
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.ItemModel, SoilProperties>>> itemModelGenerators = new HashMap<>();
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.Language, SoilProperties>>> languageGenerators = new HashMap<>();
 
     public static final Codec<SoilProperties> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(ResourceLocation.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString()).forGetter(SoilProperties::getRegistryName))
@@ -227,17 +234,19 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     }
 
     ///////////////////////////////////////////
-    // DATA GEN
+    // DATA GENERATION
     ///////////////////////////////////////////
 
-//    protected final MutableLazyValue<Generator<DTBlockStateProvider, SoilProperties>> soilStateGenerator =
-//            MutableLazyValue.supplied(SoilStateGenerator::new);
-//
-//    @Override
-//    public void generateStateData(DTBlockStateProvider provider) {
-//        // Generate soil state and model.
-//        this.soilStateGenerator.get().generate(provider, this);
-//    }
+    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, SoilProperties>> soilStateGenerator =
+            MutableLazyValue.supplied(blockStateGenerators.get(
+                    DynamicTrees.location("soil")
+            ));
+
+    @Override
+    public void generateStateData(DTDataProvider.BlockState provider) {
+        // Generate soil state and model.
+        this.soilStateGenerator.get().generate(provider, this);
+    }
 
     protected HashMap<String, ResourceLocation> textureOverrides = new HashMap<>();
     protected HashMap<String, ResourceLocation> modelOverrides = new HashMap<>();

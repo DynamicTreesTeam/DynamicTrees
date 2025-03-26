@@ -16,7 +16,7 @@ public final class DynamicBlockProperties {
     private DynamicBlockProperties() {
     }
 
-    public static final int[] defaultAges = {1,2,3,5,7,15,25};
+
 
     /**
      * A map of maximum ages to their respective age {@link IntegerProperty property}.
@@ -30,6 +30,7 @@ public final class DynamicBlockProperties {
         map.put(15, BlockStateProperties.AGE_15);
         map.put(25, BlockStateProperties.AGE_25);
     });
+    public static final int[] defaultAges = {1,2,3,5,7,15,25};
 
     public static IntegerProperty getOrCreateAge(int maxAge) {
         return AGE_PROPERTIES.computeIfAbsent(maxAge, k -> IntegerProperty.create("age", 0, maxAge));

@@ -36,7 +36,7 @@ public final class GatherDataHelper {
         PackOutput packOutput = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        final DTBlockTagsProvider blockTagsProvider = new DTBlockTagsProvider(packOutput, lookupProvider);
+        final DTBlockTagsProvider blockTagsProvider = new DTBlockTagsProvider(packOutput, modId, lookupProvider, event.getExistingFileHelper());
         final DTItemTagsProvider itemTagsProvider = new DTItemTagsProvider(packOutput, modId, lookupProvider, blockTagsProvider.contentsGetter(), event.getExistingFileHelper());
 
         generator.addProvider(event.includeServer(), blockTagsProvider);

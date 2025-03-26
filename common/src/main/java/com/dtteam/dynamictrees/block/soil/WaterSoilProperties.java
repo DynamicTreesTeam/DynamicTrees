@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.block.soil;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.platform.Services;
@@ -37,7 +38,7 @@ public class WaterSoilProperties extends SoilProperties {
     public WaterSoilProperties(final ResourceLocation registryName) {
         super(null, registryName);
 
-//        this.soilStateGenerator.reset(WaterRootGenerator::new);
+        this.soilStateGenerator.reset(blockStateGenerators.get(DynamicTrees.location("water_root_soil")));
     }
 
     @Override

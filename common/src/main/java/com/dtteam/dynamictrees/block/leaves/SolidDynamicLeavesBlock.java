@@ -31,10 +31,10 @@ public class SolidDynamicLeavesBlock extends DynamicLeavesBlock {
         return Shapes.block();
     }
 
-//    @Override
-//    public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
-//        return false;
-//    }
+    @Override
+    public boolean addLandingEffects(BlockState state1, ServerLevel level, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+        return false;
+    }
 
     @Override
     public void fallOn(Level level, BlockState blockstate, BlockPos pos, Entity entity, float fallDistance) {

@@ -617,25 +617,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     /**
-     * Thickness of tips of the root system.
-     * By default, most trees do not have one, so we return the regular primary thickness.
-     */
-    public int getPrimaryRootThickness() {
-        return primaryThickness;
-    }
-
-    /**
      * Thickness of the branch connected to a twig (radius == getPrimaryThickness) [default = 2]
      */
     public int getSecondaryThickness() {
-        return secondaryThickness;
-    }
-
-    /**
-     * Thickness of the root connected to tips in the root system.
-     * By default, most trees do not have one, so we return the regular secondary thickness.
-     */
-    public int getSecondaryRootThickness() {
         return secondaryThickness;
     }
 
@@ -876,16 +860,25 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("branch")
             ));
-
     protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> strippedBranchStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("stripped_branch")
             ));
-
     protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> surfaceRootStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("surface_root")
             ));
+    protected final MutableLazyValue<Generator<DTDataProvider.ItemModel, Family>> branchItemModelGenerator =
+            MutableLazyValue.supplied(itemModelGenerators.get(
+                    DynamicTrees.location("branch_item")
+            ));
+    protected final MutableLazyValue<Generator<DTDataProvider.Language, Family>> familyLangGenerator =
+            MutableLazyValue.supplied(languageGenerators.get(
+                    DynamicTrees.location("family_lang")
+            ));
+
+    public ResourceLocation getBranchItemParentLocation() {return DynamicTrees.location("item/branch");}
+    public ResourceLocation getRootItemParentLocation() {return DynamicTrees.location("item/root_branch");}
 
     @Override
     public void generateStateData(DTDataProvider.BlockState provider) {
@@ -896,26 +889,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         // Generate surface root block state and model.
         this.surfaceRootStateGenerator.get().generate(provider, this);
     }
-
-    public ResourceLocation getBranchItemParentLocation() {return DynamicTrees.location("item/branch");}
-    public ResourceLocation getRootItemParentLocation() {return DynamicTrees.location("item/root_branch");}
-
-    protected final MutableLazyValue<Generator<DTDataProvider.ItemModel, Family>> branchItemModelGenerator =
-            MutableLazyValue.supplied(itemModelGenerators.get(
-                    DynamicTrees.location("branch_item")
-            ));
-
     @Override
     public void generateItemModelData(DTDataProvider.ItemModel provider) {
         // Generate branch item models.
         this.branchItemModelGenerator.get().generate(provider, this);
     }
-
-    protected final MutableLazyValue<Generator<DTDataProvider.Language, Family>> familyLangGenerator =
-            MutableLazyValue.supplied(languageGenerators.get(
-                    DynamicTrees.location("family_lang")
-            ));
-
     @Override
     public void generateLangData(DTDataProvider.Language provider) {
         this.familyLangGenerator.get().generate(provider, this);

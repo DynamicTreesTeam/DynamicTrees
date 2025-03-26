@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.tree.species;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
+import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.network.NodeInspector;
@@ -26,7 +27,9 @@ import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
+import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
+import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
@@ -117,6 +120,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Species extends RegistryEntry<Species> implements Resettable<Species> {
+
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.BlockState, Species>>> blockStateGenerators = new HashMap<>();
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.ItemModel, Species>>> itemModelGenerators = new HashMap<>();
+    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.Language, Species>>> languageGenerators = new HashMap<>();
 
     public static final Species NULL_SPECIES = new Species() {
         @Override
@@ -2256,6 +2263,38 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return Collections.singletonList(DTItemTags.SEEDS);
     }
 
+    ///////////////////////////////////////////
+    // DATA GENERATION
+    ///////////////////////////////////////////
+
+    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Species>> saplingStateGenerator =
+            MutableLazyValue.supplied(blockStateGenerators.get(
+                    DynamicTrees.location("sapling")
+            ));
+    protected final MutableLazyValue<Generator<DTDataProvider.ItemModel, Species>> seedItemModelGenerator =
+            MutableLazyValue.supplied(itemModelGenerators.get(
+                    DynamicTrees.location("seed_item")
+            ));
+    protected final MutableLazyValue<Generator<DTDataProvider.Language, Species>> speciesLangGenerator =
+            MutableLazyValue.supplied(languageGenerators.get(
+                    DynamicTrees.location("species_lang")
+            ));
+
+    @Override
+    public void generateStateData(DTDataProvider.BlockState provider) {
+        // Generate sapling block state and model.
+        this.saplingStateGenerator.get().generate(provider, this);
+    }
+    @Override
+    public void generateItemModelData(DTDataProvider.ItemModel provider) {
+        // Generate seed models.
+        this.seedItemModelGenerator.get().generate(provider, this);
+    }
+    @Override
+    public void generateLangData(DTDataProvider.Language provider) {
+        this.speciesLangGenerator.get().generate(provider, this);
+    }
+
     protected List<String> onlyIfLoaded = new ArrayList<>();
     protected HashMap<String, ResourceLocation> textureOverrides = new HashMap<>();
     protected HashMap<String, String> langOverrides = new HashMap<>();
@@ -2298,12 +2337,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return DynamicTrees.location("block/smartmodel/sapling");
     }
 
-//    protected final MutableLazyValue<Generator<DTBlockStateProvider, Species>> saplingStateGenerator =
-//            MutableLazyValue.supplied(SaplingStateGenerator::new);
-//
-//    protected final MutableLazyValue<Generator<DTLangProvider,Species>> speciesLangProvider =
-//            MutableLazyValue.supplied(SpeciesLangGenerator::new);
-
     public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
                                    ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
         ResourceLocation leavesLoc = getLeavesProperties().getTexturePath(LeavesProperties.LEAVES).orElse(leavesTextureLocation);
@@ -2311,12 +2344,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         textureConsumer.accept("log", logLoc);
         textureConsumer.accept("leaves", leavesLoc);
     }
-//
-//    @Override
-//    public void generateStateData(DTBlockStateProvider provider) {
-//        // Generate sapling block state and model.
-//        this.saplingStateGenerator.get().generate(provider, this);
-//    }
 
     /**
      * @return the location of the parent model of the seed item model
@@ -2325,23 +2352,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         if (modelOverrides.containsKey(SEED_PARENT)) return modelOverrides.get(SEED_PARENT);
         return DynamicTrees.location("item/standard_seed");
     }
-
-//    protected final MutableLazyValue<Generator<DTItemModelProvider, Species>> seedModelGenerator =
-//            MutableLazyValue.supplied(SeedItemModelGenerator::new);
-//
-//    public Generator<DTItemModelProvider, Species> getSeedModelGenerator() {
-//        return this.seedModelGenerator.get();
-//    }
-//
-//    @Override
-//    public void generateItemModelData(DTItemModelProvider provider) {
-//        // Generate seed models.
-//        this.seedModelGenerator.get().generate(provider, this);
-//    }
-//    @Override
-//    public void generateLangData(DTLangProvider provider){
-//        this.speciesLangProvider.get().generate(provider, this);
-//    }
 
     public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
         // Create dynamic sapling block tags.

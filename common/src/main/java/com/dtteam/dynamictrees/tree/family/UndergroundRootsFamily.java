@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.tree.family;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
@@ -8,11 +9,15 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
+import com.dtteam.dynamictrees.data.DTDataProvider;
+import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
@@ -28,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.suffix;
@@ -39,11 +45,6 @@ public class UndergroundRootsFamily extends Family {
     private Supplier<BranchBlock> roots;
     private Supplier<Item> rootsItem;
     private Block primitiveRoots, primitiveRootsFilled, primitiveRootsCovered;
-
-//    protected final MutableLazyValue<Generator<DTBlockStateProvider, Family>> rootsStateGenerator =
-//            MutableLazyValue.supplied(RootsStateGenerator::new);
-//    protected final MutableLazyValue<Generator<DTItemModelProvider, Family>> rootsItemModelGenerator =
-//            MutableLazyValue.supplied(RootsItemModelGenerator::new);
 
     public UndergroundRootsFamily(ResourceLocation name) {
         super(name);
@@ -122,17 +123,30 @@ public class UndergroundRootsFamily extends Family {
         return getRoots();
     }
 
-//    @Override
-//    public void generateStateData(DTBlockStateProvider provider) {
-//        super.generateStateData(provider);
-//        this.rootsStateGenerator.get().generate(provider, this);
-//    }
-//
-//    @Override
-//    public void generateItemModelData(DTItemModelProvider provider) {
-//        super.generateItemModelData(provider);
-//        this.rootsItemModelGenerator.get().generate(provider, this);
-//    }
+    ///////////////////////////////////////////
+    // DATA GENERATION
+    ///////////////////////////////////////////
+
+    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> rootsStateGenerator =
+            MutableLazyValue.supplied(blockStateGenerators.get(
+                    DynamicTrees.location("roots")
+            ));
+    protected final MutableLazyValue<Generator<DTDataProvider.ItemModel, Family>> rootsItemModelGenerator =
+            MutableLazyValue.supplied(itemModelGenerators.get(
+                    DynamicTrees.location("roots_item")
+            ));
+
+    @Override
+    public void generateStateData(DTDataProvider.BlockState provider) {
+        super.generateStateData(provider);
+        this.rootsStateGenerator.get().generate(provider, this);
+    }
+
+    @Override
+    public void generateItemModelData(DTDataProvider.ItemModel provider) {
+        super.generateItemModelData(provider);
+        this.rootsItemModelGenerator.get().generate(provider, this);
+    }
 
     public ResourceLocation getBranchItemParentLocation() {
         return DynamicTrees.location("item/branch");
@@ -175,22 +189,28 @@ public class UndergroundRootsFamily extends Family {
     private int secondaryRootThickness = 3;
     private int supportedRootThicknessExtra = 2;
 
-    @Override
+    /**
+     * Thickness of tips of the root system.
+     * By default, most trees do not have one, so we return the regular primary thickness.
+     */
     public int getPrimaryRootThickness() {
         return primaryRootThickness;
     }
-    @Override
+
+    /**
+     * Thickness of the root connected to tips in the root system.
+     * By default, most trees do not have one, so we return the regular secondary thickness.
+     */
     public int getSecondaryRootThickness() {
         return secondaryRootThickness;
     }
+
     public int getSupportedRootThicknessExtra() {
         return supportedRootThicknessExtra;
     }
-
     public void setPrimaryRootThickness(int primaryRootThickness) {
         this.primaryRootThickness = primaryRootThickness;
     }
-
     public void setSecondaryRootThickness(int secondaryRootThickness) {
         this.secondaryRootThickness = secondaryRootThickness;
     }
@@ -221,19 +241,19 @@ public class UndergroundRootsFamily extends Family {
         return Optionals.ofBlock(primitiveRootsCovered);
     }
 
-//    @Override
-//    public void addGeneratedBlockTags(Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender) {
-//        super.addGeneratedBlockTags(tagAppender);
-//        //Create roots tag and root harvest tag if the family is mangrove-like.
-//        getRoots().ifPresent(roots -> {
-//            this.tierTag(getDefaultRootsHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(roots));
-//            defaultRootsTags().forEach(tag -> {
-//                if (!isOnlyIfLoaded()) {
-//                    tagAppender.apply(tag).add(roots);
-//                } else {
-//                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(roots));
-//                }
-//            });
-//        });
-//    }
+    @Override
+    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
+        super.addGeneratedBlockTags(tagAppender);
+        //Create roots tag and root harvest tag if the family is mangrove-like.
+        getRoots().ifPresent(roots -> {
+            this.tierTag(getDefaultRootsHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(roots));
+            defaultRootsTags().forEach(tag -> {
+                if (!isOnlyIfLoaded()) {
+                    tagAppender.apply(tag).add(roots);
+                } else {
+                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(roots));
+                }
+            });
+        });
+    }
 }

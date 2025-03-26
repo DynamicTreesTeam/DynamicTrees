@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.block.soil;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
@@ -53,7 +54,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
     protected UndergroundRootsFamily family;
     public AerialRootsSoilProperties(final ResourceLocation registryName) {
         super(registryName);
-//        this.soilStateGenerator.reset(AerialRootsSoilGenerator::new);
+        this.soilStateGenerator.reset(blockStateGenerators.get(DynamicTrees.location("aerial_root_soil")));
     }
 
     public void setFamily(UndergroundRootsFamily family) {
@@ -85,7 +86,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
     public static class RootSoilBlock extends SoilBlock implements SimpleWaterloggedBlock {
 
-        protected static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, 8);
+        public static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, 8);
         public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
         public RootSoilBlock(SoilProperties properties, Properties blockProperties) {

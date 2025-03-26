@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.systems.nodemapper.CoderNode;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
+import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
 import com.dtteam.dynamictrees.tree.TreeHelper;
@@ -100,9 +101,9 @@ public class RootsJoCode extends JoCode {
 
     @Override
     protected boolean setBlockForGeneration(LevelAccessor level, Species species, BlockPos pos, Direction dir, boolean careful, @SuppressWarnings("unused") boolean isLast) {
-        if (isFreeToSetBlock(level, pos, species) && (!careful || this.isClearOfNearbyBranches(level, pos, dir.getOpposite()))) {
-            species.getFamily().getBranchForRootsPlacement(level, species, pos).ifPresent(branch ->
-                    branch.setRadius(level, pos, species.getFamily().getPrimaryRootThickness(), null, careful ? 3 : 2)
+        if (isFreeToSetBlock(level, pos, species) && (!careful || this.isClearOfNearbyBranches(level, pos, dir.getOpposite())) && species.getFamily() instanceof UndergroundRootsFamily family) {
+            family.getBranchForRootsPlacement(level, species, pos).ifPresent(branch ->
+                    branch.setRadius(level, pos, family.getPrimaryRootThickness(), null, careful ? 3 : 2)
             );
             return false;
         }

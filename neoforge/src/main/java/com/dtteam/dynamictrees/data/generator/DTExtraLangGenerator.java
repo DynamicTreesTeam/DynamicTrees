@@ -8,7 +8,7 @@ public class DTExtraLangGenerator implements Generator<DTDataProvider.Language,S
     @Override
     public void generate(DTDataProvider.Language prov, String input, Dependencies dependencies) {
         if (prov instanceof DTLangProvider provider){
-            provider.add("item.dynamictrees.dendro_potion.biochar","Biochar Base Agent");
+            provider.add("item.dynamictrees.dendro_potion.biochar","Biochar Agent Base");
             provider.add("item.dynamictrees.dendro_potion.depletion","Depletion Agent");
             provider.add("item.dynamictrees.dendro_potion.mega","Mega Agent");
             provider.add("item.dynamictrees.dendro_potion.burgeoning","Burgeoning Agent");
@@ -28,8 +28,10 @@ public class DTExtraLangGenerator implements Generator<DTDataProvider.Language,S
             provider.add("commands.dynamictrees.success.get_roots","Species: %s Roots JoCode: %s");
             provider.add("commands.dynamictrees.error.get_tree","Could not find tree species at position %s.");
             provider.add("commands.dynamictrees.success.set_tree","Successfully set tree at position %s to species %s with JoCode %s.");
+            provider.add("commands.dynamictrees.success.set_tree_roots", "Successfully set tree at position %s to species %s with tree JoCode %s and roots JoCode %s.");
             provider.add("commands.dynamictrees.success.kill_tree","Successfully killed tree at position %s.");
             provider.add("commands.dynamictrees.error.unknown_species","Unknown species %s.");
+            provider.add("commands.dynamictrees.error.no_roots", "Cannot set tree of species %s with roots JoCode %s, as it does not have any roots.");
             provider.add("commands.dynamictrees.success.get_fertility","Fertility of tree at position %s is %s.");
             provider.add("commands.dynamictrees.success.set_fertility","Successfully set fertility of tree at position %s to %s.");
             provider.add("commands.dynamictrees.success.grow_pulse","Successfully sent %s growth pulses to tree at position %s.");
