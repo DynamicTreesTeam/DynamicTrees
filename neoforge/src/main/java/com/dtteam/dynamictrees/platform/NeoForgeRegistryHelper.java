@@ -26,10 +26,6 @@ public class NeoForgeRegistryHelper implements IRegistryHelper {
     public RegistryHandler newRegistryHandler() {
         return new NeoForgeRegistryHandler();
     }
-    @Override
-    public RegistryHandler newRegistryHandler(String modId) {
-        return new NeoForgeRegistryHandler(modId);
-    }
 
     @Override
     public BlockEntityType.BlockEntitySupplier<PottedSaplingBlockEntity> getPottedSaplingBlockEntity() {

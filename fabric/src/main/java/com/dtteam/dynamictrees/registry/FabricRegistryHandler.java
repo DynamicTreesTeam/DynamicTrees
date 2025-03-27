@@ -21,16 +21,27 @@ import java.util.function.Supplier;
  */
 public class FabricRegistryHandler extends RegistryHandler {
 
-    public FabricRegistryHandler(String modId) {
-        super(ResourceLocation.fromNamespaceAndPath(modId, modId));
-    }
-
     /**
      * Constructor only to be used by the {@link RegistryHandler#REGISTRY} initialization as a default value,
      * for all other purposes use the constructor with modId.
      */
     public FabricRegistryHandler() {
         super();
+    }
+
+    public FabricRegistryHandler(String modId) {
+        super(ResourceLocation.fromNamespaceAndPath(modId, modId));
+    }
+
+    /**
+     * Sets up a {@link RegistryHandler} for the given {@code modId}. This includes instantiating, registering, and
+     * subscribing it to the {@code mod event bus}. This should be {@code only} be called from the relevant mod
+     * constructor!
+     *
+     * @param modId The {@code mod ID} to setup for.
+     */
+    public static RegistryHandler setup(final String modId) {
+        return new FabricRegistryHandler(modId);
     }
 
     /**

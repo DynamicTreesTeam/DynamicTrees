@@ -27,17 +27,6 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
     }
 
     /**
-     * Sets up a {@link RegistryHandler} for the given {@code modId}. This includes instantiating, registering, and
-     * subscribing it to the {@code mod event bus}. This should be {@code only} be called from the relevant mod
-     * constructor!
-     *
-     * @param modId The {@code mod ID} to setup for.
-     */
-    public static RegistryHandler setup(final String modId) {
-        return Services.REGISTRY.newRegistryHandler(modId);
-    }
-
-    /**
      * Gets the {@link RegistryHandler} for the given mod ID, or the null registry handler if it doesn't exist.
      *
      * @param modId The mod ID of the mod to get the {@link RegistryHandler} for.

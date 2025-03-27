@@ -27,11 +27,6 @@ public class FabricRegistryHelper implements IRegistryHelper {
     }
 
     @Override
-    public RegistryHandler newRegistryHandler(String modId) {
-        return new FabricRegistryHandler(modId);
-    }
-
-    @Override
     public BlockEntityType.BlockEntitySupplier<PottedSaplingBlockEntity> getPottedSaplingBlockEntity() {
         return PottedSaplingBlockEntity::new;
     }

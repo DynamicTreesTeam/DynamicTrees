@@ -17,7 +17,6 @@ public interface IRegistryHelper {
     RegistryLoader getRegistryLoader();
 
     RegistryHandler newRegistryHandler();
-    RegistryHandler newRegistryHandler(String modId);
 
     BlockEntityType.BlockEntitySupplier<PottedSaplingBlockEntity> getPottedSaplingBlockEntity();
     PottedSaplingBlockEntity newPottedSaplingBlockEntity(BlockPos pPos, BlockState pState);

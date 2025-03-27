@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.DynamicTreesNeoForge;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
+import com.dtteam.dynamictrees.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -24,7 +25,7 @@ import java.util.function.Supplier;
 
 /**
  * Handles registries for the given mod ID in the constructor. Add-ons should instantiate one of these in their
- * constructor by calling {@link #setup(String)} with their mod ID.
+ * constructor by calling {@link #setup(String, IEventBus)} with their mod ID.
  *
  * <p>The main purpose of this is to prevent Forge from complaining about blocks and items
  * for a different mod ID having their registry names set when the active mod container is <code>dynamictrees</code>, but it
@@ -62,13 +63,23 @@ public class NeoForgeRegistryHandler extends RegistryHandler {
      *
      * @param modId The mod ID for the relevant mod.
      */
-    public NeoForgeRegistryHandler(final String modId) {
+    public NeoForgeRegistryHandler(final String modId, IEventBus modEventBus) {
         super(ResourceLocation.fromNamespaceAndPath(modId, modId));
         RegistryHandler.REGISTRY.register(this);
 
-        IEventBus modEventBus = DynamicTreesNeoForge.MOD_EVENT_BUS;
         modEventBus.register(new RegisterEventHandler<>(blocksDeferredRegister));
         modEventBus.register(new RegisterEventHandler<>(itemsDeferredRegister));
+    }
+
+    /**
+     * Sets up a {@link RegistryHandler} for the given {@code modId}. This includes instantiating, registering, and
+     * subscribing it to the {@code mod event bus}. This should be {@code only} be called from the relevant mod
+     * constructor!
+     *
+     * @param modId The {@code mod ID} to setup for.
+     */
+    public static RegistryHandler setup(final String modId, IEventBus modEventBus) {
+        return new NeoForgeRegistryHandler(modId, modEventBus);
     }
 
     @Nullable
