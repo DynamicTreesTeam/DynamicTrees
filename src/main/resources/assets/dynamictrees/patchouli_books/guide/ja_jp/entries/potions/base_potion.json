@@ -1,0 +1,26 @@
+{
+  "name": "バイオ炭の基礎ポーション",
+  "icon": "dynamictrees:dendro_potion",
+  "category": "dynamictrees:potions",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "dynamictrees:brewing",
+      "title": "バイオ炭の基礎ポーション",
+      "ingredient": "minecraft:charcoal",
+      "bottle": "minecraft:potion{Potion:'minecraft:thick'}",
+      "output": "dynamictrees:dendro_potion",
+      "text": "これは基礎ポーションの醸造レシピです。$(br2)Dynamic Trees のすべてのポーションレシピに使用されます。"
+    },
+    {
+      "type": "patchouli:relations",
+      "title": "用途",
+      "entries": [
+        "dynamictrees:potions/burgeoning_potion",
+        "dynamictrees:potions/depletion_potion",
+        "dynamictrees:potions/gigas_potion",
+        "dynamictrees:potions/transformation_potion"
+      ]
+    }
+  ]
+}
