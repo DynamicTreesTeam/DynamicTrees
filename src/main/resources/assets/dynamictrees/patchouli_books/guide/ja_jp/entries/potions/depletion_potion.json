@@ -1,0 +1,16 @@
+{
+  "name": "土壌枯渇のポーション",
+  "icon": "dynamictrees:dendro_potion{potion_index:1}",
+  "category": "dynamictrees:potions",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "dynamictrees:brewing",
+      "title": "土壌枯渇のポーション",
+      "ingredient": "minecraft:slime_ball",
+      "bottle": "dynamictrees:dendro_potion",
+      "output": "dynamictrees:dendro_potion{potion_index:1}",
+      "text": "このポーションは土壌を枯渇させ、樹木の成長を停止させます。$(br2)装飾用の小さい木が欲しい時に役立ちます。"
+    }
+  ]
+}
