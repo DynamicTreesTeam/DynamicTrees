@@ -1,0 +1,24 @@
+{
+  "name": "巨大化のポーション",
+  "icon": "dynamictrees:dendro_potion{potion_index:2}",
+  "category": "dynamictrees:potions",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "dynamictrees:brewing",
+      "title": "巨大化のポーション",
+      "ingredient": "minecraft:pumpkin_seeds",
+      "bottle": "dynamictrees:dendro_potion",
+      "output": "dynamictrees:dendro_potion{potion_index:2}",
+      "text": "樹木を巨大なサイズに成長させます。ただし、これは巨大変種（デフォルトではトウヒとジャングル）のある樹木にのみ機能します。$(br1)これは苗木を2x2のパターンで配置するのと同等です。"
+    },
+    {
+      "type": "image",
+      "images": [
+        "dynamictrees:textures/patchouli/images/mega_spruce.png"
+      ],
+      "text": "通常のトウヒの木と完全に成長したトウヒの巨木。",
+      "border": true
+    }
+  ]
+}
