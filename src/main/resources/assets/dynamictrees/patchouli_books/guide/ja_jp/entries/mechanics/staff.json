@@ -1,0 +1,19 @@
+{
+  "name": "ウッドランドの杖",
+  "read_by_default": "true",
+  "icon": "dynamictrees:staff",
+  "category": "dynamictrees:mechanics",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "spotlight",
+      "item": "dynamictrees:staff",
+      "title": "ウッドランドの杖",
+      "text": "ウッドランドの杖は樹木の状態をコピー＆ペーストできるクリエイティブツールです。$(br2)/dt createstaff コマンドを使用するか、クリエイティブメニューから入手できます。"
+    },
+    {
+      "type": "text",
+      "text": "右クリックで樹木を操作して対象の樹種を設定/リセットしたり、シフト右クリックで樹木とJoCodeを設定/リセットできます。$(br2)JoCodeは、樹木の形状を圧縮して記述するもので、樹種に依存しません。杖を使用すると、このコードがクリップボードにコピーされます。$(br2)これはクリエイティブツールですが、収穫レベル3の斧としても機能し、樹木を素早く切り倒すことができます。"
+    }
+  ]
+}
