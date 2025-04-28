@@ -1,0 +1,24 @@
+{
+  "name": "変換のポーション",
+  "icon": "dynamictrees:dendro_potion{potion_index:6}",
+  "category": "dynamictrees:potions",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "dynamictrees:brewing",
+      "title": "基礎ポーション",
+      "ingredient": "minecraft:prismarine_crystals",
+      "bottle": "dynamictrees:dendro_potion",
+      "output": "dynamictrees:dendro_potion{potion_index:6}",
+      "text": "これは樹木変換用の基礎ポーションのレシピです。$(br2)すべての変換ポーションはこれを使用します。"
+    },
+    {
+      "type": "dynamictrees:brewing",
+      "title": "変換のポーション",
+      "ingredient": "dynamictrees:oak_seed",
+      "bottle": "dynamictrees:dendro_potion{potion_index:6}",
+      "output": "dynamictrees:dendro_potion{potion_index:6,target:'dynamictrees:oak'}",
+      "text": "このポーションは既存の樹木を別の樹種に変換します。$(br2)樹木の種類はレシピで使用する種子によって決まります。上記の例ではオークのどんぐりを使用しています。"
+    }
+  ]
+}
