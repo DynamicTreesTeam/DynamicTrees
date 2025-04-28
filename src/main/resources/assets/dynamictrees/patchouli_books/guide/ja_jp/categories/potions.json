@@ -1,0 +1,6 @@
+{
+  "name": "ポーション",
+  "sortnum": 3,
+  "description": "この章ではポーションの醸造レシピを記載しています。",
+  "icon": "dynamictrees:dendro_potion"
+}
