@@ -1,0 +1,25 @@
+{
+  "name": "リンゴの木",
+  "icon": "dynamictrees:apple_oak_seed",
+  "category": "dynamictrees:trees",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "text",
+      "title": "リンゴの木",
+      "text": "リンゴの木は果樹であり、オークの派生種です。デフォルトでは平原のバイオームに生成されます。この木は成熟すると、葉から収穫可能なリンゴを育てます。"
+    },
+    {
+      "type": "image",
+      "images": [
+        "dynamictrees:textures/patchouli/images/apple_oak_1.png"
+      ],
+      "text": "成熟したリンゴの木",
+      "border": true
+    },
+    {
+      "type": "text",
+      "text": "果実の成長は、Serene Seasonsのような季節modがインストールされている場合、季節によって影響されます。そうでない場合は一年中成長します。$(br2)収穫後に、余ったリンゴを$(l:mechanics/dirt_bucket)土入りバケツ$()を使って追加の種子に変換し、再植樹することができます。"
+    }
+  ]
+}
