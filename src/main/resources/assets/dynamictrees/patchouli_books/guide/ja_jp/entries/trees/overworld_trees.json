@@ -1,0 +1,36 @@
+{
+  "name": "オーバーワールドの樹木",
+  "icon": "dynamictrees:birch_seed",
+  "category": "dynamictrees:trees",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "text",
+      "title": "オーバーワールドの樹木",
+      "text": "デフォルトではDynamic Treesの樹木はほぼ全てのバイオームの地表で見つけることができます。$(br2)オークの木は大きく頑丈で、シラカバの木は背が高くて細い特徴があります。様々な樹種や独特な形状を眺めながら、世界を探索してみてください。"
+    },
+    {
+      "type": "image",
+      "images": [
+        "dynamictrees:textures/patchouli/images/oak_1.png",
+        "dynamictrees:textures/patchouli/images/spruce_1.png",
+        "dynamictrees:textures/patchouli/images/dark_oak_1.png",
+        "dynamictrees:textures/patchouli/images/acacia_1.png"
+      ],
+      "text": "樹木の例",
+      "border": true
+    },
+    {
+      "type": "text",
+      "text": "これらの樹木の一部にはミツバチが住んでいる場合があります。木を伐採する際には、このフサフサした働き者を刺激しないよう注意してください。$(br2)自然に成長するオークやシラカバの木には、近くに花がある場合に巣が現れることがあります。"
+    },
+    {
+      "type": "image",
+      "images": [
+        "dynamictrees:textures/patchouli/images/bees_1.png"
+      ],
+      "text": "シラカバの木にあるミツバチの巣",
+      "border": true
+    }
+  ]
+}
