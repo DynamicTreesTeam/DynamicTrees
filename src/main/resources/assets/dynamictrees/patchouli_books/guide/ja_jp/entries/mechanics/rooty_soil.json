@@ -1,0 +1,22 @@
+{
+  "name": "根の土壌",
+  "read_by_default": "true",
+  "icon": "minecraft:grass_block",
+  "category": "dynamictrees:mechanics",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "text",
+      "title": "根の土壌",
+      "text": "- 樹木に栄養を提供するが、時間経過とともに枯渇することがあります。$(br2)- 骨粉を使用すると、土壌の肥沃度を高め、樹木が成熟状態を超えて成長することができます。$(br2)- コンパレーターを使用して土壌肥沃度を感知することができます。"
+    },
+    {
+      "type": "image",
+      "images": [
+        "dynamictrees:textures/patchouli/images/rooty_soil.png"
+      ],
+      "text": "シラカバの根付いた草ブロック。",
+      "border": true
+    }
+  ]
+}
