@@ -1,0 +1,33 @@
+{
+  "name": "ネザーの菌糸",
+  "icon": "dynamictrees:crimson_seed",
+  "category": "dynamictrees:trees",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "text",
+      "title": "ネザーの菌糸",
+      "text": "ネザーには樹木のような菌類が存在しています。真紅の森には巨大な真紅のキノコが広がり、歪んだ菌類たちは珍しい歪んだ森で見つけることができます。$(br2)どちらのキノコにも明るく輝くシュルームライトが生成され、この薄暗い次元をを照らします。"
+    },
+    {
+      "type": "image",
+      "images": [
+        "dynamictrees:textures/patchouli/images/nether_fungi_1.png"
+      ],
+      "text": "真紅のキノコと歪んだキノコ",
+      "border": true
+    },
+    {
+      "type": "text",
+      "text": "これらの菌類の子実体は、真紅の森や歪んだ森に芽生えた菌糸から収穫できます。そしてそれぞれのナイリウムに植え、骨粉を与えることでさらに増やすことが可能です。$(br2)一度樹木が成長を始めれば、成熟するまで骨粉を使い続ける必要はありません。"
+    },
+    {
+      "type": "image",
+      "images": [
+        "dynamictrees:textures/patchouli/images/nether_fungi_2.png"
+      ],
+      "text": "芽生えた菌糸の群生地",
+      "border": true
+    }
+  ]
+}
