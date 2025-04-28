@@ -37,7 +37,7 @@
   "config.jade.plugin_dynamictrees.fruit": "果実",
   "config.jade.plugin_dynamictrees.pod": "さや",
   "config.jade.plugin_dynamictrees.rooty": "根の土壌",
-  "config.jade.plugin_dynamictrees.rooty_water": "根の水",
+  "config.jade.plugin_dynamictrees.rooty_water": "濡れた根",
   "death.attack.falling_tree": "%1$s は倒れる木によって押しつぶされました",
   "death.attack.falling_tree.player": "%1$s は %2$s と戦いながら倒れる木によって押しつぶされました",
   "desc.dynamictrees.seasonal.autumn": "秋",
