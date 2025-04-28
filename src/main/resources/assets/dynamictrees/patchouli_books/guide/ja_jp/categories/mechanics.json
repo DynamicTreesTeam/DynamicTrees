@@ -1,0 +1,6 @@
+{
+  "name": "仕組み",
+  "sortnum": 2,
+  "description": "この章ではDynamic Treesの特徴や動作の仕組みを記載しています。",
+  "icon": "dynamictrees:dirt_bucket"
+}
