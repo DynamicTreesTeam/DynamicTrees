@@ -551,7 +551,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     public BlockBehaviour.Properties getDefaultBranchProperties(MapColor mapColor) {
         BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().sound(this.getDefaultBranchSoundType()).mapColor(mapColor)
-                .noLootTable().requiresCorrectToolForDrops();
+                .noLootTable();
         if (!this.isFireProof())
             properties.ignitedByLava();
         return properties;

@@ -341,6 +341,10 @@ public class BiomeDatabase {
     }
 
     public static class CaveRootedData {
+
+        SpeciesSelector speciesSelector = (pos, dirt, rnd) -> new SpeciesSelection();
+        ChanceSelector chanceSelector = (rnd, spc, rad) -> Chance.UNHANDLED;
+
         /**
          * If {@code true}, the tree will always be generated on the surface. Otherwise, it will be
          * generated on the next available ground position.
@@ -367,6 +371,44 @@ public class BiomeDatabase {
 
         public void setMaxDistToSurface(int maxDistToSurface) {
             this.maxDistToSurface = maxDistToSurface;
+        }
+
+        public SpeciesSelector getCaveRootedSpeciesSelector() {
+            return speciesSelector;
+        }
+
+        public ChanceSelector getCaveRootedChanceSelector(){
+            return chanceSelector;
+        }
+
+        public void setCaveRootedSpeciesSelector(SpeciesSelector selector, Operation op) {
+            SpeciesSelector existing = speciesSelector;
+            switch (op) {
+                case REPLACE -> speciesSelector = selector;
+                case SPLICE_BEFORE -> speciesSelector = (pos, dirt, rnd) -> {
+                    SpeciesSelection ss = selector.getSpecies(pos, dirt, rnd);
+                    return ss.isHandled() ? ss : existing.getSpecies(pos, dirt, rnd);
+                };
+                case SPLICE_AFTER -> speciesSelector = (pos, dirt, rnd) -> {
+                    SpeciesSelection ss = existing.getSpecies(pos, dirt, rnd);
+                    return ss.isHandled() ? ss : selector.getSpecies(pos, dirt, rnd);
+                };
+            }
+        }
+
+        public void setCaveRootedChanceSelector(ChanceSelector selector, Operation op) {
+            ChanceSelector existing = chanceSelector;
+            switch (op) {
+                case REPLACE -> chanceSelector = selector;
+                case SPLICE_BEFORE -> chanceSelector = (rnd, spc, rad) -> {
+                    Chance c = selector.getChance(rnd, spc, rad);
+                    return c != Chance.UNHANDLED ? c : existing.getChance(rnd, spc, rad);
+                };
+                case SPLICE_AFTER -> chanceSelector = (rnd, spc, rad) -> {
+                    Chance c = existing.getChance(rnd, spc, rad);
+                    return c != Chance.UNHANDLED ? c : selector.getChance(rnd, spc, rad);
+                };
+            }
         }
     }
 

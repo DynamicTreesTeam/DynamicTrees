@@ -233,11 +233,6 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
         if (oldHydro != newHydro) { // Only update if the hydro has changed. A little performance gain.
             BlockState placeState = getLeavesBlockStateForPlacement(accessor, pos, leavesProperties.getDynamicLeavesState(newHydro), oldHydro, worldGen);
             boolean decayed = newHydro == 0;
-//           if (decayed && !worldGen && (accessor instanceof Level level)
-//                    //if the old hydro is the default then its most likely a block that was just placed and failed
-//                    && oldHydro != getLeavesProperties().getCellKit().getDefaultHydration()) {
-//                dropResources(state, level, pos);
-//            }
             int flag = decayed ? 3 : (appearanceChangesWithHydro(oldHydro, newHydro) ? 2 : 4);
             accessor.setBlock(pos, placeState, flag);
             /* We do not use the 0x02 flag(update client) for performance reasons. The clients do not need to know the hydration level of the leaves blocks as it

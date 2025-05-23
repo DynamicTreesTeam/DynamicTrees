@@ -96,7 +96,9 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
 
         this.caveRootedDataAppliers
                 .register("generate_on_surface", Boolean.class, BiomeDatabase.CaveRootedData::setGenerateOnSurface)
-                .register("max_dist_to_surface", Integer.class, BiomeDatabase.CaveRootedData::setMaxDistToSurface);
+                .register("max_dist_to_surface", Integer.class, BiomeDatabase.CaveRootedData::setMaxDistToSurface)
+                .register("species", JsonElement.class, this::applyCaveRootedSpecies)
+                .register("chance", JsonElement.class, this::applyCaveRootedChance);
 
         Services.EVENT.postBiomeEntryApplierEvent(this.entryAppliers, ENTRY_APPLIERS);
     }
@@ -129,6 +131,20 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
             return;
         }
         entry.enableDefaultMultipass();
+    }
+
+    private PropertyApplierResult applyCaveRootedSpecies(BiomeDatabase.CaveRootedData entry, JsonElement jsonElement) {
+        return PropertyApplierResult.from(JsonDeserializers.SPECIES_SELECTOR.deserialize(jsonElement)
+                .ifSuccess(speciesSelector ->
+                        entry.setCaveRootedSpeciesSelector(speciesSelector, getOperationOrWarn(jsonElement))
+                ));
+    }
+
+    private PropertyApplierResult applyCaveRootedChance(BiomeDatabase.CaveRootedData entry, JsonElement jsonElement) {
+        return PropertyApplierResult.from(JsonDeserializers.CHANCE_SELECTOR.deserialize(jsonElement)
+                .ifSuccess(chanceSelector ->
+                        entry.setCaveRootedChanceSelector(chanceSelector, getOperationOrWarn(jsonElement))
+                ));
     }
 
     public static BiomeDatabase.Operation getOperationOrWarn(final JsonElement jsonElement) {
@@ -247,7 +263,6 @@ public final class BiomePopulatorsResourceLoader extends AbstractResourceLoader<
             JsonObject caveRootedJson = json.getAsJsonObject(CAVE_ROOTED);
             JsonMapWrapper applyData = new JsonMapWrapper(caveRootedJson);
             var entry = database.getJsonEntry(biomes);
-            this.entryAppliers.applyAll(applyData, entry);
             this.caveRootedDataAppliers.applyAll(applyData, entry.getOrCreateCaveRootedData());
         }
     }

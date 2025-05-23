@@ -23,6 +23,7 @@ public class MoundGenFeature extends GenFeature {
     }).setCenter(new BlockPos(2, 3, 2));
 
     public static final ConfigurationProperty<Integer> MOUND_CUTOFF_RADIUS = ConfigurationProperty.integer("mound_cutoff_radius");
+    public static final ConfigurationProperty<Boolean> OFFSET = ConfigurationProperty.bool("offset");
 
     public MoundGenFeature(ResourceLocation registryName) {
         super(registryName);
@@ -30,13 +31,14 @@ public class MoundGenFeature extends GenFeature {
 
     @Override
     protected void registerProperties() {
-        this.register(MOUND_CUTOFF_RADIUS);
+        this.register(MOUND_CUTOFF_RADIUS, OFFSET);
     }
 
     @Override
     protected GenFeatureConfiguration createDefaultConfiguration() {
         return super.createDefaultConfiguration()
-                .with(MOUND_CUTOFF_RADIUS, 5);
+                .with(MOUND_CUTOFF_RADIUS, 5)
+                .with(OFFSET, true);
     }
 
     /**
@@ -56,7 +58,9 @@ public class MoundGenFeature extends GenFeature {
             BlockState initialDirtState = level.getBlockState(rootPos);
             BlockState initialUnderState = level.getBlockState(rootPos.below());
 
-            rootPos = rootPos.above();
+            if (configuration.get(OFFSET)){
+                rootPos = rootPos.above();
+            }
 
             for (SimpleVoxmap.VoxmapCell cell : moundMap.getAllNonZeroCells()) {
                 final BlockState placeState = cell.getValue() == 1 ? initialDirtState : initialUnderState;

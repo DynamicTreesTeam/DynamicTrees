@@ -46,7 +46,7 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
                 .add(Blocks.PINK_PETALS)
                 .add(Blocks.BROWN_MUSHROOM)
                 .add(Blocks.RED_MUSHROOM)
-                .add(Blocks.LILY_PAD)
+                .add(Blocks.MOSS_CARPET)
                 .addTag(BlockTags.FLOWERS)
                 .addTag(BlockTags.REPLACEABLE_BY_TREES);
 

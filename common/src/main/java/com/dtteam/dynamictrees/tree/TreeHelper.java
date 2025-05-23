@@ -64,24 +64,23 @@ public class TreeHelper {
         if (leafMap == null) return;
         //The iterMap is the voxmap we will use as a discardable.  The leafMap must survive for snow
         SimpleVoxmap iterMap = new SimpleVoxmap(leafMap);
-        Iterable<BlockPos.MutableBlockPos> iterable = iterMap.getAllNonZero();
 
         for (int i = 0; i < iterations; i++) {
-            for (BlockPos.MutableBlockPos iPos : iterable) {
+            for (BlockPos.MutableBlockPos iPos : iterMap.getAllNonZero()) {
                 BlockState blockState = level.getBlockState(iPos);
                 Block block = blockState.getBlock();
                 if (block instanceof DynamicLeavesBlock) {//Special case for leaves
                     int prevHydro = leafMap.getVoxel(iPos);//The leafMap should contain accurate hydro data
                     int newHydro = ((Ageable) block).age(level, iPos, blockState, level.getRandom(), worldgen);//Get new values from neighbors
                     if (newHydro == -1) {
-                        //Leaf block died.  Take it out of the leafMap and iterMap
+                        //Leaf block died. Take it out of the leafMap and iterMap
                         leafMap.setVoxel(iPos, (byte) 0);
                         iterMap.setVoxel(iPos, (byte) 0);
                     } else {
                         //Leaf did not die so the block is still leaves
                         if (prevHydro == newHydro) { //But it didn't change
                             iterMap.setVoxel(iPos, (byte) 0); //Stop iterating over it if it's not changing
-                        } else {//Oh wait.. it did change
+                        } else {//Oh, wait... it did change
                             //Update both maps with this new hydro value
                             leafMap.setVoxel(iPos, (byte) newHydro);
                             iterMap.setVoxel(iPos, (byte) newHydro);

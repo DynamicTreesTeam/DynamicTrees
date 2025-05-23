@@ -1,4 +1,4 @@
 {
   "primitive_soil": "end_stone",
-  "acceptable_soils": [ "end_like" ]
+  "acceptable_soils": [ "end_like", "stone_like" ]
 }

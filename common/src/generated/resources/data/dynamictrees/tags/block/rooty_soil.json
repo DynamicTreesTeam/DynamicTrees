@@ -1,8 +1,10 @@
 {
   "values": [
     "dynamictrees:rooty_brown_terracotta",
+    "dynamictrees:rooty_clay",
     "dynamictrees:rooty_coarse_dirt",
     "dynamictrees:rooty_crimson_nylium",
+    "dynamictrees:rooty_deepslate",
     "dynamictrees:rooty_dirt",
     "dynamictrees:rooty_end_stone",
     "dynamictrees:rooty_grass_block",
@@ -22,6 +24,7 @@
     "dynamictrees:rooty_sand",
     "dynamictrees:rooty_soul_sand",
     "dynamictrees:rooty_soul_soil",
+    "dynamictrees:rooty_stone",
     "dynamictrees:rooty_terracotta",
     "dynamictrees:rooty_warped_nylium",
     "dynamictrees:rooty_water",

@@ -223,7 +223,7 @@
     "apply": {
       "cave_rooted": {
         "species": "azalea",
-        "chance": 0.66
+        "chance": 1.0
       }
     }
   },

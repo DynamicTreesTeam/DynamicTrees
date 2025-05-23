@@ -63,7 +63,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         BiomeDatabase biomeDatabase = BiomeDatabases.getDimensionalOrDefault(levelContext.dimensionName());
-        ChunkPos chunkPos = context.level().getChunk(context.origin()).getPos();
+        ChunkPos chunkPos = new ChunkPos(context.origin());
 
         DISC_PROVIDER.getPoissonDiscs(levelContext, chunkPos).forEach(disc ->
                 generateTrees(levelContext, biomeDatabase, disc, context.origin())
@@ -107,14 +107,14 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
         GeneratorResult result = GeneratorResult.GENERATED;
 
-        BiomePropertySelectors.SpeciesSelector speciesSelector = biomeEntry.getSpeciesSelector();
+        BiomePropertySelectors.SpeciesSelector speciesSelector = getSpeciesSelector(biomeEntry);
         BiomePropertySelectors.SpeciesSelection speciesSelection = speciesSelector.getSpecies(groundPos, dirtState, RANDOM);
 
         if (!biomeEntry.isBlacklisted() && speciesSelection.isHandled()) {
             Species species = speciesSelection.getSpecies();
             if (species.isValid()) {
                 if (species.isAcceptableSoilForWorldgen(levelContext.accessor(), groundPos, dirtState)) {
-                    if (biomeEntry.getChanceSelector().getChance(RANDOM, species, circle.radius) == BiomePropertySelectors.Chance.OK) {
+                    if (getChanceSelector(biomeEntry).getChance(RANDOM, species, circle.radius) == BiomePropertySelectors.Chance.OK) {
                         Holder<Biome> biome = levelContext.level().getBiome(groundPos);
                         if (!species.generate(new DynamicTreeGenerationContext(levelContext, species, originPos, groundPos.mutable(), biome, CoordUtils.getRandomDir(RANDOM), circle.radius, true))) {
                             result = GeneratorResult.FAIL_GENERATION;
@@ -138,6 +138,13 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         return result;
+    }
+
+    protected BiomePropertySelectors.SpeciesSelector getSpeciesSelector (BiomeDatabase.EntryReader biomeEntry){
+        return biomeEntry.getSpeciesSelector();
+    }
+    protected BiomePropertySelectors.ChanceSelector getChanceSelector (BiomeDatabase.EntryReader biomeEntry){
+        return biomeEntry.getChanceSelector();
     }
 
     private void generateConcreteCircle(LevelAccessor level, PoissonDisc circle, int h, GeneratorResult resultType) {

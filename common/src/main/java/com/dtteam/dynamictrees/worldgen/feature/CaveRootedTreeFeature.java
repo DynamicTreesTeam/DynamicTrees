@@ -1,19 +1,23 @@
 package com.dtteam.dynamictrees.worldgen.feature;
 
+import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.api.worldgen.GroundFinder;
 import com.dtteam.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabase;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CaveRootedTreeFeature extends DynamicTreeFeature {
 
@@ -28,7 +32,7 @@ public class CaveRootedTreeFeature extends DynamicTreeFeature {
         }
 
         BlockPos originPos = context.origin();
-        ChunkPos chunkPos = level.getChunk(originPos).getPos();
+        ChunkPos chunkPos = new ChunkPos(originPos);
         LevelContext levelContext = LevelContext.create(level);
 
         PoissonDisc disc = getDisc(levelContext, chunkPos, originPos).orElse(null);
@@ -42,18 +46,42 @@ public class CaveRootedTreeFeature extends DynamicTreeFeature {
         }
 
         BiomeDatabase.Entry biomeEntry = BiomeDatabases.getDefault().getEntry(level.getLevel().getBiome(originPos));
-        if (!biomeEntry.hasCaveRootedData())
+        if (biomeEntry.getCaveRootedData() == null)
             return false;
 
         BiomeDatabase.CaveRootedData caveRootedData = biomeEntry.getCaveRootedData();
-        BlockPos groundPos = caveRootedData.shouldGenerateOnSurface() ? groundPositions.get(groundPositions.size() - 1)
-                : getNextGroundPos(originPos, groundPositions).orElse(null);
-        if (groundPos == null || groundPos.getY() - originPos.getY() > caveRootedData.getMaxDistToSurface()) {
-            return false;
+        groundPositions = groundPositions.stream()
+                .filter(pos-> pos != BlockPos.ZERO)
+                //.filter(pos-> pos.getY() - originPos.getY() < caveRootedData.getMaxDistToSurface())
+                .sorted(Comparator.comparingInt(Vec3i::getY)).toList();
+
+        if (groundPositions.isEmpty()) return false;
+
+        if (caveRootedData.shouldGenerateOnSurface()) {
+            groundPositions = List.of(groundPositions.get(groundPositions.size() - 1));
         }
 
-        GeneratorResult result = this.generateTree(levelContext, biomeEntry, disc, originPos, groundPos);
-        return result == GeneratorResult.GENERATED;
+        AtomicBoolean generated = new AtomicBoolean(false);
+        groundPositions.forEach(groundPos -> {
+            GeneratorResult result = this.generateTree(levelContext, biomeEntry, disc, originPos, groundPos);
+            if (result == GeneratorResult.GENERATED) generated.set(true);
+        });
+
+        return generated.get();
+    }
+
+    @Override
+    protected BiomePropertySelectors.SpeciesSelector getSpeciesSelector (BiomeDatabase.EntryReader biomeEntry){
+        if (biomeEntry instanceof BiomeDatabase.Entry entry && entry.getCaveRootedData() != null)
+            return entry.getCaveRootedData().getCaveRootedSpeciesSelector();
+        return biomeEntry.getSpeciesSelector();
+    }
+
+    @Override
+    protected BiomePropertySelectors.ChanceSelector getChanceSelector (BiomeDatabase.EntryReader biomeEntry) {
+        if (biomeEntry instanceof BiomeDatabase.Entry entry && entry.getCaveRootedData() != null)
+            return entry.getCaveRootedData().getCaveRootedChanceSelector();
+        return biomeEntry.getChanceSelector();
     }
 
     private Optional<PoissonDisc> getDisc(LevelContext levelContext, ChunkPos chunkPos, BlockPos originPos) {
