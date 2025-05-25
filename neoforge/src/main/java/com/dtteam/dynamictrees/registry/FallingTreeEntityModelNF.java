@@ -11,6 +11,7 @@ import com.dtteam.dynamictrees.model.QuadManipulator;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.model.data.ModelData;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,23 +96,13 @@ public class FallingTreeEntityModelNF extends FallingTreeEntityModel {
                 }
 
                 //Draw the leaves
-                final HashMap<BlockPos, BlockState> leavesClusters = species.getFellingLeavesClusters(destructionData);
-                if (leavesClusters != null) {
-                    for (Map.Entry<BlockPos, BlockState> leafLoc : leavesClusters.entrySet()) {
-                        BlockState leafState = leafLoc.getValue();
-                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(dispatcher.getBlockModel(leafState), leafState, new Vec3(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), entity.getRandom(), ModelData.EMPTY),
-                                species.leafColorMultiplier(entity.level(), cutPos.offset(leafLoc.getKey())), leafState));
-                    }
-                } else {
-                    for (int index = 0; index < destructionData.getNumLeaves(); index++) {
-                        BlockPos relPos = destructionData.getLeavesRelPos(index);
-                        BlockState leafState = destructionData.getLeavesBlockState(index);
-                        BakedModel leavesModel = dispatcher.getBlockModel(leafState);
-                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(leavesModel, leafState, new Vec3(relPos.getX(), relPos.getY(), relPos.getZ()), entity.getRandom(), ModelData.EMPTY),
-                                destructionData.getLeavesProperties(index).treeFallColorMultiplier(leafState, entity.level(), cutPos.offset(relPos)), leafState));
-                    }
-                }
+                for (Pair<BlockPos, BlockState> leafLoc : destructionData.getAllLeavesWithPos()) {
+                    BlockState leafState = leafLoc.getValue();
+                    List<BakedQuad> bakedQuads = QuadManipulator.getQuads(dispatcher.getBlockModel(leafState), leafState, new Vec3(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), entity.getRandom(), ModelData.EMPTY);
 
+                    treeQuads.addAll(toTreeQuadData(bakedQuads, species.leafColorMultiplier(entity.level(),
+                            cutPos.offset(leafLoc.getKey())), leafState));
+                }
             }
         }
 

@@ -69,8 +69,9 @@ public final class Resources {
     public static final BiomePopulatorsResourceLoader BIOME_POPULATORS_LOADER = new BiomePopulatorsResourceLoader();
 
     public static void setupTreesResourceManager() {
+        Services.EVENT.postAddResourceLoadersEventPre(MANAGER);
         addDefaultLoaders();
-        Services.EVENT.postAddResourceLoadersEvent(MANAGER);
+        Services.EVENT.postAddResourceLoadersEventPost(MANAGER);
         MANAGER.registerAppliers();
 
         registerModTreePacks();

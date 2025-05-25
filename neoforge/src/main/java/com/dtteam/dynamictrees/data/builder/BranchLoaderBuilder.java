@@ -8,13 +8,29 @@ import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 import net.neoforged.neoforge.client.model.generators.CustomLoaderBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * @author Harley O'Connor
  */
 public final class BranchLoaderBuilder extends CustomLoaderBuilder<BlockModelBuilder> {
+
+    public static final HashMap<ResourceLocation, BiFunction<BlockModelBuilder, ExistingFileHelper, BranchLoaderBuilder>> branchBuilders = new HashMap<>();
+
+    static {
+        branchBuilders.put(
+                ClientModEventHandler.BRANCH, (parent, fileHelper)->
+                        new BranchLoaderBuilder(ClientModEventHandler.BRANCH, parent, fileHelper));
+        branchBuilders.put(
+                ClientModEventHandler.SURFACE_ROOT, (parent, fileHelper)->
+                        new BranchLoaderBuilder(ClientModEventHandler.SURFACE_ROOT, parent, fileHelper));
+        branchBuilders.put(
+                ClientModEventHandler.ROOTS, (parent, fileHelper)->
+                        new BranchLoaderBuilder(ClientModEventHandler.ROOTS, parent, fileHelper));
+    }
 
     private final Map<String, String> textures = new LinkedHashMap<>();
 
@@ -37,18 +53,6 @@ public final class BranchLoaderBuilder extends CustomLoaderBuilder<BlockModelBui
         json.add("textures", textures);
 
         return json;
-    }
-
-    public static BranchLoaderBuilder branch(BlockModelBuilder parent, ExistingFileHelper fileHelper) {
-        return new BranchLoaderBuilder(ClientModEventHandler.BRANCH, parent, fileHelper);
-    }
-
-    public static BranchLoaderBuilder surfaceRoot(BlockModelBuilder parent, ExistingFileHelper fileHelper) {
-        return new BranchLoaderBuilder(ClientModEventHandler.SURFACE_ROOT, parent, fileHelper);
-    }
-
-    public static BranchLoaderBuilder Roots(BlockModelBuilder parent, ExistingFileHelper fileHelper) {
-        return new BranchLoaderBuilder(ClientModEventHandler.ROOTS, parent, fileHelper);
     }
 
 }

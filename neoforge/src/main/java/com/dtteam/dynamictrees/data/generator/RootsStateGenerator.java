@@ -29,12 +29,12 @@ public class RootsStateGenerator implements Generator<DTDataProvider.BlockState,
             final BranchBlock root = dependencies.get(ROOT);
             final BranchLoaderBuilder builderExposed = provider.models().getBuilder(
                     Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(root)).getPath()
-            ).customLoader(BranchLoaderBuilder::Roots);
+            ).customLoader(BranchLoaderBuilder.branchBuilders.get(input.getRootsLoader()));
             input.addRootTextures(builderExposed::texture, provider.block(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_ROOT))));
 
             final BranchLoaderBuilder builderFilled = provider.models().getBuilder(
                     Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(root)).getPath() + "_filled"
-            ).customLoader(BranchLoaderBuilder::Roots);
+            ).customLoader(BranchLoaderBuilder.branchBuilders.get(input.getRootsLoader()));
             input.addRootTextures(builderFilled::texture, provider.block(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_FILLED_ROOT))));
 
             provider.getVariantBuilder(root)

@@ -1408,7 +1408,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 int radius = branch.getRadius(branchState);
                 float rotChance = rotChance(level, endPos, level.getRandom(), radius);
                 if (branch.checkForRot(level, endPos, this, fertility, radius, level.getRandom(), rotChance, worldGen) || radius != family.getPrimaryThickness()) {
-                    if (worldGen) { // worldgen
+                    if (worldGen && leafMap != null) {
                         TreeHelper.ageVolume(level, endPos.below(leafMap.getCenter().getY()), leafMap.getLenX() / 2, leafMap.getLenY(), 2, true);
                     }
                     iter.remove(); // Prune out the rotted end points, so we don't spawn fruit from them.
@@ -1462,7 +1462,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             }
         }
 
-        int maxBranchRotRadius = Services.CONFIG.getIntConfig("maxBranchRotRadius");
+        int maxBranchRotRadius = Services.CONFIG.getIntConfig(IConfigHelper.MAX_BRANCH_ROT_RADIUS);
         if (rapid || (maxBranchRotRadius != 0 && radius <= maxBranchRotRadius)) {
             BranchBlock branch = TreeHelper.getBranch(level.getBlockState(pos));
             if (branch != null) {
@@ -1986,6 +1986,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public boolean leavesAreSolid() {
         return getLeavesProperties().getPrimitiveLeaves().isSolid();
+    }
+
+    public float falloverParticleFlingMultiplier(){
+        return 1;
     }
 
     ///////////////////////////////////////////

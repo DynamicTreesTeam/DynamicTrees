@@ -103,6 +103,11 @@ public class NetherFungusSpecies extends Species {
         textureConsumer.accept("cap", capLoc);
     }
 
+    @Override
+    public float falloverParticleFlingMultiplier() {
+        return 0.5f;
+    }
+
     public SoundEvent getFallingTreeStartSound (float treeVolume, boolean hasLeaves){
         return DTRegistries.FALLING_TREE_FUNGUS_START.get();
     }

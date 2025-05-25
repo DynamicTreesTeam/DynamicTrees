@@ -25,7 +25,7 @@ public class SurfaceRootStateGenerator implements Generator<DTDataProvider.Block
             final SurfaceRootBlock surfaceRoot = dependencies.get(SURFACE_ROOT);
             provider.simpleBlock(surfaceRoot,
                     provider.models().getBuilder(Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(surfaceRoot)).getPath())
-                            .customLoader(BranchLoaderBuilder::surfaceRoot)
+                            .customLoader(BranchLoaderBuilder.branchBuilders.get(input.getSurfaceRootLoader()))
                             .texture("bark", input.getTexturePath(Family.BRANCH)
                                     .orElse(provider.block(Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_LOG))))
                                     )).end()

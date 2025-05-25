@@ -76,7 +76,7 @@
 
 
   "falling_tree_fungus_start": {
-    "subtitle": "sounds.dynamictrees.falling_tree.start",
+    "subtitle": "sounds.dynamictrees.falling_fungus.start",
     "sounds": [
       {"name": "dynamictrees:falling_tree/fungus/start1",
         "attenuation_distance": 16},
@@ -89,7 +89,7 @@
     ]
   },
   "falling_tree_fungus_end": {
-    "subtitle": "sounds.dynamictrees.falling_tree.end",
+    "subtitle": "sounds.dynamictrees.falling_fungus.end",
     "sounds": [
       {"name": "dynamictrees:falling_tree/fungus/end1"},
       {"name": "dynamictrees:falling_tree/fungus/end2"},
@@ -97,7 +97,7 @@
     ]
   },
   "falling_tree_fungus_small_end": {
-    "subtitle": "sounds.dynamictrees.falling_tree.small.end",
+    "subtitle": "sounds.dynamictrees.falling_fungus.small.end",
     "sounds": [
       "dynamictrees:falling_tree/fungus/small_end1"
     ]

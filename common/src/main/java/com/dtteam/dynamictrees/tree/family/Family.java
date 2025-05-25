@@ -856,6 +856,16 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 //        return BranchLoaderBuilder::branch;
 //    }
 
+    public ResourceLocation getSurfaceRootLoader(){
+        return DynamicTrees.location("surface_root");
+    }
+    public ResourceLocation getBranchLoader(){
+        return DynamicTrees.location("branch");
+    }
+    public ResourceLocation getRootsLoader(){
+        return DynamicTrees.location("roots");
+    }
+
     protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> branchStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("branch")

@@ -63,6 +63,9 @@ public class DTExtraLangGenerator implements Generator<DTDataProvider.Language,S
             provider.add("sounds.dynamictrees.falling_tree.small.end","Branch hits the ground");
             provider.add("sounds.dynamictrees.falling_tree.hit_water","Tree goes through water");
             provider.add("sounds.dynamictrees.falling_tree.small.hit_water","Branch falls in water");
+            provider.add("sounds.dynamictrees.falling_fungus.start","Fungus is felled");
+            provider.add("sounds.dynamictrees.falling_fungus.end","Fungus hits the ground");
+            provider.add("sounds.dynamictrees.falling_fungus.small.end","Fungus branch hits the ground");
             provider.add("config.jade.plugin_dynamictrees.rooty_water","Rooty Water");
             provider.add("config.jade.plugin_dynamictrees.fruit","Fruit");
             provider.add("config.jade.plugin_dynamictrees.rooty","Rooty Soil");

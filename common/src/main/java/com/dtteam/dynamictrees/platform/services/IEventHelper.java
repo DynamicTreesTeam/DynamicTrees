@@ -22,7 +22,8 @@ public interface IEventHelper {
 
     <V extends RegistryEntry<V>> void postRegistryEvent(AbstractRegistry<V> registry);
     <V extends RegistryEntry<V>> void postTypedRegistryEvent(TypedRegistry<V> registry);
-    void postAddResourceLoadersEvent(TreeResourceManager resourceManager);
+    void postAddResourceLoadersEventPre(TreeResourceManager resourceManager);
+    void postAddResourceLoadersEventPost(TreeResourceManager resourceManager);
     void postJsonDeserializerRegistryEvent();
     <O, I> void postApplierEvent(StagedApplierResourceLoader.ApplierStage stage, PropertyAppliers<O, I> appliers, String identifier);
     <O> void postBiomeEntryApplierEvent(JsonPropertyAppliers<O> appliers, String identifier);

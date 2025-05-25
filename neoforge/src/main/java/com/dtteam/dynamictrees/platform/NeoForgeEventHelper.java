@@ -36,8 +36,13 @@ public class NeoForgeEventHelper implements IEventHelper {
     }
 
     @Override
-    public void postAddResourceLoadersEvent(TreeResourceManager resourceManager) {
-        ModLoader.postEvent(new AddResourceLoadersEvent(resourceManager));
+    public void postAddResourceLoadersEventPre(TreeResourceManager resourceManager) {
+        ModLoader.postEvent(new AddResourceLoadersEvent.Pre(resourceManager));
+    }
+
+    @Override
+    public void postAddResourceLoadersEventPost(TreeResourceManager resourceManager) {
+        ModLoader.postEvent(new AddResourceLoadersEvent.Post(resourceManager));
     }
 
     @Override

@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -340,6 +341,21 @@ public class BranchDestructionData {
             return leaves.defaultBlockState();
         }
         return null;
+    }
+
+    public List<Pair<BlockPos, BlockState>> getAllLeavesWithPos(){
+        List<Pair<BlockPos, BlockState>> pairs = new ArrayList<>();
+        final HashMap<BlockPos, BlockState> leavesClusters = species.getFellingLeavesClusters(this);
+        if (leavesClusters != null) {
+            leavesClusters.forEach((key, value) -> pairs.add(Pair.of(key, value)));
+        } else {
+            for (int index = 0; index < getNumLeaves(); index++) {
+                BlockPos relPos = getLeavesRelPos(index);
+                BlockState leafState = getLeavesBlockState(index);
+                pairs.add(Pair.of(relPos, leafState));
+            }
+        }
+        return pairs;
     }
 
     ///////////////////////////////////////////////////////////

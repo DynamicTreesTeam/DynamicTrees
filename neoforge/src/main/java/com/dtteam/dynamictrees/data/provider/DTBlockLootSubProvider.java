@@ -53,7 +53,7 @@ public class DTBlockLootSubProvider extends BlockLootSubProvider {
         Fruit.REGISTRY.dataGenerationStream(modId).forEach(this::addFruitBlockTable);
         Pod.REGISTRY.dataGenerationStream(modId).forEach(this::addPodBlockTable);
 
-        ModLoader.postEvent(new DataGenerationStreamEvent(this, modId, fileHelper, map));
+        ModLoader.postEvent(new DataGenerationStreamEvent(this, modId, fileHelper, map, registries));
     }
 
     @Override

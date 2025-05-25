@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.event;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -15,13 +16,15 @@ public class DataGenerationStreamEvent extends Event implements IModBusEvent {
     private final Map<ResourceKey<LootTable>, LootTable.Builder> map;
     private final LootTableSubProvider provider;
     private final String modId;
+    private final HolderLookup.Provider registries;
 
-    public DataGenerationStreamEvent(final LootTableSubProvider tableProvider, String modId, ExistingFileHelper fileHelper, Map<ResourceKey<LootTable>, LootTable.Builder> map) {
+    public DataGenerationStreamEvent(final LootTableSubProvider tableProvider, String modId, ExistingFileHelper fileHelper, Map<ResourceKey<LootTable>, LootTable.Builder> map, HolderLookup.Provider registries) {
         super();
         this.provider = tableProvider;
         this.modId = modId;
         this.fileHelper = fileHelper;
         this.map = map;
+        this.registries = registries;
     }
 
     public LootTableSubProvider getProvider() {
@@ -38,5 +41,9 @@ public class DataGenerationStreamEvent extends Event implements IModBusEvent {
 
     public Map<ResourceKey<LootTable>, LootTable.Builder> getMap() {
         return map;
+    }
+
+    public HolderLookup.Provider getRegistries(){
+        return registries;
     }
 }

@@ -25,7 +25,7 @@ public class BranchStateGenerator implements Generator<DTDataProvider.BlockState
             final BranchBlock branch = dependencies.get(BRANCH);
             final BranchLoaderBuilder builder = provider.models().getBuilder(
                     Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(branch)).getPath()
-            ).customLoader(BranchLoaderBuilder::branch); //branch.getFamily().getBranchLoaderConstructor()
+            ).customLoader(BranchLoaderBuilder.branchBuilders.get(input.getBranchLoader()));
             Block block = dependencies.get(PRIMITIVE_LOG);
             input.addBranchTextures(builder::texture, provider.block(BuiltInRegistries.BLOCK.getKey(block)), block);
             provider.simpleBlock(branch, builder.end());

@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.client.SoundInstanceHandler;
 import com.dtteam.dynamictrees.data.tags.DTEntityTypeTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
+import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -26,9 +27,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class FalloverAnimationHandler implements AnimationHandler {
@@ -112,24 +116,25 @@ public class FalloverAnimationHandler implements AnimationHandler {
         if (toolAxis == Direction.Axis.Y) return; //this one isn't possible anyways
         
         double limitChance = 1;
-        if (entity.getDestroyData().getNumLeaves() > maxParticleBlocks)
-            limitChance = maxParticleBlocks / (double)entity.getDestroyData().getNumLeaves();
+        if (data.getNumLeaves() > maxParticleBlocks)
+            limitChance = maxParticleBlocks / (double)data.getNumLeaves();
         limitChance *= Math.exp(-bounces);
 
         RandomSource rand = entity.level().random;
-        int particleCount = bounces == 0 ? (int)(fallSpeed*5) : 1;
+        int particleCount = (int)((bounces == 0 ? (int)(fallSpeed*5) : 1) * data.species.falloverParticleFlingMultiplier());
+
+        if (particleCount == 0) return;
         
         Vec3 angularVel = entity.getForward().scale(fallSpeed * -data.toolDir.getAxisDirection().getStep());
         //on the X axis, the entity forward is rotated, so we rotate the angular velocity back
         if (toolAxis == Direction.Axis.X) angularVel = new Vec3(angularVel.z, angularVel.x, angularVel.y);
 
-        for (int i=0; i<data.getNumLeaves(); i++){
-            BlockPos leaves = data.getLeavesRelPos(i).offset(data.basePos);
+        for (Pair<BlockPos, BlockState> leafLoc : data.getAllLeavesWithPos()) {
+            BlockPos leaves = leafLoc.getKey().offset(data.basePos);
             double r = leaves.getY() - data.basePos.getY();
             Vec3 velocity = angularVel.scale(r);
-            BlockState leavesState = entity.getDestroyData().getLeavesBlockState(i);
 
-            spawnParticlesAtLeaves(entity, leaves, leavesState, velocity, rand, particleCount, limitChance);
+            spawnParticlesAtLeaves(entity, leaves, leafLoc.getValue(), velocity, rand, particleCount, limitChance);
         }
     }
 

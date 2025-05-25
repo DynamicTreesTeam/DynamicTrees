@@ -7,7 +7,7 @@ import net.neoforged.fml.event.IModBusEvent;
 /**
  * @author Harley O'Connor
  */
-public final class AddResourceLoadersEvent extends Event implements IModBusEvent {
+public class AddResourceLoadersEvent extends Event implements IModBusEvent {
 
     private final TreeResourceManager resourceManager;
 
@@ -17,6 +17,18 @@ public final class AddResourceLoadersEvent extends Event implements IModBusEvent
 
     public TreeResourceManager getResourceManager() {
         return resourceManager;
+    }
+
+    public static final class Pre extends AddResourceLoadersEvent{
+        public Pre(TreeResourceManager resourceManager) {
+            super(resourceManager);
+        }
+    }
+
+    public static final class Post extends AddResourceLoadersEvent{
+        public Post(TreeResourceManager resourceManager) {
+            super(resourceManager);
+        }
     }
 
 }
