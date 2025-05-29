@@ -73,6 +73,7 @@ def changelogFile = file("build/changelog.txt")
 
 publishMods {
     file = jar.archiveFile
+    displayName = "${mod_name.replace(' ','')}-${minecraft_version} ${version}"
     if (changelogFile.exists()) {
         changelog.set(changelogFile.getText())
     }
