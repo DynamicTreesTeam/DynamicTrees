@@ -32,14 +32,14 @@ public class LargePalmLeavesBakedModel extends PalmLeavesBakedModel {
             SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel, ItemOverrides.EMPTY, false).particle(frondsTexture);
 
             BlockVertexData[] quadData = {
-                    new BlockVertexData(0, 0, 3, 15, 4),
-                    new BlockVertexData(0, 1, 3, 15, 0),
+                    new BlockVertexData(0, 0, 3, 15/16f, 4/16f),
+                    new BlockVertexData(0, 1, 3, 15/16f, 0),
                     new BlockVertexData(0, 1, 0, 0, 0),
-                    new BlockVertexData(0, 0, 0, 0, 4),
-                    new BlockVertexData(0, 0, 3, 15, 4),
-                    new BlockVertexData(0, 0, 0, 0, 4),
+                    new BlockVertexData(0, 0, 0, 0, 4/16f),
+                    new BlockVertexData(0, 0, 3, 15/16f, 4/16f),
+                    new BlockVertexData(0, 0, 0, 0, 4/16f),
                     new BlockVertexData(0, 1, 0, 0, 0),
-                    new BlockVertexData(0, 1, 3, 15, 0)
+                    new BlockVertexData(0, 1, 3, 15/16f, 0)
             };
 
             for (int pass = 0; pass < 4; pass++) {
