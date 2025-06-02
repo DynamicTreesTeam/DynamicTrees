@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
+import com.dtteam.dynamictrees.client.ThickBranchRingsSource;
 import com.dtteam.dynamictrees.entity.render.FallingTreeRenderer;
 import com.dtteam.dynamictrees.entity.render.LingeringEffectorRenderer;
 import com.dtteam.dynamictrees.model.baked.BakedModelBlockPottedSapling;
@@ -35,9 +36,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
 import java.util.List;
@@ -202,6 +201,11 @@ public class ClientModEventHandler {
     public static void onModelModifyBakingResultResult(ModelEvent.ModifyBakingResult event) {
         // Put bonsai pot baked model into its model location.
         event.getModels().computeIfPresent(new ModelResourceLocation(DynamicTrees.location("potted_sapling"), ""), (k, val) -> new BakedModelBlockPottedSapling(val));
+    }
+
+    @SubscribeEvent
+    public static void stitchTextureAtlas(RegisterSpriteSourceTypesEvent event) {
+        event.register(ThickBranchRingsSource.ID, ThickBranchRingsSource.setType(ThickBranchRingsSource.CODEC));
     }
 
 }

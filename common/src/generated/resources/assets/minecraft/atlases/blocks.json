@@ -1,0 +1,84 @@
+{
+  "sources": [
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/acacia_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/stripped_acacia_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/birch_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/stripped_birch_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/cherry_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/stripped_cherry_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/crimson_stem_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/stripped_crimson_stem_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/dark_oak_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/stripped_dark_oak_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/jungle_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/stripped_jungle_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/mangrove_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/stripped_mangrove_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/oak_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/stripped_oak_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/spruce_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/stripped_spruce_log_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/warped_stem_top"
+    },
+    {
+      "type": "dynamictrees:thick_branch_rings",
+      "resource": "minecraft:block/stripped_warped_stem_top"
+    }
+  ]
+}

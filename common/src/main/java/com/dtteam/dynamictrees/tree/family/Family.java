@@ -57,8 +57,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.prefix;
-import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.suffix;
+import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.*;
 
 /**
  * This structure describes a Family whose member Species all have a common branch.
@@ -981,6 +980,27 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
         textureConsumer.accept("bark", bark);
         textureConsumer.accept("rings", rings);
+    }
+
+    public List<ResourceLocation> topBranchTextureLocations(){
+        List<ResourceLocation> locations = new ArrayList<>();
+        if (getPrimitiveLog().isPresent()){
+            locations.add(topBranchTextureLocation(getPrimitiveLog().get(), BRANCH_TOP));
+        }
+        if (getPrimitiveStrippedLog().isPresent()){
+            locations.add(topBranchTextureLocation(getPrimitiveStrippedLog().get(), STRIPPED_BRANCH_TOP));
+        }
+        return locations;
+    }
+    protected ResourceLocation topBranchTextureLocation(Block block, String key){
+        if (textureOverrides.containsKey(key)){
+            return textureOverrides.get(key);
+        } else {
+            ResourceLocation textureLoc = BuiltInRegistries.BLOCK.getKey(block);
+            textureLoc = surround(textureLoc, "block/", "_top");
+            return textureLoc;
+        }
+
     }
 
     //////////////////////////////

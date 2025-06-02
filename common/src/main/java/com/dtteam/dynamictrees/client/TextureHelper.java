@@ -19,6 +19,18 @@ public class TextureHelper {
             pixels = new int[w * h];
         }
 
+        public PixelBuffer(NativeImage image) {
+            this.w = image.getWidth();
+            this.h = image.getHeight();
+            pixels = new int[w * h];
+            for (int x = 0; x < w; x++) {
+                for (int y = 0; y < h; y++) {
+                    pixels[calcPos(x, y)] = image.getPixelRGBA(x, y);
+                }
+            }
+
+        }
+
         public PixelBuffer(TextureAtlasSprite sprite) {
             this.w = sprite.contents().width();
             this.h = sprite.contents().height();

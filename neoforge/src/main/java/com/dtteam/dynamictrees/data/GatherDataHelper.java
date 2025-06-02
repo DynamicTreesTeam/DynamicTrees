@@ -44,6 +44,8 @@ public final class GatherDataHelper {
     }
 
     public static void gatherBlockStateAndModelData(final String modId, final GatherDataEvent event, Registry<?>... registries) {
+        event.getGenerator().addProvider(event.includeServer(), new DTSpriteSourceProvider(event.getGenerator().getPackOutput(),
+                event.getLookupProvider(), modId, event.getExistingFileHelper(), registries));
         event.getGenerator().addProvider(event.includeServer(), new DTBlockStateProvider(event.getGenerator().getPackOutput(), modId,
                 event.getExistingFileHelper(), Arrays.asList(registries)));
     }
