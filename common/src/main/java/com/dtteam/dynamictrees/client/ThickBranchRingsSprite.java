@@ -12,6 +12,10 @@ import net.neoforged.api.distmarker.OnlyIn;
 public class ThickBranchRingsSprite extends SpriteContents {
     private static final int RESOLUTION = 16;
     private static final int LAYERS = 3;
+    private static final int[][] CORNERS_XY = new int[][]{
+            {0, 1, 1, 0},
+            {0, 0, 1, 1}
+    };
 
     public ThickBranchRingsSprite(ResourceLocation name, SpriteContents originalSprite){
         super(name, getFrameSize(originalSprite), processImage(originalSprite.originalImage), originalSprite.metadata);
@@ -91,15 +95,11 @@ public class ThickBranchRingsSprite extends SpriteContents {
         }
     }
     private static void fillCorners(TextureHelper.PixelBuffer majorBuffer, TextureHelper.PixelBuffer[] corners, int scale){
-        int[][] cornerXY = new int[][]{
-                {-1, 1, 1, -1},
-                {-1, -1, 1, 1}
-        };
         for (int nesting = 1; nesting <= LAYERS; nesting++) {
             for (int corner = 0; corner < 4; corner++) {
                 TextureHelper.PixelBuffer cornerPixels = corners[(corner + nesting) & 0x3];
-                int cX = cornerXY[0][corner];
-                int cY = cornerXY[1][corner];
+                int cX = (2 * CORNERS_XY[0][corner]) - 1;
+                int cY = (2 * CORNERS_XY[1][corner]) - 1;
                 int offX = cX * 6 * nesting + cX * 5;
                 int offY = cY * 6 * nesting + cY * 5;
                 int realX = centerCorner() + 5 + offX;
@@ -113,31 +113,31 @@ public class ThickBranchRingsSprite extends SpriteContents {
     }
     private static void compileBarkCornersAndEdges(TextureHelper.PixelBuffer[] corners, TextureHelper.PixelBuffer[] edges, TextureHelper.PixelBuffer baseBuffer, int scale){
         for (int i = 0; i < 4; i++) {
-            corners[i] = new TextureHelper.PixelBuffer(scale, scale);
-            edges[i] = new TextureHelper.PixelBuffer(14 * scale, scale);
+            corners[i] = new TextureHelper.PixelBuffer(2*scale, 2*scale);
+            edges[i] = new TextureHelper.PixelBuffer((RESOLUTION-2) * scale, scale);
             baseBuffer.blit(corners[i], 0, 0, i);
             baseBuffer.blit(edges[i], -1 * scale, 0, i);
         }
     }
     private static void fillBarkBorder(TextureHelper.PixelBuffer majorBuffer, TextureHelper.PixelBuffer[] corners, TextureHelper.PixelBuffer[] edges, int scale){
-        int[][] cornerXY = new int[][]{
-                {-1, 1, 1, -1},
-                {-1, -1, 1, 1}
-        };
         int pixbufSel = 0;
         for (int row = 0; row <= LAYERS; row++) {
             TextureHelper.PixelBuffer edge = edges[((pixbufSel++ * 13402141) >> 1) & 3];
             int span = edge.w;
-            edge.blit(majorBuffer, (1 + row * span) * scale, 0, 0);
-            edge.blit(majorBuffer, (majorBuffer.w - edge.h) * scale, (1 + row * span) * scale, 1);
-            edge.blit(majorBuffer, (majorBuffer.w - 1 - span - row * span) * scale, (majorBuffer.h - edge.h) * scale, 2);
-            edge.blit(majorBuffer, 0, (majorBuffer.h - 1 - edge.w - row * span) * scale, 3);
+            int segmentOffset = scale + row * span;
+            edge.blit(majorBuffer, segmentOffset, 0, 0);
+            edge.blit(majorBuffer, majorBuffer.w - edge.h, segmentOffset, 1);
+            edge.blit(majorBuffer, (majorBuffer.w - span) - segmentOffset , majorBuffer.h - edge.h, 2);
+            edge.blit(majorBuffer, 0, (majorBuffer.h - span) - segmentOffset, 3);
         }
         for (int corner = 0; corner < 4; corner++) {
-            int cX = cornerXY[0][corner] >> 1;
-            int cY = cornerXY[1][corner] >> 1;
+            int cX = CORNERS_XY[0][corner];
+            int cY = CORNERS_XY[1][corner];
             TextureHelper.PixelBuffer cornerPixels = corners[corner];
-            cornerPixels.blit(majorBuffer, cX * (majorBuffer.w - cornerPixels.w) * scale, cY * (majorBuffer.h - cornerPixels.h) * scale, corner);
+            cornerPixels.blit(majorBuffer,
+                    cX * (majorBuffer.w - cornerPixels.w),
+                    cY * (majorBuffer.h - cornerPixels.h),
+                    corner);
         }
     }
 
@@ -156,7 +156,7 @@ public class ThickBranchRingsSprite extends SpriteContents {
         //Copy a 6 wide strip of pixels from the 4th pixel ring and place
         //it over the bark texture for all 4 edges.  Alternate the placement
         //to break up the pattern
-        TextureHelper.PixelBuffer ringStrip = new TextureHelper.PixelBuffer(6 * scale, 1 * scale);
+        TextureHelper.PixelBuffer ringStrip = new TextureHelper.PixelBuffer(5 * scale, 1 * scale);
         baseBuffer.blit(ringStrip, -5 * scale, -3 * scale);
         ringStrip.blit(antecedent, 0 * scale, 2 * scale, -1);
         ringStrip.blit(antecedent, 15 * scale, 8 * scale, 1);
@@ -165,7 +165,7 @@ public class ThickBranchRingsSprite extends SpriteContents {
         ringStrip.blit(antecedent, 0 * scale, 8 * scale, 1);
         ringStrip.blit(antecedent, 15 * scale, 2 * scale, -1);
 
-        ringStrip = new TextureHelper.PixelBuffer(1 * scale, 6 * scale);
+        ringStrip = new TextureHelper.PixelBuffer(1 * scale, 5 * scale);
         baseBuffer.blit(ringStrip, -3 * scale, -5 * scale);
         ringStrip.blit(antecedent, 2 * scale, 0 * scale, -1);
         ringStrip.blit(antecedent, 8 * scale, 15 * scale, 1);
@@ -174,10 +174,28 @@ public class ThickBranchRingsSprite extends SpriteContents {
         ringStrip.blit(antecedent, 8 * scale, 0 * scale, 1);
         ringStrip.blit(antecedent, 2 * scale, 15 * scale, -1);
 
+        //save the corners
+        TextureHelper.PixelBuffer[] corners = new TextureHelper.PixelBuffer[4];
+        for (int i = 0; i < 4; i++) {
+            corners[i] = new TextureHelper.PixelBuffer(2 * scale, 2 * scale);
+            antecedent.blit(corners[i], 0, 0, i);
+        }
+
         //Copy the center 14x14 pixels of the original back over the result
         TextureHelper.PixelBuffer center = new TextureHelper.PixelBuffer(14 * scale, 14 * scale);
         baseBuffer.blit(center, -1 * scale, -1 * scale);
         center.blit(antecedent, 1 * scale, 1 * scale);
+
+        //apply the corners
+        for (int corner = 0; corner < 4; corner++) {
+            int cX = CORNERS_XY[0][corner];
+            int cY = CORNERS_XY[1][corner];
+            TextureHelper.PixelBuffer cornerPixels = corners[corner];
+            cornerPixels.blit(antecedent,
+                    cX * (antecedent.w - cornerPixels.w),
+                    cY * (antecedent.h - cornerPixels.h),
+                    corner);
+        }
 
         return antecedent;
     }
