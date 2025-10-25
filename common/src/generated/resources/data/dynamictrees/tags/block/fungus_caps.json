@@ -1,6 +1,8 @@
 {
   "values": [
     "dynamictrees:crimson_sapling",
+    "dynamictrees:mega_crimson_sapling",
+    "dynamictrees:mega_warped_sapling",
     "dynamictrees:warped_sapling"
   ]
 }

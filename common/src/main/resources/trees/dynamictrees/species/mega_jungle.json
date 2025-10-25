@@ -53,5 +53,8 @@
             }
         },
         "bottom_flare"
-    ]
+    ],
+    "lang_overrides": {
+        "seed": "Mega Jungle Pod"
+    }
 }

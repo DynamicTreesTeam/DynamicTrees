@@ -44,5 +44,8 @@
                 "quantity": 7
             }
         }
-    ]
+    ],
+    "lang_overrides": {
+        "seed": "Mega Crimson Cap"
+    }
 }

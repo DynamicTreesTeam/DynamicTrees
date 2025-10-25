@@ -34,5 +34,8 @@
         "clear_volume",
         "shroomlight",
         "bottom_flare"
-    ]
+    ],
+    "lang_overrides": {
+        "seed": "Mega Warped Cap"
+    }
 }

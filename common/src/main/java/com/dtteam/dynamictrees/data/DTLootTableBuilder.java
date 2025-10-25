@@ -102,6 +102,9 @@ public class DTLootTableBuilder {
     }
 
     public static LootTable.Builder createLeavesDrops(float[] seedChances, LootContextParamSet parameterSet, HolderLookup.Provider registries) {
+        return createLeavesDrops(seedChances, parameterSet, Items.STICK, registries);
+    }
+    public static LootTable.Builder createLeavesDrops(float[] seedChances, LootContextParamSet parameterSet, Item stickItem, HolderLookup.Provider registries) {
         return LootTable.lootTable().withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
                         SeedItemLootPoolEntry.lootTableSeedItem()

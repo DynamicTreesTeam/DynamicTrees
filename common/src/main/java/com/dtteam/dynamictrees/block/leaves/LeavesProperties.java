@@ -239,7 +239,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         if (primitiveLeaves != null && getPrimitiveLeavesBlock().isPresent()) {
             return DTLootTableBuilder.createLeavesBlockDrops(primitiveLeaves.getBlock(), seedDropChances, getFamily().getStick(1).getItem(), registries);
         }
-        return DTLootTableBuilder.createLeavesDrops(seedDropChances, LootContextParamSets.BLOCK, registries);
+        return DTLootTableBuilder.createLeavesDrops(seedDropChances, LootContextParamSets.BLOCK, getFamily().getStick(1).getItem(), registries);
     }
 
     private final LootTableSupplier lootTableSupplier;
@@ -257,7 +257,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     public LootTable.Builder createDrops(HolderLookup.Provider registries) {
-        return DTLootTableBuilder.createLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES, registries);
+        return DTLootTableBuilder.createLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES, getFamily().getStick(1).getItem(), registries);
     }
 
     public List<ItemStack> getDrops(Level level, BlockPos pos, ItemStack tool, Species species) {
