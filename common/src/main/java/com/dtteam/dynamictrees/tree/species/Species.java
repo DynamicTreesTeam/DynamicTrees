@@ -1953,6 +1953,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         megaSpecies.preMegaSpecies = this;
     }
 
+    private boolean canCraftMegaSeed = true;
+
+    public void setCanCraftMegaSeed(boolean canCraftMegaSeed) {
+        this.canCraftMegaSeed = canCraftMegaSeed;
+    }
+
+    public boolean canCraftMegaSeed() {
+        return canCraftMegaSeed;
+    }
+
     ///////////////////////////////////////////
     // FALL ANIMATION HANDLING
     ///////////////////////////////////////////
@@ -1964,8 +1974,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     /**
      * This is used for trees that have leaves that are not cubes and require extra blockstate properties such as palm
      * fronds. Used for tree felling animation.
-     *
-     * @return
      */
     @Nullable
     public HashMap<BlockPos, BlockState> getFellingLeavesClusters(final BranchDestructionData destructionData) {

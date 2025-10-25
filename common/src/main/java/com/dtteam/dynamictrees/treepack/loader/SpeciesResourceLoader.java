@@ -105,6 +105,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("world_gen_leaf_map_height", Integer.class, Species::setWorldGenLeafMapHeight)
                 .register("environment_factors", JsonObject.class, this::applyEnvironmentFactors)
                 .register("mega_species", ResourceLocation.class, this::setMegaSpecies)
+                .register("can_craft_mega_seed", Boolean.class, Species::setCanCraftMegaSeed)
                 .register("seed", Seed.class, (species, seed) -> species.setSeed(() -> seed))
                 .register("seed_composter_chance", Float.class, this.composterChanceCache::put)
                 .register("tint_sapling", Boolean.class, Species::setTintSapling)
@@ -177,8 +178,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
 
     private void setMegaSpecies(Species species, ResourceLocation registryName) {
         final ResourceLocation processedRegName = ResourceLocationUtils.parseDTLocation(registryName);
-        Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(processedRegName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '" +
-                species + "' as Species '" + processedRegName + "' was not found.")));
+        Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(processedRegName, species::setMegaSpecies, () -> LOGGER.warn("Could not set mega species for '{}' as Species '{}' was not found.", species, processedRegName)));
     }
 
     private PropertyApplierResult addAcceptableSoil(Species species, String acceptableSoil) {

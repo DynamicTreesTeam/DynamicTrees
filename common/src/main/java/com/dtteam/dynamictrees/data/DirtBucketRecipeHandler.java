@@ -11,9 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,9 +47,9 @@ public final class DirtBucketRecipeHandler {
                     List<Item> ingredients = saplingRecipe.getIngredientsForSaplingToSeed();
                     ingredients.add(DTRegistries.DIRT_BUCKET.get());
                     ingredients.add(saplingItem);
-                    craftingRecipes.add(new RecipeHolder<>(saplingToSeed, createShapeless(saplingToSeed,
+                    craftingRecipes.add(createShapeless(saplingToSeed,
                             species.getSeedStack(1), //result
-                            ingredients(ingredients)))); //ingredients
+                            ingredients(ingredients))); //ingredients
                 }
 
                 if (saplingRecipe.canCraftSeedToSapling()) {
@@ -61,12 +59,21 @@ public final class DirtBucketRecipeHandler {
                     List<Item> ingredients = saplingRecipe.getIngredientsForSeedToSapling();
                     ingredients.add(DTRegistries.DIRT_BUCKET.get());
                     ingredients.add(species.getSeed().map(Item.class::cast).orElse(Items.AIR));
-                    craftingRecipes.add(new RecipeHolder<>(seedToSapling, createShapeless(seedToSapling,
+                    craftingRecipes.add(createShapeless(seedToSapling,
                             new ItemStack(saplingItem), //result
-                            ingredients(ingredients)))); //ingredients
+                            ingredients(ingredients))); //ingredients
                 }
 
             });
+
+            if (species.isMegaSpecies() && species.getPreMegaSpecies().hasSeed() && species.getPreMegaSpecies().canCraftMegaSeed()){
+                final ResourceLocation resLoc = ResourceLocation.fromNamespaceAndPath(registryName.getNamespace(),
+                        registryName.getPath() + "_mega_of_" + species.getPreMegaSpecies().getRegistryName().getPath());
+
+                Item preMegaSeed = species.getPreMegaSpecies().getSeed().orElse(null);
+
+                craftingRecipes.add(createSquare(resLoc, species.getSeedStack(1), Ingredient.of(preMegaSeed)));
+            }
         }
     }
 
@@ -74,8 +81,15 @@ public final class DirtBucketRecipeHandler {
         return resourceLocation.getNamespace() + "_" + resourceLocation.getPath();
     }
 
-    private static ShapelessRecipe createShapeless(final ResourceLocation registryName, final ItemStack out, final Ingredient... ingredients) {
-        return new ShapelessRecipe("CRAFTING_MISC", CraftingBookCategory.MISC, out, NonNullList.of(Ingredient.EMPTY, ingredients));
+    private static RecipeHolder<ShapelessRecipe> createShapeless(final ResourceLocation registryName, final ItemStack out, final Ingredient... ingredients) {
+        ShapelessRecipe recipe = new ShapelessRecipe("CRAFTING_MISC", CraftingBookCategory.MISC, out, NonNullList.of(Ingredient.EMPTY, ingredients));;
+        return new RecipeHolder<>(registryName, recipe);
+    }
+
+    private static RecipeHolder<ShapedRecipe> createSquare(final ResourceLocation registryName, final ItemStack out, final Ingredient ingredient) {
+        ShapedRecipePattern pattern = ShapedRecipePattern.of(Map.of('#', ingredient), Arrays.asList("##","##"));
+        ShapedRecipe recipe = new ShapedRecipe("CRAFTING_MISC", CraftingBookCategory.MISC, pattern, out, NonNullList.create().add(ingredient));
+        return new RecipeHolder<>(registryName, recipe);
     }
 
     private static Ingredient[] ingredients(Collection<Item> items) {
