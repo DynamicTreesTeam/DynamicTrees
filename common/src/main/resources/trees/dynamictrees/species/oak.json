@@ -4,8 +4,6 @@
     "signal_energy": 12.0,
     "growth_rate": 0.8,
     "leaves_properties": "oak",
-    "generate_seed": true,
-    "generate_sapling": true,
     "environment_factors" : {
         "#forge:is_cold": 0.75,
         "#forge:is_hot": 0.5,

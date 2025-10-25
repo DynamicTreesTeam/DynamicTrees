@@ -14,6 +14,8 @@
         }
     },
     "leaves_properties": "spruce",
+    "generate_seed": false,
+    "generate_sapling": false,
     "environment_factors" : {
         "#forge:is_hot": 0.50,
         "#forge:is_dry": 0.25,

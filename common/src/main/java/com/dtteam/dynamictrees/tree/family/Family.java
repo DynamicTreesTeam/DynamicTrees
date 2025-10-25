@@ -83,7 +83,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     public final static Family NULL_FAMILY = new Family() {
         @Override
-        public void setupCommonSpecies(Species species) {
+        public void setCommonSpecies(Species species) {
         }
 
         @Override
@@ -216,13 +216,12 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public void setCommonSpecies(final Species species) {
-        this.commonSpecies = species;
-    }
-
-    public void setupCommonSpecies(final Species species) {
         // Set the common species and auto-generate seeds and saplings unless opted out.
-        this.commonSpecies = species.setShouldGenerateSeedIfNull(true).setShouldGenerateSaplingIfNull(true)
-                .generateSeed().generateSapling();
+        this.commonSpecies = species
+                .setShouldGenerateSeedIfNull(true)
+                .setShouldGenerateSaplingIfNull(true)
+                .generateSeed()
+                .generateSapling();
     }
 
     public Species getCommonSpecies() {
