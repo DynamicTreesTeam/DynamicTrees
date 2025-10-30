@@ -161,12 +161,12 @@ public final class Resources {
             return CompletableFuture.allOf(futures)
                     .thenCompose(stage::wait)
                     .thenAcceptAsync(v -> MANAGER.reload(futures), gameExecutor)
-                    .thenRunAsync(this::registerDirtBucketRecipes, gameExecutor)
-                    ;
+                    .thenRunAsync(this::registerDirtBucketRecipes, gameExecutor);
         }
 
         private void registerDirtBucketRecipes() {
-            if (!Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_DIRT_BUCKET_RECIPES)) {
+            if (!Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_DIRT_BUCKET_RECIPES)
+                    && !Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_MEGA_SEED_RECIPE)) {
                 return;
             }
 

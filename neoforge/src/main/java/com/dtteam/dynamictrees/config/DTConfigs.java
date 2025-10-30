@@ -136,6 +136,8 @@ public class DTConfigs {
         COMMON_BUILDER.comment("Miscellaneous Settings").push("misc");
         registerConfig(COMMON_BUILDER.comment("If enabled, dirt bucket recipes will be automatically generated.")
                 .define(IConfigHelper.GENERATE_DIRT_BUCKET_RECIPES, true));
+        registerConfig(COMMON_BUILDER.comment("If enabled, seeds for mega species can be crafted with four regular seeds.")
+                .define(IConfigHelper.GENERATE_MEGA_SEED_RECIPE, false));
         registerConfig(COMMON_BUILDER.comment("The base potion the Biochar Base is brewed from. Minecraft potions use 'awkward'. If you change this, don't forget to update the patchouli manual page too.")
                 .define(IConfigHelper.BIOCHAR_BREWING_BASE, "minecraft:thick"));
         COMMON_BUILDER.pop();

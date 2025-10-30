@@ -1,6 +1,8 @@
 package com.dtteam.dynamictrees.data;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.NonNullList;
@@ -31,50 +33,62 @@ public final class DirtBucketRecipeHandler {
 
             final ResourceLocation registryName = species.getRegistryName();
 
-            species.getPrimitiveSaplingRecipes().forEach(saplingRecipe -> {
-                final Item saplingItem = saplingRecipe.getSaplingItem().orElse(null);
-                if (saplingItem == null) {
-                    DynamicTrees.LOG.error("Error creating seed-sapling recipe for species \"{}\" as sapling item does not exist.", species.getRegistryName());
-                    return;
-                } else {
-                    BuiltInRegistries.ITEM.getKey(saplingItem);
-                }
+            if (Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_DIRT_BUCKET_RECIPES)){
+                generateSaplingRecipes(craftingRecipes, species, registryName);
+            }
 
-                if (saplingRecipe.canCraftSaplingToSeed()) {
-                    final ResourceLocation saplingToSeed = ResourceLocation.fromNamespaceAndPath(registryName.getNamespace(),
-                            separate(BuiltInRegistries.ITEM.getKey(saplingItem)) + "_to_" + registryName.getPath() + "_seed");
-
-                    List<Item> ingredients = saplingRecipe.getIngredientsForSaplingToSeed();
-                    ingredients.add(DTRegistries.DIRT_BUCKET.get());
-                    ingredients.add(saplingItem);
-                    craftingRecipes.add(createShapeless(saplingToSeed,
-                            species.getSeedStack(1), //result
-                            ingredients(ingredients))); //ingredients
-                }
-
-                if (saplingRecipe.canCraftSeedToSapling()) {
-                    final ResourceLocation seedToSapling = ResourceLocation.fromNamespaceAndPath(registryName.getNamespace(),
-                            registryName.getPath() + "_seed_to_" + separate(BuiltInRegistries.ITEM.getKey(saplingItem)));
-
-                    List<Item> ingredients = saplingRecipe.getIngredientsForSeedToSapling();
-                    ingredients.add(DTRegistries.DIRT_BUCKET.get());
-                    ingredients.add(species.getSeed().map(Item.class::cast).orElse(Items.AIR));
-                    craftingRecipes.add(createShapeless(seedToSapling,
-                            new ItemStack(saplingItem), //result
-                            ingredients(ingredients))); //ingredients
-                }
-
-            });
-
-            if (species.isMegaSpecies() && species.getPreMegaSpecies().hasSeed() && species.getPreMegaSpecies().canCraftMegaSeed()){
-                final ResourceLocation resLoc = ResourceLocation.fromNamespaceAndPath(registryName.getNamespace(),
-                        registryName.getPath() + "_mega_of_" + species.getPreMegaSpecies().getRegistryName().getPath());
-
-                Item preMegaSeed = species.getPreMegaSpecies().getSeed().orElse(null);
-
-                craftingRecipes.add(createSquare(resLoc, species.getSeedStack(1), Ingredient.of(preMegaSeed)));
+            if (Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_MEGA_SEED_RECIPE)){
+                generateMegaSeedRecipes(craftingRecipes, species, registryName);
             }
         }
+    }
+
+    private static void generateMegaSeedRecipes(Collection<RecipeHolder<?>> craftingRecipes, Species species, ResourceLocation registryName) {
+        if (species.isMegaSpecies()
+                && species.getPreMegaSpecies().hasSeed()
+                && species.getPreMegaSpecies().canCraftMegaSeed()){
+            final ResourceLocation resLoc = ResourceLocation.fromNamespaceAndPath(registryName.getNamespace(),
+                    registryName.getPath() + "_mega_of_" + species.getPreMegaSpecies().getRegistryName().getPath());
+
+            Item preMegaSeed = species.getPreMegaSpecies().getSeed().orElse(null);
+
+            craftingRecipes.add(createSquare(resLoc, species.getSeedStack(1), Ingredient.of(preMegaSeed)));
+        }
+    }
+
+    private static void generateSaplingRecipes(Collection<RecipeHolder<?>> craftingRecipes, Species species, ResourceLocation registryName) {
+        species.getPrimitiveSaplingRecipes().forEach(saplingRecipe -> {
+            final Item saplingItem = saplingRecipe.getSaplingItem().orElse(null);
+            if (saplingItem == null) {
+                DynamicTrees.LOG.error("Error creating seed-sapling recipe for species \"{}\" as sapling item does not exist.", species.getRegistryName());
+                return;
+            } else {
+                BuiltInRegistries.ITEM.getKey(saplingItem);
+            }
+
+            if (saplingRecipe.canCraftSaplingToSeed()) {
+                final ResourceLocation saplingToSeed = ResourceLocation.fromNamespaceAndPath(registryName.getNamespace(),
+                        separate(BuiltInRegistries.ITEM.getKey(saplingItem)) + "_to_" + registryName.getPath() + "_seed");
+
+                List<Item> ingredients = saplingRecipe.getIngredientsForSaplingToSeed();
+                ingredients.add(DTRegistries.DIRT_BUCKET.get());
+                ingredients.add(saplingItem);
+                craftingRecipes.add(createShapeless(saplingToSeed,
+                        species.getSeedStack(1), //result
+                        ingredients(ingredients))); //ingredients
+            }
+            if (saplingRecipe.canCraftSeedToSapling()) {
+                final ResourceLocation seedToSapling = ResourceLocation.fromNamespaceAndPath(registryName.getNamespace(),
+                        registryName.getPath() + "_seed_to_" + separate(BuiltInRegistries.ITEM.getKey(saplingItem)));
+
+                List<Item> ingredients = saplingRecipe.getIngredientsForSeedToSapling();
+                ingredients.add(DTRegistries.DIRT_BUCKET.get());
+                ingredients.add(species.getSeed().map(Item.class::cast).orElse(Items.AIR));
+                craftingRecipes.add(createShapeless(seedToSapling,
+                        new ItemStack(saplingItem), //result
+                        ingredients(ingredients))); //ingredients
+            }
+        });
     }
 
     private static String separate(final ResourceLocation resourceLocation) {

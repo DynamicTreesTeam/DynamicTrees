@@ -49,6 +49,7 @@ public interface IConfigHelper {
     String DIMENSION_BLACK_LIST = "dimensionsBlacklist";
 
     String GENERATE_DIRT_BUCKET_RECIPES = "generateDirtBucketRecipes";
+    String GENERATE_MEGA_SEED_RECIPE = "generateMegaSeedRecipe";
     String BIOCHAR_BREWING_BASE = "biocharBrewingBase";
 
     String PREFERRED_SEASON_MOD = "preferredSeasonMod";
