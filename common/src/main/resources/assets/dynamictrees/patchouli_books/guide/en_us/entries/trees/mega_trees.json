@@ -1,0 +1,21 @@
+{
+  "name": "Mega Trees",
+  "icon": "dynamictrees:mega_jungle_seed",
+  "category": "dynamictrees:trees",
+  "sortnum": 5,
+  "pages": [
+    {
+      "type": "text",
+      "title": "Mega Trees",
+      "text": "Some trees have a variant that is much larger than normal. These are known as mega variants, which have their own seeds. $(br2)A $(l:potions/mega_agent)Mega Agent$() can be used to turn a normal tree into it's mega variant."
+    },
+    {
+      "type": "image",
+      "images": [
+        "dynamictrees:textures/patchouli/images/mega_sapling_1.png"
+      ],
+      "text": "A spruce sapling (left) and a mega spruce sapling (right).",
+      "border": true
+    }
+  ]
+} 

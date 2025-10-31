@@ -10,7 +10,7 @@
       "ingredient": "minecraft:brown_mushroom",
       "bottle": "dynamictrees:dendro_potion",
       "output": "dynamictrees:dendro_potion[dynamictrees:potion_index=2]",
-      "text": "This agent makes the tree grow to a gigantic size. Note that this only works on trees that have mega variants - spruce and jungle by default.$(br)This is the equivalent of placing saplings in a 2x2 pattern."
+      "text": "This agent makes the tree grow to a gigantic size. Note that this only works on trees that have $(l:trees/mega_trees)mega variants$() - spruce and jungle by default.$(br)This is the equivalent of placing saplings in a 2x2 pattern."
     },
     {
       "type": "image",
