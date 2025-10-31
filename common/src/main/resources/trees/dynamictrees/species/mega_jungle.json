@@ -54,6 +54,10 @@
         },
         "bottom_flare"
     ],
+    "sapling_shape": "fat_sapling",
+    "model_overrides": {
+        "sapling": "dynamictrees:block/smartmodel/large_sapling"
+    },
     "lang_overrides": {
         "seed": "Mega Jungle Pod"
     }

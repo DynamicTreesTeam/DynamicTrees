@@ -1,4 +1,4 @@
-// 1.21.1	2025-10-25T02:16:56.8182557	Block States: dynamictrees
+// 1.21.1	2025-10-30T22:11:44.8430381	Block States: dynamictrees
 ba3df68d28fba8cf21f652ea60b7575c7915d267 assets/dynamictrees/blockstates/acacia_branch.json
 2606791521eac27fa77ebbeeea442b8073802a51 assets/dynamictrees/blockstates/acacia_leaves.json
 28a0cd7b38e1a854acd4f0c477573a9460811d82 assets/dynamictrees/blockstates/acacia_sapling.json
@@ -115,10 +115,10 @@ cd5d6d158a127a5a7df66a09fd6f13fa6102199f assets/dynamictrees/models/block/saplin
 4a57237782717c8e918a299847aacd892ca6f5e6 assets/dynamictrees/models/block/saplings/dark_oak.json
 62beaa82e8dcb5cbc3652ef27ac4bd8138abce43 assets/dynamictrees/models/block/saplings/jungle.json
 2a2d629109caa470b63e0d2aae0c1150a69baa69 assets/dynamictrees/models/block/saplings/mangrove.json
-485c1cbc1df5e919187aa2fec554feaf8586233d assets/dynamictrees/models/block/saplings/mega_crimson.json
-62beaa82e8dcb5cbc3652ef27ac4bd8138abce43 assets/dynamictrees/models/block/saplings/mega_jungle.json
-82e19945531fbcaf8d88a55bd21673f281be1f2c assets/dynamictrees/models/block/saplings/mega_spruce.json
-d9f91f090cdf6f10e2eda561fb313791476704bd assets/dynamictrees/models/block/saplings/mega_warped.json
+ac2bffbc0e43a39e3253750363f69a94cf48d48a assets/dynamictrees/models/block/saplings/mega_crimson.json
+e21d8cc8f74bdd49615be70e15c0d1793bd731da assets/dynamictrees/models/block/saplings/mega_jungle.json
+0476dd506c672a49ce2e5dca57c9f2ffcbc8d608 assets/dynamictrees/models/block/saplings/mega_spruce.json
+80f3a22146b271b74adfbc5e20ab6bc531291986 assets/dynamictrees/models/block/saplings/mega_warped.json
 7a849487d3813ef0bcd33e55299ef4e396af2777 assets/dynamictrees/models/block/saplings/oak.json
 82e19945531fbcaf8d88a55bd21673f281be1f2c assets/dynamictrees/models/block/saplings/spruce.json
 667dbf2ab02554d282492a618b4b4a010b290965 assets/dynamictrees/models/block/saplings/swamp_oak.json

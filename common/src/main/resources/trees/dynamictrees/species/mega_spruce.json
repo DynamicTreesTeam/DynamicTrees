@@ -34,6 +34,10 @@
         "clear_volume",
         "podzol"
     ],
+    "sapling_shape": "fat_sapling",
+    "model_overrides": {
+        "sapling": "dynamictrees:block/smartmodel/large_sapling"
+    },
     "lang_overrides": {
         "seed": "Mega Spruce Cone"
     }

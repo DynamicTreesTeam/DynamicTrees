@@ -35,6 +35,10 @@
         "shroomlight",
         "bottom_flare"
     ],
+    "sapling_shape": "fat_flat_mushroom",
+    "model_overrides": {
+        "sapling": "dynamictrees:block/smartmodel/large_mushroom_flat"
+    },
     "lang_overrides": {
         "seed": "Mega Warped Cap"
     }

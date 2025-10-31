@@ -1,0 +1,40 @@
+{
+    "parent": "block/block",
+    "render_type": "cutout_mipped",
+    "textures": {
+        "particle": "#leaves"
+    },
+    "display": {
+        "fixed": {
+            "rotation": [ 0, 90, 0 ],
+            "translation": [ 0, 0, 0 ],
+            "scale": [ 0.5, 0.5, 0.5 ]
+        }
+    },
+    "elements": [
+        {   "__comment": "Leaves",
+            "from": [ 3, 4, 3 ],
+            "to": [ 13, 14, 13 ],
+            "faces": {
+                "down":  { "uv": [ 3, 3, 13, 13 ], "texture": "#leaves", "tintindex": 0 },
+                "up":    { "uv": [ 3, 3, 13, 13 ], "texture": "#leaves", "tintindex": 0 },
+                "north": { "uv": [ 3, 3, 13, 13 ], "texture": "#leaves", "tintindex": 0 },
+                "south": { "uv": [ 3, 3, 13, 13 ], "texture": "#leaves", "tintindex": 0 },
+                "west":  { "uv": [ 3, 3, 13, 13 ], "texture": "#leaves", "tintindex": 0 },
+                "east":  { "uv": [ 3, 3, 13, 13 ], "texture": "#leaves", "tintindex": 0 }
+            }
+        },
+        {   "__comment": "Trunk",
+            "from": [ 6.5, -1, 6.5 ],
+            "to": [ 9.5, 5, 9.5 ],
+            "faces": {
+                "down":  { "uv": [ 7, 7, 10, 10 ], "texture": "#log", "cullface": "down"},
+                "up":    { "uv": [ 7, 7, 10, 10 ], "texture": "#log"},
+                "north": { "uv": [ 7, 0, 10, 6 ], "texture": "#log"},
+                "south": { "uv": [ 7, 0, 10, 6 ], "texture": "#log"},
+                "west":  { "uv": [ 7, 0, 10, 6 ], "texture": "#log"},
+                "east":  { "uv": [ 7, 0, 10, 6 ], "texture": "#log"}
+            }
+        }
+    ]
+}

@@ -40,7 +40,6 @@ public class NetherFungusSpecies extends Species {
         if (!(family instanceof NetherFungusFamily)) {
             LogManager.getLogger().warn("Family {} for nether fungus species {} is not of type {}", family.getRegistryName(), getRegistryName(), NetherFungusFamily.class);
         }
-        this.setSaplingShape(CommonVoxelShapes.SAPLING);
     }
 
     @Override
