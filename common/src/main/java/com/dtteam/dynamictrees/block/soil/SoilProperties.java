@@ -114,6 +114,8 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     }
 
     public void setPrimitiveSoilBlock(final Block primitiveSoil) {
+        if (this.primitiveSoilBlock != null && (primitiveSoil == null || primitiveSoil == Blocks.AIR))
+            return;
         if (this.primitiveSoilBlock == null || primitiveSoil != this.primitiveSoilBlock) {
             this.primitiveSoilBlock = primitiveSoil;
         }
