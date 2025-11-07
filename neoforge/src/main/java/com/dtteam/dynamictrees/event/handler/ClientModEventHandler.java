@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
-import com.dtteam.dynamictrees.block.soil.SoilHelper;
+import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.client.ThickBranchRingsSource;
 import com.dtteam.dynamictrees.entity.render.FallingTreeRenderer;
@@ -45,22 +45,6 @@ import java.util.stream.Collectors;
 
 @EventBusSubscriber(modid = DynamicTrees.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public class ClientModEventHandler {
-
-    //TODO: thick ring stitching
-//    public static void clientStart() {
-//		FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.NORMAL, false, ColorHandlerEvent.Block.class, setupEvent -> {
-//			IResourceManager manager = Minecraft.getInstance().getResourceManager();
-//			if (manager instanceof IReloadableResourceManager){
-//				ThickRingTextureManager.uploader = new ThickRingSpriteUploader(Minecraft.getInstance().textureManager);
-//				((IReloadableResourceManager) manager).addReloadListener(ThickRingTextureManager.uploader);
-//			}
-//		});
-//    }
-
-//    public static void registerClientEventHandlers() {
-//        MinecraftForge.EVENT_BUS.register(new ModelBakeEventListener());
-//        MinecraftForge.EVENT_BUS.register(TextureGenerationHandler.class);
-//    }
 
     ///////////////////////////////////////////
     // COLOR HANDLING
@@ -124,15 +108,17 @@ public class ClientModEventHandler {
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
+
     public static void registerBlockColorHandlersEvent(RegisterColorHandlersEvent.Block event){
         final int white = 0xFFFFFFFF;
         final int magenta = 0x00FF00FF;//for errors.. because magenta sucks.
 
         // Register Rooty Colorizers
-        for (SoilBlock roots : SoilHelper.getRootyBlocksList()) {
+        for (SoilProperties soil : SoilProperties.REGISTRY) {
+            if (soil.getBlock().isEmpty()) continue;
+            SoilBlock roots = soil.getBlock().get();
             event.register((state, level, pos, tintIndex) -> roots.colorMultiplier(event.getBlockColors(), state, level, pos, tintIndex), roots);
-            //Unfortunately there's no way around this. We do not own the models to set the renderType there.
-            ItemBlockRenderTypes.setRenderLayer(roots, RenderType.cutoutMipped());
+            setRenderLayerCutoutMipped(roots);
         }
 
         // Register Bonsai Pot Colorizer
@@ -156,6 +142,12 @@ public class ClientModEventHandler {
                                     ((DynamicLeavesBlock) state.getBlock()).getLeavesProperties().foliageColorMultiplier(state, level, pos) : magenta,
                     leaves);
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void setRenderLayerCutoutMipped(SoilBlock roots) {
+        //Unfortunately there's no way around this. We do not own the models to set the renderType there.
+        ItemBlockRenderTypes.setRenderLayer(roots, RenderType.cutoutMipped());
     }
 
     private static boolean isValidPos(BlockGetter level, BlockPos pos) {
