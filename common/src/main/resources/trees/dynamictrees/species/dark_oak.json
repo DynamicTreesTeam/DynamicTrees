@@ -10,12 +10,12 @@
     "growth_logic_kit": "dark_oak",
     "leaves_properties": "dark_oak",
     "environment_factors" : {
-        "#forge:is_cold": 0.75,
-        "#forge:is_hot": 0.5,
-        "#forge:is_dry": 0.25,
+        "#c:is_cold": 0.75,
+        "#c:is_hot": 0.5,
+        "#c:is_dry": 0.25,
         "mushroom": 1.25
     },
-    "perfect_biomes": { "tag": "#forge:is_spooky", "name": "minecraft:.*" },
+    "perfect_biomes": { "tag": "#c:is_spooky", "name": "minecraft:.*" },
     "primitive_sapling": "dark_oak_sapling",
     "features" : [
         {

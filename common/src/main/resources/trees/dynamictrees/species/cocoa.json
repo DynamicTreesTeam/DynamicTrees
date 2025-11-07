@@ -11,10 +11,10 @@
     "generate_sapling": true,
     "drop_seeds": false,
     "environment_factors" : {
-        "#forge:is_cold": 0.3,
-        "#forge:is_dry": 0.4,
-        "#forge:is_hot": 1.1,
-        "#forge:is_wet": 1.1
+        "#c:is_cold": 0.3,
+        "#c:is_dry": 0.4,
+        "#c:is_hot": 1.1,
+        "#c:is_wet": 1.1
     },
     "perfect_biomes": { "tag": "#minecraft:is_jungle" },
     "pods": [

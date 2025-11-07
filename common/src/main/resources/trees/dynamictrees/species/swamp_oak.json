@@ -6,10 +6,10 @@
     "growth_rate": 0.8,
     "leaves_properties": "oak",
     "environment_factors" : {
-        "#forge:is_cold": 0.5,
-        "#forge:is_dry": 0.5
+        "#c:is_cold": 0.5,
+        "#c:is_dry": 0.5
     },
-    "perfect_biomes": { "tag": "#forge:is_swamp" },
+    "perfect_biomes": { "tag": "#c:is_swamp" },
     "common_override": { "name": "minecraft:swamp" },
     "generate_sapling": true,
     "model_overrides": {

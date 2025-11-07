@@ -18,8 +18,8 @@
     "generate_seed": true,
     "generate_sapling": true,
     "environment_factors" : {
-        "#forge:is_cold": 0.25,
-        "#forge:is_wet": 0.75
+        "#c:is_cold": 0.25,
+        "#c:is_wet": 0.75
     },
     "perfect_biomes": { "name": "minecraft:crimson_forest" },
     "acceptable_soils": ["nether_soil_like", "fungus_like", "dirt_like"],

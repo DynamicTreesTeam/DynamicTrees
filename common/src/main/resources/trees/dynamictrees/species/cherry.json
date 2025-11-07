@@ -7,12 +7,14 @@
     "growth_rate": 0.8,
     "leaves_properties": "cherry",
     "environment_factors" : {
-        "#forge:is_cold": 0.75,
-        "#forge:is_hot": 0.5,
-        "#forge:is_dry": 0.5,
+        "#c:is_cold": 0.75,
+        "#c:is_hot": 0.5,
+        "#c:is_dry": 0.5,
         "#is_forest": 1.05
     },
     "perfect_biomes": { "types": [ "cherry_grove", "overworld" ] },
+    "acceptable_soils": ["dirt_like"],
+    "world_gen_acceptable_soils": ["snow_like"],
     "primitive_sapling": "cherry_sapling",
     "features" : [
         "bee_nest"

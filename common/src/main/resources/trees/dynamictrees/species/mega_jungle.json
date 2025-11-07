@@ -19,10 +19,10 @@
     "generate_seed": true,
     "generate_sapling": true,
     "environment_factors" : {
-        "#forge:is_cold": 0.15,
-        "#forge:is_dry": 0.2,
-        "#forge:is_hot": 1.1,
-        "#forge:is_wet": 1.1
+        "#c:is_cold": 0.15,
+        "#c:is_dry": 0.2,
+        "#c:is_hot": 1.1,
+        "#c:is_wet": 1.1
     },
     "perfect_biomes": { "tag": "#minecraft:is_jungle" },
     "features" : [

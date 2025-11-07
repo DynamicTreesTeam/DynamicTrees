@@ -11,10 +11,10 @@
   "leaves_properties": "mangrove",
   "roots_growth_logic_kit": "mangrove_roots",
   "environment_factors" : {
-    "#forge:is_cold": 0.75,
-    "#forge:is_dry": 0.2
+    "#c:is_cold": 0.75,
+    "#c:is_dry": 0.2
   },
-  "perfect_biomes": { "tag": "#forge:is_swamp" },
+  "perfect_biomes": { "tag": "#c:is_swamp" },
   "primitive_sapling": "mangrove_propagule",
   "sapling_shape": "slim_sapling",
   "model_overrides": {
