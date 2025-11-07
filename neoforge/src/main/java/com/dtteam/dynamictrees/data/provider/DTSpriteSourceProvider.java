@@ -2,28 +2,17 @@ package com.dtteam.dynamictrees.data.provider;
 
 import com.dtteam.dynamictrees.api.registry.Registry;
 import com.dtteam.dynamictrees.client.ThickBranchRingsSource;
-import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.SpriteSourceProvider;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.prefix;
-
-/**
- * @author Harley O'Connor
- */
 public class DTSpriteSourceProvider extends SpriteSourceProvider {
 
     private final String modId;

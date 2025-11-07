@@ -530,7 +530,6 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
         return false;
     }
 
-//    @OnlyIn(Dist.CLIENT)
     public int rootColor(BlockState state, BlockGetter blockAccess, BlockPos pos) {
         return getFamily(state, blockAccess, pos).getRootColor(state, getColorFromBark());
     }
