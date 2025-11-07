@@ -78,12 +78,16 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
     protected void generateTrees(LevelContext levelContext, BiomeDatabase biomeDatabase, PoissonDisc disc, BlockPos originPos) {
         BlockPos basePos = new BlockPos(disc.x, 0, disc.z);
-        Holder<Biome> biome = levelContext.level().getBiome(basePos);
+        Holder<Biome> biome = getNoiseBiome(levelContext, basePos);
         Heightmap.Types heightmap = Heightmap.Types.valueOf(biomeDatabase.getHeightmap(biome).toUpperCase());
         for (BlockPos groundPos : GroundFinder.getGroundFinder(levelContext.level()).findGround(levelContext.accessor(), basePos, heightmap)) {
-            BiomeDatabase.EntryReader entry = biomeDatabase.getEntry(levelContext.level().getBiome(groundPos));
+            BiomeDatabase.EntryReader entry = biomeDatabase.getEntry(getNoiseBiome(levelContext, groundPos));
             generateTree(levelContext, entry, disc, originPos, groundPos);
         }
+    }
+
+    protected static Holder<Biome> getNoiseBiome(LevelContext levelContext, BlockPos pos) {
+        return levelContext.level().getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2);
     }
 
     public static boolean validTreePos(LevelSimulatedReader pLevel, BlockPos pPos) {
@@ -115,7 +119,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
             if (species.isValid()) {
                 if (species.isAcceptableSoilForWorldgen(levelContext.accessor(), groundPos, dirtState)) {
                     if (getChanceSelector(biomeEntry).getChance(RANDOM, species, circle.radius) == BiomePropertySelectors.Chance.OK) {
-                        Holder<Biome> biome = levelContext.level().getBiome(groundPos);
+                        Holder<Biome> biome = getNoiseBiome(levelContext, groundPos);
                         if (!species.generate(new DynamicTreeGenerationContext(levelContext, species, originPos, groundPos.mutable(), biome, CoordUtils.getRandomDir(RANDOM), circle.radius, true))) {
                             result = GeneratorResult.FAIL_GENERATION;
                         }

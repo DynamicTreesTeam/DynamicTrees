@@ -45,7 +45,7 @@ public class CaveRootedTreeFeature extends DynamicTreeFeature {
             return false;
         }
 
-        BiomeDatabase.Entry biomeEntry = BiomeDatabases.getDefault().getEntry(level.getLevel().getBiome(originPos));
+        BiomeDatabase.Entry biomeEntry = BiomeDatabases.getDefault().getEntry(getNoiseBiome(levelContext,originPos));
         if (biomeEntry.getCaveRootedData() == null)
             return false;
 
@@ -58,7 +58,7 @@ public class CaveRootedTreeFeature extends DynamicTreeFeature {
         if (groundPositions.isEmpty()) return false;
 
         if (caveRootedData.shouldGenerateOnSurface()) {
-            groundPositions = List.of(groundPositions.get(groundPositions.size() - 1));
+            groundPositions = List.of(groundPositions.getLast());
         }
 
         AtomicBoolean generated = new AtomicBoolean(false);

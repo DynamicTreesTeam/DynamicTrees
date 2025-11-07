@@ -60,6 +60,7 @@ neoForge {
     dependencies {
         implementation "curse.maven:jade-324717:6011258"
         implementation "curse.maven:jei-238222:5846880"
+        implementation "curse.maven:spark-361579:6225208"
 
         implementation "curse.maven:glitchcore-955399:5660740"
         implementation "curse.maven:serene-seasons-291874:5753503"
