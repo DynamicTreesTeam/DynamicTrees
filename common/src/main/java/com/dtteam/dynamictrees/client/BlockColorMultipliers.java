@@ -4,8 +4,8 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.resources.ResourceLocation;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 

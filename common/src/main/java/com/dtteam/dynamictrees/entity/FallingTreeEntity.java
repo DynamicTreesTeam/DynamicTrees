@@ -1,21 +1,21 @@
 package com.dtteam.dynamictrees.entity;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.network.BranchDestructionData;
+import com.dtteam.dynamictrees.api.voxmap.BlockPosBounds;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandlers;
 import com.dtteam.dynamictrees.entity.animation.DataAnimationHandler;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModelTrackerCache;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
-import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.model.ModelTracker;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.api.voxmap.BlockPosBounds;
-import com.dtteam.dynamictrees.api.network.BranchDestructionData;
-import com.dtteam.dynamictrees.utility.CoordUtils.Surround;
+import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.utility.CoordUtils.Surround;
 import com.google.common.collect.Iterables;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;

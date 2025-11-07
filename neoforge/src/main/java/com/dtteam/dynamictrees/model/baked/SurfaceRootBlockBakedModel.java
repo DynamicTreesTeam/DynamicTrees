@@ -1,9 +1,9 @@
 package com.dtteam.dynamictrees.model.baked;
 
-import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
-import com.dtteam.dynamictrees.utility.CoordUtils;
-import com.dtteam.dynamictrees.model.ModelHelper;
 import com.dtteam.dynamictrees.api.network.RootConnections;
+import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
+import com.dtteam.dynamictrees.model.ModelHelper;
+import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
@@ -25,10 +25,10 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.model.IDynamicBakedModel;
 import net.neoforged.neoforge.client.model.IModelBuilder;
 import net.neoforged.neoforge.client.model.data.ModelData;
-import org.joml.Vector3f;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
+
 import java.util.*;
 import java.util.function.Function;
 

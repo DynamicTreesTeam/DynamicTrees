@@ -2,8 +2,10 @@ package com.dtteam.dynamictrees.systems.genfeature;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
-import com.dtteam.dynamictrees.systems.genfeature.context.*;
-import net.minecraft.core.BlockPos;
+import com.dtteam.dynamictrees.systems.genfeature.context.FullGenerationContext;
+import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
+import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
+import com.dtteam.dynamictrees.systems.genfeature.context.PostRotContext;
 import net.minecraft.resources.ResourceLocation;
 
 public class BiomePredicateGenFeature extends GenFeature {

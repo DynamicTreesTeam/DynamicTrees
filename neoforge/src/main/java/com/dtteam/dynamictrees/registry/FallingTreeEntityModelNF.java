@@ -1,14 +1,14 @@
 package com.dtteam.dynamictrees.registry;
 
+import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
-import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
-import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.model.QuadManipulator;
+import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
 import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -22,9 +22,7 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FallingTreeEntityModelNF extends FallingTreeEntityModel {
 

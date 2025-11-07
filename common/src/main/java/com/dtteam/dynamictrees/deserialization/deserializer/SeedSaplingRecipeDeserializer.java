@@ -1,10 +1,10 @@
 package com.dtteam.dynamictrees.deserialization.deserializer;
 
+import com.dtteam.dynamictrees.deserialization.JsonMapWrapper;
 import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
-import com.dtteam.dynamictrees.deserialization.JsonMapWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;

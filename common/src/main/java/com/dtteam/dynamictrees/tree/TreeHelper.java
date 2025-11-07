@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.tree;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
+import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
 import com.dtteam.dynamictrees.block.Ageable;
 import com.dtteam.dynamictrees.block.NullTreePart;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
@@ -13,7 +14,6 @@ import com.dtteam.dynamictrees.block.soil.SoilBlockDecayer;
 import com.dtteam.dynamictrees.client.ParticleHelper;
 import com.dtteam.dynamictrees.systems.nodemapper.TwinkleNode;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.RootsJoCode;
 import net.minecraft.core.BlockPos;
@@ -26,8 +26,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Optional;
 import java.util.function.BiConsumer;
 

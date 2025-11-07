@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.api.configuration;
 
-import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
+import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

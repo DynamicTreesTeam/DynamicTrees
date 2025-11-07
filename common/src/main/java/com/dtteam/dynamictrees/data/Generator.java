@@ -1,8 +1,8 @@
 package com.dtteam.dynamictrees.data;
 
 import net.minecraft.data.DataProvider;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;

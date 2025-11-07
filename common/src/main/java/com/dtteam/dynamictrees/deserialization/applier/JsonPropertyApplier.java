@@ -1,10 +1,9 @@
 package com.dtteam.dynamictrees.deserialization.applier;
 
-import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
-import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
+import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
+import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
 import com.google.gson.JsonElement;
-
 import org.jetbrains.annotations.Nullable;
 
 /**

@@ -7,8 +7,6 @@ import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import com.dtteam.dynamictrees.tree.species.SwampSpecies;
 import com.mojang.datafixers.util.Pair;
 
-import java.util.ArrayList;
-
 public class DTConfigs {
     public static SimpleConfig CONFIG;
     private static DTConfigProvider configs;

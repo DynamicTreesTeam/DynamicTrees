@@ -1,9 +1,9 @@
 package com.dtteam.dynamictrees.block.soil;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
 import com.dtteam.dynamictrees.deserialization.applier.VoidApplier;
-import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;

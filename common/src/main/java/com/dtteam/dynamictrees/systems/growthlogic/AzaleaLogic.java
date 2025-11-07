@@ -2,8 +2,8 @@ package com.dtteam.dynamictrees.systems.growthlogic;
 
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionManipulationContext;
-import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;

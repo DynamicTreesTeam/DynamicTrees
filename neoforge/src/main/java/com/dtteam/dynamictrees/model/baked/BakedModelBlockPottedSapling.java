@@ -1,8 +1,8 @@
 package com.dtteam.dynamictrees.model.baked;
 
+import com.dtteam.dynamictrees.model.QuadManipulator;
 import com.dtteam.dynamictrees.registry.PottedSaplingBlockEntityNF;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.model.QuadManipulator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -20,8 +20,8 @@ import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.model.IDynamicBakedModel;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

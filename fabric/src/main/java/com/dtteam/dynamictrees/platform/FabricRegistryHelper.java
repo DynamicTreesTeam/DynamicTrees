@@ -2,10 +2,10 @@ package com.dtteam.dynamictrees.platform;
 
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlockEntity;
+import com.dtteam.dynamictrees.platform.services.IRegistryHelper;
 import com.dtteam.dynamictrees.registry.FabricRegistryHandler;
 import com.dtteam.dynamictrees.registry.FabricRegistryLoader;
 import com.dtteam.dynamictrees.registry.RegistryLoader;
-import com.dtteam.dynamictrees.platform.services.IRegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;

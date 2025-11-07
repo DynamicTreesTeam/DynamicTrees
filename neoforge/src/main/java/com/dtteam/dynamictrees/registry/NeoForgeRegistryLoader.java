@@ -2,11 +2,11 @@ package com.dtteam.dynamictrees.registry;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
+import com.dtteam.dynamictrees.worldgen.biomemodifier.AddDynamicTreesBiomeModifier;
+import com.dtteam.dynamictrees.worldgen.biomemodifier.RunFeatureCancellersBiomeModifier;
 import com.dtteam.dynamictrees.worldgen.holderset.IncludesExcludesHolderSet;
 import com.dtteam.dynamictrees.worldgen.holderset.NameRegexMatchHolderSet;
 import com.dtteam.dynamictrees.worldgen.holderset.TagsRegexMatchHolderSet;
-import com.dtteam.dynamictrees.worldgen.biomemodifier.AddDynamicTreesBiomeModifier;
-import com.dtteam.dynamictrees.worldgen.biomemodifier.RunFeatureCancellersBiomeModifier;
 import com.google.common.base.Suppliers;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;

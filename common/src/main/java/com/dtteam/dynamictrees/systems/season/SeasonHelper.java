@@ -1,9 +1,9 @@
 package com.dtteam.dynamictrees.systems.season;
 
 import com.dtteam.dynamictrees.api.season.SeasonManager;
+import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
-import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 

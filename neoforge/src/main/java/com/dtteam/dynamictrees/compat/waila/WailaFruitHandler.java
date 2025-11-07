@@ -1,8 +1,8 @@
 package com.dtteam.dynamictrees.compat.waila;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import com.dtteam.dynamictrees.block.DynamicBlockProperties;
+import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;

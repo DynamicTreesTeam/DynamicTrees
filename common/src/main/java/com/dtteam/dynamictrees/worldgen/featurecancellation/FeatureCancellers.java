@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.worldgen.featurecancellation;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.cell.CellKit;
 import com.dtteam.dynamictrees.api.registry.Registry;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
 import net.minecraft.world.level.levelgen.feature.HugeFungusConfiguration;

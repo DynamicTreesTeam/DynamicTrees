@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.deserialization.deserializer;
 
+import com.dtteam.dynamictrees.deserialization.JsonMapWrapper;
 import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.applier.Applier;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
@@ -7,7 +8,6 @@ import com.dtteam.dynamictrees.deserialization.applier.VoidApplier;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.deserialization.JsonMapWrapper;
 import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

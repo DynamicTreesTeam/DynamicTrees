@@ -2,8 +2,8 @@ package com.dtteam.dynamictrees.deserialization;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;

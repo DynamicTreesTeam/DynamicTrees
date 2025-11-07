@@ -1,12 +1,12 @@
 package com.dtteam.dynamictrees.deserialization.deserializer;
 
+import com.dtteam.dynamictrees.block.CommonVoxelShapes;
 import com.dtteam.dynamictrees.deserialization.DeserializationException;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
+import com.dtteam.dynamictrees.deserialization.ShapeFunctions;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
-import com.dtteam.dynamictrees.block.CommonVoxelShapes;
-import com.dtteam.dynamictrees.deserialization.ShapeFunctions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

@@ -14,7 +14,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-
 import org.jetbrains.annotations.Nullable;
 
 public class LingeringEffectorEntity extends Entity {// implements IEntityAdditionalSpawnData {

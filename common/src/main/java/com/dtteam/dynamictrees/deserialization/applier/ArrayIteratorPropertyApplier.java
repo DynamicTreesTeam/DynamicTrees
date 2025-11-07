@@ -5,8 +5,8 @@ import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.dtteam.dynamictrees.utility.NullUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

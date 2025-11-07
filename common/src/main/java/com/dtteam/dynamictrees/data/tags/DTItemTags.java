@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.data.tags;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.systems.substance.GrowthSubstance;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;

@@ -1,9 +1,7 @@
 package com.dtteam.dynamictrees.event;
 
-import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.PropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.applier.JsonPropertyApplier;
-import com.google.gson.JsonElement;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 

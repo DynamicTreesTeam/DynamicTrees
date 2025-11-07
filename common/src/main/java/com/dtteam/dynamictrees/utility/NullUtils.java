@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.utility;
 
 import org.jetbrains.annotations.Nullable;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
 

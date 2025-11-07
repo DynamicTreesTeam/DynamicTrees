@@ -1,9 +1,9 @@
 package com.dtteam.dynamictrees.deserialization.result;
 
-import com.dtteam.dynamictrees.deserialization.DeserializationException;
-import com.dtteam.dynamictrees.deserialization.NoSuchDeserializerException;
 import com.dtteam.dynamictrees.api.function.ThrowableBiFunction;
 import com.dtteam.dynamictrees.api.function.ThrowableFunction;
+import com.dtteam.dynamictrees.deserialization.DeserializationException;
+import com.dtteam.dynamictrees.deserialization.NoSuchDeserializerException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

@@ -1,10 +1,8 @@
 package com.dtteam.dynamictrees.registry;
 
-import com.dtteam.dynamictrees.DynamicTreesNeoForge;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
-import com.dtteam.dynamictrees.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;

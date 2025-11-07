@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.api.resource.loading.preparation;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.function.IgnoreThrowable;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.resource.DTResource;
@@ -8,10 +9,9 @@ import com.dtteam.dynamictrees.api.resource.ResourceAccessor;
 import com.dtteam.dynamictrees.api.resource.loading.ApplicationException;
 import com.dtteam.dynamictrees.api.resource.loading.StagedApplierResourceLoader;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
+import com.dtteam.dynamictrees.deserialization.JsonMapWrapper;
 import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.api.function.IgnoreThrowable;
-import com.dtteam.dynamictrees.deserialization.JsonMapWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;

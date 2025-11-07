@@ -1,15 +1,15 @@
 package com.dtteam.dynamictrees.deserialization.result;
 
 import com.dtteam.dynamictrees.deserialization.DeserializationException;
-import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.NoSuchDeserializerException;
+import com.dtteam.dynamictrees.deserialization.deserializer.JsonDeserializer;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;

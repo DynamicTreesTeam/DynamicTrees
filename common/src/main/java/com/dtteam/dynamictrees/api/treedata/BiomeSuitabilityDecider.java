@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.api.treedata;
 
 import com.dtteam.dynamictrees.tree.species.Species;
-//import com.dtteam.dynamictrees.api.TreeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;

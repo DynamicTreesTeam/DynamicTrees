@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.worldgen.feature;
 
-import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;

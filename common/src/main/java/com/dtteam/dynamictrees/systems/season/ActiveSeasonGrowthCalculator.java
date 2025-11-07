@@ -1,6 +1,5 @@
 package com.dtteam.dynamictrees.systems.season;
 
-import com.dtteam.dynamictrees.api.season.SeasonGrowthCalculator;
 import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.season.SeasonGrowthCalculator;
 import net.minecraft.util.Mth;

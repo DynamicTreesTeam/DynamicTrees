@@ -1,8 +1,6 @@
 package com.dtteam.dynamictrees.registry;
 
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
 
 public interface RegistryEvent<V extends RegistryEntry<V>> {
 //    Event<RegistryEvent<?>> EVENT = EventFactory.createArrayBacked(RegistryEvent.class,

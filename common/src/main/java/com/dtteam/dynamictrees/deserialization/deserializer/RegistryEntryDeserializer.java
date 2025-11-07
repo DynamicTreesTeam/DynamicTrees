@@ -2,9 +2,9 @@ package com.dtteam.dynamictrees.deserialization.deserializer;
 
 import com.dtteam.dynamictrees.api.registry.Registry;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
+import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.result.Result;
-import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
 import com.google.gson.JsonElement;
 
 /**
