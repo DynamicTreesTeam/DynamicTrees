@@ -204,10 +204,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         this.stripBranch(state, level, pos, radius);
     }
 
-    public void stripBranch(BlockState state, LevelAccessor level, BlockPos pos) {
-        this.stripBranch(state, level, pos, this.getRadius(state));
-    }
-
     public void stripBranch(BlockState state, LevelAccessor level, BlockPos pos, int radius) {
         this.getFamily().getStrippedBranch().ifPresent(strippedBranch ->
                 strippedBranch.setRadius(

@@ -249,12 +249,18 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.useItemOn(stack, level, player, hand, hitResult), ItemInteractionResult.FAIL);
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> {
+            var newHit = hitResult.withPosition(muse.pos);
+            return muse.state.useItemOn(stack, level, player, hand, newHit);
+        }, ItemInteractionResult.FAIL);
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.useWithoutItem(level, player, hitResult), InteractionResult.FAIL);
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> {
+            var newHit = hitResult.withPosition(muse.pos);
+            return muse.state.useWithoutItem(level, player, newHit);
+        }, InteractionResult.FAIL);
     }
 
     /** NeoForge override */
