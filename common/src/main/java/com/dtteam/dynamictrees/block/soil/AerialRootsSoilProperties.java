@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
@@ -13,8 +14,10 @@ import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.systems.nodemapper.RootIntegrityNode;
+import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.EntityUtils;
 import com.dtteam.dynamictrees.utility.ItemUtils;
 import net.minecraft.core.BlockPos;
@@ -92,6 +95,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
         public RootSoilBlock(SoilProperties properties, Properties blockProperties) {
             super(properties, blockProperties);
             registerDefaultState(defaultBlockState().setValue(RADIUS, 8).setValue(WATERLOGGED, false));
+            soilBlockDecayer = (level, rootPos, rootyState, species) -> true;
         }
 
         @Override
@@ -149,9 +153,8 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
         @Override
         public boolean fallWithTree(BlockState state, Level level, BlockPos pos, boolean hasRoots) {
-            if (hasRoots && level.isClientSide()){
-                //This only removes the block on the client side!
-                //The actual removal of the root block is handled by tick.
+            if (hasRoots){
+                //Since tick doesn't handle the removal we must handle it here
                 level.setBlock(pos, getDecayBlockStateAir(state, level, pos), 2);
                 return true;
             }
@@ -168,20 +171,37 @@ public class AerialRootsSoilProperties extends SoilProperties {
                 removed = true;
             }
             //if the species is not valid then this block should be removed asap
-            if (!getSpecies(state, level, pos).isValid()){
+            else if (!getSpecies(state, level, pos).isValid()){
                 level.setBlockAndUpdate(pos, getDecayBlockStateAir(state, level, pos));
                 removed = true;
             }
             if (!removed){
                 updateRadius(level, state, pos, 3, false);
             }
-            super.tick(state, level, pos, random);
         }
 
         @Override
         public void updateTree(BlockState rootyState, Level level, BlockPos rootPos, RandomSource random, boolean natural) {
             int radOld = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getNormal()));
-            super.updateTree(rootyState, level, rootPos, random, natural);
+            if (ChunkTreeHelper.isSurroundedByLoadedChunks(level, rootPos)) {
+
+                boolean viable = false;
+
+                Species species = getSpecies(rootyState, level, rootPos);
+
+                if (species.isValid()) {
+                    BlockPos treePos = rootPos.relative(getTrunkDirection(level, rootPos));
+                    TreePart treeBase = TreeHelper.getTreePart(level.getBlockState(treePos));
+                    if (treeBase != TreeHelper.NULL_TREE_PART) {
+                        viable = species.update(level, this, rootPos, getFertility(rootyState, level, rootPos), treeBase, treePos, random, natural);
+                    }
+                }
+
+                if (!viable) {
+                    level.setBlock(rootPos, getDecayBlockStateAir(rootyState, level, rootPos), 3);
+                }
+
+            }
             int radNew = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getNormal()));
             //If the radius was updated, tick the root block
             if (radOld != radNew) level.scheduleTick(rootPos, this, 1);
@@ -233,10 +253,10 @@ public class AerialRootsSoilProperties extends SoilProperties {
             Direction fallingDir = toolDir.orElse(Direction.Plane.HORIZONTAL.getRandomDirection(level.getRandom()));
 
             if (branch.isPresent()) {
-                destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), fallingDir, false, player);
+                destroyData = branch.get().destroyBranchFromNode(level, rootPos.above(), fallingDir, player == null, player);
             }
             if (roots.isPresent()) {
-                BranchDestructionData rootDestroyData = roots.get().destroyBranchFromNode(level, rootPos.below(), fallingDir, false, player);
+                BranchDestructionData rootDestroyData = roots.get().destroyBranchFromNode(level, rootPos.below(), fallingDir, player == null, player);
                 if (destroyData == null){
                     destroyData = rootDestroyData;
                 } else {

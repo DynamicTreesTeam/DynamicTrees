@@ -340,15 +340,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
     }
 
-
-    private void DropTreeIfUnsupported (Level level, BlockPos rootPos, @Nullable Player player, FallingTreeEntity.DestroyType destroyType){
-        if (level.getBlockState(rootPos).getBlock() instanceof AerialRootsSoilProperties.RootSoilBlock rootyBlock){
-            if (rootyBlock.isStructurallyUnstable(level, rootPos)){
-                rootyBlock.dropWholeTree(level, rootPos, player, destroyType);
-            }
-        }
-    }
-
     @Override
     public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
         // Tries to get the face being pounded on.

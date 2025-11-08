@@ -44,6 +44,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     static class HandlerData extends DataAnimationHandler {
         float fallSpeed = 0;
         int bounces = 0;
+        long touchedGroundTick = -1;
         boolean startSoundPlayed = false;
         boolean fallThroughWaterSoundPlayed = false;
         boolean endSoundPlayed = false;
@@ -206,11 +207,12 @@ public class FalloverAnimationHandler implements AnimationHandler {
                 entity.setPos(entity.getX(), collBox.maxY, entity.getZ());
                 entity.yo = entity.getY();
                 entity.setOnGround(true);
+                if (getData(entity).touchedGroundTick == -1) getData(entity).touchedGroundTick = entity.tickCount;
             }
         }
 
         //Wait at least ten ticks before calculating falling stuff, to avoid crashing into dirty blocks from the tree itself.
-        if (entity.tickCount > TICKS_BEFORE_CHECKING_COLLISION && fallSpeed > 0 && testCollision(entity)) {
+        if (entity.tickCount - getData(entity).touchedGroundTick > TICKS_BEFORE_CHECKING_COLLISION && fallSpeed > 0 && testCollision(entity)) {
             playEndSound(entity);
             flingLeavesParticles(entity, fallSpeed);
             addRotation(entity, -fallSpeed);//pull back to before the collision
