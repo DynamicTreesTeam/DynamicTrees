@@ -42,6 +42,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -105,6 +106,8 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        //shapes get cached before the primitive soil gets set, so we default to full block
+        if (getPrimitiveSoilBlock() == Blocks.AIR) return Shapes.block();
         return getPrimitiveSoilBlock().defaultBlockState().getShape(level, pos, context);
     }
 
@@ -130,7 +133,7 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     @Override
     protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
-        return super.getLightBlock(state, level, pos);
+        return getPrimitiveSoilBlock().defaultBlockState().getLightBlock(level, pos);
     }
 
     @Override

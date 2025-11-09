@@ -62,6 +62,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
 
         @Override
         public void generateBlock(BlockBehaviour.Properties properties) {
+
         }
     }.setRegistryName(DynamicTrees.NULL).setBlockRegistryName(DynamicTrees.NULL);
 
@@ -142,10 +143,6 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
      */
     public BlockState getPrimitiveSoilState (BlockState currentSoilState){
         return primitiveSoilBlock.defaultBlockState();
-    }
-
-    public boolean inheritsPrimitiveProperties() {
-        return true;
     }
 
     ///////////////////////////////////////////

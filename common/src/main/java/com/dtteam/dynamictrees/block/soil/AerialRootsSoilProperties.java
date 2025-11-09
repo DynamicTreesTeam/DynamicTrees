@@ -85,11 +85,6 @@ public class AerialRootsSoilProperties extends SoilProperties {
         return rootyState;
     }
 
-    @Override
-    public boolean inheritsPrimitiveProperties() {
-        return false;
-    }
-
     public static class RootSoilBlock extends SoilBlock implements SimpleWaterloggedBlock {
 
         private static final int MIN_RADIUS = 1;
