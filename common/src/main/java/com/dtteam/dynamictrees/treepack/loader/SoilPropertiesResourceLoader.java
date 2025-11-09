@@ -1,27 +1,27 @@
 package com.dtteam.dynamictrees.treepack.loader;
 
 import com.dtteam.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
-import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpreadableSoilProperties;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.dtteam.dynamictrees.deserialization.deserializer.ResourceLocationDeserializer;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
+import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-
-import java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Max Hyper and Harley O'Connor
  */
 public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoader<SoilProperties> {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public SoilPropertiesResourceLoader() {
         super(SoilProperties.REGISTRY, SOIL_PROPERTIES);
@@ -30,13 +30,18 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
     @Override
     public void registerAppliers() {
         this.loadAppliers
-                .register("substitute_soil", String.class, (soilProperties, substitute) ->
-                        soilProperties.setHasSubstitute(true));
+                .register("substitute_soil", ResourceLocation.class,
+                        (soilProperties, registryName) -> {
+                            soilProperties.setGenerateBlock(false);
+                            registryName = ResourceLocationUtils.parseDTLocation(registryName);
+                            SoilProperties.REGISTRY.runOnNextLock(SoilProperties.REGISTRY.generateIfValidRunnable(registryName,
+                                    soilProperties::setSubstitute, setSubstituteWarn(soilProperties, registryName)));
+                        });
 
         // Primitive soil is needed before gathering data.
         this.gatherDataAppliers
                 .register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock)
-                .register("only_if_loaded",String.class, SoilProperties::setOnlyIfLoaded)
+                .register("only_if_loaded", String.class, SoilProperties::setOnlyIfLoaded)
                 .registerArrayApplier("only_if_loaded",String.class,SoilProperties::setOnlyIfLoaded)
                 .registerMapApplier("model_overrides", ResourceLocation.class, SoilProperties::setModelOverrides)
                 .registerMapApplier("texture_overrides", ResourceLocation.class, SoilProperties::setTextureOverrides);
@@ -53,6 +58,10 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
                 .registerArrayApplier("acceptable_soils", String.class, this::registerAcceptableSoil);
 
         super.registerAppliers();
+    }
+
+    private static Runnable setSubstituteWarn(final SoilProperties soilProperties, final ResourceLocation registryName) {
+        return () -> LOGGER.warn("Could not set soil substitute for \"{}\" as soil with name \"{}\" was not found.", soilProperties, registryName);
     }
 
     private void registerAcceptableSoil(SoilProperties soilProperties, String acceptableSoil) {
@@ -96,23 +105,8 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
     protected void postLoadOnLoad(LoadData loadData, JsonObject json) {
         super.postLoadOnLoad(loadData, json);
         SoilProperties soilProperties = loadData.getResource();
-        if (soilProperties.hasSubstitute()) {
-            SoilProperties.REGISTRY.runOnNextLock(() -> this.setSubstituteSoil(soilProperties, json));
-        } else {
+        if (soilProperties.shouldGenerateBlock()) {
             this.generateSoilBlock(soilProperties, json);
-        }
-    }
-
-    private void setSubstituteSoil(SoilProperties soilProperties, JsonObject json) {
-        SoilProperties substitute = JsonHelper.getOrDefault(json, "substitute_soil", SoilProperties.class, SoilProperties.NULL_SOIL_PROPERTIES);
-        if (substitute.isValid()) {
-            this.useSubstituteSoilBlock(soilProperties, substitute);
-        }
-    }
-
-    private void useSubstituteSoilBlock(SoilProperties soilProperties, SoilProperties substitute) {
-        if (BuiltInRegistries.BLOCK.get(substitute.getBlockRegistryName()) instanceof SoilBlock soilBlock) {
-            soilProperties.setBlock(soilBlock);
         }
     }
 

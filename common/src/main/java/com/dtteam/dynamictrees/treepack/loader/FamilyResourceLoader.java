@@ -105,8 +105,7 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
      * @return a {@link Runnable} that logs the warning
      */
     private static Runnable setCommonWarn(final Family family, final ResourceLocation registryName) {
-        return () -> LOGGER.warn("Could not set common species for \"" + family + "\" as species with name  \"" +
-                registryName + "\" was not found.");
+        return () -> LOGGER.warn("Could not set common species for \"{}\" as species with name  \"{}\" was not found.", family, registryName);
     }
 
     @Override

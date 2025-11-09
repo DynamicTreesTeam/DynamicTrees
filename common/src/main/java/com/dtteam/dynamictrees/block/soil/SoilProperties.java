@@ -75,7 +75,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     protected Supplier<SoilBlock> block;
     protected Integer soilFlags = 0;
     private ResourceLocation blockRegistryName;
-    protected boolean hasSubstitute;
+    protected boolean generateBlock = true;
     protected List<String> onlyIfLoaded = new ArrayList<>();
     protected int foliageTintIndex = 0;
     protected int rootsTintIndex = 1;
@@ -186,12 +186,16 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         this.block = () -> soilBlock;
     }
 
-    public boolean hasSubstitute() {
-        return hasSubstitute;
+    public boolean shouldGenerateBlock() {
+        return generateBlock;
     }
 
-    public void setHasSubstitute(boolean hasSubstitute) {
-        this.hasSubstitute = hasSubstitute;
+    public void setGenerateBlock(boolean hasSubstitute) {
+        this.generateBlock = hasSubstitute;
+    }
+
+    public void setSubstitute(SoilProperties substituteSoilProperties) {
+        this.block = () -> substituteSoilProperties.block.get();
     }
 
     public void setFoliageTintIndex(int foliageTintIndex) {
