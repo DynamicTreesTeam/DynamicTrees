@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomBooleanFeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
 
 import java.util.stream.Stream;
 
@@ -28,15 +29,15 @@ public class MushroomFeatureCanceller<T extends FeatureConfiguration> extends Fe
         }
 
         // Mushrooms come in RandomBooleanFeatureConfiguration to select between brown and red.
-        if (!(configuredFeature.config() instanceof RandomBooleanFeatureConfiguration randomBooleanFeatureConfiguration)) {
+        if (!(configuredFeature.config() instanceof RandomFeatureConfiguration randomConfig)) {
             return false;
         }
 
-        return getConfigs(randomBooleanFeatureConfiguration).anyMatch(this.mushroomFeatureConfigClass::isInstance) &&
+        return getConfigs(randomConfig).anyMatch(this.mushroomFeatureConfigClass::isInstance) &&
                 featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());
     }
 
-    private Stream<FeatureConfiguration> getConfigs(final RandomBooleanFeatureConfiguration twoFeatureConfig) {
+    private Stream<FeatureConfiguration> getConfigs(final RandomFeatureConfiguration twoFeatureConfig) {
         return twoFeatureConfig.getFeatures().map(ConfiguredFeature::config);
     }
 }
