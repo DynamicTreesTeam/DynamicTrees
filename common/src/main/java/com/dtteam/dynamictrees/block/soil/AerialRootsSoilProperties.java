@@ -85,11 +85,6 @@ public class AerialRootsSoilProperties extends SoilProperties {
         return rootyState;
     }
 
-    @Override
-    public boolean inheritsPrimitiveProperties() {
-        return false;
-    }
-
     public static class RootSoilBlock extends SoilBlock implements SimpleWaterloggedBlock {
 
         private static final int MIN_RADIUS = 1;
@@ -154,6 +149,21 @@ public class AerialRootsSoilProperties extends SoilProperties {
         public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
             int radius = state.getValue(RADIUS);
             return Block.box(8-radius,0,8-radius,radius+8,16,radius+8);
+        }
+
+        @Override
+        protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+            return getShape(state, level, pos, context);
+        }
+
+        @Override
+        protected VoxelShape getVisualShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+            return getShape(state, level, pos, context);
+        }
+
+        @Override
+        protected VoxelShape getBlockSupportShape(BlockState state, BlockGetter level, BlockPos pos) {
+            return getShape(state, level, pos, CollisionContext.empty());
         }
 
         @Override

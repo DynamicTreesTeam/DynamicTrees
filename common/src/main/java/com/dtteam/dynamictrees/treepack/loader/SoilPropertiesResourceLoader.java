@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.treepack.loader;
 
 import com.dtteam.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpreadableSoilProperties;
@@ -9,6 +10,7 @@ import com.dtteam.dynamictrees.deserialization.deserializer.ResourceLocationDese
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -109,31 +111,19 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
     }
 
     private void useSubstituteSoilBlock(SoilProperties soilProperties, SoilProperties substitute) {
-//        ObjectHolderRegistry.addHandler(registryNameFilter -> {
-//            if (registryNameFilter.test(ForgeRegistries.Keys.BLOCKS.location())) {
-//                if (ForgeRegistries.BLOCKS.getValue(substitute.getBlockRegistryName()) instanceof RootyBlock rootyBlock) {
-//                    soilProperties.setBlock(rootyBlock);
-//                }
-//            }
-//        });
+        if (BuiltInRegistries.BLOCK.get(substitute.getBlockRegistryName()) instanceof SoilBlock soilBlock) {
+            soilProperties.setBlock(soilBlock);
+        }
     }
 
     private void generateSoilBlock(SoilProperties soilProperties, JsonObject json) {
-        AtomicBoolean generated = new AtomicBoolean(false);
-        if (soilProperties.inheritsPrimitiveProperties())
-            soilProperties.getPrimitiveSoilBlockOptional().ifPresent(primitive -> {
-                soilProperties.generateBlock(BlockBehaviour.Properties.ofFullCopy(primitive));
-                generated.set(true);
-            });
-        if (!generated.get()){
-            soilProperties.generateBlock(JsonHelper.getBlockProperties(
-                    json,
-                    soilProperties.getDefaultMapColor(),
-                    soilProperties::getDefaultBlockProperties,
-                    error -> this.logError(soilProperties.getRegistryName(), error),
-                    warning -> this.logWarning(soilProperties.getRegistryName(), warning)
-            ));
-        }
+        soilProperties.generateBlock(JsonHelper.getBlockProperties(
+                json,
+                soilProperties.getDefaultMapColor(),
+                soilProperties::getDefaultBlockProperties,
+                error -> this.logError(soilProperties.getRegistryName(), error),
+                warning -> this.logWarning(soilProperties.getRegistryName(), warning)
+        ));
 
     }
 

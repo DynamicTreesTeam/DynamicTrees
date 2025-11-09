@@ -12,7 +12,6 @@ import com.dtteam.dynamictrees.block.FutureBreakable;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
-import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.loot.LootTableSupplier;

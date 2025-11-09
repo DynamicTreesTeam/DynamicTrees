@@ -42,6 +42,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -85,6 +86,7 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
     public Block getPrimitiveSoilBlock() {
         return getSoilProperties().getPrimitiveSoilBlock();
     }
+
     public BlockState getPrimitiveSoilState(BlockState currentSoilState) {
         return getSoilProperties().getPrimitiveSoilState(currentSoilState);
     }
@@ -105,7 +107,27 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        //shapes get cached before the primitive soil gets set, so we default to full block
+        if (getPrimitiveSoilBlock() == Blocks.AIR) return super.getShape(state, level, pos, context);
         return getPrimitiveSoilBlock().defaultBlockState().getShape(level, pos, context);
+    }
+
+    @Override
+    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (getPrimitiveSoilBlock() == Blocks.AIR) return super.getCollisionShape(state, level, pos, context);
+        return getPrimitiveSoilBlock().defaultBlockState().getCollisionShape(level, pos, context);
+    }
+
+    @Override
+    protected VoxelShape getVisualShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (getPrimitiveSoilBlock() == Blocks.AIR) return super.getVisualShape(state, level, pos, context);
+        return getPrimitiveSoilBlock().defaultBlockState().getVisualShape(level, pos, context);
+    }
+
+    @Override
+    protected VoxelShape getBlockSupportShape(BlockState state, BlockGetter level, BlockPos pos) {
+        if (getPrimitiveSoilBlock() == Blocks.AIR) return super.getBlockSupportShape(state, level, pos);
+        return getPrimitiveSoilBlock().defaultBlockState().getBlockSupportShape(level, pos);
     }
 
     @Override
@@ -130,7 +152,7 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     @Override
     protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
-        return super.getLightBlock(state, level, pos);
+        return getPrimitiveSoilBlock().defaultBlockState().getLightBlock(level, pos);
     }
 
     @Override
