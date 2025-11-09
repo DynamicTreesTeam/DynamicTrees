@@ -4,19 +4,21 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
 import com.dtteam.dynamictrees.deserialization.applier.VoidApplier;
+import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.google.common.collect.BiMap;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Max Hyper
@@ -76,9 +78,9 @@ public class SoilHelper {
         registerSoil(properties.getRegistryName(), properties.getPrimitiveSoilBlock(), adjNames);
     }
 
-    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, String... adjNames) {
+    public static void registerSoil(ResourceLocation name, Block soilBlock, String... adjNames) {
         if (soilBlock == Blocks.AIR) {
-            return SoilProperties.NULL_SOIL_PROPERTIES;
+            return;
         }
 
         int flag = 0;
@@ -87,15 +89,15 @@ public class SoilHelper {
                 flag |= adjectiveMap.get(adjName);
             } else {
                 DynamicTrees.LOG.error("Adjective \"{}\" not found while registering soil block: {}", adjName, soilBlock);
-                return SoilProperties.NULL_SOIL_PROPERTIES;
+                return;
             }
         }
 
-        return registerSoil(name, soilBlock, flag);
+        registerSoil(name, soilBlock, flag);
     }
 
-    public static SoilProperties registerSoil(ResourceLocation name, Block soilBlock, int adjFlag) {
-        return dirtMap.compute(soilBlock, (bl, prop) -> (prop == null) ? new SoilProperties(soilBlock, name, adjFlag, true) : prop.addSoilFlags(adjFlag));
+    public static void registerSoil(ResourceLocation name, Block soilBlock, int adjFlag) {
+        dirtMap.compute(soilBlock, (bl, prop) -> (prop == null) ? new SoilProperties(soilBlock, name, adjFlag, true) : prop.addSoilFlags(adjFlag));
     }
 
     public static boolean isSoilAcceptable(BlockState soilState, int soilFlags) {
@@ -119,14 +121,6 @@ public class SoilHelper {
         return dirtMap.getOrDefault(block, SoilProperties.NULL_SOIL_PROPERTIES);
     }
 
-    public static Set<SoilBlock> getRootyBlocksList() {
-        return dirtMap.values().stream()
-                .map(SoilProperties::getBlock)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
-    }
-
     public static int getSoilFlags(String... types) {
         int flags = 0;
 
@@ -144,5 +138,4 @@ public class SoilHelper {
         soilApplier.apply(value, acceptableSoil);
         return PropertyApplierResult.success();
     }
-
 }

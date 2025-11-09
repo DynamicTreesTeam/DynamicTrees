@@ -110,13 +110,20 @@ public class UndergroundRootsSpecies extends Species {
     }
 
     @Override
-    public boolean postGrow(Level level, BlockPos rootPos, BlockPos treePos, int fertility, boolean natural) {
+    public boolean postGrow(Level level, BlockPos soilPos, BlockPos treePos, int fertility, boolean natural) {
         int radius = TreeHelper.getRadius(level, treePos);
-        BlockState soilState = level.getBlockState(rootPos);
+        BlockState soilState = level.getBlockState(soilPos);
+
         if (radius >= 8 || (isWater(soilState) && radius >= updateSoilOnWaterRadius)) {
-            replaceSoilBlock(soilState, level, rootPos, fertility);
+            SoilBlock soilBlock = TreeHelper.getRooty(soilState);
+            if (soilBlock == null) return false;
+            BlockPos rootPos = soilPos.relative(soilBlock.getTrunkDirection(level, soilPos).getOpposite());
+            boolean hasRoots = TreeHelper.isBranch(level.getBlockState(rootPos));
+            if (hasRoots){
+                replaceSoilBlock(soilState, level, soilPos, fertility);
+            }
         }
-        return super.postGrow(level, rootPos, treePos, fertility, natural);
+        return super.postGrow(level, soilPos, treePos, fertility, natural);
     }
 
     public boolean soilDestroyAction(Level level, @NotNull BlockPos rootPos, BlockState state, @NotNull Player player){
@@ -201,7 +208,7 @@ public class UndergroundRootsSpecies extends Species {
             if (TreeHelper.isBranch(belowState)){
                 GrowSignal rootGrowSignal = new GrowSignal(this, rootPos, getRootEnergy(level, rootPos), level.random, defaultDir.getOpposite());
                 return TreeHelper.getTreePart(belowState).growSignal(level, belowPos, rootGrowSignal);
-            } else {
+            } else if (isAcceptableSoil(belowState)) {
                 getFamily().getRoots().ifPresent(branch -> branch.setRadius(level, belowPos, family.getPrimaryThickness(), null));
             }
         }

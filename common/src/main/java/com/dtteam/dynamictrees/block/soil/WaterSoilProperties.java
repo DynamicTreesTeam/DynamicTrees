@@ -137,9 +137,7 @@ public class WaterSoilProperties extends SoilProperties {
             return true;
         }
 
-        public boolean fallWithTree(BlockState state, Level level, BlockPos pos) {
-            //The block is removed when this is checked because it means it got attached to a tree
-            level.setBlockAndUpdate(pos, getDecayBlockState(state, level, pos));
+        public boolean fallWithTree(BlockState state, Level level, BlockPos pos, boolean hasRoots) {
             return true;
         }
 

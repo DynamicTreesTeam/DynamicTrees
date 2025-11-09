@@ -20,6 +20,8 @@ import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.EntityUtils;
 import com.dtteam.dynamictrees.utility.ItemUtils;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -33,6 +35,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -89,13 +92,29 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
     public static class RootSoilBlock extends SoilBlock implements SimpleWaterloggedBlock {
 
-        public static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, 8);
+        private static final int MIN_RADIUS = 1;
+        private static final int MAX_RADIUS = 8;
+
+        public static final IntegerProperty RADIUS = IntegerProperty.create("radius", MIN_RADIUS, MAX_RADIUS);
         public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
         public RootSoilBlock(SoilProperties properties, Properties blockProperties) {
             super(properties, blockProperties);
-            registerDefaultState(defaultBlockState().setValue(RADIUS, 8).setValue(WATERLOGGED, false));
+            registerDefaultState(defaultBlockState().setValue(RADIUS, MAX_RADIUS).setValue(WATERLOGGED, false));
             soilBlockDecayer = (level, rootPos, rootyState, species) -> true;
+        }
+
+        @Override
+        public BlockState GetStateFromIndex(int index){
+            if (index <= MAX_RADIUS && index >= MIN_RADIUS)
+                return defaultBlockState().setValue(RADIUS, index);
+            return defaultBlockState();
+        }
+
+        @Override
+        public int getStateIndex(BlockState state){
+            if (!state.hasProperty(RADIUS)) return 0;
+            return state.getValue(RADIUS);
         }
 
         @Override
@@ -147,14 +166,14 @@ public class AerialRootsSoilProperties extends SoilProperties {
             final RootIntegrityNode node = new RootIntegrityNode();
             BlockState belowState = level.getBlockState(belowPos);
             if (!TreeHelper.isTreePart(belowState)) return true;
-            TreeHelper.getTreePart(belowState).analyse(belowState, level, belowPos, null, new MapSignal(node)); // Analyze entire tree network to find root node and species.
+            TreeHelper.getTreePart(belowState).analyse(belowState, level, belowPos, null, new MapSignal(node));
             return node.getStable().isEmpty();
         }
 
         @Override
         public boolean fallWithTree(BlockState state, Level level, BlockPos pos, boolean hasRoots) {
             if (hasRoots){
-                //Since tick doesn't handle the removal we must handle it here
+                //tick would set this to a branch so we set it to air before that happens.
                 level.setBlock(pos, getDecayBlockStateAir(state, level, pos), 2);
                 return true;
             }
@@ -163,45 +182,23 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
         @Override
         protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-            if (!state.is(this)) return; //The root has already been destroyed / removed.
-            boolean removed = false;
-            //If no roots support it then drop the whole tree.
+            if (!state.is(this)) return;
+
             if (isStructurallyUnstable(level, pos)){
                 dropWholeTree(level, pos, null, FallingTreeEntity.DestroyType.HARVEST);
-                removed = true;
-            }
-            //if the species is not valid then this block should be removed asap
-            else if (!getSpecies(state, level, pos).isValid()){
-                level.setBlockAndUpdate(pos, getDecayBlockStateAir(state, level, pos));
-                removed = true;
-            }
-            if (!removed){
+            } else {
                 updateRadius(level, state, pos, 3, false);
             }
+
+            super.tick(level.getBlockState(pos), level, pos, random);
         }
 
         @Override
         public void updateTree(BlockState rootyState, Level level, BlockPos rootPos, RandomSource random, boolean natural) {
             int radOld = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getNormal()));
-            if (ChunkTreeHelper.isSurroundedByLoadedChunks(level, rootPos)) {
 
-                boolean viable = false;
+            super.updateTree(rootyState, level, rootPos, random, natural);
 
-                Species species = getSpecies(rootyState, level, rootPos);
-
-                if (species.isValid()) {
-                    BlockPos treePos = rootPos.relative(getTrunkDirection(level, rootPos));
-                    TreePart treeBase = TreeHelper.getTreePart(level.getBlockState(treePos));
-                    if (treeBase != TreeHelper.NULL_TREE_PART) {
-                        viable = species.update(level, this, rootPos, getFertility(rootyState, level, rootPos), treeBase, treePos, random, natural);
-                    }
-                }
-
-                if (!viable) {
-                    level.setBlock(rootPos, getDecayBlockStateAir(rootyState, level, rootPos), 3);
-                }
-
-            }
             int radNew = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getNormal()));
             //If the radius was updated, tick the root block
             if (radOld != radNew) level.scheduleTick(rootPos, this, 1);
@@ -212,7 +209,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
             if (state.hasProperty(WATERLOGGED)) {
                 return getFluidState(state).createLegacyBlock();
             }
-            return super.getDecayBlockState(state, level, pos);
+            return Blocks.AIR.defaultBlockState();
         }
 
         @Override
@@ -228,13 +225,6 @@ public class AerialRootsSoilProperties extends SoilProperties {
             return decay;
         }
 
-        /**
-         * Called when a player removes a block.
-         * This is responsible for actually destroying the block, and the block is intact at time of call.
-         * This is called regardless of whether the player can harvest the block or not.
-         * @return true if the block is actually destroyed.
-         * Note: When used in multiplayer, this is called on both client and server sides!
-         */
         @Override
         public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
             if (!level.isClientSide)
@@ -285,12 +275,12 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
         @Override
         public int updateRadius (LevelAccessor level, BlockState state, BlockPos pos, int flags, boolean force) {
-            if (!(state.getBlock() instanceof RootSoilBlock)) return 8;
+            if (!(state.getBlock() instanceof RootSoilBlock)) return MAX_RADIUS;
             int upRad = TreeHelper.getRadius(level, pos.above());
             if (upRad > 0){
                 int thisRad = state.getValue(RootSoilBlock.RADIUS);
                 if (upRad != thisRad || force){
-                    int newRadius = Math.min(upRad, 8);
+                    int newRadius = Math.min(upRad, MAX_RADIUS);
                     level.setBlock(pos, state.setValue(RootSoilBlock.RADIUS, newRadius), flags);
                     return newRadius;
                 }
@@ -298,7 +288,6 @@ public class AerialRootsSoilProperties extends SoilProperties {
             }
             return 0;
         }
-
     }
 
     public List<TagKey<Block>> defaultSoilBlockTags() {

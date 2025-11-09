@@ -23,16 +23,13 @@ public class VoidAnimationHandler implements AnimationHandler {
     public void initMotion(FallingTreeEntity entity) {
         FallingTreeEntity.standardDropLogsPayload(entity);
         FallingTreeEntity.standardDropLeavesPayLoad(entity);
-        entity.cleanupRootyDirt();
     }
 
     @Override
-    public void handleMotion(FallingTreeEntity entity) {
-    }
+    public void handleMotion(FallingTreeEntity entity) {}
 
     @Override
-    public void dropPayload(FallingTreeEntity entity) {
-    } //Payload is dropped in initMotion
+    public void dropPayload(FallingTreeEntity entity) {}
 
     @Override
 //    @OnlyIn(Dist.CLIENT)

@@ -148,8 +148,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     }
 
     public CompoundTag buildVoxelData(BranchDestructionData destroyData) {
-        CompoundTag tag = new CompoundTag();
-        destroyData.writeToNBT(tag);
+        CompoundTag tag = destroyData.writeToNBT(new CompoundTag());
 
         tag.putDouble("geomx", geomCenter.x);
         tag.putDouble("geomy", geomCenter.y);
@@ -435,19 +434,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         builder.define(voxelDataParameter, new CompoundTag());
     }
 
-    public void cleanupRootyDirt() {
-        // Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
-        if (!this.level().isClientSide) {
-            final BlockPos rootPos = getDestroyData().cutPos.below();
-            final BlockState belowState = this.level().getBlockState(rootPos);
-
-            if (TreeHelper.isRooty(belowState)) {
-                final SoilBlock soilBlock = (SoilBlock) belowState.getBlock();
-                soilBlock.doDecay(this.level(), rootPos, belowState, getDestroyData().species, false);
-            }
-        }
-    }
-
 
     //This is shipped off to the clients
     public void setVoxelData(CompoundTag tag) {
@@ -459,8 +445,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public CompoundTag getVoxelData() {
         return getEntityData().get(voxelDataParameter);
     }
-
-
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compound) {
@@ -477,7 +461,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
                 }
             }
         }
-
     }
 
     @Override
@@ -494,11 +477,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
             compound.put("payload", list);
         }
     }
-
-//    @Override
-//    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity entity) {
-//        return NetworkHooks.getEntitySpawningPacket(this);
-//    }
 
     public static FallingTreeEntity dropTree(Level level, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
         //Spawn the appropriate item entities into the level

@@ -12,6 +12,7 @@ import com.dtteam.dynamictrees.block.FutureBreakable;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.loot.LootTableSupplier;
@@ -30,6 +31,7 @@ import com.dtteam.dynamictrees.utility.ItemUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.server.level.ServerLevel;
@@ -54,6 +56,7 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -384,7 +387,19 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
             cutDir = Direction.DOWN;
         }
 
-        return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutPos, cutDir, toolDir, trunkHeight);
+        Pair<ResourceLocation, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getNormal()), false);
+        return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutPos, cutDir, toolDir, trunkHeight, cachedState);
+    }
+
+    protected static @Nullable Pair<ResourceLocation, Integer> getCachedSoilState(Level level, BlockPos rootPos, boolean hasRoots) {
+        BlockState soilState = level.getBlockState(rootPos);
+        SoilBlock soilBlock = TreeHelper.getRooty(soilState);
+        if (soilBlock != null && soilBlock.fallWithTree(soilState, level, rootPos, hasRoots)){
+            ResourceLocation blockResLoc = BuiltInRegistries.BLOCK.getKey(soilBlock);
+            int stateId = soilBlock.getStateIndex(soilState);
+            return Pair.of(blockResLoc, stateId);
+        }
+        return null;
     }
 
     /**

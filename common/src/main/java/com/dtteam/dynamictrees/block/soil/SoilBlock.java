@@ -157,6 +157,14 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
         builder.add(FERTILITY).add(IS_VARIANT);
     }
 
+    public BlockState GetStateFromIndex(int index){
+        return defaultBlockState();
+    }
+
+    public int getStateIndex(BlockState state){
+        return 0;
+    }
+
     ///////////////////////////////////////////
     // INTERACTION
     ///////////////////////////////////////////
@@ -192,25 +200,21 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
         return Direction.UP;
     }
 
-    public void updateTree(BlockState rootyState, Level level, BlockPos rootPos, RandomSource random, boolean natural) {
-
-        if (ChunkTreeHelper.isSurroundedByLoadedChunks(level, rootPos)) {
-
+    public void updateTree(BlockState rootyState, Level level, BlockPos soilPos, RandomSource random, boolean natural) {
+        if (ChunkTreeHelper.isSurroundedByLoadedChunks(level, soilPos)) {
             boolean viable = false;
 
-            Species species = getSpecies(rootyState, level, rootPos);
-
+            Species species = getSpecies(rootyState, level, soilPos);
             if (species.isValid()) {
-                BlockPos treePos = rootPos.relative(getTrunkDirection(level, rootPos));
+                BlockPos treePos = soilPos.relative(getTrunkDirection(level, soilPos));
                 TreePart treeBase = TreeHelper.getTreePart(level.getBlockState(treePos));
                 if (treeBase != TreeHelper.NULL_TREE_PART) {
-                    viable = species.update(level, this, rootPos, getFertility(rootyState, level, rootPos), treeBase, treePos, random, natural);
+                    viable = species.update(level, this, soilPos, getFertility(rootyState, level, soilPos), treeBase, treePos, random, natural);
                 }
             }
 
             if (!viable) {
-                //TODO: Attempt to destroy what's left of the tree before setting rooty to dirt
-                level.setBlock(rootPos, getDecayBlockState(rootyState, level, rootPos), 3);
+                doDecay(level, soilPos, rootyState);
             }
 
         }
@@ -233,28 +237,9 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
      * @param level      The {@link Level} instance.
      * @param rootPos    The {@link BlockPos} of the {@link SoilBlock}.
      * @param rootyState The {@link BlockState} of the {@link SoilBlock}.
-     * @param species    The {@link Species} of the tree that was removed.
      */
-    public void doDecay(Level level, BlockPos rootPos, BlockState rootyState, Species species, boolean forceDecay) {
-        if (level.isClientSide || !TreeHelper.isRooty(rootyState)) {
-            return;
-        }
-
-        if (forceDecay){
-            level.setBlock(rootPos, getDecayBlockState(rootyState, level, rootPos), 3);
-        } else {
-            this.updateTree(rootyState, level, rootPos, level.random, true); // This will turn the rooty dirt back to it's default soil block.
-        }
-        final BlockState newState = level.getBlockState(rootPos);
-
-        // Make sure we're not still a rooty block and return if custom decay returns true.
-        if (TreeHelper.isRooty(newState) || (soilBlockDecayer != null && soilBlockDecayer.decay(level, rootPos, rootyState, species))) {
-            return;
-        }
-
-        final BlockState primitiveDirt = this.getDecayBlockState(rootyState, level, rootPos);
-
-        level.setBlock(rootPos, primitiveDirt, Block.UPDATE_ALL);
+    public void doDecay(Level level, BlockPos rootPos, BlockState rootyState) {
+        level.setBlock(rootPos, getDecayBlockState(rootyState, level, rootPos), Block.UPDATE_ALL);
     }
 
     @Override
@@ -440,7 +425,7 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
-        if (neighborPos.equals(pos.offset(getTrunkDirection(level, pos).getNormal()))){
+        if (neighborPos.equals(pos.relative(getTrunkDirection(level, pos)))){
             level.scheduleTick(pos, this, 1);
         }
         super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
@@ -449,8 +434,8 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!state.is(this)) return; //The root has already been destroyed / removed.
-        if (!TreeHelper.isBranch(level.getBlockState(pos.offset(getTrunkDirection(level, pos).getNormal())))){
-            doDecay(level, pos, state, getSpecies(state, level, pos), true);
+        if (getMainTrunk(level, pos) == null){
+            doDecay(level, pos, state);
         }
         super.tick(state, level, pos, random);
     }
@@ -463,13 +448,19 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     @Override
     public Family getFamily(BlockState state, BlockGetter level, BlockPos rootPos) {
-        BlockPos treePos = rootPos.relative(getTrunkDirection(level, rootPos));
-        BlockState treeState = level.getBlockState(treePos);
-        return TreeHelper.isBranch(treeState) ? TreeHelper.getBranch(treeState).getFamily(treeState, level, treePos) : Family.NULL_FAMILY;
+        BranchBlock branchBlock = getMainTrunk(level, rootPos);
+        return branchBlock != null ? branchBlock.getFamily() : Family.NULL_FAMILY;
     }
 
     @Nullable
-    private SpeciesBlockEntity getTileEntitySpecies(LevelAccessor level, BlockPos pos) {
+    protected BranchBlock getMainTrunk(BlockGetter level, BlockPos soilPos){
+        BlockPos pos = soilPos.relative(getTrunkDirection(level, soilPos));
+        BlockState trunkState = level.getBlockState(pos);
+        return TreeHelper.getBranch(trunkState);
+    }
+
+    @Nullable
+    protected SpeciesBlockEntity getTileEntitySpecies(LevelAccessor level, BlockPos pos) {
         final BlockEntity blockEntity = level.getBlockEntity(pos);
         if(blockEntity == null)
             return null;
@@ -478,23 +469,23 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     /**
      * Rooty Dirt can report whatever {@link Family} species it wants to be. We'll use a stored value to determine the
-     * species for the {@link BlockEntity} version. Otherwise we'll just make it report whatever {@link DynamicTrees} the
+     * species for the {@link BlockEntity} version. Otherwise, we'll just make it report whatever {@link DynamicTrees} the
      * above {@link BranchBlock} says it is.
      */
-    public Species getSpecies(BlockState state, LevelAccessor level, BlockPos rootPos) {
+    public Species getSpecies(BlockState state, LevelAccessor level, BlockPos soilPos) {
+        Family family = getFamily(state, level, soilPos);
+        if (!family.isValid()) return Species.NULL_SPECIES;
 
-        Family tree = getFamily(state, level, rootPos);
-
-        SpeciesBlockEntity rootyDirtTE = getTileEntitySpecies(level, rootPos);
+        SpeciesBlockEntity rootyDirtTE = getTileEntitySpecies(level, soilPos);
 
         if (rootyDirtTE != null) {
             Species species = rootyDirtTE.getSpecies();
-            if (species.getFamily() == tree) {//As a sanity check we should see if the tree and the stored species are a match
+            if (species.getFamily() == family) {//As a sanity check we should see if the tree and the stored species are a match
                 return rootyDirtTE.getSpecies();
             }
         }
 
-        return tree.getSpeciesForLocation(level, rootPos.relative(getTrunkDirection(level, rootPos)));
+        return family.getSpeciesForLocation(level, soilPos.relative(getTrunkDirection(level, soilPos)));
     }
 
     public void setSpecies(Level level, BlockPos rootPos, Species species) {
@@ -535,11 +526,6 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
     }
 
     public boolean fallWithTree(BlockState state, Level level, BlockPos pos, boolean hasRoots) {
-        return fallWithTree(state, level, pos);
-    }
-
-    public boolean fallWithTree(BlockState state, Level level, BlockPos pos) {
         return false;
     }
-
 }

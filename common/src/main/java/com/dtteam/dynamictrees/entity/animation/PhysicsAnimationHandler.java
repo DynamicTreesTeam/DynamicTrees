@@ -157,13 +157,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
     }
 
     public boolean shouldDie(FallingTreeEntity entity) {
-        final boolean dead = entity.landed || entity.tickCount > 120;
-
-        if (dead) {
-            entity.cleanupRootyDirt();
-        }
-
-        return dead;
+        return entity.landed || entity.tickCount > 120;
     }
 
     @Override
@@ -177,7 +171,6 @@ public class PhysicsAnimationHandler implements AnimationHandler {
         poseStack.mulPose(Axis.YN.rotationDegrees(yaw));
         poseStack.mulPose(Axis.XP.rotationDegrees(pit));
         poseStack.translate(-mc.x - 0.5, -mc.y, -mc.z - 0.5);
-
     }
 
     @Override

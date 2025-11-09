@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -47,19 +48,19 @@ public class FallingTreeEntityModelNF extends FallingTreeEntityModel {
                 Species species = destructionData.species;
 
                 //Draw the rooty block if it is set to fall too
-                BlockPos rootPos = cutPos.below();
-                BlockState bottomState = entity.level().getBlockState(rootPos);
                 boolean rootyBlockAdded = false;
-                if (TreeHelper.isRooty(bottomState)) {
-                    SoilBlock soilBlock = TreeHelper.getRooty(bottomState);
-                    if (soilBlock != null && soilBlock.fallWithTree(bottomState, entity.level(), rootPos, !destructionData.getRelativeCutPos().equals(BlockPos.ZERO))) {
-                        BakedModel rootyModel = dispatcher.getBlockModel(bottomState);
+                if (destructionData.soilState != null){
+                    SoilBlock soilBlock = TreeHelper.getRooty(BuiltInRegistries.BLOCK.get(destructionData.soilState.getLeft()));
+                    if (soilBlock != null) {
+                        BlockState soilState = soilBlock.GetStateFromIndex(destructionData.soilState.getRight());
+                        BakedModel rootyModel = dispatcher.getBlockModel(soilState);
                         BlockPos cutOffset = destructionData.getRelativeCutPos();
-                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, bottomState, new Vec3(cutOffset.getX(), cutOffset.getY()-1, cutOffset.getZ()), entity.getRandom(), ModelData.EMPTY),
-                                destructionData.species.getFamily().getRootColor(bottomState, soilBlock.getColorFromBark()),
-                                bottomState));
+                        treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, soilState, new Vec3(cutOffset.getX(), cutOffset.getY()-1, cutOffset.getZ()), entity.getRandom(), ModelData.EMPTY),
+                                destructionData.species.getFamily().getRootColor(soilState, soilBlock.getColorFromBark()),
+                                soilState));
                         rootyBlockAdded = true;
                     }
+
                 }
 
                 BakedModel branchModel = dispatcher.getBlockModel(exState);

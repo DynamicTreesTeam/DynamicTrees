@@ -375,11 +375,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
                         entity.landed ||
                         entity.tickCount > 120 + (entity.getDestroyData().trunkHeight);
 
-        //Force the Rooty Dirt to update if it's there.  Turning it back to dirt.
-        if (dead) {
-            entity.cleanupRootyDirt();
-            if (entity.level().isClientSide)
-                SoundInstanceHandler.stopSoundInstance(entity);
+        if (dead && entity.level().isClientSide) {
+            SoundInstanceHandler.stopSoundInstance(entity);
         }
 
         return dead;

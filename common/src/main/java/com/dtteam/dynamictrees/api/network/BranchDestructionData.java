@@ -37,6 +37,7 @@ public class BranchDestructionData {
     public final BlockPos cutPos; // The absolute(world) position of the block that was cut
     public final BlockPos basePos; // The absolute(world) position of base for the tree entity
     public final int trunkHeight;
+    public final Pair<ResourceLocation, Integer> soilState;
 
     public static final BlockPosBounds bounds = new BlockPosBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));
 
@@ -55,12 +56,13 @@ public class BranchDestructionData {
         this.cutPos = BlockPos.ZERO;
         this.basePos = BlockPos.ZERO;
         this.trunkHeight = 0;
+        this.soilState = null;
     }
 
     private Map<BlockPos, BranchConnectionData> unencodedBranches;
     private Map<BlockPos, BlockState> unencodedLeaves;
     private List<BlockPos> unencodedEnds;
-    public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, NetVolumeNode.Volume volume, BlockPos cutPos, BlockPos basePos, Direction cutDir, Direction toolDir, int trunkHeight) {
+    public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, NetVolumeNode.Volume volume, BlockPos cutPos, BlockPos basePos, Direction cutDir, Direction toolDir, int trunkHeight, @Nullable Pair<ResourceLocation, Integer> soilState) {
         this.species = species;
         int[][] encodedBranchData = convertBranchesToIntArrays(branches);
         this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -77,6 +79,7 @@ public class BranchDestructionData {
         this.cutDir = cutDir;
         this.toolDir = toolDir;
         this.trunkHeight = trunkHeight;
+        this.soilState = soilState;
         //these are only used for merging destructionData
         unencodedBranches = branches;
         unencodedLeaves = leaves;
@@ -108,11 +111,14 @@ public class BranchDestructionData {
         int maxY = Math.max(basePos.getY()+trunkHeight, other.basePos.getY()+other.trunkHeight);
         int newHeight = maxY - newBasePos.getY();
 
+        //If the other brings soil accept it
+        Pair<ResourceLocation, Integer> soil = soilState == null ? other.soilState : soilState;
+
         //Finally the new destructionData is generated.
         // All other parameters use the values from the first destructionData (this).
         return new BranchDestructionData(
                 species, newBranches, newLeaves, newLeavesDrops, newEnds, newVolume,
-                cutPos, newBasePos, cutDir, toolDir, newHeight
+                cutPos, newBasePos, cutDir, toolDir, newHeight, soil
         );
     }
 
@@ -131,6 +137,9 @@ public class BranchDestructionData {
         this.cutDir = Direction.values()[Mth.clamp(nbt.getInt("cutdir"), 0, Direction.values().length - 1)];
         this.toolDir = Direction.values()[Mth.clamp(nbt.getInt("tooldir"), 0, Direction.values().length - 1)];
         this.trunkHeight = nbt.getInt("trunkheight");
+        this.soilState = nbt.contains("soilblock") ?
+                Pair.of(ResourceLocation.parse(nbt.getString("soilblock")), nbt.getInt("soilstateid"))
+                : null;
     }
 
     public CompoundTag writeToNBT(CompoundTag tag) {
@@ -151,6 +160,10 @@ public class BranchDestructionData {
         tag.putInt("cutdir", cutDir.get3DDataValue());
         tag.putInt("tooldir", toolDir.get3DDataValue());
         tag.putInt("trunkheight", trunkHeight);
+        if (soilState != null) {
+            tag.putString("soilblock", soilState.getLeft().toString());
+            tag.putInt("soilstateid", soilState.getRight());
+        }
         return tag;
     }
 
@@ -256,29 +269,9 @@ public class BranchDestructionData {
         int encodedConnections = destroyedBranchesConnections[index];
 
         for (Direction face : Direction.values()) {
-            int rad = (encodedConnections >> (face.get3DDataValue() * 5) & 0x1F);
-            connections[face.get3DDataValue()] = Math.max(0, rad);
+            connections[face.get3DDataValue()] = (encodedConnections >> (face.get3DDataValue() * 5) & 0x1F);
         }
     }
-
-    public static class BlockStateWithConnections {
-        private final BlockState blockState;
-        private final int[] connections;
-
-        public BlockStateWithConnections(BlockState blockState) {
-            this.blockState = blockState;
-            this.connections = new int[6];
-        }
-
-        public BlockState getBlockState() {
-            return blockState;
-        }
-
-        public int[] getConnections() {
-            return connections;
-        }
-    }
-
 
     ///////////////////////////////////////////////////////////
     // Leaves
@@ -400,9 +393,6 @@ public class BranchDestructionData {
 
     /**
      * Get absolute positions of a position type
-     *
-     * @param posType
-     * @return
      */
     public Iterable<BlockPos> getPositions(PosType posType) {
         return getPositions(posType, true);
@@ -410,31 +400,24 @@ public class BranchDestructionData {
 
     /**
      * Get relative or absolute positions of a position type
-     *
-     * @param posType
-     * @param absolute
-     * @return
      */
     public Iterable<BlockPos> getPositions(PosType posType, boolean absolute) {
 
         final Function<Integer, BlockPos> getter;
-        final int limit;
-
-        switch (posType) {
-            default:
-            case BRANCHES:
-                getter = absolute ? i -> getBranchRelPos(i).offset(basePos) : this::getBranchRelPos;
-                limit = getNumBranches();
-                break;
-            case ENDPOINTS:
+        final int limit = switch (posType) {
+            case ENDPOINTS -> {
                 getter = absolute ? i -> getEndPointRelPos(i).offset(basePos) : this::getEndPointRelPos;
-                limit = getNumEndpoints();
-                break;
-            case LEAVES:
+                yield getNumEndpoints();
+            }
+            case LEAVES -> {
                 getter = absolute ? i -> getLeavesRelPos(i).offset(basePos) : this::getLeavesRelPos;
-                limit = getNumLeaves();
-                break;
-        }
+                yield getNumLeaves();
+            }
+            case BRANCHES -> {
+                getter = absolute ? i -> getBranchRelPos(i).offset(basePos) : this::getBranchRelPos;
+                yield getNumBranches();
+            }
+        };
 
         return new Iterable<>() {
             @NotNull
