@@ -101,8 +101,8 @@ public class RootsGenFeature extends GenFeature {
     public boolean startRoots(GenFeatureConfiguration configuration, LevelAccessor level, BlockPos treePos, Species species, int trunkRadius) {
         int hash = CoordUtils.coordHashCode(treePos, 2);
         SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
-        this.nextRoot(level, rootMap, treePos, species, trunkRadius, configuration.get(MIN_TRUNK_RADIUS), configuration.get(SCALE_FACTOR), BlockPos.ZERO, 0,
-                -1, null, 0, configuration.get(LEVEL_LIMIT));
+        this.nextRoot(level, rootMap, treePos, species, trunkRadius, configuration.get(MIN_TRUNK_RADIUS), configuration.get(SCALE_FACTOR), BlockPos.ZERO
+                , 0, -1, null, 0, configuration.get(LEVEL_LIMIT));
         return true;
     }
 
@@ -113,7 +113,7 @@ public class RootsGenFeature extends GenFeature {
             BlockState placeState = level.getBlockState(currPos);
             BlockState belowState = level.getBlockState(currPos.below());
 
-            boolean onNormalCube = belowState.isRedstoneConductor(level, currPos.below());
+            boolean onNormalCube = belowState.isFaceSturdy(level, currPos.below(), Direction.UP);
 
             if (pos == BlockPos.ZERO || isReplaceableWithRoots(level, placeState, currPos) && (depth == 1 || onNormalCube)) {
                 if (radius > 0) {
@@ -148,11 +148,6 @@ public class RootsGenFeature extends GenFeature {
         }
 
         return placeState.canBeReplaced() && !placeState.getFluidState().is(FluidTags.LAVA);
-    }
-
-    public RootsGenFeature setScaler(TetraFunction<Integer, Integer, Integer, Float, Integer> scaler) {
-        this.scaler = scaler;
-        return this;
     }
 
 }
