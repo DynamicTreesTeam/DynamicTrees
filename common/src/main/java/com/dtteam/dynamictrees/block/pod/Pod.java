@@ -102,9 +102,6 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
     private final BlockShapeData blockShapeData = new BlockShapeData();
 
-    /**
-     * Sets whether the pod can be bone-mealed to accelerate growth. Defaults to {@link DTConfigs#CAN_BONE_MEAL_PODS}.
-     */
     private boolean canBoneMeal = true;
 
     /**
