@@ -45,7 +45,11 @@ public final class BiomeDatabases {
     }
 
     public static void populateBlacklistFromConfig() {
-        Services.CONFIG.getStringListConfig(IConfigHelper.DIMENSION_BLACK_LIST).forEach(BiomeDatabases::tryBlacklist);
+        if (Services.CONFIG.isServerConfigLoaded()){
+            Services.CONFIG.getStringListConfig(IConfigHelper.DIMENSION_BLACK_LIST).forEach(BiomeDatabases::tryBlacklist);
+        } else {
+            LogManager.getLogger().error("Dimension Blacklist tried to load from config before config was loaded! this should not happen.");
+        }
     }
 
     private static void tryBlacklist(String location) {

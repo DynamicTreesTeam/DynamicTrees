@@ -46,8 +46,9 @@ public class CommonGameEventHandler {
     public static void onLevelLoad(LevelEvent.Load event) {
         if (event.getLevel().isClientSide()) {
             ClientModEventHandler.discoverWoodColors();
+        } else {
+            BiomeDatabases.populateBlacklistFromConfig();
         }
-        BiomeDatabases.populateBlacklistFromConfig();
     }
 
     /**
