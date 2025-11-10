@@ -72,10 +72,6 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         return true;
     }
 
-    public static boolean isFoliage(LevelSimulatedReader pLevel, BlockPos pPos) {
-        return pLevel.isStateAtPosition(pPos, (state) -> state.is(DTBlockTags.FOLIAGE));
-    }
-
     protected void generateTrees(LevelContext levelContext, BiomeDatabase biomeDatabase, PoissonDisc disc, BlockPos originPos) {
         BlockPos basePos = new BlockPos(disc.x, originPos.getY(), disc.z);
         Holder<Biome> biome = getNoiseBiome(levelContext, basePos);
@@ -86,15 +82,20 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         }
     }
 
+    //We must access the uncached noise, since accessing getBiome or getNoiseBiome calls chunks, which can hang.
     protected static Holder<Biome> getNoiseBiome(LevelContext levelContext, BlockPos pos) {
-        return levelContext.level().getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2);
+        return levelContext.level().getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2);
     }
 
     public static boolean validTreePos(LevelSimulatedReader pLevel, BlockPos pPos) {
         return pLevel.isStateAtPosition(pPos, (state) ->
-                state.isAir() || state.is(BlockTags.REPLACEABLE_BY_TREES) || state.is(DTBlockTags.FOLIAGE));
+                state.isAir() || state.is(BlockTags.REPLACEABLE_BY_TREES) || isFoliage(pLevel, pPos));
     }
-    
+
+    public static boolean isFoliage(LevelSimulatedReader pLevel, BlockPos pPos) {
+        return pLevel.isStateAtPosition(pPos, (state) -> state.is(DTBlockTags.FOLIAGE));
+    }
+
     protected GeneratorResult generateTree(LevelContext levelContext, BiomeDatabase.EntryReader biomeEntry, PoissonDisc circle, BlockPos originPos, BlockPos groundPos) {
         if (groundPos == BlockPos.ZERO) {
             return GeneratorResult.NO_GROUND;
