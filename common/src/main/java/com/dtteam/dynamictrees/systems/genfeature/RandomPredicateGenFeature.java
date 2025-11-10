@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.systems.genfeature;
 
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
 import com.dtteam.dynamictrees.systems.genfeature.context.*;
+import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -26,6 +27,11 @@ public class RandomPredicateGenFeature extends GenFeature {
                 .with(PLACE_CHANCE, 0.5f)
                 .with(GEN_FEATURE, GenFeatureConfiguration.getNull())
                 .with(ONLY_WORLD_GEN, false);
+    }
+
+    @Override
+    public boolean shouldApply(Species species, GenFeatureConfiguration configuration) {
+        return configuration.get(GEN_FEATURE).shouldApply(species);
     }
 
     @Override

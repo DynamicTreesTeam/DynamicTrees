@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.systems.genfeature.context.FullGenerationContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostRotContext;
+import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.resources.ResourceLocation;
 
 public class BiomePredicateGenFeature extends GenFeature {
@@ -30,8 +31,12 @@ public class BiomePredicateGenFeature extends GenFeature {
                 .with(ONLY_WORLD_GEN, false);
     }
 
-    //Pre-generation does not have access to biome
+    @Override
+    public boolean shouldApply(Species species, GenFeatureConfiguration configuration) {
+        return configuration.get(GEN_FEATURE).shouldApply(species);
+    }
 
+    //Pre-generation does not have access to biome
     @Override
     protected boolean generate(GenFeatureConfiguration configuration, FullGenerationContext context) {
         final boolean worldGen = context.isWorldGen();
