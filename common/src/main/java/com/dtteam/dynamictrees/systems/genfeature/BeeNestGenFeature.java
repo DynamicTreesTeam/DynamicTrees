@@ -156,7 +156,7 @@ public class BeeNestGenFeature extends GenFeature {
         return true;
     }
 
-    protected static void storeBee(RandomSource random, BeehiveBlockEntity blockEntity) {
+    protected void storeBee(RandomSource random, BeehiveBlockEntity blockEntity) {
         blockEntity.storeBee(BeehiveBlockEntity.Occupant.create(random.nextInt(599)));
     }
 
