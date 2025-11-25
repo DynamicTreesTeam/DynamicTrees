@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
@@ -59,31 +60,40 @@ public class BeeNestGenFeature extends GenFeature {
 
     @Override
     public GenFeatureConfiguration createDefaultConfiguration() {
-        return super.createDefaultConfiguration().with(NEST_BLOCK, Blocks.BEE_NEST).with(MAX_HEIGHT, 32).with(CAN_GROW_PREDICATE, (world, pos) -> {
-            if (world.getRandom().nextFloat() > GROW_CHANCE) {
-                return false;
-            }
-            // Default flower check predicate, straight from AbstractTreeGrower
-            for (BlockPos blockpos : BlockPos.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
-                if (world.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
-                    return true;
-                }
-            }
+        return super.createDefaultConfiguration()
+                .with(NEST_BLOCK, Blocks.BEE_NEST)
+                .with(MAX_HEIGHT, 32)
+                .with(CAN_GROW_PREDICATE, this::getCanGrowPredicate)
+                .with(WORLD_GEN_CHANCE_FUNCTION, this::getWorldGenChanceFunction)
+                .with(MAX_COUNT, 1);
+    }
+
+    protected double getWorldGenChanceFunction(LevelAccessor world, BlockPos pos) {
+        // Default biome check chance function. Uses vanilla chances
+        Holder<Biome> biomeHolder = world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2);
+        if (biomeHolder.is(DTBiomeTags.IS_BEE_NEST_GUARANTEED))
+            return GUARANTEED_CHANCE;
+
+        if (biomeHolder.is(DTBiomeTags.IS_BEE_NEST_COMMON))
+            return COMMON_CHANCE;
+
+        if (biomeHolder.is(DTBiomeTags.IS_BEE_NEST_UNCOMMON))
+            return UNCOMMON_CHANCE;
+
+        return biomeHolder.is(DTBiomeTags.IS_BEE_NEST_RARE) ? RARE_CHANCE : 0;
+    }
+
+    protected boolean getCanGrowPredicate(LevelAccessor world, BlockPos pos) {
+        if (world.getRandom().nextFloat() > GROW_CHANCE) {
             return false;
-        }).with(WORLD_GEN_CHANCE_FUNCTION, (world, pos) -> {
-            // Default biome check chance function. Uses vanilla chances
-            Holder<Biome> biomeHolder = world.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2);
-            if (biomeHolder.is(DTBiomeTags.IS_BEE_NEST_GUARANTEED))
-                return GUARANTEED_CHANCE;
-
-            if (biomeHolder.is(DTBiomeTags.IS_BEE_NEST_COMMON))
-                return COMMON_CHANCE;
-
-            if (biomeHolder.is(DTBiomeTags.IS_BEE_NEST_UNCOMMON))
-                return UNCOMMON_CHANCE;
-
-            return biomeHolder.is(DTBiomeTags.IS_BEE_NEST_RARE) ? RARE_CHANCE : 0;
-        }).with(MAX_COUNT, 1);
+        }
+        // Default flower check predicate, straight from AbstractTreeGrower
+        for (BlockPos blockpos : BlockPos.betweenClosed(pos.below().north(2).west(2), pos.above().south(2).east(2))) {
+            if (world.getBlockState(blockpos).is(BlockTags.FLOWERS)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -104,7 +114,7 @@ public class BeeNestGenFeature extends GenFeature {
         return this.placeBeeNestInValidPlace(configuration, context.level(), context.pos(), false, context.random());
     }
 
-    private boolean placeBeeNestInValidPlace(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, boolean worldGen, RandomSource random) {
+    protected boolean placeBeeNestInValidPlace(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, boolean worldGen, RandomSource random) {
         Block nestBlock = configuration.get(NEST_BLOCK);
 
         int treeHeight = getTreeHeight(world, rootPos, configuration.get(MAX_HEIGHT));
@@ -119,7 +129,7 @@ public class BeeNestGenFeature extends GenFeature {
         if (validSpaces == null) {
             return false;
         }
-        if (validSpaces.size() > 0) {
+        if (!validSpaces.isEmpty()) {
             Pair<BlockPos, List<Direction>> chosenSpace = validSpaces.get(world.getRandom().nextInt(validSpaces.size()));
             //There is always AT LEAST one valid direction, since if there were none the pos would not have been added to validSpaces
             Direction chosenDir = chosenSpace.getValue().get(world.getRandom().nextInt(chosenSpace.getValue().size()));
@@ -129,7 +139,7 @@ public class BeeNestGenFeature extends GenFeature {
         return false;
     }
 
-    private boolean placeBeeNestWithBees(LevelAccessor world, Block nestBlock, BlockPos pos, Direction faceDir, boolean worldGen, RandomSource random) {
+    protected boolean placeBeeNestWithBees(LevelAccessor world, Block nestBlock, BlockPos pos, Direction faceDir, boolean worldGen, RandomSource random) {
         BlockState nestState = nestBlock.defaultBlockState();
         if (nestState.hasProperty(BeehiveBlock.FACING)) {
             nestState = nestState.setValue(BeehiveBlock.FACING, faceDir);
@@ -139,25 +149,18 @@ public class BeeNestGenFeature extends GenFeature {
             int j = 2 + random.nextInt(2);
 
             for(int k = 0; k < j; ++k) {
-                blockEntity.storeBee(BeehiveBlockEntity.Occupant.create(random.nextInt(599)));
+                storeBee(random, blockEntity);
             }
 
         });
         return true;
     }
 
-    //This just fetches a World instance from an IWorld instance, since IWorld cannot be used to create bees.
-    @Nullable
-    private Level worldFromIWorld(LevelAccessor iWorld) {
-        if (iWorld instanceof WorldGenRegion) {
-            return ((WorldGenRegion) iWorld).getLevel();
-        } else if (iWorld instanceof Level) {
-            return (Level) iWorld;
-        }
-        return null;
+    protected static void storeBee(RandomSource random, BeehiveBlockEntity blockEntity) {
+        blockEntity.storeBee(BeehiveBlockEntity.Occupant.create(random.nextInt(599)));
     }
 
-    private boolean nestAlreadyPresent(LevelAccessor world, Block nestBlock, BlockPos rootPos, int maxHeight) {
+    protected boolean nestAlreadyPresent(LevelAccessor world, Block nestBlock, BlockPos rootPos, int maxHeight) {
         for (int y = 2; y < maxHeight; y++) {
             BlockPos trunkPos = rootPos.above(y);
             for (Direction dir : CoordUtils.HORIZONTALS) {
@@ -169,7 +172,7 @@ public class BeeNestGenFeature extends GenFeature {
         return false;
     }
 
-    private int getTreeHeight(LevelAccessor world, BlockPos rootPos, int maxHeight) {
+    protected int getTreeHeight(LevelAccessor world, BlockPos rootPos, int maxHeight) {
         for (int i = 1; i < maxHeight; i++) {
             if (!TreeHelper.isBranch(world.getBlockState(rootPos.above(i)))) {
                 return i - 1;
@@ -180,7 +183,7 @@ public class BeeNestGenFeature extends GenFeature {
 
     //The valid places this genFeature looks for are empty blocks under branches next to the trunk, similar to armpits lol
     @Nullable
-    private List<Pair<BlockPos, List<Direction>>> findBranchPits(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, int maxHeight) {
+    protected List<Pair<BlockPos, List<Direction>>> findBranchPits(GenFeatureConfiguration configuration, LevelAccessor world, BlockPos rootPos, int maxHeight) {
         int existingBlocks = 0;
         List<Pair<BlockPos, List<Direction>>> validSpaces = new LinkedList<>();
         for (int y = 2; y < maxHeight; y++) {
