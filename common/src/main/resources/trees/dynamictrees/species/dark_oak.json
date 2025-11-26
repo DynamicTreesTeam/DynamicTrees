@@ -44,6 +44,7 @@
             "name": "biome_predicate",
             "properties": {
                 "_comment": "Smaller giant mushrooms under the canopy",
+                "_comment2": "This feature gets disabled when Dynamic Trees + is installed",
                 "gen_feature": {
                     "name": "random_predicate",
                     "properties": {
@@ -58,6 +59,7 @@
             "name": "random_predicate",
             "properties": {
                 "_comment": "Fully replace the tree with a giant mushroom",
+                "_comment2": "This feature gets disabled when Dynamic Trees + is installed",
                 "gen_feature": {
                     "name": "biome_predicate",
                     "properties": {

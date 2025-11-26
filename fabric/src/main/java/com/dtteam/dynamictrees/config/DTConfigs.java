@@ -51,7 +51,7 @@ public class DTConfigs {
         createConfig("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days",
         IConfigHelper.DESEASE_CHANCE, 0.0f, 0.0f, 1.0f);
         createConfig("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. 24 = Full 3x3 thick size. Set to 0 to prevent rotting",
-        IConfigHelper.MAX_BRANCH_ROT_RADIUS, 7, 0, ThickBranchBlock.MAX_RADIUS_THICK);
+        IConfigHelper.MAX_BRANCH_ROT_RADIUS, 5, 0, ThickBranchBlock.MAX_RADIUS_THICK);
         createConfig("How much harder it is to destroy a rooty block compared to its non-rooty state",
         IConfigHelper.ROOTY_BLOCK_HARDNESS_MULTIPLIER, 40f, 0f, 128f);
         createConfig("Options for how oak trees generate in swamps. ROOTED: Swamp oak trees will generate on shallow water with mangrove-like roots. SUNK: Swamp oak trees will generate on shallow water one block under the surface. DISABLED: Swamp oaks will not generate on water.",
@@ -60,9 +60,9 @@ public class DTConfigs {
         IConfigHelper.BONE_MEAL_GROWTH_PULSES, 1, 1, 512);
 
         configs.addSection("interaction");
-        createConfig("If enabled all leaves will be passable. If the Passable Foliage mod is installed this config is overridden",
+        createConfig("If enabled all leaves will be passable. If the Passable Foliage mod is installed this config is overridden as true.",
                 IConfigHelper.IS_LEAVES_PASSABLE, false);
-        createConfig("If enabled player movement on leaves will not be enhanced",
+        createConfig("If enabled player movement on leaves will not be enhanced.",
                 IConfigHelper.VANILLA_LEAVES_COLLISION, false);
         createConfig("If enabled then thinner branches can be climbed",
                 IConfigHelper.ENABLE_BRANCH_CLIMBING, true);

@@ -7,7 +7,10 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
@@ -30,7 +33,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.ScheduledTick;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("deprecation")
 public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
 
     public static final int MAX_RADIUS = 8;
@@ -42,16 +44,12 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
     private final Family family;
 
     public SurfaceRootBlock(Family family) {
-        this(MapColor.WOOD, family);
-        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
-    }
-
-    public SurfaceRootBlock(MapColor mapColor, Family family) {
         super(Properties.of()
-                .mapColor(mapColor)
+                .mapColor(family.getDefaultBranchMapColor())
                 .strength(2.5f, 1.0F)
-                .sound(SoundType.WOOD));
+                .sound(family.getDefaultBranchSoundType()));
 
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
         this.family = family;
     }
 
@@ -202,45 +200,80 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
         BlockState state = ChunkTreeHelper.getStateSafe(level, dPos);
         final BlockState upState = ChunkTreeHelper.getStateSafe(level, pos.above());
 
-        final RootConnections.ConnectionLevel connectionLevel = (upState != null && isAirOrWater(upState) && state != null && state.isRedstoneConductor(level, dPos)) ?
-                RootConnections.ConnectionLevel.HIGH : (state != null && isAirOrWater(state) ? RootConnections.ConnectionLevel.LOW : RootConnections.ConnectionLevel.MID);
+        if (state == null || upState == null) return null;
+
+        if (TreeHelper.isBranch(state)) {
+            int radius = TreeHelper.getTreePart(state).getRadius(state);
+            if (radius >= 8)
+                return new RootConnection(RootConnections.ConnectionLevel.MID, 8);
+        }
+
+        boolean goUp = isAirOrWater(upState) && state.isCollisionShapeFullBlock(level, dPos);
+        boolean goDown = isAirOrWater(state);
+
+        final RootConnections.ConnectionLevel connectionLevel;
+        if (goUp){
+            connectionLevel = RootConnections.ConnectionLevel.HIGH;
+        } else if (goDown){
+            connectionLevel = RootConnections.ConnectionLevel.LOW;
+        } else {
+            connectionLevel = RootConnections.ConnectionLevel.MID;
+        }
 
         if (connectionLevel != RootConnections.ConnectionLevel.MID) {
             dPos = dPos.above(connectionLevel.getYOffset());
             state = ChunkTreeHelper.getStateSafe(level, dPos);
         }
 
-        if (state != null && state.getBlock() instanceof SurfaceRootBlock) {
-            return new RootConnection(connectionLevel, ((SurfaceRootBlock) state.getBlock()).getRadius(state));
-        } else if (connectionLevel == RootConnections.ConnectionLevel.MID && TreeHelper.isBranch(state)) {
-            return new RootConnection(RootConnections.ConnectionLevel.MID, Math.min(TreeHelper.getTreePart(state).getRadius(state), 8));
+        if (state != null && state.getBlock() instanceof SurfaceRootBlock sideRoot) {
+            return new RootConnection(connectionLevel,  sideRoot.getRadius(state));
         }
 
         return null;
     }
 
-//    @Override
-//    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-//        final BlockState upstate = level.getBlockState(pos.above());
-//
-//        if (upstate.getBlock() instanceof TrunkShellBlock) {
-//            level.setBlockAndUpdate(pos, upstate);
-//        }
-//
-//        for (Direction dir : CoordUtils.HORIZONTALS) {
-//            final BlockPos dPos = pos.relative(dir).below();
-//            level.getBlockState(dPos).neighborChanged(level, dPos, this, pos, false);
-//        }
-//
-//        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
-//    }
-
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+        level.scheduleTick(pos, state.getBlock(), 0);
+    }
+
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        super.tick(state, level, pos, random);
         if (!canBlockStay(level, pos, state)) {
+            int thisRad = state.hasProperty(RADIUS) ? state.getValue(RADIUS) : 0;
             level.removeBlock(pos, false);
+            for (Direction dir : CoordUtils.HORIZONTALS) {
+                updateDisconnectedRoot(level, pos, dir, thisRad);
+            }
         }
     }
+
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        BlockState destroyed = super.playerWillDestroy(level, pos, state, player);
+        int thisRad = state.hasProperty(RADIUS) ? state.getValue(RADIUS) : 0;
+        for (Direction dir : CoordUtils.HORIZONTALS) {
+            updateDisconnectedRoot(level, pos, dir, thisRad);
+        }
+        return destroyed;
+    }
+
+    private void updateDisconnectedRoot(Level level, BlockPos pos, Direction dir, int thisRad) {
+        final RootConnection conn = this.getSideConnectionRadius(level, pos, dir);
+        if (conn == null) {
+            return;
+        }
+        if (conn.radius < thisRad){
+            BlockPos offsetPos = pos.relative(dir).above(conn.level.getYOffset());
+            BlockState offsetState = ChunkTreeHelper.getStateSafe(level, offsetPos);
+            if (offsetState != null && offsetState.is(this)){
+                Block offsetBlock = offsetState.getBlock();
+                level.scheduleTick(offsetPos, offsetBlock, 0);
+            }
+        }
+    }
+
 
     protected boolean canBlockStay(Level level, BlockPos pos, BlockState state) {
         final BlockPos below = pos.below();
@@ -248,7 +281,7 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
 
         final int radius = getRadius(state);
 
-        if (belowState.isRedstoneConductor(level, below)) { // If a root is sitting on a solid block.
+        if (belowState.isFaceSturdy(level, below, Direction.UP)) { // If a root is sitting on a solid block.
             for (Direction dir : CoordUtils.HORIZONTALS) {
                 final RootConnection conn = this.getSideConnectionRadius(level, pos, dir);
 

@@ -5,6 +5,7 @@ import com.dtteam.dynamictrees.api.function.TetraFunction;
 import com.dtteam.dynamictrees.api.voxmap.SimpleVoxmap;
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
+import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
 import com.dtteam.dynamictrees.tree.TreeHelper;
@@ -25,7 +26,7 @@ public class RootsGenFeature extends GenFeature {
     public static final ConfigurationProperty<Integer> LEVEL_LIMIT = ConfigurationProperty.integer("level_limit");
     public static final ConfigurationProperty<Float> SCALE_FACTOR = ConfigurationProperty.floatProperty("scale_factor");
 
-    private TetraFunction<Integer, Integer, Integer, Float, Integer> scaler = (inRadius, trunkRadius, minTrunkRadius, scaleFactor) -> {
+    private final TetraFunction<Integer, Integer, Integer, Float, Integer> scaler = (inRadius, trunkRadius, minTrunkRadius, scaleFactor) -> {
         float scale = Mth.clamp(trunkRadius >= minTrunkRadius ? (trunkRadius / scaleFactor) : 0, 0, 1);
         return (int) (inRadius * scale);
     };
@@ -71,11 +72,15 @@ public class RootsGenFeature extends GenFeature {
         return maps;
     }
 
+    private int getMinTrunkRadius(GenFeatureConfiguration configuration){
+        return Math.max(8, configuration.get(MIN_TRUNK_RADIUS));
+    }
+
     @Override
     protected boolean postGenerate(GenFeatureConfiguration configuration, PostGenerationContext context) {
         final BlockPos treePos = context.pos().above();
         final int trunkRadius = TreeHelper.getRadius(context.level(), treePos);
-        return trunkRadius >= configuration.get(MIN_TRUNK_RADIUS) &&
+        return trunkRadius >= getMinTrunkRadius(configuration) &&
                 this.startRoots(configuration, context.level(), treePos, context.species(), trunkRadius);
     }
 
@@ -85,13 +90,7 @@ public class RootsGenFeature extends GenFeature {
         final BlockPos treePos = context.treePos();
         final int trunkRadius = TreeHelper.getRadius(level, treePos);
 
-        if (context.fertility() > 0 && trunkRadius >= configuration.get(MIN_TRUNK_RADIUS)) {
-            final Surround surr = Surround.values()[level.getRandom().nextInt(8)];
-            final BlockPos dPos = treePos.offset(surr.getOffset());
-            if (level.getBlockState(dPos).getBlock() instanceof SurfaceRootBlock) {
-//                level.setBlock(dPos, DTRegistries.TRUNK_SHELL.get().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, surr.getOpposite()), Block.UPDATE_ALL);
-            }
-
+        if (context.fertility() > 0 && trunkRadius >= getMinTrunkRadius(configuration)) {
             this.startRoots(configuration, level, treePos, context.species(), trunkRadius);
         }
 
@@ -101,21 +100,20 @@ public class RootsGenFeature extends GenFeature {
     public boolean startRoots(GenFeatureConfiguration configuration, LevelAccessor level, BlockPos treePos, Species species, int trunkRadius) {
         int hash = CoordUtils.coordHashCode(treePos, 2);
         SimpleVoxmap rootMap = rootMaps[hash % rootMaps.length];
-        this.nextRoot(level, rootMap, treePos, species, trunkRadius, configuration.get(MIN_TRUNK_RADIUS), configuration.get(SCALE_FACTOR), BlockPos.ZERO
+        this.nextRoot(level, rootMap, treePos, species, trunkRadius, getMinTrunkRadius(configuration), configuration.get(SCALE_FACTOR), BlockPos.ZERO
                 , 0, -1, null, 0, configuration.get(LEVEL_LIMIT));
         return true;
     }
 
-    protected void nextRoot(LevelAccessor level, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, int minTrunkRadius, float scaleFactor, BlockPos pos, int height, int levelCount, Direction fromDir, int radius, int levelLimit) {
-
+    protected void nextRoot(LevelAccessor level, SimpleVoxmap rootMap, BlockPos trunkPos, Species species, int trunkRadius, int minTrunkRadius, float scaleFactor, BlockPos relativePos, int height, int levelCount, Direction fromDir, int radius, int levelLimit) {
         for (int depth = 0; depth < 2; depth++) {
-            BlockPos currPos = trunkPos.offset(pos).above(height - depth);
+            BlockPos currPos = trunkPos.offset(relativePos).above(height - depth);
             BlockState placeState = level.getBlockState(currPos);
             BlockState belowState = level.getBlockState(currPos.below());
 
             boolean onNormalCube = belowState.isFaceSturdy(level, currPos.below(), Direction.UP);
-
-            if (pos == BlockPos.ZERO || isReplaceableWithRoots(level, placeState, currPos) && (depth == 1 || onNormalCube)) {
+            boolean isStructurallySound = depth == 1 || onNormalCube;
+            if (relativePos == BlockPos.ZERO || isReplaceableWithRoots(level, placeState, currPos) && isStructurallySound) {
                 if (radius > 0) {
                     species.getFamily().getSurfaceRoot().ifPresent(root ->
                             root.setRadius(level, currPos, radius, 3)
@@ -124,14 +122,14 @@ public class RootsGenFeature extends GenFeature {
                 if (onNormalCube) {
                     for (Direction dir : CoordUtils.HORIZONTALS) {
                         if (dir != fromDir) {
-                            BlockPos dPos = pos.relative(dir);
-                            int nextRad = this.scaler.apply((int) rootMap.getVoxel(dPos), trunkRadius, minTrunkRadius, scaleFactor);
-                            if (pos != BlockPos.ZERO && nextRad >= radius) {
+                            BlockPos dRelativePos = relativePos.relative(dir);
+                            int nextRad = this.scaler.apply((int) rootMap.getVoxel(dRelativePos), trunkRadius, minTrunkRadius, scaleFactor);
+                            if (relativePos != BlockPos.ZERO && nextRad >= radius) {
                                 nextRad = radius - 1;
                             }
                             int thisLevelCount = depth == 1 ? 1 : levelCount + 1;
                             if (nextRad > 0 && thisLevelCount <= levelLimit) {//Don't go longer than 2 adjacent blocks on a single level
-                                nextRoot(level, rootMap, trunkPos, species, trunkRadius, minTrunkRadius, scaleFactor, dPos, height - depth, thisLevelCount, dir.getOpposite(), nextRad, levelLimit);//Recurse here
+                                nextRoot(level, rootMap, trunkPos, species, trunkRadius, minTrunkRadius, scaleFactor, dRelativePos, height - depth, thisLevelCount, dir.getOpposite(), nextRad, levelLimit);//Recurse here
                             }
                         }
                     }
@@ -143,11 +141,10 @@ public class RootsGenFeature extends GenFeature {
     }
 
     protected boolean isReplaceableWithRoots(LevelAccessor level, BlockState placeState, BlockPos pos) {
-        if (level.isEmptyBlock(pos) || placeState.getBlock() instanceof TrunkShellBlock) {
-            return true;
-        }
-
-        return placeState.canBeReplaced() && !placeState.getFluidState().is(FluidTags.LAVA);
+        return level.isEmptyBlock(pos)
+                || placeState.getBlock() instanceof TrunkShellBlock
+                || placeState.is(DTBlockTags.FOLIAGE)
+                || placeState.canBeReplaced() && !placeState.getFluidState().is(FluidTags.LAVA);
     }
 
 }
