@@ -463,7 +463,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * itemstack instead of having it done automatically.
      *
      * @param primitiveLog A block object that is the log
-     * @param primitiveLog An itemStack of the log item
      * @return {@link Family} for chaining calls
      */
     public Family setPrimitiveLog(Block primitiveLog) {
@@ -728,7 +727,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // ROOT SYSTEM
     ///////////////////////////////////////////
 
-    //By default there is no root species anyways. This is overriden by families like mangrove.
+    //By default, there is no root species anyway. This is overridden by families like mangrove.
     public boolean isAcceptableSoilForRootSystem(BlockState soilBlockState) {
         return getCommonSpecies().isAcceptableSoil(soilBlockState);
     }
@@ -846,13 +845,6 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     ///////////////////////////////////////////
     // DATA GENERATION
     ///////////////////////////////////////////
-
-//    /**
-//     * @return a constructor for the relevant branch block model builder for the corresponding loader
-//     */
-//    public BiFunction<BlockModelBuilder, FileHelper, BranchLoaderBuilder> getBranchLoaderConstructor() {
-//        return BranchLoaderBuilder::branch;
-//    }
 
     public ResourceLocation getSurfaceRootLoader(){
         return DynamicTrees.location("surface_root");

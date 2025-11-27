@@ -45,17 +45,6 @@ public class NetherFungusFamily extends Family {
     }
 
     @Override
-    public MapColor getDefaultBranchMapColor() {
-        // TODO 1.20: Customize warped and crimson in default.json
-        return MapColor.WARPED_STEM;
-    }
-
-    @Override
-    public SoundType getDefaultBranchSoundType() {
-        return SoundType.STEM;
-    }
-
-    @Override
     public boolean isFireProof() {
         return true;
     }

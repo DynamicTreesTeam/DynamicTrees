@@ -240,6 +240,7 @@ public class ChunkTreeHelper {
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean canAccessStateSafely(BlockGetter level, BlockPos pos) {
         if (level instanceof LevelReader) { // Handles most cases.
             return ((LevelReader) level).hasChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));

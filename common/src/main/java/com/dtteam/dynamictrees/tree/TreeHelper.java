@@ -163,8 +163,7 @@ public class TreeHelper {
     public static Species getCommonSpecies(Level level, BlockPos pos) {
         pos = dereferenceTrunkShell(level, pos);
         BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof BranchBlock) {
-            BranchBlock branch = (BranchBlock) state.getBlock();
+        if (state.getBlock() instanceof BranchBlock branch) {
             return branch.getFamily().getCommonSpecies();
         }
 
@@ -184,19 +183,17 @@ public class TreeHelper {
 
         if (rootPos != BlockPos.ZERO) {
             BlockState rootyState = level.getBlockState(rootPos);
-            return TreeHelper.getRooty(rootyState).getSpecies(rootyState, level, rootPos);
+            SoilBlock rooty = TreeHelper.getRooty(rootyState);
+            if (rooty != null)
+                return rooty.getSpecies(rootyState, level, rootPos);
         }
         return Species.NULL_SPECIES;
     }
 
     /**
-     * This is resource intensive.  Use only for interaction code. Only the root node can determine the exact species
+     * This is resource intensive.  Use only for interaction code. Only the root node can determine the exact species,
      * and it has to be found by mapping the branch network.  Tries to find the exact species and if that fails tries to
      * find the common species.
-     *
-     * @param level
-     * @param pos
-     * @return
      */
     public static Species getBestGuessSpecies(Level level, BlockPos pos) {
         Species species = getExactSpecies(level, pos);
@@ -301,6 +298,8 @@ public class TreeHelper {
     public static void destroyTree(Level level, BlockPos cutPos, @Nullable Player player, BiConsumer<BlockPos, ItemStack> dropConsumer) {
         BlockPos startPos = dereferenceTrunkShell(level, cutPos);
         BranchBlock cutBlock = getBranch(level.getBlockState(startPos));
+
+        if (cutBlock == null) return;
 
         // Fire event for break sound and particles
         level.levelEvent(null, 2001, cutPos, Block.getId(level.getBlockState(cutPos)));

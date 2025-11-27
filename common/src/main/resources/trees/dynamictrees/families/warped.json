@@ -4,5 +4,9 @@
     "common_species": "warped",
     "primitive_log": "warped_stem",
     "primitive_stripped_log": "stripped_warped_stem",
-    "max_branch_radius": 24
+    "max_branch_radius": 24,
+    "branch_properties": {
+        "map_color": "WARPED_STEM",
+        "sound": "STEM"
+    }
 }

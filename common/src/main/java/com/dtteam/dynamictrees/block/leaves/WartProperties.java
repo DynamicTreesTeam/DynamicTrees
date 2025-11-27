@@ -32,11 +32,6 @@ public class WartProperties extends SolidLeavesProperties {
     }
 
     @Override
-    public MapColor getDefaultMapColor() {
-        return MapColor.GRASS;
-    }
-
-    @Override
     public BlockBehaviour.Properties getDefaultBlockProperties(MapColor mapColor) {
         return BlockBehaviour.Properties.of().mapColor(mapColor).strength(1.0F).sound(SoundType.WART_BLOCK).randomTicks();
     }
