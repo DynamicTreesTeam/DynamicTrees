@@ -123,8 +123,8 @@ public class JsonHelper {
                         .orElseThrow();
     }
 
-    public static BlockBehaviour.Properties getBlockProperties(final JsonObject jsonObject, final MapColor defaultMapColor, final Function<MapColor, BlockBehaviour.Properties> defaultPropertiesGetter, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
-        final BlockBehaviour.Properties properties = defaultPropertiesGetter.apply(JsonHelper.getOrDefault(jsonObject, "map_color", MapColor.class, defaultMapColor));
+    public static BlockBehaviour.Properties getBlockProperties(final JsonObject jsonObject, final Supplier<BlockBehaviour.Properties> defaultProperties, final Consumer<String> errorConsumer, final Consumer<String> warningConsumer) {
+        final BlockBehaviour.Properties properties = defaultProperties.get();
 
         JsonPropertyApplierLists.PROPERTIES.applyAll(new JsonMapWrapper(jsonObject), properties)
                 .forEachErrorWarning(errorConsumer, warningConsumer);

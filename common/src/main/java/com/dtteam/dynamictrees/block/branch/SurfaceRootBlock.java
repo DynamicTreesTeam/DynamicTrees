@@ -43,11 +43,8 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
 
     private final Family family;
 
-    public SurfaceRootBlock(Family family) {
-        super(Properties.of()
-                .mapColor(family.getDefaultBranchMapColor())
-                .strength(2.5f, 1.0F)
-                .sound(family.getDefaultBranchSoundType()));
+    public SurfaceRootBlock(Family family, Properties properties) {
+        super(properties.strength(2.5f, 1.0F));
 
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
         this.family = family;

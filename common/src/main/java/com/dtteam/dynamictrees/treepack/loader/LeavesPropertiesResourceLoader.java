@@ -76,8 +76,8 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
     }
 
     private PropertyApplierResult readDoesAge(LeavesProperties leavesProperties, String configurationName) {
-        LogManager.getLogger().warn("Deprecated use of leaves properties `does_age` property by \"" +
-                leavesProperties.getRegistryName() + "\". This has been renamed to `ageing_configuration`.");
+        LogManager.getLogger().warn("Deprecated use of leaves properties `does_age` property by \"{}\". This has been renamed to `ageing_configuration`.",
+                leavesProperties.getRegistryName());
         // Account for refactors: YES -> ALWAYS, NO -> NEVER
         if (configurationName.equalsIgnoreCase("yes")) {
             leavesProperties.setAgeingConfiguration(LeavesProperties.AgeingConfiguration.ALWAYS);
@@ -85,7 +85,7 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
             leavesProperties.setAgeingConfiguration(LeavesProperties.AgeingConfiguration.NEVER);
         } else {
             try {
-                leavesProperties.setDoesAge(configurationName);
+                leavesProperties.setAgeingConfiguration(LeavesProperties.AgeingConfiguration.valueOf(configurationName.toUpperCase()));
             } catch (IllegalArgumentException e) {
                 return PropertyApplierResult.failure("Unsupported ageing configuration: \"" + configurationName + "\".");
             }
@@ -124,7 +124,6 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
     private void generateBlocks(LeavesProperties leavesProperties, JsonObject json) {
         final BlockBehaviour.Properties blockProperties = JsonHelper.getBlockProperties(
                 json,
-                leavesProperties.getDefaultMapColor(),
                 leavesProperties::getDefaultBlockProperties,
                 error -> this.logError(leavesProperties.getRegistryName(), error),
                 warning -> this.logWarning(leavesProperties.getRegistryName(), warning)

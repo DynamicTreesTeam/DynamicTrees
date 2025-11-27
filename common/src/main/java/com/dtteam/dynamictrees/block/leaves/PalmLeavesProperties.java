@@ -40,13 +40,6 @@ public class PalmLeavesProperties extends LeavesProperties {
         return new DynamicPalmLeavesBlock(this, properties);
     }
 
-//    /**
-//     * @return a constructor for the relevant branch block model builder for the corresponding loader
-//     */
-//    public BiFunction<BlockModelBuilder, FileHelper, PalmLeavesLoaderBuilder> getFrondsLoaderConstructor() {
-//        return (b,e)->PalmLeavesLoaderBuilder.fronds(frondLoader, b,e);
-//    }
-
     ResourceLocation frondLoader = DynamicTrees.location("large_palm_fronds");
     public void setFrondLoader(ResourceLocation frondLoader) {
         this.frondLoader = frondLoader;
@@ -182,19 +175,6 @@ public class PalmLeavesProperties extends LeavesProperties {
 //    @Override
 //    protected String getBlockRegistryNameSuffix() {
 //        return "_fronds";
-//    }
-
-//    @Override
-//    public LootTable.Builder createBlockDrops() {
-//        if (primitiveLeaves != null && getPrimitiveLeavesBlock().isPresent()) {
-//            return DTLootTableProvider.BlockLoot.createPalmLeavesBlockDrops(primitiveLeaves.getBlock(), seedDropChances);
-//        }
-//        return DTLootTableProvider.BlockLoot.createPalmLeavesDrops(seedDropChances, LootContextParamSets.BLOCK);
-//    }
-//
-//    @Override
-//    public LootTable.Builder createDrops() {
-//        return DTLootTableProvider.BlockLoot.createPalmLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES);
 //    }
 
 }

@@ -28,10 +28,6 @@ public class MultiPropertyApplier<T, I> extends PropertyApplier<T, Object, I> {
         this.appliers.add(applier);
     }
 
-    /**
-     * @deprecated not used
-     */
-    @Deprecated
     @Nullable
     @Override
     protected PropertyApplierResult applyIfShould(T object, I input, Applier<T, Object> applier) {
@@ -40,7 +36,7 @@ public class MultiPropertyApplier<T, I> extends PropertyApplier<T, Object, I> {
 
         do {
             applierResult = applyNext(object, input, applier, iterator);
-        } while (applierResult == null || !applierResult.wasSuccessful());
+        } while (applierResult == null || applierResult.failed());
 
         return applierResult;
     }

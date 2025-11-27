@@ -428,7 +428,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     }
 
     //This allows for the correct tool to be used in the root covering (shovel instead of axe, for example).
-    @Deprecated
+    @Override
     public float getDestroyProgress(BlockState pState, Player pPlayer, BlockGetter pLevel, BlockPos pPos) {
         Optional<Block> covered = getFamily().getPrimitiveCoveredRoots();
         if (pState.hasProperty(LAYER) && pState.getValue(LAYER) == Layer.COVERED && covered.isPresent()){

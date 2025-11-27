@@ -19,29 +19,28 @@ import java.util.function.Function;
  */
 public class ArrayPropertyApplier<T, V, I> extends PropertyApplier<T, List<V>, I> {
 
-    private final Function<I, Result<Iterator<I>, I>> iteratorDeserialiser;
-    private final LazyValue<Deserializer<I, V>> valueDeserialiser;
+    private final Function<I, Result<Iterator<I>, I>> iteratorDeserializer;
+    private final LazyValue<Deserializer<I, V>> valueDeserializer;
 
     public ArrayPropertyApplier(String key, Class<T> objectClass, Applier<T, List<V>> applier,
-                                Function<I, Result<Iterator<I>, I>> iteratorDeserialiser,
-                                LazyValue<Deserializer<I, V>> valueDeserialiser) {
+                                Function<I, Result<Iterator<I>, I>> iteratorDeserializer,
+                                LazyValue<Deserializer<I, V>> valueDeserializer) {
         super(key, objectClass, applier);
-        this.iteratorDeserialiser = iteratorDeserialiser;
-        this.valueDeserialiser = valueDeserialiser;
+        this.iteratorDeserializer = iteratorDeserializer;
+        this.valueDeserializer = valueDeserializer;
     }
 
-    @SuppressWarnings("unchecked")
     @Nullable
     @Override
     protected PropertyApplierResult applyIfShould(T object, I input, Applier<T, List<V>> applier) {
-        final Result<Iterator<I>, I> iteratorResult = this.iteratorDeserialiser.apply(input);
+        final Result<Iterator<I>, I> iteratorResult = this.iteratorDeserializer.apply(input);
         if (!iteratorResult.success()) {
             return null;
         }
         final List<V> values = new ArrayList<>();
         final Iterator<I> iterator = iteratorResult.get();
         while (iterator.hasNext()) {
-            valueDeserialiser.get().deserialize(iterator.next()).ifSuccessOrElse(values::add, error -> LogManager.getLogger().error(error), warning -> LogManager.getLogger().warn(warning));
+            valueDeserializer.get().deserialize(iterator.next()).ifSuccessOrElse(values::add, error -> LogManager.getLogger().error(error), warning -> LogManager.getLogger().warn(warning));
         }
         return applier.apply(object, values);
     }

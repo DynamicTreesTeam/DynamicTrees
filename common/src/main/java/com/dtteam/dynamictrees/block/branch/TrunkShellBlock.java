@@ -18,10 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.*;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -57,7 +54,11 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     }
 
     public TrunkShellBlock() {
-        super(Properties.of().ignitedByLava().pushReaction(PushReaction.BLOCK));
+        super(Properties.of()
+                .ignitedByLava()
+                .pushReaction(PushReaction.BLOCK)
+                .sound(SoundType.WOOD)
+                .explosionResistance(3.0F));
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
     }
 
@@ -110,6 +111,12 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return NullUtils.applyIfNonnull(this.getMuse(level, pos), muse -> ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(state, level, muse.pos), super.getHardness(state, level, pos));
     }
 
+    //Better than nothing, for now.
+    @Override
+    protected SoundType getSoundType(BlockState state) {
+        return SoundType.WOOD;
+    }
+
     //    @Override
 //    public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, @Nullable Entity entity) {
 //        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().getSoundType(muse.state, level, muse.pos, entity), SoundType.WOOD);
@@ -138,11 +145,6 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     public boolean museDoesNotExist(BlockGetter level, BlockState state, BlockPos pos) {
         final BlockPos musePos = pos.offset(this.getMuseDir(state, pos).getOffset());
         return ChunkTreeHelper.getStateSafe(level, musePos) == null;
-    }
-
-    @Nullable
-    public ShellMuse getMuseUnchecked(BlockGetter level, BlockPos pos) {
-        return this.getMuseUnchecked(level, level.getBlockState(pos), pos);
     }
 
     @Nullable

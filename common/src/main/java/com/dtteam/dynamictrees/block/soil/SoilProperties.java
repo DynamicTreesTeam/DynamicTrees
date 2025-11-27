@@ -126,6 +126,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     /**
      * Allows to veto a soil block based on the BlockState.
      */
+    @SuppressWarnings("unused")
     public boolean isValidState(BlockState primitiveSoilState){
         return true;
     }
@@ -141,6 +142,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     /**
      * @return the BlockState of the primitive soil that is set when it is no longer supporting a tree.
      */
+    @SuppressWarnings("unused")
     public BlockState getPrimitiveSoilState (BlockState currentSoilState){
         return primitiveSoilBlock.defaultBlockState();
     }
@@ -210,12 +212,21 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     // MATERIAL
     ///////////////////////////////////////////
 
+    @Deprecated(forRemoval = true)
     public MapColor getDefaultMapColor() {
         return MapColor.DIRT;
     }
 
+    public BlockBehaviour.Properties getDefaultBlockProperties() {
+        return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.DIRT)
+                .sound(SoundType.GRAVEL)
+                .strength(0.5F);
+    }
+
+    @Deprecated(forRemoval = true)
     public BlockBehaviour.Properties getDefaultBlockProperties(final MapColor mapColor) {
-        return BlockBehaviour.Properties.of().mapColor(mapColor).strength(0.5F).sound(SoundType.GRAVEL);
+        return BlockBehaviour.Properties.of().mapColor(MapColor.DIRT).strength(0.5F).sound(SoundType.GRAVEL);
     }
 
     ///////////////////////////////////////////

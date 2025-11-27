@@ -18,14 +18,14 @@ import java.util.function.Function;
 public class MapPropertyApplier<T, V, I> extends PropertyApplier<T, Map<String,V>, I> {
 
     private final Function<I, JsonObject> jsonObjectDeserializer;
-    private final LazyValue<Deserializer<JsonElement, V>> valueDeserialiser;
+    private final LazyValue<Deserializer<JsonElement, V>> valueDeserializer;
 
     public MapPropertyApplier(String key, Class<T> objectClass, Applier<T, Map<String,V>> applier,
                               Function<I, JsonObject> jsonObjectDeserializer,
-                              LazyValue<Deserializer<JsonElement, V>> valueDeserialiser) {
+                              LazyValue<Deserializer<JsonElement, V>> valueDeserializer) {
         super(key, objectClass, applier);
         this.jsonObjectDeserializer = jsonObjectDeserializer;
-        this.valueDeserialiser = valueDeserialiser;
+        this.valueDeserializer = valueDeserializer;
     }
 
     @Nullable
@@ -33,7 +33,7 @@ public class MapPropertyApplier<T, V, I> extends PropertyApplier<T, Map<String,V
     protected PropertyApplierResult applyIfShould(T object, I input, Applier<T, Map<String,V>> applier) {
         HashMap<String, V> values = new HashMap<>();
         jsonObjectDeserializer.apply(input).entrySet().forEach((entry)->
-                valueDeserialiser.get().deserialize(entry.getValue()).ifSuccessOrElse(v->values.put(entry.getKey(),v), error -> LogManager.getLogger().error(error), warning -> LogManager.getLogger().warn(warning)));
+                valueDeserializer.get().deserialize(entry.getValue()).ifSuccessOrElse(v->values.put(entry.getKey(),v), error -> LogManager.getLogger().error(error), warning -> LogManager.getLogger().warn(warning)));
         return applier.apply(object, values);
     }
 

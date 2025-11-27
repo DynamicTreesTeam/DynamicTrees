@@ -1475,15 +1475,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return false;
     }
 
-    /**
-     * @deprecated No longe in use due to extra parameter. Use/override {@link #rot(LevelAccessor, BlockPos, int, int, int,
-     * RandomSource, boolean, boolean)} instead.
-     */
-    @Deprecated
-    public boolean rot(LevelAccessor level, BlockPos pos, int neighborCount, int radius, RandomSource random, boolean rapid) {
-        return false;
-    }
-
     public void postRot(PostRotContext context) {
         this.genFeatures.forEach(configuration -> configuration.generate(GenFeature.Type.POST_ROT, context));
     }

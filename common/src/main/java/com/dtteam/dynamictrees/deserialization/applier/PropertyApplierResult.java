@@ -29,8 +29,8 @@ public final class PropertyApplierResult {
         this.warnings = warnings;
     }
 
-    public boolean wasSuccessful() {
-        return this.errorMessage == null;
+    public boolean failed() {
+        return this.errorMessage != null;
     }
 
     public Optional<String> getError() {

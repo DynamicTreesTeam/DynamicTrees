@@ -18,23 +18,19 @@ import java.util.function.Function;
 public class ArrayIteratorPropertyApplier<T, V, I> extends PropertyApplier<T, V, I> {
 
     private final PropertyApplier<T, V, I> propertyApplier;
-    private final Function<I, Result<Iterator<I>, I>> iteratorDeserialiser;
+    private final Function<I, Result<Iterator<I>, I>> iteratorDeserializer;
 
     public ArrayIteratorPropertyApplier(String key, Class<T> objectClass, Class<V> valueClass, PropertyApplier<T, V, I> applier,
-                                        Function<I, Result<Iterator<I>, I>> iteratorDeserialiser) {
+                                        Function<I, Result<Iterator<I>, I>> iteratorDeserializer) {
         super(key, objectClass, applier.applier);
         this.propertyApplier = applier;
-        this.iteratorDeserialiser = iteratorDeserialiser;
+        this.iteratorDeserializer = iteratorDeserializer;
     }
 
-    /**
-     * @deprecated not used
-     */
-    @Deprecated
     @Nullable
     @Override
     protected PropertyApplierResult applyIfShould(T object, I input, Applier<T, V> applier) {
-        final Result<Iterator<I>, I> iteratorResult = this.iteratorDeserialiser.apply(input);
+        final Result<Iterator<I>, I> iteratorResult = this.iteratorDeserializer.apply(input);
         if (!iteratorResult.success()) {
             return null;
         }

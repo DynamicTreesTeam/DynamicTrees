@@ -536,18 +536,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return this.ageingConfiguration.shouldAge(worldGen);
     }
 
-    /**
-     * @deprecated use {@link #setAgeingConfiguration(AgeingConfiguration)}
-     */
-    @Deprecated
-    public void setDoesAge(String doesAge) {
-        try {
-            this.ageingConfiguration = AgeingConfiguration.valueOf(doesAge.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid ageing configuration \"" + doesAge + "\".");
-        }
-    }
-
     public void setAgeingConfiguration(AgeingConfiguration doesAge) {
         this.ageingConfiguration = doesAge;
     }
@@ -583,13 +571,19 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.connectAnyRadius = connectAnyRadius;
     }
 
+    @Deprecated(forRemoval = true)
     public MapColor getDefaultMapColor() {
         return MapColor.PLANT;
     }
 
+    @Deprecated(forRemoval = true)
     public BlockBehaviour.Properties getDefaultBlockProperties(final MapColor mapColor) {
+        return getDefaultBlockProperties();
+    }
+
+    public BlockBehaviour.Properties getDefaultBlockProperties() {
         return BlockBehaviour.Properties.of()
-                .mapColor(mapColor)
+                .mapColor(MapColor.PLANT)
                 .ignitedByLava()
                 .pushReaction(PushReaction.DESTROY)
                 .strength(0.2F)
@@ -599,6 +593,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
                 .isValidSpawn((s, r, p, e) -> e == EntityType.OCELOT || e == EntityType.PARROT)
                 .isSuffocating((s, r, p) -> false)
                 .isViewBlocking((s, r, p) -> false)
+                .isRedstoneConductor((s, r, p) -> false)
                 .forceSolidOn();
     }
 

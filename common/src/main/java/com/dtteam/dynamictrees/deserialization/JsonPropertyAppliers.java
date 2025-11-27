@@ -61,7 +61,7 @@ public final class JsonPropertyAppliers<O> implements PropertyAppliers<O, JsonEl
             }
 
             // If the application wasn't successful, return the error.
-            if (!result.wasSuccessful()) {
+            if (result.failed()) {
                 return result.addErrorPrefix("[" + key + "] ").addWarningsPrefix("[" + key + "] ");
             }
 

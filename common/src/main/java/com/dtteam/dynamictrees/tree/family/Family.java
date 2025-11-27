@@ -534,21 +534,22 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return null;
     }
 
+    @Deprecated(forRemoval = true)
     public MapColor getDefaultBranchMapColor() {
         return MapColor.WOOD;
     }
 
-    public boolean getDefaultFlammable() {
-        return true;
-    }
-
+    @Deprecated(forRemoval = true)
     public SoundType getDefaultBranchSoundType() {
         return SoundType.WOOD;
     }
 
-    public BlockBehaviour.Properties getDefaultBranchProperties(MapColor mapColor) {
+    public BlockBehaviour.Properties getDefaultBranchProperties() {
         BlockBehaviour.Properties properties = BlockBehaviour.Properties.of()
-                .sound(this.getDefaultBranchSoundType()).mapColor(mapColor).noLootTable();
+                .sound(SoundType.WOOD)
+                .mapColor(MapColor.WOOD)
+                .noLootTable()
+                .explosionResistance(3.0F);
         if (!this.isFireProof())
             properties.ignitedByLava();
         return properties;
@@ -562,7 +563,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @return The {@link #properties} for this {@link Family} object.
      */
     public BlockBehaviour.Properties getProperties() {
-        return this.properties == null ? this.getDefaultBranchProperties(this.getDefaultBranchMapColor()) : this.properties;
+        return this.properties == null ? this.getDefaultBranchProperties() : this.properties;
     }
 
 
@@ -711,7 +712,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public Supplier<SurfaceRootBlock> createSurfaceRoot() {
-        return RegistryHandler.addBlock(suffix(this.getRegistryName(), "_root"), () -> new SurfaceRootBlock(this));
+        return RegistryHandler.addBlock(suffix(this.getRegistryName(), "_root"), () -> new SurfaceRootBlock(this, getDefaultBranchProperties()));
     }
 
     public Optional<SurfaceRootBlock> getSurfaceRoot() {

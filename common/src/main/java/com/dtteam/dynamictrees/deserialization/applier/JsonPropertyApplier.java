@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class JsonPropertyApplier<O, V> extends PropertyApplier<O, V, JsonElement> {
 
-    private final LazyValue<JsonDeserializer<V>> deserialiser;
+    private final LazyValue<JsonDeserializer<V>> deserializer;
 
     public JsonPropertyApplier(String key, Class<O> objectClass, Class<V> valueClass, VoidApplier<O, V> propertyApplier) {
         this(key, objectClass, valueClass, (Applier<O, V>) propertyApplier);
@@ -19,7 +19,7 @@ public final class JsonPropertyApplier<O, V> extends PropertyApplier<O, V, JsonE
 
     public JsonPropertyApplier(String key, Class<O> objectClass, Class<V> valueClass, Applier<O, V> applier) {
         super(key, objectClass, applier);
-        this.deserialiser = LazyValue.supplied(() -> JsonDeserializers.getOrThrow(valueClass));
+        this.deserializer = LazyValue.supplied(() -> JsonDeserializers.getOrThrow(valueClass));
     }
 
     @SuppressWarnings("unchecked")
@@ -35,7 +35,7 @@ public final class JsonPropertyApplier<O, V> extends PropertyApplier<O, V, JsonE
                             PropertyApplierResult::addWarnings,
                             null
                     );
-        return deserialiser.get().deserialize(input)
+        return deserializer.get().deserialize(input)
                 .map(value -> this.applier.apply(object, value))
                 .orElseApply(
                         PropertyApplierResult::failure,
