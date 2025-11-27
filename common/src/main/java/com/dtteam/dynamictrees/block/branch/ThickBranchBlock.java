@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -33,12 +32,20 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, MAX_RADIUS_THICK); //39 ?
 
-    public ThickBranchBlock(ResourceLocation name, MapColor mapColor) {
-        this(name, Properties.of().mapColor(mapColor));
-    }
+    protected static final VoxelShape[] thickShapeCache = new VoxelShape[MAX_RADIUS_THICK+1];
 
     public ThickBranchBlock(ResourceLocation name, Properties properties) {
         super(name, properties, RADIUS_DOUBLE, MAX_RADIUS_THICK);
+        generateShapeCache();
+    }
+
+    private void generateShapeCache(){
+        thickShapeCache[0] = Shapes.empty();
+        for (int i=1; i<= MAX_RADIUS_THICK; i++){
+            double radius = i / 16.0;
+            AABB coreAabb = new AABB(0.5 - radius, 0.0, 0.5 - radius, 0.5 + radius, 1.0, 0.5 + radius);
+            thickShapeCache[i] = Shapes.create(coreAabb);
+        }
     }
 
     public TrunkShellBlock getTrunkShell() {
@@ -193,13 +200,11 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        final int thisRadius = getRadius(state);
-        if (thisRadius <= MAX_RADIUS) {
+        final int radius = getRadius(state);
+        if (radius <= MAX_RADIUS) {
             return super.getShape(state, level, pos, context);
         }
-
-        final double radius = thisRadius / 16.0;
-        return Shapes.create(new AABB(0.5 - radius, 0.0, 0.5 - radius, 0.5 + radius, 1.0, 0.5 + radius));
+        return thickShapeCache[radius];
     }
 
     @Override

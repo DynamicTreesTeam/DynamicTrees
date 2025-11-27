@@ -40,7 +40,6 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -63,18 +62,29 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     private final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
 
-    /**
-     * @param name name of branch, without a {@code _branch} suffix
-     */
-    public BasicBranchBlock(ResourceLocation name, MapColor mapColor) {
-        this(name, BlockBehaviour.Properties.of().mapColor(mapColor), RADIUS, MAX_RADIUS);
-    }
+    protected static final VoxelShape[] shapeCache = new VoxelShape[MAX_RADIUS+1];
+    protected static final VoxelShape[][] sideShapeCache = new VoxelShape[MAX_RADIUS+1][6];
 
     /**
      * @param name name of branch, without a {@code _branch} suffix
      */
     public BasicBranchBlock(ResourceLocation name, Properties properties) {
         this(name, properties, RADIUS, MAX_RADIUS);
+        generateShapeCache();
+    }
+
+    private void generateShapeCache(){
+        shapeCache[0] = Shapes.empty();
+        for (int i=1; i<= MAX_RADIUS; i++){
+            double radius = i / 16.0;
+            AABB coreAabb = new AABB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
+            shapeCache[i] = Shapes.create(coreAabb);
+            for (Direction dir : Direction.values()){
+                double gap = 0.5f - radius;
+                AABB sideAabb = coreAabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
+                sideShapeCache[i][dir.ordinal()] = Shapes.create(sideAabb);
+            }
+        }
     }
 
     /**
@@ -391,18 +401,14 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        int thisRadiusInt = getRadius(state);
-        double radius = thisRadiusInt / 16.0;
-        VoxelShape core = Shapes.box(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
+        int radius = getRadius(state);
+        VoxelShape core = shapeCache[radius];
 
         for (Direction dir : Direction.values()) {
-            int sideRadiusInt = Math.min(getSideConnectionRadius(level, pos, thisRadiusInt, dir), thisRadiusInt);
-            double sideRadius = sideRadiusInt / 16.0f;
-            if (sideRadius > 0.0f) {
-                double gap = 0.5f - sideRadius;
-                AABB aabb = new AABB(0.5 - sideRadius, 0.5 - sideRadius, 0.5 - sideRadius, 0.5 + sideRadius, 0.5 + sideRadius, 0.5 + sideRadius);
-                aabb = aabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
-                core = Shapes.or(core, Shapes.create(aabb));
+            int sideRadius = Math.min(getSideConnectionRadius(level, pos, radius, dir), radius);
+            if (sideRadius > 0) {
+                VoxelShape side = sideShapeCache[sideRadius][dir.ordinal()];
+                core = Shapes.or(core, side);
             }
         }
 
