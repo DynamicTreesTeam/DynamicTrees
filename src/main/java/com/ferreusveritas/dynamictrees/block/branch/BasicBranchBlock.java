@@ -388,40 +388,10 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
                 (!state.hasProperty(WATERLOGGED) || !state.getValue(WATERLOGGED));
     }
 
-    @Nonnull
-    @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        int thisRadiusInt = getRadius(state);
-        double radius = thisRadiusInt / 16.0;
-        VoxelShape core = Shapes.box(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
-
-        for (Direction dir : Direction.values()) {
-            int sideRadiusInt = Math.min(getSideConnectionRadius(level, pos, thisRadiusInt, dir), thisRadiusInt);
-            double sideRadius = sideRadiusInt / 16.0f;
-            if (sideRadius > 0.0f) {
-                double gap = 0.5f - sideRadius;
-                AABB aabb = new AABB(0.5 - sideRadius, 0.5 - sideRadius, 0.5 - sideRadius, 0.5 + sideRadius, 0.5 + sideRadius, 0.5 + sideRadius);
-                aabb = aabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
-                core = Shapes.or(core, Shapes.create(aabb));
-            }
-        }
-
-        return core;
-    }
-
     @Override
     public int getRadiusForConnection(BlockState state, BlockGetter level, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         return getRadius(state);
     }
-
-    protected int getSideConnectionRadius(BlockGetter level, BlockPos pos, int radius, Direction side) {
-        final BlockPos deltaPos = pos.relative(side);
-        final BlockState blockState = CoordUtils.getStateSafe(level, deltaPos);
-
-        // If adjacent block is not loaded assume there is no connection.
-        return blockState == null ? 0 : TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, level, deltaPos, this, side, radius);
-    }
-
 
     ///////////////////////////////////////////
     // NODE ANALYSIS

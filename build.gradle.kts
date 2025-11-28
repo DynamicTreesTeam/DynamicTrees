@@ -137,7 +137,7 @@ java {
     }
 }
 
-val changelogFile = file("temp/changelog.txt")
+val changelogFile = file("build/changelog.txt")
 
 curseforge {
     val curseApiKey = optionalProperty("curseApiKey") ?: System.getenv("CURSEFORGE_API_KEY")

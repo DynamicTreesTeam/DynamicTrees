@@ -4,6 +4,7 @@ import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.FutureBreakable;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.network.MapSignal;
+import com.ferreusveritas.dynamictrees.api.treedata.BranchShapeState;
 import com.ferreusveritas.dynamictrees.api.treedata.TreePart;
 import com.ferreusveritas.dynamictrees.block.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.block.leaves.DynamicLeavesBlock;
@@ -47,9 +48,13 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.ToolActions;
 
@@ -63,6 +68,9 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
 
     public static final int MAX_RADIUS = 8;
     public static final String NAME_SUFFIX = "_branch";
+
+    //This cache does not include radius == 8, it's just Shapes.block().
+    protected static final VoxelShape[] shapeCache = new VoxelShape[BranchShapeState.TOTAL_STATES];
 
     public static DynamicTrees.DestroyMode destroyMode = DynamicTrees.DestroyMode.SLOPPY;
 
@@ -296,6 +304,59 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
+    }
+
+
+    @Override
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        byte[] radii = new byte[7];
+        int radius = getRadius(state);
+
+        //skip all the fancy shape stuff if the trunk is just a block.
+        if (radius == 8) return Shapes.block();
+
+        radii[6] = (byte)radius; //last radius is the core
+
+        for (Direction dir : Direction.values()) {
+            radii[dir.ordinal()] = (byte)Math.min(getSideConnectionRadius(level, pos, radius, dir), radius);
+        }
+        int shapeStateIndex = BranchShapeState.fromArray(radii).toIndex();
+
+        VoxelShape cachedShape = shapeCache[shapeStateIndex];
+        if (cachedShape != null){
+            return cachedShape;
+        }
+
+        VoxelShape newShape = generateNewShape(radii);
+        shapeCache[shapeStateIndex] = newShape;
+        return newShape;
+    }
+
+    private static VoxelShape generateNewShape(byte[] radii) {
+        double radius = radii[6] / 16.0;
+        VoxelShape shape = Shapes.create(makeCube(radius));
+        for (Direction dir : Direction.values()) {
+            double sideRadius = radii[dir.ordinal()] / 16.0f;
+            if (sideRadius > 0.0f) {
+                double gap = 0.5f - sideRadius;
+                AABB aabb = makeCube(sideRadius);
+                aabb = aabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
+                shape = Shapes.or(shape, Shapes.create(aabb));
+            }
+        }
+        return shape;
+    }
+
+    protected static AABB makeCube(double radius) {
+        return new AABB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
+    }
+
+    protected int getSideConnectionRadius(BlockGetter level, BlockPos pos, int radius, Direction side) {
+        final BlockPos deltaPos = pos.relative(side);
+        final BlockState blockState = CoordUtils.getStateSafe(level, deltaPos);
+
+        // If adjacent block is not loaded assume there is no connection.
+        return blockState == null ? 0 : TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, level, deltaPos, this, side, radius);
     }
 
     ///////////////////////////////////////////

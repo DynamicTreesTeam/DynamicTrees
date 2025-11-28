@@ -505,6 +505,14 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     //////////////////////////////
 
     @Override
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (isFullBlock(state)) {
+            return Shapes.block();
+        }
+        return super.getShape(state, level, pos, context);
+    }
+
+    @Override
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         if (isFullBlock(pState)) {
             VoxelShape fullShape = Shapes.block();
@@ -513,38 +521,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             return fullShape;
         }
         return super.getCollisionShape(pState, pLevel, pPos, pContext);
-    }
-
-    @Nonnull
-    @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext pContext) {
-        if (isFullBlock(state)) {
-            return Shapes.block();
-        }
-        int thisRadiusInt = getRadius(state);
-        double radius = thisRadiusInt / 16.0;
-        VoxelShape core = Shapes.box(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
-
-        for (Direction dir : Direction.values()) {
-            int sideRadiusInt = Math.min(getSideConnectionRadius(level, pos, thisRadiusInt, dir), thisRadiusInt);
-            double sideRadius = sideRadiusInt / 16.0f;
-            if (sideRadius > 0.0f) {
-                double gap = 0.5f - sideRadius;
-                AABB aabb = new AABB(0.5 - sideRadius, 0.5 - sideRadius, 0.5 - sideRadius, 0.5 + sideRadius, 0.5 + sideRadius, 0.5 + sideRadius);
-                aabb = aabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
-                core = Shapes.or(core, Shapes.create(aabb));
-            }
-        }
-
-        return core;
-    }
-
-    protected int getSideConnectionRadius(BlockGetter level, BlockPos pos, int radius, Direction side) {
-        final BlockPos deltaPos = pos.relative(side);
-        final BlockState blockState = CoordUtils.getStateSafe(level, deltaPos);
-
-        // If adjacent block is not loaded assume there is no connection.
-        return blockState == null ? 0 : TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, level, deltaPos, this, side, radius);
     }
 
     @Override
