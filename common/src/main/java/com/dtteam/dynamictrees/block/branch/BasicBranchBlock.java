@@ -45,7 +45,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBlock {
@@ -64,9 +63,8 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     private final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
 
-    //8 radii for core, 9 radii for each side
-    private static final int TOTAL_SHAPES = 8*9*9*9*9*9*9;
-    protected static final VoxelShape[] shapeCache = new VoxelShape[TOTAL_SHAPES];
+    //This cache does not include radius == 8, it's just Shapes.block().
+    protected static final VoxelShape[] shapeCache = new VoxelShape[BranchShapeState.TOTAL_STATES];
 
     /**
      * @param name name of branch, without a {@code _branch} suffix
@@ -389,15 +387,18 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        int[] radii = new int[7];
+        byte[] radii = new byte[7];
         int radius = getRadius(state);
-        radii[6] = radius; //last radii is the core
+
+        //skip all the fancy shape stuff if the trunk is just a block.
+        if (radius == 8) return Shapes.block();
+
+        radii[6] = (byte)radius; //last radius is the core
 
         for (Direction dir : Direction.values()) {
-            int sideRadius = Math.min(getSideConnectionRadius(level, pos, radius, dir), radius);
-            radii[dir.ordinal()] = sideRadius;
+            radii[dir.ordinal()] = (byte)Math.min(getSideConnectionRadius(level, pos, radius, dir), radius);
         }
-        int shapeStateIndex  = BranchShapeState.fromIntArray(radii).toIndex();
+        int shapeStateIndex = BranchShapeState.fromArray(radii).toIndex();
 
         VoxelShape cachedShape = shapeCache[shapeStateIndex];
         if (cachedShape != null){
@@ -409,19 +410,23 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
         return newShape;
     }
 
-    private static VoxelShape generateNewShape(int[] radii) {
+    private static VoxelShape generateNewShape(byte[] radii) {
         double radius = radii[6] / 16.0;
-        VoxelShape shape = Shapes.box(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
+        VoxelShape shape = Shapes.create(makeCube(radius));
         for (Direction dir : Direction.values()) {
             double sideRadius = radii[dir.ordinal()] / 16.0f;
             if (sideRadius > 0.0f) {
                 double gap = 0.5f - sideRadius;
-                AABB aabb = new AABB(0.5 - sideRadius, 0.5 - sideRadius, 0.5 - sideRadius, 0.5 + sideRadius, 0.5 + sideRadius, 0.5 + sideRadius);
+                AABB aabb = makeCube(sideRadius);
                 aabb = aabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
                 shape = Shapes.or(shape, Shapes.create(aabb));
             }
         }
         return shape;
+    }
+
+    protected static AABB makeCube(double radius) {
+        return new AABB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
     }
 
     @Override

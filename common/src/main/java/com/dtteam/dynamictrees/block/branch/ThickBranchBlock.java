@@ -32,19 +32,17 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, MAX_RADIUS_THICK); //39 ?
 
-    protected static final VoxelShape[] thickShapeCache = new VoxelShape[MAX_RADIUS_THICK+1];
+    protected static final VoxelShape[] trunkShapes = new VoxelShape[MAX_RADIUS_THICK];
 
     public ThickBranchBlock(ResourceLocation name, Properties properties) {
         super(name, properties, RADIUS_DOUBLE, MAX_RADIUS_THICK);
-        generateShapeCache();
+        precomputeTrunkShapes();
     }
 
-    private void generateShapeCache(){
-        thickShapeCache[0] = Shapes.empty();
-        for (int i=1; i<= MAX_RADIUS_THICK; i++){
-            double radius = i / 16.0;
-            AABB coreAabb = new AABB(0.5 - radius, 0.0, 0.5 - radius, 0.5 + radius, 1.0, 0.5 + radius);
-            thickShapeCache[i] = Shapes.create(coreAabb);
+    private void precomputeTrunkShapes(){
+        for (int i=0; i< MAX_RADIUS_THICK; i++){
+            double radius = (i+1) / 16.0;
+            trunkShapes[i] = Shapes.create(makeCube(radius));
         }
     }
 
@@ -204,7 +202,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         if (radius <= MAX_RADIUS) {
             return super.getShape(state, level, pos, context);
         }
-        return thickShapeCache[radius];
+        return trunkShapes[radius-1];
     }
 
     @Override
