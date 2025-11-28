@@ -2,12 +2,12 @@ package com.dtteam.dynamictrees.api.treedata;
 
 public record BranchShapeState(byte down, byte up, byte north, byte south, byte west, byte east, byte core){
 
-    private static final int[] BLOCK_START = new int[8]; // start offsets for core = 1 to 8
+    private static final int[] BLOCK_START = new int[8]; // start offsets for each family of shapes (by core)
     public static final int TOTAL_STATES;
     static {
         int sum = 0;
         for (int core = 1; core < 8; ++core) {
-            int size = (int) Math.pow(core + 1, 6); // (c+1)^6
+            int size = (int) Math.pow(core + 1, 6);
             BLOCK_START[core] = sum;
             sum += size;
         }

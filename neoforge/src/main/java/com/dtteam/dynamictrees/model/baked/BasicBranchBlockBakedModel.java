@@ -48,11 +48,11 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
     protected final BakedModel[][] cores = new BakedModel[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
     protected final BakedModel[] rings = new BakedModel[8]; // 8 Cores with the ring textures on all 6 sides.
 
-    public BasicBranchBlockBakedModel(IGeometryBakingContext customData, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
-                                      Function<Material, TextureAtlasSprite> spriteGetter) {
-        this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT,
-                ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
-        this.blockModel.customData.setRenderTypeHint(customData.getRenderTypeHint());
+    public BasicBranchBlockBakedModel(IGeometryBakingContext customData, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
+        this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT, ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
+        if (customData.getRenderTypeHint() != null){
+            this.blockModel.customData.setRenderTypeHint(customData.getRenderTypeHint());
+        }
         this.barkTexture = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, barkTextureLocation));
         this.ringsTexture = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, ringsTextureLocation));
         initModels();
@@ -189,17 +189,11 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
     @NotNull
     @Override
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData, @Nullable RenderType renderType) {
-        if (state == null || side != null) {
-            return Collections.emptyList();
-        }
-
-        final List<BakedQuad> quadsList = new ArrayList<>(24);
+        if (state == null || side != null) return Collections.emptyList();
 
         final int coreRadius = getRadius(state);
+        if (coreRadius > 8) return Collections.emptyList();
 
-        if (coreRadius > 8) {
-            return Collections.emptyList();
-        }
 
         int[] connections = new int[]{0, 0, 0, 0, 0, 0};
         Direction forceRingDir = null;
@@ -219,6 +213,8 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
         for (int i : connections) {
             numConnections += (i != 0) ? 1 : 0;
         }
+
+        final List<BakedQuad> quadsList = new ArrayList<>(24);
 
         if (numConnections == 0 && forceRingDir != null) {
             quadsList.addAll(rings[coreRadius - 1].getQuads(state, forceRingDir, rand, extraData, renderType));
@@ -245,7 +241,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
                         final int idx = connDir.get3DDataValue();
                         final int connRadius = connections[idx];
                         // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius-1 connections for leaves (which are partly transparent).
-                        if (connRadius > 0 && (connRadius == twigRadius.get() || face != connDir)) {
+                        if (connRadius > 0 && (connRadius <= twigRadius.get() || face != connDir)) {
                             quadsList.addAll(sleeves[idx][connRadius - 1].getQuads(state, face, rand, extraData, renderType));
                         }
                     }
