@@ -40,9 +40,11 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     }
 
     private void precomputeTrunkShapes(){
-        for (int i=0; i< MAX_RADIUS_THICK; i++){
+        //This generates a couple unused shapes for the smaller radii, but I really don't care.
+        for (int i=0; i<MAX_RADIUS_THICK; i++){
             double radius = (i+1) / 16.0;
-            trunkShapes[i] = Shapes.create(makeCube(radius));
+            AABB coreAabb = new AABB(0.5 - radius, 0.0, 0.5 - radius, 0.5 + radius, 1.0, 0.5 + radius);
+            trunkShapes[i] = Shapes.create(coreAabb);
         }
     }
 
@@ -141,7 +143,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         return Math.min(MAX_RADIUS, connectionRadius);
     }
 
-    public ReplaceableState getReplaceability(LevelAccessor level, BlockPos pos, BlockPos corePos) {
+    private ReplaceableState getReplaceability(LevelAccessor level, BlockPos pos, BlockPos corePos) {
 
         final BlockState state = level.getBlockState(pos);
         final Block block = state.getBlock();

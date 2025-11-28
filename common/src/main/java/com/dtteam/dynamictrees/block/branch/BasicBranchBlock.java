@@ -4,7 +4,6 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.Cell;
 import com.dtteam.dynamictrees.api.cell.CellNull;
 import com.dtteam.dynamictrees.api.network.MapSignal;
-import com.dtteam.dynamictrees.api.treedata.BranchShapeState;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
@@ -14,7 +13,6 @@ import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionContext;
-import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -41,10 +39,6 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBlock {
@@ -62,9 +56,6 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
     private final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
-
-    //This cache does not include radius == 8, it's just Shapes.block().
-    protected static final VoxelShape[] shapeCache = new VoxelShape[BranchShapeState.TOTAL_STATES];
 
     /**
      * @param name name of branch, without a {@code _branch} suffix
@@ -386,60 +377,8 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        byte[] radii = new byte[7];
-        int radius = getRadius(state);
-
-        //skip all the fancy shape stuff if the trunk is just a block.
-        if (radius == 8) return Shapes.block();
-
-        radii[6] = (byte)radius; //last radius is the core
-
-        for (Direction dir : Direction.values()) {
-            radii[dir.ordinal()] = (byte)Math.min(getSideConnectionRadius(level, pos, radius, dir), radius);
-        }
-        int shapeStateIndex = BranchShapeState.fromArray(radii).toIndex();
-
-        VoxelShape cachedShape = shapeCache[shapeStateIndex];
-        if (cachedShape != null){
-            return cachedShape;
-        }
-
-        VoxelShape newShape = generateNewShape(radii);
-        shapeCache[shapeStateIndex] = newShape;
-        return newShape;
-    }
-
-    private static VoxelShape generateNewShape(byte[] radii) {
-        double radius = radii[6] / 16.0;
-        VoxelShape shape = Shapes.create(makeCube(radius));
-        for (Direction dir : Direction.values()) {
-            double sideRadius = radii[dir.ordinal()] / 16.0f;
-            if (sideRadius > 0.0f) {
-                double gap = 0.5f - sideRadius;
-                AABB aabb = makeCube(sideRadius);
-                aabb = aabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
-                shape = Shapes.or(shape, Shapes.create(aabb));
-            }
-        }
-        return shape;
-    }
-
-    protected static AABB makeCube(double radius) {
-        return new AABB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
-    }
-
-    @Override
     public int getRadiusForConnection(BlockState state, BlockGetter level, BlockPos pos, BranchBlock from, Direction side, int fromRadius) {
         return getRadius(state);
-    }
-
-    protected int getSideConnectionRadius(BlockGetter level, BlockPos pos, int radius, Direction side) {
-        final BlockPos deltaPos = pos.relative(side);
-        final BlockState blockState = ChunkTreeHelper.getStateSafe(level, deltaPos);
-
-        // If adjacent block is not loaded assume there is no connection.
-        return blockState == null ? 0 : TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, level, deltaPos, this, side, radius);
     }
 
 

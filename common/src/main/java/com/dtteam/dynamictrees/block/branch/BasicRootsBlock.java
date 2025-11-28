@@ -10,7 +10,6 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.pod.OffsetablePodBlock;
 import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
-import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.loot.LootTableSupplier;
 import com.dtteam.dynamictrees.platform.Services;
@@ -21,7 +20,6 @@ import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.systems.nodemapper.RootsDestroyerNode;
 import com.dtteam.dynamictrees.systems.nodemapper.SpeciesNode;
 import com.dtteam.dynamictrees.systems.nodemapper.StateNode;
-import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -63,7 +61,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -492,37 +489,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             return fullShape;
         }
         return super.getCollisionShape(pState, pLevel, pPos, pContext);
-    }
-
-    @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext pContext) {
-        if (isFullBlock(state)) {
-            return Shapes.block();
-        }
-        int thisRadiusInt = getRadius(state);
-        double radius = thisRadiusInt / 16.0;
-        VoxelShape core = Shapes.box(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
-
-        for (Direction dir : Direction.values()) {
-            int sideRadiusInt = Math.min(getSideConnectionRadius(level, pos, thisRadiusInt, dir), thisRadiusInt);
-            double sideRadius = sideRadiusInt / 16.0f;
-            if (sideRadius > 0.0f) {
-                double gap = 0.5f - sideRadius;
-                AABB aabb = new AABB(0.5 - sideRadius, 0.5 - sideRadius, 0.5 - sideRadius, 0.5 + sideRadius, 0.5 + sideRadius, 0.5 + sideRadius);
-                aabb = aabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
-                core = Shapes.or(core, Shapes.create(aabb));
-            }
-        }
-
-        return core;
-    }
-
-    protected int getSideConnectionRadius(BlockGetter level, BlockPos pos, int radius, Direction side) {
-        final BlockPos deltaPos = pos.relative(side);
-        final BlockState blockState = ChunkTreeHelper.getStateSafe(level, deltaPos);
-
-        // If adjacent block is not loaded assume there is no connection.
-        return blockState == null ? 0 : TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, level, deltaPos, this, side, radius);
     }
 
     @Override
