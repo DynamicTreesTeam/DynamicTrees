@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.model.baked;
 import com.dtteam.dynamictrees.model.ModelHelper;
 import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
 import com.google.common.collect.Maps;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
@@ -33,8 +34,9 @@ import java.util.function.Function;
 public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
 
     private static final int MIN_RADIUS_FOR_CROSS = 4;
+    final static float Z_FIGHTING_OFFSET = 0.001f;
 
-    private final BakedModel[][] sleeveFaces = new BakedModel[6][8];
+    private final BakedModel[][] sleeveEndFaces = new BakedModel[6][8];
 
     public BasicRootsBlockBakedModel(IGeometryBakingContext customData, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
         super(customData, barkTextureLocation, ringsTextureLocation, spriteGetter);
@@ -46,14 +48,10 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
             for (int i = 0; i < 8; i++) {
                 int radius = i + 1;
                 for (Direction dir : Direction.values()) {
-                    sleeveFaces[dir.get3DDataValue()][i] = bakeSleeveFace(radius, dir, ringsTexture);
+                    sleeveEndFaces[dir.get3DDataValue()][i] = bakeSleeveFace(radius, dir, ringsTexture);
                 }
             }
         }
-    }
-
-    private boolean isTransparent(){
-        return getRenderType() != RenderType.solid();
     }
 
     @Override
@@ -178,8 +176,7 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
         Vector3f posFrom = new Vector3f(8 - radius, 8 - radius, 8 - radius);
         Vector3f posTo = new Vector3f(8 + radius, 8 + radius, 8 + radius);
 
-        final float zFightingOffset = 0.001f;
-        final float center = 8 + zFightingOffset;
+        final float center = 8 + Z_FIGHTING_OFFSET;
 
         if (planeAxis == Axis.X){
             posFrom = new Vector3f(center, posFrom.y(), posFrom.z());
@@ -203,9 +200,9 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
     public BakedModel bakeSleeveFace(int radius, Direction dir, TextureAtlasSprite rings) {
         int dradius = radius * 2;
         int halfSize = (16 - dradius) / 2;
-        int halfSizeX = dir.getStepX() != 0 ? halfSize : dradius;
-        int halfSizeY = dir.getStepY() != 0 ? halfSize : dradius;
-        int halfSizeZ = dir.getStepZ() != 0 ? halfSize : dradius;
+        float halfSizeX = dir.getStepX() != 0 ? halfSize + Z_FIGHTING_OFFSET : dradius;
+        float halfSizeY = dir.getStepY() != 0 ? halfSize + Z_FIGHTING_OFFSET : dradius;
+        float halfSizeZ = dir.getStepZ() != 0 ? halfSize + Z_FIGHTING_OFFSET : dradius;
         int move = 16 - halfSize;
         int centerX = 16 + (dir.getStepX() * move);
         int centerY = 16 + (dir.getStepY() * move);
@@ -243,25 +240,28 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
 
         if (side == null) {
             List<BakedQuad> quadsList = super.getQuads(state, null, rand, extraData, renderType);
+            //if its solid don't bother with the inside cross
+            if (renderType == RenderType.solid())
+                return quadsList;
 
             //The core inside cross is stored in the null side
             final Direction sourceDir = getSourceDir(coreRadius, connections);
             final int coreDir = resolveCoreDir(sourceDir);
 
             quadsList.addAll(cores[coreDir][coreRadius - 1].getQuads(state, null, rand, extraData, renderType));
-
             return quadsList;
         }
 
         //From here on is to add the ends to solid roots
-        if (getRenderType() != RenderType.solid()) return Collections.emptyList();
+        if (renderType != RenderType.solid())
+            return Collections.emptyList();
 
         final List<BakedQuad> quadsList = new ArrayList<>(24);
 
         final int idx = side.get3DDataValue();
         final int connRadius = connections[idx];
         if (connRadius > 0) {
-            quadsList.addAll(sleeveFaces[idx][connRadius - 1].getQuads(state, side, rand, extraData, renderType));
+            quadsList.addAll(sleeveEndFaces[idx][connRadius - 1].getQuads(state, side, rand, extraData, renderType));
         }
 
         return quadsList;
@@ -269,6 +269,10 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
 
     private Direction[] directionsOfAxis(Axis axis){
         return Arrays.stream(Direction.values()).filter(d -> d.getAxis() == axis).toList().toArray(Direction[]::new);
+    }
+
+    private boolean isTransparent(){
+        return getRenderType() != RenderType.solid();//&& Minecraft.useFancyGraphics();
     }
 
 }

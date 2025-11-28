@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.model.ModelHelper;
 import com.dtteam.dynamictrees.model.modeldata.ModelConnections;
 import com.google.common.collect.Maps;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;

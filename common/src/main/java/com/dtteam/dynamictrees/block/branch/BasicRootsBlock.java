@@ -481,6 +481,14 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     //////////////////////////////
 
     @Override
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (isFullBlock(state)) {
+            return Shapes.block();
+        }
+        return super.getShape(state, level, pos, context);
+    }
+
+    @Override
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         if (isFullBlock(pState)) {
             VoxelShape fullShape = Shapes.block();

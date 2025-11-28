@@ -32,7 +32,7 @@ public class BranchBlockModelLoader implements IGeometryLoader<BranchBlockModelG
     @Override
     public BranchBlockModelGeometry read(JsonObject modelObject, JsonDeserializationContext deserializationContext) throws JsonParseException {
         final JsonObject textures = this.getTexturesObject(modelObject);
-        final ResourceLocation familyName = this.getLocation(modelObject);
+        final ResourceLocation familyName = this.getLocation(modelObject, "family");
 
         return this.getModelGeometry(this.getBarkTextureLocation(textures), this.getRingsTextureLocation(textures),
                 familyName == null ? null : ResourceLocationUtils.parseDTLocation(familyName));
@@ -55,9 +55,9 @@ public class BranchBlockModelLoader implements IGeometryLoader<BranchBlockModelG
     }
 
     @Nullable
-    protected ResourceLocation getLocation(final JsonObject object) {
+    protected ResourceLocation getLocation(final JsonObject object, String identifier) {
         try {
-            return this.getLocationOrThrow(this.getOrThrow(object, "family"));
+            return this.getLocationOrThrow(this.getOrThrow(object, identifier));
         } catch (final RuntimeException e) {
             return null;
         }
