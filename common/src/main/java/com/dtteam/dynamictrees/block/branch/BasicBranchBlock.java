@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.Cell;
 import com.dtteam.dynamictrees.api.cell.CellNull;
 import com.dtteam.dynamictrees.api.network.MapSignal;
+import com.dtteam.dynamictrees.api.treedata.BranchShapeState;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
@@ -44,6 +45,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBlock {
@@ -62,29 +64,15 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     private final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
 
-    protected static final VoxelShape[] shapeCache = new VoxelShape[MAX_RADIUS+1];
-    protected static final VoxelShape[][] sideShapeCache = new VoxelShape[MAX_RADIUS+1][6];
+    //8 radii for core, 9 radii for each side
+    private static final int TOTAL_SHAPES = 8*9*9*9*9*9*9;
+    protected static final VoxelShape[] shapeCache = new VoxelShape[TOTAL_SHAPES];
 
     /**
      * @param name name of branch, without a {@code _branch} suffix
      */
     public BasicBranchBlock(ResourceLocation name, Properties properties) {
         this(name, properties, RADIUS, MAX_RADIUS);
-        generateShapeCache();
-    }
-
-    private void generateShapeCache(){
-        shapeCache[0] = Shapes.empty();
-        for (int i=1; i<= MAX_RADIUS; i++){
-            double radius = i / 16.0;
-            AABB coreAabb = new AABB(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
-            shapeCache[i] = Shapes.create(coreAabb);
-            for (Direction dir : Direction.values()){
-                double gap = 0.5f - radius;
-                AABB sideAabb = coreAabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
-                sideShapeCache[i][dir.ordinal()] = Shapes.create(sideAabb);
-            }
-        }
     }
 
     /**
@@ -401,18 +389,39 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        int[] radii = new int[7];
         int radius = getRadius(state);
-        VoxelShape core = shapeCache[radius];
+        radii[6] = radius; //last radii is the core
 
         for (Direction dir : Direction.values()) {
             int sideRadius = Math.min(getSideConnectionRadius(level, pos, radius, dir), radius);
-            if (sideRadius > 0) {
-                VoxelShape side = sideShapeCache[sideRadius][dir.ordinal()];
-                core = Shapes.or(core, side);
-            }
+            radii[dir.ordinal()] = sideRadius;
+        }
+        int shapeStateIndex  = BranchShapeState.fromIntArray(radii).toIndex();
+
+        VoxelShape cachedShape = shapeCache[shapeStateIndex];
+        if (cachedShape != null){
+            return cachedShape;
         }
 
-        return core;
+        VoxelShape newShape = generateNewShape(radii);
+        shapeCache[shapeStateIndex] = newShape;
+        return newShape;
+    }
+
+    private static VoxelShape generateNewShape(int[] radii) {
+        double radius = radii[6] / 16.0;
+        VoxelShape shape = Shapes.box(0.5 - radius, 0.5 - radius, 0.5 - radius, 0.5 + radius, 0.5 + radius, 0.5 + radius);
+        for (Direction dir : Direction.values()) {
+            double sideRadius = radii[dir.ordinal()] / 16.0f;
+            if (sideRadius > 0.0f) {
+                double gap = 0.5f - sideRadius;
+                AABB aabb = new AABB(0.5 - sideRadius, 0.5 - sideRadius, 0.5 - sideRadius, 0.5 + sideRadius, 0.5 + sideRadius, 0.5 + sideRadius);
+                aabb = aabb.expandTowards(dir.getStepX() * gap, dir.getStepY() * gap, dir.getStepZ() * gap);
+                shape = Shapes.or(shape, Shapes.create(aabb));
+            }
+        }
+        return shape;
     }
 
     @Override

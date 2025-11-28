@@ -5,13 +5,16 @@ import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -47,12 +50,7 @@ public class WaterSoilProperties extends SoilProperties {
     }
 
     @Override
-    public MapColor getDefaultMapColor() {
-        return MapColor.WATER;
-    }
-
-    @Override
-    public BlockBehaviour.Properties getDefaultBlockProperties(MapColor mapColor) {
+    public BlockBehaviour.Properties getDefaultBlockProperties() {
         return BlockBehaviour.Properties.ofFullCopy(Blocks.WATER);
     }
 
@@ -76,16 +74,16 @@ public class WaterSoilProperties extends SoilProperties {
             return 1;
         }
 
-//        @Override
-//        public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
-//            BlockState upState = level.getBlockState(pos.above());
-//            if (TreeHelper.isBranch(upState)) {
-//                return TreeHelper.getBranch(upState).getFamily().getBranchItem()
-//                        .map(ItemStack::new)
-//                        .orElse(ItemStack.EMPTY);
-//            }
-//            return ItemStack.EMPTY;
-//        }
+        @Override
+        public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+            BlockState upState = level.getBlockState(pos.above());
+            if (TreeHelper.isBranch(upState)) {
+                return TreeHelper.getBranch(upState).getFamily().getBranchItem()
+                        .map(ItemStack::new)
+                        .orElse(ItemStack.EMPTY);
+            }
+            return ItemStack.EMPTY;
+        }
 
         @Override
         public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
