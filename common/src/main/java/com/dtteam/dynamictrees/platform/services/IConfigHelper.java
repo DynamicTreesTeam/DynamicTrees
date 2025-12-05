@@ -5,7 +5,9 @@ import java.util.List;
 public interface IConfigHelper {
 
     String LEAVES_SEED_DROP_RATE = "leavesSeedDropRate";
+    String MIN_SEASONAL_LEAVES_SEED_DROP_RATE = "minSeasonalLeavesSeedDropRate";
     String VOLUNTARY_SEED_DROP_RATE = "voluntarySeedDropRate";
+    String MIN_SEASONAL_VOLUNTARY_SEED_DROP_RATE = "minSeasonalVoluntarySeedDropRate";
     String SEED_PLANT_RATE = "seedPlantRate";
     String SEED_TIME_TO_LIVE = "seedTimeToLive";
     String SEED_ONLY_FOREST = "seedOnlyForest";
@@ -17,7 +19,7 @@ public interface IConfigHelper {
     String TREE_HARDNESS_MULTIPLIER = "treeHardnessMultiplier";
     String DROP_STICKS = "dropSticks";
     String SCALE_BIOME_GROWTH_RATE = "scaleBiomeGrowthRate";
-    String DESEASE_CHANCE = "diseaseChance";
+    String DISEASE_CHANCE = "diseaseChance";
     String MAX_BRANCH_ROT_RADIUS = "maxBranchRotRadius";
     String ROOTY_BLOCK_HARDNESS_MULTIPLIER = "rootyBlockHardnessMultiplier";
     String SWAMP_OAKS_IN_WATER = "swampOaksInWater";
@@ -54,7 +56,7 @@ public interface IConfigHelper {
 
     String PREFERRED_SEASON_MOD = "preferredSeasonMod";
     String ENABLE_SEASONAL_SEED_DROP_FACTOR = "enableSeasonalSeedDropFactor";
-    String ENABLE_SEASONAL_SEED_GROWTH_FACTOR = "enableSeasonalGrowthFactor";
+    String ENABLE_SEASONAL_GROWTH_FACTOR = "enableSeasonalGrowthFactor";
     String ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION_FACTOR = "enableSeasonalFruitProductionFactor";
 
     String DEBUG = "debug";

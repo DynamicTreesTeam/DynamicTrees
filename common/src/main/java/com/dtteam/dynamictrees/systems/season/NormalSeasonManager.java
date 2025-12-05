@@ -110,7 +110,7 @@ public class NormalSeasonManager implements SeasonManager {
     }
 
     public float getFruitProductionFactorAsScan(ResourceLocation dimLoc, BlockPos rootPos, float offset) {
-        if (seasonContextMap.size() > 0) {
+        if (!seasonContextMap.isEmpty()) {
             float seasonValue = rootPos.getY() / 64.0f;
             boolean tropical = rootPos.getZ() >= 1.0f;
             if (seasonContextMap.containsKey(dimLoc)) {

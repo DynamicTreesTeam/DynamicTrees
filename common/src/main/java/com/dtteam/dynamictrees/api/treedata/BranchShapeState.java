@@ -16,7 +16,7 @@ public record BranchShapeState(byte down, byte up, byte north, byte south, byte 
 
     /**
      * This optimized indexing takes into account that each side radius
-     * is capped by the core radius (side <= core).
+     * is capped by the core radius (side ≤ core).
      * That way the total size is reduced considerably.
      * @return the index where the voxel shape should be stored
      */

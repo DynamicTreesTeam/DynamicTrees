@@ -49,7 +49,7 @@ public class DTConfigs {
         createConfig("Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome",
         IConfigHelper.SCALE_BIOME_GROWTH_RATE, 0.5f, 0.0f, 1.0f);
         createConfig("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days",
-        IConfigHelper.DESEASE_CHANCE, 0.0f, 0.0f, 1.0f);
+        IConfigHelper.DISEASE_CHANCE, 0.0f, 0.0f, 1.0f);
         createConfig("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. 24 = Full 3x3 thick size. Set to 0 to prevent rotting",
         IConfigHelper.MAX_BRANCH_ROT_RADIUS, 5, 0, ThickBranchBlock.MAX_RADIUS_THICK);
         createConfig("How much harder it is to destroy a rooty block compared to its non-rooty state",
@@ -121,7 +121,7 @@ public class DTConfigs {
         createConfig("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).",
                 IConfigHelper.ENABLE_SEASONAL_SEED_DROP_FACTOR, true);
         createConfig("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).",
-                IConfigHelper.ENABLE_SEASONAL_SEED_GROWTH_FACTOR, true);
+                IConfigHelper.ENABLE_SEASONAL_GROWTH_FACTOR, true);
         createConfig("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).",
                 IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION_FACTOR, true);
 

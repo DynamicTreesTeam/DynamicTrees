@@ -36,7 +36,9 @@ public final class VoluntarySeedDropChance implements LootItemCondition {
     public boolean test(LootContext context) {
         final Float seasonalSeedDropFactor = context.getParamOrNull(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR);
         assert seasonalSeedDropFactor != null;
-        return rarity * Services.CONFIG.getDoubleConfig(IConfigHelper.VOLUNTARY_SEED_DROP_RATE) * seasonalSeedDropFactor > context.getRandom().nextFloat();
+        double minimumDropRate = Services.CONFIG.getDoubleConfig(IConfigHelper.MIN_SEASONAL_VOLUNTARY_SEED_DROP_RATE);
+        double adjustedSeasonalSeedDropFactor = Math.min(seasonalSeedDropFactor + minimumDropRate, 1.0F);
+        return rarity * Services.CONFIG.getDoubleConfig(IConfigHelper.VOLUNTARY_SEED_DROP_RATE) * adjustedSeasonalSeedDropFactor > context.getRandom().nextFloat();
     }
 
     public static LootItemCondition.Builder voluntarySeedDropChance() {

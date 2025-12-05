@@ -43,8 +43,12 @@ public class DTConfigs {
         SERVER_BUILDER.comment("Seed Settings").push("seeds");
         registerConfig(SERVER_BUILDER.comment("The rate at which seeds drop from leaves.").
                 defineInRange(IConfigHelper.LEAVES_SEED_DROP_RATE, 1.0, 0.0, 64.0));
+        registerConfig(SERVER_BUILDER.comment("The minimum chance for seed dropping from leaves when a seasonal mod is installed. 0 = during the off season seeds never drop from leaves, 1 = seeds will drop at maximum rate during the entire year. Can be fractional.").
+                defineInRange(IConfigHelper.MIN_SEASONAL_LEAVES_SEED_DROP_RATE, 0.15, 0.0, 1.0));
         registerConfig(SERVER_BUILDER.comment("The rate at which seeds voluntarily drop from branches").
                 defineInRange(IConfigHelper.VOLUNTARY_SEED_DROP_RATE, 0.01, 0.0, 1.0));
+        registerConfig(SERVER_BUILDER.comment("The minimum chance for seed dropping voluntarily when a seasonal mod is installed. 0 = during the off season seeds never drop voluntarily, 1 = seeds will drop at maximum rate during the entire year. Can be fractional.").
+                defineInRange(IConfigHelper.MIN_SEASONAL_VOLUNTARY_SEED_DROP_RATE, 0.0, 0.0, 1.0));
         registerConfig(SERVER_BUILDER.comment("The rate at which seeds voluntarily plant themselves in their ideal biomes").
                 defineInRange(IConfigHelper.SEED_PLANT_RATE, 1f / 6f, 0.0, 1.0));
         registerConfig(SERVER_BUILDER.comment("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute").
@@ -69,7 +73,7 @@ public class DTConfigs {
         registerConfig(SERVER_BUILDER.comment("Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome").
                 defineInRange(IConfigHelper.SCALE_BIOME_GROWTH_RATE, 0.5f, 0.0f, 1.0f));
         registerConfig(SERVER_BUILDER.comment("The chance of a tree on depleted soil to die. 1/256(~0.004) averages to about 1 death every 16 minecraft days").
-                defineInRange(IConfigHelper.DESEASE_CHANCE, 0.0f, 0.0f, 1.0f));
+                defineInRange(IConfigHelper.DISEASE_CHANCE, 0.0f, 0.0f, 1.0f));
         registerConfig(SERVER_BUILDER.comment("The maximum radius of a branch that is allowed to postRot away. 8 = Full block size. 24 = Full 3x3 thick size. Set to 0 to prevent rotting").
                 defineInRange(IConfigHelper.MAX_BRANCH_ROT_RADIUS, 7, 0, ThickBranchBlock.MAX_RADIUS_THICK));
         registerConfig(SERVER_BUILDER.comment("How much harder it is to destroy a rooty block compared to its non-rooty state").
@@ -148,7 +152,7 @@ public class DTConfigs {
         registerConfig(COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
                 define(IConfigHelper.ENABLE_SEASONAL_SEED_DROP_FACTOR, true));
         registerConfig(COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
-                define(IConfigHelper.ENABLE_SEASONAL_SEED_GROWTH_FACTOR, true));
+                define(IConfigHelper.ENABLE_SEASONAL_GROWTH_FACTOR, true));
         registerConfig(COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").
                 define(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION_FACTOR, true));
 

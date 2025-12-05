@@ -48,7 +48,7 @@ public class SeasonHelper {
     }
 
     static public float globalSeasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos, float offset) {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_GROWTH_FACTOR) ? seasonManager.getGrowthFactor(levelContext.level(), rootPos, offset) : 1.0F;
+        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_GROWTH_FACTOR) ? seasonManager.getGrowthFactor(levelContext.level(), rootPos, offset) : 1.0F;
     }
 
     static public float globalSeasonalSeedDropFactor(LevelContext levelContext, BlockPos pos) {

@@ -35,8 +35,9 @@ public final class SeasonalSeedDropChance implements LootItemCondition {
         Float seasonalSeedDropFactor = context.getParamOrNull(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR);
         assert seasonalSeedDropFactor != null;
         // Adjusted to a minimum of 0.15 to ensure there are at least some seed drops all year round.
-        float adjustedSeasonalSeedDropFactor = Math.min(seasonalSeedDropFactor + 0.15F, 1.0F);
-       return Services.CONFIG.getDoubleConfig(IConfigHelper.LEAVES_SEED_DROP_RATE) * adjustedSeasonalSeedDropFactor > context.getRandom().nextFloat();
+        double minimumDropRate = Services.CONFIG.getDoubleConfig(IConfigHelper.MIN_SEASONAL_LEAVES_SEED_DROP_RATE);
+        double adjustedSeasonalSeedDropFactor = Math.min(seasonalSeedDropFactor + minimumDropRate, 1.0F);
+        return Services.CONFIG.getDoubleConfig(IConfigHelper.LEAVES_SEED_DROP_RATE) * adjustedSeasonalSeedDropFactor > context.getRandom().nextFloat();
     }
 
     public static LootItemCondition.Builder seasonalSeedDropChance() {

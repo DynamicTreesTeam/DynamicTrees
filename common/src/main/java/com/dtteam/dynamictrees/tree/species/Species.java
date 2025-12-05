@@ -1600,7 +1600,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if the tree became diseased
      */
     public boolean handleDisease(Level level, TreePart baseTreePart, BlockPos treePos, RandomSource random, int fertility) {
-        if (fertility == 0 && Services.CONFIG.getDoubleConfig(IConfigHelper.DESEASE_CHANCE) > random.nextFloat()) {
+        if (fertility == 0 && Services.CONFIG.getDoubleConfig(IConfigHelper.DISEASE_CHANCE) > random.nextFloat()) {
             baseTreePart.analyse(level.getBlockState(treePos), level, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
             return true;
         }
