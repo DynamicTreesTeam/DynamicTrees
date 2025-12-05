@@ -3,5 +3,7 @@ package com.dtteam.dynamictrees.api.season;
 public enum ClimateZoneType {
     NONE,
     TEMPERATE,
-    TROPICAL
+    TROPICAL,
+    ARID,
+    COLD
 }
