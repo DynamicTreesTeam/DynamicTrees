@@ -288,12 +288,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     protected Boolean tintSapling = true;
 
-    //WorldGen
-    /**
-     * A map of environmental biome factors that change a tree's suitability
-     */
-    protected Map<TagKey<Biome>, Float> envFactors = new HashMap<>();//Environmental factors
-
     protected IDTBiomeHolderSet  perfectBiomes = Services.MISC.newDTBiomeHolderSet();
 
     protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
@@ -351,7 +345,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public Species reset() {
         this.fruits.clear();
         this.pods.clear();
-        this.envFactors.clear();
         this.genFeatures.clear();
         this.acceptableBlocksForGrowth.clear();
         this.primitiveSaplingRecipe.clear();
@@ -363,8 +356,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Can be overridden by subclasses for setting defaults for things before reload, such as {@link #envFactors}.
-     *
+     * Can be overridden by subclasses for setting defaults for things before reload.
      * @return This {@link Species} object for chaining.
      */
     @Override
@@ -403,13 +395,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
-    /**
-     * @return The default chance for the compostable {@link Seed} to be successfully composted.
-     */
-    public float defaultSeedComposterChance() {
-        return 0.3f;
-    }
-
     public Family getFamily() {
         return family;
     }
@@ -417,31 +402,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public void setFamily(Family family) {
         family.addSpecies(this);
         this.family = family;
-    }
-
-    /**
-     * @return the {@link #family}'s {@linkplain Family#getCommonSpecies() common species}
-     */
-    public Species getCommonSpecies() {
-        return this.family.getCommonSpecies();
-    }
-
-    /**
-     * @return {@code true} if this species is the common of {@link #family}; {@code false} otherwise
-     */
-    public boolean isCommonSpecies() {
-        return this.getCommonSpecies() == this;
-    }
-
-    /**
-     * Checks whether {@link #seed} is the same instance as the {@link Seed} of the common {@link Species} of the
-     * owning {@link Family}.
-     *
-     * @return {@code true} if {@link #seed} {@code ==} the {@link Seed} of the common {@link Species} of {@link
-     * #family}; {@code false} otherwise.
-     */
-    public boolean isSeedCommon() {
-        return this.getCommonSpecies().getSeed().orElse(null) == this.seed.get();
     }
 
     public Species setUnlocalizedName(String name) {
@@ -560,6 +520,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     ///////////////////////////////////////////
     //LEAVES
     ///////////////////////////////////////////
+    //region leaves
 
     public Species setLeavesProperties(LeavesProperties leavesProperties) {
         this.leavesProperties = leavesProperties;
@@ -626,10 +587,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public int leafColorMultiplier(Level level, BlockPos pos) {
         return getLeavesProperties().treeFallColorMultiplier(getLeavesProperties().getDynamicLeavesState(), level, pos);
     }
+    //endregion
 
     ///////////////////////////////////////////
     //SEEDS
     ///////////////////////////////////////////
+    //region seeds
+
+    /**
+     * @return The default chance for the compostable {@link Seed} to be successfully composted.
+     */
+    public float defaultSeedComposterChance() {
+        return 0.3f;
+    }
 
     /**
      * Get an ItemStack of the species {@link Seed} with the supplied quantity.
@@ -712,6 +682,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.seed = seedSup;
         return this;
     }
+    //endregion
+
+    ///////////////////////////////////////////
+    //LOOT
+    ///////////////////////////////////////////
+    //region loot
 
     public List<ItemStack> getVoluntaryDrops(Level level, BlockPos rootPos, int fertility) {
         if (level.isClientSide) {
@@ -860,10 +836,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
         return true;
     }
+    //endregion
 
     ///////////////////////////////////////////
     // SAPLING
     ///////////////////////////////////////////
+    //region sapling
 
     /**
      * Valid primitive sapling {@link Item}s. Used for dirt bucket recipes.
@@ -1115,9 +1093,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
+    /**
+     * Provides the {@link PottedSaplingBlock} for this Species. {@link Species} subclasses can derive their own {@link
+     * PottedSaplingBlock} subclass if they want something custom.
+     *
+     * @return The {@link PottedSaplingBlock} for this {@link Species}.
+     */
+    public PottedSaplingBlock getPottedSapling() {
+        return DTRegistries.POTTED_SAPLING.get();
+    }
+    //endregion
+
     ///////////////////////////////////////////
     //DIRT
     ///////////////////////////////////////////
+    //region dirt
 
     public boolean placeRootyDirtBlock(LevelAccessor level, BlockPos rootPos, int fertility) {
         BlockState dirtState = level.getBlockState(rootPos);
@@ -1326,10 +1316,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public boolean soilDestroyAction (Level level, @NotNull BlockPos rootPos, BlockState state, @NotNull Player player){
         return false;
     }
+    //endregion
 
-    //////////////////////////////
+    ///////////////////////////////////////////
     // GROWTH
-    //////////////////////////////
+    ///////////////////////////////////////////
+    //region growth
 
     /**
      * Basic update. This handles everything for the species Rot, Drops, Fruit, Disease, and Growth respectively. If the
@@ -1607,15 +1599,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         return false;
     }
+    //end region
 
     //////////////////////////////
     // BIOME HANDLING
     //////////////////////////////
-
-    public Species envFactor(TagKey<Biome> type, float factor) {
-        envFactors.put(type, factor);
-        return this;
-    }
+    //region biome-handling
 
     /**
      * The result of posting a BiomeSuitabilityEvent
@@ -1642,15 +1631,15 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         float ugs = (float) (double) Services.CONFIG.getDoubleConfig(IConfigHelper.SCALE_BIOME_GROWTH_RATE); // Universal growth scalar.
 
-        if (ugs == 1.0f || this.isBiomePerfect(biomeHolder)) {
+        if (ugs == 1.0f) { // || this.isBiomePerfect(biomeHolder)
             return 1.0f;
         }
 
         float suit = defaultSuitability();
 
-        for (TagKey<Biome> t : biomeHolder.tags().toList()) {
-            suit *= envFactors.getOrDefault(t, 1.0f);
-        }
+//        for (TagKey<Biome> t : biomeHolder.tags().toList()) {
+//            suit *= envFactors.getOrDefault(t, 1.0f);
+//        }
 
         //Linear interpolation of suitability with universal growth scalar
         suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
@@ -1658,21 +1647,20 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return Mth.clamp(suit, 0.0f, 1.0f);
     }
 
-    /**
-     * Used to determine if the provided {@link Biome} argument will yield unhindered growth to Maximum potential. This
-     * has the affect of the suitability being 100%(or 1.0f)
-     *
-     * @param biome The biome being tested
-     * @return True if biome is "perfect" false otherwise.
-     */
-    public boolean isBiomePerfect(Holder<Biome> biome) {
-        return this.perfectBiomes.contains(biome);
-    }
-
-
-    public IDTBiomeHolderSet getPerfectBiomes() {
-        return perfectBiomes;
-    }
+//    /**
+//     * Used to determine if the provided {@link Biome} argument will yield unhindered growth to Maximum potential. This
+//     * has the affect of the suitability being 100%(or 1.0f)
+//     *
+//     * @param biome The biome being tested
+//     * @return True if biome is "perfect" false otherwise.
+//     */
+//    public boolean isBiomePerfect(Holder<Biome> biome) {
+//        return this.perfectBiomes.contains(biome);
+//    }
+//
+//    public IDTBiomeHolderSet getPerfectBiomes() {
+//        return perfectBiomes;
+//    }
 
     /**
      * A value that determines what a tree's suitability is before climate manipulation occurs.
@@ -1680,10 +1668,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public static float defaultSuitability() {
         return 0.85f;
     }
+    //endregion
 
     //////////////////////////////
     // SEASONAL
     //////////////////////////////
+    //region seasonal
 
     /**
      * default flower holding is relative to the flowering offset, but default is first half of spring
@@ -1796,11 +1786,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
         return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin + seasonalFruitingOffset, flowerSeasonHoldMax + seasonalFruitingOffset);
     }
-
+    //endregion
 
     //////////////////////////////
     // INTERACTIVE
     //////////////////////////////
+    //region interactive
 
     @Nullable
     public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
@@ -1919,10 +1910,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
         return this.alwaysShowOnWaila;
     }
+    //endregion
 
     ///////////////////////////////////////////
     // MEGANESS
     ///////////////////////////////////////////
+    //region meganess
 
     private Species megaSpecies = Species.NULL_SPECIES;
     private Species preMegaSpecies = Species.NULL_SPECIES;
@@ -1953,10 +1946,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public boolean canCraftMegaSeed() {
         return canCraftMegaSeed;
     }
+    //endregion
 
     ///////////////////////////////////////////
     // FALL ANIMATION HANDLING
     ///////////////////////////////////////////
+    //region fall-animation-handling
 
     public AnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
         return getFamily().selectAnimationHandler(fallingEntity);
@@ -1990,10 +1985,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public float falloverParticleFlingMultiplier(){
         return 1;
     }
+    //endregion
 
     ///////////////////////////////////////////
     // SOUND EFFECTS
     ///////////////////////////////////////////
+    //region sound-effects
 
     protected float bigTreeSoundThreshold = 20;
 
@@ -2031,25 +2028,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public void setBigTreeSoundThreshold(float bigTreeSoundThreshold) {
         this.bigTreeSoundThreshold = bigTreeSoundThreshold;
     }
+    //endregion
 
-    //////////////////////////////
-    // BONSAI POT
-    //////////////////////////////
-
-    /**
-     * Provides the {@link PottedSaplingBlock} for this Species. {@link Species} subclasses can derive their own {@link
-     * PottedSaplingBlock} subclass if they want something custom.
-     *
-     * @return The {@link PottedSaplingBlock} for this {@link Species}.
-     */
-    public PottedSaplingBlock getPottedSapling() {
-        return DTRegistries.POTTED_SAPLING.get();
-    }
-
-
-    //////////////////////////////
+    ///////////////////////////////////////////
     // WORLDGEN
-    //////////////////////////////
+    ///////////////////////////////////////////
+    //region worldgen
 
     /**
      * Default worldgen spawn mechanism. This method uses JoCodes to generate tree models. Override to use other
@@ -2258,17 +2242,37 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return Collections.unmodifiableSet(pods);
     }
 
-    public List<TagKey<Block>> defaultSaplingTags() {
-        return Collections.singletonList(DTBlockTags.SAPLINGS);
+    /**
+     * @return the {@link #family}'s {@linkplain Family#getCommonSpecies() common species}
+     */
+    public Species getCommonSpecies() {
+        return this.family.getCommonSpecies();
     }
 
-    public List<TagKey<Item>> defaultSeedTags() {
-        return Collections.singletonList(DTItemTags.SEEDS);
+    /**
+     * @return {@code true} if this species is the common of {@link #family}; {@code false} otherwise
+     */
+    public boolean isCommonSpecies() {
+        return this.getCommonSpecies() == this;
     }
+
+    /**
+     * Checks whether {@link #seed} is the same instance as the {@link Seed} of the common {@link Species} of the
+     * owning {@link Family}.
+     *
+     * @return {@code true} if {@link #seed} {@code ==} the {@link Seed} of the common {@link Species} of {@link
+     * #family}; {@code false} otherwise.
+     */
+    public boolean isSeedCommon() {
+        return this.getCommonSpecies().getSeed().orElse(null) == this.seed.get();
+    }
+
+    //endregion
 
     ///////////////////////////////////////////
     // DATA GENERATION
     ///////////////////////////////////////////
+    //region data-generation
 
     protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Species>> saplingStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
@@ -2409,6 +2413,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return Optional.ofNullable(dropSeeds).orElse(!this.hasFruits());
     }
 
+    public List<TagKey<Block>> defaultSaplingTags() {
+        return Collections.singletonList(DTBlockTags.SAPLINGS);
+    }
+
+    public List<TagKey<Item>> defaultSeedTags() {
+        return Collections.singletonList(DTItemTags.SEEDS);
+    }
+
     @Override
     public String toLoadDataString() {
         final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
@@ -2424,7 +2436,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 Pair.of("lowestBranchHeight", this.lowestBranchHeight), Pair.of("signalEnergy", this.signalEnergy),
                 Pair.of("growthRate", this.growthRate), Pair.of("soilLongevity", this.soilLongevity),
                 Pair.of("soilTypeFlags", this.soilTypeFlags), Pair.of("maxBranchRadius", this.maxBranchRadius),
-                Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
+                Pair.of("leavesProperties", this.leavesProperties),
                 Pair.of("megaSpecies", this.megaSpecies), Pair.of("seed", this.seed),
                 Pair.of("primitive_sapling", DynamicSaplingBlock.SAPLING_REPLACERS.entrySet().stream()
                         .filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny()
@@ -2433,10 +2445,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
                 Pair.of("genFeatures", this.genFeatures));
     }
+    //endregion
 
-    //////////////////////////////
+    ///////////////////////////////////////////
     // REGISTRY
-    //////////////////////////////
+    ///////////////////////////////////////////
+    //region registry
 
     public static Species findSpecies(final String name) {
         return findSpecies(ResourceLocationUtils.parseDTLocation(name));
@@ -2476,5 +2490,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public static List<ResourceLocation> getSpeciesDirectory() {
         return new ArrayList<>(Species.REGISTRY.getRegistryNames());
     }
+    //endregion
 
 }
