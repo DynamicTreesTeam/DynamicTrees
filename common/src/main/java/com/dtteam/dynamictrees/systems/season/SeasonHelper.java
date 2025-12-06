@@ -14,14 +14,14 @@ public class SeasonHelper {
 
     // A season provider returns a float value from 0(Inclusive) to 4(Exclusive) that signifies one of the four classic seasons.
     // A whole number is the beginning of a season with #.5 being the middle of the season.
-    public static final float SPRING = 0.0f;
-    public static final float SUMMER = 1.0f;
-    public static final float AUTUMN = 2.0f;
-    public static final float WINTER = 3.0f;
-
-    // Tropical convenience values.
-    public static final float DRY = SUMMER;
-    public static final float WET = WINTER;
+    public static final float SPRING_START = 0.0f;
+    public static final float SPRING_MIDDLE = 0.5f;
+    public static final float SUMMER_START = 1.0f;
+    public static final float SUMMER_MIDDLE = 1.5f;
+    public static final float AUTUMN_START = 2.0f;
+    public static final float AUTUMN_MIDDLE = 2.5f;
+    public static final float WINTER_START = 3.0f;
+    public static final float WINTER_MIDDLE = 3.5f;
 
     private static SeasonManager seasonManager = NormalSeasonManager.NULL.get();
 
@@ -44,28 +44,19 @@ public class SeasonHelper {
         seasonManager.updateTick(level, dayTime);
     }
 
-    static public float globalSeasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos) {
-        return globalSeasonalGrowthFactor(levelContext, rootPos, 0);
-    }
-
     static public float globalSeasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos, float offset) {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_GROWTH_FACTOR) ? seasonManager.getGrowthFactor(levelContext.level(), rootPos, offset) : 1.0F;
-    }
-
-    static public float globalSeasonalSeedDropFactor(LevelContext levelContext, BlockPos pos) {
-        return globalSeasonalSeedDropFactor(levelContext, pos, 0);
+        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_GROWTH)
+                ? seasonManager.getGrowthFactor(levelContext.level(), rootPos, offset) : 1.0F;
     }
 
     static public float globalSeasonalSeedDropFactor(LevelContext levelContext, BlockPos pos, float offset) {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_DROP_FACTOR) ? seasonManager.getSeedDropFactor(levelContext.level(), pos, offset) : 1.0F;
-    }
-
-    static public float globalSeasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos, boolean getAsScan) {
-        return globalSeasonalFruitProductionFactor(levelContext, pos, 0, getAsScan);
+        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_DROP)
+                ? seasonManager.getSeedDropFactor(levelContext.level(), pos, offset) : 1.0F;
     }
 
     static public float globalSeasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos, float offset, boolean getAsScan) {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION_FACTOR) ? seasonManager.getFruitProductionFactor(levelContext.level(), pos, offset, getAsScan) : 1.0F;
+        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION)
+                ? seasonManager.getFruitProductionFactor(levelContext.level(), pos, offset, getAsScan) : 1.0F;
     }
 
     /**
@@ -76,11 +67,8 @@ public class SeasonHelper {
         return seasonManager.getSeasonValue(levelContext.level(), pos);
     }
 
-    /**
-     * Tests if the position in level is considered tropical and thus follows tropical season rules.
-     */
-    static public boolean isTropical(Level level, BlockPos pos) {
-        return seasonManager.getClimate(level, pos) == ClimateZoneType.TROPICAL;
+    static public ClimateZoneType getClimate(Level level, BlockPos rootPos){
+        return seasonManager.getClimate(level, rootPos);
     }
 
     /**

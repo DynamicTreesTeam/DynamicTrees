@@ -1,37 +1,52 @@
 package com.dtteam.dynamictrees.systems.climate;
 
 import com.dtteam.dynamictrees.api.season.ClimateZoneType;
+import com.dtteam.dynamictrees.api.season.SeasonType;
 
 public class ClimateHandler {
 
-    public float offClimateMultipliers(ClimateZoneType preferredTreeClimate, ClimateZoneType biomeClimate){
-        if (preferredTreeClimate == ClimateZoneType.NONE || biomeClimate == ClimateZoneType.NONE) return 1.0f;
-        return switch (preferredTreeClimate){
-            case TEMPERATE -> switch (biomeClimate){
-                case COLD, ARID -> 0.75f;
-                default -> 1.0f;
-            };
-            case TROPICAL -> switch (biomeClimate){
-                case ARID -> 0.75F;
-                case COLD -> 0.0F;
-                default -> 1.0f;
-            };
-            case ARID -> switch (biomeClimate){
-                case TROPICAL -> 0.0F;
-                case COLD -> 0.75F;
-                default -> 1.0f;
-            };
-            case COLD -> switch (biomeClimate){
-                case TROPICAL -> 0.0F;
-                case ARID -> 0.75F;
-                default -> 1.0f;
-            };
-            default -> 1.0f;
-        };
+    private static final double[][] CLIMATE_MULTIPLIER_TABLE = {
+            //biome:
+            //TEMP   TROP   ARID   COLD
+            { 1.0,    0.6,   0.9,   0.4 }, // TEMPERATE species
+            { 0.7,    1.0,   0.5,   0.1 }, // TROPICAL species
+            { 0.6,    0.7,   1.0,   0.3 }, // ARID species
+            { 0.9,    0.4,   0.8,   1.0 }  // COLD species
+    };
+
+    public static double climateMultiplier(ClimateZoneType preferred, ClimateZoneType plantedIn, double minimum) {
+        double realValue = CLIMATE_MULTIPLIER_TABLE[preferred.ordinal()][plantedIn.ordinal()];
+        return realValue * (1-minimum) + minimum;
     }
 
-//    public float offClimateFruitOffsets(ClimateZoneType preferredTreeClimate, ClimateZoneType biomeClimate){
-//
-//    }
+    /**
+     * For climates with regular seasons (temperate, cold) the offset is relative to summer (0.0 is summer).
+     * For climate with dry-wet seasons (tropical, arid) the offsets is relative to wet season (0.0 is wet season).
+     * Summer and wet season my not align.
+     */
+    public Float defaultClimateFruitOffsets(ClimateZoneType preferredTreeClimate, ClimateZoneType biomeClimate, Float preferredClimateOffset){
+        if (preferredTreeClimate == biomeClimate){
+            return preferredClimateOffset;
+        }
+        if (preferredTreeClimate.seasonType == SeasonType.DRY_WET && biomeClimate.seasonType == SeasonType.DRY_WET){
+            return preferredClimateOffset;
+        }
+        return 0.0f;
+    }
+
+    /**
+     * For climates with regular seasons (temperate, cold) the offset is relative to summer (0.0 is summer).
+     * For climate with dry-wet seasons (tropical, arid) the offsets is relative to wet season (0.0 is wet season).
+     * Summer and wet season my not align.
+     */
+    public Float defaultClimateSeedOffsets(ClimateZoneType preferredTreeClimate, ClimateZoneType biomeClimate, Float preferredClimateOffset){
+        if (preferredTreeClimate == biomeClimate){
+            return preferredClimateOffset;
+        }
+        if (preferredTreeClimate.seasonType == SeasonType.DRY_WET && biomeClimate.seasonType == SeasonType.DRY_WET){
+            return preferredClimateOffset;
+        }
+        return 1.0f;
+    }
 
 }

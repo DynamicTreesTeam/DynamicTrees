@@ -27,10 +27,10 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
         }
 
         return switch (type) {
-            case TEMPERATE -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.STANDARD), 1.0f, 1.0f);
+            case TEMPERATE -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.TEMPERATURE), 1.0f, 1.0f);
             case TROPICAL -> clippedSineWave(seasonValue,  peakClimateOffset(SeasonType.DRY_WET), 0.3f, 0.9f);
             case ARID -> clippedSineWave(seasonValue,  peakClimateOffset(SeasonType.DRY_WET), 1.0f, 0.0f);
-            case COLD -> clippedSineWave(seasonValue,  peakClimateOffset(SeasonType.STANDARD), 2.0f, 0.0f);
+            case COLD -> clippedSineWave(seasonValue,  peakClimateOffset(SeasonType.TEMPERATURE), 2.0f, 0.0f);
             default -> 1.0f;
         };
     }
@@ -44,7 +44,7 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
 
         return switch (type) {
             case TEMPERATE -> clippedSineWave(seasonValue, 2.5f, 1.5f, -0.25f);
-            case TROPICAL -> clippedSineWave(seasonValue, 3.5f, 0.31f, 0.9f);
+            case TROPICAL -> clippedSineWave(seasonValue, 3.5f, 0.3f, 0.9f);
             default -> 1.0f;
         };
     }
@@ -58,7 +58,7 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
 
         return switch (type) {
             case TEMPERATE -> clippedSineWave(seasonValue, 3.5f, 1.0f, 1.0f);
-            case TROPICAL -> clippedSineWave(seasonValue, 0.5f, 0.31f, 0.9f);
+            case TROPICAL -> clippedSineWave(seasonValue, 0.5f, 0.3f, 0.9f);
             default -> 1.0f;
         };
     }

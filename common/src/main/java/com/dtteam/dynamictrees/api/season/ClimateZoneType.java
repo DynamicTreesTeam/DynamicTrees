@@ -1,11 +1,11 @@
 package com.dtteam.dynamictrees.api.season;
 
 public enum ClimateZoneType {
-    NONE (SeasonType.STANDARD),
-    TEMPERATE (SeasonType.STANDARD),
+    NONE (SeasonType.TEMPERATURE),
+    TEMPERATE (SeasonType.TEMPERATURE),
     TROPICAL (SeasonType.DRY_WET),
     ARID (SeasonType.DRY_WET),
-    COLD (SeasonType.STANDARD);
+    COLD (SeasonType.TEMPERATURE);
 
     public final SeasonType seasonType;
     ClimateZoneType(SeasonType seasonType){

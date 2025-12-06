@@ -46,6 +46,7 @@ import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
+import com.dtteam.dynamictrees.systems.climate.ClimateHandler;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.genfeature.context.*;
@@ -63,7 +64,10 @@ import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.utility.Optionals;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
-import com.dtteam.dynamictrees.worldgen.*;
+import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
+import com.dtteam.dynamictrees.worldgen.JoCode;
+import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
+import com.dtteam.dynamictrees.worldgen.RootsJoCode;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
@@ -289,8 +293,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     protected Boolean tintSapling = true;
 
-    protected IDTBiomeHolderSet  perfectBiomes = Services.MISC.newDTBiomeHolderSet();
-
     protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
 
     /**
@@ -303,21 +305,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     private final Set<Fruit> fruits = new HashSet<>();
 
     private final Set<Pod> pods = new HashSet<>();
-
-    private final ClimateZoneType preferredClimate = ClimateZoneType.TEMPERATE;
-
-    /**
-     * default flower holding is relative to the flowering offset, but default is first half of spring
-     */
-    protected float flowerSeasonHoldMin = SeasonHelper.SPRING;
-    protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
-
-    @Nullable
-    protected Float seasonalGrowthOffset = 0f;
-    @Nullable
-    protected Float seasonalSeedDropOffset = 0f;
-    @Nullable
-    protected Float seasonalFruitingOffset = 0f;
 
     /**
      * Blank constructor for {@link #NULL_SPECIES}.
@@ -364,7 +351,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.genFeatures.clear();
         this.acceptableBlocksForGrowth.clear();
         this.primitiveSaplingRecipe.clear();
-        this.perfectBiomes.clear();
 
         this.clearAcceptableSoils();
 
@@ -1623,6 +1609,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     //region biome-handling
 
     /**
+     * The preferred climate for the species. This replaces the old "PerfectBiomes".
+     * If a tree is planted outside its preferred climate, growth, seed drops and fruit production will be
+     * negatively affected.
+     */
+    private ClimateZoneType preferredClimate = ClimateZoneType.TEMPERATE;
+    /**
+     * How much the factors of growth, fruiting and seed dropping are affected when planted outside their
+     * preferred climate. If the value is 0, climates will affect it a lot, if its 1.0 it will grow just fine
+     * in any climate.
+     */
+    private float climateToleranceFloor = 0.2f;
+
+    /**
      * The result of posting a BiomeSuitabilityEvent
      * @param handled       If the suitability was handled. returns false by default.
      * @param suitability   The resulting suitability
@@ -1645,44 +1644,31 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return result.suitability();
         }
 
-        float ugs = (float) (double) Services.CONFIG.getDoubleConfig(IConfigHelper.SCALE_BIOME_GROWTH_RATE); // Universal growth scalar.
+        double ugs = Services.CONFIG.getDoubleConfig(IConfigHelper.SCALE_BIOME_GROWTH_RATE); // Universal growth scalar.
 
-        if (ugs == 1.0f) { // || this.isBiomePerfect(biomeHolder)
+        if (ugs == 1.0 || preferredClimate == ClimateZoneType.NONE) {
             return 1.0f;
         }
 
-        float suit = defaultSuitability();
+        ClimateZoneType currentClimate = SeasonHelper.getClimate(level, pos);
+        if (currentClimate == preferredClimate || currentClimate == ClimateZoneType.NONE){
+            return 1.0f; //Replaces "Perfect biome" check
+        }
 
-//        for (TagKey<Biome> t : biomeHolder.tags().toList()) {
-//            suit *= envFactors.getOrDefault(t, 1.0f);
-//        }
+        double suit = ClimateHandler.climateMultiplier(preferredClimate, currentClimate, climateToleranceFloor);
 
         //Linear interpolation of suitability with universal growth scalar
         suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
 
-        return Mth.clamp(suit, 0.0f, 1.0f);
+        return (float)Mth.clamp(suit, 0.0, 1.0);
     }
 
-//    /**
-//     * Used to determine if the provided {@link Biome} argument will yield unhindered growth to Maximum potential. This
-//     * has the affect of the suitability being 100%(or 1.0f)
-//     *
-//     * @param biome The biome being tested
-//     * @return True if biome is "perfect" false otherwise.
-//     */
-//    public boolean isBiomePerfect(Holder<Biome> biome) {
-//        return this.perfectBiomes.contains(biome);
-//    }
-//
-//    public IDTBiomeHolderSet getPerfectBiomes() {
-//        return perfectBiomes;
-//    }
+    public void setClimateToleranceFloor(float climateToleranceFloor) {
+        this.climateToleranceFloor = climateToleranceFloor;
+    }
 
-    /**
-     * A value that determines what a tree's suitability is before climate manipulation occurs.
-     */
-    public static float defaultSuitability() {
-        return 0.85f;
+    public void setPreferredClimate(ClimateZoneType preferredClimate) {
+        this.preferredClimate = preferredClimate;
     }
     //endregion
 
@@ -1691,21 +1677,69 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     ///////////////////////////////////////////
     //region seasonal
 
-    public void setSeasonalGrowthOffset(@Nullable Float offset) {
-        seasonalGrowthOffset = offset;
-    }
+    /**
+     * default flower holding is relative to the flowering offset, but default is first half of spring
+     */
+    protected float flowerSeasonHoldMin = SeasonHelper.SPRING_START;
+    protected float flowerSeasonHoldMax = SeasonHelper.SPRING_MIDDLE;
 
-    public void setSeasonalSeedDropOffset(@Nullable Float offset) {
-        seasonalSeedDropOffset = offset;
-    }
+    protected final HashMap<ClimateZoneType, Float> seasonalGrowthOffset = new HashMap<>();
+    protected final HashMap<ClimateZoneType, Float> seasonalFruitingOffset = new HashMap<>();
+    protected final HashMap<ClimateZoneType, Float> seasonalSeedDropOffset = new HashMap<>();
+
+    private final float defaultGrowthOffset = 0;
+    private final float defaultFruitingOffset = 0;
+    private final float defaultSeedDropOffset = 1;
 
     /**
      * The default fruiting will PEAK in the middle of summer, starting at the middle of spring and ending at the middle
      * of fall. this offset will move the fruiting by a factor of one season. (an offset of 2.0 will my fruiting peak in
-     * winter). set to null for it to be all year round
+     * winter). set to null for it to be all year round.
+     * For tropical and arid climates it's the same, but they peak in the middle of wet season by default.
      */
+    public void setSeasonalFruitingOffset(ClimateZoneType climate, @Nullable Float offset) {
+        seasonalGrowthOffset.put(climate, offset);
+        //Tropical and arid offsets usually match
+        if (climate == ClimateZoneType.TROPICAL && !seasonalGrowthOffset.containsKey(ClimateZoneType.ARID)){
+            seasonalGrowthOffset.put(ClimateZoneType.ARID, offset);
+        }
+        if (climate == ClimateZoneType.ARID && !seasonalGrowthOffset.containsKey(ClimateZoneType.TROPICAL)){
+            seasonalGrowthOffset.put(ClimateZoneType.TROPICAL, offset);
+        }
+    }
+    public void setSeasonalGrowthOffset(ClimateZoneType climate, @Nullable Float offset) {
+        seasonalFruitingOffset.put(climate, offset);
+        //Tropical and arid offsets usually match
+        if (climate == ClimateZoneType.TROPICAL && !seasonalFruitingOffset.containsKey(ClimateZoneType.ARID)){
+            seasonalFruitingOffset.put(ClimateZoneType.ARID, offset);
+        }
+        if (climate == ClimateZoneType.ARID && !seasonalFruitingOffset.containsKey(ClimateZoneType.TROPICAL)){
+            seasonalFruitingOffset.put(ClimateZoneType.TROPICAL, offset);
+        }
+    }
+    public void setSeasonalSeedDropOffset(ClimateZoneType climate, @Nullable Float offset) {
+        seasonalSeedDropOffset.put(climate, offset);
+        //Tropical and arid offsets usually match
+        if (climate == ClimateZoneType.TROPICAL && !seasonalSeedDropOffset.containsKey(ClimateZoneType.ARID)){
+            seasonalSeedDropOffset.put(ClimateZoneType.ARID, offset);
+        }
+        if (climate == ClimateZoneType.ARID && !seasonalSeedDropOffset.containsKey(ClimateZoneType.TROPICAL)){
+            seasonalSeedDropOffset.put(ClimateZoneType.TROPICAL, offset);
+        }
+    }
+
+    @Deprecated(forRemoval = true)
+    public void setSeasonalGrowthOffset(@Nullable Float offset) {
+        seasonalGrowthOffset.put(preferredClimate, offset);
+    }
+
+    @Deprecated(forRemoval = true)
+    public void setSeasonalSeedDropOffset(@Nullable Float offset) {
+        seasonalSeedDropOffset.put(preferredClimate, offset);
+    }
+    @Deprecated(forRemoval = true)
     public void setSeasonalFruitingOffset(@Nullable Float offset) {
-        seasonalFruitingOffset = offset;
+        seasonalFruitingOffset.put(preferredClimate, offset);
     }
 
     /**
@@ -1716,79 +1750,85 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return Factor from 0.0 (no growth) to 1.0 (full growth).
      */
     public float seasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos) {
-        return seasonalGrowthOffset != null ? SeasonHelper.globalSeasonalGrowthFactor(levelContext, rootPos, -seasonalGrowthOffset) : 1.0f;
+        ClimateZoneType climate = SeasonHelper.getClimate(levelContext.level(), rootPos);
+        Float offset = seasonalGrowthOffset.getOrDefault(climate, defaultGrowthOffset);
+        return offset != null ? SeasonHelper.globalSeasonalGrowthFactor(levelContext, rootPos, -offset) : 1.0f;
     }
 
     public float seasonalSeedDropFactor(LevelContext levelContext, BlockPos pos) {
-        return seasonalSeedDropOffset != null ? SeasonHelper.globalSeasonalSeedDropFactor(levelContext, pos, -seasonalSeedDropOffset) : 1.0f;
+        ClimateZoneType climate = SeasonHelper.getClimate(levelContext.level(), pos);
+        Float offset = seasonalSeedDropOffset.getOrDefault(climate, defaultSeedDropOffset);
+        return offset != null ? SeasonHelper.globalSeasonalSeedDropFactor(levelContext, pos, -offset) : 1.0f;
     }
 
     public float seasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos) {
-        return seasonalFruitingOffset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -seasonalFruitingOffset, false) : 1.0f;
+        ClimateZoneType climate = SeasonHelper.getClimate(levelContext.level(), pos);
+        Float offset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
+        return offset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -offset, false) : 1.0f;
     }
 
     public void inheritSeasonalFruitingOffsetToFruits(){
-        this.fruits.forEach((fruit)->fruit.setSeasonOffset(this.seasonalFruitingOffset));
+//        this.fruits.forEach((fruit)->fruit.setSeasonOffset(this.seasonalFruitingOffset));
     }
 
     public void inheritSeasonalFruitingOffsetToPods(){
-        this.pods.forEach((pod)->pod.setSeasonOffset(this.seasonalFruitingOffset));
+//        this.pods.forEach((pod)->pod.setSeasonOffset(this.seasonalFruitingOffset));
     }
 
     /**
      * 1 = Spring 2 = Summer 4 = Autumn 8 = Winter Values are OR'ed together for the return
      */
     public int getSeasonalTooltipFlags(LevelContext levelContext) {
-        final float seasonStart = 1f / 6;
-        final float seasonEnd = 1 - 1f / 6;
-        final float threshold = 0.75f;
-
-        if (this.hasFruits() || this.hasPods()) {
-            int seasonFlags = 0;
-            for (int i = 0; i < 4; i++) {
-                boolean isValidSeason = false;
-                if (seasonalFruitingOffset != null) {
-                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
-                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonEnd - seasonalFruitingOffset) * 64.0f), 0), true);
-                    if (Math.min(prod1, prod2) > threshold) {
-                        isValidSeason = true;
-                    }
-
-                } else {
-                    isValidSeason = true;
-                }
-
-                if (isValidSeason) {
-                    seasonFlags |= 1 << i;
-                }
-
-            }
-            return seasonFlags;
-        }
+//        final float seasonStart = 1f / 6;
+//        final float seasonEnd = 1 - 1f / 6;
+//        final float threshold = 0.75f;
+//
+//        if (this.hasFruits() || this.hasPods()) {
+//            int seasonFlags = 0;
+//            for (int i = 0; i < 4; i++) {
+//                boolean isValidSeason = false;
+//                if (seasonalFruitingOffset != null) {
+//                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
+//                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonEnd - seasonalFruitingOffset) * 64.0f), 0), true);
+//                    if (Math.min(prod1, prod2) > threshold) {
+//                        isValidSeason = true;
+//                    }
+//
+//                } else {
+//                    isValidSeason = true;
+//                }
+//
+//                if (isValidSeason) {
+//                    seasonFlags |= 1 << i;
+//                }
+//
+//            }
+//            return seasonFlags;
+//        }
 
         return 0;
     }
 
-    /**
-     * When seasons are active allow a seasonal time range where fruit growth does not progress past the flower stage.
-     * This allows for a flowery spring time.
-     *
-     * @param min The minimum season value relative to the fruiting offset.
-     * @param max The maximum season value relative to the fruiting offset.
-     * @return This {@link Species} object for chaining.
-     */
-    public Species setFlowerSeasonHold(float min, float max) {
-        flowerSeasonHoldMin = min;
-        flowerSeasonHoldMax = max;
-        return this;
-    }
-
-    public boolean testFlowerSeasonHold(Float seasonValue) {
-        if (seasonalFruitingOffset == null) {
-            return false;
-        }
-        return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin + seasonalFruitingOffset, flowerSeasonHoldMax + seasonalFruitingOffset);
-    }
+//    /**
+//     * When seasons are active allow a seasonal time range where fruit growth does not progress past the flower stage.
+//     * This allows for a flowery spring time.
+//     *
+//     * @param min The minimum season value relative to the fruiting offset.
+//     * @param max The maximum season value relative to the fruiting offset.
+//     * @return This {@link Species} object for chaining.
+//     */
+//    public Species setFlowerSeasonHold(float min, float max) {
+//        flowerSeasonHoldMin = min;
+//        flowerSeasonHoldMax = max;
+//        return this;
+//    }
+//
+//    public boolean testFlowerSeasonHold(Float seasonValue) {
+//        if (seasonalFruitingOffset == null) {
+//            return false;
+//        }
+//        return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin + seasonalFruitingOffset, flowerSeasonHoldMax + seasonalFruitingOffset);
+//    }
     //endregion
 
     ///////////////////////////////////////////
@@ -2444,7 +2484,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 Pair.of("primitive_sapling", DynamicSaplingBlock.SAPLING_REPLACERS.entrySet().stream()
                         .filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny()
                         .orElse(Blocks.AIR)),
-                Pair.of("perfectBiomes", this.perfectBiomes),
                 Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
                 Pair.of("genFeatures", this.genFeatures));
     }

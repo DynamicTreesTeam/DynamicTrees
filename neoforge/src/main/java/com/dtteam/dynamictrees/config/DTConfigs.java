@@ -150,11 +150,11 @@ public class DTConfigs {
         registerConfig(COMMON_BUILDER.comment("The mod ID of preferred season mod. If a season provider for this mod ID is present, it will be used for integration with seasons. Set this to \"!\" to disable integration or \"*\" to accept the any integration (the first available).")
                 .define(IConfigHelper.PREFERRED_SEASON_MOD, SeasonCompatibilityHandler.ANY));
         registerConfig(COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
-                define(IConfigHelper.ENABLE_SEASONAL_SEED_DROP_FACTOR, true));
+                define(IConfigHelper.ENABLE_SEASONAL_SEED_DROP, true));
         registerConfig(COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
-                define(IConfigHelper.ENABLE_SEASONAL_GROWTH_FACTOR, true));
+                define(IConfigHelper.ENABLE_SEASONAL_GROWTH, true));
         registerConfig(COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").
-                define(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION_FACTOR, true));
+                define(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION, true));
 
         COMMON_BUILDER.pop();
 

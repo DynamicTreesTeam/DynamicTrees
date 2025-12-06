@@ -119,11 +119,11 @@ public class DTConfigs {
         createConfig("The mod ID of preferred season mod. If a season provider for this mod ID is present, it will be used for integration with seasons. Set this to \"!\" to disable integration or \"*\" to accept the any integration (the first available).",
                 IConfigHelper.PREFERRED_SEASON_MOD, SeasonCompatibilityHandler.ANY);
         createConfig("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).",
-                IConfigHelper.ENABLE_SEASONAL_SEED_DROP_FACTOR, true);
+                IConfigHelper.ENABLE_SEASONAL_SEED_DROP, true);
         createConfig("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).",
-                IConfigHelper.ENABLE_SEASONAL_GROWTH_FACTOR, true);
+                IConfigHelper.ENABLE_SEASONAL_GROWTH, true);
         createConfig("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).",
-                IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION_FACTOR, true);
+                IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION, true);
 
 //		configs.addSection("visuals");
 //		fancyThickRings = createConfig("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched",

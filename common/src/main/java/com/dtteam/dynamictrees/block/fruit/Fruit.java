@@ -226,11 +226,6 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
         return isSeasonBetween(seasonValue, min, max);
     }
 
-    @Nullable
-    public final Float getSeasonOffset() {
-        return seasonOffset;
-    }
-
     /**
      * Sets the season offset for fruit production. By default, this will peak in the middle of summer, starting at the
      * middle of spring and ending at the middle of fall. This offset will move the fruiting by a factor of one season.

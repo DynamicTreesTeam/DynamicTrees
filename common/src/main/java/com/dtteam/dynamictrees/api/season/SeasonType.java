@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.api.season;
 
 public enum SeasonType {
-    STANDARD,
+    TEMPERATURE,
     DRY_WET
 }
