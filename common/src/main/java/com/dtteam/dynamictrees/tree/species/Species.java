@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.substance.Emptiable;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffectProvider;
@@ -303,6 +304,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     private final Set<Pod> pods = new HashSet<>();
 
+    private final ClimateZoneType preferredClimate = ClimateZoneType.TEMPERATE;
+
+    /**
+     * default flower holding is relative to the flowering offset, but default is first half of spring
+     */
+    protected float flowerSeasonHoldMin = SeasonHelper.SPRING;
+    protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
+
+    @Nullable
+    protected Float seasonalGrowthOffset = 0f;
+    @Nullable
+    protected Float seasonalSeedDropOffset = 0f;
+    @Nullable
+    protected Float seasonalFruitingOffset = 0f;
+
     /**
      * Blank constructor for {@link #NULL_SPECIES}.
      */
@@ -421,101 +437,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public Component getTextComponent() {
         return this.formatComponent(Component.translatable(this.getUnlocalizedName()), ChatFormatting.AQUA);
     }
-
-    public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
-        this.tapering = tapering;
-        this.signalEnergy = energy;
-        this.upProbability = upProbability;
-        this.lowestBranchHeight = lowestBranchHeight;
-        this.growthRate = growthRate;
-        return this;
-    }
-
-    public void setTapering(float tapering) {
-        this.tapering = tapering;
-    }
-
-    public void setUpProbability(int upProbability) {
-        this.upProbability = upProbability;
-    }
-
-    public void setLowestBranchHeight(int lowestBranchHeight) {
-        this.lowestBranchHeight = lowestBranchHeight;
-    }
-
-    public void setSignalEnergy(float signalEnergy) {
-        this.signalEnergy = signalEnergy;
-    }
-
-    public void setGrowthRate(float growthRate) {
-        this.growthRate = growthRate;
-    }
-
-    public float getSignalEnergy() {
-        return signalEnergy;
-    }
-
-    public float getEnergy(Level level, BlockPos rootPos) {
-        return this.logicKit.getEnergy(new PositionalSpeciesContext(level, rootPos, this));
-    }
-
-    public float getGrowthRate(Level level, BlockPos rootPos) {
-        return this.growthRate * this.seasonalGrowthFactor(LevelContext.create(level), rootPos);
-    }
-
-    /**
-     * Probability reinforcer for up direction which is arguably the direction most trees generally grow in.
-     */
-    public int getUpProbability() {
-        return upProbability;
-    }
-
-    /**
-     * Probability reinforcer for current travel direction
-     */
-    public int getProbabilityForCurrentDir() {
-        return 1;
-    }
-
-    public int getLowestBranchHeight() {
-        return lowestBranchHeight;
-    }
-
-    public float getTapering() {
-        return tapering;
-    }
-
-    /**
-     * Works out if this {@link Species} will require a {@link SpeciesBlockEntity} at the given position. It should
-     * require one if it's not the common species, and it's not in its common species override for the given position.
-     *
-     * @param level The {@link LevelAccessor} the tree is being planted in.
-     * @param pos   The {@link BlockPos} at which the tree is being planted at.
-     * @return True if it will require a {@link SpeciesBlockEntity}.
-     */
-    public boolean doesRequireTileEntity(LevelAccessor level, BlockPos pos) {
-        return !this.isCommonSpecies() && !this.shouldOverrideCommon(level, pos);
-    }
-
-    public boolean hasCommonOverride() {
-        return this.commonOverride != null;
-    }
-
-    public void setCommonOverride(final CommonOverride commonOverride) {
-        this.commonOverride = commonOverride;
-    }
-
-    public boolean shouldOverrideCommon(final BlockGetter level, final BlockPos trunkPos) {
-        //Common Override test will fail if the server has not loaded yet
-        if (Services.MISC.getCurrentServer() == null) {
-            DynamicTrees.LOG.warn("shouldOverrideCommon was called before the server was loaded, will return false for now.");
-            return false;
-        }
-        return this.hasCommonOverride() && this.commonOverride.test(level, trunkPos);
-    }
-
-    @FunctionalInterface
-    public interface CommonOverride extends BiPredicate<BlockGetter, BlockPos> { }
 
     ///////////////////////////////////////////
     //LEAVES
@@ -1316,12 +1237,107 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public boolean soilDestroyAction (Level level, @NotNull BlockPos rootPos, BlockState state, @NotNull Player player){
         return false;
     }
+
+    /**
+     * Works out if this {@link Species} will require a {@link SpeciesBlockEntity} at the given position. It should
+     * require one if it's not the common species, and it's not in its common species override for the given position.
+     *
+     * @param level The {@link LevelAccessor} the tree is being planted in.
+     * @param pos   The {@link BlockPos} at which the tree is being planted at.
+     * @return True if it will require a {@link SpeciesBlockEntity}.
+     */
+    public boolean doesRequireTileEntity(LevelAccessor level, BlockPos pos) {
+        return !this.isCommonSpecies() && !this.shouldOverrideCommon(level, pos);
+    }
+
+    public boolean hasCommonOverride() {
+        return this.commonOverride != null;
+    }
+
+    public void setCommonOverride(final CommonOverride commonOverride) {
+        this.commonOverride = commonOverride;
+    }
+
+    public boolean shouldOverrideCommon(final BlockGetter level, final BlockPos trunkPos) {
+        //Common Override test will fail if the server has not loaded yet
+        if (Services.MISC.getCurrentServer() == null) {
+            DynamicTrees.LOG.warn("shouldOverrideCommon was called before the server was loaded, will return false for now.");
+            return false;
+        }
+        return this.hasCommonOverride() && this.commonOverride.test(level, trunkPos);
+    }
+
+    @FunctionalInterface
+    public interface CommonOverride extends BiPredicate<BlockGetter, BlockPos> { }
     //endregion
 
     ///////////////////////////////////////////
     // GROWTH
     ///////////////////////////////////////////
     //region growth
+
+    public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
+        this.tapering = tapering;
+        this.signalEnergy = energy;
+        this.upProbability = upProbability;
+        this.lowestBranchHeight = lowestBranchHeight;
+        this.growthRate = growthRate;
+        return this;
+    }
+
+    public void setTapering(float tapering) {
+        this.tapering = tapering;
+    }
+
+    public void setUpProbability(int upProbability) {
+        this.upProbability = upProbability;
+    }
+
+    public void setLowestBranchHeight(int lowestBranchHeight) {
+        this.lowestBranchHeight = lowestBranchHeight;
+    }
+
+    public void setSignalEnergy(float signalEnergy) {
+        this.signalEnergy = signalEnergy;
+    }
+
+    public void setGrowthRate(float growthRate) {
+        this.growthRate = growthRate;
+    }
+
+    public float getSignalEnergy() {
+        return signalEnergy;
+    }
+
+    public float getEnergy(Level level, BlockPos rootPos) {
+        return this.logicKit.getEnergy(new PositionalSpeciesContext(level, rootPos, this));
+    }
+
+    public float getGrowthRate(Level level, BlockPos rootPos) {
+        return this.growthRate * this.seasonalGrowthFactor(LevelContext.create(level), rootPos);
+    }
+
+    /**
+     * Probability reinforcer for up direction which is arguably the direction most trees generally grow in.
+     */
+    public int getUpProbability() {
+        return upProbability;
+    }
+
+    /**
+     * Probability reinforcer for current travel direction
+     */
+    public int getProbabilityForCurrentDir() {
+        return 1;
+    }
+
+    public int getLowestBranchHeight() {
+        return lowestBranchHeight;
+    }
+
+    public float getTapering() {
+        return tapering;
+    }
 
     /**
      * Basic update. This handles everything for the species Rot, Drops, Fruit, Disease, and Growth respectively. If the
@@ -1599,11 +1615,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         return false;
     }
-    //end region
+    //endregion
 
-    //////////////////////////////
+    ///////////////////////////////////////////
     // BIOME HANDLING
-    //////////////////////////////
+    ///////////////////////////////////////////
     //region biome-handling
 
     /**
@@ -1670,23 +1686,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
     //endregion
 
-    //////////////////////////////
+    ///////////////////////////////////////////
     // SEASONAL
-    //////////////////////////////
+    ///////////////////////////////////////////
     //region seasonal
-
-    /**
-     * default flower holding is relative to the flowering offset, but default is first half of spring
-     */
-    protected float flowerSeasonHoldMin = SeasonHelper.SPRING;
-    protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
-
-    @Nullable
-    protected Float seasonalGrowthOffset = 0f;
-    @Nullable
-    protected Float seasonalSeedDropOffset = 0f;
-    @Nullable
-    protected Float seasonalFruitingOffset = 0f;
 
     public void setSeasonalGrowthOffset(@Nullable Float offset) {
         seasonalGrowthOffset = offset;
@@ -1788,9 +1791,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
     //endregion
 
-    //////////////////////////////
+    ///////////////////////////////////////////
     // INTERACTIVE
-    //////////////////////////////
+    ///////////////////////////////////////////
     //region interactive
 
     @Nullable

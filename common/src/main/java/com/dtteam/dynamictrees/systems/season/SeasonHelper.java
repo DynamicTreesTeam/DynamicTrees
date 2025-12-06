@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.systems.season;
 
+import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.season.SeasonManager;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.platform.Services;
@@ -79,7 +80,7 @@ public class SeasonHelper {
      * Tests if the position in level is considered tropical and thus follows tropical season rules.
      */
     static public boolean isTropical(Level level, BlockPos pos) {
-        return seasonManager.isTropical(level, pos);
+        return seasonManager.getClimate(level, pos) == ClimateZoneType.TROPICAL;
     }
 
     /**

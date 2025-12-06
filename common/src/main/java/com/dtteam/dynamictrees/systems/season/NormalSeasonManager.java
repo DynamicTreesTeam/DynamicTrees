@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,25 +46,40 @@ public class NormalSeasonManager implements SeasonManager {
 
 
     ////////////////////////////////////////////////////////////////
-    // Tropical Predicate
+    // Climate Predicates
     ////////////////////////////////////////////////////////////////
 
+    static private final float ARID_THRESHHOLD = 1.0f;
     static private final float TROPICAL_THRESHHOLD = 0.8f; //Same threshold used by Serene Seasons.  Seems smart enough
+    static private final float COLD_THRESHHOLD = 0.2f;
 
     private BiPredicate<Level, BlockPos> isTropical = (level, rootPos) -> level.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value().getBaseTemperature() > TROPICAL_THRESHHOLD;
+    private BiPredicate<Level, BlockPos> isCold = (level, rootPos) -> level.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value().getBaseTemperature() < COLD_THRESHHOLD;
+    private BiPredicate<Level, BlockPos> isArid = (level, rootPos) -> {
+        Biome b = level.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value();
+        return (b.getBaseTemperature() >= ARID_THRESHHOLD || !b.hasPrecipitation());
+    };
 
-    /**
-     * Set the global predicate that determines if a world location is tropical. Predicate should return true if
-     * tropical, false if temperate.
-     */
     public void setTropicalPredicate(BiPredicate<Level, BlockPos> predicate) {
         isTropical = predicate;
     }
-
-    public boolean isTropical(Level level, BlockPos rootPos) {
-        return isTropical.test(level, rootPos);
+    public void setAridPredicate(BiPredicate<Level, BlockPos> predicate) {
+        isArid = predicate;
+    }
+    public void setColdPredicate(BiPredicate<Level, BlockPos> predicate) {
+        isCold = predicate;
     }
 
+    /**
+     * Predicates should return true if tropical, arid or cold, respectively.
+     * If all fail the location is determined to be temperate.
+     */
+    public ClimateZoneType getClimate(Level level, BlockPos rootPos) {
+        if (isCold.test(level, rootPos)) return ClimateZoneType.COLD;
+        if (isArid.test(level, rootPos)) return ClimateZoneType.ARID;
+        if (isTropical.test(level, rootPos)) return ClimateZoneType.TROPICAL;
+        return ClimateZoneType.TEMPERATE;
+    }
 
     ////////////////////////////////////////////////////////////////
     // ISeasonManager Interface
@@ -75,12 +91,14 @@ public class NormalSeasonManager implements SeasonManager {
 
     public float getGrowthFactor(Level level, BlockPos rootPos, float offset) {
         SeasonContext context = getContext(level);
-        return isTropical(level, rootPos) ? context.getTropicalGrowthFactor(offset) : context.getTemperateGrowthFactor(offset);
+        ClimateZoneType climate = getClimate(level, rootPos);
+        return context.getGrowthFactor(offset, climate);
     }
 
     public float getSeedDropFactor(Level level, BlockPos rootPos, float offset) {
         SeasonContext context = getContext(level);
-        return isTropical(level, rootPos) ? context.getTropicalSeedDropFactor(offset) : context.getTemperateSeedDropFactor(offset);
+        ClimateZoneType climate = getClimate(level, rootPos);
+        return context.getSeedDropFactor(offset, climate);
     }
 
     @Override
@@ -90,7 +108,8 @@ public class NormalSeasonManager implements SeasonManager {
         }
 
         SeasonContext context = getContext(level);
-        return isTropical(level, rootPos) ? context.getTropicalFruitProductionFactor(offset) : context.getTemperateFruitProductionFactor(offset);
+        ClimateZoneType climate = getClimate(level, rootPos);
+        return context.getFruitProductionFactor(offset, climate);
     }
 
     @Override
@@ -101,7 +120,8 @@ public class NormalSeasonManager implements SeasonManager {
     @Override
     public Float getPeakFruitProductionSeasonValue(Level level, BlockPos rootPos, float offset) {
         SeasonContext context = getContext(level);
-        return isTropical(level, rootPos) ? context.getTropicalPeakFruitProductionSeasonValue(offset) : context.getTemperatePeakFruitProductionSeasonValue(offset);
+        ClimateZoneType climate = getClimate(level, rootPos);
+        return context.getPeakFruitProductionSeasonValue(offset, climate);
     }
 
     @Override
@@ -116,7 +136,7 @@ public class NormalSeasonManager implements SeasonManager {
             if (seasonContextMap.containsKey(dimLoc)) {
                 SeasonContext context = seasonContextMap.get(dimLoc);
                 SeasonGrowthCalculator calculator = context.getCalculator();
-                return calculator.calcFruitProduction(seasonValue + offset, tropical ? ClimateZoneType.TROPICAL : ClimateZoneType.TEMPERATE);
+                return calculator.calcFruitProductionRate(seasonValue + offset, tropical ? ClimateZoneType.TROPICAL : ClimateZoneType.TEMPERATE);
             }
         }
         return 0.0f;

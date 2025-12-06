@@ -24,7 +24,7 @@ public interface SeasonManager {
 
     Float getPeakFruitProductionSeasonValue(Level level, BlockPos rootPos, float offset);
 
-    boolean isTropical(Level level, BlockPos rootPos);
+    ClimateZoneType getClimate(Level level, BlockPos rootPos);
 
     boolean shouldSnowMelt(Level level, BlockPos pos);
 

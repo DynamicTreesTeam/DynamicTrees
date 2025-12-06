@@ -61,8 +61,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
 
     @Override
     public void registerAppliers() {
-        this.environmentFactorAppliers.register(new TagKeyJsonPropertyApplier<>(Registries.BIOME, Species.class,
-                (TriConsumer<TagKey<Biome>, Species, Float>) (tagKey, species, factor) -> species.envFactor(tagKey, factor)));
+//        this.environmentFactorAppliers.register(new TagKeyJsonPropertyApplier<>(Registries.BIOME, Species.class,
+//                (TriConsumer<TagKey<Biome>, Species, Float>) (tagKey, species, factor) -> species.envFactor(tagKey, factor)));
 
         JsonDeserializers.register(Species.CommonOverride.class, input ->
                 JsonDeserializers.BIOME_PREDICATE.deserialize(input)
@@ -113,8 +113,8 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("primitive_sapling", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .registerArrayApplier("primitive_saplings", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .register("common_override", Species.CommonOverride.class, Species::setCommonOverride)
-                .register("perfect_biomes", IDTBiomeHolderSet.class,
-                        (species, biomeList) -> species.getPerfectBiomes().getIncludeComponents().add(biomeList))
+//                .register("perfect_biomes", IDTBiomeHolderSet.class,
+//                        (species, biomeList) -> species.getPerfectBiomes().getIncludeComponents().add(biomeList))
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (Applier<Species, String>) this::addAcceptableSoil)
