@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.treepack.loader;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.resource.loading.preparation.JsonRegistryResourceLoader;
+import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.pod.Pod;
@@ -13,6 +14,7 @@ import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
 import com.dtteam.dynamictrees.deserialization.TagKeyJsonPropertyApplier;
 import com.dtteam.dynamictrees.deserialization.applier.Applier;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
+import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
@@ -20,7 +22,6 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
-import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -51,7 +52,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
      * A {@link JsonPropertyAppliers} for applying environment factors to {@link Species} objects.
      * (based on Forge's BiomeType).
      */
-    private final JsonPropertyAppliers<Species> environmentFactorAppliers = new JsonPropertyAppliers<>(Species.class);
+    private final JsonPropertyAppliers<Species> seasonOffsetAppliers = new JsonPropertyAppliers<>(Species.class);
 
     private final Map<Species, Float> composterChanceCache = new HashMap<>();
 
@@ -61,8 +62,10 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
 
     @Override
     public void registerAppliers() {
-//        this.environmentFactorAppliers.register(new TagKeyJsonPropertyApplier<>(Registries.BIOME, Species.class,
-//                (TriConsumer<TagKey<Biome>, Species, Float>) (tagKey, species, factor) -> species.envFactor(tagKey, factor)));
+        this.seasonOffsetAppliers
+                .registerMapApplier("fruiting", Float.class, Species::setSeasonalFruitingOffset)
+                .registerMapApplier("seed_drop", Float.class, Species::setSeasonalSeedDropOffset)
+        .registerMapApplier("growth", Float.class, Species::setSeasonalGrowthOffset);;
 
         JsonDeserializers.register(Species.CommonOverride.class, input ->
                 JsonDeserializers.BIOME_PREDICATE.deserialize(input)
@@ -103,7 +106,6 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("growth_logic_kit", GrowthLogicKitConfiguration.class, Species::setGrowthLogicKit)
                 .register("leaves_properties", LeavesProperties.class, Species::setLeavesProperties)
                 .register("world_gen_leaf_map_height", Integer.class, Species::setWorldGenLeafMapHeight)
-                .register("environment_factors", JsonObject.class, this::applyEnvironmentFactors)
                 .register("mega_species", ResourceLocation.class, this::setMegaSpecies)
                 .register("can_craft_mega_seed", Boolean.class, Species::setCanCraftMegaSeed)
                 .register("seed", Seed.class, (species, seed) -> species.setSeed(() -> seed))
@@ -125,16 +127,29 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .registerArrayApplier("features", GenFeatureConfiguration.class, Species::addGenFeature)
                 .register("does_rot", Boolean.class, Species::setDoesRot)
                 .register("drop_seeds", Boolean.class, Species::setDropSeeds)
-                .register("seasonal_seed_drop_offset", Float.class, Species::setSeasonalSeedDropOffset)
-                .register("seasonal_growth_offset", Float.class, Species::setSeasonalGrowthOffset)
-                .register("seasonal_fruiting_offset", Float.class, Species::setSeasonalFruitingOffset)
+                .register("preferred_climate", ClimateZoneType.class, Species::setPreferredClimate)
+                .register("seasonal_offsets", JsonObject.class, this::applySeasonalOffsets)
+                .register("climate_tolerance_floor", Float.class, Species::setClimateToleranceFloor)
                 .register("inherit_fruiting_offset_to_fruits", Boolean.class, (species, doInherit)->{
                     if (doInherit) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingOffsetToFruits); })
                 .register("inherit_fruiting_offset_to_pods", Boolean.class, (species, doInherit)->{
                     if (doInherit) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingOffsetToPods); })
                 .register("big_tree_sound_threshold", Float.class, Species::setBigTreeSoundThreshold)
                 .register("plantable_on_fluid", Boolean.class, Species::setPlantableOnFluid)
-                .register("allowed_water_height_for_world_gen", Integer.class, Species::setAllowedWaterHeightForWorldgen);
+                .register("allowed_water_height_for_world_gen", Integer.class, Species::setAllowedWaterHeightForWorldgen)
+
+                .register("seasonal_seed_drop_offset", Float.class, (s,o)->
+                        LOGGER.error("The \"seasonal_seed_drop_offset\" property has been removed. Use \"seasonal_offsets\" instead! Species {}.", s.getRegistryName())
+                )
+                .register("seasonal_growth_offset", Float.class, (s,o)->
+                        LOGGER.error("The \"seasonal_growth_offset\" property has been removed. Use \"seasonal_offsets\" instead! Species {}.", s.getRegistryName())
+                )
+                .register("seasonal_fruiting_offset", Float.class, (s,o)->
+                        LOGGER.error("The \"seasonal_fruiting_offset\" property has been removed. Use \"seasonal_offsets\" instead! Species {}.", s.getRegistryName())
+                )
+                .register("environment_factors", JsonObject.class, (s,o)->
+                        LOGGER.error("The \"environment_factors\" property has been removed. Use \"preferred_climate\" instead! Species {}.", s.getRegistryName())
+                );
 
         registerMangroveAppliers();
 
@@ -166,12 +181,12 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         });
     }
 
-    private void applyEnvironmentFactors(Species species, JsonObject jsonObject) {
-        this.environmentFactorAppliers.applyAll(new JsonMapWrapper(jsonObject), species)
+    private void applySeasonalOffsets(Species species, JsonObject jsonObject) {
+        this.seasonOffsetAppliers.applyAll(new JsonMapWrapper(jsonObject), species)
                 .forEachErrorWarning(
-                        error -> LOGGER.error("Error applying environment factor for " +
+                        error -> LOGGER.error("Error applying seasonal offsets for " +
                                 "species '{}': {}", species.getRegistryName(), error),
-                        warning -> LOGGER.warn("Warning applying environment factor for " +
+                        warning -> LOGGER.warn("Warning applying seasonal offsets for " +
                                 "species '{}': {}", species.getRegistryName(), warning)
                 );
     }

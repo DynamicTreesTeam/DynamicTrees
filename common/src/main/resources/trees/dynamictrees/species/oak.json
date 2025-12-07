@@ -4,13 +4,8 @@
     "signal_energy": 12.0,
     "growth_rate": 0.8,
     "leaves_properties": "oak",
-    "environment_factors" : {
-        "#c:is_cold": 0.75,
-        "#c:is_hot": 0.5,
-        "#c:is_dry": 0.5,
-        "#is_forest": 1.05
-    },
-    "perfect_biomes": { "types": [ "forest", "overworld" ] },
+    "preferred_climate" : "temperate",
+    "climate_tolerance_floor": 0.5,
     "primitive_sapling": "oak_sapling",
     "features" : [
         {

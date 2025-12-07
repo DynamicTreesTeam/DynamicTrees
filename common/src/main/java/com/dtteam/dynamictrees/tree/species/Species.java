@@ -75,6 +75,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -116,7 +117,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -922,6 +925,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 transitionToTree(level, pos, getFamily());
     }
 
+//    private void debugPrint(Level level, BlockPos pos){
+//        var player = Minecraft.getInstance().player;
+//        if (player != null){
+//            ClimateZoneType climate = SeasonHelper.getClimate(level, pos);
+//            LevelContext context = LevelContext.create(level);
+//            player.sendSystemMessage(Component.literal( "Current climate: "+climate));
+//            player.sendSystemMessage(Component.literal( "Preferred climate: "+preferredClimate));
+//            player.sendSystemMessage(Component.literal("Climate suitability: "+ClimateHandler.climateMultiplier(preferredClimate, climate, climateToleranceFloor)));
+//            player.sendSystemMessage(Component.literal("Fruiting offset: "+seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset)));
+//            player.sendSystemMessage(Component.literal("Fruiting factor: "+seasonalFruitProductionFactor(context, pos)));
+//        }
+//    }
+
     protected boolean shouldTransitionToTree(Level level, BlockPos pos) {
         return level.isEmptyBlock(pos.above()) && isAcceptableSoil(level, pos.below(), level.getBlockState(pos.below()));
     }
@@ -1697,7 +1713,28 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * winter). set to null for it to be all year round.
      * For tropical and arid climates it's the same, but they peak in the middle of wet season by default.
      */
+    public void setSeasonalFruitingOffset(Map<String, Float> offsets) {
+        offsets.forEach((key, value)->setSeasonalFruitingOffset(ClimateZoneType.valueOf(key.toUpperCase(Locale.ENGLISH)), value));
+    }
     public void setSeasonalFruitingOffset(ClimateZoneType climate, @Nullable Float offset) {
+        seasonalFruitingOffset.put(climate, offset);
+        //Tropical and arid offsets usually match
+        if (climate == ClimateZoneType.TROPICAL && !seasonalFruitingOffset.containsKey(ClimateZoneType.ARID)){
+            seasonalFruitingOffset.put(ClimateZoneType.ARID, offset);
+        }
+        if (climate == ClimateZoneType.ARID && !seasonalFruitingOffset.containsKey(ClimateZoneType.TROPICAL)){
+            seasonalFruitingOffset.put(ClimateZoneType.TROPICAL, offset);
+        }
+        //Fruiting season often defines seeding season (1 season after)
+        if (!seasonalSeedDropOffset.containsKey(climate)){
+            setSeasonalSeedDropOffset(climate, offset == null ? null : offset + 1);
+        }
+    }
+
+    public void setSeasonalGrowthOffset(Map<String, Float> offsets) {
+        offsets.forEach((key, value)->setSeasonalGrowthOffset(ClimateZoneType.valueOf(key.toUpperCase(Locale.ENGLISH)), value));
+    }
+    public void setSeasonalGrowthOffset(ClimateZoneType climate, @Nullable Float offset) {
         seasonalGrowthOffset.put(climate, offset);
         //Tropical and arid offsets usually match
         if (climate == ClimateZoneType.TROPICAL && !seasonalGrowthOffset.containsKey(ClimateZoneType.ARID)){
@@ -1707,15 +1744,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             seasonalGrowthOffset.put(ClimateZoneType.TROPICAL, offset);
         }
     }
-    public void setSeasonalGrowthOffset(ClimateZoneType climate, @Nullable Float offset) {
-        seasonalFruitingOffset.put(climate, offset);
-        //Tropical and arid offsets usually match
-        if (climate == ClimateZoneType.TROPICAL && !seasonalFruitingOffset.containsKey(ClimateZoneType.ARID)){
-            seasonalFruitingOffset.put(ClimateZoneType.ARID, offset);
-        }
-        if (climate == ClimateZoneType.ARID && !seasonalFruitingOffset.containsKey(ClimateZoneType.TROPICAL)){
-            seasonalFruitingOffset.put(ClimateZoneType.TROPICAL, offset);
-        }
+
+    public void setSeasonalSeedDropOffset(Map<String, Float> offsets) {
+        offsets.forEach((key, value)->setSeasonalSeedDropOffset(ClimateZoneType.valueOf(key.toUpperCase(Locale.ENGLISH)), value));
     }
     public void setSeasonalSeedDropOffset(ClimateZoneType climate, @Nullable Float offset) {
         seasonalSeedDropOffset.put(climate, offset);

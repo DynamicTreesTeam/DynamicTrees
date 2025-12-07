@@ -9,11 +9,8 @@
     "soil_longevity": 3,
     "growth_logic_kit": "nether_fungus",
     "leaves_properties": "crimson",
-    "environment_factors" : {
-        "#c:is_cold": 0.25,
-        "#c:is_wet": 0.75
-    },
-    "perfect_biomes": { "name": "minecraft:crimson_forest" },
+    "preferred_climate" : "arid",
+    "climate_tolerance_floor": 0.3,
     "primitive_sapling": "crimson_fungus",
     "acceptable_soils": ["nether_soil_like", "fungus_like", "dirt_like"],
     "acceptable_growth_blocks": ["minecraft:crimson_nylium", "dynamictrees:rooty_crimson_nylium"],

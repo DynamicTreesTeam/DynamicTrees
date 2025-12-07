@@ -6,11 +6,7 @@
     "lowest_branch_height": 3,
     "growth_rate": 0.7,
     "leaves_properties": "acacia",
-    "environment_factors" : {
-        "#c:is_cold": 0.25,
-        "#is_nether": 0.75,
-        "#c:is_wet": 0.75
-    },
-    "perfect_biomes": { "tag": "#minecraft:is_savanna" },
+    "preferred_climate" : "arid",
+    "climate_tolerance_floor": 0.7,
     "primitive_sapling": "acacia_sapling"
 }

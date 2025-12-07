@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.deserialization;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.CellKit;
 import com.dtteam.dynamictrees.api.configuration.PropertyDefinition;
+import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.worldgen.BiomePredicate;
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
@@ -264,6 +265,8 @@ public final class JsonDeserializers {
             register(GenerationStep.Decoration.class, new EnumDeserializer<>(GenerationStep.Decoration.class));
     public static final JsonDeserializer<BiomeDatabase.Operation> OPERATION =
             register(BiomeDatabase.Operation.class, new EnumDeserializer<>(BiomeDatabase.Operation.class));
+    public static final JsonDeserializer<ClimateZoneType> CLIMATE =
+            register(ClimateZoneType.class, new EnumDeserializer<>(ClimateZoneType.class));
 
     public static final JsonDeserializer<IDTBiomeHolderSet> BIOME_LIST = register(IDTBiomeHolderSet.class, new BiomeListDeserializer());
     public static final JsonDeserializer<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->
