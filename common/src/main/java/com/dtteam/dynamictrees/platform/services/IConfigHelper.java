@@ -58,6 +58,7 @@ public interface IConfigHelper {
     String ENABLE_SEASONAL_SEED_DROP = "enableSeasonalSeedDropFactor";
     String ENABLE_SEASONAL_GROWTH = "enableSeasonalGrowthFactor";
     String ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION = "enableSeasonalFruitProductionFactor";
+    String WET_SEASON_OFFSET = "wetSeasonOffset";
 
     String DEBUG = "debug";
 

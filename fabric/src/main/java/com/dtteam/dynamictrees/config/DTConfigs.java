@@ -124,6 +124,8 @@ public class DTConfigs {
                 IConfigHelper.ENABLE_SEASONAL_GROWTH, true);
         createConfig("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).",
                 IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION, true);
+        createConfig("The seasonal offset of the wet season relative to summer. Tropical and arid climates use wet/dry seasons instead of regular summer/fall/winter/spring seasons. Tree growth and fruit production usually peak during the wet season. If set to 0.0 the wet season happens at the same time as summer. The default of 1.5 means it happens between fall and winter.",
+                IConfigHelper.WET_SEASON_OFFSET, 1.5, 0.0, 4.0);
 
 //		configs.addSection("visuals");
 //		fancyThickRings = createConfig("Rings of thick trees are rendered using a texture created with an expanded tangram construction technique. Otherwise the ring texture is simply stretched",
