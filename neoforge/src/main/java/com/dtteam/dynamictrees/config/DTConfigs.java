@@ -155,6 +155,8 @@ public class DTConfigs {
                 define(IConfigHelper.ENABLE_SEASONAL_GROWTH, true));
         registerConfig(COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").
                 define(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION, true));
+        registerConfig(COMMON_BUILDER.comment("The seasonal offset of the wet season relative to summer. Tropical and arid climates use wet/dry seasons instead of regular summer/fall/winter/spring seasons. Tree growth and fruit production usually peak during the wet season. If set to 0.0 the wet season happens at the same time as summer. The default of 1.5 means it happens between fall and winter.").
+                defineInRange(IConfigHelper.WET_SEASON_OFFSET, 1.5, 0.0, 4.0));
 
         COMMON_BUILDER.pop();
 

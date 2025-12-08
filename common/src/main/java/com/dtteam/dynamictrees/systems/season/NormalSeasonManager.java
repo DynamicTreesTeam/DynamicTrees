@@ -50,6 +50,7 @@ public class NormalSeasonManager implements SeasonManager {
     ////////////////////////////////////////////////////////////////
 
     static private final float ARID_THRESHHOLD = 1.0f;
+    static private final float ARID_DOWNFALL_THRESHHOLD = 0.0f;
     static private final float TROPICAL_THRESHHOLD = 0.8f; //Same threshold used by Serene Seasons.  Seems smart enough
     static private final float COLD_THRESHHOLD = 0.2f;
 
@@ -57,7 +58,7 @@ public class NormalSeasonManager implements SeasonManager {
     private BiPredicate<Level, BlockPos> isCold = (level, rootPos) -> level.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value().getBaseTemperature() < COLD_THRESHHOLD;
     private BiPredicate<Level, BlockPos> isArid = (level, rootPos) -> {
         Biome b = level.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value();
-        return (b.getBaseTemperature() >= ARID_THRESHHOLD || !b.hasPrecipitation());
+        return (b.getBaseTemperature() >= ARID_THRESHHOLD); // || b.climateSettings.downfall() <= ARID_DOWNFALL_THRESHHOLD
     };
 
     public void setTropicalPredicate(BiPredicate<Level, BlockPos> predicate) {
