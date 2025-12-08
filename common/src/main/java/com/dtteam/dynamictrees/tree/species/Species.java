@@ -28,6 +28,7 @@ import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
+import com.dtteam.dynamictrees.client.RootColorCache;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.data.Generator;
@@ -117,9 +118,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -925,19 +924,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 transitionToTree(level, pos, getFamily());
     }
 
-//    private void debugPrint(Level level, BlockPos pos){
-//        var player = Minecraft.getInstance().player;
-//        if (player != null){
-//            ClimateZoneType climate = SeasonHelper.getClimate(level, pos);
-//            LevelContext context = LevelContext.create(level);
-//            player.sendSystemMessage(Component.literal( "Current climate: "+climate));
-//            player.sendSystemMessage(Component.literal( "Preferred climate: "+preferredClimate));
-//            player.sendSystemMessage(Component.literal("Climate suitability: "+ClimateHandler.climateMultiplier(preferredClimate, climate, climateToleranceFloor)));
-//            player.sendSystemMessage(Component.literal("Fruiting offset: "+seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset)));
-//            player.sendSystemMessage(Component.literal("Fruiting factor: "+seasonalFruitProductionFactor(context, pos)));
-//        }
-//    }
-
     protected boolean shouldTransitionToTree(Level level, BlockPos pos) {
         return level.isEmptyBlock(pos.above()) && isAcceptableSoil(level, pos.below(), level.getBlockState(pos.below()));
     }
@@ -1671,12 +1657,17 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return 1.0f; //Replaces "Perfect biome" check
         }
 
-        double suit = ClimateHandler.climateMultiplier(preferredClimate, currentClimate, climateToleranceFloor);
+        double suit = getClimateSuitabilityMultiplier(level, pos);
 
         //Linear interpolation of suitability with universal growth scalar
         suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
 
         return (float)Mth.clamp(suit, 0.0, 1.0);
+    }
+
+    public double getClimateSuitabilityMultiplier(Level level, BlockPos pos){
+        ClimateZoneType climate = SeasonHelper.getClimate(level, pos);
+        return ClimateHandler.climateMultiplier(preferredClimate, climate, climateToleranceFloor);
     }
 
     public void setClimateToleranceFloor(float climateToleranceFloor) {
@@ -1685,6 +1676,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public void setPreferredClimate(ClimateZoneType preferredClimate) {
         this.preferredClimate = preferredClimate;
+    }
+
+    public ClimateZoneType getPreferredClimate() {
+        return preferredClimate;
     }
     //endregion
 
@@ -1926,6 +1921,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return True if action was handled, false otherwise.
      */
     public boolean onTreeActivated(Family.TreeActivationContext context) {
+        debugPrint(context);
+
         if (context.heldItem() != null) { // Ensure there is something in the player's hand.
             if (applySubstance(context.level(), context.rootPos(), context.hitPos(), context.player(), context.hand(),
                     context.heldItem())) {
@@ -1935,6 +1932,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         return false;
+    }
+
+    private void debugPrint(Family.TreeActivationContext context) {
+        var level = context.level();
+        var pos = context.rootPos();
+        Player player = context.player();
+        ClimateZoneType climate = SeasonHelper.getClimate(level, pos);
+        LevelContext lContext = LevelContext.create(level);
+        player.sendSystemMessage(Component.literal( "Current climate: "+climate));
+        player.sendSystemMessage(Component.literal( "Preferred climate: "+preferredClimate));
+        player.sendSystemMessage(Component.literal("Climate suitability: "+ getClimateSuitabilityMultiplier(level, pos)));
+        player.sendSystemMessage(Component.literal("Fruiting offset: "+seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset)));
+        player.sendSystemMessage(Component.literal("Fruiting factor: "+seasonalFruitProductionFactor(lContext, pos)));
     }
 
     /**

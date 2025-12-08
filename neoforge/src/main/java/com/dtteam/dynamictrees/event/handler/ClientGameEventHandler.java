@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
+import com.dtteam.dynamictrees.client.RootColorCache;
 import com.dtteam.dynamictrees.client.Tooltips;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
@@ -10,13 +11,25 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.event.level.ChunkWatchEvent;
 
 @EventBusSubscriber(modid = DynamicTrees.MOD_ID, value = Dist.CLIENT)
 public class ClientGameEventHandler {
+
+    ///////////////////////////////////////////
+    // CHUNK
+    ///////////////////////////////////////////
+
+    @SubscribeEvent
+    public static void onChunkUnwatch(ChunkWatchEvent.UnWatch event) {
+        ChunkPos chunk = event.getPos();
+        RootColorCache.invalidateChunk(chunk);
+    }
 
     ///////////////////////////////////////////
     // ITEM

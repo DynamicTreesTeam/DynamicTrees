@@ -26,6 +26,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -525,7 +526,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         }
     }
 
-
     /**
      * If the leaves block should tick and age. May return {@code false} to allow for dead leaves.
      *
@@ -681,7 +681,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
             if (code.startsWith("@")) {
                 code = code.substring(1);
                 if ("biome".equals(code)) { // Built in code since we need access to super.
-                    this.colorMultiplier = (state, level, pos, t) -> ((LevelAccessor) level).getBiome(pos).value().getFoliageColor();
+                    this.colorMultiplier = (state, level, pos, t) -> BiomeColors.getAverageFoliageColor(level, pos);
                     return;
                 }
 

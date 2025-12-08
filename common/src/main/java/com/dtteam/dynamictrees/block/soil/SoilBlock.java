@@ -10,6 +10,7 @@ import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.client.RootColorCache;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
@@ -42,7 +43,6 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -324,6 +324,12 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
         return super.playerWillDestroy(level, pos, state, player);
     }
 
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (level.isClientSide()) RootColorCache.invalidate(pos);
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+
     /**
      * Usually does nothing as rooty blocks usually don't have radius.
      * Overriden by #AerialRootsSoilProperties
@@ -534,8 +540,10 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
         final int white = 0xFFFFFFFF;
         if (tintIndex == getSoilProperties().foliageTintIndex)
             return blockColors.getColor(getPrimitiveSoilState(state), level, pos, tintIndex);
-        else if (tintIndex == getSoilProperties().rootsTintIndex)
-            return state.getBlock() instanceof SoilBlock ? rootColor(state, level, pos) : white;
+        else if (tintIndex == getSoilProperties().rootsTintIndex){
+            int alive = state.getBlock() instanceof SoilBlock ? rootColor(state, level, pos) : white;
+            return RootColorCache.getOrComputeColor(this::getSpecies, state, pos, alive);
+        }
         return white;
     }
 

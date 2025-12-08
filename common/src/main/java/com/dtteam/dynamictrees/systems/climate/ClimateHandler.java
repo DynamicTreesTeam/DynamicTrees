@@ -7,11 +7,12 @@ public class ClimateHandler {
 
     private static final double[][] CLIMATE_MULTIPLIER_TABLE = {
             //biome:
-            //TEMP   TROP   ARID   COLD
-            { 1.0,    0.6,   0.9,   0.4 }, // TEMPERATE species
-            { 0.7,    1.0,   0.5,   0.1 }, // TROPICAL species
-            { 0.6,    0.7,   1.0,   0.3 }, // ARID species
-            { 0.9,    0.4,   0.8,   1.0 }  // COLD species
+            //NONE TEMP TROP ARID COLD
+            { 1.0, 1.0, 1.0, 1.0, 1.0 }, // NONE
+            { 1.0, 1.0, 0.6, 0.9, 0.4 }, // TEMPERATE species
+            { 1.0, 0.7, 1.0, 0.6, 0.1 }, // TROPICAL species
+            { 1.0, 0.6, 0.7, 1.0, 0.3 }, // ARID species
+            { 1.0, 0.9, 0.4, 0.8, 1.0 }  // COLD species
     };
 
     public static double climateMultiplier(ClimateZoneType preferred, ClimateZoneType plantedIn, double minimum) {

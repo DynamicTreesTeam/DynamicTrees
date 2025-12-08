@@ -85,7 +85,9 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         this.commonAppliers
                 .register("always_show_on_waila", Boolean.class, Species::setAlwaysShowOnWaila)
                 .register("sapling_sound", SoundType.class, Species::setSaplingSound)
-                .register("sapling_shape", VoxelShape.class, Species::setSaplingShape);
+                .register("sapling_shape", VoxelShape.class, Species::setSaplingShape)
+                .register("preferred_climate", ClimateZoneType.class, Species::setPreferredClimate)
+                .register("climate_tolerance_floor", Float.class, Species::setClimateToleranceFloor);
 
         this.gatherDataAppliers
                 .register("sapling_shape", VoxelShape.class, Species::setSaplingShape)
@@ -127,9 +129,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .registerArrayApplier("features", GenFeatureConfiguration.class, Species::addGenFeature)
                 .register("does_rot", Boolean.class, Species::setDoesRot)
                 .register("drop_seeds", Boolean.class, Species::setDropSeeds)
-                .register("preferred_climate", ClimateZoneType.class, Species::setPreferredClimate)
                 .register("seasonal_offsets", JsonObject.class, this::applySeasonalOffsets)
-                .register("climate_tolerance_floor", Float.class, Species::setClimateToleranceFloor)
                 .register("inherit_fruiting_offset_to_fruits", Boolean.class, (species, doInherit)->{
                     if (doInherit) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingOffsetToFruits); })
                 .register("inherit_fruiting_offset_to_pods", Boolean.class, (species, doInherit)->{

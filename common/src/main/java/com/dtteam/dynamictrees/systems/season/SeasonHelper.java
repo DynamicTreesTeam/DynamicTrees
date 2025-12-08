@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.function.Supplier;
 
@@ -67,7 +68,7 @@ public class SeasonHelper {
         return seasonManager.getSeasonValue(levelContext.level(), pos);
     }
 
-    static public ClimateZoneType getClimate(Level level, BlockPos rootPos){
+    static public ClimateZoneType getClimate(LevelAccessor level, BlockPos rootPos){
         return seasonManager.getClimate(level, rootPos);
     }
 

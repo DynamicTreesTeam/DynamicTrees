@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.HashMap;
@@ -54,20 +55,27 @@ public class NormalSeasonManager implements SeasonManager {
     static private final float TROPICAL_THRESHHOLD = 0.8f; //Same threshold used by Serene Seasons.  Seems smart enough
     static private final float COLD_THRESHHOLD = 0.2f;
 
-    private BiPredicate<Level, BlockPos> isTropical = (level, rootPos) -> level.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value().getBaseTemperature() > TROPICAL_THRESHHOLD;
-    private BiPredicate<Level, BlockPos> isCold = (level, rootPos) -> level.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value().getBaseTemperature() < COLD_THRESHHOLD;
-    private BiPredicate<Level, BlockPos> isArid = (level, rootPos) -> {
-        Biome b = level.getUncachedNoiseBiome(rootPos.getX() >> 2, rootPos.getY() >> 2, rootPos.getZ() >> 2).value();
+    private BiPredicate<LevelAccessor, BlockPos> isTropical = (level, rootPos) -> getBiomeForDist(level, rootPos).getBaseTemperature() > TROPICAL_THRESHHOLD;
+    private BiPredicate<LevelAccessor, BlockPos> isCold = (level, rootPos) -> getBiomeForDist(level, rootPos).getBaseTemperature() < COLD_THRESHHOLD;
+    private BiPredicate<LevelAccessor, BlockPos> isArid = (level, rootPos) -> {
+        Biome b = getBiomeForDist(level, rootPos);
         return (b.getBaseTemperature() >= ARID_THRESHHOLD); // || b.climateSettings.downfall() <= ARID_DOWNFALL_THRESHHOLD
     };
 
-    public void setTropicalPredicate(BiPredicate<Level, BlockPos> predicate) {
+    private static Biome getBiomeForDist(LevelAccessor level, BlockPos pos){
+        if (level instanceof Level){ //Worldgen worlds are not Level, which would crash with getBiome
+            return level.getBiome(pos).value();
+        }
+        return level.getUncachedNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2).value();
+    }
+
+    public void setTropicalPredicate(BiPredicate<LevelAccessor, BlockPos> predicate) {
         isTropical = predicate;
     }
-    public void setAridPredicate(BiPredicate<Level, BlockPos> predicate) {
+    public void setAridPredicate(BiPredicate<LevelAccessor, BlockPos> predicate) {
         isArid = predicate;
     }
-    public void setColdPredicate(BiPredicate<Level, BlockPos> predicate) {
+    public void setColdPredicate(BiPredicate<LevelAccessor, BlockPos> predicate) {
         isCold = predicate;
     }
 
@@ -75,7 +83,7 @@ public class NormalSeasonManager implements SeasonManager {
      * Predicates should return true if tropical, arid or cold, respectively.
      * If all fail the location is determined to be temperate.
      */
-    public ClimateZoneType getClimate(Level level, BlockPos rootPos) {
+    public ClimateZoneType getClimate(LevelAccessor level, BlockPos rootPos) {
         if (isCold.test(level, rootPos)) return ClimateZoneType.COLD;
         if (isArid.test(level, rootPos)) return ClimateZoneType.ARID;
         if (isTropical.test(level, rootPos)) return ClimateZoneType.TROPICAL;
