@@ -45,9 +45,10 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
         }
 
         return switch (type) {
-            case TEMPERATE -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.TEMPERATURE), 1.5f, -0.25f);
+            case TEMPERATE -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.TEMPERATURE), 1.0f, 0.3f);
             case TROPICAL -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.DRY_WET), 0.3f, 0.9f);
-            //TODO: arid and cold curves
+            case ARID -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.DRY_WET), 5f, -0.35f);
+            case COLD -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.TEMPERATURE), 0.6f, 0.4f);
             default -> 1.0f;
         };
     }
@@ -62,7 +63,8 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
         return switch (type) {
             case TEMPERATE -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.TEMPERATURE), 1.0f, 1.0f);
             case TROPICAL -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.DRY_WET), 0.3f, 0.9f);
-            //TODO: arid and cold curves
+            case ARID -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.DRY_WET), 1.0f, 0.7f);
+            case COLD -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.DRY_WET), 2.0f, 0f);
             default -> 1.0f;
         };
     }
