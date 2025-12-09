@@ -11,10 +11,8 @@ import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.JsonMapWrapper;
 import com.dtteam.dynamictrees.deserialization.JsonPropertyAppliers;
-import com.dtteam.dynamictrees.deserialization.TagKeyJsonPropertyApplier;
 import com.dtteam.dynamictrees.deserialization.applier.Applier;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
-import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
@@ -24,19 +22,15 @@ import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -115,8 +109,6 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("primitive_sapling", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .registerArrayApplier("primitive_saplings", SeedSaplingRecipe.class, Species::addPrimitiveSaplingRecipe)
                 .register("common_override", Species.CommonOverride.class, Species::setCommonOverride)
-//                .register("perfect_biomes", IDTBiomeHolderSet.class,
-//                        (species, biomeList) -> species.getPerfectBiomes().getIncludeComponents().add(biomeList))
                 .register("can_bone_meal_tree", Boolean.class, Species::setCanBoneMealTree)
                 .registerArrayApplier("acceptable_growth_blocks", Block.class, Species::addAcceptableBlockForGrowth)
                 .registerArrayApplier("acceptable_soils", String.class, (Applier<Species, String>) this::addAcceptableSoil)
@@ -130,10 +122,6 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("preferred_climate", ClimateZoneType.class, Species::setPreferredClimate)
                 .register("seasonal_offsets", JsonObject.class, this::applySeasonalOffsets)
                 .register("climate_tolerance_floor", Float.class, Species::setClimateToleranceFloor)
-                .register("inherit_fruiting_offset_to_fruits", Boolean.class, (species, doInherit)->{
-                    if (doInherit) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingOffsetToFruits); })
-                .register("inherit_fruiting_offset_to_pods", Boolean.class, (species, doInherit)->{
-                    if (doInherit) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingOffsetToPods); })
                 .register("big_tree_sound_threshold", Float.class, Species::setBigTreeSoundThreshold)
                 .register("plantable_on_fluid", Boolean.class, Species::setPlantableOnFluid)
                 .register("allowed_water_height_for_world_gen", Integer.class, Species::setAllowedWaterHeightForWorldgen)
@@ -207,6 +195,10 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     protected void postLoadOnLoad(LoadData loadData, JsonObject json) {
         super.postLoadOnLoad(loadData, json);
         loadData.getResource().generateSeed().generateSapling();
+        Species.REGISTRY.forEach(species -> {
+            if (species.hasFruits()) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingParametersToFruits);
+            if (species.hasPods()) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingParametersToPods);
+        });
     }
 
     @Override

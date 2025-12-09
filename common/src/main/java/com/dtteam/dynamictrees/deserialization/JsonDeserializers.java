@@ -185,7 +185,6 @@ public final class JsonDeserializers {
     public static final JsonDeserializer<Long> LONG = register(Long.class, input ->
             NUMBER.deserialize(input).map(Number::longValue)
     );
-
     public static final JsonDeserializer<Float> FLOAT = register(Float.class, input ->
             NUMBER.deserialize(input).map(Number::floatValue)
     );

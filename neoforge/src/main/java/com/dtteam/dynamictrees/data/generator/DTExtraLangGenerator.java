@@ -50,11 +50,16 @@ public class DTExtraLangGenerator implements Generator<DTDataProvider.Language,S
             provider.add("potion.burgeoning.description","Quickly grow a tree");
             provider.add("potion.harvest.description","Increase a tree's drops");
             provider.add("desc.dynamictrees.seasonal.fertile_seasons","Fertile Seasons");
+            provider.add("desc.dynamictrees.seasonal.infertile","Infertile in %s climates");
             provider.add("desc.dynamictrees.seasonal.year_round","Year-Round");
             provider.add("desc.dynamictrees.seasonal.spring","Spring");
             provider.add("desc.dynamictrees.seasonal.summer","Summer");
             provider.add("desc.dynamictrees.seasonal.autumn","Autumn");
             provider.add("desc.dynamictrees.seasonal.winter","Winter");
+            provider.add("desc.dynamictrees.climate.temperate","Temperate");
+            provider.add("desc.dynamictrees.climate.tropical","Tropical");
+            provider.add("desc.dynamictrees.climate.arid","Arid");
+            provider.add("desc.dynamictrees.climate.cold","Cold");
             provider.add("death.attack.falling_tree","%1$s was crushed by a falling tree");
             provider.add("death.attack.falling_tree.player","%1$s was crushed by a falling tree whilst fighting %2$s");
             provider.add("sounds.dynamictrees.falling_tree.start","Timber!");

@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.client;
 
+import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
@@ -7,9 +8,12 @@ import java.util.List;
 
 public class Tooltips {
 
-    public static void applySeasonalTooltips(List<Component> tipList, int flags) {
-        if (flags != 0) {
-            tipList.add(Component.translatable("desc.dynamictrees.seasonal.fertile_seasons").append(":"));
+    public static void applySeasonalTooltips(List<Component> tipList, int flags, ClimateZoneType climate) {
+        if (flags == -1) {
+            tipList.add(Component.translatable("desc.dynamictrees.seasonal.infertile", climate.unlocalizedName).append(".").withStyle(ChatFormatting.RED));
+        }
+        else if (flags != 0) {
+            tipList.add(Component.translatable("desc.dynamictrees.seasonal.fertile_seasons").append(" (").append(Component.translatable(climate.unlocalizedName)).append("):"));
 
             if ((flags & 15) == 15) {
                 tipList.add(Component.literal(" ").append(Component.translatable("desc.dynamictrees.seasonal.year_round").withStyle(ChatFormatting.LIGHT_PURPLE)));

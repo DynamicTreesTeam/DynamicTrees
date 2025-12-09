@@ -64,7 +64,7 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
             case TEMPERATE -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.TEMPERATURE), 1.0f, 1.0f);
             case TROPICAL -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.DRY_WET), 0.3f, 0.9f);
             case ARID -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.DRY_WET), 1.0f, 0.7f);
-            case COLD -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.DRY_WET), 2.0f, 0f);
+            case COLD -> clippedSineWave(seasonValue, peakClimateOffset(SeasonType.TEMPERATURE), 2.0f, 0f);
             default -> 1.0f;
         };
     }

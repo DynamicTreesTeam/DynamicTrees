@@ -75,7 +75,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -117,7 +116,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -1694,18 +1692,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     //region seasonal
 
     /**
-     * default flower holding is relative to the flowering offset, but default is first half of spring
+     * Start and end of the flower hold period relative to the fruiting peak.
+     * During this period flowers will grow but not mature into fruits, waiting instead for the next season.
      */
-    protected float flowerSeasonHoldMin = SeasonHelper.SPRING_START;
-    protected float flowerSeasonHoldMax = SeasonHelper.SPRING_MIDDLE;
+    protected float flowerSeasonHoldPeriodStart = -1.5f;
+    protected float flowerSeasonHoldPeriodEnd = -1.0f;
 
     protected final HashMap<ClimateZoneType, Float> seasonalGrowthOffset = new HashMap<>();
     protected final HashMap<ClimateZoneType, Float> seasonalFruitingOffset = new HashMap<>();
     protected final HashMap<ClimateZoneType, Float> seasonalSeedDropOffset = new HashMap<>();
 
-    private final float defaultGrowthOffset = 0;
-    private final float defaultFruitingOffset = 0;
-    private final float defaultSeedDropOffset = 1;
+    private static final float defaultGrowthOffset = 0;
+    private static final float defaultFruitingOffset = 0;
+    private static final float defaultSeedDropOffset = 1;
 
     /**
      * The default fruiting will PEAK in the middle of summer, starting at the middle of spring and ending at the middle
@@ -1798,68 +1797,73 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return offset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -offset, false) : 1.0f;
     }
 
-    public void inheritSeasonalFruitingOffsetToFruits(){
-//        this.fruits.forEach((fruit)->fruit.setSeasonOffset(this.seasonalFruitingOffset));
+    public void inheritSeasonalFruitingParametersToFruits(){
+        this.fruits.forEach((fruit)->{
+            fruit.setSeasonalFactorGetter(this::seasonalFruitProductionFactor);
+            fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
+        });
     }
 
-    public void inheritSeasonalFruitingOffsetToPods(){
-//        this.pods.forEach((pod)->pod.setSeasonOffset(this.seasonalFruitingOffset));
+    public void inheritSeasonalFruitingParametersToPods(){
+        this.pods.forEach((fruit)->{
+            fruit.setSeasonalFactorGetter(this::seasonalFruitProductionFactor);
+            fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
+        });
     }
 
     /**
      * 1 = Spring 2 = Summer 4 = Autumn 8 = Winter Values are OR'ed together for the return
      */
-    public int getSeasonalTooltipFlags(LevelContext levelContext) {
-//        final float seasonStart = 1f / 6;
-//        final float seasonEnd = 1 - 1f / 6;
-//        final float threshold = 0.75f;
-//
-//        if (this.hasFruits() || this.hasPods()) {
-//            int seasonFlags = 0;
-//            for (int i = 0; i < 4; i++) {
-//                boolean isValidSeason = false;
-//                if (seasonalFruitingOffset != null) {
-//                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
-//                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonEnd - seasonalFruitingOffset) * 64.0f), 0), true);
-//                    if (Math.min(prod1, prod2) > threshold) {
-//                        isValidSeason = true;
-//                    }
-//
-//                } else {
-//                    isValidSeason = true;
-//                }
-//
-//                if (isValidSeason) {
-//                    seasonFlags |= 1 << i;
-//                }
-//
-//            }
-//            return seasonFlags;
-//        }
+    public int getSeasonalTooltipFlags(LevelContext levelContext, Player player) {
+        final float seasonStart = 1f / 6;
+        final float seasonEnd = 1 - 1f / 6;
+        final float threshold = 0.75f;
+
+        BlockPos playerPos = BlockPos.containing(player.position());
+        ClimateZoneType climate = SeasonHelper.getClimate(player.level(), playerPos);
+
+        if (this.hasFruits() || this.hasPods()) {
+            int seasonFlags = 0;
+            for (int i = 0; i < 4; i++) {
+                boolean isValidSeason = false;
+                Float seasonOffset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
+                if (seasonOffset != null) {
+                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, playerPos, i + seasonStart + seasonOffset, true);
+                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, playerPos, i + seasonEnd + seasonOffset, true);
+                    if (Math.min(prod1, prod2) > threshold) {
+                        isValidSeason = true;
+                    }
+
+                } else {
+                    isValidSeason = true;
+                }
+
+                if (isValidSeason) {
+                    seasonFlags |= 1 << i;
+                }
+
+            }
+            return seasonFlags == 0 ? -1 : seasonFlags;
+        }
 
         return 0;
     }
 
-//    /**
-//     * When seasons are active allow a seasonal time range where fruit growth does not progress past the flower stage.
-//     * This allows for a flowery spring time.
-//     *
-//     * @param min The minimum season value relative to the fruiting offset.
-//     * @param max The maximum season value relative to the fruiting offset.
-//     * @return This {@link Species} object for chaining.
-//     */
-//    public Species setFlowerSeasonHold(float min, float max) {
-//        flowerSeasonHoldMin = min;
-//        flowerSeasonHoldMax = max;
-//        return this;
-//    }
-//
-//    public boolean testFlowerSeasonHold(Float seasonValue) {
-//        if (seasonalFruitingOffset == null) {
-//            return false;
-//        }
-//        return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin + seasonalFruitingOffset, flowerSeasonHoldMax + seasonalFruitingOffset);
-//    }
+    public boolean isInFlowerHoldPeriod(LevelContext level, BlockPos rootPos, Float seasonValue) {
+        ClimateZoneType climate = SeasonHelper.getClimate(level.level(), rootPos);
+        Float offset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
+        if (offset == null) {
+            return false;
+        }
+        final Float peakSeasonValue = SeasonHelper.getSeasonManager()
+                .getPeakFruitProductionSeasonValue(level.level(), rootPos, offset);
+        if (peakSeasonValue == null || flowerSeasonHoldPeriodEnd == 0.0F) {
+            return false;
+        }
+        final float min = flowerSeasonHoldPeriodStart + peakSeasonValue;
+        final float max = flowerSeasonHoldPeriodEnd + peakSeasonValue;
+        return SeasonHelper.isSeasonBetween(seasonValue, min, max);
+    }
     //endregion
 
     ///////////////////////////////////////////
