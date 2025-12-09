@@ -32,9 +32,15 @@ public class FabricEventHelper implements IEventHelper {
     }
 
     @Override
-    public void postAddResourceLoadersEvent(TreeResourceManager resourceManager) {
+    public void postAddResourceLoadersEventPre(TreeResourceManager resourceManager) {
 
     }
+
+    @Override
+    public void postAddResourceLoadersEventPost(TreeResourceManager resourceManager) {
+
+    }
+
 
     @Override
     public void postJsonDeserializerRegistryEvent() {

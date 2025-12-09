@@ -12,7 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.HashMap;
 import java.util.Map;
 
-//@OnlyIn(Dist.CLIENT)
+//
 public class SoundInstanceHandler {
 
     private static final Map<Integer, SoundInstance> instances = new HashMap<>();

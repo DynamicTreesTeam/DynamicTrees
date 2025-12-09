@@ -178,9 +178,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     protected float lootVolumeMultiplier = 1.0f;
 
-//    @OnlyIn(Dist.CLIENT)
+//    
     public int woodRingColor; // For rooty blocks
-//    @OnlyIn(Dist.CLIENT)
+//    
     public int woodBarkColor; // For rooty water
 
     /**
@@ -432,7 +432,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.maxBranchRadius = maxBranchRadius;
     }
 
-//    @OnlyIn(Dist.CLIENT)
+//    
     public int getRootColor(BlockState state, boolean getBark) {
         return getBark ? woodBarkColor : woodRingColor;
     }

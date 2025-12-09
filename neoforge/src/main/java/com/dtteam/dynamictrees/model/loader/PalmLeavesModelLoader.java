@@ -6,13 +6,11 @@ import com.google.gson.JsonObject;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@OnlyIn(Dist.CLIENT)
+
 public class PalmLeavesModelLoader implements IGeometryLoader<PalmLeavesModelGeometry> {
 
     public static final Logger LOGGER = LogManager.getLogger();

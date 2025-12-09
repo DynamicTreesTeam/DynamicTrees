@@ -1,6 +1,10 @@
 package com.dtteam.dynamictrees.registry;
 
-import com.dtteam.dynamictrees.api.registry.RegistryHandler;
+import com.dtteam.dynamictrees.api.registry.*;
+import net.minecraft.core.*;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.*;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -70,12 +74,12 @@ public class FabricRegistryHandler extends RegistryHandler {
 
     @Override
     public <T extends Block> Supplier<T> putBlock(ResourceLocation registryName, Supplier<T> blockSup) {
-        return null;
+        return ()->(T)Registry.register(BuiltInRegistries.BLOCK, registryName, (Block)blockSup.get());
     }
 
     @Override
     public <T extends Item> Supplier<T> putItem(ResourceLocation registryName, Supplier<T> itemSup) {
-        return null;
+        return ()->(T)Registry.register(BuiltInRegistries.ITEM, registryName, (Item)itemSup.get());
     }
 
     public static class RegisterEventHandler<T> {

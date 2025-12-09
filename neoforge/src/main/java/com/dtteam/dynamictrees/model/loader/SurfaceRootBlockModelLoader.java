@@ -4,13 +4,11 @@ import com.dtteam.dynamictrees.model.geometry.BranchBlockModelGeometry;
 import com.dtteam.dynamictrees.model.geometry.SurfaceRootBlockModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * @author Harley O'Connor
  */
-@OnlyIn(Dist.CLIENT)
+
 public class SurfaceRootBlockModelLoader extends BranchBlockModelLoader {
 
     @Override

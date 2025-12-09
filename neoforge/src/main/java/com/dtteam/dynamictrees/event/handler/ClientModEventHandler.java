@@ -32,8 +32,6 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.FoliageColor;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -53,7 +51,7 @@ public class ClientModEventHandler {
     // COLOR HANDLING
     ///////////////////////////////////////////
 
-    @OnlyIn(Dist.CLIENT)
+    
     public static void discoverWoodColors() {
 
         final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance()
@@ -72,7 +70,7 @@ public class ClientModEventHandler {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     private static int getFaceColor(BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
         final BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
         List<BakedQuad> quads = model.getQuads(state, face, RandomSource.create(), ModelData.EMPTY, null);
@@ -94,14 +92,14 @@ public class ClientModEventHandler {
     }
 
     @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
+    
     public static void registerColorResolversEvent(RegisterColorHandlersEvent.ColorResolvers event){
         BlockColorMultipliers.register("birch", (state, level, pos, tintIndex) -> FoliageColor.getBirchColor());
         BlockColorMultipliers.register("spruce", (state, level, pos, tintIndex) -> FoliageColor.getEvergreenColor());
     }
 
     @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
+    
     public static void registerItemColorHandlersEvent(RegisterColorHandlersEvent.Item event){
         // Register Potion Colorizer
         event.register(DTRegistries.DENDRO_POTION.get()::getColor, DTRegistries.DENDRO_POTION.get());
@@ -110,7 +108,7 @@ public class ClientModEventHandler {
     }
 
     @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
+    
 
     public static void registerBlockColorHandlersEvent(RegisterColorHandlersEvent.Block event){
         final int white = 0xFFFFFFFF;

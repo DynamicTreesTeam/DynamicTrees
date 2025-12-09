@@ -11,8 +11,6 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +28,7 @@ import java.util.function.Function;
  *
  * @author Harley O'Connor
  */
-@OnlyIn(Dist.CLIENT)
+
 public class BranchBlockModelGeometry implements IUnbakedGeometry<BranchBlockModelGeometry> {
     protected final Set<ResourceLocation> textures = new HashSet<>();
     protected final ResourceLocation barkTextureLocation;

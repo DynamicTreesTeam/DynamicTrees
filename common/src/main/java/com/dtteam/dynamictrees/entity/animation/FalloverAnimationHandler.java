@@ -383,7 +383,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     @Override
-//    @OnlyIn(Dist.CLIENT)
+//    
     public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack) {
 
         float yaw = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTick));
@@ -406,7 +406,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     @Override
-//    @OnlyIn(Dist.CLIENT)
+//    
     public boolean shouldRender(FallingTreeEntity entity, double x, double y, double z) {
         return true;
     }

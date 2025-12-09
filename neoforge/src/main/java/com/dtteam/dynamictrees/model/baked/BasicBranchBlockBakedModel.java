@@ -20,8 +20,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.NamedRenderTypeManager;
 import net.neoforged.neoforge.client.model.IDynamicBakedModel;
@@ -36,7 +34,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
+
 public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 
     protected final BlockModel blockModel;

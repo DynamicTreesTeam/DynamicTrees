@@ -10,8 +10,6 @@ import com.dtteam.dynamictrees.worldgen.holderset.DTBiomeHolderSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 public class NeoForgeMiscHelper implements IMiscHelper {
@@ -26,7 +24,7 @@ public class NeoForgeMiscHelper implements IMiscHelper {
         }
     }
 
-    @Override @OnlyIn(Dist.CLIENT)
+    @Override 
     public FallingTreeEntityModel newFallingTreeEntityModel(FallingTreeEntity entity) {
         return new FallingTreeEntityModelNF(entity);
     }
