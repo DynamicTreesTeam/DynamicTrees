@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
+import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
@@ -74,33 +75,43 @@ public class PodzolGenFeature extends GenFeature {
         for (int i = 0; i < maxHeight; i++) {
             final BlockPos offPos = new BlockPos(x, pos.getY() - 1 - i, z);
 
-            if (!level.isEmptyBlock(offPos)) {
-                final BlockState state = level.getBlockState(offPos);
-                final Block block = state.getBlock();
-                if (TreeHelper.isRooty(state)){
-                    break; //Don't try to turn rooty soil into podzol.
-                }
-                // Skip past Mushrooms and branches on the way down.
-                if (block instanceof BranchBlock || block instanceof MushroomBlock || block instanceof LeavesBlock || block instanceof TrunkShellBlock) {
-                    continue;
-                } else if (configuration.get(KILL_PLANTS) && (block instanceof FlowerBlock || block instanceof TallGrassBlock || block instanceof DoublePlantBlock)) {
-                    // Kill plants.
-                    if (level.getBrightness(LightLayer.SKY, offPos) <= darkThreshold) {
-                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-                    }
-                    continue;
-                } else if (SoilHelper.isSoilAcceptable(state, SoilHelper.getSoilFlags(SoilHelper.DIRT_LIKE))) {
-                    // Convert grass or dirt to podzol.
-                    if (level.getBrightness(LightLayer.SKY, offPos.above()) <= darkThreshold) {
-                        level.setBlock(offPos, podzol.defaultBlockState(), Block.UPDATE_ALL);
-                    } else {
-                        spreadPodzol(level, pos, podzol);
-                    }
-                }
-                break;
+            if (level.isEmptyBlock(offPos)) continue;
+            final BlockState state = level.getBlockState(offPos);
+
+            if (TreeHelper.isRooty(state)){
+                break; //Don't try to turn rooty soil into podzol.
             }
+
+            if (configuration.get(KILL_PLANTS) && shouldDestroyPlant(state)) {
+                // Kill plants.
+                if (level.getBrightness(LightLayer.SKY, offPos) <= darkThreshold) {
+                    level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+                }
+                continue;
+            }
+
+            if (state.is(DTBlockTags.FOLIAGE) || TreeHelper.isTreePart(state)) {
+                // Skip past Foliage and branches on the way down.
+                continue;
+            }
+
+            if (SoilHelper.isSoilAcceptable(state, SoilHelper.getSoilFlags(SoilHelper.DIRT_LIKE))) {
+                // Convert grass or dirt to podzol.
+                if (level.getBrightness(LightLayer.SKY, offPos.above()) <= darkThreshold) {
+                    level.setBlock(offPos, podzol.defaultBlockState(), Block.UPDATE_ALL);
+                } else {
+                    spreadPodzol(level, pos, podzol);
+                }
+            }
+
+            break;
         }
         return true;
+    }
+
+    private boolean shouldDestroyPlant(BlockState state){
+        Block block = state.getBlock();
+        return block instanceof FlowerBlock || block instanceof TallGrassBlock || block instanceof DoublePlantBlock;
     }
 
     public static void spreadPodzol(LevelAccessor level, BlockPos pos, Block podzol) {
