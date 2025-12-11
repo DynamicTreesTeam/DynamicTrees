@@ -52,7 +52,7 @@ public class PodzolGenFeature extends GenFeature {
         final int x = pos.getX() + random.nextInt(5) - 2;
         final int z = pos.getZ() + random.nextInt(5) - 2;
 
-        final int darkThreshold = 4;
+        final int darkThreshold = 10;
 
         for (int i = 0; i < 32; i++) {
             final BlockPos offPos = new BlockPos(x, pos.getY() - 1 - i, z);
@@ -60,7 +60,9 @@ public class PodzolGenFeature extends GenFeature {
             if (!level.isEmptyBlock(offPos)) {
                 final BlockState state = level.getBlockState(offPos);
                 final Block block = state.getBlock();
-
+                if (TreeHelper.isRooty(state)){
+                    break; //Don't try to turn rooty soil into podzol.
+                }
                 // Skip past Mushrooms and branches on the way down.
                 if (block instanceof BranchBlock || block instanceof MushroomBlock || block instanceof LeavesBlock) {
                     continue;
