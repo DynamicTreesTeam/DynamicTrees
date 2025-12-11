@@ -56,8 +56,10 @@ public class NormalSeasonManager implements SeasonManager {
     static private final float TROPICAL_THRESHHOLD = 0.8f; //Same threshold used by Serene Seasons.  Seems smart enough
     static private final float COLD_THRESHHOLD = 0.2f;
 
-    private BiPredicate<LevelAccessor, BlockPos> isTropical = (level, rootPos) -> getBiomeForDist(level, rootPos).getBaseTemperature() > TROPICAL_THRESHHOLD;
-    private BiPredicate<LevelAccessor, BlockPos> isCold = (level, rootPos) -> getBiomeForDist(level, rootPos).getBaseTemperature() < COLD_THRESHHOLD;
+    private BiPredicate<LevelAccessor, BlockPos> isTropical = (level, rootPos) ->
+            getBiomeForDist(level, rootPos).getBaseTemperature() > TROPICAL_THRESHHOLD;
+    private BiPredicate<LevelAccessor, BlockPos> isCold = (level, rootPos) ->
+            getBiomeForDist(level, rootPos).getBaseTemperature() < COLD_THRESHHOLD;
     private BiPredicate<LevelAccessor, BlockPos> isArid = (level, rootPos) -> {
         Biome b = getBiomeForDist(level, rootPos);
         return (b.getBaseTemperature() >= ARID_THRESHHOLD); // || b.climateSettings.downfall() <= ARID_DOWNFALL_THRESHHOLD
@@ -112,13 +114,9 @@ public class NormalSeasonManager implements SeasonManager {
     }
 
     @Override
-    public float getFruitProductionFactor(Level level, BlockPos rootPos, float offset, boolean getAsScan) {
-        ClimateZoneType climate = getClimate(level, rootPos);
-        if (getAsScan) {
-            return getFruitProductionFactorAsScan(level.dimension().location(), climate, offset);
-        }
-
+    public float getFruitProductionFactor(Level level, BlockPos rootPos, float offset) {
         SeasonContext context = getContext(level);
+        ClimateZoneType climate = getClimate(level, rootPos);
         return context.getFruitProductionFactor(offset, climate);
     }
 
@@ -137,17 +135,6 @@ public class NormalSeasonManager implements SeasonManager {
     @Override
     public boolean shouldSnowMelt(Level level, BlockPos pos) {
         return getContext(level).getSeasonProvider().shouldSnowMelt(level, pos);
-    }
-
-    public float getFruitProductionFactorAsScan(ResourceLocation dimLoc, ClimateZoneType climate, float seasonValue) {
-        if (!seasonContextMap.isEmpty()) {
-            if (seasonContextMap.containsKey(dimLoc)) {
-                SeasonContext context = seasonContextMap.get(dimLoc);
-                SeasonGrowthCalculator calculator = context.getCalculator();
-                return calculator.calcFruitProductionRate(seasonValue, climate);
-            }
-        }
-        return 0.0f;
     }
 
 }

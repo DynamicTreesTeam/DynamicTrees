@@ -19,7 +19,7 @@ public interface SeasonManager {
 
     float getSeedDropFactor(Level level, BlockPos rootPos, float offset);
 
-    float getFruitProductionFactor(Level level, BlockPos rootPos, float offset, boolean getAsScan);
+    float getFruitProductionFactor(Level level, BlockPos rootPos, float offset);
 
     Float getSeasonValue(Level level, BlockPos rootPos);
 

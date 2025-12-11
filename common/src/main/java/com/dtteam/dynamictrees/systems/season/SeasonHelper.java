@@ -38,9 +38,9 @@ public class SeasonHelper {
                 ? SeasonCompatibilityHandler.getSeasonManager().getSeedDropFactor(levelContext.level(), pos, offset) : 1.0F;
     }
 
-    static public float globalSeasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos, float offset, boolean getAsScan) {
+    static public float globalSeasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos, float offset) {
         return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION)
-                ? SeasonCompatibilityHandler.getSeasonManager().getFruitProductionFactor(levelContext.level(), pos, offset, getAsScan) : 1.0F;
+                ? SeasonCompatibilityHandler.getSeasonManager().getFruitProductionFactor(levelContext.level(), pos, offset) : 1.0F;
     }
 
     static public Float getPeakFruitProductionSeason(LevelContext levelContext, BlockPos pos, float offset) {

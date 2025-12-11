@@ -12,6 +12,7 @@ public interface IConfigHelper {
     String SEED_TIME_TO_LIVE = "seedTimeToLive";
     String SEED_ONLY_FOREST = "seedOnlyForest";
     String SEED_MIN_FORESTNESS = "seedMinForestness";
+    String CLIMATE_AFFECTS_FRUITS_AND_PODS = "climateAffectsFruitsAndPods";
 
     String TREE_GROWTH_MULTIPLIER = "treeGrowthMultiplier";
     String TREE_HARVEST_MULTIPLIER = "treeHarvestMultiplier";

@@ -647,7 +647,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public void processVolume(NetVolumeNode.Volume volume) {
-        volume.multiplyVolume(Services.CONFIG.getDoubleConfig("treeHarvestMultiplier")); // For cheaters. you know who you are.
+        volume.multiplyVolume(Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_HARVEST_MULTIPLIER)); // For cheaters. you know who you are.
         volume.multiplyVolume(getFamily().getLootVolumeMultiplier()); //the family can have a multiplier too
     }
 
@@ -1520,7 +1520,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public boolean grow(Level level, SoilBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
 
-        float growthRate = (float) (getGrowthRate(level, rootPos) * Services.CONFIG.getDoubleConfig("treeGrowthMultiplier"));
+        float growthRate = (float) (getGrowthRate(level, rootPos) * Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_GROWTH_MULTIPLIER));
         do {
             if (fertility > 0) {
                 if (growthRate > random.nextFloat()) {
@@ -1799,14 +1799,16 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public float seasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos) {
         ClimateZoneType climate = ClimateHelper.getClimate(levelContext.level(), pos);
         Float offset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
-        return offset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -offset, false) : 1.0f;
+        return offset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -offset) : 1.0f;
     }
 
     public void inheritSeasonalFruitingParametersToFruits(){
         this.fruits.forEach((fruit)->{
             fruit.setSeasonalFactorGetter((l, p)->{
                 ClimateZoneType climate = ClimateHelper.getClimate(l.level(), p);
-                return (float)(this.seasonalFruitProductionFactor(l,p) * ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor));
+                double multiplier = Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
+                        ? ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor) : 1.0;
+                return (float)(this.seasonalFruitProductionFactor(l,p) * multiplier);
             });
             fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
         });
@@ -1816,7 +1818,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.pods.forEach((fruit)->{
             fruit.setSeasonalFactorGetter((l, p)->{
                 ClimateZoneType climate = ClimateHelper.getClimate(l.level(), p);
-                return (float)(this.seasonalFruitProductionFactor(l,p) * ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor));
+                double multiplier = Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
+                        ? ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor) : 1.0;
+                return (float)(this.seasonalFruitProductionFactor(l,p) * multiplier);
             });
             fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
         });
@@ -1829,7 +1833,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         if (this.hasFruits() || this.hasPods()) {
             BlockPos playerPos = BlockPos.containing(player.position());
             ClimateZoneType climate = ClimateHelper.getClimate(player.level(), playerPos);
-            float suitability = (float) ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor);
+            float suitability = (float) (Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
+                    ? ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor) : 1.0);
             if (suitability < 0.3) return 0; //No seasons, still display
 
             Float seasonOffset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
@@ -1876,7 +1881,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         // Bonemeal fertilizes the soil and causes a single growth pulse.
         if (canBoneMealTree() && itemStack.is(DTItemTags.FERTILIZER)) {
-            return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(Services.CONFIG.getIntConfig("boneMealGrowthPulses"));
+            return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(Services.CONFIG.getIntConfig(IConfigHelper.BONE_MEAL_GROWTH_PULSES));
         }
 
         // Use substance provider interface if it's available.

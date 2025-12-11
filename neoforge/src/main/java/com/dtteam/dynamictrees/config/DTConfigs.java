@@ -57,6 +57,8 @@ public class DTConfigs {
                 define(IConfigHelper.SEED_ONLY_FOREST, true));
         registerConfig(SERVER_BUILDER.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional.").
                 defineInRange(IConfigHelper.SEED_MIN_FORESTNESS, 0.0, 0.0, 1.0));
+        registerConfig(SERVER_BUILDER.comment("If enabled, fruit and pod production will be affected by the current biome's climate.").
+                define(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS, true));
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.comment("Tree Settings").push("trees");
