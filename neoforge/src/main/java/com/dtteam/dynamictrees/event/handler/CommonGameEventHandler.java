@@ -8,6 +8,7 @@ import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
+import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
@@ -102,7 +103,7 @@ public class CommonGameEventHandler {
 
     @SubscribeEvent
     public static void onServerStart(final ServerStartingEvent event) {
-        SeasonHelper.getSeasonManager().flushMappings();
+        SeasonCompatibilityHandler.getSeasonManager().flushMappings();
     }
 
     @SubscribeEvent

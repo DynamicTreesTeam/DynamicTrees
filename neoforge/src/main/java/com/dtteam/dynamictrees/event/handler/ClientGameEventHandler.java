@@ -5,6 +5,7 @@ import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.client.Tooltips;
 import com.dtteam.dynamictrees.item.Seed;
+import com.dtteam.dynamictrees.systems.season.ClimateHelper;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
@@ -46,7 +47,7 @@ public class ClientGameEventHandler {
         }
 
         BlockPos playerPos = BlockPos.containing(player.position());
-        ClimateZoneType climate = SeasonHelper.getClimate(player.level(), playerPos);
+        ClimateZoneType climate = ClimateHelper.getClimate(player.level(), playerPos);
         int flags = seed.getSpecies().getSeasonalTooltipFlags(levelContext, player);
         Tooltips.applySeasonalTooltips(event.getToolTip(), flags, climate);
     }

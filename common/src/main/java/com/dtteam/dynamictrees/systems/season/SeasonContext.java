@@ -2,11 +2,11 @@ package com.dtteam.dynamictrees.systems.season;
 
 import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.season.SeasonGrowthCalculator;
+import com.dtteam.dynamictrees.api.season.SeasonProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
-import java.util.function.BiFunction;
 
 public class SeasonContext {
     private final SeasonProvider provider;

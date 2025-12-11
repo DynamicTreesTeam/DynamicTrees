@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.systems.season;
 import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.season.SeasonGrowthCalculator;
 import com.dtteam.dynamictrees.api.season.SeasonManager;
+import com.dtteam.dynamictrees.api.season.SeasonProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;

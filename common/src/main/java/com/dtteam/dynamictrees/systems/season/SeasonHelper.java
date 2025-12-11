@@ -24,40 +24,28 @@ public class SeasonHelper {
     public static final float WINTER_START = 3.0f;
     public static final float WINTER_MIDDLE = 3.5f;
 
-    private static SeasonManager seasonManager = NormalSeasonManager.NULL.get();
-
-    static public SeasonManager getSeasonManager() {
-        return seasonManager;
-    }
-
-    /**
-     * Maybe you don't like the global function season function.  Fine, do it all yourself then!
-     *
-     * <p>Add-ons should not use this method! {@link SeasonCompatibilityHandler#registerSeasonManager(String, Supplier)}
-     * should be used to register a season manager for a corresponding mod to respect the preferred season mod
-     * configuration option.</p>
-     */
-    static public void setSeasonManager(SeasonManager manager) {
-        seasonManager = manager;
-    }
-
     static public void updateTick(Level level, long dayTime) {
-        seasonManager.updateTick(level, dayTime);
+        SeasonCompatibilityHandler.getSeasonManager().updateTick(level, dayTime);
     }
 
     static public float globalSeasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos, float offset) {
         return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_GROWTH)
-                ? seasonManager.getGrowthFactor(levelContext.level(), rootPos, offset) : 1.0F;
+                ? SeasonCompatibilityHandler.getSeasonManager().getGrowthFactor(levelContext.level(), rootPos, offset) : 1.0F;
     }
 
     static public float globalSeasonalSeedDropFactor(LevelContext levelContext, BlockPos pos, float offset) {
         return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_DROP)
-                ? seasonManager.getSeedDropFactor(levelContext.level(), pos, offset) : 1.0F;
+                ? SeasonCompatibilityHandler.getSeasonManager().getSeedDropFactor(levelContext.level(), pos, offset) : 1.0F;
     }
 
     static public float globalSeasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos, float offset, boolean getAsScan) {
         return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION)
-                ? seasonManager.getFruitProductionFactor(levelContext.level(), pos, offset, getAsScan) : 1.0F;
+                ? SeasonCompatibilityHandler.getSeasonManager().getFruitProductionFactor(levelContext.level(), pos, offset, getAsScan) : 1.0F;
+    }
+
+    static public Float getPeakFruitProductionSeason(LevelContext levelContext, BlockPos pos, float offset) {
+        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION)
+                ? SeasonCompatibilityHandler.getSeasonManager().getPeakFruitProductionSeasonValue(levelContext.level(), pos, offset) : null;
     }
 
     /**
@@ -65,11 +53,7 @@ public class SeasonHelper {
      * in the world.
      */
     static public Float getSeasonValue(LevelContext levelContext, BlockPos pos) {
-        return seasonManager.getSeasonValue(levelContext.level(), pos);
-    }
-
-    static public ClimateZoneType getClimate(LevelAccessor level, BlockPos rootPos){
-        return seasonManager.getClimate(level, rootPos);
+        return SeasonCompatibilityHandler.getSeasonManager().getSeasonValue(levelContext.level(), pos);
     }
 
     /**
@@ -82,7 +66,6 @@ public class SeasonHelper {
      * @return
      */
     static public boolean isSeasonBetween(Float testValue, float SeasonA, float SeasonB) {
-
         testValue %= 4.0f;
         SeasonA %= 4.0f;
         SeasonB %= 4.0f;
@@ -96,7 +79,7 @@ public class SeasonHelper {
     }
 
     static public boolean shouldSnowMelt(Level level, BlockPos pos) {
-        return seasonManager.shouldSnowMelt(level, pos);
+        return SeasonCompatibilityHandler.getSeasonManager().shouldSnowMelt(level, pos);
     }
 
 }

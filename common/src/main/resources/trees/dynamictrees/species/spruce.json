@@ -14,8 +14,7 @@
     "world_gen_acceptable_soils": ["snow_like"],
     "mega_species": "mega_spruce",
     "features" : [
-        "conifer_topper",
-        "podzol"
+        "conifer_topper"
     ],
     "lang_overrides": {
         "seed": "Spruce Cone"

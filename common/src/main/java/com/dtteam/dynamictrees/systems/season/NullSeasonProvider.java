@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.systems.season;
 
+import com.dtteam.dynamictrees.api.season.SeasonProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 

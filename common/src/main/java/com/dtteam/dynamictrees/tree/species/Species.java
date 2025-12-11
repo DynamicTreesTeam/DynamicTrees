@@ -46,7 +46,7 @@ import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
-import com.dtteam.dynamictrees.systems.climate.ClimateHandler;
+import com.dtteam.dynamictrees.systems.season.ClimateHelper;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.genfeature.context.*;
@@ -926,7 +926,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 //    private void debugPrint(Level level, BlockPos pos){
 //        var player = Minecraft.getInstance().player;
 //        if (player != null){
-//            ClimateZoneType climate = SeasonHelper.getClimate(level, pos);
+//            ClimateZoneType climate = ClimateHelper.getClimate(level, pos);
 //            LevelContext context = LevelContext.create(level);
 //            player.sendSystemMessage(Component.literal( "Current climate: "+climate));
 //            player.sendSystemMessage(Component.literal( "Preferred climate: "+preferredClimate));
@@ -1664,12 +1664,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return 1.0f;
         }
 
-        ClimateZoneType currentClimate = SeasonHelper.getClimate(level, pos);
+        ClimateZoneType currentClimate = ClimateHelper.getClimate(level, pos);
         if (currentClimate == preferredClimate || currentClimate == ClimateZoneType.NONE){
             return 1.0f; //Replaces "Perfect biome" check
         }
 
-        double suit = ClimateHandler.climateMultiplier(preferredClimate, currentClimate, climateToleranceFloor);
+        double suit = ClimateHelper.climateMultiplier(this, currentClimate, climateToleranceFloor);
 
         //Linear interpolation of suitability with universal growth scalar
         suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
@@ -1684,6 +1684,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public void setPreferredClimate(ClimateZoneType preferredClimate) {
         this.preferredClimate = preferredClimate;
     }
+
+    public ClimateZoneType getPreferredClimate() {
+        return preferredClimate;
+    }
+
     //endregion
 
     ///////////////////////////////////////////
@@ -1780,19 +1785,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return Factor from 0.0 (no growth) to 1.0 (full growth).
      */
     public float seasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos) {
-        ClimateZoneType climate = SeasonHelper.getClimate(levelContext.level(), rootPos);
+        ClimateZoneType climate = ClimateHelper.getClimate(levelContext.level(), rootPos);
         Float offset = seasonalGrowthOffset.getOrDefault(climate, defaultGrowthOffset);
         return offset != null ? SeasonHelper.globalSeasonalGrowthFactor(levelContext, rootPos, -offset) : 1.0f;
     }
 
     public float seasonalSeedDropFactor(LevelContext levelContext, BlockPos pos) {
-        ClimateZoneType climate = SeasonHelper.getClimate(levelContext.level(), pos);
+        ClimateZoneType climate = ClimateHelper.getClimate(levelContext.level(), pos);
         Float offset = seasonalSeedDropOffset.getOrDefault(climate, defaultSeedDropOffset);
         return offset != null ? SeasonHelper.globalSeasonalSeedDropFactor(levelContext, pos, -offset) : 1.0f;
     }
 
     public float seasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos) {
-        ClimateZoneType climate = SeasonHelper.getClimate(levelContext.level(), pos);
+        ClimateZoneType climate = ClimateHelper.getClimate(levelContext.level(), pos);
         Float offset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
         return offset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -offset, false) : 1.0f;
     }
@@ -1800,8 +1805,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public void inheritSeasonalFruitingParametersToFruits(){
         this.fruits.forEach((fruit)->{
             fruit.setSeasonalFactorGetter((l, p)->{
-                ClimateZoneType climate = SeasonHelper.getClimate(l.level(), p);
-                return (float)(this.seasonalFruitProductionFactor(l,p) * ClimateHandler.climateMultiplier(preferredClimate, climate, climateToleranceFloor));
+                ClimateZoneType climate = ClimateHelper.getClimate(l.level(), p);
+                return (float)(this.seasonalFruitProductionFactor(l,p) * ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor));
             });
             fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
         });
@@ -1810,8 +1815,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public void inheritSeasonalFruitingParametersToPods(){
         this.pods.forEach((fruit)->{
             fruit.setSeasonalFactorGetter((l, p)->{
-                ClimateZoneType climate = SeasonHelper.getClimate(l.level(), p);
-                return (float)(this.seasonalFruitProductionFactor(l,p) * ClimateHandler.climateMultiplier(preferredClimate, climate, climateToleranceFloor));
+                ClimateZoneType climate = ClimateHelper.getClimate(l.level(), p);
+                return (float)(this.seasonalFruitProductionFactor(l,p) * ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor));
             });
             fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
         });
@@ -1823,14 +1828,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public int getSeasonalTooltipFlags(LevelContext levelContext, Player player) {
         if (this.hasFruits() || this.hasPods()) {
             BlockPos playerPos = BlockPos.containing(player.position());
-            ClimateZoneType climate = SeasonHelper.getClimate(player.level(), playerPos);
-            float suitability = (float)ClimateHandler.climateMultiplier(preferredClimate, climate, climateToleranceFloor);
+            ClimateZoneType climate = ClimateHelper.getClimate(player.level(), playerPos);
+            float suitability = (float) ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor);
             if (suitability < 0.3) return 0; //No seasons, still display
 
             Float seasonOffset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
             if (seasonOffset == null) return 15;//All seasons
 
-            Float offset = SeasonHelper.getSeasonManager().getPeakFruitProductionSeasonValue(levelContext.level(), playerPos, seasonOffset);
+            Float offset = SeasonHelper.getPeakFruitProductionSeason(levelContext, playerPos, seasonOffset);
             if (offset == null) return 15;//All seasons
 
             int seasonFlags = 0;
@@ -1846,13 +1851,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public boolean isInFlowerHoldPeriod(LevelContext level, BlockPos rootPos, Float seasonValue) {
-        ClimateZoneType climate = SeasonHelper.getClimate(level.level(), rootPos);
+        ClimateZoneType climate = ClimateHelper.getClimate(level.level(), rootPos);
         Float offset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
         if (offset == null) {
             return false;
         }
-        final Float peakSeasonValue = SeasonHelper.getSeasonManager()
-                .getPeakFruitProductionSeasonValue(level.level(), rootPos, offset);
+        final Float peakSeasonValue = SeasonHelper.getPeakFruitProductionSeason(level, rootPos, offset);
         if (peakSeasonValue == null || flowerSeasonHoldPeriodEnd == 0.0F) {
             return false;
         }

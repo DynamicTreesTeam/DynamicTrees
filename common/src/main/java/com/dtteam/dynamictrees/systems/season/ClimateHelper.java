@@ -1,9 +1,11 @@
-package com.dtteam.dynamictrees.systems.climate;
+package com.dtteam.dynamictrees.systems.season;
 
 import com.dtteam.dynamictrees.api.season.ClimateZoneType;
-import com.dtteam.dynamictrees.api.season.SeasonType;
+import com.dtteam.dynamictrees.tree.species.Species;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
 
-public class ClimateHandler {
+public class ClimateHelper {
 
     private static final double[][] CLIMATE_MULTIPLIER_TABLE = {
             //biome:
@@ -15,9 +17,14 @@ public class ClimateHandler {
             { 1.0, 0.9, 0.4, 0.8, 1.0 }  // COLD species
     };
 
-    public static double climateMultiplier(ClimateZoneType preferred, ClimateZoneType plantedIn, double minimum) {
+    public static double climateMultiplier(Species species, ClimateZoneType plantedIn, double minimum) {
+        ClimateZoneType preferred = species.getPreferredClimate();
         double realValue = CLIMATE_MULTIPLIER_TABLE[preferred.ordinal()][plantedIn.ordinal()];
         return realValue * (1-minimum) + minimum;
+    }
+
+    static public ClimateZoneType getClimate(LevelAccessor level, BlockPos rootPos){
+        return SeasonCompatibilityHandler.getSeasonManager().getClimate(level, rootPos);
     }
 
 }
