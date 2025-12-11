@@ -7,7 +7,7 @@
     "growth_rate": 1.25,
     "leaves_properties": "birch",
     "preferred_climate" : "temperate",
-    "climate_tolerance_floor": 0.5,
+    "climate_tolerance": 0.5,
     "primitive_sapling": "birch_sapling",
     "features" : [
         {

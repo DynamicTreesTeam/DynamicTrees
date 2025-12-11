@@ -17,7 +17,7 @@
             "arid": 0
         }
     },
-    "climate_tolerance_floor": 0.1,
+    "climate_tolerance": 0.1,
     "pods": [
         "cocoa"
     ],

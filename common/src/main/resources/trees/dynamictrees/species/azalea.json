@@ -11,7 +11,7 @@
     "generate_sapling": true,
     "growth_logic_kit": "azalea",
     "preferred_climate" : "temperate",
-    "climate_tolerance_floor": 0.4,
+    "climate_tolerance": 0.4,
     "primitive_saplings": [
         {
             "sapling_block": "azalea",

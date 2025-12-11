@@ -1633,7 +1633,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * preferred climate. If the value is 0, climates will affect it a lot, if its 1.0 it will grow just fine
      * in any climate.
      */
-    private float climateToleranceFloor = 0.2f;
+    private float climateTolerance = 0.2f;
 
     /**
      * The result of posting a BiomeSuitabilityEvent
@@ -1669,7 +1669,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return 1.0f; //Replaces "Perfect biome" check
         }
 
-        double suit = ClimateHelper.climateMultiplier(this, currentClimate, climateToleranceFloor);
+        double suit = ClimateHelper.climateMultiplier(this, currentClimate, climateTolerance);
 
         //Linear interpolation of suitability with universal growth scalar
         suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
@@ -1677,8 +1677,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return (float)Mth.clamp(suit, 0.0, 1.0);
     }
 
-    public void setClimateToleranceFloor(float climateToleranceFloor) {
-        this.climateToleranceFloor = climateToleranceFloor;
+    public void setClimateTolerance(float climateTolerance) {
+        this.climateTolerance = climateTolerance;
     }
 
     public void setPreferredClimate(ClimateZoneType preferredClimate) {
@@ -1807,7 +1807,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             fruit.setSeasonalFactorGetter((l, p)->{
                 ClimateZoneType climate = ClimateHelper.getClimate(l.level(), p);
                 double multiplier = Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
-                        ? ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor) : 1.0;
+                        ? ClimateHelper.climateMultiplier(this, climate, climateTolerance) : 1.0;
                 return (float)(this.seasonalFruitProductionFactor(l,p) * multiplier);
             });
             fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
@@ -1819,7 +1819,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             fruit.setSeasonalFactorGetter((l, p)->{
                 ClimateZoneType climate = ClimateHelper.getClimate(l.level(), p);
                 double multiplier = Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
-                        ? ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor) : 1.0;
+                        ? ClimateHelper.climateMultiplier(this, climate, climateTolerance) : 1.0;
                 return (float)(this.seasonalFruitProductionFactor(l,p) * multiplier);
             });
             fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
@@ -1834,7 +1834,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             BlockPos playerPos = BlockPos.containing(player.position());
             ClimateZoneType climate = ClimateHelper.getClimate(player.level(), playerPos);
             float suitability = (float) (Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
-                    ? ClimateHelper.climateMultiplier(this, climate, climateToleranceFloor) : 1.0);
+                    ? ClimateHelper.climateMultiplier(this, climate, climateTolerance) : 1.0);
             if (suitability < 0.3) return 0; //No seasons, still display
 
             Float seasonOffset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);

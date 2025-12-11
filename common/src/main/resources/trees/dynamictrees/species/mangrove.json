@@ -11,7 +11,7 @@
   "leaves_properties": "mangrove",
   "roots_growth_logic_kit": "mangrove_roots",
   "preferred_climate" : "tropical",
-  "climate_tolerance_floor": 0.2,
+  "climate_tolerance": 0.2,
   "primitive_sapling": "mangrove_propagule",
   "sapling_shape": "slim_sapling",
   "model_overrides": {

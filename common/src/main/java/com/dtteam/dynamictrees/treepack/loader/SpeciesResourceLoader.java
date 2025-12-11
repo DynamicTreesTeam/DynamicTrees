@@ -121,7 +121,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("drop_seeds", Boolean.class, Species::setDropSeeds)
                 .register("preferred_climate", ClimateZoneType.class, Species::setPreferredClimate)
                 .register("seasonal_offsets", JsonObject.class, this::applySeasonalOffsets)
-                .register("climate_tolerance_floor", Float.class, Species::setClimateToleranceFloor)
+                .register("climate_tolerance", Float.class, Species::setClimateTolerance)
                 .register("big_tree_sound_threshold", Float.class, Species::setBigTreeSoundThreshold)
                 .register("plantable_on_fluid", Boolean.class, Species::setPlantableOnFluid)
                 .register("allowed_water_height_for_world_gen", Integer.class, Species::setAllowedWaterHeightForWorldgen)

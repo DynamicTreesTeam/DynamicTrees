@@ -8,7 +8,7 @@
     "growth_logic_kit": "conifer",
     "leaves_properties": "spruce",
     "preferred_climate" : "cold",
-    "climate_tolerance_floor": 0.5,
+    "climate_tolerance": 0.5,
     "primitive_sapling": "spruce_sapling",
     "acceptable_soils": ["dirt_like"],
     "world_gen_acceptable_soils": ["snow_like"],

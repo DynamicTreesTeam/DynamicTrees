@@ -6,7 +6,7 @@
     "growth_rate": 0.8,
     "leaves_properties": "oak",
     "preferred_climate" : "temperate",
-    "climate_tolerance_floor": 0.4,
+    "climate_tolerance": 0.4,
     "common_override": { "name": "minecraft:swamp" },
     "generate_sapling": true,
     "model_overrides": {

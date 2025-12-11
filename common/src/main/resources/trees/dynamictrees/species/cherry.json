@@ -7,7 +7,7 @@
     "growth_rate": 0.8,
     "leaves_properties": "cherry",
     "preferred_climate" : "temperate",
-    "climate_tolerance_floor": 0.4,
+    "climate_tolerance": 0.4,
     "acceptable_soils": ["dirt_like"],
     "world_gen_acceptable_soils": ["snow_like"],
     "primitive_sapling": "cherry_sapling",

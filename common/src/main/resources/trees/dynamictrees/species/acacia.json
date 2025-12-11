@@ -7,6 +7,6 @@
     "growth_rate": 0.7,
     "leaves_properties": "acacia",
     "preferred_climate" : "arid",
-    "climate_tolerance_floor": 0.7,
+    "climate_tolerance": 0.7,
     "primitive_sapling": "acacia_sapling"
 }

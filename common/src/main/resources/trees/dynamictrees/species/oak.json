@@ -5,7 +5,7 @@
     "growth_rate": 0.8,
     "leaves_properties": "oak",
     "preferred_climate" : "temperate",
-    "climate_tolerance_floor": 0.5,
+    "climate_tolerance": 0.5,
     "primitive_sapling": "oak_sapling",
     "features" : [
         {

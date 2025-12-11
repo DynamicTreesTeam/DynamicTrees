@@ -10,7 +10,7 @@
     "growth_logic_kit": "dark_oak",
     "leaves_properties": "dark_oak",
     "preferred_climate" : "temperate",
-    "climate_tolerance_floor": 0.6,
+    "climate_tolerance": 0.6,
     "primitive_sapling": "dark_oak_sapling",
     "features" : [
         {

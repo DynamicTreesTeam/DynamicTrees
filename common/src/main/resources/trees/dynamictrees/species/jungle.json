@@ -8,7 +8,7 @@
     "growth_logic_kit": "jungle",
     "leaves_properties": "jungle",
     "preferred_climate" : "tropical",
-    "climate_tolerance_floor": 0.3,
+    "climate_tolerance": 0.3,
     "primitive_sapling": "jungle_sapling",
     "mega_species": "mega_jungle",
     "features" : [

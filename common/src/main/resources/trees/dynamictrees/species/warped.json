@@ -10,7 +10,7 @@
     "growth_logic_kit": "nether_fungus",
     "leaves_properties": "warped",
     "preferred_climate" : "arid",
-    "climate_tolerance_floor": 0.3,
+    "climate_tolerance": 0.3,
     "perfect_biomes": { "name": "minecraft:warped_forest" },
     "primitive_sapling": "warped_fungus",
     "acceptable_soils": ["nether_soil_like", "fungus_like", "dirt_like"],

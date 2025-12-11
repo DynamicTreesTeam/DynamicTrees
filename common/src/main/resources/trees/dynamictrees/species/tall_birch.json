@@ -8,7 +8,7 @@
     "soil_longevity": 12,
     "leaves_properties": "birch",
     "preferred_climate" : "temperate",
-    "climate_tolerance_floor": 0.5,
+    "climate_tolerance": 0.5,
     "common_override": { "name": "minecraft:old_growth_birch_forest" },
     "generate_sapling": true,
     "features" : [
