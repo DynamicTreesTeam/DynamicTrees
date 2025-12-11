@@ -1799,14 +1799,20 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public void inheritSeasonalFruitingParametersToFruits(){
         this.fruits.forEach((fruit)->{
-            fruit.setSeasonalFactorGetter(this::seasonalFruitProductionFactor);
+            fruit.setSeasonalFactorGetter((l, p)->{
+                ClimateZoneType climate = SeasonHelper.getClimate(l.level(), p);
+                return (float)(this.seasonalFruitProductionFactor(l,p) * ClimateHandler.climateMultiplier(preferredClimate, climate, climateToleranceFloor));
+            });
             fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
         });
     }
 
     public void inheritSeasonalFruitingParametersToPods(){
         this.pods.forEach((fruit)->{
-            fruit.setSeasonalFactorGetter(this::seasonalFruitProductionFactor);
+            fruit.setSeasonalFactorGetter((l, p)->{
+                ClimateZoneType climate = SeasonHelper.getClimate(l.level(), p);
+                return (float)(this.seasonalFruitProductionFactor(l,p) * ClimateHandler.climateMultiplier(preferredClimate, climate, climateToleranceFloor));
+            });
             fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
         });
     }
@@ -1815,38 +1821,28 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * 1 = Spring 2 = Summer 4 = Autumn 8 = Winter Values are OR'ed together for the return
      */
     public int getSeasonalTooltipFlags(LevelContext levelContext, Player player) {
-        final float seasonStart = 1f / 6;
-        final float seasonEnd = 1 - 1f / 6;
-        final float threshold = 0.75f;
-
-        BlockPos playerPos = BlockPos.containing(player.position());
-        ClimateZoneType climate = SeasonHelper.getClimate(player.level(), playerPos);
-
         if (this.hasFruits() || this.hasPods()) {
+            BlockPos playerPos = BlockPos.containing(player.position());
+            ClimateZoneType climate = SeasonHelper.getClimate(player.level(), playerPos);
+            float suitability = (float)ClimateHandler.climateMultiplier(preferredClimate, climate, climateToleranceFloor);
+            if (suitability < 0.3) return 0; //No seasons, still display
+
+            Float seasonOffset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
+            if (seasonOffset == null) return 15;//All seasons
+
+            Float offset = SeasonHelper.getSeasonManager().getPeakFruitProductionSeasonValue(levelContext.level(), playerPos, seasonOffset);
+            if (offset == null) return 15;//All seasons
+
             int seasonFlags = 0;
             for (int i = 0; i < 4; i++) {
-                boolean isValidSeason = false;
-                Float seasonOffset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
-                if (seasonOffset != null) {
-                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, playerPos, i + seasonStart + seasonOffset, true);
-                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, playerPos, i + seasonEnd + seasonOffset, true);
-                    if (Math.min(prod1, prod2) > threshold) {
-                        isValidSeason = true;
-                    }
-
-                } else {
-                    isValidSeason = true;
-                }
-
-                if (isValidSeason) {
+                if (Math.abs(((offset - i + 1) % 4)) <= 0.5f){
                     seasonFlags |= 1 << i;
                 }
-
             }
-            return seasonFlags == 0 ? -1 : seasonFlags;
+            return seasonFlags;
         }
 
-        return 0;
+        return -1; //display nothing
     }
 
     public boolean isInFlowerHoldPeriod(LevelContext level, BlockPos rootPos, Float seasonValue) {

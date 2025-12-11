@@ -9,10 +9,11 @@ import java.util.List;
 public class Tooltips {
 
     public static void applySeasonalTooltips(List<Component> tipList, int flags, ClimateZoneType climate) {
-        if (flags == -1) {
-            tipList.add(Component.translatable("desc.dynamictrees.seasonal.infertile", climate.unlocalizedName).append(".").withStyle(ChatFormatting.RED));
+        if (flags == -1) return;
+        if (flags == 0) {
+            tipList.add(Component.translatable("desc.dynamictrees.seasonal.infertile", Component.translatable(climate.unlocalizedName)).withStyle(ChatFormatting.RED));
         }
-        else if (flags != 0) {
+        else {
             tipList.add(Component.translatable("desc.dynamictrees.seasonal.fertile_seasons").append(" (").append(Component.translatable(climate.unlocalizedName)).append("):"));
 
             if ((flags & 15) == 15) {

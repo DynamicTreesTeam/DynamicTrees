@@ -131,11 +131,6 @@ public final class JsonDeserializers {
             JsonResult.success(input, input)
     );
 
-    public static final JsonDeserializer<JsonNull> JSON_NULL = register(JsonNull.class, input ->
-            input.isJsonNull() ? JsonResult.success(input, JsonNull.INSTANCE) :
-                    JsonResult.failure(input, "Json element was not a json null.")
-    );
-
     public static final JsonDeserializer<JsonPrimitive> JSON_PRIMITIVE = register(JsonPrimitive.class, input ->
             input.isJsonPrimitive() ? JsonResult.success(input, input.getAsJsonPrimitive()) :
                     JsonResult.failure(input, "Json element was not a json primitive.")

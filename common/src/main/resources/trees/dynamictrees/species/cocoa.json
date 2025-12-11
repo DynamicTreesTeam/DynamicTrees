@@ -13,7 +13,8 @@
     "preferred_climate" : "tropical",
     "seasonal_offsets": {
         "fruiting": {
-            "tropical": null
+            "tropical": null,
+            "arid": 0
         }
     },
     "climate_tolerance_floor": 0.1,

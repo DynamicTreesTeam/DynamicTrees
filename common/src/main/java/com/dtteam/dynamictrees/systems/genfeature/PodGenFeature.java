@@ -50,7 +50,7 @@ public class PodGenFeature extends GenFeature {
         final BlockState blockState = level.getBlockState(context.treePos());
         final BranchBlock branch = TreeHelper.getBranch(blockState);
         if (context.natural() && branch != null && branch.getRadius(blockState) >= configuration.get(FRUITING_RADIUS)
-                && shouldGrow(configuration, context.species(), context.levelContext(), context.treePos(), context.random())) {
+                && shouldGrow(configuration, context.levelContext(), context.treePos(), context.random())) {
             Pod pod = configuration.get(POD);
             this.place(pod, pod::place, level, context.pos(),
                     SeasonHelper.getSeasonValue(context.levelContext(), context.pos()), configuration.get(BLOCKS_PER_POD), configuration.get(LOWEST_TRUNK_HEIGHT));
@@ -58,10 +58,12 @@ public class PodGenFeature extends GenFeature {
         return false;
     }
 
-    private boolean shouldGrow(GenFeatureConfiguration configuration, Species species, LevelContext levelContext, BlockPos treePos,
-                               RandomSource random) {
-        return species.seasonalFruitProductionFactor(levelContext, treePos) >
-                random.nextFloat() && random.nextFloat() <= configuration.get(PLACE_CHANCE);
+    private boolean shouldGrow(GenFeatureConfiguration configuration, LevelContext levelContext, BlockPos treePos, RandomSource random) {
+        Pod pod = configuration.get(POD);
+        final float fruitingFactor = pod.seasonalFruitProductionFactor(levelContext, treePos);
+        return fruitingFactor > pod.getRequiredProductionFactor()
+                && fruitingFactor > random.nextFloat()
+                && random.nextFloat() <= configuration.get(PLACE_CHANCE);
     }
 
     @Override

@@ -195,10 +195,6 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
     protected void postLoadOnLoad(LoadData loadData, JsonObject json) {
         super.postLoadOnLoad(loadData, json);
         loadData.getResource().generateSeed().generateSapling();
-        Species.REGISTRY.forEach(species -> {
-            if (species.hasFruits()) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingParametersToFruits);
-            if (species.hasPods()) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingParametersToPods);
-        });
     }
 
     @Override
@@ -207,6 +203,9 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         this.composterChanceCache.put(species, species.defaultSeedComposterChance());
         super.postLoadOnReload(loadData, json);
         this.registerComposterChances();
+
+        if (species.hasFruits()) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingParametersToFruits);
+        if (species.hasPods()) Species.REGISTRY.runOnNextLock(species::inheritSeasonalFruitingParametersToPods);
     }
 
     private void registerComposterChances() {

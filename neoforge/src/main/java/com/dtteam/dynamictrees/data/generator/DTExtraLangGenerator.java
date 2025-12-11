@@ -50,7 +50,7 @@ public class DTExtraLangGenerator implements Generator<DTDataProvider.Language,S
             provider.add("potion.burgeoning.description","Quickly grow a tree");
             provider.add("potion.harvest.description","Increase a tree's drops");
             provider.add("desc.dynamictrees.seasonal.fertile_seasons","Fertile Seasons");
-            provider.add("desc.dynamictrees.seasonal.infertile","Infertile in %s climates");
+            provider.add("desc.dynamictrees.seasonal.infertile","Infertile in %s Climates");
             provider.add("desc.dynamictrees.seasonal.year_round","Year-Round");
             provider.add("desc.dynamictrees.seasonal.spring","Spring");
             provider.add("desc.dynamictrees.seasonal.summer","Summer");
