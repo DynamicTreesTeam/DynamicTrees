@@ -127,16 +127,16 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
                 .register("allowed_water_height_for_world_gen", Integer.class, Species::setAllowedWaterHeightForWorldgen)
 
                 .register("seasonal_seed_drop_offset", Float.class, (s,o)->
-                        LOGGER.error("The \"seasonal_seed_drop_offset\" property has been removed. Use \"seasonal_offsets\" instead! Species {}.", s.getRegistryName())
+                        LOGGER.warn("The \"seasonal_seed_drop_offset\" property has been removed. Use \"seasonal_offsets\" instead! Species {}.", s.getRegistryName())
                 )
                 .register("seasonal_growth_offset", Float.class, (s,o)->
-                        LOGGER.error("The \"seasonal_growth_offset\" property has been removed. Use \"seasonal_offsets\" instead! Species {}.", s.getRegistryName())
+                        LOGGER.warn("The \"seasonal_growth_offset\" property has been removed. Use \"seasonal_offsets\" instead! Species {}.", s.getRegistryName())
                 )
                 .register("seasonal_fruiting_offset", Float.class, (s,o)->
-                        LOGGER.error("The \"seasonal_fruiting_offset\" property has been removed. Use \"seasonal_offsets\" instead! Species {}.", s.getRegistryName())
+                        LOGGER.warn("The \"seasonal_fruiting_offset\" property has been removed. Use \"seasonal_offsets\" instead! Species {}.", s.getRegistryName())
                 )
                 .register("environment_factors", JsonObject.class, (s,o)->
-                        LOGGER.error("The \"environment_factors\" property has been removed. Use \"preferred_climate\" instead! Species {}.", s.getRegistryName())
+                        LOGGER.warn("The \"environment_factors\" property has been removed. Use \"preferred_climate\" instead! Species {}.", s.getRegistryName())
                 );
 
         registerMangroveAppliers();
