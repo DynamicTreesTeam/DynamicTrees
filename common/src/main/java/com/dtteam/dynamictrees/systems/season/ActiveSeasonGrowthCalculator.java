@@ -72,8 +72,8 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
     @Override
     public Float getPeakFruitProductionSeasonValue(ClimateZoneType type) {
         return switch (type) {
-            case TEMPERATE, COLD -> 0f;
-            case TROPICAL, ARID -> (float)(double)Services.CONFIG.getDoubleConfig(IConfigHelper.WET_SEASON_OFFSET);
+            case TEMPERATE, COLD -> 2 + peakClimateOffset(SeasonType.TEMPERATURE);
+            case TROPICAL, ARID -> 2 + peakClimateOffset(SeasonType.DRY_WET);
             default -> null;
         };
     }

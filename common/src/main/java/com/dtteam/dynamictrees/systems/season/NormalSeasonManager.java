@@ -137,4 +137,8 @@ public class NormalSeasonManager implements SeasonManager {
         return getContext(level).getSeasonProvider().shouldSnowMelt(level, pos);
     }
 
+    @Override
+    public void clearCache(Level level) {
+        getContext(level).clearCache();
+    }
 }

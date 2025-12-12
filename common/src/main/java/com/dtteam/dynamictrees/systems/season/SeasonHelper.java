@@ -75,7 +75,6 @@ public class SeasonHelper {
         } else {
             return testValue < SeasonB || testValue > SeasonA; //The test wraps around the zero point(outside)
         }
-
     }
 
     static public boolean shouldSnowMelt(Level level, BlockPos pos) {

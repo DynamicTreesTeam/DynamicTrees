@@ -51,7 +51,7 @@ public class SeasonContext {
 
     public float getGrowthFactor(float offset, ClimateZoneType climate) {
         if (seasonValue == null || climate == ClimateZoneType.NONE) return 1;
-        float season = seasonValue + offset;
+        float season = (seasonValue + offset) % 4.0f;
         int key = (int)(season * seasonValueCacheMultiplier);
 
         HashMap<Integer, Float> values = cachedGrowthFactors.computeIfAbsent(climate, k -> new HashMap<>());
@@ -63,7 +63,8 @@ public class SeasonContext {
     }
 
     public float getSeedDropFactor(float offset, ClimateZoneType climate) {
-        float season = seasonValue + offset;
+        if (seasonValue == null || climate == ClimateZoneType.NONE) return 1;
+        float season = (seasonValue + offset) % 4.0f;
         int key = (int)(season * seasonValueCacheMultiplier);
 
         HashMap<Integer, Float> values = cachedSeedDropFactors.computeIfAbsent(climate, k -> new HashMap<>());
@@ -76,7 +77,7 @@ public class SeasonContext {
 
     public float getFruitProductionFactor(float offset, ClimateZoneType climate) {
         if (seasonValue == null || climate == ClimateZoneType.NONE) return 1;
-        float season = seasonValue + offset;
+        float season = (seasonValue + offset) % 4.0f;
         int key = (int)(season * seasonValueCacheMultiplier);
 
         HashMap<Integer, Float> values = cachedFruitProductionFactors.computeIfAbsent(climate, k -> new HashMap<>());
@@ -89,7 +90,14 @@ public class SeasonContext {
 
     public Float getPeakFruitProductionSeasonValue(float offset, ClimateZoneType climate) {
         if (seasonValue == null || climate == ClimateZoneType.NONE) return null;
-        return peakFruitSeasons.get(climate) + offset;
+        return (peakFruitSeasons.get(climate) + offset) % 4.0f;
+    }
+
+    public void clearCache(){
+        cachedGrowthFactors.clear();
+        cachedSeedDropFactors.clear();
+        cachedFruitProductionFactors.clear();
+        peakFruitSeasons.clear();
     }
 
 }

@@ -29,4 +29,6 @@ public interface SeasonManager {
 
     boolean shouldSnowMelt(Level level, BlockPos pos);
 
+    void clearCache(Level level);
+
 }

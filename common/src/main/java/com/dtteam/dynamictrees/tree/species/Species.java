@@ -1840,12 +1840,13 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             Float seasonOffset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
             if (seasonOffset == null) return 15;//All seasons
 
-            Float offset = SeasonHelper.getPeakFruitProductionSeason(levelContext, playerPos, seasonOffset);
-            if (offset == null) return 15;//All seasons
+            Float fruitPeak = SeasonHelper.getPeakFruitProductionSeason(levelContext, playerPos, seasonOffset);
+            if (fruitPeak == null) return 15;//All seasons
 
             int seasonFlags = 0;
             for (int i = 0; i < 4; i++) {
-                if (Math.abs(((offset - i + 1) % 4)) <= 0.5f){
+                float season = i + 0.5f;
+                if (SeasonHelper.isSeasonBetween(fruitPeak, season-0.6f, season+0.6f)){
                     seasonFlags |= 1 << i;
                 }
             }
