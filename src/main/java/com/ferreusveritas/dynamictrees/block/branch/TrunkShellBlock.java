@@ -71,7 +71,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     }
 
     public TrunkShellBlock() {
-        super(Properties.of().ignitedByLava().pushReaction(PushReaction.BLOCK));
+        super(Properties.of().ignitedByLava().pushReaction(PushReaction.BLOCK).noOcclusion());
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
     }
 
