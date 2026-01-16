@@ -2,12 +2,12 @@ package com.ferreusveritas.dynamictrees.block.branch;
 
 import com.ferreusveritas.dynamictrees.block.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.ShellDirection;
 import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
 import com.ferreusveritas.dynamictrees.util.Null;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -34,7 +34,6 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -48,20 +47,25 @@ import java.util.function.Consumer;
 @SuppressWarnings("deprecation")
 public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleWaterloggedBlock {
 
-    public static final EnumProperty<Surround> CORE_DIR = EnumProperty.create("coredir", Surround.class);
+    // Single unified property for all 24 shell directions
+    public static final EnumProperty<ShellDirection> CORE_DIR = EnumProperty.create("coredir", ShellDirection.class);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     public static class ShellMuse {
         public final BlockState state;
         public final BlockPos pos;
         public final BlockPos museOffset;
-        public final Surround dir;
+        public final ShellDirection dir;
 
-        public ShellMuse(BlockState state, BlockPos pos, Surround dir, BlockPos museOffset) {
+        public ShellMuse(BlockState state, BlockPos pos, ShellDirection dir, BlockPos museOffset) {
             this.state = state;
             this.pos = pos;
             this.dir = dir;
             this.museOffset = museOffset;
+        }
+
+        public boolean isOuter() {
+            return dir.isOuter();
         }
 
         public int getRadius() {
@@ -72,7 +76,9 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     public TrunkShellBlock() {
         super(Properties.of().ignitedByLava().pushReaction(PushReaction.BLOCK).noOcclusion());
-        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState()
+                .setValue(CORE_DIR, ShellDirection.N)
+                .setValue(WATERLOGGED, false));
     }
 
     ///////////////////////////////////////////
@@ -80,21 +86,38 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     ///////////////////////////////////////////
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(CORE_DIR).add(WATERLOGGED);
+        builder.add(CORE_DIR, WATERLOGGED);
     }
 
     @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         ShellMuse muse = this.getMuseUnchecked(level, state, pos);
-        if (!isValid(muse)) {
-            if (state.getValue(WATERLOGGED)) {
-                level.setBlockAndUpdate(pos, Blocks.WATER.defaultBlockState());
-            } else {
-                level.removeBlock(pos, false);
+
+        if (muse == null) {
+            ShellDirection museDir = getMuseDir(state);
+            BlockPos targetPos = pos.offset(museDir.getOffset());
+
+            if (!CoordUtils.canAccessStateSafely(level, targetPos)) {
+                level.scheduleTick(pos, this, 20);
+                return;
             }
+            // Chunk accessible, muse gone - remove shell
+            removeShell(state, level, pos);
+            return;
+        }
+
+        if (!isValid(muse)) {
+            removeShell(state, level, pos);
         }
     }
 
+    private void removeShell(BlockState state, ServerLevel level, BlockPos pos) {
+        if (state.getValue(WATERLOGGED)) {
+            level.setBlockAndUpdate(pos, Blocks.WATER.defaultBlockState());
+        } else {
+            level.removeBlock(pos, false);
+        }
+    }
     ///////////////////////////////////////////
     // INTERACTION
     ///////////////////////////////////////////
@@ -130,17 +153,16 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         final BlockPos clickedPos = useContext.getClickedPos();
         if (this.museDoesNotExist(level, state, clickedPos)) {
             this.scheduleUpdateTick(level, clickedPos);
-            return false;
         }
         return false;
     }
 
-    public Surround getMuseDir(BlockState state, BlockPos pos) {
+    public ShellDirection getMuseDir(BlockState state) {
         return state.getValue(CORE_DIR);
     }
 
     public boolean museDoesNotExist(BlockGetter level, BlockState state, BlockPos pos) {
-        final BlockPos musePos = pos.offset(this.getMuseDir(state, pos).getOffset());
+        final BlockPos musePos = pos.offset(this.getMuseDir(state).getOffset());
         return CoordUtils.getStateSafe(level, musePos) == null;
     }
 
@@ -156,7 +178,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     @Nullable
     public ShellMuse getMuseUnchecked(BlockGetter level, BlockState state, BlockPos pos, BlockPos originalPos) {
-        final Surround museDir = getMuseDir(state, pos);
+        final ShellDirection museDir = getMuseDir(state);
         final BlockPos musePos = pos.offset(museDir.getOffset());
         final BlockState museState = CoordUtils.getStateSafe(level, musePos);
 
@@ -167,11 +189,9 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         final Block block = museState.getBlock();
         if (block instanceof Musable && ((Musable) block).isMusable(level, museState, musePos)) {
             return new ShellMuse(museState, musePos, museDir, musePos.subtract(originalPos));
-        } else if (block instanceof TrunkShellBlock) { // If its another trunkshell, then this trunkshell is on another layer. IF they share a common direction, we return that shell's muse.
-            final Vec3i offset = ((TrunkShellBlock) block).getMuseDir(museState, musePos).getOffset();
-            if (new Vec3(offset.getX(), offset.getY(), offset.getZ()).add(new Vec3(museDir.getOffset().getX(), museDir.getOffset().getY(), museDir.getOffset().getZ())).lengthSqr() > 2.25) {
-                return (((TrunkShellBlock) block).getMuseUnchecked(level, museState, musePos, originalPos));
-            }
+        } else if (block instanceof TrunkShellBlock shellBlock) {
+            // If it's another trunk shell, follow the chain to find the core
+            return shellBlock.getMuseUnchecked(level, museState, musePos, originalPos);
         }
         return null;
     }
@@ -185,7 +205,6 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     public ShellMuse getMuse(BlockGetter level, BlockState state, BlockPos pos) {
         final ShellMuse muse = this.getMuseUnchecked(level, state, pos);
 
-        // Check the muse for validity.
         if (!isValid(muse)) {
             this.scheduleUpdateTick(level, pos);
         }
@@ -193,20 +212,35 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return muse;
     }
 
+    /**
+     * Validates a shell muse based on radius thresholds.
+     * Inner shells (distance 1) require radius > 8
+     * Outer shells (distance 2) require radius > 24
+     */
     protected boolean isValid(@Nullable ShellMuse muse) {
-        return muse != null && muse.getRadius() > 8;
+        if (muse == null) {
+            return false;
+        }
+        int radius = muse.getRadius();
+        int shellLevel = muse.dir.getShellLevel();
+
+        return switch (shellLevel) {
+            case 1 -> radius > ThickBranchBlock.RADIUS_TO_INNER_SHELL;      // > 8
+            case 2 -> radius > ThickBranchBlock.RADIUS_TO_OUTER_SHELL;      // > 24
+            case 3 -> radius > ThickBranchBlock.RADIUS_TO_OUTERMOST_SHELL;  // > 40
+            default -> false;
+        };
     }
 
     public void scheduleUpdateTick(BlockGetter level, BlockPos pos) {
         if (!(level instanceof LevelAccessor)) {
             return;
         }
-
         ((LevelAccessor) level).getBlockTicks().schedule(new ScheduledTick<>(this, pos.immutable(), 0, TickPriority.HIGH, 0));
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean p_220069_6_) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean isMoving) {
         this.scheduleUpdateTick(level, pos);
     }
 
@@ -225,30 +259,25 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         Null.consumeIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().onBlockExploded(muse.state, level, muse.pos, explosion));
     }
 
-    //TODO: This may not even be necessary
     @Nullable
-    protected Surround findDetachedMuse(Level level, BlockPos pos) {
-        for (Surround s : Surround.values()) {
-            final BlockState state = level.getBlockState(pos.offset(s.getOffset()));
-
+    protected ShellDirection findDetachedMuse(Level level, BlockPos pos) {
+        for (ShellDirection dir : ShellDirection.values()) {
+            final BlockState state = level.getBlockState(pos.offset(dir.getOffset()));
             if (state.getBlock() instanceof Musable) {
-                return s;
+                return dir;
             }
         }
         return null;
     }
 
-    //TODO: This may not even be necessary
     @Override
     public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
         final BlockState newState = level.getBlockState(pos);
-
         if (newState.getBlock() != Blocks.AIR) {
             return;
         }
-
         Null.consumeIfNonnull(this.findDetachedMuse((Level) level, pos),
-                surround -> level.setBlock(pos, defaultBlockState().setValue(CORE_DIR, surround), 1));
+                dir -> level.setBlock(pos, defaultBlockState().setValue(CORE_DIR, dir), 1));
     }
 
     @Override
@@ -258,12 +287,12 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
 
     @Override
     public boolean isFlammable(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-        return false; // This is the simple solution to the problem.  Maybe I'll work it out later.
+        return false;
     }
 
     @Override
     public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction face) {
-        return 0; // This is the simple solution to the problem.  Maybe I'll work it out later.
+        return 0;
     }
 
     public boolean isFullBlockShell(BlockGetter level, BlockPos pos) {
@@ -295,7 +324,7 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     @Override
     public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
         if (state.getValue(WATERLOGGED)) {
-            level.getFluidTicks().schedule(new ScheduledTick<>(Fluids.WATER,currentPos, Fluids.WATER.getTickDelay(level),0));
+            level.getFluidTicks().schedule(new ScheduledTick<>(Fluids.WATER, currentPos, Fluids.WATER.getTickDelay(level), 0));
         }
         return super.updateShape(state, facing, facingState, level, currentPos, facingPos);
     }
@@ -326,7 +355,6 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return true;
     }
 
-
     @Override
     public void initializeClient(Consumer<IClientBlockExtensions> consumer) {
         consumer.accept(new IClientBlockExtensions() {
@@ -339,9 +367,8 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
                     return false;
                 }
 
-                if (state.getBlock() instanceof TrunkShellBlock) {
-                    final ShellMuse muse = ((TrunkShellBlock)state.getBlock()).getMuseUnchecked(level, state, shellPos);
-
+                if (state.getBlock() instanceof TrunkShellBlock shellBlock) {
+                    final ShellMuse muse = shellBlock.getMuseUnchecked(level, state, shellPos);
                     if (muse == null) {
                         return true;
                     }
@@ -367,30 +394,22 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
                         case EAST -> d0 = x + axisalignedbb.maxX + 0.1D;
                     }
 
-                    // Safe to spawn particles here since this is a client side only member function.
                     level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, museState), d0, d1, d2, 0, 0, 0);
                 }
-
                 return true;
             }
 
             @Override
             public boolean addDestroyEffects(BlockState state, Level level, BlockPos pos, ParticleEngine manager) {
-                if (state.getBlock() instanceof TrunkShellBlock) {
-                    final ShellMuse muse = ((TrunkShellBlock)state.getBlock()).getMuseUnchecked(level, state, pos);
-
+                if (state.getBlock() instanceof TrunkShellBlock shellBlock) {
+                    final ShellMuse muse = shellBlock.getMuseUnchecked(level, state, pos);
                     if (muse == null) {
                         return true;
                     }
-
-                    final BlockState museState = muse.state;
-                    final BlockPos musePos = muse.pos;
-
-                    manager.destroy(musePos, museState);
+                    manager.destroy(muse.pos, muse.state);
                 }
                 return true;
             }
         });
     }
-
 }
