@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.ShellDirection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +16,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -31,10 +32,14 @@ import javax.annotation.Nullable;
 
 public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
-    public static final int MAX_RADIUS_THICK = 24;
+    public static final int MAX_RADIUS_THICK = 56;
+    public static final int RADIUS_TO_INNER_SHELL = 8;      // > 8 needs 3×3
+    public static final int RADIUS_TO_OUTER_SHELL = 24;     // > 24 needs 5×5
+    public static final int RADIUS_TO_OUTERMOST_SHELL = 40; // > 40 needs 7×7
 
-    protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, MAX_RADIUS_THICK); //39 ?
+    protected static final IntegerProperty RADIUS_DOUBLE = IntegerProperty.create("radius", 1, MAX_RADIUS_THICK);
 
+    @Deprecated
     public ThickBranchBlock(ResourceLocation name, MapColor mapColor) {
         this(name, Properties.of().mapColor(mapColor));
     }
@@ -52,8 +57,8 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         builder.add(RADIUS_DOUBLE).add(WATERLOGGED);
     }
 
-    ///////////////////////////////////////////
-    // GROWTH
+///////////////////////////////////////////
+// GROWTH
     ///////////////////////////////////////////
 
     @Override
@@ -69,7 +74,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         if (this.updateTrunkShells(level, pos, radius, flags)) {
             return super.setRadius(level, pos, radius, originDir, flags);
         }
-        return super.setRadius(level, pos, MAX_RADIUS, originDir, flags);
+        return super.setRadius(level, pos, getRadius(level.getBlockState(pos)), originDir, flags);
     }
 
     @Override
@@ -79,41 +84,174 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     }
 
     private boolean updateTrunkShells(LevelAccessor level, BlockPos pos, int radius, int flags) {
-        // If the radius is <= 8 then we can just set the block as normal and move on.
-        if (radius <= MAX_RADIUS) {
+        boolean needsInnerRing = radius > RADIUS_TO_INNER_SHELL;       // > 8
+        boolean needsOuterRing = radius > RADIUS_TO_OUTER_SHELL;       // > 24
+        boolean needsOutermostRing = radius > RADIUS_TO_OUTERMOST_SHELL; // > 40
+
+        // No shells needed
+        if (!needsInnerRing) {
             return true;
         }
 
-        boolean setable = true;
-        final ReplaceableState[] repStates = new ReplaceableState[8];
-
-        for (Surround dir : Surround.values()) {
-            final BlockPos dPos = pos.offset(dir.getOffset());
-            final ReplaceableState rep = getReplaceability(level, dPos, pos);
-
-            repStates[dir.ordinal()] = rep;
-
+        // === Check inner ring ===
+        final ReplaceableState[] innerRepStates = new ReplaceableState[8];
+        ShellDirection[] innerDirs = ShellDirection.innerValues();
+        for (int i = 0; i < innerDirs.length; i++) {
+            ShellDirection dir = innerDirs[i];
+            BlockPos dPos = pos.offset(dir.getOffset());
+            ReplaceableState rep = getReplaceability(level, dPos, pos, 1);
+            innerRepStates[i] = rep;
             if (rep == ReplaceableState.BLOCKING) {
-                setable = false;
-                break;
+                return false;
             }
         }
 
-        if (setable) {
-            BlockState trunkState = level.getBlockState(pos);
-            boolean isWaterlogged = trunkState.hasProperty(WATERLOGGED) && trunkState.getValue(WATERLOGGED);
-            for (Surround dir : Surround.values()) {
-                final BlockPos dPos = pos.offset(dir.getOffset());
-                final ReplaceableState rep = repStates[dir.ordinal()];
-                final boolean replacingWater = isWaterlogged || level.getBlockState(dPos).getFluidState() == Fluids.WATER.getSource(false);
-
-                if (rep == ReplaceableState.REPLACEABLE) {
-                    level.setBlock(dPos, getTrunkShell().defaultBlockState().setValue(TrunkShellBlock.CORE_DIR, dir.getOpposite()).setValue(TrunkShellBlock.WATERLOGGED, replacingWater), flags);
+        // === Check outer ring (if needed) ===
+        final ReplaceableState[] outerRepStates = new ReplaceableState[16];
+        ShellDirection[] outerDirs = ShellDirection.outerValues();
+        if (needsOuterRing) {
+            for (int i = 0; i < outerDirs.length; i++) {
+                ShellDirection dir = outerDirs[i];
+                BlockPos dPos = pos.offset(dir.getOffset());
+                ReplaceableState rep = getReplaceability(level, dPos, pos, 2);
+                outerRepStates[i] = rep;
+                if (rep == ReplaceableState.BLOCKING) {
+                    return false;
                 }
             }
-            return true;
         }
-        return false;
+
+        // === Check outermost ring (if needed) ===
+        final ReplaceableState[] outermostRepStates = new ReplaceableState[24];
+        ShellDirection[] outermostDirs = ShellDirection.outermostValues();
+        if (needsOutermostRing) {
+            for (int i = 0; i < outermostDirs.length; i++) {
+                ShellDirection dir = outermostDirs[i];
+                BlockPos dPos = pos.offset(dir.getOffset());
+                ReplaceableState rep = getReplaceability(level, dPos, pos, 3);
+                outermostRepStates[i] = rep;
+                if (rep == ReplaceableState.BLOCKING) {
+                    return false;
+                }
+            }
+        }
+
+        // === Place shells ===
+        BlockState trunkState = level.getBlockState(pos);
+        boolean isWaterlogged = trunkState.hasProperty(WATERLOGGED) && trunkState.getValue(WATERLOGGED);
+
+        // Place inner ring
+        for (int i = 0; i < innerDirs.length; i++) {
+            ShellDirection dir = innerDirs[i];
+            BlockPos dPos = pos.offset(dir.getOffset());
+            ReplaceableState rep = innerRepStates[i];
+            boolean replacingWater = isWaterlogged || level.getBlockState(dPos).getFluidState() == Fluids.WATER.getSource(false);
+
+            if (rep == ReplaceableState.REPLACEABLE) {
+                level.setBlock(dPos, getTrunkShell().defaultBlockState()
+                        .setValue(TrunkShellBlock.CORE_DIR, dir.getOpposite())
+                        .setValue(TrunkShellBlock.WATERLOGGED, replacingWater), flags);
+            }
+        }
+
+        // Place outer ring (if needed)
+        if (needsOuterRing) {
+            for (int i = 0; i < outerDirs.length; i++) {
+                ShellDirection dir = outerDirs[i];
+                BlockPos dPos = pos.offset(dir.getOffset());
+                ReplaceableState rep = outerRepStates[i];
+                boolean replacingWater = isWaterlogged || level.getBlockState(dPos).getFluidState() == Fluids.WATER.getSource(false);
+
+                if (rep == ReplaceableState.REPLACEABLE) {
+                    level.setBlock(dPos, getTrunkShell().defaultBlockState()
+                            .setValue(TrunkShellBlock.CORE_DIR, dir.getOpposite())
+                            .setValue(TrunkShellBlock.WATERLOGGED, replacingWater), flags);
+                }
+            }
+        }
+
+        // Place outermost ring (if needed)
+        if (needsOutermostRing) {
+            for (int i = 0; i < outermostDirs.length; i++) {
+                ShellDirection dir = outermostDirs[i];
+                BlockPos dPos = pos.offset(dir.getOffset());
+                ReplaceableState rep = outermostRepStates[i];
+                boolean replacingWater = isWaterlogged || level.getBlockState(dPos).getFluidState() == Fluids.WATER.getSource(false);
+
+                if (rep == ReplaceableState.REPLACEABLE) {
+                    level.setBlock(dPos, getTrunkShell().defaultBlockState()
+                            .setValue(TrunkShellBlock.CORE_DIR, dir.getOpposite())
+                            .setValue(TrunkShellBlock.WATERLOGGED, replacingWater), flags);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public ReplaceableState getReplaceability(LevelAccessor level, BlockPos pos, BlockPos corePos, int ringLevel) {
+        final BlockState state = level.getBlockState(pos);
+        final Block block = state.getBlock();
+
+        if (block instanceof TrunkShellBlock) {
+            ShellDirection dir = state.getValue(TrunkShellBlock.CORE_DIR);
+            return pos.offset(dir.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;
+        }
+
+        if (state.canBeReplaced() || state.is(DTBlockTags.FOLIAGE)) {
+            return ReplaceableState.REPLACEABLE;
+        }
+
+        if (TreeHelper.isTreePart(block)) {
+            return ReplaceableState.TREEPART;
+        }
+
+        if (block instanceof SurfaceRootBlock) {
+            return ReplaceableState.TREEPART;
+        }
+
+        if (BranchConnectables.isBlockConnectable(block)) {
+            return ReplaceableState.TREEPART;
+        }
+
+        if (block instanceof FruitBlock || block instanceof PodBlock) {
+            return ReplaceableState.TREEPART;
+        }
+
+        if (this.getFamily().getCommonSpecies().isAcceptableSoilForWorldgen(level, pos, state)) {
+            return ReplaceableState.REPLACEABLE;
+        }
+
+        if (ringLevel == 1) {
+            float hardness = state.getDestroySpeed(level, pos);
+            if (hardness >= 0 && hardness < 1) {
+                return ReplaceableState.REPLACEABLE;
+            }
+        }
+
+        if (ringLevel == 2) {
+            float hardness = state.getDestroySpeed(level, pos);
+            if (hardness >= 0 && hardness < 3) {
+                return ReplaceableState.REPLACEABLE;
+            }
+        }
+
+        // Outermost ring can break most hard blocks
+        if (ringLevel == 3) {
+            float hardness = state.getDestroySpeed(level, pos);
+            if (hardness >= 0 && hardness < 5) {
+                return ReplaceableState.REPLACEABLE;
+            }
+        }
+
+        return ReplaceableState.BLOCKING;
+    }
+
+    enum ReplaceableState {
+        SHELL,
+        REPLACEABLE,
+        BLOCKING,
+        TREEPART
     }
 
     @Override
@@ -134,53 +272,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         }
 
         final int connectionRadius = TreeHelper.getTreePart(blockState).getRadiusForConnection(blockState, level, deltaPos, this, side, radius);
-
         return Math.min(MAX_RADIUS, connectionRadius);
-    }
-
-    public ReplaceableState getReplaceability(LevelAccessor level, BlockPos pos, BlockPos corePos) {
-
-        final BlockState state = level.getBlockState(pos);
-        final Block block = state.getBlock();
-
-        if (block instanceof TrunkShellBlock) {
-            // Determine if this shell belongs to the trunk.  Block otherwise.
-            Surround surr = state.getValue(TrunkShellBlock.CORE_DIR);
-            return pos.offset(surr.getOffset()).equals(corePos) ? ReplaceableState.SHELL : ReplaceableState.BLOCKING;
-        }
-
-        if (state.canBeReplaced() || state.is(DTBlockTags.FOLIAGE)) {
-            return ReplaceableState.REPLACEABLE;
-        }
-
-        if (TreeHelper.isTreePart(block)) {
-            return ReplaceableState.TREEPART;
-        }
-
-        if (block instanceof SurfaceRootBlock) {
-            return ReplaceableState.TREEPART;
-        }
-
-        if (BranchConnectables.isBlockConnectable(block)) {
-            return ReplaceableState.TREEPART;
-        }
-
-        if (block instanceof FruitBlock || block instanceof PodBlock){
-            return ReplaceableState.TREEPART;
-        }
-
-        if (this.getFamily().getCommonSpecies().isAcceptableSoilForWorldgen(level, pos, state)) {
-            return ReplaceableState.REPLACEABLE;
-        }
-
-        return ReplaceableState.BLOCKING;
-    }
-
-    enum ReplaceableState {
-        SHELL,            // This indicates that the block is already a shell.
-        REPLACEABLE,    // This indicates that the block is truly replaceable and will be erased.
-        BLOCKING,        // This indicates that the block is not replaceable, will NOT be erased, and will prevent the tree from growing.
-        TREEPART        // This indicates that the block is part of a tree, will NOT be erase, and will NOT prevent the tree from growing.
     }
 
     @Override
@@ -188,9 +280,8 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
         return MAX_RADIUS_THICK;
     }
 
-
-    ///////////////////////////////////////////
-    // PHYSICAL BOUNDS
+///////////////////////////////////////////
+// PHYSICAL BOUNDS
     ///////////////////////////////////////////
 
     @Nonnull
@@ -209,5 +300,4 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     public boolean isMusable(BlockGetter level, BlockState state, BlockPos pos) {
         return getRadius(state) > 8;
     }
-
 }
