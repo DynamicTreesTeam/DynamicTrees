@@ -3,7 +3,6 @@ package com.ferreusveritas.dynamictrees.tree.species;
 import com.ferreusveritas.dynamictrees.DynamicTrees;
 import com.ferreusveritas.dynamictrees.api.TreeHelper;
 import com.ferreusveritas.dynamictrees.api.TreeRegistry;
-import com.ferreusveritas.dynamictrees.api.cell.CellKit;
 import com.ferreusveritas.dynamictrees.api.data.Generator;
 import com.ferreusveritas.dynamictrees.api.data.SaplingStateGenerator;
 import com.ferreusveritas.dynamictrees.api.data.SeedItemModelGenerator;
@@ -914,10 +913,38 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected final Set<SeedSaplingRecipe> primitiveSaplingRecipe = new HashSet<>();
 
     public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe) {
-        if (recipe.shouldReplaceSaplingWhenPlaced()){
-            recipe.getSaplingBlock().ifPresent(block -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), this));
-        }
+        recipe.getSaplingBlock().ifPresent(block -> TreeRegistry.registerSaplingReplacer(block.defaultBlockState(), this));
         primitiveSaplingRecipe.add(recipe);
+    }
+
+    /**
+     * This is only relevant if {@link DTConfigs#REPLACE_VANILLA_SAPLING} is set to TRUE.
+     * Allows to configure said behavior when placing the sapling.
+     */
+    public boolean shouldReplaceSaplingWhenPlaced(BlockState originalSapling){
+        for (SeedSaplingRecipe recipe : primitiveSaplingRecipe) {
+            if (recipe.shouldReplaceSaplingWhenPlaced()
+                    && recipe.getSaplingBlock().isPresent()
+                    && originalSapling.is(recipe.getSaplingBlock().get())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * This is only relevant if {@link DTConfigs#REPLACE_VANILLA_SAPLING} is set to TRUE.
+     * Allows to configure said behavior when growing the sapling.
+     */
+    public boolean shouldReplaceSaplingWhenGrown(BlockState originalSapling){
+        for (SeedSaplingRecipe recipe : primitiveSaplingRecipe) {
+            if (recipe.shouldReplaceSaplingWhenGrown()
+                    && recipe.getSaplingBlock().isPresent()
+                    && originalSapling.is(recipe.getSaplingBlock().get())){
+                return true;
+            }
+        }
+        return false;
     }
 
     public Set<SeedSaplingRecipe> getPrimitiveSaplingRecipes() {

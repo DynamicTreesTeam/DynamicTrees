@@ -36,6 +36,7 @@ public class SeedSaplingRecipe {
     private boolean canCraftSaplingToSeed = true;
     private boolean canCraftSeedToSapling = true;
     private boolean replaceSaplingWhenPlaced = true;
+    private boolean replaceSaplingWhenGrown = true;
 
     public SeedSaplingRecipe(@Nullable Block saplingBlock, Item saplingItem) {
         this(saplingItem);
@@ -64,6 +65,10 @@ public class SeedSaplingRecipe {
 
     public void setReplaceSaplingWhenPlaced(boolean replaceSaplingWhenPlaced) {
         this.replaceSaplingWhenPlaced = replaceSaplingWhenPlaced;
+    }
+
+    public void setReplaceSaplingWhenGrown(boolean replaceSaplingWhenGrown) {
+        this.replaceSaplingWhenGrown = replaceSaplingWhenGrown;
     }
 
     public Optional<Item> getSaplingItem() {
@@ -104,5 +109,9 @@ public class SeedSaplingRecipe {
 
     public boolean shouldReplaceSaplingWhenPlaced() {
         return replaceSaplingWhenPlaced;
+    }
+
+    public boolean shouldReplaceSaplingWhenGrown() {
+        return replaceSaplingWhenGrown;
     }
 }

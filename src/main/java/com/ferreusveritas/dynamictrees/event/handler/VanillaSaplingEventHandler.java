@@ -18,9 +18,10 @@ public class VanillaSaplingEventHandler {
 
     @SubscribeEvent
     public void onPlayerPlaceBlock(BlockEvent.EntityPlaceEvent event) {
-        final Block block = event.getPlacedBlock().getBlock();
+        final BlockState state = event.getPlacedBlock();
+        final Block block = state.getBlock();
 
-        if (!(event.getLevel() instanceof Level level) || !TreeRegistry.SAPLING_REPLACERS.containsKey(block)) {
+        if (!(event.getLevel() instanceof Level level) || !TreeRegistry.shouldReplaceSaplingWhenPlaced(state)) {
             return;
         }
 
@@ -46,9 +47,10 @@ public class VanillaSaplingEventHandler {
     public void onSaplingGrowTree(SaplingGrowTreeEvent event) {
         final LevelAccessor levelAccess = event.getLevel();
         final BlockPos pos = event.getPos();
-        final Block block = levelAccess.getBlockState(pos).getBlock();
+        final BlockState state = levelAccess.getBlockState(pos);
+        final Block block = state.getBlock();
 
-        if (!(levelAccess instanceof Level level) || !TreeRegistry.SAPLING_REPLACERS.containsKey(block)) {
+        if (!(levelAccess instanceof Level level) || !TreeRegistry.shouldReplaceSaplingWhenGrown(state)) {
             return;
         }
 

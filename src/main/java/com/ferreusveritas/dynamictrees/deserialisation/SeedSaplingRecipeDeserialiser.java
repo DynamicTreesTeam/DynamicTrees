@@ -17,6 +17,7 @@ public final class SeedSaplingRecipeDeserialiser implements JsonDeserialiser<See
     public SeedSaplingRecipeDeserialiser() {
         this.appliers
                 .register("replace_sapling_when_placed", Boolean.class, SeedSaplingRecipe::setReplaceSaplingWhenPlaced)
+                .register("replace_sapling_when_grown", Boolean.class, SeedSaplingRecipe::setReplaceSaplingWhenGrown)
                 .register("can_craft_sapling_to_seed", Boolean.class, SeedSaplingRecipe::setCanCraftSaplingToSeed)
                 .register("can_craft_seed_to_sapling", Boolean.class, SeedSaplingRecipe::setCanCraftSeedToSapling)
                 .register("sapling_to_seed_extra_ingredient", Item.class, SeedSaplingRecipe::addExtraIngredientForSaplingToSeed)
