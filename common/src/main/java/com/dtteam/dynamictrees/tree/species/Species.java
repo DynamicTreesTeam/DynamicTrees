@@ -1840,7 +1840,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * 1 = Spring 2 = Summer 4 = Autumn 8 = Winter Values are OR'ed together for the return
      */
     public int getSeasonalTooltipFlags(LevelContext levelContext, Player player) {
-        if (this.hasFruits() || this.hasPods()) {
+        if (showSeasonalTooltip()) {
             BlockPos playerPos = BlockPos.containing(player.position());
             ClimateZoneType climate = ClimateHelper.getClimate(player.level(), playerPos);
             float suitability = (float) (Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
@@ -1864,6 +1864,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
 
         return -1; //display nothing
+    }
+
+    protected boolean showSeasonalTooltip() {
+        return this.hasFruits() || this.hasPods();
     }
 
     public boolean isInFlowerHoldPeriod(LevelContext level, BlockPos rootPos, Float seasonValue) {
