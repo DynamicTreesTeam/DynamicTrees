@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.BlockGrowFeatureEvent;
@@ -15,9 +16,10 @@ public class VanillaSaplingEventHandler {
 
     @SubscribeEvent
     public void onPlayerPlaceBlock(BlockEvent.EntityPlaceEvent event) {
-        final Block block = event.getPlacedBlock().getBlock();
+        final BlockState state = event.getPlacedBlock();
+        final Block block = state.getBlock();
 
-        if (!(event.getLevel() instanceof Level level) || !DynamicSaplingBlock.SAPLING_REPLACERS.containsKey(block)) {
+        if (!(event.getLevel() instanceof Level level) || !DynamicSaplingBlock.shouldReplaceSaplingWhenPlaced(state)) {
             return;
         }
 
@@ -43,9 +45,10 @@ public class VanillaSaplingEventHandler {
     public void onSaplingGrowTree(BlockGrowFeatureEvent event) {
         final LevelAccessor levelAccess = event.getLevel();
         final BlockPos pos = event.getPos();
-        final Block block = levelAccess.getBlockState(pos).getBlock();
+        final BlockState state = levelAccess.getBlockState(pos);
+        final Block block = state.getBlock();
 
-        if (!(levelAccess instanceof Level level) || !DynamicSaplingBlock.SAPLING_REPLACERS.containsKey(block)) {
+        if (!(levelAccess instanceof Level level) || !DynamicSaplingBlock.shouldReplaceSaplingWhenGrown(state)) {
             return;
         }
 

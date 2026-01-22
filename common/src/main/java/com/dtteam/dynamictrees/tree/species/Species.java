@@ -757,10 +757,30 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected final Set<SeedSaplingRecipe> primitiveSaplingRecipe = new HashSet<>();
 
     public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe) {
-        if (recipe.shouldReplaceSaplingWhenPlaced()){
-            recipe.getSaplingBlock().ifPresent(block -> DynamicSaplingBlock.registerSaplingReplacer(block.defaultBlockState(), this));
-        }
+        recipe.getSaplingBlock().ifPresent(block -> DynamicSaplingBlock.registerSaplingReplacer(block.defaultBlockState(), this));
         primitiveSaplingRecipe.add(recipe);
+    }
+
+    /**
+     * This is only relevant if {@link IConfigHelper#REPLACE_VANILLA_SAPLINGS} is set to TRUE.
+     * Allows to configure said behavior when placing the sapling.
+     */
+    public boolean shouldReplaceSaplingWhenPlaced(BlockState originalSapling){
+        return primitiveSaplingRecipe.stream().anyMatch(recipe ->
+                recipe.shouldReplaceSaplingWhenPlaced()
+                        && recipe.getSaplingBlock().isPresent()
+                        && originalSapling.is(recipe.getSaplingBlock().get()));
+    }
+
+    /**
+     * This is only relevant if {@link IConfigHelper#REPLACE_VANILLA_SAPLINGS} is set to TRUE.
+     * Allows to configure said behavior when growing the sapling.
+     */
+    public boolean shouldReplaceSaplingWhenGrown(BlockState originalSapling){
+        return primitiveSaplingRecipe.stream().anyMatch(recipe ->
+                recipe.shouldReplaceSaplingWhenGrown()
+                        && recipe.getSaplingBlock().isPresent()
+                        && originalSapling.is(recipe.getSaplingBlock().get()));
     }
 
     public Set<SeedSaplingRecipe> getPrimitiveSaplingRecipes() {
@@ -922,19 +942,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return !Services.EVENT.postTransitionSaplingToTreeEvent(this, level, pos) && shouldTransitionToTree(level, pos) &&
                 transitionToTree(level, pos, getFamily());
     }
-
-//    private void debugPrint(Level level, BlockPos pos){
-//        var player = Minecraft.getInstance().player;
-//        if (player != null){
-//            ClimateZoneType climate = ClimateHelper.getClimate(level, pos);
-//            LevelContext context = LevelContext.create(level);
-//            player.sendSystemMessage(Component.literal( "Current climate: "+climate));
-//            player.sendSystemMessage(Component.literal( "Preferred climate: "+preferredClimate));
-//            player.sendSystemMessage(Component.literal("Climate suitability: "+ClimateHandler.climateMultiplier(preferredClimate, climate, climateToleranceFloor)));
-//            player.sendSystemMessage(Component.literal("Fruiting offset: "+seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset)));
-//            player.sendSystemMessage(Component.literal("Fruiting factor: "+seasonalFruitProductionFactor(context, pos)));
-//        }
-//    }
 
     protected boolean shouldTransitionToTree(Level level, BlockPos pos) {
         return level.isEmptyBlock(pos.above()) && isAcceptableSoil(level, pos.below(), level.getBlockState(pos.below()));
@@ -1627,13 +1634,13 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * If a tree is planted outside its preferred climate, growth, seed drops and fruit production will be
      * negatively affected.
      */
-    private ClimateZoneType preferredClimate = ClimateZoneType.TEMPERATE;
+    protected ClimateZoneType preferredClimate = ClimateZoneType.TEMPERATE;
     /**
      * How much the factors of growth, fruiting and seed dropping are affected when planted outside their
      * preferred climate. If the value is 0, climates will affect it a lot, if its 1.0 it will grow just fine
      * in any climate.
      */
-    private float climateTolerance = 0.2f;
+    protected float climateTolerance = 0.2f;
 
     /**
      * The result of posting a BiomeSuitabilityEvent
@@ -1689,6 +1696,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return preferredClimate;
     }
 
+    public float getClimateTolerance() {
+        return climateTolerance;
+    }
     //endregion
 
     ///////////////////////////////////////////
@@ -1707,9 +1717,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected final HashMap<ClimateZoneType, Float> seasonalFruitingOffset = new HashMap<>();
     protected final HashMap<ClimateZoneType, Float> seasonalSeedDropOffset = new HashMap<>();
 
-    private static final float defaultGrowthOffset = 0;
-    private static final float defaultFruitingOffset = 0;
-    private static final float defaultSeedDropOffset = 1;
+    protected static final float defaultGrowthOffset = 0;
+    protected static final float defaultFruitingOffset = 0;
+    protected static final float defaultSeedDropOffset = 1;
 
     /**
      * The default fruiting will PEAK in the middle of summer, starting at the middle of spring and ending at the middle

@@ -173,4 +173,19 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
         SAPLING_REPLACERS.put(state.getBlock(), species);
     }
 
+    public static boolean shouldReplaceSaplingWhenPlaced(BlockState sapling){
+        Block block = sapling.getBlock();
+        if (!SAPLING_REPLACERS.containsKey(block)) return false;
+        Species species = SAPLING_REPLACERS.get(block);
+        return species.shouldReplaceSaplingWhenPlaced(sapling);
+    }
+
+    public static boolean shouldReplaceSaplingWhenGrown(BlockState sapling){
+        Block block = sapling.getBlock();
+        if (!SAPLING_REPLACERS.containsKey(block)) return false;
+        Species species = SAPLING_REPLACERS.get(block);
+        return species.shouldReplaceSaplingWhenGrown(sapling);
+    }
+
+
 }
