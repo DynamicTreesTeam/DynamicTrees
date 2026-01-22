@@ -17,10 +17,13 @@ public class ClimateHelper {
             { 1.0, 0.9, 0.4, 0.8, 1.0 }  // COLD species
     };
 
-    public static double climateMultiplier(Species species, ClimateZoneType plantedIn, double minimum) {
-        ClimateZoneType preferred = species.getPreferredClimate();
+    public static double climateMultiplier(ClimateZoneType preferred, ClimateZoneType plantedIn, double minimum) {
         double realValue = CLIMATE_MULTIPLIER_TABLE[preferred.ordinal()][plantedIn.ordinal()];
         return realValue * (1-minimum) + minimum;
+    }
+
+    public static double climateMultiplier(Species species, ClimateZoneType plantedIn, double minimum) {
+        climateMultiplier(species.getPreferredClimate(), plantedIn, minimum);
     }
 
     static public ClimateZoneType getClimate(LevelAccessor level, BlockPos rootPos){
