@@ -23,7 +23,7 @@ public class ClimateHelper {
     }
 
     public static double climateMultiplier(Species species, ClimateZoneType plantedIn, double minimum) {
-        climateMultiplier(species.getPreferredClimate(), plantedIn, minimum);
+        return climateMultiplier(species.getPreferredClimate(), plantedIn, minimum);
     }
 
     static public ClimateZoneType getClimate(LevelAccessor level, BlockPos rootPos){
