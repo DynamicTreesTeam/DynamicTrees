@@ -7,7 +7,7 @@ import com.ferreusveritas.dynamictrees.data.DTBlockTags;
 import com.ferreusveritas.dynamictrees.init.DTRegistries;
 import com.ferreusveritas.dynamictrees.systems.BranchConnectables;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.CoordUtils.ShellDirection;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.ShellOffset;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -32,7 +32,7 @@ import javax.annotation.Nullable;
 
 public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
-    public static final int MAX_RADIUS_THICK = 56;
+    public static final int MAX_RADIUS_THICK = (TrunkShellBlock.MAX_DISTANCE*2+1)*8;
     public static final int RADIUS_TO_INNER_SHELL = 8;      // > 8 needs 3×3
     public static final int RADIUS_TO_OUTER_SHELL = 24;     // > 24 needs 5×5
     public static final int RADIUS_TO_OUTERMOST_SHELL = 40; // > 40 needs 7×7
@@ -95,7 +95,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
         // === Check inner ring ===
         final ReplaceableState[] innerRepStates = new ReplaceableState[8];
-        ShellDirection[] innerDirs = ShellDirection.innerValues();
+        ShellOffset[] innerDirs = ShellOffset.levelValues(1);
         for (int i = 0; i < innerDirs.length; i++) {
             ShellDirection dir = innerDirs[i];
             BlockPos dPos = pos.offset(dir.getOffset());

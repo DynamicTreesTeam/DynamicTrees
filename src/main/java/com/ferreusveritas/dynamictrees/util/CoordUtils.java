@@ -33,6 +33,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -83,179 +84,107 @@ public final class CoordUtils {
         }
     }
 
-    /**
-     * Unified shell direction enum for TrunkShellBlock.
-     * Contains all 24 positions: 8 inner (distance 1) + 16 outer (distance 2)
-     */
-    /**
-     * Unified shell direction enum for TrunkShellBlock.
-     * Contains all 48 positions: 8 inner (distance 1) + 16 outer (distance 2) + 24 outermost (distance 3)
-     */
-    public enum ShellDirection implements StringRepresentable {
-        // Inner ring (distance 1) - 8 positions
-        N(0, -1, 1),
-        NE(1, -1, 1),
-        E(1, 0, 1),
-        SE(1, 1, 1),
-        S(0, 1, 1),
-        SW(-1, 1, 1),
-        W(-1, 0, 1),
-        NW(-1, -1, 1),
+//    // Inner ring (distance 1) - 8 positions
+//    N(0, -1, 1),
+//    NE(1, -1, 1),
+//    E(1, 0, 1),
+//    SE(1, 1, 1),
+//    S(0, 1, 1),
+//    SW(-1, 1, 1),
+//    W(-1, 0, 1),
+//    NW(-1, -1, 1),
+//
+//    // Outer ring (distance 2) - 16 positions
+//    N2(0, -2, 2),
+//    NE2(1, -2, 2),
+//    E2(2, 0, 2),
+//    SE2(1, 2, 2),
+//    S2(0, 2, 2),
+//    SW2(-1, 2, 2),
+//    W2(-2, 0, 2),
+//    NW2(-1, -2, 2),
+//    NNE(2, -2, 2),
+//    ENE(2, -1, 2),
+//    ESE(2, 1, 2),
+//    SSE(2, 2, 2),
+//    SSW(-2, 2, 2),
+//    WSW(-2, 1, 2),
+//    WNW(-2, -1, 2),
+//    NNW(-2, -2, 2),
+//
+//    // Outermost ring (distance 3) - 24 positions
+//    N3(0, -3, 3),
+//    E3(3, 0, 3),
+//    S3(0, 3, 3),
+//    W3(-3, 0, 3),
+//    CORNER_NE(3, -3, 3),
+//    CORNER_SE(3, 3, 3),
+//    CORNER_SW(-3, 3, 3),
+//    CORNER_NW(-3, -3, 3),
+//    N3E(1, -3, 3),
+//    N3EE(2, -3, 3),
+//    N3W(-1, -3, 3),
+//    N3WW(-2, -3, 3),
+//    E3N(3, -1, 3),
+//    E3NN(3, -2, 3),
+//    E3S(3, 1, 3),
+//    E3SS(3, 2, 3),
+//    S3E(1, 3, 3),
+//    S3EE(2, 3, 3),
+//    S3W(-1, 3, 3),
+//    S3WW(-2, 3, 3),
+//    W3N(-3, -1, 3),
+//    W3NN(-3, -2, 3),
+//    W3S(-3, 1, 3),
+//    W3SS(-3, 2, 3);
 
-        // Outer ring (distance 2) - 16 positions
-        N2(0, -2, 2),
-        NE2(1, -2, 2),
-        E2(2, 0, 2),
-        SE2(1, 2, 2),
-        S2(0, 2, 2),
-        SW2(-1, 2, 2),
-        W2(-2, 0, 2),
-        NW2(-1, -2, 2),
-        NNE(2, -2, 2),
-        ENE(2, -1, 2),
-        ESE(2, 1, 2),
-        SSE(2, 2, 2),
-        SSW(-2, 2, 2),
-        WSW(-2, 1, 2),
-        WNW(-2, -1, 2),
-        NNW(-2, -2, 2),
+    public static class ShellOffset {
 
-        // Outermost ring (distance 3) - 24 positions
-        N3(0, -3, 3),
-        E3(3, 0, 3),
-        S3(0, 3, 3),
-        W3(-3, 0, 3),
-        CORNER_NE(3, -3, 3),
-        CORNER_SE(3, 3, 3),
-        CORNER_SW(-3, 3, 3),
-        CORNER_NW(-3, -3, 3),
-        N3E(1, -3, 3),
-        N3EE(2, -3, 3),
-        N3W(-1, -3, 3),
-        N3WW(-2, -3, 3),
-        E3N(3, -1, 3),
-        E3NN(3, -2, 3),
-        E3S(3, 1, 3),
-        E3SS(3, 2, 3),
-        S3E(1, 3, 3),
-        S3EE(2, 3, 3),
-        S3W(-1, 3, 3),
-        S3WW(-2, 3, 3),
-        W3N(-3, -1, 3),
-        W3NN(-3, -2, 3),
-        W3S(-3, 1, 3),
-        W3SS(-3, 2, 3);
-
-        private static final ShellDirection[] INNER = {N, NE, E, SE, S, SW, W, NW};
-        private static final ShellDirection[] OUTER = {N2, NE2, E2, SE2, S2, SW2, W2, NW2, NNE, ENE, ESE, SSE, SSW, WSW, WNW, NNW};
-        private static final ShellDirection[] OUTERMOST = {N3, E3, S3, W3, CORNER_NE, CORNER_SE, CORNER_SW, CORNER_NW, N3E, N3EE, N3W, N3WW, E3N, E3NN, E3S, E3SS, S3E, S3EE, S3W, S3WW, W3N, W3NN, W3S, W3SS};
+        private static final HashMap<Integer, ShellOffset[]> ringCache = new HashMap<>();
 
         private final BlockPos offset;
-        private final String name;
-        private final int shellLevel;
 
-        ShellDirection(int x, int z, int shellLevel) {
+        public ShellOffset(Vec3i offset){
+            this(offset.getX(), offset.getZ());
+        }
+        public ShellOffset(int x, int z) {
             this.offset = new BlockPos(x, 0, z);
-            this.name = name().toLowerCase(java.util.Locale.ROOT);
-            this.shellLevel = shellLevel;
+        }
+
+        public static int getShellLevel(int x, int z){
+            return Math.max(Math.abs(x), Math.abs(z));
         }
 
         public BlockPos getOffset() {
             return offset;
         }
 
-        /** Returns 1 for inner, 2 for outer, 3 for outermost */
         public int getShellLevel() {
-            return shellLevel;
+            return getShellLevel(offset.getX(), offset.getZ());
         }
 
-        public boolean isInner() {
-            return shellLevel == 1;
+        public ShellOffset getOpposite() {
+            return new ShellOffset(-offset.getX(), -offset.getZ());
         }
 
-        public boolean isOuter() {
-            return shellLevel == 2;
-        }
-
-        public boolean isOutermost() {
-            return shellLevel == 3;
-        }
-
-        @Override
-        @Nonnull
-        public String getSerializedName() {
-            return name;
-        }
-
-        public ShellDirection getOpposite() {
-            return switch (this) {
-                // Inner ring
-                case N -> S;
-                case NE -> SW;
-                case E -> W;
-                case SE -> NW;
-                case S -> N;
-                case SW -> NE;
-                case W -> E;
-                case NW -> SE;
-                // Outer ring
-                case N2 -> S2;
-                case NE2 -> SW2;
-                case E2 -> W2;
-                case SE2 -> NW2;
-                case S2 -> N2;
-                case SW2 -> NE2;
-                case W2 -> E2;
-                case NW2 -> SE2;
-                case NNE -> SSW;
-                case ENE -> WSW;
-                case ESE -> WNW;
-                case SSE -> NNW;
-                case SSW -> NNE;
-                case WSW -> ENE;
-                case WNW -> ESE;
-                case NNW -> SSE;
-                // Outermost ring
-                case N3 -> S3;
-                case E3 -> W3;
-                case S3 -> N3;
-                case W3 -> E3;
-                case CORNER_NE -> CORNER_SW;
-                case CORNER_SE -> CORNER_NW;
-                case CORNER_SW -> CORNER_NE;
-                case CORNER_NW -> CORNER_SE;
-                case N3E -> S3W;
-                case N3EE -> S3WW;
-                case N3W -> S3E;
-                case N3WW -> S3EE;
-                case E3N -> W3S;
-                case E3NN -> W3SS;
-                case E3S -> W3N;
-                case E3SS -> W3NN;
-                case S3E -> N3W;
-                case S3EE -> N3WW;
-                case S3W -> N3E;
-                case S3WW -> N3EE;
-                case W3N -> E3S;
-                case W3NN -> E3SS;
-                case W3S -> E3N;
-                case W3SS -> E3NN;
-            };
-        }
-
-        /** Get inner ring directions only (8 positions at distance 1) */
-        public static ShellDirection[] innerValues() {
-            return INNER;
-        }
-
-        /** Get outer ring directions only (16 positions at distance 2) */
-        public static ShellDirection[] outerValues() {
-            return OUTER;
-        }
-
-        /** Get outermost ring directions only (24 positions at distance 3) */
-        public static ShellDirection[] outermostValues() {
-            return OUTERMOST;
+        public static ShellOffset[] levelValues(int level) {
+            if (level < 1) return new ShellOffset[0];
+            if (ringCache.containsKey(level)){
+                return ringCache.get(level);
+            } else {
+                //There are 8N blocks on each ring (Chebyshev distance)
+                ShellOffset[] array = new ShellOffset[8 * level];
+                int i = 0;
+                for (int x = -level; x <= level; x++) {
+                    for (int z = -level; z <= level; z++) {
+                        if (getShellLevel(x, z) == level) {
+                            array[i++] = new ShellOffset(x, z);
+                        }
+                    }
+                }
+                ringCache.put(level, array);
+                return array;
+            }
         }
     }
 

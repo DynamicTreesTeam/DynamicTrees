@@ -2,8 +2,7 @@ package com.ferreusveritas.dynamictrees.block.branch;
 
 import com.ferreusveritas.dynamictrees.block.BlockWithDynamicHardness;
 import com.ferreusveritas.dynamictrees.util.CoordUtils;
-import com.ferreusveritas.dynamictrees.util.CoordUtils.ShellDirection;
-import com.ferreusveritas.dynamictrees.util.CoordUtils.Surround;
+import com.ferreusveritas.dynamictrees.util.CoordUtils.ShellOffset;
 import com.ferreusveritas.dynamictrees.util.Null;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;
@@ -26,6 +25,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -46,38 +46,27 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("deprecation")
 public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleWaterloggedBlock {
-
+    public static final int MAX_DISTANCE = 3;
     // Single unified property for all 24 shell directions
-    public static final EnumProperty<ShellDirection> CORE_DIR = EnumProperty.create("coredir", ShellDirection.class);
+    @Deprecated
+    public static final EnumProperty<CoordUtils.Surround> CORE_DIR = EnumProperty.create("coredir", CoordUtils.Surround.class);
+    public static final IntegerProperty CORE_OFFSET_X = IntegerProperty.create("shell_offset_x", 0, MAX_DISTANCE*2);
+    public static final IntegerProperty CORE_OFFSET_Z = IntegerProperty.create("shell_offset_z", 0, MAX_DISTANCE*2);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-    public static class ShellMuse {
-        public final BlockState state;
-        public final BlockPos pos;
-        public final BlockPos museOffset;
-        public final ShellDirection dir;
-
-        public ShellMuse(BlockState state, BlockPos pos, ShellDirection dir, BlockPos museOffset) {
-            this.state = state;
-            this.pos = pos;
-            this.dir = dir;
-            this.museOffset = museOffset;
-        }
-
-        public boolean isOuter() {
-            return dir.isOuter();
-        }
-
+    public record ShellMuse(BlockState state, BlockPos pos, ShellOffset dir, BlockPos museOffset) {
         public int getRadius() {
-            final Block block = this.state.getBlock();
-            return block instanceof BranchBlock ? ((BranchBlock) block).getRadius(state) : 0;
+                final Block block = this.state.getBlock();
+                return block instanceof BranchBlock ? ((BranchBlock) block).getRadius(state) : 0;
+            }
         }
-    }
 
     public TrunkShellBlock() {
         super(Properties.of().ignitedByLava().pushReaction(PushReaction.BLOCK).noOcclusion());
         registerDefaultState(defaultBlockState()
-                .setValue(CORE_DIR, ShellDirection.N)
+                .setValue(CORE_DIR, CoordUtils.Surround.N)
+                .setValue(CORE_OFFSET_X, MAX_DISTANCE)
+                .setValue(CORE_OFFSET_Z, MAX_DISTANCE)
                 .setValue(WATERLOGGED, false));
     }
 
@@ -94,8 +83,8 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         ShellMuse muse = this.getMuseUnchecked(level, state, pos);
 
         if (muse == null) {
-            ShellDirection museDir = getMuseDir(state);
-            BlockPos targetPos = pos.offset(museDir.getOffset());
+            ShellOffset museOffset = getMuseDir(state);
+            BlockPos targetPos = pos.offset(museOffset.getOffset());
 
             if (!CoordUtils.canAccessStateSafely(level, targetPos)) {
                 level.scheduleTick(pos, this, 20);
@@ -157,8 +146,14 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return false;
     }
 
-    public ShellDirection getMuseDir(BlockState state) {
-        return state.getValue(CORE_DIR);
+    public ShellOffset getMuseOffset(BlockState state) {
+        ShellOffset offset = new ShellOffset(state.getValue(CORE_OFFSET_X)-MAX_DISTANCE, state.getValue(CORE_OFFSET_Z)-MAX_DISTANCE);
+        if (offset.getShellLevel() == 0) { //This means the shell offset value is 0 (legacy world)
+            CoordUtils.Surround offsetDir = state.getValue(CORE_DIR);
+            return new ShellOffset(offsetDir.getOffset());
+        } else {
+            return offset;
+        }
     }
 
     public boolean museDoesNotExist(BlockGetter level, BlockState state, BlockPos pos) {

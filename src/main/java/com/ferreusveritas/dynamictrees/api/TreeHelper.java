@@ -152,7 +152,7 @@ public class TreeHelper {
         if (blockState.getBlock() instanceof TrunkShellBlock) {
             TrunkShellBlock.ShellMuse muse = ((TrunkShellBlock) blockState.getBlock()).getMuse(level, blockState, pos);
             if (muse != null) {
-                return muse.pos;
+                return muse.pos();
             }
         }
 
