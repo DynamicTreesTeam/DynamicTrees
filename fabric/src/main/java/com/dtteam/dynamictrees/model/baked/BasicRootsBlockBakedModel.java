@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.model.baked;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.google.common.collect.Maps;
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
@@ -76,10 +77,18 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
 
     @Override
     protected int getRadius(BlockState blockState) {
-        if (blockState.getBlock() instanceof BasicRootsBlock rootsBlock) {
-            return rootsBlock.getRadius(blockState);
+        if (blockState.getBlock() instanceof BasicRootsBlock) {
+            if (blockState.hasProperty(BasicRootsBlock.RADIUS)) {
+                return blockState.getValue(BasicRootsBlock.RADIUS);
+            }
         }
         return super.getRadius(blockState);
+    }
+
+    @Override
+    protected void emitQuad(QuadEmitter emitter, BakedQuad quad, Direction cullFace) {
+        emitter.fromVanilla(quad, null, null);
+        emitter.emit();
     }
 
     @Override
@@ -109,7 +118,9 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
         Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
 
         for (Direction face : Direction.values()) {
-            if (coreRadius != connections[face.get3DDataValue()]) {
+            int connectionOnFace = connections[face.get3DDataValue()];
+
+            if (coreRadius != connectionOnFace) {
                 List<BakedQuad> quads;
                 if (coreRingDir == null || coreRingDir != face) {
                     quads = coresQuads[coreDir][coreRadius - 1];
@@ -118,8 +129,7 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
                 }
                 for (BakedQuad quad : quads) {
                     if (quad.getDirection() == face) {
-                        emitter.fromVanilla(quad, null, face);
-                        emitter.emit();
+                        emitQuad(emitter, quad, face);
                     }
                 }
             }
@@ -128,13 +138,12 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
                 for (Direction connDir : Direction.values()) {
                     int idx = connDir.get3DDataValue();
                     int connRadius = connections[idx];
-                    if (connRadius > 0 && (connRadius <= twigRadius || face != connDir)) {
+                    if (connRadius > 0 && connRadius < 8 && (connRadius <= twigRadius || face != connDir)) {
                         List<BakedQuad> sleeveQuads = sleevesQuads[idx][connRadius - 1];
                         if (sleeveQuads != null) {
                             for (BakedQuad quad : sleeveQuads) {
                                 if (quad.getDirection() == face) {
-                                    emitter.fromVanilla(quad, null, face);
-                                    emitter.emit();
+                                    emitQuad(emitter, quad, face);
                                 }
                             }
                         }
@@ -142,15 +151,12 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
                 }
             }
 
-            int idx = face.get3DDataValue();
-            int connRadius = connections[idx];
-            if (connRadius > 0) {
-                List<BakedQuad> endFaceQuads = sleeveEndFaces[idx][connRadius - 1];
+            if (connectionOnFace > 0 && connectionOnFace <= coreRadius) {
+                List<BakedQuad> endFaceQuads = sleeveEndFaces[face.get3DDataValue()][connectionOnFace - 1];
                 if (endFaceQuads != null) {
                     for (BakedQuad quad : endFaceQuads) {
                         if (quad.getDirection() == face) {
-                            emitter.fromVanilla(quad, null, face);
-                            emitter.emit();
+                            emitQuad(emitter, quad, face);
                         }
                     }
                 }

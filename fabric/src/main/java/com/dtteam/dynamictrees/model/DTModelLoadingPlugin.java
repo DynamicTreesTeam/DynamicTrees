@@ -130,6 +130,8 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
                         BakedModel model = createRootsBlockModel(barkTexture, ringsTexture, spriteGetter);
                         UNDERGROUND_ROOTS_MODEL_CACHE.put(blockId.withSuffix("_filled"), model);
                     });
+
+
                 });
             }
         }
@@ -159,6 +161,25 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
         return new BasicRootsBlockBakedModel(barkSprite, ringsSprite);
     }
 
+    private BakedModel createFallbackRootsModel(UndergroundRootsFamily family, String variant, Function<Material, TextureAtlasSprite> spriteGetter) {
+        if (variant.contains("layer=exposed")) {
+            return family.getPrimitiveRoots().map(primitiveRoots -> {
+                ResourceLocation primitiveRootsId = BuiltInRegistries.BLOCK.getKey(primitiveRoots);
+                ResourceLocation barkTexture = ResourceLocation.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_side");
+                ResourceLocation ringsTexture = ResourceLocation.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_top");
+                return createRootsBlockModel(barkTexture, ringsTexture, spriteGetter);
+            }).orElse(null);
+        } else if (variant.contains("layer=filled")) {
+            return family.getPrimitiveFilledRoots().map(primitiveFilledRoots -> {
+                ResourceLocation primitiveFilledRootsId = BuiltInRegistries.BLOCK.getKey(primitiveFilledRoots);
+                ResourceLocation barkTexture = ResourceLocation.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_side");
+                ResourceLocation ringsTexture = ResourceLocation.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_top");
+                return createRootsBlockModel(barkTexture, ringsTexture, spriteGetter);
+            }).orElse(null);
+        }
+        return null;
+    }
+
     private BakedModel modifyModelAfterBake(BakedModel model, ModelModifier.AfterBake.Context context) {
         ModelResourceLocation modelId = context.topLevelId();
         if (modelId == null) return model;
@@ -170,8 +191,8 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
         ResourceLocation blockId = modelId.id();
         Block block = BuiltInRegistries.BLOCK.get(blockId);
 
-        if (block instanceof BasicRootsBlock) {
-            initBranchModels(material -> context.textureGetter().apply(new Material(material.atlasLocation(), material.texture())));
+        if (block instanceof BasicRootsBlock rootsBlock) {
+            initBranchModels(context.textureGetter());
 
             String variant = modelId.variant();
             ResourceLocation cacheKey;
@@ -179,6 +200,8 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
                 cacheKey = blockId.withSuffix("_filled");
             } else if (variant.contains("layer=exposed")) {
                 cacheKey = blockId.withSuffix("_exposed");
+            } else if (variant.contains("layer=covered")) {
+                return model;
             } else {
                 return model;
             }
@@ -187,10 +210,29 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
             if (rootsModel != null) {
                 return rootsModel;
             }
+
+            if (rootsBlock.getFamily() instanceof UndergroundRootsFamily undergroundFamily) {
+                BakedModel fallbackModel = createFallbackRootsModel(undergroundFamily, variant, context.textureGetter());
+                if (fallbackModel != null) {
+                    UNDERGROUND_ROOTS_MODEL_CACHE.put(cacheKey, fallbackModel);
+                    return fallbackModel;
+                }
+            }
+            return model;
+        }
+
+        if (block instanceof SurfaceRootBlock) {
+            initBranchModels(context.textureGetter());
+
+            BakedModel rootModel = ROOT_MODEL_CACHE.get(blockId);
+            if (rootModel != null) {
+                return rootModel;
+            }
+            return model;
         }
 
         if (block instanceof BranchBlock) {
-            initBranchModels(material -> context.textureGetter().apply(new Material(material.atlasLocation(), material.texture())));
+            initBranchModels(context.textureGetter());
 
             BakedModel branchModel = BRANCH_MODEL_CACHE.get(blockId);
             if (branchModel != null) {
@@ -198,14 +240,6 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
             }
         }
 
-        if (block instanceof SurfaceRootBlock) {
-            initBranchModels(material -> context.textureGetter().apply(new Material(material.atlasLocation(), material.texture())));
-
-            BakedModel rootModel = ROOT_MODEL_CACHE.get(blockId);
-            if (rootModel != null) {
-                return rootModel;
-            }
-        }
 
         return model;
     }

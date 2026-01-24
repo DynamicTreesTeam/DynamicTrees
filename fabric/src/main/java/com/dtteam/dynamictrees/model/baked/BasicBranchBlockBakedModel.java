@@ -20,7 +20,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
@@ -39,7 +38,7 @@ public class BasicBranchBlockBakedModel implements BakedModel, FabricBakedModel 
     protected final TextureAtlasSprite barkTexture;
     protected final TextureAtlasSprite ringsTexture;
 
-    public final List<BakedQuad>[][] sleevesQuads = new List[6][7];
+    public final List<BakedQuad>[][] sleevesQuads = new List[6][8];
     public final List<BakedQuad>[][] coresQuads = new List[3][8];
     public final List<BakedQuad>[] ringsQuads = new List[8];
 
@@ -201,8 +200,7 @@ public class BasicBranchBlockBakedModel implements BakedModel, FabricBakedModel 
                 }
                 for (BakedQuad quad : quads) {
                     if (quad.getDirection() == face) {
-                        emitter.fromVanilla(quad, null, face);
-                        emitter.emit();
+                        emitQuad(emitter, quad, face);
                     }
                 }
             }
@@ -211,13 +209,12 @@ public class BasicBranchBlockBakedModel implements BakedModel, FabricBakedModel 
                 for (Direction connDir : Direction.values()) {
                     int idx = connDir.get3DDataValue();
                     int connRadius = connections[idx];
-                    if (connRadius > 0 && (connRadius <= twigRadius || face != connDir)) {
+                    if (connRadius > 0 && connRadius < 8 && (connRadius <= twigRadius || face != connDir)) {
                         List<BakedQuad> sleeveQuads = sleevesQuads[idx][connRadius - 1];
                         if (sleeveQuads != null) {
                             for (BakedQuad quad : sleeveQuads) {
                                 if (quad.getDirection() == face) {
-                                    emitter.fromVanilla(quad, null, face);
-                                    emitter.emit();
+                                    emitQuad(emitter, quad, face);
                                 }
                             }
                         }
@@ -225,6 +222,11 @@ public class BasicBranchBlockBakedModel implements BakedModel, FabricBakedModel 
                 }
             }
         }
+    }
+
+    protected void emitQuad(QuadEmitter emitter, BakedQuad quad, Direction cullFace) {
+        emitter.fromVanilla(quad, null, cullFace);
+        emitter.emit();
     }
 
     @Override

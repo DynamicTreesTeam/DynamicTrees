@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.model;
 
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
-import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.ClientServices;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +17,7 @@ public class FallingTreeEntityModelTrackerCache {
     @Nullable
     public static FallingTreeEntityModel getOrCreateModel(FallingTreeEntity entity) {
         if (entity.level().isClientSide())
-            return models.computeIfAbsent(entity.getId(), i -> Services.MISC.newFallingTreeEntityModel(entity));
+            return models.computeIfAbsent(entity.getId(), i -> ClientServices.CLIENT.newFallingTreeEntityModel(entity));
         return null;
     }
 

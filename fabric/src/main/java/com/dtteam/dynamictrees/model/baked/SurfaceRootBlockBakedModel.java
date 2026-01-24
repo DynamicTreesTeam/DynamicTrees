@@ -254,7 +254,7 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
                 if (coreQuads != null) {
                     for (BakedQuad quad : coreQuads) {
                         if (quad.getDirection() == face) {
-                            emitter.fromVanilla(quad, null, face);
+                            emitter.fromVanilla(quad, null, null);
                             emitter.emit();
                         }
                     }
@@ -269,7 +269,7 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
                         if (isGrounded && sleevesQuads[idx][connRadius - 1] != null) {
                             for (BakedQuad quad : sleevesQuads[idx][connRadius - 1]) {
                                 if (quad.getDirection() == face) {
-                                    emitter.fromVanilla(quad, null, face);
+                                    emitter.fromVanilla(quad, null, null);
                                     emitter.emit();
                                 }
                             }
@@ -277,7 +277,7 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
                         if (connectionLevels[idx] == RootConnections.ConnectionLevel.HIGH && vertsQuads[idx][connRadius - 1] != null) {
                             for (BakedQuad quad : vertsQuads[idx][connRadius - 1]) {
                                 if (quad.getDirection() == face) {
-                                    emitter.fromVanilla(quad, null, face);
+                                    emitter.fromVanilla(quad, null, null);
                                     emitter.emit();
                                 }
                             }
