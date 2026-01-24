@@ -28,6 +28,8 @@ public class DTConfigs {
                 IConfigHelper.MIN_SEASONAL_LEAVES_SEED_DROP_RATE, 0.15, 0.0, 1.0);
         createConfig("The rate at which seeds voluntarily drop from branches",
                 IConfigHelper.VOLUNTARY_SEED_DROP_RATE, 0.01, 0.0, 1.0);
+        createConfig("The minimum chance for seed dropping voluntarily when a seasonal mod is installed. 0 = during the off season seeds never drop voluntarily, 1 = seeds will drop at maximum rate during the entire year. Can be fractional.",
+                IConfigHelper.MIN_SEASONAL_VOLUNTARY_SEED_DROP_RATE, 0.0, 0.0, 1.0);
         createConfig("The rate at which seeds voluntarily plant themselves in their ideal biomes",
                 IConfigHelper.SEED_PLANT_RATE, 1f / 6f, 0.0, 1.0);
         createConfig("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute",
@@ -36,6 +38,8 @@ public class DTConfigs {
                 IConfigHelper.SEED_ONLY_FOREST, true);
         createConfig("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional.",
                 IConfigHelper.SEED_MIN_FORESTNESS, 0.0, 0.0, 1.0);
+        createConfig("If enabled, fruit and pod production will be affected by the current biome's climate.",
+                IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS, true);
 
         configs.addSection("trees");
         createConfig("Factor that multiplies the rate at which trees grow. Use at own risk",
@@ -45,8 +49,7 @@ public class DTConfigs {
         createConfig("Maximum harvesting hardness that can be calculated. Regardless of tree thickness.",
                 IConfigHelper.MAX_TREE_HARDNESS, 20f, 1f, 200f);
         createConfig("A multiplier of tree hardness. Higher values make trees slower to chop, lower values makes them faster to chop.",
-
-                IConfigHelper.TREE_HARDNESS_MULTIPLIER, 1, (1/128f), 32f);
+                IConfigHelper.TREE_HARDNESS_MULTIPLIER, 1f, (1/128f), 32f);
         createConfig("If enabled then sticks will be dropped for partial logs",
                 IConfigHelper.DROP_STICKS, true);
         createConfig("Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome",
