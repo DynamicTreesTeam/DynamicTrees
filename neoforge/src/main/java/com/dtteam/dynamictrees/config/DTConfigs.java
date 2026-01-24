@@ -57,6 +57,8 @@ public class DTConfigs {
                 define(IConfigHelper.SEED_ONLY_FOREST, true));
         registerConfig(SERVER_BUILDER.comment("The minimum forestness that non-forest-like biomes can have. 0 = is not at all a forest, 1 = may as well be a forest. Can be fractional.").
                 defineInRange(IConfigHelper.SEED_MIN_FORESTNESS, 0.0, 0.0, 1.0));
+        registerConfig(SERVER_BUILDER.comment("If enabled, fruit and pod production will be affected by the current biome's climate.").
+                define(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS, true));
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.comment("Tree Settings").push("trees");
@@ -150,11 +152,13 @@ public class DTConfigs {
         registerConfig(COMMON_BUILDER.comment("The mod ID of preferred season mod. If a season provider for this mod ID is present, it will be used for integration with seasons. Set this to \"!\" to disable integration or \"*\" to accept the any integration (the first available).")
                 .define(IConfigHelper.PREFERRED_SEASON_MOD, SeasonCompatibilityHandler.ANY));
         registerConfig(COMMON_BUILDER.comment("If enabled, seed drop rates will be multiplied based on the current season (requires serene seasons).").
-                define(IConfigHelper.ENABLE_SEASONAL_SEED_DROP_FACTOR, true));
+                define(IConfigHelper.ENABLE_SEASONAL_SEED_DROP, true));
         registerConfig(COMMON_BUILDER.comment("If enabled, growth rates will be multiplied based on the current season (requires serene seasons).").
-                define(IConfigHelper.ENABLE_SEASONAL_GROWTH_FACTOR, true));
+                define(IConfigHelper.ENABLE_SEASONAL_GROWTH, true));
         registerConfig(COMMON_BUILDER.comment("If enabled, fruit production rates will be multiplied based on the current season (requires serene seasons).").
-                define(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION_FACTOR, true));
+                define(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION, true));
+        registerConfig(COMMON_BUILDER.comment("The seasonal offset of the wet season relative to summer. Tropical and arid climates use wet/dry seasons instead of regular summer/fall/winter/spring seasons. Tree growth and fruit production usually peak during the wet season. If set to 0.0 the wet season happens at the same time as summer. The default of 2.5 means it happens between fall and winter.").
+                defineInRange(IConfigHelper.WET_SEASON_OFFSET, 2.5, 0.0, 4.0));
 
         COMMON_BUILDER.pop();
 

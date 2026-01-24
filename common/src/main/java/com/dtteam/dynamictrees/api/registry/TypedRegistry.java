@@ -97,11 +97,12 @@ public class TypedRegistry<V extends RegistryEntry<V>> extends SimpleRegistry<V>
 
         if (typeElement != null) {
             JsonDeserializers.RESOURCE_LOCATION.deserialize(typeElement)
-                    .map(resourceLocation -> this.getType(ResourceLocationUtils.parseDTLocation(resourceLocation)), "Could not find type for '{}' (will use default).")
+                    .map(ResourceLocationUtils::parseDTLocation)
+                    .map(resourceLocation -> this.getType(resourceLocation), "Could not find type for '{}' (will use default).")
                     .ifSuccessOrElse(
                             type::set,
-                            error -> LogManager.getLogger().error("Error constructing " + this.name + " '" + registryName + "': " + error),
-                            warning -> LogManager.getLogger().warn("Warning whilst constructing " + this.name + " '" + registryName + "': " + warning)
+                            error -> LogManager.getLogger().error("Error constructing {} '{}': {}", this.name, registryName, error),
+                            warning -> LogManager.getLogger().warn("Warning whilst constructing {} '{}': {}", this.name, registryName, warning)
                     );
         }
 

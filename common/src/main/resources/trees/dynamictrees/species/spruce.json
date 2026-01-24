@@ -7,19 +7,14 @@
     "growth_rate": 0.9,
     "growth_logic_kit": "conifer",
     "leaves_properties": "spruce",
-    "environment_factors" : {
-        "#c:is_hot": 0.50,
-        "#c:is_dry": 0.25,
-        "#c:is_wet": 0.75
-    },
-    "perfect_biomes": { "tag": "#c:is_coniferous" },
+    "preferred_climate" : "cold",
+    "climate_tolerance": 0.5,
     "primitive_sapling": "spruce_sapling",
     "acceptable_soils": ["dirt_like"],
     "world_gen_acceptable_soils": ["snow_like"],
     "mega_species": "mega_spruce",
     "features" : [
-        "conifer_topper",
-        "podzol"
+        "conifer_topper"
     ],
     "lang_overrides": {
         "seed": "Spruce Cone"

@@ -87,7 +87,7 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
         final Float season = SeasonHelper.getSeasonValue(LevelContext.create(level), pos);
 
         if (season != null) { // Non-Null means we are season capable.
-            if (pod.isOutOfSeason(LevelContext.create(level), pos)) {
+            if (pod.isOutOfSeason(level, pos)) {
                 this.outOfSeason(level, pos); // Destroy the block or similar action.
                 return;
             }

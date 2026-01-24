@@ -1,4 +1,4 @@
-package com.dtteam.dynamictrees.systems.season;
+package com.dtteam.dynamictrees.api.season;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

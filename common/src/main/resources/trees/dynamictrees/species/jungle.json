@@ -7,13 +7,8 @@
     "growth_rate": 1.0,
     "growth_logic_kit": "jungle",
     "leaves_properties": "jungle",
-    "environment_factors" : {
-        "#c:is_cold": 0.15,
-        "#c:is_dry": 0.2,
-        "#c:is_hot": 1.1,
-        "#c:is_wet": 1.1
-    },
-    "perfect_biomes": { "tag": "#minecraft:is_jungle" },
+    "preferred_climate" : "tropical",
+    "climate_tolerance": 0.3,
     "primitive_sapling": "jungle_sapling",
     "mega_species": "mega_jungle",
     "features" : [

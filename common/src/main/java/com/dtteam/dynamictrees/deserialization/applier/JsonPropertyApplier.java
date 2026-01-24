@@ -22,19 +22,12 @@ public final class JsonPropertyApplier<O, V> extends PropertyApplier<O, V, JsonE
         this.deserializer = LazyValue.supplied(() -> JsonDeserializers.getOrThrow(valueClass));
     }
 
-    @SuppressWarnings("unchecked")
     @Nullable
     @Override
     protected PropertyApplierResult applyIfShould(O object, JsonElement input,
                                                   Applier<O, V> applier) {
-        if (JsonDeserializers.JSON_NULL.deserialize(input).success())
-            return JsonDeserializers.JSON_NULL.deserialize(input)
-                    .map(value -> this.applier.apply(object, null))
-                    .orElseApply(
-                            PropertyApplierResult::failure,
-                            PropertyApplierResult::addWarnings,
-                            null
-                    );
+        if (input.isJsonNull())
+            return this.applier.apply(object, null);
         return deserializer.get().deserialize(input)
                 .map(value -> this.applier.apply(object, value))
                 .orElseApply(

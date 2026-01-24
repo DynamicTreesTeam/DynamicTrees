@@ -13,7 +13,7 @@ public interface SeasonGrowthCalculator {
 
     float calcSeedDropRate(Float seasonValue, ClimateZoneType type);
 
-    float calcFruitProduction(Float seasonValue, ClimateZoneType type);
+    float calcFruitProductionRate(Float seasonValue, ClimateZoneType type);
 
     /**
      * @return the season value at which the fruit production will be at its highest, or {@code null} if the specified

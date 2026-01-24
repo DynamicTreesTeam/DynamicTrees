@@ -235,6 +235,13 @@ public class JsonResult<T> extends AbstractResult<T, JsonElement> {
     }
 
     /**
+     * A special case for when the value is meant to be null, success is considered true despite value being null.
+     */
+    public static <T> JsonResult<T> nullSuccess(JsonElement json, T value) {
+        return new NullJsonResult<>(json, value, null);
+    }
+
+    /**
      * Creates a failure json result for the specified {@code json} input and {@code error}.
      *
      * @param json  the original json input

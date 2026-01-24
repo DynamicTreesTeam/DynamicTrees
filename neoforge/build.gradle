@@ -3,7 +3,7 @@ import me.modmuss50.mpp.ReleaseType
 plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
-    id "me.modmuss50.mod-publish-plugin" version "0.8.4"
+    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 }
 
 neoForge {
@@ -60,11 +60,12 @@ neoForge {
     dependencies {
         implementation "curse.maven:jade-324717:6011258"
         implementation "curse.maven:jei-238222:5846880"
-        implementation "curse.maven:spark-361579:6225208"
-
         implementation "curse.maven:glitchcore-955399:5660740"
         implementation "curse.maven:serene-seasons-291874:5753503"
-        implementation "curse.maven:patchouli-306770:6164617"
+        
+        //runtimeOnly "curse.maven:distant-horizons-508933:7328639"
+        runtimeOnly "curse.maven:patchouli-306770:6164617"
+        runtimeOnly "curse.maven:spark-361579:6225208"
     }
 
     publishing {

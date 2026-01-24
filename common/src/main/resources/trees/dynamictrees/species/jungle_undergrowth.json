@@ -5,6 +5,6 @@
     "signal_energy": 1.2,
     "soil_longevity": 1,
     "leaves_properties": "jungle_undergrowth",
-    "perfect_biomes": { "name": "minecraft:jungle" },
+    "preferred_climate" : "tropical",
     "acceptable_soils": ["dirt_like"]
 }

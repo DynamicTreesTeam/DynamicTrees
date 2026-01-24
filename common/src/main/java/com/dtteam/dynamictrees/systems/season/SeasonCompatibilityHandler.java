@@ -19,6 +19,23 @@ public final class SeasonCompatibilityHandler {
 
     private static final LinkedHashMap<String, Supplier<SeasonManager>> SEASON_MANAGERS = Maps.newLinkedHashMap();
 
+    private static SeasonManager activeSeasonManager = NormalSeasonManager.NULL.get();
+
+    static public SeasonManager getSeasonManager() {
+        return activeSeasonManager;
+    }
+
+    /**
+     * Maybe you don't like the global function season function.  Fine, do it all yourself then!
+     *
+     * <p>Add-ons should not use this method! {@link SeasonCompatibilityHandler#registerSeasonManager(String, Supplier)}
+     * should be used to register a season manager for a corresponding mod to respect the preferred season mod
+     * configuration option.</p>
+     */
+    static public void setSeasonManager(SeasonManager manager) {
+        activeSeasonManager = manager;
+    }
+
     /**
      * Registers the specified {@link NormalSeasonManager} supplier for the specified {@code modId}. Given as a supplier for
      * lazy initialisation.
@@ -47,13 +64,13 @@ public final class SeasonCompatibilityHandler {
 
         // If disabled, use null manager.
         if (Objects.equals(modId, DISABLED)) {
-            SeasonHelper.setSeasonManager(NormalSeasonManager.NULL.get());
+            setSeasonManager(NormalSeasonManager.NULL.get());
             return;
         }
 
         // If any, select first manager registered.
         if (Objects.equals(modId, ANY)) {
-            SeasonHelper.setSeasonManager(
+            setSeasonManager(
                     SEASON_MANAGERS.entrySet().stream()
                             .filter(entry -> Services.PLATFORM.isModLoaded(entry.getKey()))
                             .map(Map.Entry::getValue)
@@ -74,7 +91,7 @@ public final class SeasonCompatibilityHandler {
             return;
         }
 
-        SeasonHelper.setSeasonManager(SEASON_MANAGERS.get(modId).get());
+        setSeasonManager(SEASON_MANAGERS.get(modId).get());
     }
 
 }

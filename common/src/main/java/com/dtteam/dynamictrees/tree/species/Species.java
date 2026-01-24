@@ -9,6 +9,7 @@ import com.dtteam.dynamictrees.api.network.NodeInspector;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
+import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.substance.Emptiable;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffect;
 import com.dtteam.dynamictrees.api.substance.SubstanceEffectProvider;
@@ -45,6 +46,7 @@ import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
+import com.dtteam.dynamictrees.systems.season.ClimateHelper;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.genfeature.context.*;
@@ -62,7 +64,10 @@ import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.utility.Optionals;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
-import com.dtteam.dynamictrees.worldgen.*;
+import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
+import com.dtteam.dynamictrees.worldgen.JoCode;
+import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
+import com.dtteam.dynamictrees.worldgen.RootsJoCode;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
@@ -112,6 +117,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -288,14 +294,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     protected Boolean tintSapling = true;
 
-    //WorldGen
-    /**
-     * A map of environmental biome factors that change a tree's suitability
-     */
-    protected Map<TagKey<Biome>, Float> envFactors = new HashMap<>();//Environmental factors
-
-    protected IDTBiomeHolderSet  perfectBiomes = Services.MISC.newDTBiomeHolderSet();
-
     protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
 
     /**
@@ -351,11 +349,9 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public Species reset() {
         this.fruits.clear();
         this.pods.clear();
-        this.envFactors.clear();
         this.genFeatures.clear();
         this.acceptableBlocksForGrowth.clear();
         this.primitiveSaplingRecipe.clear();
-        this.perfectBiomes.clear();
 
         this.clearAcceptableSoils();
 
@@ -363,8 +359,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * Can be overridden by subclasses for setting defaults for things before reload, such as {@link #envFactors}.
-     *
+     * Can be overridden by subclasses for setting defaults for things before reload.
      * @return This {@link Species} object for chaining.
      */
     @Override
@@ -403,13 +398,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
-    /**
-     * @return The default chance for the compostable {@link Seed} to be successfully composted.
-     */
-    public float defaultSeedComposterChance() {
-        return 0.3f;
-    }
-
     public Family getFamily() {
         return family;
     }
@@ -417,31 +405,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public void setFamily(Family family) {
         family.addSpecies(this);
         this.family = family;
-    }
-
-    /**
-     * @return the {@link #family}'s {@linkplain Family#getCommonSpecies() common species}
-     */
-    public Species getCommonSpecies() {
-        return this.family.getCommonSpecies();
-    }
-
-    /**
-     * @return {@code true} if this species is the common of {@link #family}; {@code false} otherwise
-     */
-    public boolean isCommonSpecies() {
-        return this.getCommonSpecies() == this;
-    }
-
-    /**
-     * Checks whether {@link #seed} is the same instance as the {@link Seed} of the common {@link Species} of the
-     * owning {@link Family}.
-     *
-     * @return {@code true} if {@link #seed} {@code ==} the {@link Seed} of the common {@link Species} of {@link
-     * #family}; {@code false} otherwise.
-     */
-    public boolean isSeedCommon() {
-        return this.getCommonSpecies().getSeed().orElse(null) == this.seed.get();
     }
 
     public Species setUnlocalizedName(String name) {
@@ -462,104 +425,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this.formatComponent(Component.translatable(this.getUnlocalizedName()), ChatFormatting.AQUA);
     }
 
-    public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
-        this.tapering = tapering;
-        this.signalEnergy = energy;
-        this.upProbability = upProbability;
-        this.lowestBranchHeight = lowestBranchHeight;
-        this.growthRate = growthRate;
-        return this;
-    }
-
-    public void setTapering(float tapering) {
-        this.tapering = tapering;
-    }
-
-    public void setUpProbability(int upProbability) {
-        this.upProbability = upProbability;
-    }
-
-    public void setLowestBranchHeight(int lowestBranchHeight) {
-        this.lowestBranchHeight = lowestBranchHeight;
-    }
-
-    public void setSignalEnergy(float signalEnergy) {
-        this.signalEnergy = signalEnergy;
-    }
-
-    public void setGrowthRate(float growthRate) {
-        this.growthRate = growthRate;
-    }
-
-    public float getSignalEnergy() {
-        return signalEnergy;
-    }
-
-    public float getEnergy(Level level, BlockPos rootPos) {
-        return this.logicKit.getEnergy(new PositionalSpeciesContext(level, rootPos, this));
-    }
-
-    public float getGrowthRate(Level level, BlockPos rootPos) {
-        return this.growthRate * this.seasonalGrowthFactor(LevelContext.create(level), rootPos);
-    }
-
-    /**
-     * Probability reinforcer for up direction which is arguably the direction most trees generally grow in.
-     */
-    public int getUpProbability() {
-        return upProbability;
-    }
-
-    /**
-     * Probability reinforcer for current travel direction
-     */
-    public int getProbabilityForCurrentDir() {
-        return 1;
-    }
-
-    public int getLowestBranchHeight() {
-        return lowestBranchHeight;
-    }
-
-    public float getTapering() {
-        return tapering;
-    }
-
-    /**
-     * Works out if this {@link Species} will require a {@link SpeciesBlockEntity} at the given position. It should
-     * require one if it's not the common species, and it's not in its common species override for the given position.
-     *
-     * @param level The {@link LevelAccessor} the tree is being planted in.
-     * @param pos   The {@link BlockPos} at which the tree is being planted at.
-     * @return True if it will require a {@link SpeciesBlockEntity}.
-     */
-    public boolean doesRequireTileEntity(LevelAccessor level, BlockPos pos) {
-        return !this.isCommonSpecies() && !this.shouldOverrideCommon(level, pos);
-    }
-
-    public boolean hasCommonOverride() {
-        return this.commonOverride != null;
-    }
-
-    public void setCommonOverride(final CommonOverride commonOverride) {
-        this.commonOverride = commonOverride;
-    }
-
-    public boolean shouldOverrideCommon(final BlockGetter level, final BlockPos trunkPos) {
-        //Common Override test will fail if the server has not loaded yet
-        if (Services.MISC.getCurrentServer() == null) {
-            DynamicTrees.LOG.warn("shouldOverrideCommon was called before the server was loaded, will return false for now.");
-            return false;
-        }
-        return this.hasCommonOverride() && this.commonOverride.test(level, trunkPos);
-    }
-
-    @FunctionalInterface
-    public interface CommonOverride extends BiPredicate<BlockGetter, BlockPos> { }
-
     ///////////////////////////////////////////
     //LEAVES
     ///////////////////////////////////////////
+    //region leaves
 
     public Species setLeavesProperties(LeavesProperties leavesProperties) {
         this.leavesProperties = leavesProperties;
@@ -626,10 +495,19 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public int leafColorMultiplier(Level level, BlockPos pos) {
         return getLeavesProperties().treeFallColorMultiplier(getLeavesProperties().getDynamicLeavesState(), level, pos);
     }
+    //endregion
 
     ///////////////////////////////////////////
     //SEEDS
     ///////////////////////////////////////////
+    //region seeds
+
+    /**
+     * @return The default chance for the compostable {@link Seed} to be successfully composted.
+     */
+    public float defaultSeedComposterChance() {
+        return 0.3f;
+    }
 
     /**
      * Get an ItemStack of the species {@link Seed} with the supplied quantity.
@@ -712,6 +590,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.seed = seedSup;
         return this;
     }
+    //endregion
+
+    ///////////////////////////////////////////
+    //LOOT
+    ///////////////////////////////////////////
+    //region loot
 
     public List<ItemStack> getVoluntaryDrops(Level level, BlockPos rootPos, int fertility) {
         if (level.isClientSide) {
@@ -763,7 +647,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public void processVolume(NetVolumeNode.Volume volume) {
-        volume.multiplyVolume(Services.CONFIG.getDoubleConfig("treeHarvestMultiplier")); // For cheaters. you know who you are.
+        volume.multiplyVolume(Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_HARVEST_MULTIPLIER)); // For cheaters. you know who you are.
         volume.multiplyVolume(getFamily().getLootVolumeMultiplier()); //the family can have a multiplier too
     }
 
@@ -860,10 +744,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
         return true;
     }
+    //endregion
 
     ///////////////////////////////////////////
     // SAPLING
     ///////////////////////////////////////////
+    //region sapling
 
     /**
      * Valid primitive sapling {@link Item}s. Used for dirt bucket recipes.
@@ -871,10 +757,30 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected final Set<SeedSaplingRecipe> primitiveSaplingRecipe = new HashSet<>();
 
     public void addPrimitiveSaplingRecipe(SeedSaplingRecipe recipe) {
-        if (recipe.shouldReplaceSaplingWhenPlaced()){
-            recipe.getSaplingBlock().ifPresent(block -> DynamicSaplingBlock.registerSaplingReplacer(block.defaultBlockState(), this));
-        }
+        recipe.getSaplingBlock().ifPresent(block -> DynamicSaplingBlock.registerSaplingReplacer(block.defaultBlockState(), this));
         primitiveSaplingRecipe.add(recipe);
+    }
+
+    /**
+     * This is only relevant if {@link IConfigHelper#REPLACE_VANILLA_SAPLINGS} is set to TRUE.
+     * Allows to configure said behavior when placing the sapling.
+     */
+    public boolean shouldReplaceSaplingWhenPlaced(BlockState originalSapling){
+        return primitiveSaplingRecipe.stream().anyMatch(recipe ->
+                recipe.shouldReplaceSaplingWhenPlaced()
+                        && recipe.getSaplingBlock().isPresent()
+                        && originalSapling.is(recipe.getSaplingBlock().get()));
+    }
+
+    /**
+     * This is only relevant if {@link IConfigHelper#REPLACE_VANILLA_SAPLINGS} is set to TRUE.
+     * Allows to configure said behavior when growing the sapling.
+     */
+    public boolean shouldReplaceSaplingWhenGrown(BlockState originalSapling){
+        return primitiveSaplingRecipe.stream().anyMatch(recipe ->
+                recipe.shouldReplaceSaplingWhenGrown()
+                        && recipe.getSaplingBlock().isPresent()
+                        && originalSapling.is(recipe.getSaplingBlock().get()));
     }
 
     public Set<SeedSaplingRecipe> getPrimitiveSaplingRecipes() {
@@ -1115,9 +1021,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return this;
     }
 
+    /**
+     * Provides the {@link PottedSaplingBlock} for this Species. {@link Species} subclasses can derive their own {@link
+     * PottedSaplingBlock} subclass if they want something custom.
+     *
+     * @return The {@link PottedSaplingBlock} for this {@link Species}.
+     */
+    public PottedSaplingBlock getPottedSapling() {
+        return DTRegistries.POTTED_SAPLING.get();
+    }
+    //endregion
+
     ///////////////////////////////////////////
     //DIRT
     ///////////////////////////////////////////
+    //region dirt
 
     public boolean placeRootyDirtBlock(LevelAccessor level, BlockPos rootPos, int fertility) {
         BlockState dirtState = level.getBlockState(rootPos);
@@ -1327,9 +1245,106 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return false;
     }
 
-    //////////////////////////////
+    /**
+     * Works out if this {@link Species} will require a {@link SpeciesBlockEntity} at the given position. It should
+     * require one if it's not the common species, and it's not in its common species override for the given position.
+     *
+     * @param level The {@link LevelAccessor} the tree is being planted in.
+     * @param pos   The {@link BlockPos} at which the tree is being planted at.
+     * @return True if it will require a {@link SpeciesBlockEntity}.
+     */
+    public boolean doesRequireTileEntity(LevelAccessor level, BlockPos pos) {
+        return !this.isCommonSpecies() && !this.shouldOverrideCommon(level, pos);
+    }
+
+    public boolean hasCommonOverride() {
+        return this.commonOverride != null;
+    }
+
+    public void setCommonOverride(final CommonOverride commonOverride) {
+        this.commonOverride = commonOverride;
+    }
+
+    public boolean shouldOverrideCommon(final BlockGetter level, final BlockPos trunkPos) {
+        //Common Override test will fail if the server has not loaded yet
+        if (Services.MISC.getCurrentServer() == null) {
+            DynamicTrees.LOG.warn("shouldOverrideCommon was called before the server was loaded, will return false for now.");
+            return false;
+        }
+        return this.hasCommonOverride() && this.commonOverride.test(level, trunkPos);
+    }
+
+    @FunctionalInterface
+    public interface CommonOverride extends BiPredicate<BlockGetter, BlockPos> { }
+    //endregion
+
+    ///////////////////////////////////////////
     // GROWTH
-    //////////////////////////////
+    ///////////////////////////////////////////
+    //region growth
+
+    public Species setBasicGrowingParameters(float tapering, float energy, int upProbability, int lowestBranchHeight, float growthRate) {
+        this.tapering = tapering;
+        this.signalEnergy = energy;
+        this.upProbability = upProbability;
+        this.lowestBranchHeight = lowestBranchHeight;
+        this.growthRate = growthRate;
+        return this;
+    }
+
+    public void setTapering(float tapering) {
+        this.tapering = tapering;
+    }
+
+    public void setUpProbability(int upProbability) {
+        this.upProbability = upProbability;
+    }
+
+    public void setLowestBranchHeight(int lowestBranchHeight) {
+        this.lowestBranchHeight = lowestBranchHeight;
+    }
+
+    public void setSignalEnergy(float signalEnergy) {
+        this.signalEnergy = signalEnergy;
+    }
+
+    public void setGrowthRate(float growthRate) {
+        this.growthRate = growthRate;
+    }
+
+    public float getSignalEnergy() {
+        return signalEnergy;
+    }
+
+    public float getEnergy(Level level, BlockPos rootPos) {
+        return this.logicKit.getEnergy(new PositionalSpeciesContext(level, rootPos, this));
+    }
+
+    public float getGrowthRate(Level level, BlockPos rootPos) {
+        return this.growthRate * this.seasonalGrowthFactor(LevelContext.create(level), rootPos);
+    }
+
+    /**
+     * Probability reinforcer for up direction which is arguably the direction most trees generally grow in.
+     */
+    public int getUpProbability() {
+        return upProbability;
+    }
+
+    /**
+     * Probability reinforcer for current travel direction
+     */
+    public int getProbabilityForCurrentDir() {
+        return 1;
+    }
+
+    public int getLowestBranchHeight() {
+        return lowestBranchHeight;
+    }
+
+    public float getTapering() {
+        return tapering;
+    }
 
     /**
      * Basic update. This handles everything for the species Rot, Drops, Fruit, Disease, and Growth respectively. If the
@@ -1512,7 +1527,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public boolean grow(Level level, SoilBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
 
-        float growthRate = (float) (getGrowthRate(level, rootPos) * Services.CONFIG.getDoubleConfig("treeGrowthMultiplier"));
+        float growthRate = (float) (getGrowthRate(level, rootPos) * Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_GROWTH_MULTIPLIER));
         do {
             if (fertility > 0) {
                 if (growthRate > random.nextFloat()) {
@@ -1607,15 +1622,25 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         return false;
     }
+    //endregion
 
-    //////////////////////////////
+    ///////////////////////////////////////////
     // BIOME HANDLING
-    //////////////////////////////
+    ///////////////////////////////////////////
+    //region biome-handling
 
-    public Species envFactor(TagKey<Biome> type, float factor) {
-        envFactors.put(type, factor);
-        return this;
-    }
+    /**
+     * The preferred climate for the species. This replaces the old "PerfectBiomes".
+     * If a tree is planted outside its preferred climate, growth, seed drops and fruit production will be
+     * negatively affected.
+     */
+    protected ClimateZoneType preferredClimate = ClimateZoneType.TEMPERATE;
+    /**
+     * How much the factors of growth, fruiting and seed dropping are affected when planted outside their
+     * preferred climate. If the value is 0, climates will affect it a lot, if its 1.0 it will grow just fine
+     * in any climate.
+     */
+    protected float climateTolerance = 0.2f;
 
     /**
      * The result of posting a BiomeSuitabilityEvent
@@ -1640,79 +1665,126 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return result.suitability();
         }
 
-        float ugs = (float) (double) Services.CONFIG.getDoubleConfig(IConfigHelper.SCALE_BIOME_GROWTH_RATE); // Universal growth scalar.
+        double ugs = Services.CONFIG.getDoubleConfig(IConfigHelper.SCALE_BIOME_GROWTH_RATE); // Universal growth scalar.
 
-        if (ugs == 1.0f || this.isBiomePerfect(biomeHolder)) {
+        if (ugs == 1.0 || preferredClimate == ClimateZoneType.NONE) {
             return 1.0f;
         }
 
-        float suit = defaultSuitability();
-
-        for (TagKey<Biome> t : biomeHolder.tags().toList()) {
-            suit *= envFactors.getOrDefault(t, 1.0f);
+        ClimateZoneType currentClimate = ClimateHelper.getClimate(level, pos);
+        if (currentClimate == preferredClimate || currentClimate == ClimateZoneType.NONE){
+            return 1.0f; //Replaces "Perfect biome" check
         }
+
+        double suit = ClimateHelper.climateMultiplier(this, currentClimate, climateTolerance);
 
         //Linear interpolation of suitability with universal growth scalar
         suit = ugs <= 0.5f ? ugs * 2.0f * suit : ((1.0f - ugs) * suit + (ugs - 0.5f)) * 2.0f;
 
-        return Mth.clamp(suit, 0.0f, 1.0f);
+        return (float)Mth.clamp(suit, 0.0, 1.0);
     }
 
-    /**
-     * Used to determine if the provided {@link Biome} argument will yield unhindered growth to Maximum potential. This
-     * has the affect of the suitability being 100%(or 1.0f)
-     *
-     * @param biome The biome being tested
-     * @return True if biome is "perfect" false otherwise.
-     */
-    public boolean isBiomePerfect(Holder<Biome> biome) {
-        return this.perfectBiomes.contains(biome);
+    public void setClimateTolerance(float climateTolerance) {
+        this.climateTolerance = climateTolerance;
     }
 
-
-    public IDTBiomeHolderSet getPerfectBiomes() {
-        return perfectBiomes;
+    public void setPreferredClimate(ClimateZoneType preferredClimate) {
+        this.preferredClimate = preferredClimate;
     }
 
-    /**
-     * A value that determines what a tree's suitability is before climate manipulation occurs.
-     */
-    public static float defaultSuitability() {
-        return 0.85f;
+    public ClimateZoneType getPreferredClimate() {
+        return preferredClimate;
     }
 
-    //////////////////////////////
+    public float getClimateTolerance() {
+        return climateTolerance;
+    }
+    //endregion
+
+    ///////////////////////////////////////////
     // SEASONAL
-    //////////////////////////////
+    ///////////////////////////////////////////
+    //region seasonal
 
     /**
-     * default flower holding is relative to the flowering offset, but default is first half of spring
+     * Start and end of the flower hold period relative to the fruiting peak.
+     * During this period flowers will grow but not mature into fruits, waiting instead for the next season.
      */
-    protected float flowerSeasonHoldMin = SeasonHelper.SPRING;
-    protected float flowerSeasonHoldMax = SeasonHelper.SPRING + 0.5f;
+    protected float flowerSeasonHoldPeriodStart = -1.5f;
+    protected float flowerSeasonHoldPeriodEnd = -1.0f;
 
-    @Nullable
-    protected Float seasonalGrowthOffset = 0f;
-    @Nullable
-    protected Float seasonalSeedDropOffset = 0f;
-    @Nullable
-    protected Float seasonalFruitingOffset = 0f;
+    protected final HashMap<ClimateZoneType, Float> seasonalGrowthOffset = new HashMap<>();
+    protected final HashMap<ClimateZoneType, Float> seasonalFruitingOffset = new HashMap<>();
+    protected final HashMap<ClimateZoneType, Float> seasonalSeedDropOffset = new HashMap<>();
 
-    public void setSeasonalGrowthOffset(@Nullable Float offset) {
-        seasonalGrowthOffset = offset;
-    }
-
-    public void setSeasonalSeedDropOffset(@Nullable Float offset) {
-        seasonalSeedDropOffset = offset;
-    }
+    protected static final float defaultGrowthOffset = 0;
+    protected static final float defaultFruitingOffset = 0;
+    protected static final float defaultSeedDropOffset = 1;
 
     /**
      * The default fruiting will PEAK in the middle of summer, starting at the middle of spring and ending at the middle
      * of fall. this offset will move the fruiting by a factor of one season. (an offset of 2.0 will my fruiting peak in
-     * winter). set to null for it to be all year round
+     * winter). set to null for it to be all year round.
+     * For tropical and arid climates it's the same, but they peak in the middle of wet season by default.
      */
+    public void setSeasonalFruitingOffset(Map<String, Float> offsets) {
+        offsets.forEach((key, value)->setSeasonalFruitingOffset(ClimateZoneType.valueOf(key.toUpperCase(Locale.ENGLISH)), value));
+    }
+    public void setSeasonalFruitingOffset(ClimateZoneType climate, @Nullable Float offset) {
+        seasonalFruitingOffset.put(climate, offset);
+        //Tropical and arid offsets usually match
+        if (climate == ClimateZoneType.TROPICAL && !seasonalFruitingOffset.containsKey(ClimateZoneType.ARID)){
+            seasonalFruitingOffset.put(ClimateZoneType.ARID, offset);
+        }
+        if (climate == ClimateZoneType.ARID && !seasonalFruitingOffset.containsKey(ClimateZoneType.TROPICAL)){
+            seasonalFruitingOffset.put(ClimateZoneType.TROPICAL, offset);
+        }
+        //Fruiting season often defines seeding season (1 season after)
+        if (!seasonalSeedDropOffset.containsKey(climate)){
+            setSeasonalSeedDropOffset(climate, offset == null ? null : offset + 1);
+        }
+    }
+
+    public void setSeasonalGrowthOffset(Map<String, Float> offsets) {
+        offsets.forEach((key, value)->setSeasonalGrowthOffset(ClimateZoneType.valueOf(key.toUpperCase(Locale.ENGLISH)), value));
+    }
+    public void setSeasonalGrowthOffset(ClimateZoneType climate, @Nullable Float offset) {
+        seasonalGrowthOffset.put(climate, offset);
+        //Tropical and arid offsets usually match
+        if (climate == ClimateZoneType.TROPICAL && !seasonalGrowthOffset.containsKey(ClimateZoneType.ARID)){
+            seasonalGrowthOffset.put(ClimateZoneType.ARID, offset);
+        }
+        if (climate == ClimateZoneType.ARID && !seasonalGrowthOffset.containsKey(ClimateZoneType.TROPICAL)){
+            seasonalGrowthOffset.put(ClimateZoneType.TROPICAL, offset);
+        }
+    }
+
+    public void setSeasonalSeedDropOffset(Map<String, Float> offsets) {
+        offsets.forEach((key, value)->setSeasonalSeedDropOffset(ClimateZoneType.valueOf(key.toUpperCase(Locale.ENGLISH)), value));
+    }
+    public void setSeasonalSeedDropOffset(ClimateZoneType climate, @Nullable Float offset) {
+        seasonalSeedDropOffset.put(climate, offset);
+        //Tropical and arid offsets usually match
+        if (climate == ClimateZoneType.TROPICAL && !seasonalSeedDropOffset.containsKey(ClimateZoneType.ARID)){
+            seasonalSeedDropOffset.put(ClimateZoneType.ARID, offset);
+        }
+        if (climate == ClimateZoneType.ARID && !seasonalSeedDropOffset.containsKey(ClimateZoneType.TROPICAL)){
+            seasonalSeedDropOffset.put(ClimateZoneType.TROPICAL, offset);
+        }
+    }
+
+    @Deprecated(forRemoval = true)
+    public void setSeasonalGrowthOffset(@Nullable Float offset) {
+        seasonalGrowthOffset.put(preferredClimate, offset);
+    }
+
+    @Deprecated(forRemoval = true)
+    public void setSeasonalSeedDropOffset(@Nullable Float offset) {
+        seasonalSeedDropOffset.put(preferredClimate, offset);
+    }
+    @Deprecated(forRemoval = true)
     public void setSeasonalFruitingOffset(@Nullable Float offset) {
-        seasonalFruitingOffset = offset;
+        seasonalFruitingOffset.put(preferredClimate, offset);
     }
 
     /**
@@ -1723,91 +1795,108 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return Factor from 0.0 (no growth) to 1.0 (full growth).
      */
     public float seasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos) {
-        return seasonalGrowthOffset != null ? SeasonHelper.globalSeasonalGrowthFactor(levelContext, rootPos, -seasonalGrowthOffset) : 1.0f;
+        ClimateZoneType climate = ClimateHelper.getClimate(levelContext.level(), rootPos);
+        Float offset = seasonalGrowthOffset.getOrDefault(climate, defaultGrowthOffset);
+        return offset != null ? SeasonHelper.globalSeasonalGrowthFactor(levelContext, rootPos, -offset) : 1.0f;
     }
 
     public float seasonalSeedDropFactor(LevelContext levelContext, BlockPos pos) {
-        return seasonalSeedDropOffset != null ? SeasonHelper.globalSeasonalSeedDropFactor(levelContext, pos, -seasonalSeedDropOffset) : 1.0f;
+        ClimateZoneType climate = ClimateHelper.getClimate(levelContext.level(), pos);
+        Float offset = seasonalSeedDropOffset.getOrDefault(climate, defaultSeedDropOffset);
+        return offset != null ? SeasonHelper.globalSeasonalSeedDropFactor(levelContext, pos, -offset) : 1.0f;
     }
 
     public float seasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos) {
-        return seasonalFruitingOffset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -seasonalFruitingOffset, false) : 1.0f;
+        ClimateZoneType climate = ClimateHelper.getClimate(levelContext.level(), pos);
+        Float offset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
+        return offset != null ? SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -offset) : 1.0f;
     }
 
-    public void inheritSeasonalFruitingOffsetToFruits(){
-        this.fruits.forEach((fruit)->fruit.setSeasonOffset(this.seasonalFruitingOffset));
+    public void inheritSeasonalFruitingParametersToFruits(){
+        this.fruits.forEach((fruit)->{
+            fruit.setSeasonalFactorGetter((l, p)->{
+                ClimateZoneType climate = ClimateHelper.getClimate(l.level(), p);
+                double multiplier = Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
+                        ? ClimateHelper.climateMultiplier(this, climate, climateTolerance) : 1.0;
+                return (float)(this.seasonalFruitProductionFactor(l,p) * multiplier);
+            });
+            fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
+        });
     }
 
-    public void inheritSeasonalFruitingOffsetToPods(){
-        this.pods.forEach((pod)->pod.setSeasonOffset(this.seasonalFruitingOffset));
+    public void inheritSeasonalFruitingParametersToPods(){
+        this.pods.forEach((fruit)->{
+            fruit.setSeasonalFactorGetter((l, p)->{
+                ClimateZoneType climate = ClimateHelper.getClimate(l.level(), p);
+                double multiplier = Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
+                        ? ClimateHelper.climateMultiplier(this, climate, climateTolerance) : 1.0;
+                return (float)(this.seasonalFruitProductionFactor(l,p) * multiplier);
+            });
+            fruit.setFloweringPeriodPredicate(this::isInFlowerHoldPeriod);
+        });
     }
 
     /**
      * 1 = Spring 2 = Summer 4 = Autumn 8 = Winter Values are OR'ed together for the return
      */
-    public int getSeasonalTooltipFlags(LevelContext levelContext) {
-        final float seasonStart = 1f / 6;
-        final float seasonEnd = 1 - 1f / 6;
-        final float threshold = 0.75f;
+    public int getSeasonalTooltipFlags(LevelContext levelContext, Player player) {
+        if (showSeasonalTooltip()) {
+            BlockPos playerPos = BlockPos.containing(player.position());
+            ClimateZoneType climate = ClimateHelper.getClimate(player.level(), playerPos);
+            float suitability = (float) (Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
+                    ? ClimateHelper.climateMultiplier(this, climate, climateTolerance) : 1.0);
+            if (suitability < 0.3) return 0; //No seasons, still display
 
-        if (this.hasFruits() || this.hasPods()) {
+            Float seasonOffset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
+            if (seasonOffset == null) return 15;//All seasons
+
+            Float fruitPeak = SeasonHelper.getPeakFruitProductionSeason(levelContext, playerPos, seasonOffset);
+            if (fruitPeak == null) return 15;//All seasons
+
             int seasonFlags = 0;
             for (int i = 0; i < 4; i++) {
-                boolean isValidSeason = false;
-                if (seasonalFruitingOffset != null) {
-                    final float prod1 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonStart - seasonalFruitingOffset) * 64.0f), 0), true);
-                    final float prod2 = SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, new BlockPos(0, (int) ((i + seasonEnd - seasonalFruitingOffset) * 64.0f), 0), true);
-                    if (Math.min(prod1, prod2) > threshold) {
-                        isValidSeason = true;
-                    }
-
-                } else {
-                    isValidSeason = true;
-                }
-
-                if (isValidSeason) {
+                float season = i + 0.5f;
+                if (SeasonHelper.isSeasonBetween(fruitPeak, season-0.6f, season+0.6f)){
                     seasonFlags |= 1 << i;
                 }
-
             }
             return seasonFlags;
         }
 
-        return 0;
+        return -1; //display nothing
     }
 
-    /**
-     * When seasons are active allow a seasonal time range where fruit growth does not progress past the flower stage.
-     * This allows for a flowery spring time.
-     *
-     * @param min The minimum season value relative to the fruiting offset.
-     * @param max The maximum season value relative to the fruiting offset.
-     * @return This {@link Species} object for chaining.
-     */
-    public Species setFlowerSeasonHold(float min, float max) {
-        flowerSeasonHoldMin = min;
-        flowerSeasonHoldMax = max;
-        return this;
+    protected boolean showSeasonalTooltip() {
+        return this.hasFruits() || this.hasPods();
     }
 
-    public boolean testFlowerSeasonHold(Float seasonValue) {
-        if (seasonalFruitingOffset == null) {
+    public boolean isInFlowerHoldPeriod(LevelContext level, BlockPos rootPos, Float seasonValue) {
+        ClimateZoneType climate = ClimateHelper.getClimate(level.level(), rootPos);
+        Float offset = seasonalFruitingOffset.getOrDefault(climate, defaultFruitingOffset);
+        if (offset == null) {
             return false;
         }
-        return SeasonHelper.isSeasonBetween(seasonValue, flowerSeasonHoldMin + seasonalFruitingOffset, flowerSeasonHoldMax + seasonalFruitingOffset);
+        final Float peakSeasonValue = SeasonHelper.getPeakFruitProductionSeason(level, rootPos, offset);
+        if (peakSeasonValue == null || flowerSeasonHoldPeriodEnd == 0.0F) {
+            return false;
+        }
+        final float min = flowerSeasonHoldPeriodStart + peakSeasonValue;
+        final float max = flowerSeasonHoldPeriodEnd + peakSeasonValue;
+        return SeasonHelper.isSeasonBetween(seasonValue, min, max);
     }
+    //endregion
 
-
-    //////////////////////////////
+    ///////////////////////////////////////////
     // INTERACTIVE
-    //////////////////////////////
+    ///////////////////////////////////////////
+    //region interactive
 
     @Nullable
     public SubstanceEffect getSubstanceEffect(ItemStack itemStack) {
 
         // Bonemeal fertilizes the soil and causes a single growth pulse.
         if (canBoneMealTree() && itemStack.is(DTItemTags.FERTILIZER)) {
-            return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(Services.CONFIG.getIntConfig("boneMealGrowthPulses"));
+            return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(Services.CONFIG.getIntConfig(IConfigHelper.BONE_MEAL_GROWTH_PULSES));
         }
 
         // Use substance provider interface if it's available.
@@ -1919,10 +2008,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
         return this.alwaysShowOnWaila;
     }
+    //endregion
 
     ///////////////////////////////////////////
     // MEGANESS
     ///////////////////////////////////////////
+    //region meganess
 
     private Species megaSpecies = Species.NULL_SPECIES;
     private Species preMegaSpecies = Species.NULL_SPECIES;
@@ -1953,10 +2044,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public boolean canCraftMegaSeed() {
         return canCraftMegaSeed;
     }
+    //endregion
 
     ///////////////////////////////////////////
     // FALL ANIMATION HANDLING
     ///////////////////////////////////////////
+    //region fall-animation-handling
 
     public AnimationHandler selectAnimationHandler(FallingTreeEntity fallingEntity) {
         return getFamily().selectAnimationHandler(fallingEntity);
@@ -1990,10 +2083,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public float falloverParticleFlingMultiplier(){
         return 1;
     }
+    //endregion
 
     ///////////////////////////////////////////
     // SOUND EFFECTS
     ///////////////////////////////////////////
+    //region sound-effects
 
     protected float bigTreeSoundThreshold = 20;
 
@@ -2031,25 +2126,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public void setBigTreeSoundThreshold(float bigTreeSoundThreshold) {
         this.bigTreeSoundThreshold = bigTreeSoundThreshold;
     }
+    //endregion
 
-    //////////////////////////////
-    // BONSAI POT
-    //////////////////////////////
-
-    /**
-     * Provides the {@link PottedSaplingBlock} for this Species. {@link Species} subclasses can derive their own {@link
-     * PottedSaplingBlock} subclass if they want something custom.
-     *
-     * @return The {@link PottedSaplingBlock} for this {@link Species}.
-     */
-    public PottedSaplingBlock getPottedSapling() {
-        return DTRegistries.POTTED_SAPLING.get();
-    }
-
-
-    //////////////////////////////
+    ///////////////////////////////////////////
     // WORLDGEN
-    //////////////////////////////
+    ///////////////////////////////////////////
+    //region worldgen
 
     /**
      * Default worldgen spawn mechanism. This method uses JoCodes to generate tree models. Override to use other
@@ -2258,17 +2340,37 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return Collections.unmodifiableSet(pods);
     }
 
-    public List<TagKey<Block>> defaultSaplingTags() {
-        return Collections.singletonList(DTBlockTags.SAPLINGS);
+    /**
+     * @return the {@link #family}'s {@linkplain Family#getCommonSpecies() common species}
+     */
+    public Species getCommonSpecies() {
+        return this.family.getCommonSpecies();
     }
 
-    public List<TagKey<Item>> defaultSeedTags() {
-        return Collections.singletonList(DTItemTags.SEEDS);
+    /**
+     * @return {@code true} if this species is the common of {@link #family}; {@code false} otherwise
+     */
+    public boolean isCommonSpecies() {
+        return this.getCommonSpecies() == this;
     }
+
+    /**
+     * Checks whether {@link #seed} is the same instance as the {@link Seed} of the common {@link Species} of the
+     * owning {@link Family}.
+     *
+     * @return {@code true} if {@link #seed} {@code ==} the {@link Seed} of the common {@link Species} of {@link
+     * #family}; {@code false} otherwise.
+     */
+    public boolean isSeedCommon() {
+        return this.getCommonSpecies().getSeed().orElse(null) == this.seed.get();
+    }
+
+    //endregion
 
     ///////////////////////////////////////////
     // DATA GENERATION
     ///////////////////////////////////////////
+    //region data-generation
 
     protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Species>> saplingStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
@@ -2409,6 +2511,14 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return Optional.ofNullable(dropSeeds).orElse(!this.hasFruits());
     }
 
+    public List<TagKey<Block>> defaultSaplingTags() {
+        return Collections.singletonList(DTBlockTags.SAPLINGS);
+    }
+
+    public List<TagKey<Item>> defaultSeedTags() {
+        return Collections.singletonList(DTItemTags.SEEDS);
+    }
+
     @Override
     public String toLoadDataString() {
         final RegistryHandler registryHandler = RegistryHandler.get(this.getRegistryName().getNamespace());
@@ -2424,19 +2534,20 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                 Pair.of("lowestBranchHeight", this.lowestBranchHeight), Pair.of("signalEnergy", this.signalEnergy),
                 Pair.of("growthRate", this.growthRate), Pair.of("soilLongevity", this.soilLongevity),
                 Pair.of("soilTypeFlags", this.soilTypeFlags), Pair.of("maxBranchRadius", this.maxBranchRadius),
-                Pair.of("leavesProperties", this.leavesProperties), Pair.of("envFactors", this.envFactors),
+                Pair.of("leavesProperties", this.leavesProperties),
                 Pair.of("megaSpecies", this.megaSpecies), Pair.of("seed", this.seed),
                 Pair.of("primitive_sapling", DynamicSaplingBlock.SAPLING_REPLACERS.entrySet().stream()
                         .filter(entry -> entry.getValue() == this).map(Map.Entry::getKey).findAny()
                         .orElse(Blocks.AIR)),
-                Pair.of("perfectBiomes", this.perfectBiomes),
                 Pair.of("acceptableBlocksForGrowth", this.acceptableBlocksForGrowth),
                 Pair.of("genFeatures", this.genFeatures));
     }
+    //endregion
 
-    //////////////////////////////
+    ///////////////////////////////////////////
     // REGISTRY
-    //////////////////////////////
+    ///////////////////////////////////////////
+    //region registry
 
     public static Species findSpecies(final String name) {
         return findSpecies(ResourceLocationUtils.parseDTLocation(name));
@@ -2476,5 +2587,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public static List<ResourceLocation> getSpeciesDirectory() {
         return new ArrayList<>(Species.REGISTRY.getRegistryNames());
     }
+    //endregion
 
 }

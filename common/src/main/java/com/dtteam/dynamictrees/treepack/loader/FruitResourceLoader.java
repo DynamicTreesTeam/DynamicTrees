@@ -45,9 +45,7 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
                 .register("item_stack", ItemStack.class, Fruit::setItemStack)
                 .register("can_bone_meal", Boolean.class, Fruit::setCanBoneMeal)
                 .register("growth_chance", Float.class, Fruit::setGrowthChance)
-                .register("flower_hold_period_length", Float.class, Fruit::setFlowerHoldPeriodLength)
-                .register("season_offset", Float.class, Fruit::setSeasonOffset)
-                .register("min_production_factor", Float.class, Fruit::setMinProductionFactor)
+                .register("required_production_factor", Float.class, Fruit::setRequiredProductionFactor)
                 .register("mature_action", Growable.MatureAction.class, Fruit::setMatureAction);
     }
 

@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.api.season;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 
 /**
  * Manages Seasonal output rates.
@@ -18,14 +19,16 @@ public interface SeasonManager {
 
     float getSeedDropFactor(Level level, BlockPos rootPos, float offset);
 
-    float getFruitProductionFactor(Level level, BlockPos rootPos, float offset, boolean getAsScan);
+    float getFruitProductionFactor(Level level, BlockPos rootPos, float offset);
 
     Float getSeasonValue(Level level, BlockPos rootPos);
 
     Float getPeakFruitProductionSeasonValue(Level level, BlockPos rootPos, float offset);
 
-    boolean isTropical(Level level, BlockPos rootPos);
+    ClimateZoneType getClimate(LevelAccessor level, BlockPos rootPos);
 
     boolean shouldSnowMelt(Level level, BlockPos pos);
+
+    void clearCache(Level level);
 
 }

@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.block.pod;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.function.TriPredicate;
 import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
@@ -11,7 +12,6 @@ import com.dtteam.dynamictrees.block.Growable;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
-import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.common.collect.Maps;
@@ -23,6 +23,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -41,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**
@@ -111,13 +113,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     private ItemStack itemStack;
 
     private float growthChance = 0.2F;
-
-    @Nullable
-    private Float seasonOffset = 0f;
-
-    private float flowerHoldPeriodLength = 0.5F;
-
-    private float minProductionFactor = 0.3F;
+    private float requiredProductionFactor = 0.3F;
 
     private int maxDropCount = 1;
     private int minDropCount = 1;
@@ -127,8 +123,19 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
 
     private Growable.MatureAction matureAction = Growable.MatureAction.DEFAULT;
 
+    private BiFunction<LevelContext, BlockPos, Float> seasonalFactorGetter = (l, b)-> 1.0f;
+    private TriPredicate<LevelContext, BlockPos, Float> floweringPeriodPredicate = (l, b, s)-> false;
+
     public Pod(ResourceLocation registryName) {
         super(registryName);
+    }
+
+    public void setSeasonalFactorGetter(BiFunction<LevelContext, BlockPos, Float> seasonalFactorGetter) {
+        this.seasonalFactorGetter = seasonalFactorGetter;
+    }
+
+    public void setFloweringPeriodPredicate(TriPredicate<LevelContext, BlockPos, Float> floweringPeriodPredicate) {
+        this.floweringPeriodPredicate = floweringPeriodPredicate;
     }
 
     /**
@@ -250,60 +257,24 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         this.growthChance = growthChance;
     }
 
-    public boolean isInFlowerHoldPeriod(LevelAccessor level, BlockPos rootPos, Float seasonValue) {
-        if (seasonOffset == null) {
-            return false;
-        }
-        final Float peakSeasonValue = SeasonHelper.getSeasonManager()
-                .getPeakFruitProductionSeasonValue(LevelContext.create(level).level(), rootPos, seasonOffset);
-        if (peakSeasonValue == null || flowerHoldPeriodLength == 0.0F) {
-            return false;
-        }
-        final float min = peakSeasonValue - 1.5F;
-        final float max = min + flowerHoldPeriodLength;
-        return SeasonHelper.isSeasonBetween(seasonValue, min, max);
+    public final float getRequiredProductionFactor() {
+        return requiredProductionFactor;
     }
 
-    @Nullable
-    public final Float getSeasonOffset() {
-        return seasonOffset;
+    public void setRequiredProductionFactor(float requiredProductionFactor) {
+        this.requiredProductionFactor = requiredProductionFactor;
     }
 
-    /**
-     * Sets the season offset for fruit production. By default, this will peak in the middle of summer, starting at the
-     * middle of spring and ending at the middle of fall. This offset will move the fruiting by a factor of one season.
-     * For example, an offset of 2.0 would cause fruiting to peak in winter.
-     *
-     * @param offset the offset for fruit production, or {@code null} for it to peak all year round
-     */
-    public void setSeasonOffset(@Nullable Float offset) {
-        seasonOffset = offset;
+    public Float seasonalFruitProductionFactor(LevelContext level, BlockPos pos){
+        return seasonalFactorGetter.apply(level, pos);
     }
 
-    public float seasonalProductionFactor(LevelContext levelContext, BlockPos pos) {
-        return seasonOffset != null ?
-                SeasonHelper.globalSeasonalFruitProductionFactor(levelContext, pos, -seasonOffset, false)
-                : 1.0F;
+    public boolean isOutOfSeason(Level level, BlockPos pos) {
+        return seasonalFruitProductionFactor(LevelContext.create(level), pos) < requiredProductionFactor;
     }
 
-    public float getFlowerHoldPeriodLength() {
-        return flowerHoldPeriodLength;
-    }
-
-    public void setFlowerHoldPeriodLength(float flowerHoldPeriodLength) {
-        this.flowerHoldPeriodLength = flowerHoldPeriodLength;
-    }
-
-    public final float getMinProductionFactor() {
-        return minProductionFactor;
-    }
-
-    public void setMinProductionFactor(float minProductionFactor) {
-        this.minProductionFactor = minProductionFactor;
-    }
-
-    public boolean isOutOfSeason(LevelContext levelContext, BlockPos pos) {
-        return seasonalProductionFactor(levelContext, pos) < minProductionFactor;
+    public Boolean isInFlowerHoldPeriod(LevelAccessor level, BlockPos pos, Float seasonValue){
+        return floweringPeriodPredicate.test(LevelContext.create(level), pos, seasonValue);
     }
 
     public void place(LevelAccessor level, BlockPos pos, @Nullable Float seasonValue, Direction facing, int radius) {
@@ -392,10 +363,10 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     @Override
     public Pod reset() {
         canBoneMeal = Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig(IConfigHelper.CAN_BONE_MEAL_PODS);
-        seasonOffset = 0.0F;
-        flowerHoldPeriodLength = 0.5F;
-        minProductionFactor = 0.3F;
+        requiredProductionFactor = 0.3F;
         matureAction = Growable.MatureAction.DEFAULT;
+        seasonalFactorGetter = (l,b)-> 1.0f;
+        floweringPeriodPredicate = (l, b, s)-> false;
         return this;
     }
 

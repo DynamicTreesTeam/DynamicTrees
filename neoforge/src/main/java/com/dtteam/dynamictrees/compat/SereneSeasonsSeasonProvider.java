@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.compat;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.season.SeasonProvider;
 import com.dtteam.dynamictrees.systems.season.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Tuple;
@@ -24,7 +25,7 @@ public class SereneSeasonsSeasonProvider implements SeasonProvider {
 
     @Override
     public boolean shouldSnowMelt(Level level, BlockPos pos) {
-        if (ModConfig.seasons.generateSnowAndIce && seasonValue < SeasonHelper.WINTER) {
+        if (ModConfig.seasons.generateSnowAndIce && seasonValue < SeasonHelper.WINTER_START) {
             return level.getBiome(pos).value().warmEnoughToRain(pos);
         }
         return false;

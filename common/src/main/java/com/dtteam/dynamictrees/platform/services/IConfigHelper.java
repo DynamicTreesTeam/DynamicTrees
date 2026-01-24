@@ -12,6 +12,7 @@ public interface IConfigHelper {
     String SEED_TIME_TO_LIVE = "seedTimeToLive";
     String SEED_ONLY_FOREST = "seedOnlyForest";
     String SEED_MIN_FORESTNESS = "seedMinForestness";
+    String CLIMATE_AFFECTS_FRUITS_AND_PODS = "climateAffectsFruitsAndPods";
 
     String TREE_GROWTH_MULTIPLIER = "treeGrowthMultiplier";
     String TREE_HARVEST_MULTIPLIER = "treeHarvestMultiplier";
@@ -55,9 +56,10 @@ public interface IConfigHelper {
     String BIOCHAR_BREWING_BASE = "biocharBrewingBase";
 
     String PREFERRED_SEASON_MOD = "preferredSeasonMod";
-    String ENABLE_SEASONAL_SEED_DROP_FACTOR = "enableSeasonalSeedDropFactor";
-    String ENABLE_SEASONAL_GROWTH_FACTOR = "enableSeasonalGrowthFactor";
-    String ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION_FACTOR = "enableSeasonalFruitProductionFactor";
+    String ENABLE_SEASONAL_SEED_DROP = "enableSeasonalSeedDropFactor";
+    String ENABLE_SEASONAL_GROWTH = "enableSeasonalGrowthFactor";
+    String ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION = "enableSeasonalFruitProductionFactor";
+    String WET_SEASON_OFFSET = "wetSeasonOffset";
 
     String DEBUG = "debug";
 

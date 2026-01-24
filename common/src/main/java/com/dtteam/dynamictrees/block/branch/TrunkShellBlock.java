@@ -58,7 +58,8 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
                 .ignitedByLava()
                 .pushReaction(PushReaction.BLOCK)
                 .sound(SoundType.WOOD)
-                .explosionResistance(3.0F));
+                .explosionResistance(3.0F)
+                .noOcclusion());
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
     }
 

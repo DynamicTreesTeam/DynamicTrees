@@ -5,11 +5,8 @@
     "signal_energy": 12.0,
     "growth_rate": 0.8,
     "leaves_properties": "oak",
-    "environment_factors" : {
-        "#c:is_cold": 0.5,
-        "#c:is_dry": 0.5
-    },
-    "perfect_biomes": { "tag": "#c:is_swamp" },
+    "preferred_climate" : "temperate",
+    "climate_tolerance": 0.4,
     "common_override": { "name": "minecraft:swamp" },
     "generate_sapling": true,
     "model_overrides": {

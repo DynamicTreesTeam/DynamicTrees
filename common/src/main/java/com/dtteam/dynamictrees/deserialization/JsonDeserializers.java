@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.deserialization;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.CellKit;
 import com.dtteam.dynamictrees.api.configuration.PropertyDefinition;
+import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.worldgen.BiomePredicate;
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
@@ -130,11 +131,6 @@ public final class JsonDeserializers {
             JsonResult.success(input, input)
     );
 
-    public static final JsonDeserializer<JsonNull> JSON_NULL = register(JsonNull.class, input ->
-            input.isJsonNull() ? JsonResult.success(input, JsonNull.INSTANCE) :
-                    JsonResult.failure(input, "Json element was not a json null.")
-    );
-
     public static final JsonDeserializer<JsonPrimitive> JSON_PRIMITIVE = register(JsonPrimitive.class, input ->
             input.isJsonPrimitive() ? JsonResult.success(input, input.getAsJsonPrimitive()) :
                     JsonResult.failure(input, "Json element was not a json primitive.")
@@ -184,7 +180,6 @@ public final class JsonDeserializers {
     public static final JsonDeserializer<Long> LONG = register(Long.class, input ->
             NUMBER.deserialize(input).map(Number::longValue)
     );
-
     public static final JsonDeserializer<Float> FLOAT = register(Float.class, input ->
             NUMBER.deserialize(input).map(Number::floatValue)
     );
@@ -264,6 +259,8 @@ public final class JsonDeserializers {
             register(GenerationStep.Decoration.class, new EnumDeserializer<>(GenerationStep.Decoration.class));
     public static final JsonDeserializer<BiomeDatabase.Operation> OPERATION =
             register(BiomeDatabase.Operation.class, new EnumDeserializer<>(BiomeDatabase.Operation.class));
+    public static final JsonDeserializer<ClimateZoneType> CLIMATE =
+            register(ClimateZoneType.class, new EnumDeserializer<>(ClimateZoneType.class));
 
     public static final JsonDeserializer<IDTBiomeHolderSet> BIOME_LIST = register(IDTBiomeHolderSet.class, new BiomeListDeserializer());
     public static final JsonDeserializer<BiomePredicate> BIOME_PREDICATE = register(BiomePredicate.class, jsonElement ->

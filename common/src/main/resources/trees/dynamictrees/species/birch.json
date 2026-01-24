@@ -6,13 +6,8 @@
     "lowest_branch_height": 4,
     "growth_rate": 1.25,
     "leaves_properties": "birch",
-    "environment_factors" : {
-        "#c:is_cold": 0.75,
-        "#c:is_hot": 0.5,
-        "#c:is_dry": 0.5,
-        "#is_forest": 1.05
-    },
-    "perfect_biomes": { "name": "minecraft:.*birch.*" },
+    "preferred_climate" : "temperate",
+    "climate_tolerance": 0.5,
     "primitive_sapling": "birch_sapling",
     "features" : [
         {

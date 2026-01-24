@@ -32,8 +32,14 @@ public class MapPropertyApplier<T, V, I> extends PropertyApplier<T, Map<String,V
     @Override
     protected PropertyApplierResult applyIfShould(T object, I input, Applier<T, Map<String,V>> applier) {
         HashMap<String, V> values = new HashMap<>();
-        jsonObjectDeserializer.apply(input).entrySet().forEach((entry)->
-                valueDeserializer.get().deserialize(entry.getValue()).ifSuccessOrElse(v->values.put(entry.getKey(),v), error -> LogManager.getLogger().error(error), warning -> LogManager.getLogger().warn(warning)));
+        jsonObjectDeserializer.apply(input).entrySet().forEach((entry)->{
+            if (entry.getValue().isJsonNull()) values.put(entry.getKey(), null);
+            else valueDeserializer.get().deserialize(entry.getValue()).ifSuccessOrElse(
+                    v->values.put(entry.getKey(),v),
+                    error -> LogManager.getLogger().error(error),
+                    warning -> LogManager.getLogger().warn(warning));
+        });
+
         return applier.apply(object, values);
     }
 

@@ -21,7 +21,7 @@ public class NullSeasonGrowthCalculator implements SeasonGrowthCalculator {
     }
 
     @Override
-    public float calcFruitProduction(Float seasonValue, ClimateZoneType type) {
+    public float calcFruitProductionRate(Float seasonValue, ClimateZoneType type) {
         return 1.0f;
     }
 
