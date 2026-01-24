@@ -69,7 +69,7 @@ public class FallingTreeEntityModelFabric extends FallingTreeEntityModel {
                     float offset = (8 - Math.min(((BranchBlock) exState.getBlock()).getRadius(exState), BranchBlock.MAX_RADIUS)) / 16f;
                     int coreRadius = ((BranchBlock) exState.getBlock()).getRadius(exState);
                     treeQuads.addAll(toTreeQuadData(
-                            getBranchQuadsWithConnections(branchModel, exState, new Vec3(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), random, connectionArray, coreRadius, cutDir),
+                            getBottomRingQuads(branchModel, new Vec3(offsetPos.getX(), offsetPos.getY(), offsetPos.getZ()).scale(offset), coreRadius, cutDir),
                             exState));
                     bottomRingsAdded = true;
                 }
@@ -101,6 +101,29 @@ public class FallingTreeEntityModelFabric extends FallingTreeEntityModel {
         }
 
         return treeQuads;
+    }
+
+    private List<BakedQuad> getBottomRingQuads(BakedModel model, Vec3 offset, int coreRadius, Direction cutDir) {
+        List<BakedQuad> allQuads = new ArrayList<>();
+
+        if (model instanceof BasicBranchBlockBakedModel branchModel) {
+            List<BakedQuad> ringQuads = branchModel.ringsQuads[coreRadius - 1];
+            for (BakedQuad quad : ringQuads) {
+                if (quad.getDirection() == cutDir) {
+                    allQuads.add(quad);
+                }
+            }
+        }
+
+        if (offset.x() != 0 || offset.y() != 0 || offset.z() != 0) {
+            List<BakedQuad> offsetQuads = new ArrayList<>();
+            for (BakedQuad quad : allQuads) {
+                offsetQuads.add(offsetQuad(quad, offset));
+            }
+            return offsetQuads;
+        }
+
+        return allQuads;
     }
 
     private List<BakedQuad> getBranchQuadsWithConnections(BakedModel model, BlockState state, Vec3 offset, RandomSource random, int[] connections, int coreRadius, Direction forceRingDir) {
