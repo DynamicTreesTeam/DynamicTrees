@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees;
 
+import com.dtteam.dynamictrees.api.season.*;
 import com.dtteam.dynamictrees.api.worldgen.*;
 import com.dtteam.dynamictrees.block.branch.*;
 import com.dtteam.dynamictrees.block.leaves.*;
@@ -142,8 +143,10 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
                 return;
             }
 
-            int flags = seed.getSpecies().getSeasonalTooltipFlags(levelContext);
-            Tooltips.applySeasonalTooltips(lines, flags);
+            BlockPos playerPos = BlockPos.containing(player.position());
+            ClimateZoneType climate = ClimateHelper.getClimate(player.level(), playerPos);
+            int flags = seed.getSpecies().getSeasonalTooltipFlags(levelContext, player);
+            Tooltips.applySeasonalTooltips(lines, flags, climate);
         });
     }
 

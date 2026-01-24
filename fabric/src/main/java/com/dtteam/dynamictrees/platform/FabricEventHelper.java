@@ -73,7 +73,7 @@ public class FabricEventHelper implements IEventHelper {
 
     @Override
     public Species.BiomeSuitabilityEventResult postBiomeSuitabilityEvent(Level level, Biome biome, Species species, BlockPos pos) {
-        return new Species.BiomeSuitabilityEventResult(false, Species.defaultSuitability());
+        return new Species.BiomeSuitabilityEventResult(false, 0.0f);
     }
 
     @Override

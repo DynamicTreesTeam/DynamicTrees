@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.command.DTCommand;
 import com.dtteam.dynamictrees.systems.FutureBreak;
+import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
@@ -50,7 +51,7 @@ public class CommonEventHandler {
         });
 
         ServerLifecycleEvents.SERVER_STARTED.register((minecraftServer -> {
-            SeasonHelper.getSeasonManager().flushMappings();
+            SeasonCompatibilityHandler.getSeasonManager().flushMappings();
         }));
         
         CommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext, commandSelection) -> {
