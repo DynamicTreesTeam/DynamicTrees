@@ -9,7 +9,6 @@
     "MixinBrewingStandMenu",
     "MixinBushBlock",
     "MixinChunkSerializer",
-    "MixinDynamicTreeFeature",
     "MixinMinecraftServer",
     "MixinPotionBrewing",
     "MixinSaplingBlock"
