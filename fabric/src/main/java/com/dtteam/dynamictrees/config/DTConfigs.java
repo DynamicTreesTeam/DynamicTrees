@@ -24,8 +24,12 @@ public class DTConfigs {
         configs.addSection("seeds");
         createConfig("The rate at which seeds drop from leaves.",
                 IConfigHelper.LEAVES_SEED_DROP_RATE, 1D, 0D, 64D);
+        createConfig("The minimum chance for seed dropping from leaves when a seasonal mod is installed. 0 = during the off season seeds never drop from leaves, 1 = seeds will drop at maximum rate during the entire year. Can be fractional.",
+                IConfigHelper.MIN_SEASONAL_LEAVES_SEED_DROP_RATE, 0.15, 0.0, 1.0);
         createConfig("The rate at which seeds voluntarily drop from branches",
         IConfigHelper.VOLUNTARY_SEED_DROP_RATE, 0.01, 0.0, 1.0);
+        createConfig("The minimum chance for seed dropping voluntarily when a seasonal mod is installed. 0 = during the off season seeds never drop voluntarily, 1 = seeds will drop at maximum rate during the entire year. Can be fractional.",
+                IConfigHelper.MIN_SEASONAL_VOLUNTARY_SEED_DROP_RATE, 0.0, 0.0, 1.0);
         createConfig("The rate at which seeds voluntarily plant themselves in their ideal biomes",
         IConfigHelper.SEED_PLANT_RATE, 1f / 6f, 0.0, 1.0);
         createConfig("Ticks before a seed in the world attempts to plant itself or despawn. 1200 = 1 minute",
@@ -37,13 +41,13 @@ public class DTConfigs {
 
         configs.addSection("trees");
         createConfig("Factor that multiplies the rate at which trees grow. Use at own risk",
-        IConfigHelper.TREE_GROWTH_MULTIPLIER, 0.5f, 0, 16f);
+        IConfigHelper.TREE_GROWTH_MULTIPLIER, 0.5f, 0f, 16f);
         createConfig("Factor that multiplies the wood returned from harvesting a tree.  You cheat.",
         IConfigHelper.TREE_HARVEST_MULTIPLIER, 1f, 0f, 128f);
         createConfig("Maximum harvesting hardness that can be calculated. Regardless of tree thickness.",
         IConfigHelper.MAX_TREE_HARDNESS, 20f, 1f, 200f);
         createConfig("A multiplier of tree hardness. Higher values make trees slower to chop, lower values makes them faster to chop.",
-        IConfigHelper.TREE_HARDNESS_MULTIPLIER, 1, (1/128f), 32f);
+        IConfigHelper.TREE_HARDNESS_MULTIPLIER, 1f, (1/128f), 32f);
         createConfig("If enabled then sticks will be dropped for partial logs",
                 IConfigHelper.DROP_STICKS, true);
         createConfig("Scales the growth for the environment.  0.5f is nominal. 0.0 trees only grow in their native biome. 1.0 trees grow anywhere like they are in their native biome",
@@ -112,6 +116,8 @@ public class DTConfigs {
         configs.addSection("misc");
         createConfig("If enabled, dirt bucket recipes will be automatically generated.",
                 IConfigHelper.GENERATE_DIRT_BUCKET_RECIPES, true);
+        createConfig("If enabled, seeds for mega species can be crafted with four regular seeds.",
+                IConfigHelper.GENERATE_MEGA_SEED_RECIPE, false);
         createConfig("The base potion the Biochar Base is brewed from. Minecraft potions use 'awkward'. If you change this, don't forget to update the patchouli manual page too.",
                 IConfigHelper.BIOCHAR_BREWING_BASE, "minecraft:thick");
 

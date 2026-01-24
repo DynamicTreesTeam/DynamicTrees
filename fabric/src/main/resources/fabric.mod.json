@@ -8,8 +8,8 @@
     "${mod_author}"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamictrees",
+    "sources": "https://github.com/DynamicTreesTeam/DynamicTrees"
   },
   "license": "${license}",
   "icon": "${mod_id}.png",
@@ -17,6 +17,9 @@
   "entrypoints": {
     "main": [
       "com.dtteam.dynamictrees.DynamicTreesFabric"
+    ],
+    "client": [
+      "com.dtteam.dynamictrees.DynamicTreesFabricClient"
     ]
   },
   "mixins": [
@@ -30,7 +33,7 @@
     "java": ">=${java_version}"
   },
   "suggests": {
-    "another-mod": "*"
+    "dynamictreesplus": "*"
   }
 }
   

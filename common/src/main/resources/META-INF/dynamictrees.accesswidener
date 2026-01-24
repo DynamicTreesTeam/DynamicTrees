@@ -21,3 +21,4 @@ accessible class net/minecraft/world/inventory/BrewingStandMenu$PotionSlot
 accessible class net/minecraft/data/tags/IntrinsicHolderTagsProvider$IntrinsicTagAppender
 accessible method net/minecraft/client/renderer/texture/SpriteContents metadata ()Lnet/minecraft/server/packs/resources/ResourceMetadata;
 accessible field net/minecraft/client/renderer/texture/SpriteContents originalImage Lcom/mojang/blaze3d/platform/NativeImage;
+accessible method net/minecraft/client/renderer/texture/atlas/SpriteSources register (Ljava/lang/String;Lcom/mojang/serialization/MapCodec;)Lnet/minecraft/client/renderer/texture/atlas/SpriteSourceType;

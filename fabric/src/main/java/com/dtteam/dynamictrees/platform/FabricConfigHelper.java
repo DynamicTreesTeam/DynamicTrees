@@ -33,7 +33,21 @@ public class FabricConfigHelper implements IConfigHelper {
     }
     @Override
     public Double getDoubleConfig(String config){
-        return DTConfigs.CONFIG.getOrDefault(config, getConfig(config, Double.class));
+        if (!DTConfigs.CONFIG.containsConfig(config)){
+            DynamicTrees.LOG.error("Failed to get configuration \"{}\" of {} as it does not exist.", config, Double.class);
+            return null;
+        }
+        Pair<Class<?>, ?> def = DTConfigs.getDefaultValue(config);
+        Double defaultVal;
+        if (def.getFirst().equals(Float.class)) {
+            defaultVal = ((Float) def.getSecond()).doubleValue();
+        } else if (def.getFirst().equals(Double.class)) {
+            defaultVal = (Double) def.getSecond();
+        } else {
+            DynamicTrees.LOG.error("Failed to get configuration \"{}\" of {} as it is of {} instead.", config, Double.class, def.getFirst());
+            return null;
+        }
+        return DTConfigs.CONFIG.getOrDefault(config, defaultVal);
     }
     @Override
     public String getStringConfig(String config){

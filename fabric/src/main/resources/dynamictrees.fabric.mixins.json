@@ -7,10 +7,15 @@
   "mixins": [
     "MixinBrewingStandBlockEntity",
     "MixinBrewingStandMenu",
+    "MixinBushBlock",
     "MixinChunkSerializer",
-    "MixinPotionBrewing"
+    "MixinDynamicTreeFeature",
+    "MixinMinecraftServer",
+    "MixinPotionBrewing",
+    "MixinSaplingBlock"
   ],
-  "client": [],
+  "client": [
+  ],
   "server": [],
   "injectors": {
     "defaultRequire": 1
