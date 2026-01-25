@@ -5,9 +5,8 @@ import com.dtteam.dynamictrees.api.worldgen.GroundFinder;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.api.worldgen.RandomXOR;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.poissondisc.PoissonDisc;
 import com.dtteam.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -138,7 +137,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         // Display concrete circles for testing the circle growing algorithm.
-        if (Services.CONFIG.getBoolConfig(IConfigHelper.DEBUG)) {
+        if (DTConfigs.SERVER.debug.get()) {
             this.generateConcreteCircle(levelContext.accessor(), circle, groundPos.getY(), result);
         }
 

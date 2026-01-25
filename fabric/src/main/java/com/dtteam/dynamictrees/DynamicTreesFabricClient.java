@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.block.leaves.*;
 import com.dtteam.dynamictrees.block.sapling.*;
 import com.dtteam.dynamictrees.block.soil.*;
 import com.dtteam.dynamictrees.client.*;
+import com.dtteam.dynamictrees.config.*;
 import com.dtteam.dynamictrees.entity.render.*;
 import com.dtteam.dynamictrees.item.*;
 import com.dtteam.dynamictrees.model.*;
@@ -15,6 +16,7 @@ import com.dtteam.dynamictrees.systems.season.*;
 import com.dtteam.dynamictrees.tree.*;
 import com.dtteam.dynamictrees.tree.family.*;
 import com.dtteam.dynamictrees.tree.species.*;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.*;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.*;
@@ -35,6 +37,7 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.state.*;
+import net.neoforged.fml.config.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -44,6 +47,7 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        NeoForgeConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID, ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
         AtlasSourceTypeRegistryImpl.register(ThickBranchRingsSource.ID, ThickBranchRingsSource.setType(ThickBranchRingsSource.CODEC));
         registerModelLoaders();
         registerEntityRenderers();

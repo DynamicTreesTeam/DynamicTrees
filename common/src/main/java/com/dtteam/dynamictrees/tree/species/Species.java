@@ -41,8 +41,8 @@ import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
@@ -647,8 +647,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public void processVolume(NetVolumeNode.Volume volume) {
-        volume.multiplyVolume(Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_HARVEST_MULTIPLIER)); // For cheaters. you know who you are.
-        volume.multiplyVolume(getFamily().getLootVolumeMultiplier()); //the family can have a multiplier too
+        volume.multiplyVolume(DTConfigs.SERVER.treeHarvestMultiplier.get());
+        volume.multiplyVolume(getFamily().getLootVolumeMultiplier());
     }
 
     private List<ItemStack> getDropsForBranchType(Level level, ItemStack tool, @Nullable Float explosionRadius,
@@ -694,7 +694,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         public LogsAndSticks(List<ItemStack> logs, int sticks) {
             this.logs = logs;
-            this.sticks = Services.CONFIG.getBoolConfig(IConfigHelper.DROP_STICKS) ? sticks : 0;
+            this.sticks = DTConfigs.SERVER.dropSticks.get() ? sticks : 0;
         }
 
     }
@@ -1477,7 +1477,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             }
         }
 
-        int maxBranchRotRadius = Services.CONFIG.getIntConfig(IConfigHelper.MAX_BRANCH_ROT_RADIUS);
+        int maxBranchRotRadius = DTConfigs.SERVER.maxBranchRotRadius.get();
         if (rapid || (maxBranchRotRadius != 0 && radius <= maxBranchRotRadius)) {
             BranchBlock branch = TreeHelper.getBranch(level.getBlockState(pos));
             if (branch != null) {
@@ -1527,7 +1527,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public boolean grow(Level level, SoilBlock rootyDirt, BlockPos rootPos, int fertility, TreePart treeBase, BlockPos treePos, RandomSource random, boolean natural) {
 
-        float growthRate = (float) (getGrowthRate(level, rootPos) * Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_GROWTH_MULTIPLIER));
+        float growthRate = (float) (getGrowthRate(level, rootPos) * DTConfigs.SERVER.treeGrowthMultiplier.get());
         do {
             if (fertility > 0) {
                 if (growthRate > random.nextFloat()) {
@@ -1615,7 +1615,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if the tree became diseased
      */
     public boolean handleDisease(Level level, TreePart baseTreePart, BlockPos treePos, RandomSource random, int fertility) {
-        if (fertility == 0 && Services.CONFIG.getDoubleConfig(IConfigHelper.DISEASE_CHANCE) > random.nextFloat()) {
+        if (fertility == 0 && DTConfigs.SERVER.diseaseChance.get() > random.nextFloat()) {
             baseTreePart.analyse(level.getBlockState(treePos), level, treePos, Direction.DOWN, new MapSignal(new DiseaseNode(this)));
             return true;
         }
@@ -1665,7 +1665,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return result.suitability();
         }
 
-        double ugs = Services.CONFIG.getDoubleConfig(IConfigHelper.SCALE_BIOME_GROWTH_RATE); // Universal growth scalar.
+        double ugs = DTConfigs.SERVER.scaleBiomeGrowthRate.get();
 
         if (ugs == 1.0 || preferredClimate == ClimateZoneType.NONE) {
             return 1.0f;
@@ -1816,7 +1816,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.fruits.forEach((fruit)->{
             fruit.setSeasonalFactorGetter((l, p)->{
                 ClimateZoneType climate = ClimateHelper.getClimate(l.level(), p);
-                double multiplier = Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
+                double multiplier = DTConfigs.SERVER.climateAffectsFruitsAndPods.get()
                         ? ClimateHelper.climateMultiplier(this, climate, climateTolerance) : 1.0;
                 return (float)(this.seasonalFruitProductionFactor(l,p) * multiplier);
             });
@@ -1828,7 +1828,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.pods.forEach((fruit)->{
             fruit.setSeasonalFactorGetter((l, p)->{
                 ClimateZoneType climate = ClimateHelper.getClimate(l.level(), p);
-                double multiplier = Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
+                double multiplier = DTConfigs.SERVER.climateAffectsFruitsAndPods.get()
                         ? ClimateHelper.climateMultiplier(this, climate, climateTolerance) : 1.0;
                 return (float)(this.seasonalFruitProductionFactor(l,p) * multiplier);
             });
@@ -1843,7 +1843,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         if (showSeasonalTooltip()) {
             BlockPos playerPos = BlockPos.containing(player.position());
             ClimateZoneType climate = ClimateHelper.getClimate(player.level(), playerPos);
-            float suitability = (float) (Services.CONFIG.getBoolConfig(IConfigHelper.CLIMATE_AFFECTS_FRUITS_AND_PODS)
+            float suitability = (float) (DTConfigs.SERVER.climateAffectsFruitsAndPods.get()
                     ? ClimateHelper.climateMultiplier(this, climate, climateTolerance) : 1.0);
             if (suitability < 0.3) return 0; //No seasons, still display
 
@@ -1896,7 +1896,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
         // Bonemeal fertilizes the soil and causes a single growth pulse.
         if (canBoneMealTree() && itemStack.is(DTItemTags.FERTILIZER)) {
-            return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(Services.CONFIG.getIntConfig(IConfigHelper.BONE_MEAL_GROWTH_PULSES));
+            return new FertilizeSubstance().setAmount(2).setGrow(true).setPulses(DTConfigs.SERVER.boneMealGrowthPulses.get());
         }
 
         // Use substance provider interface if it's available.

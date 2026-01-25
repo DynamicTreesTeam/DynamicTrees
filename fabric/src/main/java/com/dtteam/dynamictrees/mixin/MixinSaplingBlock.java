@@ -1,8 +1,7 @@
 package com.dtteam.dynamictrees.mixin;
 
 import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -20,7 +19,7 @@ public class MixinSaplingBlock {
 
     @Inject(method = "advanceTree", at = @At("HEAD"), cancellable = true)
     private void onAdvanceTree(ServerLevel level, BlockPos pos, BlockState state, RandomSource random, CallbackInfo ci) {
-        if (!Services.CONFIG.getBoolConfig(IConfigHelper.REPLACE_VANILLA_SAPLINGS)) {
+        if (!DTConfigs.COMMON.replaceVanillaSaplings.get()) {
             return;
         }
 

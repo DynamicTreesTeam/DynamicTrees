@@ -4,7 +4,7 @@ package com.dtteam.dynamictrees;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
-import com.dtteam.dynamictrees.config.DTConfigs;
+import com.dtteam.dynamictrees.config.*;
 import com.dtteam.dynamictrees.data.GatherDataHelper;
 import com.dtteam.dynamictrees.data.generator.DTExtraLangGenerator;
 import com.dtteam.dynamictrees.data.generator.DataGenerators;

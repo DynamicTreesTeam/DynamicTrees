@@ -3,8 +3,7 @@ package com.dtteam.dynamictrees.event.handler;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.command.DTCommand;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.poissondisc.UniversalPoissonDiscProvider;
@@ -65,7 +64,7 @@ public class CommonGameEventHandler {
 
     @SubscribeEvent
     public static void onChunkDataLoad(ChunkDataEvent.Load event) {
-        if (!Services.CONFIG.getBoolConfig(IConfigHelper.WORLD_GEN)) return;
+        if (!DTConfigs.SERVER.worldGen.get()) return;
 
         final LevelAccessor level = event.getLevel();
 
@@ -82,7 +81,7 @@ public class CommonGameEventHandler {
 
     @SubscribeEvent
     public static void onChunkDataSave(ChunkDataEvent.Save event) {
-        if (!Services.CONFIG.getBoolConfig(IConfigHelper.WORLD_GEN)) return;
+        if (!DTConfigs.SERVER.worldGen.get()) return;
 
         final LevelContext levelContext = LevelContext.create(event.getLevel());
         final UniversalPoissonDiscProvider discProvider = DynamicTreeFeature.DISC_PROVIDER;

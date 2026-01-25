@@ -1,8 +1,7 @@
 package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
@@ -24,7 +23,7 @@ public class VanillaSaplingEventHandler {
     }
 
     public static void updateEnabled() {
-        isEnabled = Services.CONFIG.getBoolConfig(IConfigHelper.REPLACE_VANILLA_SAPLINGS);
+        isEnabled = DTConfigs.COMMON.replaceVanillaSaplings.get();
     }
 
     private static InteractionResult onUseBlock(Player player, Level level, InteractionHand hand, BlockHitResult hitResult) {

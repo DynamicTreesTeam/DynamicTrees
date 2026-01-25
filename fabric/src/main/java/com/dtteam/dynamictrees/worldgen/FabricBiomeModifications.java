@@ -3,8 +3,7 @@ package com.dtteam.dynamictrees.worldgen;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.worldgen.featurecancellation.FeatureCancellationRegistry;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
@@ -36,16 +35,20 @@ public class FabricBiomeModifications {
     public static void register() {
         BiomeModifications.create(REMOVE_TREES_ID)
                 .add(ModificationPhase.REMOVALS, BiomeSelectors.all(), (selectionContext, modificationContext) -> {
-                    if (!Services.CONFIG.getBoolConfig(IConfigHelper.WORLD_GEN)) {
-                        return;
+                    if(DTConfigs.SERVER_CONFIG.isLoaded()) {
+                        if (!DTConfigs.SERVER.worldGen.get()) {
+                            return;
+                        }
                     }
                     removeVanillaTrees(selectionContext, modificationContext);
                 });
 
         BiomeModifications.create(ADD_TREES_ID)
                 .add(ModificationPhase.ADDITIONS, BiomeSelectors.all(), (selectionContext, modificationContext) -> {
-                    if (!Services.CONFIG.getBoolConfig(IConfigHelper.WORLD_GEN)) {
-                        return;
+                    if(DTConfigs.SERVER_CONFIG.isLoaded()) {
+                        if (!DTConfigs.SERVER.worldGen.get()) {
+                            return;
+                        }
                     }
                     addDynamicTrees(modificationContext);
                 });

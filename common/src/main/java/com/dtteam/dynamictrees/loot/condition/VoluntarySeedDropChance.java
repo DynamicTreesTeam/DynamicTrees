@@ -1,8 +1,7 @@
 package com.dtteam.dynamictrees.loot.condition;
 
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -36,9 +35,9 @@ public final class VoluntarySeedDropChance implements LootItemCondition {
     public boolean test(LootContext context) {
         final Float seasonalSeedDropFactor = context.getParamOrNull(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR);
         assert seasonalSeedDropFactor != null;
-        double minimumDropRate = Services.CONFIG.getDoubleConfig(IConfigHelper.MIN_SEASONAL_VOLUNTARY_SEED_DROP_RATE);
+        double minimumDropRate = DTConfigs.SERVER.minSeasonalVoluntarySeedDropRate.get();
         double adjustedSeasonalSeedDropFactor = Math.min(seasonalSeedDropFactor + minimumDropRate, 1.0F);
-        return rarity * Services.CONFIG.getDoubleConfig(IConfigHelper.VOLUNTARY_SEED_DROP_RATE) * adjustedSeasonalSeedDropFactor > context.getRandom().nextFloat();
+        return rarity * DTConfigs.SERVER.voluntarySeedDropRate.get() * adjustedSeasonalSeedDropFactor > context.getRandom().nextFloat();
     }
 
     public static LootItemCondition.Builder voluntarySeedDropChance() {

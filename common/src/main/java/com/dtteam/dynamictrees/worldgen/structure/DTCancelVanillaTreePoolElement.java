@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.worldgen.structure;
 
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -44,7 +43,7 @@ public class DTCancelVanillaTreePoolElement extends StructurePoolElement {
     }
 
     private boolean isEnabled() {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.CANCEL_VANILLA_VILLAGE_TREES);
+        return DTConfigs.COMMON.cancelVanillaVillageTrees.get();
     }
 
     @Override

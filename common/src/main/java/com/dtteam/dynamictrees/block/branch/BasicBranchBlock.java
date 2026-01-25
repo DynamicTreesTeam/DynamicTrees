@@ -8,8 +8,7 @@ import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.pod.OffsetablePodBlock;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionContext;
@@ -192,8 +191,8 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
         final int radius = this.getRadius(level.getBlockState(pos));
         final double hardness = this.getFamily().getPrimitiveLog().orElse(Blocks.AIR).defaultBlockState()
-                .getDestroySpeed(level, pos) * Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_HARDNESS_MULTIPLIER) * (radius * radius) / 64.0f * 8.0f;
-        return (float) Math.min(hardness, Services.CONFIG.getDoubleConfig(IConfigHelper.MAX_TREE_HARDNESS)); // So many youtube let's plays start with "OMG, this is taking so long to break this tree!"
+                .getDestroySpeed(level, pos) * DTConfigs.SERVER.treeHardnessMultiplier.get() * (radius * radius) / 64.0f * 8.0f;
+        return (float) Math.min(hardness, DTConfigs.SERVER.maxTreeHardness.get());
     }
 
     /** NeoForge override */
@@ -370,7 +369,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     /** NeoForge Override */
     @SuppressWarnings("unused")
     public boolean isLadder(BlockState state, LevelReader level, BlockPos pos, LivingEntity entity) {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_BRANCH_CLIMBING) &&
+        return DTConfigs.SERVER.enableBranchClimbing.get() &&
                 entity instanceof Player &&
                 getFamily().branchIsLadder() &&
                 (!state.hasProperty(WATERLOGGED) || !state.getValue(WATERLOGGED));

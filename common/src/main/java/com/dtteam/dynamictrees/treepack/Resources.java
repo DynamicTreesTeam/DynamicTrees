@@ -3,9 +3,9 @@ package com.dtteam.dynamictrees.treepack;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.configuration.ConfigurationTemplateResourceLoader;
 import com.dtteam.dynamictrees.api.resource.TreeResourceManager;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DirtBucketRecipeHandler;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
@@ -165,8 +165,8 @@ public final class Resources {
         }
 
         private void registerDirtBucketRecipes() {
-            if (!Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_DIRT_BUCKET_RECIPES)
-                    && !Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_MEGA_SEED_RECIPE)) {
+            if (!DTConfigs.COMMON.generateDirtBucketRecipes.get()
+                    && !DTConfigs.COMMON.generateMegaSeedRecipe.get()) {
                 return;
             }
 

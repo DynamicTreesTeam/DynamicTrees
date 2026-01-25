@@ -3,10 +3,9 @@ package com.dtteam.dynamictrees.entity.animation;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.client.SoundInstanceHandler;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.tags.DTEntityTypeTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.MathUtils;
@@ -107,7 +106,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     protected void flingLeavesParticles(FallingTreeEntity entity, float fallSpeed){
         int bounces = getData(entity).bounces;
         if (bounces > 1) return;
-        int maxParticleBlocks = Services.CONFIG.getIntConfig(IConfigHelper.MAX_FALLING_TREE_LEAVES_PARTICLES);
+        int maxParticleBlocks = DTConfigs.COMMON.maxFallingTreeLeavesParticles.get();
         if (maxParticleBlocks == 0) return;
         
         BranchDestructionData data = entity.getDestroyData();
@@ -224,21 +223,19 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
         //Crush living things with clumsy dead trees
         Level level = entity.level();
-        if (Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_FALLING_TREE_DAMAGE) && !level.isClientSide) {
+        if (DTConfigs.SERVER.enableFallingTreeDamage.get() && !level.isClientSide) {
             List<LivingEntity> elist = testEntityCollision(entity);
             for (LivingEntity living : elist) {
                 if (!getData(entity).entitiesHit.contains(living) && !living.getType().is(DTEntityTypeTags.FALLING_TREE_DAMAGE_IMMUNE)) {
                     getData(entity).entitiesHit.add(living);
                     float damage = entity.getDestroyData().woodVolume.getVolume() * Math.abs(fallSpeed) * 3f;
                     if (getData(entity).bounces == 0 && damage > 2) {
-                        //System.out.println("damage: " + damage);
                         living.setDeltaMovement(
                                 living.getDeltaMovement().x + (level.random.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getStepX() * damage * 0.2f),
                                 living.getDeltaMovement().y + (level.random.nextFloat() * fallSpeed * 0.25f),
                                 living.getDeltaMovement().z + (level.random.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getStepZ() * damage * 0.2f));
                         living.setDeltaMovement(living.getDeltaMovement().x + (level.random.nextFloat() - 0.5), living.getDeltaMovement().y, living.getDeltaMovement().z + (level.random.nextFloat() - 0.5));
-                        damage *= Services.CONFIG.getDoubleConfig(IConfigHelper.FALLING_TREE_DAMAGE_MULTIPLIER);
-                        //System.out.println("Tree Falling Damage: " + damage + "/" + living.getHealth());
+                        damage *= DTConfigs.SERVER.fallingTreeDamageMultiplier.get();
                         living.hurt(AnimationConstants.treeDamage(level.registryAccess()), damage);
                     }
                 }
