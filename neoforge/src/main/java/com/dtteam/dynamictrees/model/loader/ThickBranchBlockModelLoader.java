@@ -2,14 +2,12 @@ package com.dtteam.dynamictrees.model.loader;
 
 import com.dtteam.dynamictrees.model.geometry.BranchBlockModelGeometry;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Harley O'Connor
  */
-@OnlyIn(Dist.CLIENT)
+
 public class ThickBranchBlockModelLoader extends BranchBlockModelLoader {
 
     @Override

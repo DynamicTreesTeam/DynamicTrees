@@ -655,15 +655,15 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.colorString = colorString;
     }
 
-    //@OnlyIn(Dist.CLIENT)
+    //
     private BlockColor colorMultiplier;
 
-    //@OnlyIn(Dist.CLIENT)
+    //
     public int treeFallColorMultiplier(BlockState state, BlockAndTintGetter level, BlockPos pos) {
         return this.foliageColorMultiplier(state, level, pos);
     }
 
-    //@OnlyIn(Dist.CLIENT)
+    //
     public int foliageColorMultiplier(BlockState state, BlockAndTintGetter level, BlockPos pos) {
         if (colorMultiplier == null) {
             return 0x00FF00FF; //purple if broken
@@ -671,7 +671,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         return colorMultiplier.getColor(state, level, pos, -1);
     }
 
-//    @OnlyIn(Dist.CLIENT)
+//    
     private void processColor() {
         int color = -1;
         if (this.colorNumber != null) {
@@ -700,7 +700,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.colorMultiplier = (s, w, p, t) -> c == -1 ? Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), w, p, 0) : c;
     }
 
-    //@OnlyIn(Dist.CLIENT)
+    //
     public static void postInitClient() {
         REGISTRY.getAll().forEach(LeavesProperties::processColor);
     }

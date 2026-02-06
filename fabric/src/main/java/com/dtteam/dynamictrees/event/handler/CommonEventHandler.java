@@ -1,9 +1,13 @@
 package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
+import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
+import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.command.DTCommand;
-import com.dtteam.dynamictrees.platform.FabricMiscHelper;
 import com.dtteam.dynamictrees.systems.FutureBreak;
+import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
@@ -13,10 +17,17 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.block.Block;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 public class CommonEventHandler {
 
@@ -28,16 +39,11 @@ public class CommonEventHandler {
         });
 
         ServerWorldEvents.LOAD.register(((minecraftServer, serverLevel) -> {
-            FabricMiscHelper.currentServer = minecraftServer;
             BiomeDatabases.populateBlacklistFromConfig();
         }));
-//        if (event.getLevel().isClientSide()) {
-//            ClientModEventHandler.discoverWoodColors();
-//        }
 
         ServerWorldEvents.UNLOAD.register(((minecraftServer, serverLevel) -> {
-            FabricMiscHelper.currentServer = null;
-            DynamicTreeFeature.DISC_PROVIDER.unloadWorld(serverLevel);//clears the circles
+            DynamicTreeFeature.DISC_PROVIDER.unloadWorld(serverLevel);
         }));
 
         ClientTickEvents.START_WORLD_TICK.register((level)->{
@@ -45,12 +51,26 @@ public class CommonEventHandler {
         });
 
         ServerLifecycleEvents.SERVER_STARTED.register((minecraftServer -> {
-            SeasonHelper.getSeasonManager().flushMappings();
+            SeasonCompatibilityHandler.getSeasonManager().flushMappings();
         }));
         
         CommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext, commandSelection) -> {
             new DTCommand().registerDTCommand(commandDispatcher);
         }));
+
+        PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
+            Block block = state.getBlock();
+            if (block instanceof BranchBlock branchBlock) {
+                return branchBlock.onDestroyedByPlayer(state, level, pos, player, true, level.getFluidState(pos));
+            } else if (block instanceof TrunkShellBlock trunkShellBlock) {
+                return trunkShellBlock.onDestroyedByPlayer(state, level, pos, player, true, level.getFluidState(pos));
+            } else if (block instanceof SoilBlock soilBlock) {
+                return soilBlock.onDestroyedByPlayer(state, level, pos, player, true, level.getFluidState(pos));
+            } else if (block instanceof PottedSaplingBlock pottedSaplingBlock) {
+                return pottedSaplingBlock.onDestroyedByPlayer(state, level, pos, player, true, level.getFluidState(pos));
+            }
+            return true;
+        });
 
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new FabricReloadListener());
 
@@ -60,6 +80,13 @@ public class CommonEventHandler {
 
         public FabricReloadListener() {
             super(null);
+        }
+
+        @Override
+        public CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager,
+                                              ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
+                                              Executor backgroundExecutor, Executor gameExecutor) {
+            return super.reload(stage, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
         }
 
         @Override

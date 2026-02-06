@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.client;
 
-import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.platform.ClientServices;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
@@ -37,7 +37,7 @@ public class TextureHelper {
             pixels = new int[w * h];
             for (int x = 0; x < w; x++) {
                 for (int y = 0; y < h; y++) {
-                    pixels[calcPos(x, y)] = Services.MISC.getPixelRGBA(sprite, x, y);
+                    pixels[calcPos(x, y)] = ClientServices.CLIENT.getPixelRGBA(sprite, x, y);
                 }
             }
 

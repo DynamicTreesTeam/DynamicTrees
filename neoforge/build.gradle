@@ -107,13 +107,13 @@ publishMods {
     curseforge {
         projectId = "252818"
         projectSlug = "dynamictrees" // Required for discord webhook
-        accessToken = curseApiKey ?: System.getenv("CURSEFORGE_API_KEY")
+//        accessToken = curseApiKey ?: System.getenv("CURSEFORGE_API_KEY")
         minecraftVersions.add("1.21.1")
         optional("dynamictreesplus")
     }
     modrinth {
         projectId = "vdjF5PL5"
-        accessToken = modrinthToken ?: System.getenv("MODRINTH_TOKEN")
+//        accessToken = modrinthToken ?: System.getenv("MODRINTH_TOKEN")
         minecraftVersions.add("1.21.1")
         optional("qaO9Dqpu")
     }

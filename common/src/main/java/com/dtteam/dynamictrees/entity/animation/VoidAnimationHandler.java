@@ -32,7 +32,7 @@ public class VoidAnimationHandler implements AnimationHandler {
     public void dropPayload(FallingTreeEntity entity) {}
 
     @Override
-//    @OnlyIn(Dist.CLIENT)
+//    
     public boolean shouldRender(FallingTreeEntity entity, double x, double y, double z) {
         return false;
     }

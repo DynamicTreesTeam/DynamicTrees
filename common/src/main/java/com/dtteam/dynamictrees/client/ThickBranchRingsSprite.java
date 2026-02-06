@@ -5,10 +5,8 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
+
 public class ThickBranchRingsSprite extends SpriteContents {
     private static final int RESOLUTION = 16;
     private static final int LAYERS = 3;
@@ -18,7 +16,7 @@ public class ThickBranchRingsSprite extends SpriteContents {
     };
 
     public ThickBranchRingsSprite(ResourceLocation name, SpriteContents originalSprite){
-        super(name, getFrameSize(originalSprite), processImage(originalSprite.originalImage), originalSprite.metadata);
+        super(name, getFrameSize(originalSprite), processImage(originalSprite.originalImage), originalSprite.metadata());
     }
 
     private static FrameSize getFrameSize(SpriteContents sprite){

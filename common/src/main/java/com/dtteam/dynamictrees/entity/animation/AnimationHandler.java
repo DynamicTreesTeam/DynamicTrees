@@ -14,10 +14,10 @@ public interface AnimationHandler {
 
     boolean shouldDie(FallingTreeEntity entity);
 
-//    @OnlyIn(Dist.CLIENT)
+//    
     void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack);
 
-//    @OnlyIn(Dist.CLIENT)
+//    
     boolean shouldRender(FallingTreeEntity entity, double x, double y, double z);
 
 }

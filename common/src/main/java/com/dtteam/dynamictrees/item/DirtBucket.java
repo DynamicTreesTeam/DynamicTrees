@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.item;
 
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,7 +42,7 @@ public class DirtBucket extends Item {
             }
         }
 
-        if (Services.CONFIG.getBoolConfig(IConfigHelper.DIRT_BUCKET_PLACES_DIRT)) {
+        if (DTConfigs.SERVER.dirtBucketPlacesDirt.get()) {
             if (blockRayTraceResult.getType() != HitResult.Type.BLOCK) {
                 return new InteractionResultHolder<>(InteractionResult.PASS, itemStack);
             } else {

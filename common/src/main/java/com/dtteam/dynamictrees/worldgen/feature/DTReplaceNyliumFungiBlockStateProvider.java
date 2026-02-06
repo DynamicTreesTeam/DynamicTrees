@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.worldgen.feature;
 
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -31,7 +30,7 @@ public class DTReplaceNyliumFungiBlockStateProvider extends BlockStateProvider {
 
     @Override
     public BlockState getState(RandomSource random, BlockPos state) {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.REPLACE_NYLIUM_FUNGI)
+        return DTConfigs.COMMON.replaceNyliumFungi.get()
                 ? this.enabled.getState(random, state)
                 : this.disabled.getState(random, state);
     }

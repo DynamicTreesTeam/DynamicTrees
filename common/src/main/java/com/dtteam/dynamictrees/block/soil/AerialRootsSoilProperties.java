@@ -7,11 +7,10 @@ import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
-import com.dtteam.dynamictrees.entity.animation.FalloverAnimationHandler;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.entity.animation.*;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.systems.nodemapper.RootIntegrityNode;
 import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
@@ -142,7 +141,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
             if (up.getBlock() instanceof BlockWithDynamicHardness upBlock){
                 hardness = upBlock.getHardness(up, level, pos.above());
             }
-            return (float)(hardness * Services.CONFIG.getDoubleConfig(IConfigHelper.ROOTY_BLOCK_HARDNESS_MULTIPLIER));
+            return (float)(hardness * DTConfigs.SERVER.rootyBlockHardnessMultiplier.get());
         }
 
         @Override

@@ -2,9 +2,8 @@ package com.dtteam.dynamictrees.worldgen;
 
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors.*;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -570,7 +569,7 @@ public class BiomeDatabase {
     }
 
     public BiomeDatabase setForestness(Holder<Biome> biome, float forestness) {
-        getEntry(biome).setForestness((float) Math.max(forestness, Services.CONFIG.getDoubleConfig(IConfigHelper.SEED_MIN_FORESTNESS)));
+        getEntry(biome).setForestness((float) Math.max(forestness, DTConfigs.SERVER.seedMinForestness.get()));
         return this;
     }
 

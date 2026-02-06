@@ -3,7 +3,6 @@ package com.dtteam.dynamictrees.event.handler;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 
@@ -31,10 +30,10 @@ public final class OptionalHandlers {
 
     /**
      * Registers or unregisters event handlers based on config changes. Called when the config is loaded or reloaded in
-     * {@link DTConfigs}.
+     * {@link com.dtteam.dynamictrees.config.DTConfigEvents}.
      */
     public static void configReload() {
-        registerOrUnregister(VANILLA_SAPLING_EVENT_HANDLER, Services.CONFIG.getBoolConfig(IConfigHelper.REPLACE_VANILLA_SAPLINGS));
+        registerOrUnregister(VANILLA_SAPLING_EVENT_HANDLER, DTConfigs.COMMON.replaceVanillaSaplings.get());
     }
 
     /**

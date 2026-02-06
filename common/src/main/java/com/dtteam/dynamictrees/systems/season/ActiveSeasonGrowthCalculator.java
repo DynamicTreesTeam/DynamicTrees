@@ -3,8 +3,7 @@ package com.dtteam.dynamictrees.systems.season;
 import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.season.SeasonGrowthCalculator;
 import com.dtteam.dynamictrees.api.season.SeasonType;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import net.minecraft.util.Mth;
 
 public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
@@ -15,7 +14,7 @@ public class ActiveSeasonGrowthCalculator implements SeasonGrowthCalculator {
 
     private float peakClimateOffset(SeasonType type){
         float summerOffset = -0.5f;
-        float wetSeasonOffset = (float)(summerOffset + Services.CONFIG.getDoubleConfig(IConfigHelper.WET_SEASON_OFFSET));
+        float wetSeasonOffset = (float)(summerOffset + DTConfigs.COMMON.wetSeasonOffset.get());
         if (type == SeasonType.DRY_WET){
             return wetSeasonOffset;
         } else return summerOffset;

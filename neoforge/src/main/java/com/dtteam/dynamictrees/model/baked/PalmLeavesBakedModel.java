@@ -14,8 +14,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.RenderTypeGroup;
 import net.neoforged.neoforge.client.model.IDynamicBakedModel;
@@ -26,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
+
 public abstract class PalmLeavesBakedModel implements IDynamicBakedModel {
 
     protected RenderTypeGroup renderGroup = new RenderTypeGroup(RenderType.cutout(), RenderType.cutout());

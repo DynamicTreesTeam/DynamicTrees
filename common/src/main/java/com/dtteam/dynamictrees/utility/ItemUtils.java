@@ -1,8 +1,8 @@
 package com.dtteam.dynamictrees.utility;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -72,7 +72,7 @@ public final class ItemUtils {
             return;
         }
 
-        int damage = switch (Services.CONFIG.getEnumConfig(IConfigHelper.AXE_DAMAGE_MODE, DynamicTrees.AxeDamage.class)) {
+        int damage = switch (DTConfigs.SERVER.axeDamageMode.get()) {
             case VANILLA -> 1;
             case THICKNESS -> Math.max(1, radius) / 2;
             case VOLUME -> (int) woodVolume.getVolume();

@@ -3,8 +3,7 @@ package com.dtteam.dynamictrees.worldgen.biomemodifier;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.NeoForgeRegistryLoader;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabase;
 import com.dtteam.dynamictrees.worldgen.featurecancellation.FeatureCancellationRegistry;
@@ -25,7 +24,7 @@ public class RunFeatureCancellersBiomeModifier implements BiomeModifier {
 
     @Override
     public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
-        if (phase == Phase.REMOVE && Services.CONFIG.getBoolConfig(IConfigHelper.WORLD_GEN)) {
+        if (phase == Phase.REMOVE && DTConfigs.SERVER.worldGen.get()) {
             ResourceKey<Biome> biomeKey = biome.unwrapKey().orElseThrow();
             BiomeGenerationSettingsBuilder generationSettings = builder.getGenerationSettings();
 

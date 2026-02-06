@@ -23,42 +23,38 @@ public class FabricEventHelper implements IEventHelper {
 
     @Override
     public <V extends RegistryEntry<V>> void postRegistryEvent(AbstractRegistry<V> registry) {
-        //RegistryEvent.EVENT.invoker().
     }
 
     @Override
     public <V extends RegistryEntry<V>> void postTypedRegistryEvent(TypedRegistry<V> registry) {
-
     }
 
     @Override
-    public void postAddResourceLoadersEvent(TreeResourceManager resourceManager) {
+    public void postAddResourceLoadersEventPre(TreeResourceManager resourceManager) {
+    }
 
+    @Override
+    public void postAddResourceLoadersEventPost(TreeResourceManager resourceManager) {
     }
 
     @Override
     public void postJsonDeserializerRegistryEvent() {
-
     }
 
     @Override
     public <O, I> void postApplierEvent(StagedApplierResourceLoader.ApplierStage stage, PropertyAppliers<O, I> appliers, String identifier) {
-
     }
 
     @Override
     public <O> void postBiomeEntryApplierEvent(JsonPropertyAppliers<O> appliers, String identifier) {
-
     }
 
     @Override
     public <O> void postCancellationApplierEvent(JsonPropertyAppliers<O> appliers, String identifier) {
-
     }
 
     @Override
     public void postSpeciesPostGenerationEvent(PostGenerationContext context) {
-
     }
 
     @Override
@@ -68,27 +64,26 @@ public class FabricEventHelper implements IEventHelper {
 
     @Override
     public boolean canCropGrow(Level level, BlockPos pos, BlockState state, boolean doGrow) {
-        return false;
+        return doGrow;
     }
 
     @Override
     public void cropGrowPost(Level level, BlockPos pos, BlockState state) {
-
     }
 
     @Override
     public Species.BiomeSuitabilityEventResult postBiomeSuitabilityEvent(Level level, Biome biome, Species species, BlockPos pos) {
-        return null;
+        return new Species.BiomeSuitabilityEventResult(false, 0.0f);
     }
 
     @Override
     public Seed.VoluntaryPlantEventResult postSeedVoluntaryPlantEvent(ItemEntity entityItem, Species species, BlockPos pos, boolean willPlant) {
-        return new Seed.VoluntaryPlantEventResult(false, false);
+        return new Seed.VoluntaryPlantEventResult(false, willPlant);
     }
 
     @Override
     public PoissonDiscProvider postPoissonDiscProviderCreateEvent(LevelAccessor level, PoissonDiscProvider poissonDiscProvider) {
-        return null;
+        return poissonDiscProvider;
     }
 
 }

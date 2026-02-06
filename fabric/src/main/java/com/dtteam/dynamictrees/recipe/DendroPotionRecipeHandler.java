@@ -1,8 +1,7 @@
 package com.dtteam.dynamictrees.recipe;
 
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.item.DendroPotion;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
@@ -35,12 +34,10 @@ public class DendroPotionRecipeHandler {
     }
 
     public static List<DendroBrewingMix> getAllDendroRecipes() {
-        //If they have already been processed then don't process them again
         if (!brewingRecipes.isEmpty()) return brewingRecipes;
 
-        //Biochar potion
         ItemStack biocharIngredient = new ItemStack(Items.CHARCOAL);
-        final ItemStack baseStack = setPotion(new ItemStack(Items.POTION), Services.CONFIG.getStringConfig(IConfigHelper.BIOCHAR_BREWING_BASE));
+        final ItemStack baseStack = setPotion(new ItemStack(Items.POTION), DTConfigs.COMMON.biocharBrewingBase.get());
         brewingRecipes.add(getRecipe(baseStack, biocharIngredient, getPotionStack(DendroPotion.DendroPotionType.BIOCHAR)));
         ingredients.add(biocharIngredient);
 

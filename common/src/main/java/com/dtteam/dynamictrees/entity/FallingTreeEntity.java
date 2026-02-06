@@ -8,10 +8,10 @@ import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandlers;
 import com.dtteam.dynamictrees.entity.animation.DataAnimationHandler;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModelTrackerCache;
 import com.dtteam.dynamictrees.model.ModelTracker;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.platform.*;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -335,7 +335,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     }
 
     protected AnimationHandler selectAnimationHandler() {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_FALLING_TREES) ? destroyData.species.selectAnimationHandler(this) : AnimationHandlers.voidAnimationHandler;
+        return DTConfigs.SERVER.enableFallingTrees.get() ? destroyData.species.selectAnimationHandler(this) : AnimationHandlers.voidAnimationHandler;
     }
 
     public AnimationHandler defaultAnimationHandler() {

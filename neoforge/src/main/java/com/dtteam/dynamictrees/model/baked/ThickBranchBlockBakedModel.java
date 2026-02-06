@@ -27,8 +27,6 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.model.IModelBuilder;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
@@ -42,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
+
 public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
 
     private final BakedModel[] trunksBark = new BakedModel[16]; // The trunk will always feature bark on its sides.

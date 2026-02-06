@@ -19,8 +19,8 @@ import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -178,9 +178,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     protected float lootVolumeMultiplier = 1.0f;
 
-//    @OnlyIn(Dist.CLIENT)
+//    
     public int woodRingColor; // For rooty blocks
-//    @OnlyIn(Dist.CLIENT)
+//    
     public int woodBarkColor; // For rooty water
 
     /**
@@ -432,7 +432,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.maxBranchRadius = maxBranchRadius;
     }
 
-//    @OnlyIn(Dist.CLIENT)
+//    
     public int getRootColor(BlockState state, boolean getBark) {
         return getBark ? woodBarkColor : woodRingColor;
     }
@@ -630,7 +630,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public int getMinRadiusForStripping() {
-        if (minRadiusForStripping == null) return Services.CONFIG.getIntConfig(IConfigHelper.MIN_RADIUS_FOR_STRIP);
+        if (minRadiusForStripping == null) return DTConfigs.SERVER.minRadiusForStrip.get();
         return minRadiusForStripping;
     }
 
@@ -639,7 +639,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public boolean reduceRadiusWhenStripping() {
-        if (Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_STRIP_RADIUS_REDUCTION))
+        if (DTConfigs.SERVER.enableStripRadiusReduction.get())
             return reduceRadiusWhenStripping;
         return false;
     }

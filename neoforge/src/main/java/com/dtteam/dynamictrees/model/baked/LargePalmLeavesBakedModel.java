@@ -9,14 +9,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.SimpleBakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
+
 public class LargePalmLeavesBakedModel extends PalmLeavesBakedModel {
 
     public static List<LargePalmLeavesBakedModel> INSTANCES = new ArrayList<>();

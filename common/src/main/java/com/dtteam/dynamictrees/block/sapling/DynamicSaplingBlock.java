@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.block.sapling;
 
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
@@ -145,8 +144,7 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
 
     @Override
     public List<ItemStack> getDrops(@NotNull BlockState state, @NotNull LootParams.Builder builder) {
-        // Drop nothing if sapling drops are disabled, nuthin'!
-        if (!Services.CONFIG.getBoolConfig(IConfigHelper.DYNAMIC_SAPLING_DROPS))
+        if (!DTConfigs.SERVER.dynamicSaplingDrops.get())
             return Collections.emptyList();
         // If a loot table has been added load those drops instead.
         LootTable loottable = builder.getLevel().getServer().reloadableRegistries().getLootTable(getLootTable());

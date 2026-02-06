@@ -2,8 +2,7 @@ package com.dtteam.dynamictrees.tree.species;
 
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import net.minecraft.core.Direction;
@@ -28,7 +27,7 @@ public class SwampSpecies extends Species {
     @Override
     public boolean generate(DynamicTreeGenerationContext context) {
         if (isWater(context.level().getBlockState(context.rootPos()))) {
-            switch (Services.CONFIG.getEnumConfig(IConfigHelper.SWAMP_OAKS_IN_WATER, WaterSurfaceGenerationState.class)) {
+            switch (DTConfigs.SERVER.swampOaksInWater.get()) {
                 case WaterSurfaceGenerationState.SUNK: //generate 1 block down
                     if (context.radius() >= minRadiusForSunkGeneration) {
                         context.rootPos().move(Direction.DOWN, countWaterBlocksBelow(context.level(), context.rootPos(), getAllowedWaterHeightForWorldgen()));

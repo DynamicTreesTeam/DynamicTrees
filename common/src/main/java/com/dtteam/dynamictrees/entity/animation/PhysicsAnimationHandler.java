@@ -161,7 +161,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
     }
 
     @Override
-//    @OnlyIn(Dist.CLIENT)
+//    
     public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack) {
         final float yaw = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTick));
         final float pit = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTick));
@@ -174,7 +174,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
     }
 
     @Override
-//    @OnlyIn(Dist.CLIENT)
+//    
     public boolean shouldRender(FallingTreeEntity entity, double x, double y, double z) {
         return true;
     }

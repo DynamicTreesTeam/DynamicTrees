@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.worldgen;
 
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.ResourceLocationException;
@@ -45,8 +44,8 @@ public final class BiomeDatabases {
     }
 
     public static void populateBlacklistFromConfig() {
-        if (Services.CONFIG.isServerConfigLoaded()){
-            Services.CONFIG.getStringListConfig(IConfigHelper.DIMENSION_BLACK_LIST).forEach(BiomeDatabases::tryBlacklist);
+        if (DTConfigs.SERVER_CONFIG.isLoaded()){
+            DTConfigs.SERVER.dimensionBlacklist.get().forEach(BiomeDatabases::tryBlacklist);
         } else {
             LogManager.getLogger().error("Dimension Blacklist tried to load from config before config was loaded! this should not happen.");
         }

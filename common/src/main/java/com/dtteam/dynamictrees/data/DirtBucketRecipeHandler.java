@@ -1,8 +1,7 @@
 package com.dtteam.dynamictrees.data;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.NonNullList;
@@ -36,11 +35,11 @@ public final class DirtBucketRecipeHandler {
 
             final ResourceLocation registryName = species.getRegistryName();
 
-            if (Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_DIRT_BUCKET_RECIPES)){
+            if (DTConfigs.COMMON.generateDirtBucketRecipes.get()){
                 generateSaplingRecipes(craftingRecipes, species, registryName);
             }
 
-            if (Services.CONFIG.getBoolConfig(IConfigHelper.GENERATE_MEGA_SEED_RECIPE)){
+            if (DTConfigs.COMMON.generateMegaSeedRecipe.get()){
                 generateMegaSeedRecipes(craftingRecipes, species, registryName);
             }
         }

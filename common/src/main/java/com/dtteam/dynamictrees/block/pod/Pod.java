@@ -9,9 +9,8 @@ import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.DynamicBlockProperties;
 import com.dtteam.dynamictrees.block.Growable;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
 import com.google.common.collect.Maps;
@@ -362,7 +361,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     @NotNull
     @Override
     public Pod reset() {
-        canBoneMeal = Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig(IConfigHelper.CAN_BONE_MEAL_PODS);
+        canBoneMeal = DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.SERVER.canBoneMealPods.get();
         requiredProductionFactor = 0.3F;
         matureAction = Growable.MatureAction.DEFAULT;
         seasonalFactorGetter = (l,b)-> 1.0f;

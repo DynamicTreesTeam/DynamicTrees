@@ -1,6 +1,9 @@
 package com.dtteam.dynamictrees.registry;
 
-import com.dtteam.dynamictrees.api.registry.RegistryHandler;
+import com.dtteam.dynamictrees.api.registry.*;
+import net.minecraft.core.*;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -31,6 +34,7 @@ public class FabricRegistryHandler extends RegistryHandler {
 
     public FabricRegistryHandler(String modId) {
         super(ResourceLocation.fromNamespaceAndPath(modId, modId));
+        RegistryHandler.REGISTRY.register(this);
     }
 
     /**
@@ -60,22 +64,34 @@ public class FabricRegistryHandler extends RegistryHandler {
 
     @Override
     public @Nullable Supplier<Block> getBlock(ResourceLocation registryName) {
-        return null;
+        Block block = BuiltInRegistries.BLOCK.get(registryName);
+        return () -> block;
     }
 
     @Override
     public @Nullable Supplier<Item> getItem(ResourceLocation registryName) {
-        return null;
+        Item item = BuiltInRegistries.ITEM.get(registryName);
+        return () -> item;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Block> Supplier<T> putBlock(ResourceLocation registryName, Supplier<T> blockSup) {
-        return null;
+        if (this.warnIfInvalid("Block", registryName)) {
+            return (Supplier<T>) getBlock(registryName);
+        }
+        T block = Registry.register(BuiltInRegistries.BLOCK, registryName, blockSup.get());
+        return () -> block;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Item> Supplier<T> putItem(ResourceLocation registryName, Supplier<T> itemSup) {
-        return null;
+        if (this.warnIfInvalid("Item", registryName)) {
+            return (Supplier<T>) getItem(registryName);
+        }
+        T item = Registry.register(BuiltInRegistries.ITEM, registryName, itemSup.get());
+        return () -> item;
     }
 
     public static class RegisterEventHandler<T> {

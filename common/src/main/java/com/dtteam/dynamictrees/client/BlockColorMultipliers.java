@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-//@OnlyIn(Dist.CLIENT)
+//
 public class BlockColorMultipliers {
 
     private static Map<ResourceLocation, BlockColor> colorBase = new HashMap<>();

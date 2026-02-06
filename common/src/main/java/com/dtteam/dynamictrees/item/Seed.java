@@ -3,8 +3,8 @@ package com.dtteam.dynamictrees.item;
 import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
+import com.dtteam.dynamictrees.platform.*;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
@@ -122,9 +122,9 @@ public class Seed extends Item {//implements IPlantable {
             return false;
         }
 
-        float plantChance = (float) (getSpecies().biomeSuitability(level, pos) * Services.CONFIG.getDoubleConfig(IConfigHelper.SEED_PLANT_RATE));
+        float plantChance = (float) (getSpecies().biomeSuitability(level, pos) * DTConfigs.SERVER.seedPlantRate.get());
 
-        if (Services.CONFIG.getBoolConfig(IConfigHelper.SEED_ONLY_FOREST)) {
+        if (DTConfigs.SERVER.seedOnlyForest.get()) {
 //            plantChance *= BiomeDatabases.getDimensionalOrDefault(level.dimension().location())
 //                    .getForestness(level.getBiome(pos));
         }
@@ -150,7 +150,7 @@ public class Seed extends Item {//implements IPlantable {
     }
 
     public int getTimeToLive(ItemStack seedStack) {
-        int lifespan = Services.CONFIG.getIntConfig(IConfigHelper.SEED_TIME_TO_LIVE);//1 minute by default(helps with lag)
+        int lifespan = DTConfigs.SERVER.seedTimeToLive.get();
 //        if (seedStack.hasTag()) {
 //            CompoundTag nbtData = seedStack.getTag();
 //            assert nbtData != null;

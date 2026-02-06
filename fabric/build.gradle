@@ -1,7 +1,11 @@
+import me.modmuss50.mpp.ReleaseType
+
 plugins {
     id 'multiloader-loader'
     id 'fabric-loom'
+    id "me.modmuss50.mod-publish-plugin" version "0.8.4"
 }
+
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
@@ -11,6 +15,8 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.forge_config_api_port_version}"
+
 }
 
 loom {
@@ -34,6 +40,15 @@ loom {
             ideConfigGenerated(true)
             runDir('runs/server')
         }
+        datagen {
+            client()
+            setConfigName('Fabric Datagen')
+            ideConfigGenerated(true)
+            runDir('runs/datagen')
+            vmArg("-Dfabric-api.datagen")
+            vmArg("-Dfabric-api.datagen.output-dir=${project(':common').file('src/generated/resources')}")
+            vmArg("-Dfabric-api.datagen.modid=${mod_id}")
+        }
     }
     repositories {
         maven {
@@ -50,11 +65,36 @@ loom {
         modImplementation "curse.maven:jade-324717:6011268"
         modImplementation "curse.maven:jei-238222:5846878"
 
-        modImplementation ":core-3.6.7"
-        modImplementation ":toml-3.6.7"
         modImplementation ":typetools-0.6.3"
 
         modImplementation "curse.maven:glitchcore-955399:5660741"
         modImplementation "curse.maven:serene-seasons-291874:5753502"
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+def changelogFile = file("build/changelog.txt")
+
+publishMods {
+    file = remapJar.archiveFile
+    displayName = "${mod_name.replace(' ','')}-Fabric-${minecraft_version} ${project.version}"
+    if (changelogFile.exists()) {
+        changelog.set(changelogFile.getText())
+    }
+    type = ReleaseType.of(versionType.toUpperCase())
+    modLoaders.add("fabric")
+    modLoaders.add("quilt")
+
+    curseforge {
+        projectId = "252818"
+        projectSlug = "dynamictrees"
+        minecraftVersions.add("1.21.1")
+        optional("dynamictreesplus")
+    }
+    modrinth {
+        projectId = "vdjF5PL5"
+        minecraftVersions.add("1.21.1")
+        optional("qaO9Dqpu")
     }
 }

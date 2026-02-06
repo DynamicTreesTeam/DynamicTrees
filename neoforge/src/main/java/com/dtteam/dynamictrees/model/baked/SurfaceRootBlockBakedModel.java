@@ -20,8 +20,6 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.model.IDynamicBakedModel;
 import net.neoforged.neoforge.client.model.IModelBuilder;
 import net.neoforged.neoforge.client.model.data.ModelData;
@@ -32,7 +30,7 @@ import org.joml.Vector3f;
 import java.util.*;
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
+
 public class SurfaceRootBlockBakedModel implements IDynamicBakedModel {
 
     private final BlockModel blockModel;

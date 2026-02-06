@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.platform;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.config.DTConfigs;
+import com.dtteam.dynamictrees.config.*;
 import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 
 import java.util.List;

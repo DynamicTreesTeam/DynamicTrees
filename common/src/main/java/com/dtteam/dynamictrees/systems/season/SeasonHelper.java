@@ -3,8 +3,7 @@ package com.dtteam.dynamictrees.systems.season;
 import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.season.SeasonManager;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -29,22 +28,22 @@ public class SeasonHelper {
     }
 
     static public float globalSeasonalGrowthFactor(LevelContext levelContext, BlockPos rootPos, float offset) {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_GROWTH)
+        return DTConfigs.COMMON.enableSeasonalGrowth.get()
                 ? SeasonCompatibilityHandler.getSeasonManager().getGrowthFactor(levelContext.level(), rootPos, offset) : 1.0F;
     }
 
     static public float globalSeasonalSeedDropFactor(LevelContext levelContext, BlockPos pos, float offset) {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_DROP)
+        return DTConfigs.COMMON.enableSeasonalSeedDrop.get()
                 ? SeasonCompatibilityHandler.getSeasonManager().getSeedDropFactor(levelContext.level(), pos, offset) : 1.0F;
     }
 
     static public float globalSeasonalFruitProductionFactor(LevelContext levelContext, BlockPos pos, float offset) {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION)
+        return DTConfigs.COMMON.enableSeasonalFruitProduction.get()
                 ? SeasonCompatibilityHandler.getSeasonManager().getFruitProductionFactor(levelContext.level(), pos, offset) : 1.0F;
     }
 
     static public Float getPeakFruitProductionSeason(LevelContext levelContext, BlockPos pos, float offset) {
-        return Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_SEASONAL_SEED_FRUIT_PRODUCTION)
+        return DTConfigs.COMMON.enableSeasonalFruitProduction.get()
                 ? SeasonCompatibilityHandler.getSeasonManager().getPeakFruitProductionSeasonValue(levelContext.level(), pos, offset) : null;
     }
 

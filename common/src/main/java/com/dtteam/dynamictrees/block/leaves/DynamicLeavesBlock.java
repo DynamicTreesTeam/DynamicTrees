@@ -12,8 +12,8 @@ import com.dtteam.dynamictrees.client.ParticleHelper;
 import com.dtteam.dynamictrees.data.tags.DTEntityTypeTags;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import com.dtteam.dynamictrees.tree.TreeHelper;
@@ -123,7 +123,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
      */
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource rand) {
-        double growthMultiplier = Services.CONFIG.getDoubleConfig(IConfigHelper.TREE_GROWTH_MULTIPLIER);
+        double growthMultiplier = DTConfigs.SERVER.treeGrowthMultiplier.get();
         if (rand.nextFloat() > growthMultiplier) {
             return;
         }
@@ -545,11 +545,11 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     protected boolean isMovementVanilla(){
-        return Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig(IConfigHelper.VANILLA_LEAVES_COLLISION);
+        return DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.SERVER.vanillaLeavesCollision.get();
     }
 
     protected boolean isLeavesPassable() {
-        return (Services.CONFIG.isServerConfigLoaded() && Services.CONFIG.getBoolConfig(IConfigHelper.IS_LEAVES_PASSABLE))
+        return (DTConfigs.SERVER_CONFIG.isLoaded() && DTConfigs.SERVER.isLeavesPassable.get())
                 || Services.PLATFORM.isModLoaded(DynamicTrees.PASSABLE_FOLIAGE);
     }
 
@@ -580,8 +580,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
     @Override
     public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
-        // We are only interested in Living things crashing through the canopy.
-        if (!Services.CONFIG.getBoolConfig(IConfigHelper.ENABLE_CANOPY_CRASH) || !(entity instanceof LivingEntity)) {
+        if (!DTConfigs.SERVER.enableCanopyCrash.get() || !(entity instanceof LivingEntity)) {
             return;
         }
 
