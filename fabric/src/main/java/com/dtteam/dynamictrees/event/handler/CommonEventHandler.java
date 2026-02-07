@@ -46,9 +46,6 @@ public class CommonEventHandler {
             DynamicTreeFeature.DISC_PROVIDER.unloadWorld(serverLevel);
         }));
 
-        ClientTickEvents.START_WORLD_TICK.register((level)->{
-            SeasonHelper.updateTick(level, level.getDayTime());
-        });
 
         ServerLifecycleEvents.SERVER_STARTED.register((minecraftServer -> {
             SeasonCompatibilityHandler.getSeasonManager().flushMappings();
