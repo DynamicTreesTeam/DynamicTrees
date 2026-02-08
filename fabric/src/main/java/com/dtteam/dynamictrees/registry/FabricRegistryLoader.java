@@ -18,6 +18,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -56,6 +57,12 @@ public class FabricRegistryLoader extends RegistryLoader {
     public <T extends Item> Supplier<T> registerItem(String name, Supplier<T> newBlock) {
         T item = Registry.register(BuiltInRegistries.ITEM, DynamicTrees.location(name), newBlock.get());
         return ()-> item;
+    }
+
+    @Override
+    public <T extends Recipe<?>> Supplier<RecipeSerializer<T>> registerRecipeType(String name, Supplier<RecipeSerializer<T>> newBlock) {
+        RecipeSerializer<T> type = Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, DynamicTrees.location(name), newBlock.get());
+        return ()-> type;
     }
 
     @Override

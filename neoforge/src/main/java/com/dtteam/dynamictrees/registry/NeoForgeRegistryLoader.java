@@ -22,6 +22,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -62,6 +63,8 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     public static final DeferredRegister<LootItemConditionType> LOOT_CONDITION_TYPES = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<LootPoolEntryType> LOOT_POOL_ENTRY_TYPES = DeferredRegister.create(Registries.LOOT_POOL_ENTRY_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<LootItemFunctionType<?>> LOOT_FUNCTION_TYPES = DeferredRegister.create(Registries.LOOT_FUNCTION_TYPE, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZER = DeferredRegister.create(Registries.RECIPE_SERIALIZER, DynamicTrees.MOD_ID);
+
 
     public static void setup(IEventBus modBus) {
         BLOCK_ENTITY_TYPES.register(modBus);
@@ -77,6 +80,7 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         LOOT_POOL_ENTRY_TYPES.register(modBus);
         LOOT_CONDITION_TYPES.register(modBus);
         LOOT_FUNCTION_TYPES.register(modBus);
+        RECIPE_SERIALIZER.register(modBus);
 
         //NeoForge
         BIOME_MODIFIER_SERIALIZERS.register(modBus);
@@ -97,6 +101,11 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         Supplier<T> sup = Suppliers.memoize(newBlock::get);
         RegistryHandler.addItem(DynamicTrees.location(name), sup);
         return sup;
+    }
+
+    @Override
+    public <T extends Recipe<?>> Supplier<RecipeSerializer<T>> registerRecipeType(String name, Supplier<RecipeSerializer<T>> newBlock) {
+        return RECIPE_SERIALIZER.register(name, newBlock);
     }
 
     @Override

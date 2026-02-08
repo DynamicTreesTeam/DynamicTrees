@@ -96,6 +96,7 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
             }
         }
 
+
         ColorProviderRegistry.BLOCK.register(
                 (state, level, pos, tintIndex) -> isValidPos(level, pos) && (state.getBlock() instanceof PottedSaplingBlock)
                         ? DTRegistries.POTTED_SAPLING.get().getSpecies(level, pos).saplingColorMultiplier(state, level, pos, tintIndex) : white,
@@ -108,6 +109,12 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
                         (state, level, pos, tintIndex) -> isValidPos(level, pos)
                                 ? species.saplingColorMultiplier(state, level, pos, tintIndex) : white,
                         species.getSapling().get()
+                );
+            }
+            species.getSapling().ifPresent(sapling -> BlockRenderLayerMap.INSTANCE.putBlock(sapling, RenderType.cutoutMipped()));
+            if(species.hasFruits()){
+                species.getFruits().forEach(fruit ->
+                        BlockRenderLayerMap.INSTANCE.putBlock(fruit.getBlock(), RenderType.cutoutMipped())
                 );
             }
         }
@@ -142,8 +149,10 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
 
             LevelContext levelContext = LevelContext.create(player.level());
             Species species = seed.getSpecies();
-
-            if (SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null || !species.isValid()) {
+            if(!species.isValid()) {
+                return;
+            }
+            if (SeasonHelper.getSeasonValue(levelContext, BlockPos.ZERO) == null ) {
                 return;
             }
 

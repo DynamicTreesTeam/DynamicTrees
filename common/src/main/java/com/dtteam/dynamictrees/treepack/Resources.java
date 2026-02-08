@@ -1,36 +1,23 @@
 package com.dtteam.dynamictrees.treepack;
 
-import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.configuration.ConfigurationTemplateResourceLoader;
-import com.dtteam.dynamictrees.api.resource.TreeResourceManager;
-import com.dtteam.dynamictrees.config.DTConfigs;
-import com.dtteam.dynamictrees.data.DirtBucketRecipeHandler;
-import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
-import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
-import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
-import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
+import com.dtteam.dynamictrees.*;
+import com.dtteam.dynamictrees.api.configuration.*;
+import com.dtteam.dynamictrees.api.resource.*;
+import com.dtteam.dynamictrees.platform.*;
+import com.dtteam.dynamictrees.systems.genfeature.*;
+import com.dtteam.dynamictrees.systems.growthlogic.*;
 import com.dtteam.dynamictrees.treepack.loader.*;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.packs.PackLocationInfo;
-import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.network.chat.*;
+import net.minecraft.server.packs.*;
+import net.minecraft.server.packs.repository.*;
+import net.minecraft.server.packs.resources.*;
+import net.minecraft.util.profiling.*;
+import net.minecraft.world.item.crafting.*;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Harley O'Connor
@@ -160,34 +147,9 @@ public final class Resources {
             // Reload all reload listeners in the trees resource manager and registers dirt bucket recipes.
             return CompletableFuture.allOf(futures)
                     .thenCompose(stage::wait)
-                    .thenAcceptAsync(v -> MANAGER.reload(futures), gameExecutor)
-                    .thenRunAsync(this::registerDirtBucketRecipes, gameExecutor);
+                    .thenAcceptAsync(v -> MANAGER.reload(futures), gameExecutor);
         }
 
-        private void registerDirtBucketRecipes() {
-            if (!DTConfigs.COMMON.generateDirtBucketRecipes.get()
-                    && !DTConfigs.COMMON.generateMegaSeedRecipe.get()) {
-                return;
-            }
-
-            if (recipeManager == null){
-                MinecraftServer server = Services.MISC.getCurrentServer();
-                if (server == null) return; //TO-DO: figure out later, in fabric this doesn't work.
-                recipeManager = server.getRecipeManager();
-            }
-
-            //Hash multimap to be able to modify it
-            final Multimap<RecipeType<?>, RecipeHolder<?>> recipes = HashMultimap.create();
-
-            // Put the recipes into the new map and make each type's recipes mutable.
-            this.recipeManager.byType.forEach((recipes::put));
-
-            // Register dirt bucket recipes.
-            DirtBucketRecipeHandler.registerDirtBucketRecipes(recipes.get(RecipeType.CRAFTING));
-
-            // Set the new recipes, turning back into an immutable map.
-            recipeManager.byType = ImmutableMultimap.copyOf(recipes);
-        }
     }
 
 }

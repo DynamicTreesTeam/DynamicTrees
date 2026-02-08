@@ -11,6 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -40,6 +41,8 @@ public abstract class RegistryLoader {
 
     abstract public <T extends Item> Supplier<T> registerItem(String name, Supplier<T> newBlock);
 
+    abstract public <T extends Recipe<?>> Supplier<RecipeSerializer<T>> registerRecipeType(String name, Supplier<RecipeSerializer<T>> newBlock);
+
     abstract public <T extends Entity> Supplier<EntityType<T>> registerEntity(String name, EntityType.Builder<T> builder, boolean isTree);
 
     abstract public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String name, BlockEntityType.BlockEntitySupplier<? extends T> newBlockEntity, Supplier<Set<Block>> validBlocks);
@@ -49,7 +52,7 @@ public abstract class RegistryLoader {
     abstract public <T> Supplier<DataComponentType<T>> registerDataComponentType(String name, UnaryOperator<DataComponentType.Builder<T>> operator);
 
     abstract public <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>, I extends ArgumentTypeInfo<A, T>>
-    Supplier<I> registerCommandArgumentType (String name, Class<A> infoClass, I argumentTypeInfo);
+    Supplier<I> registerCommandArgumentType(String name, Class<A> infoClass, I argumentTypeInfo);
 
     abstract public Supplier<LootItemConditionType> registerLootConditionType(String name, MapCodec<? extends LootItemCondition> serializerFactory);
 
@@ -57,12 +60,12 @@ public abstract class RegistryLoader {
 
     abstract public <L extends LootItemFunction> Supplier<LootItemFunctionType<L>> registerLootFunctionType(String name, MapCodec<L> serializerFactory);
 
-    abstract public <T extends PlacementModifier> Supplier<PlacementModifierType<T>> registerPlacementModifierType (String name, Supplier<PlacementModifierType<T>> supplier);
+    abstract public <T extends PlacementModifier> Supplier<PlacementModifierType<T>> registerPlacementModifierType(String name, Supplier<PlacementModifierType<T>> supplier);
 
-    abstract public <T extends Feature<?>> Supplier<T> registerFeature (String name, Supplier<T> supplier);
+    abstract public <T extends Feature<?>> Supplier<T> registerFeature(String name, Supplier<T> supplier);
 
-    abstract public <T extends BlockStateProvider> Supplier<BlockStateProviderType<T>> registerBlockStateProviderType (String name, Supplier<BlockStateProviderType<T>> supplier);
+    abstract public <T extends BlockStateProvider> Supplier<BlockStateProviderType<T>> registerBlockStateProviderType(String name, Supplier<BlockStateProviderType<T>> supplier);
 
-    abstract public <T extends StructurePoolElement> Supplier<StructurePoolElementType<T>> registerStructurePoolElementType (String name, Supplier<StructurePoolElementType<T>> supplier);
+    abstract public <T extends StructurePoolElement> Supplier<StructurePoolElementType<T>> registerStructurePoolElementType(String name, Supplier<StructurePoolElementType<T>> supplier);
 
 }

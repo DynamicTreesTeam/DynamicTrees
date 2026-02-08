@@ -762,7 +762,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * This is only relevant if {@link IConfigHelper#REPLACE_VANILLA_SAPLINGS} is set to TRUE.
+     * This is only relevant if {@link com.dtteam.dynamictrees.config.DTConfigs#replaceVanillaSaplings} is set to TRUE.
      * Allows to configure said behavior when placing the sapling.
      */
     public boolean shouldReplaceSaplingWhenPlaced(BlockState originalSapling){
@@ -773,7 +773,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     /**
-     * This is only relevant if {@link IConfigHelper#REPLACE_VANILLA_SAPLINGS} is set to TRUE.
+     * This is only relevant if {@link com.dtteam.dynamictrees.config.DTConfigs#replaceVanillaSaplings} is set to TRUE.
      * Allows to configure said behavior when growing the sapling.
      */
     public boolean shouldReplaceSaplingWhenGrown(BlockState originalSapling){
@@ -2027,7 +2027,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public boolean isMegaSpecies() {
-        return preMegaSpecies.isValid();
+        return preMegaSpecies!= null && preMegaSpecies.isValid();
     }
 
     public void setMegaSpecies(final Species megaSpecies) {
