@@ -48,9 +48,9 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
     protected final TextureAtlasSprite ringsTexture;
 
 
-    protected final BakedModel[][] sleeves = new BakedModel[6][7];
-    protected final BakedModel[][] cores = new BakedModel[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-    protected final BakedModel[] rings = new BakedModel[8]; // 8 Cores with the ring textures on all 6 sides.
+    protected BakedModel[][] sleeves = new BakedModel[6][7];
+    protected BakedModel[][] cores = new BakedModel[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
+    protected BakedModel[] rings = new BakedModel[8]; // 8 Cores with the ring textures on all 6 sides.
 
     public BasicBranchBlockBakedModel(IGeometryBakingContext customData, ResourceLocation modelLocation, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
                                       Function<Material, TextureAtlasSprite> spriteGetter) {
@@ -202,7 +202,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
 
         final int coreRadius = getRadius(state);
 
-        if (coreRadius > 8) {
+        if (coreRadius > cores[0].length) {
             return Collections.emptyList();
         }
 
