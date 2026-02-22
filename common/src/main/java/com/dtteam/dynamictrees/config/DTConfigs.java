@@ -165,7 +165,7 @@ public class DTConfigs {
 
         builder.push("misc");
         config.generateDirtBucketRecipes = builder.define("generateDirtBucketRecipes", true);
-        config.generateMegaSeedRecipe = builder.define("generateMegaSeedRecipe", false);
+        config.generateMegaSeedRecipe = builder.define("generateMegaSeedRecipe", true);
         config.biocharBrewingBase = builder.define("biocharBrewingBase", "minecraft:thick");
         builder.pop();
 

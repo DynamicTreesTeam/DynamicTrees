@@ -117,6 +117,11 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
                         BlockRenderLayerMap.INSTANCE.putBlock(fruit.getBlock(), RenderType.cutoutMipped())
                 );
             }
+            if(species.hasPods()){
+                species.getPods().forEach(pod ->
+                        BlockRenderLayerMap.INSTANCE.putBlock(pod.getBlock(), RenderType.cutoutMipped())
+                );
+            }
         }
 
         for (DynamicLeavesBlock leaves : LeavesProperties.REGISTRY.getAll().stream()
