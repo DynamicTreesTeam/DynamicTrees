@@ -35,6 +35,9 @@
   },
   "suggests": {
     "dynamictreesplus": "*"
+  },
+  "requires": {
+    "forgeconfigapiport": "*"
   }
 }
   

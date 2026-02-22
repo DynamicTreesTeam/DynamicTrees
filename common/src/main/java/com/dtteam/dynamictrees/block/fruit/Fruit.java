@@ -74,7 +74,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     };
 
     /**
-     * Sets whether the fruit can be bone-mealed to accelerate growth. Defaults to {@link IConfigHelper#CAN_BONE_MEAL_FRUIT}.
+     * Sets whether the fruit can be bone-mealed to accelerate growth. Defaults to {@link DTConfigs#canBoneMealFruit}.
      */
     private boolean canBoneMeal;
 

@@ -133,12 +133,12 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     protected boolean hasStrippedBranch = true;
     /**
      * The minimum radius that the branch needs to have to be stripped by an axe
-     * If it's not modified by a tree-pack (null), it uses the value of {@link IConfigHelper#MIN_RADIUS_FOR_STRIP}
+     * If it's not modified by a tree-pack (null), it uses the value of {@link DTConfigs#minRadiusForStrip}
      */
     protected Integer minRadiusForStripping = null;
     /**
      * Whether the radius of the branch is reduced by 1 when stripped.
-     * This parameter is ignored if the value of {@link IConfigHelper#ENABLE_STRIP_RADIUS_REDUCTION} is set to FALSE.
+     * This parameter is ignored if the value of {@link DTConfigs#enableStripRadiusReduction} is set to FALSE.
      */
     protected boolean reduceRadiusWhenStripping = true;
     /**
