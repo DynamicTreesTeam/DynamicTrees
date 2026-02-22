@@ -65,7 +65,7 @@ loom {
         modImplementation "curse.maven:jade-324717:6011268"
         modImplementation "curse.maven:jei-238222:5846878"
 
-        modImplementation ":typetools-0.6.3"
+        implementation("net.jodah:typetools:0.6.3")
 
         modImplementation "curse.maven:glitchcore-955399:5660741"
         modImplementation "curse.maven:serene-seasons-291874:5753502"
