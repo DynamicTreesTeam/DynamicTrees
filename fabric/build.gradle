@@ -110,7 +110,7 @@ publishMods {
     curseforge {
         projectId = "252818"
         projectSlug = "dynamictrees"
-        accessToken = curseApiKey ?: System.getenv("CURSEFORGE_API_KEY")
+        accessToken = providers.gradleProperty("curseApiKey").orElse(providers.environmentVariable("CURSEFORGE_API_KEY")).orNull
         minecraftVersions.add("1.21.1")
 //        optional("dynamictreesplus")
         requires("forge-config-api-port")
@@ -118,7 +118,7 @@ publishMods {
     modrinth {
         projectId = "vdjF5PL5"
         minecraftVersions.add("1.21.1")
-        accessToken = modrinthToken ?: System.getenv("MODRINTH_TOKEN")
+        accessToken = providers.gradleProperty("modrinthToken").orElse(providers.environmentVariable("MODRINTH_TOKEN")).orNull
 //        optional("qaO9Dqpu")
         requires("ohNO6lps")
     }
