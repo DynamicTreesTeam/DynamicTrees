@@ -21,7 +21,8 @@
     ],
     "client": [
       "com.dtteam.dynamictrees.DynamicTreesFabricClient"
-    ]
+    ],
+    "dynamictrees": []
   },
   "mixins": [
     "${mod_id}.mixins.json",

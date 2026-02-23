@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees;
 
+import com.dtteam.dynamictrees.api.DynamicTreesAddonEntrypoint;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.config.DTConfigs;
@@ -15,6 +16,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.neoforged.fml.config.*;
 
 public class DynamicTreesFabric implements ModInitializer {
@@ -35,6 +37,14 @@ public class DynamicTreesFabric implements ModInitializer {
         DynamicTrees.init();
 
         FabricRegistryLoader.setup();
+
+        for (EntrypointContainer<DynamicTreesAddonEntrypoint> container : FabricLoader.getInstance().getEntrypointContainers("dynamictrees", DynamicTreesAddonEntrypoint.class)) {
+            try {
+                container.getEntrypoint().onDynamicTreesPreSetup();
+            } catch (Throwable e) {
+                DynamicTrees.LOG.error("Failed to invoke Dynamic Trees addon entrypoint for mod: {}", container.getProvider().getMetadata().getId(), e);
+            }
+        }
 
         DynamicTrees.commonSetup();
 
