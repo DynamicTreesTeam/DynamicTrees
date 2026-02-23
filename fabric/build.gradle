@@ -71,27 +71,6 @@ loom {
         modImplementation "curse.maven:serene-seasons-291874:5753502"
     }
 
-    publishing {
-        repositories {
-            maven {
-                url "file://${project.projectDir}/repo"
-            }
-            var mavenUsername = project.findProperty("harleyOConnorMavenUsername")?.toString() ?: System.getenv("MAVEN_USERNAME")
-            var mavenPassword = project.findProperty("harleyOConnorMavenPassword")?.toString() ?: System.getenv("MAVEN_PASSWORD")
-            if (mavenUsername == null || mavenPassword == null) {
-                logger.log(LogLevel.WARN,"Credentials for maven not detected; it will be disabled.")
-                return
-            }
-            maven {
-                name = "HarleyOConnor"
-                url = "https://harleyoconnor.com/maven"
-                credentials {
-                    username = mavenUsername
-                    password = mavenPassword
-                }
-            }
-        }
-    }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
