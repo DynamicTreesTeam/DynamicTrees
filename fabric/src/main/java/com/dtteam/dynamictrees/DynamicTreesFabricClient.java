@@ -45,6 +45,9 @@ import java.util.stream.*;
 
 public class DynamicTreesFabricClient implements ClientModInitializer {
 
+    private static boolean initialized = false;
+    private static boolean woodColorsDiscovered = false;
+
     @Override
     public void onInitializeClient() {
         NeoForgeConfigRegistry.INSTANCE.register(DynamicTrees.MOD_ID, ModConfig.Type.CLIENT, DTConfigs.CLIENT_CONFIG);
@@ -54,6 +57,20 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
         registerColorHandlers();
         registerTooltipCallback();
         registerClientTick();
+        registerClientWorldLoad();
+    }
+
+    private void registerClientWorldLoad() {
+
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            if (!initialized && client.level != null) {
+                discoverWoodColors();
+                LeavesProperties.postInitClient();
+                BlockColorMultipliers.cleanUp();
+                registerBlockColors();
+                initialized = true;
+            }
+        });
     }
 
     private void registerModelLoaders() {
@@ -193,6 +210,10 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
 
     private static int getFaceColor(BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
         final BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
+        if (model == null) {
+            DynamicTrees.LOG.warn("Could not get model for {}! Branch needs to be handled manually!", state.getBlock());
+            return 0;
+        }
         List<BakedQuad> quads = model.getQuads(state, face, RandomSource.create());
         if (quads.isEmpty()) {
             quads = model.getQuads(state, null, RandomSource.create());

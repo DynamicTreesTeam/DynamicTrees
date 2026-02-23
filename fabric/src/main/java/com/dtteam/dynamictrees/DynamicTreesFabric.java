@@ -1,8 +1,6 @@
 package com.dtteam.dynamictrees;
 
 import com.dtteam.dynamictrees.api.DynamicTreesAddonEntrypoint;
-import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.event.handler.CommonEventHandler;
 import com.dtteam.dynamictrees.event.handler.ModEventHandler;
@@ -12,7 +10,6 @@ import com.dtteam.dynamictrees.registry.FabricRegistryHandler;
 import com.dtteam.dynamictrees.registry.FabricRegistryLoader;
 import com.dtteam.dynamictrees.worldgen.FabricBiomeModifications;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.*;
-import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -31,12 +28,6 @@ public class DynamicTreesFabric implements ModInitializer {
         FabricRegistryHandler.setup(DynamicTrees.MOD_ID);
 
         CommonEventHandler.RegisterEvents();
-        ModEventHandler.RegisterEvents();
-        VanillaSaplingEventHandler.register();
-
-        DynamicTrees.init();
-
-        FabricRegistryLoader.setup();
 
         for (EntrypointContainer<DynamicTreesAddonEntrypoint> container : FabricLoader.getInstance().getEntrypointContainers("dynamictrees", DynamicTreesAddonEntrypoint.class)) {
             try {
@@ -45,6 +36,13 @@ public class DynamicTreesFabric implements ModInitializer {
                 DynamicTrees.LOG.error("Failed to invoke Dynamic Trees addon entrypoint for mod: {}", container.getProvider().getMetadata().getId(), e);
             }
         }
+
+        ModEventHandler.RegisterEvents();
+        VanillaSaplingEventHandler.register();
+
+        DynamicTrees.init();
+
+        FabricRegistryLoader.setup();
 
         DynamicTrees.commonSetup();
 
@@ -59,14 +57,7 @@ public class DynamicTreesFabric implements ModInitializer {
             FabricMiscHelper.currentServer = null;
         });
 
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-                LeavesProperties.postInitClient();
-                BlockColorMultipliers.cleanUp();
-                DynamicTreesFabricClient.registerBlockColors();
-                DynamicTreesFabricClient.discoverWoodColors();
-            });
-        }
+
     }
 
 }

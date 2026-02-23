@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.platform;
 
+import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.DynamicTreesAddonEntrypoint;
 import com.dtteam.dynamictrees.api.registry.AbstractRegistry;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
@@ -12,6 +14,8 @@ import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.platform.services.IEventHelper;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.tree.species.Species;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
@@ -31,6 +35,13 @@ public class FabricEventHelper implements IEventHelper {
 
     @Override
     public void postAddResourceLoadersEventPre(TreeResourceManager resourceManager) {
+        for (EntrypointContainer<DynamicTreesAddonEntrypoint> container : FabricLoader.getInstance().getEntrypointContainers("dynamictrees", DynamicTreesAddonEntrypoint.class)) {
+            try {
+                container.getEntrypoint().onAddResourceLoaders(resourceManager);
+            } catch (Throwable e) {
+                DynamicTrees.LOG.error("Failed to invoke Dynamic Trees addon resource loader for mod: {}", container.getProvider().getMetadata().getId(), e);
+            }
+        }
     }
 
     @Override
