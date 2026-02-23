@@ -5,7 +5,7 @@ plugins {
     id 'fabric-loom'
     id "me.modmuss50.mod-publish-plugin" version "0.8.4"
 }
-version = "${fabricVersion}"
+version = "${version}${fabricVersionAppend}"
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
@@ -100,7 +100,7 @@ def changelogFile = file("../fabric/build/changelog.txt")
 
 publishMods {
     file = remapJar.archiveFile
-    displayName = "${mod_name.replace(' ','')}-Fabric-${minecraft_version} ${fabricVersion}"
+    displayName = "${mod_name.replace(' ','')}-Fabric-${minecraft_version} ${version}"
     if (changelogFile.exists()) {
         changelog.set(changelogFile.getText())
     }
