@@ -1,9 +1,7 @@
-import me.modmuss50.mpp.ReleaseType
-
 plugins {
     id 'multiloader-loader'
     id 'fabric-loom'
-    id "me.modmuss50.mod-publish-plugin" version "0.8.4"
+    id "me.modmuss50.mod-publish-plugin"
 }
 version = "${version}${fabricVersionAppend}"
 
@@ -75,30 +73,3 @@ loom {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-def changelogFile = file("../fabric/build/changelog.txt")
-
-publishMods {
-    file = remapJar.archiveFile
-    displayName = "${mod_name.replace(' ','')}-Fabric-${minecraft_version} ${version}"
-    if (changelogFile.exists()) {
-        changelog.set(changelogFile.getText())
-    }
-    type = ReleaseType.of(fabricVersionType.toUpperCase())
-    modLoaders.add("fabric")
-    modLoaders.add("quilt")
-    curseforge {
-        projectId = "252818"
-        projectSlug = "dynamictrees"
-        accessToken = providers.gradleProperty("curseApiKey").orElse(providers.environmentVariable("CURSEFORGE_API_KEY")).orNull
-        minecraftVersions.add("1.21.1")
-//        optional("dynamictreesplus")
-        requires("forge-config-api-port")
-    }
-    modrinth {
-        projectId = "vdjF5PL5"
-        minecraftVersions.add("1.21.1")
-        accessToken = providers.gradleProperty("modrinthToken").orElse(providers.environmentVariable("MODRINTH_TOKEN")).orNull
-//        optional("qaO9Dqpu")
-        requires("ohNO6lps")
-    }
-}

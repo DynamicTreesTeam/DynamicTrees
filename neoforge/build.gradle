@@ -1,9 +1,7 @@
-import me.modmuss50.mpp.ReleaseType
-
 plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
-    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
+    id "me.modmuss50.mod-publish-plugin"
 }
 version = "${version}${neoVersionAppend}"
 
@@ -23,7 +21,7 @@ neoForge {
     runs {
         configureEach {
             systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
-            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
+            ideName = "NeoForge ${it.name.capitalize()} (${project.path})"
         }
         client {
             client()
@@ -64,7 +62,6 @@ neoForge {
         implementation "curse.maven:glitchcore-955399:5660740"
         implementation "curse.maven:serene-seasons-291874:5753503"
         
-        //runtimeOnly "curse.maven:distant-horizons-508933:7328639"
         runtimeOnly "curse.maven:patchouli-306770:6164617"
         runtimeOnly "curse.maven:spark-361579:6225208"
     }
@@ -72,29 +69,3 @@ neoForge {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-def changelogFile = file("../neoforge/build/changelog.txt")
-
-publishMods {
-    file = jar.archiveFile
-    displayName = "${mod_name.replace(' ','')}-NeoForge-${minecraft_version} ${project.version}"
-    if (changelogFile.exists()) {
-        changelog.set(changelogFile.getText())
-    }
-    type = ReleaseType.of(versionType.toUpperCase())
-    modLoaders.add("neoforge")
-
-    curseforge {
-        projectId = "252818"
-        projectSlug = "dynamictrees"
-        accessToken = providers.gradleProperty("curseApiKey").orElse(providers.environmentVariable("CURSEFORGE_API_KEY")).orNull
-        minecraftVersions.add("1.21.1")
-        optional("dynamictreesplus")
-    }
-    modrinth {
-        projectId = "vdjF5PL5"
-        accessToken = providers.gradleProperty("modrinthToken").orElse(providers.environmentVariable("MODRINTH_TOKEN")).orNull
-        minecraftVersions.add("1.21.1")
-        optional("qaO9Dqpu")
-    }
-}

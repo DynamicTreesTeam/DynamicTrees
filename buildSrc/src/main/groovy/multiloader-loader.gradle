@@ -42,3 +42,49 @@ tasks.named('sourcesJar', Jar) {
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
 }
+
+pluginManager.withPlugin('me.modmuss50.mod-publish-plugin') {
+    def isFabric = project.name == 'fabric'
+    def loaderName = isFabric ? 'Fabric' : 'NeoForge'
+    def changelogFile = file("../${project.name}/build/changelog.txt")
+    def releaseType = isFabric ? project.findProperty('fabricVersionType') : project.findProperty('versionType')
+
+    afterEvaluate {
+        publishMods {
+            file = isFabric ? remapJar.archiveFile : jar.archiveFile
+            displayName = "${mod_name.replace(' ','')}-${loaderName}-${minecraft_version} ${version}"
+            if (changelogFile.exists()) {
+                changelog.set(changelogFile.getText())
+            }
+            type = releaseType?.toUpperCase() ?: 'RELEASE'
+            if (isFabric) {
+                modLoaders.add("fabric")
+                modLoaders.add("quilt")
+            } else {
+                modLoaders.add("neoforge")
+            }
+            curseforge {
+                projectId = "252818"
+                projectSlug = "dynamictrees"
+                accessToken = providers.gradleProperty("curseApiKey").getOrElse(providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull())
+                minecraftVersions.add(minecraft_version)
+                if (isFabric) {
+                    requires("forge-config-api-port")
+                } else {
+                    optional("dynamictreesplus")
+                }
+            }
+            modrinth {
+                projectId = "vdjF5PL5"
+                accessToken = providers.gradleProperty("modrinthToken").getOrElse(providers.environmentVariable("MODRINTH_TOKEN").getOrNull())
+                minecraftVersions.add(minecraft_version)
+                if (isFabric) {
+                    requires("ohNO6lps")
+                } else {
+                    optional("qaO9Dqpu")
+                }
+            }
+        }
+    }
+}
+
