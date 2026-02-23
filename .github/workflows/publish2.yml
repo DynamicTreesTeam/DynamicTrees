@@ -1,4 +1,4 @@
-name: Publish 1.20.1
+name: Publish 1.21.1
 
 on:
   workflow_dispatch:
