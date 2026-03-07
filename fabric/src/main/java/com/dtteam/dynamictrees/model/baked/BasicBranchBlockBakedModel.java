@@ -5,6 +5,9 @@ import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.renderer.v1.mesh.*;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
+import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
@@ -200,7 +203,7 @@ public class BasicBranchBlockBakedModel implements BakedModel, FabricBakedModel 
                 }
                 for (BakedQuad quad : quads) {
                     if (quad.getDirection() == face) {
-                        emitQuad(emitter, quad, face);
+                        emitQuad(emitter, quad, face, context);
                     }
                 }
             }
@@ -214,7 +217,7 @@ public class BasicBranchBlockBakedModel implements BakedModel, FabricBakedModel 
                         if (sleeveQuads != null) {
                             for (BakedQuad quad : sleeveQuads) {
                                 if (quad.getDirection() == face) {
-                                    emitQuad(emitter, quad, face);
+                                    emitQuad(emitter, quad, face, context);
                                 }
                             }
                         }
@@ -224,8 +227,17 @@ public class BasicBranchBlockBakedModel implements BakedModel, FabricBakedModel 
         }
     }
 
-    protected void emitQuad(QuadEmitter emitter, BakedQuad quad, Direction cullFace) {
-        emitter.fromVanilla(quad, null, cullFace);
+    protected void emitQuad(QuadEmitter emitter, BakedQuad quad, Direction cullFace, RenderContext context) {
+        var renderer = RendererAccess.INSTANCE.getRenderer();
+
+        MaterialFinder finder = renderer.materialFinder();
+
+        finder.disableAo(0, true);
+        finder.disableDiffuse(0, true);
+
+        RenderMaterial material = finder.find();
+
+        emitter.fromVanilla(quad, material, cullFace);
         emitter.emit();
     }
 

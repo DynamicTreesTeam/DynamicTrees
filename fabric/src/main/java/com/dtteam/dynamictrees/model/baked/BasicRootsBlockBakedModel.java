@@ -85,7 +85,6 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
         return super.getRadius(blockState);
     }
 
-    @Override
     protected void emitQuad(QuadEmitter emitter, BakedQuad quad, Direction cullFace) {
         emitter.fromVanilla(quad, null, null);
         emitter.emit();
