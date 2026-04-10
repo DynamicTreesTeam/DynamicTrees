@@ -1,7 +1,6 @@
 plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
-    id "me.modmuss50.mod-publish-plugin"
 }
 version = "${version}${neoVersionAppend}"
 
@@ -12,32 +11,26 @@ neoForge {
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
-    def mainResources = project(":common").file("src/main/resources")
-    def genResources = project(":common").file("src/generated/resources")
     runs {
         configureEach {
             systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
-            ideName = "NeoForge ${it.name.capitalize()} (${project.path})"
+            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
         }
         client {
             client()
+            gameDirectory = this.mkdir(this.file("runs/client"))
         }
         data {
-            data()
-            programArgument ('--all')
-            programArgument ('--existing')
-            programArgument (mainResources.absolutePath)
-            programArgument ('--output')
-            programArgument (genResources.absolutePath)
-            programArgument ('--mod')
-            programArgument ("${mod_id}")
+            clientData()
+            gameDirectory = this.mkdir(this.file("runs/data"))
+            // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
         server {
             server()
+            this.file("runs/server").createParentDirectories()
+            gameDirectory = this.mkdir(this.file("runs/server"))
         }
     }
     mods {
@@ -45,27 +38,25 @@ neoForge {
             sourceSet sourceSets.main
         }
     }
-    repositories {
-        maven {
-            url "https://cursemaven.com"
-            content {
-                includeGroup "curse.maven"
-            }
-        }
-        flatDir {
-            dir 'libs'
-        }
-    }
-    dependencies {
-        implementation "curse.maven:jade-324717:6011258"
-        implementation "curse.maven:jei-238222:5846880"
-        implementation "curse.maven:glitchcore-955399:5660740"
-        implementation "curse.maven:serene-seasons-291874:5753503"
-        
-        runtimeOnly "curse.maven:patchouli-306770:6164617"
-        runtimeOnly "curse.maven:spark-361579:6225208"
-    }
-
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations.named("$variant") {
+        attributes {
+            attribute(loaderAttribute, 'neoforge')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName, it.getTaskName(null, 'jarJar')].each { variant ->
+        configurations.named("$variant") {
+            attributes {
+                attribute(loaderAttribute, 'neoforge')
+            }
+        }
+    }
+}

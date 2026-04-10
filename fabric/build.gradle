@@ -1,29 +1,19 @@
 plugins {
     id 'multiloader-loader'
-    id 'fabric-loom'
-    id "me.modmuss50.mod-publish-plugin"
+    id 'net.fabricmc.fabric-loom'
 }
 version = "${version}${fabricVersionAppend}"
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
-    }
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.forge_config_api_port_version}"
-
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 }
 
 loom {
     def aw = project(':common').file("src/main/resources/META-INF/${mod_id}.accesswidener")
     if (aw.exists()) {
         accessWidenerPath.set(aw)
-    }
-    mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
     }
     runs {
         client {
@@ -38,38 +28,24 @@ loom {
             ideConfigGenerated(true)
             runDir('runs/server')
         }
-        datagen {
-            client()
-            setConfigName('Fabric Datagen')
-            ideConfigGenerated(true)
-            runDir('runs/datagen')
-            vmArg("-Dfabric-api.datagen")
-            vmArg("-Dfabric-api.datagen.output-dir=${project(':common').file('src/generated/resources')}")
-            vmArg("-Dfabric-api.datagen.modid=${mod_id}")
-        }
     }
-    repositories {
-        maven {
-            url "https://cursemaven.com"
-            content {
-                includeGroup "curse.maven"
-            }
-        }
-        flatDir {
-            dir 'libs'
-        }
-    }
-    dependencies {
-        modImplementation "curse.maven:jade-324717:6011268"
-        modImplementation "curse.maven:jei-238222:5846878"
-
-        implementation("net.jodah:typetools:0.6.3")
-
-        modImplementation "curse.maven:glitchcore-955399:5660741"
-        modImplementation "curse.maven:serene-seasons-291874:5753502"
-    }
-
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
-
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements', 'includeInternal', 'modCompileClasspath'].each { variant ->
+    configurations.named("$variant") {
+        attributes {
+            attribute(loaderAttribute, 'fabric')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant->
+        configurations.named("$variant") {
+            attributes {
+                attribute(loaderAttribute, 'fabric')
+            }
+        }
+    }
+}

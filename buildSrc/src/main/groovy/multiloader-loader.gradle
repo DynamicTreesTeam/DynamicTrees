@@ -1,5 +1,6 @@
 plugins {
     id 'multiloader-common'
+    id 'me.modmuss50.mod-publish-plugin'
 }
 
 configurations {
@@ -13,8 +14,9 @@ configurations {
 
 dependencies {
     compileOnly(project(':common')) {
-        capabilities {
-            requireCapability "$group:$mod_id"
+        def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+        attributes {
+            attribute(loaderAttribute, 'common')
         }
     }
     commonJava project(path: ':common', configuration: 'commonJava')
@@ -47,11 +49,11 @@ pluginManager.withPlugin('me.modmuss50.mod-publish-plugin') {
     def isFabric = project.name == 'fabric'
     def loaderName = isFabric ? 'Fabric' : 'NeoForge'
     def changelogFile = file("../${project.name}/build/changelog.txt")
-    def releaseType = isFabric ? project.findProperty('fabricVersionType') : project.findProperty('versionType')
+    def releaseType = isFabric ? project.findProperty('fabricVersionType') : project.findProperty('neoVersionType')
 
     afterEvaluate {
         publishMods {
-            file = isFabric ? remapJar.archiveFile : jar.archiveFile
+            file = isFabric ? jar.archiveFile : jar.archiveFile
             displayName = "${mod_name.replace(' ','')}-${loaderName}-${minecraft_version} ${version}"
             if (changelogFile.exists()) {
                 changelog.set(changelogFile.getText())
@@ -87,4 +89,3 @@ pluginManager.withPlugin('me.modmuss50.mod-publish-plugin') {
         }
     }
 }
-

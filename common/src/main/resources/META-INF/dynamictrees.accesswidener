@@ -1,4 +1,4 @@
-accessWidener v2 named
+accessWidener v1 official
 
 mutable field net/minecraft/world/level/block/Block stateDefinition Lnet/minecraft/world/level/block/state/StateDefinition;
 accessible method net/minecraft/world/level/PathNavigationRegion getChunk (Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/chunk/ChunkAccess;
