@@ -7,6 +7,9 @@ import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
+import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
@@ -254,7 +257,15 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
                 if (coreQuads != null) {
                     for (BakedQuad quad : coreQuads) {
                         if (quad.getDirection() == face) {
-                            emitter.fromVanilla(quad, null, null);
+                            var renderer = RendererAccess.INSTANCE.getRenderer();
+                            MaterialFinder finder = renderer.materialFinder();
+
+                            finder.disableAo(0, true);
+                            finder.disableDiffuse(0, true);
+
+                            RenderMaterial material = finder.find();
+
+                            emitter.fromVanilla(quad, material, null);
                             emitter.emit();
                         }
                     }
@@ -269,7 +280,15 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
                         if (isGrounded && sleevesQuads[idx][connRadius - 1] != null) {
                             for (BakedQuad quad : sleevesQuads[idx][connRadius - 1]) {
                                 if (quad.getDirection() == face) {
-                                    emitter.fromVanilla(quad, null, null);
+                                    var renderer = RendererAccess.INSTANCE.getRenderer();
+                                    MaterialFinder finder = renderer.materialFinder();
+
+                                    finder.disableAo(0, true);
+                                    finder.disableDiffuse(0, true);
+
+                                    RenderMaterial material = finder.find();
+
+                                    emitter.fromVanilla(quad, material, null);
                                     emitter.emit();
                                 }
                             }
@@ -277,7 +296,15 @@ public class SurfaceRootBlockBakedModel implements BakedModel, FabricBakedModel 
                         if (connectionLevels[idx] == RootConnections.ConnectionLevel.HIGH && vertsQuads[idx][connRadius - 1] != null) {
                             for (BakedQuad quad : vertsQuads[idx][connRadius - 1]) {
                                 if (quad.getDirection() == face) {
-                                    emitter.fromVanilla(quad, null, null);
+                                    var renderer = RendererAccess.INSTANCE.getRenderer();
+                                    MaterialFinder finder = renderer.materialFinder();
+
+                                    finder.disableAo(0, true);
+                                    finder.disableDiffuse(0, true);
+
+                                    RenderMaterial material = finder.find();
+
+                                    emitter.fromVanilla(quad, material, null);
                                     emitter.emit();
                                 }
                             }

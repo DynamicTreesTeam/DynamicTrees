@@ -6,6 +6,9 @@ import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.utility.CoordUtils.Surround;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
+import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
@@ -196,12 +199,18 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
         int radiusIndex = coreRadius - 9;
         if (radiusIndex < 0 || radiusIndex >= trunksBarkQuads.length) return;
 
+        var renderer = RendererAccess.INSTANCE.getRenderer();
+        MaterialFinder finder = renderer.materialFinder();
+        finder.disableAo(0, true);
+        finder.disableDiffuse(0, true);
+        RenderMaterial material = finder.find();
+
         for (Direction face : Direction.values()) {
             List<BakedQuad> barkQuads = trunksBarkQuads[radiusIndex];
             if (barkQuads != null) {
                 for (BakedQuad quad : barkQuads) {
                     if (quad.getDirection() == face) {
-                        emitter.fromVanilla(quad, null, face);
+                        emitter.fromVanilla(quad, material, face);
                         emitter.emit();
                     }
                 }
@@ -213,7 +222,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
                     if (ringQuads != null) {
                         for (BakedQuad quad : ringQuads) {
                             if (quad.getDirection() == face) {
-                                emitter.fromVanilla(quad, null, face);
+                                emitter.fromVanilla(quad, material, face);
                                 emitter.emit();
                             }
                         }
@@ -223,7 +232,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
                     if (topBarkQuads != null) {
                         for (BakedQuad quad : topBarkQuads) {
                             if (quad.getDirection() == face) {
-                                emitter.fromVanilla(quad, null, face);
+                                emitter.fromVanilla(quad, material, face);
                                 emitter.emit();
                             }
                         }
