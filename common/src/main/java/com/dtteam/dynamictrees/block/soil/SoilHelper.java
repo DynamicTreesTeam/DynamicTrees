@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.deserialization.applier.VoidApplier;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.google.common.collect.BiMap;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -78,7 +78,7 @@ public class SoilHelper {
         registerSoil(properties.getRegistryName(), properties.getPrimitiveSoilBlock(), adjNames);
     }
 
-    public static void registerSoil(ResourceLocation name, Block soilBlock, String... adjNames) {
+    public static void registerSoil(Identifier name, Block soilBlock, String... adjNames) {
         if (soilBlock == Blocks.AIR) {
             return;
         }
@@ -96,7 +96,7 @@ public class SoilHelper {
         registerSoil(name, soilBlock, flag);
     }
 
-    public static void registerSoil(ResourceLocation name, Block soilBlock, int adjFlag) {
+    public static void registerSoil(Identifier name, Block soilBlock, int adjFlag) {
         dirtMap.compute(soilBlock, (bl, prop) -> (prop == null) ? new SoilProperties(soilBlock, name, adjFlag, true) : prop.addSoilFlags(adjFlag));
     }
 

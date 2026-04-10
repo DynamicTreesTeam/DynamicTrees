@@ -15,7 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -47,7 +47,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
     protected final BakedModel[][] cores = new BakedModel[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
     protected final BakedModel[] rings = new BakedModel[8]; // 8 Cores with the ring textures on all 6 sides.
 
-    public BasicBranchBlockBakedModel(IGeometryBakingContext customData, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
+    public BasicBranchBlockBakedModel(IGeometryBakingContext customData, Identifier barkTextureLocation, Identifier ringsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
         this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT, ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
         if (customData.getRenderTypeHint() != null){
             this.blockModel.customData.setRenderTypeHint(customData.getRenderTypeHint());
@@ -350,7 +350,7 @@ public class BasicBranchBlockBakedModel implements IDynamicBakedModel {
     }
 
     public RenderType getRenderType (){
-        ResourceLocation renderTypeHint = blockModel.customData.getRenderTypeHint();
+        Identifier renderTypeHint = blockModel.customData.getRenderTypeHint();
         if (renderTypeHint == null)
             return RenderType.solid();
         return NamedRenderTypeManager.get(renderTypeHint).block();

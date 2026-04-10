@@ -23,10 +23,10 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.ModelIdentifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockGetter;
@@ -55,7 +55,7 @@ public class ClientModEventHandler {
     
     public static void discoverWoodColors() {
 
-        final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance()
+        final Function<Identifier, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance()
                 .getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
 
         for (Family family : Family.REGISTRY.getAll()) {
@@ -72,7 +72,7 @@ public class ClientModEventHandler {
     }
 
     
-    private static int getFaceColor(BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
+    private static int getFaceColor(BlockState state, Direction face, Function<Identifier, TextureAtlasSprite> textureGetter) {
         final BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
         List<BakedQuad> quads = model.getQuads(state, face, RandomSource.create(), ModelData.EMPTY, null);
         if (quads.isEmpty()) // If the quad list is empty, means there is no face on that side, so we try with null.
@@ -171,13 +171,13 @@ public class ClientModEventHandler {
     ///////////////////////////////////////////
 
     //These locs are accessed by the model data generators
-    public static final ResourceLocation BRANCH = DynamicTrees.location("branch");
-    public static final ResourceLocation THICK_BRANCH = DynamicTrees.location("thick_branch");
-    public static final ResourceLocation SURFACE_ROOT = DynamicTrees.location("surface_root");
-    public static final ResourceLocation ROOTS = DynamicTrees.location("roots");
-    public static final ResourceLocation LARGE_PALM_FRONDS = DynamicTrees.location("large_palm_fronds");
-    public static final ResourceLocation MEDIUM_PALM_FRONDS = DynamicTrees.location("medium_palm_fronds");
-    public static final ResourceLocation SMALL_PALM_FRONDS = DynamicTrees.location("small_palm_fronds");
+    public static final Identifier BRANCH = DynamicTrees.location("branch");
+    public static final Identifier THICK_BRANCH = DynamicTrees.location("thick_branch");
+    public static final Identifier SURFACE_ROOT = DynamicTrees.location("surface_root");
+    public static final Identifier ROOTS = DynamicTrees.location("roots");
+    public static final Identifier LARGE_PALM_FRONDS = DynamicTrees.location("large_palm_fronds");
+    public static final Identifier MEDIUM_PALM_FRONDS = DynamicTrees.location("medium_palm_fronds");
+    public static final Identifier SMALL_PALM_FRONDS = DynamicTrees.location("small_palm_fronds");
 
     @SubscribeEvent
     public static void onModelRegistryEvent(ModelEvent.RegisterGeometryLoaders event) {
@@ -194,7 +194,7 @@ public class ClientModEventHandler {
     @SubscribeEvent
     public static void onModelModifyBakingResultResult(ModelEvent.ModifyBakingResult event) {
         // Put bonsai pot baked model into its model location.
-        event.getModels().computeIfPresent(new ModelResourceLocation(DynamicTrees.location("potted_sapling"), ""), (k, val) -> new BakedModelBlockPottedSapling(val));
+        event.getModels().computeIfPresent(new ModelIdentifier(DynamicTrees.location("potted_sapling"), ""), (k, val) -> new BakedModelBlockPottedSapling(val));
     }
 
     @SubscribeEvent

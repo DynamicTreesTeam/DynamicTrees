@@ -147,7 +147,7 @@ public class FruitBlock extends Block implements BonemealableBlock, Growable {
 //    @SuppressWarnings("deprecation")
 //    @Override
 //    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
-//        ResourceLocation resourcelocation = this.getLootTable();
+//        Identifier resourcelocation = this.getLootTable();
 //        if (resourcelocation == BuiltInLootTables.EMPTY) return Collections.emptyList();
 //        else {
 //            LootParams lootParams = builder.withParameter(LootContextParams.BLOCK_STATE, state).create(LootContextParamSets.BLOCK);

@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
 import com.dtteam.dynamictrees.worldgen.RootsJoCode;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,7 +37,7 @@ public final class JoCodeResourceLoader extends AbstractResourceLoader<List<Stri
         );
     }
 
-    private void registerCodes(ResourceLocation location, List<String> lines) {
+    private void registerCodes(Identifier location, List<String> lines) {
         final Species species = Species.findSpecies(location);
         lines.forEach(line -> this.registerCodeForLine(species, line));
         LOGGER.debug("Successfully loaded JoCodes for species \"{}\".", location);

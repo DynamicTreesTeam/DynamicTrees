@@ -11,7 +11,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -88,7 +88,7 @@ public class FabricRegistryLoader extends RegistryLoader {
 
     @Override
     public Supplier<SoundEvent> registerSoundEvent(String name) {
-        ResourceLocation location = DynamicTrees.location(name);
+        Identifier location = DynamicTrees.location(name);
         SoundEvent type = Registry.register(BuiltInRegistries.SOUND_EVENT, location, SoundEvent.createVariableRangeEvent(location));
         return ()-> type;
     }

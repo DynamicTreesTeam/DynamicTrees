@@ -12,14 +12,14 @@ import com.dtteam.dynamictrees.block.Growable;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.google.common.collect.Maps;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -125,7 +125,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     private BiFunction<LevelContext, BlockPos, Float> seasonalFactorGetter = (l, b)-> 1.0f;
     private TriPredicate<LevelContext, BlockPos, Float> floweringPeriodPredicate = (l, b, s)-> false;
 
-    public Pod(ResourceLocation registryName) {
+    public Pod(Identifier registryName) {
         super(registryName);
     }
 
@@ -154,7 +154,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
      * @param properties the properties of the block. May be the {@linkplain #getDefaultBlockProperties default
      *                   properties} or a modification of them.
      */
-    public final void createBlock(@Nullable ResourceLocation name, Block.Properties properties) {
+    public final void createBlock(@Nullable Identifier name, Block.Properties properties) {
         block = RegistryHandler.addBlock(name == null ? this.getRegistryName() : name, () -> createBlock(properties));
     }
 
@@ -323,10 +323,10 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         return true;
     }
 
-    private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
-            ResourceLocationUtils.prefix(BuiltInRegistries.BLOCK.getKey(block.get()), "blocks/"));
+    private final LazyValue<Identifier> blockDropsPath = LazyValue.supplied(() ->
+            IdentifierUtils.prefix(BuiltInRegistries.BLOCK.getKey(block.get()), "blocks/"));
 
-    public ResourceLocation getBlockDropsPath() {
+    public Identifier getBlockDropsPath() {
         return blockDropsPath.get();
     }
 

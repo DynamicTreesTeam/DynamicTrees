@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.compat.waila;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -12,7 +12,7 @@ import snownee.jade.api.config.IPluginConfig;
 
 public class WailaRootyHandler implements IBlockComponentProvider {
 
-    public static final ResourceLocation ROOTY_UID = DynamicTrees.location("rooty");
+    public static final Identifier ROOTY_UID = DynamicTrees.location("rooty");
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -23,7 +23,7 @@ public class WailaRootyHandler implements IBlockComponentProvider {
     }
 
     @Override
-    public ResourceLocation getUid() {
+    public Identifier getUid() {
         return ROOTY_UID;
     }
 }

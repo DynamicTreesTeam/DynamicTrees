@@ -20,7 +20,7 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -48,8 +48,8 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
     private final BakedModel[] trunksTopRings = new BakedModel[16]; // The trunk will feature rings on its top when there's no branches on top of it.
     private final BakedModel[] trunksBotRings = new BakedModel[16]; // The trunk will always feature rings on its bottom surface if nothing is below it.
 
-    public ThickBranchBlockBakedModel(IGeometryBakingContext customData, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation,
-                                      ResourceLocation thickRingsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
+    public ThickBranchBlockBakedModel(IGeometryBakingContext customData, Identifier barkTextureLocation, Identifier ringsTextureLocation,
+                                      Identifier thickRingsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
         super(customData, barkTextureLocation, ringsTextureLocation, spriteGetter);
         initThickModels(spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, thickRingsTextureLocation)));
     }
@@ -69,7 +69,7 @@ public class ThickBranchBlockBakedModel extends BasicBranchBlockBakedModel {
     }
 
     private boolean isTextureNull(@Nullable TextureAtlasSprite sprite) {
-        return sprite == null || sprite.equals(ModelHelper.getTexture(ResourceLocation.parse("")));
+        return sprite == null || sprite.equals(ModelHelper.getTexture(Identifier.parse("")));
     }
 
     public BakedModel bakeTrunkBark(int radius, TextureAtlasSprite bark, boolean side) {

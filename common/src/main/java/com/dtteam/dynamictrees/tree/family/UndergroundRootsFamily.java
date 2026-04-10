@@ -18,7 +18,7 @@ import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -36,7 +36,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.suffix;
+import static com.dtteam.dynamictrees.utility.IdentifierUtils.suffix;
 
 public class UndergroundRootsFamily extends Family {
 
@@ -46,7 +46,7 @@ public class UndergroundRootsFamily extends Family {
     private Supplier<Item> rootsItem;
     private Block primitiveRoots, primitiveRootsFilled, primitiveRootsCovered;
 
-    public UndergroundRootsFamily(ResourceLocation name) {
+    public UndergroundRootsFamily(Identifier name) {
         super(name);
     }
 
@@ -84,17 +84,17 @@ public class UndergroundRootsFamily extends Family {
         this.setRootsItem(this.createRootsItem(this.getBranchName(), this.roots));
     }
 
-    protected Supplier<BranchBlock> createRoots(final ResourceLocation name) {
+    protected Supplier<BranchBlock> createRoots(final Identifier name) {
         return RegistryHandler.addBlock(suffix(name, getRootsNameSuffix()), () -> createRootsBlock(name));
     }
-    protected BranchBlock createRootsBlock(ResourceLocation name) {
+    protected BranchBlock createRootsBlock(Identifier name) {
         final BasicRootsBlock branch = new BasicRootsBlock(name, this.getProperties());
         if (this.isFireProof()) {
             branch.setFireSpreadSpeed(0).setFlammability(0);
         }
         return branch;
     }
-    public Supplier<BlockItem> createRootsItem(final ResourceLocation registryName, final Supplier<BranchBlock> rootsSup) {
+    public Supplier<BlockItem> createRootsItem(final Identifier registryName, final Supplier<BranchBlock> rootsSup) {
         return RegistryHandler.addItem(suffix(registryName, getRootsNameSuffix()), () -> new BlockItem(rootsSup.get(), new Item.Properties()));
     }
 
@@ -148,7 +148,7 @@ public class UndergroundRootsFamily extends Family {
         this.rootsItemModelGenerator.get().generate(provider, this);
     }
 
-    public ResourceLocation getBranchItemParentLocation() {
+    public Identifier getBranchItemParentLocation() {
         return DynamicTrees.location("item/branch");
     }
 

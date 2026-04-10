@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.api.worldgen;
 
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 public final class LevelContext {
 
     private final ResourceKey<Level> dimensionKey;
-    private final ResourceLocation dimensionName;
+    private final Identifier dimensionName;
     @Nullable
     private final Long seed;
     private final LevelAccessor accessor;
@@ -33,7 +33,7 @@ public final class LevelContext {
         return dimensionKey;
     }
 
-    public ResourceLocation dimensionName() {
+    public Identifier dimensionName() {
         return dimensionName;
     }
 

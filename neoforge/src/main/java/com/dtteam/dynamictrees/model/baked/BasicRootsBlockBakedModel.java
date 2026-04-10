@@ -15,7 +15,7 @@ import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.IModelBuilder;
@@ -36,7 +36,7 @@ public class BasicRootsBlockBakedModel extends BasicBranchBlockBakedModel {
 
     private final BakedModel[][] sleeveEndFaces = new BakedModel[6][8];
 
-    public BasicRootsBlockBakedModel(IGeometryBakingContext customData, ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
+    public BasicRootsBlockBakedModel(IGeometryBakingContext customData, Identifier barkTextureLocation, Identifier ringsTextureLocation, Function<Material, TextureAtlasSprite> spriteGetter) {
         super(customData, barkTextureLocation, ringsTextureLocation, spriteGetter);
         initModels();
     }

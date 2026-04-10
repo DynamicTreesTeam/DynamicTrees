@@ -18,7 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -35,7 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class WailaBranchHandler implements IBlockComponentProvider {
-    public static final ResourceLocation ID = DynamicTrees.location("branch");
+    public static final Identifier ID = DynamicTrees.location("branch");
 
     private BlockPos lastPos = BlockPos.ZERO;
     private Species lastSpecies = Species.NULL_SPECIES;
@@ -57,7 +57,7 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
         //Attempt to get species from server via NBT data
         if (nbtData.contains("species")) {
-            species = Species.findSpecies(ResourceLocation.parse(nbtData.getString("species")));
+            species = Species.findSpecies(Identifier.parse(nbtData.getString("species")));
         }
 
         //Attempt to get species by checking if we're still looking at the same block
@@ -176,7 +176,7 @@ public class WailaBranchHandler implements IBlockComponentProvider {
     }
 
     @Override
-    public ResourceLocation getUid() {
+    public Identifier getUid() {
         return ID;
     }
 }

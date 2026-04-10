@@ -7,9 +7,9 @@ import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.builder.PalmLeavesLoaderBuilder;
 import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
@@ -26,8 +26,8 @@ public class PalmLeavesStateGenerator implements Generator<DTDataProvider.BlockS
     @Override
     public void generate(DTDataProvider.BlockState prov, LeavesProperties input, Dependencies dependencies) {
         if (prov instanceof DTBlockStateProvider provider){
-            ResourceLocation defaultFrondsTexture = provider.block(ResourceLocationUtils.suffix(input.getRegistryName(), "_frond"));
-            ResourceLocation defaultCoreTexture = provider.block(ResourceLocationUtils.suffix(input.getRegistryName(), "_base"));
+            Identifier defaultFrondsTexture = provider.block(IdentifierUtils.suffix(input.getRegistryName(), "_frond"));
+            Identifier defaultCoreTexture = provider.block(IdentifierUtils.suffix(input.getRegistryName(), "_base"));
             PalmLeavesProperties palmInput = (PalmLeavesProperties) input;
 
             final PalmLeavesLoaderBuilder frondBuilder = provider.models().getBuilder(palmInput.getFrondsModelName())

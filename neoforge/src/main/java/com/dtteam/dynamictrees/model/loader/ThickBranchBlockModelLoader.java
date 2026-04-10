@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.model.loader;
 
 import com.dtteam.dynamictrees.model.geometry.BranchBlockModelGeometry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public class ThickBranchBlockModelLoader extends BranchBlockModelLoader {
 
     @Override
-    protected BranchBlockModelGeometry getModelGeometry(ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation, @Nullable ResourceLocation familyName) {
+    protected BranchBlockModelGeometry getModelGeometry(Identifier barkTextureLocation, Identifier ringsTextureLocation, @Nullable Identifier familyName) {
         return new BranchBlockModelGeometry(barkTextureLocation, ringsTextureLocation, familyName, true);
     }
 

@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.loot.DTLoot;
 import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,17 +43,17 @@ public class DynamicTrees {
         OVERFLOW
     }
 
-    public static final ResourceLocation NULL = DynamicTrees.location("null");
+    public static final Identifier NULL = DynamicTrees.location("null");
 
-    public static final ResourceLocation OAK = DynamicTrees.location("oak");
-    public static final ResourceLocation BIRCH = DynamicTrees.location("birch");
-    public static final ResourceLocation SPRUCE = DynamicTrees.location("spruce");
-    public static final ResourceLocation JUNGLE = DynamicTrees.location("jungle");
-    public static final ResourceLocation DARK_OAK = DynamicTrees.location("dark_oak");
-    public static final ResourceLocation ACACIA = DynamicTrees.location("acacia");
-    public static final ResourceLocation AZALEA = DynamicTrees.location("azalea");
-    public static final ResourceLocation CRIMSON = DynamicTrees.location("crimson");
-    public static final ResourceLocation WARPED = DynamicTrees.location("warped");
+    public static final Identifier OAK = DynamicTrees.location("oak");
+    public static final Identifier BIRCH = DynamicTrees.location("birch");
+    public static final Identifier SPRUCE = DynamicTrees.location("spruce");
+    public static final Identifier JUNGLE = DynamicTrees.location("jungle");
+    public static final Identifier DARK_OAK = DynamicTrees.location("dark_oak");
+    public static final Identifier ACACIA = DynamicTrees.location("acacia");
+    public static final Identifier AZALEA = DynamicTrees.location("azalea");
+    public static final Identifier CRIMSON = DynamicTrees.location("crimson");
+    public static final Identifier WARPED = DynamicTrees.location("warped");
 
     // The loader specific projects are able to import and use any code from the common project. This allows you to
     // write the majority of your code here and load it from your loader specific projects. This example has some
@@ -80,7 +80,7 @@ public class DynamicTrees {
         SETUP_HANDLERS.forEach(Runnable::run);
     }
 
-    public static ResourceLocation location (String name){
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+    public static Identifier location (String name){
+        return Identifier.fromNamespaceAndPath(MOD_ID, name);
     }
 }

@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.data.builder;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 import net.neoforged.neoforge.client.model.generators.CustomLoaderBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -17,11 +17,11 @@ public final class PalmLeavesLoaderBuilder extends CustomLoaderBuilder<BlockMode
 
     private final Map<String, String> textures = new LinkedHashMap<>();
 
-    public PalmLeavesLoaderBuilder(ResourceLocation loaderId, BlockModelBuilder parent, ExistingFileHelper fileHelper) {
+    public PalmLeavesLoaderBuilder(Identifier loaderId, BlockModelBuilder parent, ExistingFileHelper fileHelper) {
         super(loaderId, parent, fileHelper, false);
     }
 
-    public PalmLeavesLoaderBuilder texture(String key, ResourceLocation location) {
+    public PalmLeavesLoaderBuilder texture(String key, Identifier location) {
         this.textures.put(key, location.toString());
         return this;
     }
@@ -38,7 +38,7 @@ public final class PalmLeavesLoaderBuilder extends CustomLoaderBuilder<BlockMode
         return json;
     }
 
-    public static PalmLeavesLoaderBuilder fronds(ResourceLocation loaderId, BlockModelBuilder parent, ExistingFileHelper fileHelper) {
+    public static PalmLeavesLoaderBuilder fronds(Identifier loaderId, BlockModelBuilder parent, ExistingFileHelper fileHelper) {
         return new PalmLeavesLoaderBuilder(loaderId, parent, fileHelper);
     }
 

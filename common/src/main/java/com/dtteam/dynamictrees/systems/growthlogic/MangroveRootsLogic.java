@@ -7,12 +7,12 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.utility.MathUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class MangroveRootsLogic extends GrowthLogicKit {
 
-    public MangroveRootsLogic(ResourceLocation registryName) {
+    public MangroveRootsLogic(Identifier registryName) {
         super(registryName);
     }
 

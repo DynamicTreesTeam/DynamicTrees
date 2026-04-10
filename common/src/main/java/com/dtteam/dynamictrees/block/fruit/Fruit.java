@@ -14,11 +14,11 @@ import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -95,7 +95,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     private int minDropCount = 1;
     private int maxDropCount = 1;
 
-    public Fruit(ResourceLocation registryName) {
+    public Fruit(Identifier registryName) {
         super(registryName);
     }
 
@@ -124,7 +124,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      * @param properties the properties of the block. May be the {@linkplain #getDefaultBlockProperties default
      *                   properties} or a modification of them.
      */
-    public final void createBlock(@Nullable ResourceLocation name, Block.Properties properties) {
+    public final void createBlock(@Nullable Identifier name, Block.Properties properties) {
         block = RegistryHandler.addBlock(name == null ? this.getRegistryName() : name, () -> createBlock(properties));
     }
 
@@ -287,10 +287,10 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
         return true;
     }
 
-    private final LazyValue<ResourceLocation> blockDropsPath = LazyValue.supplied(() ->
-            ResourceLocationUtils.prefix(BuiltInRegistries.BLOCK.getKey(block.get()),"blocks/"));
+    private final LazyValue<Identifier> blockDropsPath = LazyValue.supplied(() ->
+            IdentifierUtils.prefix(BuiltInRegistries.BLOCK.getKey(block.get()),"blocks/"));
 
-    public ResourceLocation getBlockDropsPath() {
+    public Identifier getBlockDropsPath() {
         return blockDropsPath.get();
     }
 

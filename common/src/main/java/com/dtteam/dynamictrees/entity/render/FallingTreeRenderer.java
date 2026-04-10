@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
 
@@ -21,7 +21,7 @@ public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(FallingTreeEntity entity) {
+    public Identifier getTextureLocation(FallingTreeEntity entity) {
         return TextureAtlas.LOCATION_BLOCKS;
     }
 

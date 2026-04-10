@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.api.resource.ResourceCollector;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.util.GsonHelper;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ public final class JsonResourcePreparer extends AbstractResourcePreparer<JsonEle
     }
 
     @Override
-    protected void readAndPutResource(Resource resource, ResourceLocation resourceName) throws PreparationException, IOException {
+    protected void readAndPutResource(Resource resource, Identifier resourceName) throws PreparationException, IOException {
         final JsonElement jsonElement = readResource(resource);
         this.resourceCollector.put(new DTResource<>(resourceName, jsonElement));
     }

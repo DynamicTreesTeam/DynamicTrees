@@ -3,8 +3,8 @@ package com.dtteam.dynamictrees.worldgen;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import net.minecraft.ResourceLocationException;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.IdentifierException;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.Map;
@@ -18,28 +18,28 @@ public final class BiomeDatabases {
 
     private static final BiomeDatabase DEFAULT_DATABASE = new BiomeDatabase();
     /** Dimension names to their respective {@link com.dtteam.dynamictrees.worldgen.BiomeDatabase}. */
-    private static final Map<ResourceLocation, BiomeDatabase> DIMENSIONAL_DATABASES = Maps.newHashMap();
+    private static final Map<Identifier, BiomeDatabase> DIMENSIONAL_DATABASES = Maps.newHashMap();
     /** Dimension names for dimensions that are blacklisted. */
-    private static final Set<ResourceLocation> BLACKLIST = Sets.newHashSet();
+    private static final Set<Identifier> BLACKLIST = Sets.newHashSet();
 
     public static BiomeDatabase getDefault() {
         return DEFAULT_DATABASE;
     }
 
-    public static BiomeDatabase getDimensionalOrDefault(ResourceLocation dimensionLocation) {
+    public static BiomeDatabase getDimensionalOrDefault(Identifier dimensionLocation) {
         return Optional.ofNullable(DIMENSIONAL_DATABASES.get(dimensionLocation))
                 .orElse(DEFAULT_DATABASE);
     }
 
-    public static BiomeDatabase getOrCreateDimensional(ResourceLocation dimensionLocation) {
+    public static BiomeDatabase getOrCreateDimensional(Identifier dimensionLocation) {
         return DIMENSIONAL_DATABASES.computeIfAbsent(dimensionLocation, k -> BiomeDatabase.copyOf(DEFAULT_DATABASE));
     }
 
-    public static Map<ResourceLocation, BiomeDatabase> getDimensionalDatabases() {
+    public static Map<Identifier, BiomeDatabase> getDimensionalDatabases() {
         return DIMENSIONAL_DATABASES;
     }
 
-    public static boolean isBlacklisted(ResourceLocation dimensionLocation) {
+    public static boolean isBlacklisted(Identifier dimensionLocation) {
         return BLACKLIST.contains(dimensionLocation);
     }
 
@@ -53,8 +53,8 @@ public final class BiomeDatabases {
 
     private static void tryBlacklist(String location) {
         try {
-            BLACKLIST.add(ResourceLocation.parse(location));
-        } catch (ResourceLocationException e) {
+            BLACKLIST.add(Identifier.parse(location));
+        } catch (IdentifierException e) {
             LogManager.getLogger().error("Couldn't get location for dimension blacklist in config.", e);
         }
     }

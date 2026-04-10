@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.model.loader;
 
 import com.dtteam.dynamictrees.model.geometry.BranchBlockModelGeometry;
 import com.dtteam.dynamictrees.model.geometry.RootsBlockModelGeometry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -11,9 +11,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class RootsBlockModelLoader extends BranchBlockModelLoader {
 
-    protected BranchBlockModelGeometry getModelGeometry(final ResourceLocation barkTextureLocation,
-                                                        final ResourceLocation ringsTextureLocation,
-                                                        @Nullable final ResourceLocation familyName) {
+    protected BranchBlockModelGeometry getModelGeometry(final Identifier barkTextureLocation,
+                                                        final Identifier ringsTextureLocation,
+                                                        @Nullable final Identifier familyName) {
         return new RootsBlockModelGeometry(barkTextureLocation, ringsTextureLocation, familyName);
     }
 

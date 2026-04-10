@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
@@ -31,7 +31,7 @@ public class PalmLeavesProperties extends LeavesProperties {
 
     public static final TypedRegistry.EntryType<LeavesProperties> TYPE = TypedRegistry.newType(PalmLeavesProperties::new);
 
-    public PalmLeavesProperties(ResourceLocation registryName) {
+    public PalmLeavesProperties(Identifier registryName) {
         super(registryName);
     }
 
@@ -40,11 +40,11 @@ public class PalmLeavesProperties extends LeavesProperties {
         return new DynamicPalmLeavesBlock(this, properties);
     }
 
-    ResourceLocation frondLoader = DynamicTrees.location("large_palm_fronds");
-    public void setFrondLoader(ResourceLocation frondLoader) {
+    Identifier frondLoader = DynamicTrees.location("large_palm_fronds");
+    public void setFrondLoader(Identifier frondLoader) {
         this.frondLoader = frondLoader;
     }
-    public ResourceLocation getFrondLoader () { return frondLoader; }
+    public Identifier getFrondLoader () { return frondLoader; }
 
     protected final MutableLazyValue<Generator<DTDataProvider.BlockState, LeavesProperties>> frondsStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
@@ -70,22 +70,22 @@ public class PalmLeavesProperties extends LeavesProperties {
     public static final String FROND = "frond";
     public static final String CORE_TOP = "core_top";
     public static final String CORE_BOTTOM = "core_bottom";
-    public void addFrondTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation leavesTextureLocation) {
-        ResourceLocation leavesLoc = getTexturePath(FROND).orElse(leavesTextureLocation);
+    public void addFrondTextures(BiConsumer<String, Identifier> textureConsumer, Identifier leavesTextureLocation) {
+        Identifier leavesLoc = getTexturePath(FROND).orElse(leavesTextureLocation);
         textureConsumer.accept("frond", leavesLoc);
     }
 
-    public void addCoreTextures(BiConsumer<String, ResourceLocation> textureConsumer,
-                                   ResourceLocation coreTextureLocation) {
-        ResourceLocation coreLoc = getTexturePath(CORE_BOTTOM).orElse(coreTextureLocation);
+    public void addCoreTextures(BiConsumer<String, Identifier> textureConsumer,
+                                   Identifier coreTextureLocation) {
+        Identifier coreLoc = getTexturePath(CORE_BOTTOM).orElse(coreTextureLocation);
         textureConsumer.accept("core_bottom", coreLoc);
     }
 
-    public ResourceLocation getCoreTopSmartModelLocation() {
+    public Identifier getCoreTopSmartModelLocation() {
         if (modelOverrides.containsKey(CORE_TOP)) return modelOverrides.get(CORE_TOP);
         return DynamicTrees.location("block/smartmodel/palm/core_top");
     }
-    public ResourceLocation getCoreBottomSmartModelLocation() {
+    public Identifier getCoreBottomSmartModelLocation() {
         if (modelOverrides.containsKey(CORE_BOTTOM)) return modelOverrides.get(CORE_BOTTOM);
         return DynamicTrees.location("block/smartmodel/palm/core_bottom");
     }

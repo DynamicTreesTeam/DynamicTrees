@@ -28,7 +28,7 @@ import com.dtteam.dynamictrees.utility.ItemUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -101,7 +101,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     private int flammability = 5; // Mimic vanilla logs
     private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
-    public BasicRootsBlock(ResourceLocation name, BlockBehaviour.Properties properties) {
+    public BasicRootsBlock(Identifier name, BlockBehaviour.Properties properties) {
         super(name, properties);
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(LAYER, Layer.EXPOSED));
         rootLootTableSupplier = new LootTableSupplier("trees/roots/", name);
@@ -263,7 +263,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     private final LootTableSupplier rootLootTableSupplier;
 
-    public ResourceLocation getLootTableName() {
+    public Identifier getLootTableName() {
         return rootLootTableSupplier.getName();
     }
 
@@ -401,7 +401,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             }
         }
 
-        Pair<ResourceLocation, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getNormal()), true);
+        Pair<Identifier, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getNormal()), true);
         return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), new HashMap<>(), new ArrayList<>(), destroyer.getEnds(), volumeSum.getVolume(), cutPos, basePos, cutDir, toolDir, trunkHeight, cachedState);
     }
 

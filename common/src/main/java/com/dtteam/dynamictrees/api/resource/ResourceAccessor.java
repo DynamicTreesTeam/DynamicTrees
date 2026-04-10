@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.api.resource;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -11,15 +11,15 @@ import java.util.function.Predicate;
  */
 public interface ResourceAccessor<R> {
 
-    DTResource<R> getResource(ResourceLocation key);
+    DTResource<R> getResource(Identifier key);
 
     Iterable<DTResource<R>> getAllResources();
 
-    Iterable<DTResource<R>> getAllResources(Predicate<ResourceLocation> resourceFilter);
+    Iterable<DTResource<R>> getAllResources(Predicate<Identifier> resourceFilter);
 
     void forEach(Consumer<DTResource<R>> resourceConsumer);
 
-    ResourceAccessor<R> filtered(Predicate<ResourceLocation> resourceFilter);
+    ResourceAccessor<R> filtered(Predicate<Identifier> resourceFilter);
 
     <N> ResourceAccessor<N> map(Function<R, N> resourceMapper);
 

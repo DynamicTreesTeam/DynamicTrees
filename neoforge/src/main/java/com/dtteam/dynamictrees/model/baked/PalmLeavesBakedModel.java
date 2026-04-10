@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,7 +34,7 @@ public abstract class PalmLeavesBakedModel implements IDynamicBakedModel {
 
     protected final BakedModel[] bakedFronds = new BakedModel[8]; // 8 = Number of surrounding blocks
 
-    public PalmLeavesBakedModel(ResourceLocation frondsResLoc, Function<Material, TextureAtlasSprite> spriteGetter){
+    public PalmLeavesBakedModel(Identifier frondsResLoc, Function<Material, TextureAtlasSprite> spriteGetter){
         this.blockModel = new BlockModel(null, new ArrayList<>(), new HashMap<>(), false, BlockModel.GuiLight.FRONT, ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
         frondsTexture = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, frondsResLoc));
         initModels();

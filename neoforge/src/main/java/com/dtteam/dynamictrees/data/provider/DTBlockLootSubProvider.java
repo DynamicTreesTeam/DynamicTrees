@@ -11,7 +11,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -65,7 +65,7 @@ public class DTBlockLootSubProvider extends BlockLootSubProvider {
 
     private void addVoluntaryTable(Species species) {
         if (species.shouldGenerateVoluntaryDrops()) {
-            final ResourceLocation leavesTablePath = species.getVoluntaryDropsPath();
+            final Identifier leavesTablePath = species.getVoluntaryDropsPath();
             if (!fileHelper.exists(leavesTablePath, PackType.SERVER_DATA)) {
                 this.map.put(ResourceKey.create(Registries.LOOT_TABLE, leavesTablePath), species.createVoluntaryDrops(registries));
             }
@@ -74,7 +74,7 @@ public class DTBlockLootSubProvider extends BlockLootSubProvider {
 
     private void addBranchTable(BranchBlock branchBlock) {
         if (branchBlock.shouldGenerateBranchDrops()) {
-            final ResourceLocation branchTablePath = branchBlock.getLootTableName();
+            final Identifier branchTablePath = branchBlock.getLootTableName();
             if (!fileHelper.exists(branchTablePath, PackType.SERVER_DATA)) {
                 this.map.put(ResourceKey.create(Registries.LOOT_TABLE, branchTablePath), branchBlock.createBranchDrops(registries));
             }
@@ -83,7 +83,7 @@ public class DTBlockLootSubProvider extends BlockLootSubProvider {
 
     private void addLeavesBlockTable(LeavesProperties leavesProperties) {
         if (leavesProperties.shouldGenerateBlockDrops()) {
-            final ResourceLocation leavesBlockTablePath = leavesProperties.getBlockLootTableName();
+            final Identifier leavesBlockTablePath = leavesProperties.getBlockLootTableName();
             if (!fileHelper.exists(leavesBlockTablePath, PackType.SERVER_DATA)) {
                 this.map.put(ResourceKey.create(Registries.LOOT_TABLE, leavesBlockTablePath), leavesProperties.createBlockDrops(registries));
             }
@@ -92,7 +92,7 @@ public class DTBlockLootSubProvider extends BlockLootSubProvider {
 
     private void addLeavesTable(LeavesProperties leavesProperties) {
         if (leavesProperties.shouldGenerateDrops()) {
-            final ResourceLocation leavesTablePath = leavesProperties.getLootTableName();
+            final Identifier leavesTablePath = leavesProperties.getLootTableName();
             if (!fileHelper.exists(leavesTablePath, PackType.SERVER_DATA)) {
                 this.map.put(ResourceKey.create(Registries.LOOT_TABLE, leavesTablePath), leavesProperties.createDrops(registries));
             }
@@ -101,7 +101,7 @@ public class DTBlockLootSubProvider extends BlockLootSubProvider {
 
     private void addFruitBlockTable(Fruit fruit) {
         if (fruit.shouldGenerateBlockDrops()) {
-            final ResourceLocation fruitBlockTablePath = fruit.getBlockDropsPath();
+            final Identifier fruitBlockTablePath = fruit.getBlockDropsPath();
             if (!fileHelper.exists(fruitBlockTablePath, PackType.SERVER_DATA)) {
                 this.map.put(ResourceKey.create(Registries.LOOT_TABLE, fruitBlockTablePath), fruit.createBlockDrops(registries));
             }
@@ -110,7 +110,7 @@ public class DTBlockLootSubProvider extends BlockLootSubProvider {
 
     private void addPodBlockTable(Pod pod) {
         if (pod.shouldGenerateBlockDrops()) {
-            final ResourceLocation fruitBlockTablePath = pod.getBlockDropsPath();
+            final Identifier fruitBlockTablePath = pod.getBlockDropsPath();
             if (!fileHelper.exists(fruitBlockTablePath, PackType.SERVER_DATA)) {
                 this.map.put(ResourceKey.create(Registries.LOOT_TABLE, fruitBlockTablePath), pod.createBlockDrops(registries));
             }

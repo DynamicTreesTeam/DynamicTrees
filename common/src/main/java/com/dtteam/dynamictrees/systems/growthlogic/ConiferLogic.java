@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionCon
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ConiferLogic extends GrowthLogicKit {
 
@@ -24,7 +24,7 @@ public class ConiferLogic extends GrowthLogicKit {
      */
     public static final ConfigurationProperty<Boolean> VARIATE_LOWEST_BRANCH = ConfigurationProperty.bool("variate_lowest_branch");
 
-    public ConiferLogic(final ResourceLocation registryName) {
+    public ConiferLogic(final Identifier registryName) {
         super(registryName);
     }
 

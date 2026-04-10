@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.SimpleBakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class MediumPalmLeavesBakedModel extends PalmLeavesBakedModel {
 
     public static List<MediumPalmLeavesBakedModel> INSTANCES = new ArrayList<>();
 
-    public MediumPalmLeavesBakedModel(ResourceLocation frondsResLoc, Function<Material, TextureAtlasSprite> spriteGetter){
+    public MediumPalmLeavesBakedModel(Identifier frondsResLoc, Function<Material, TextureAtlasSprite> spriteGetter){
         super(frondsResLoc, spriteGetter);
         INSTANCES.add(this);
     }

@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.block.leaves;
 
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -18,7 +18,7 @@ public class SolidLeavesProperties extends LeavesProperties {
 
     public static final TypedRegistry.EntryType<LeavesProperties> TYPE = TypedRegistry.newType(SolidLeavesProperties::new);
 
-    public SolidLeavesProperties(ResourceLocation registryName) {
+    public SolidLeavesProperties(Identifier registryName) {
         super(registryName);
         this.requiresShears = false;
     }

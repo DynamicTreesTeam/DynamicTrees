@@ -5,10 +5,10 @@ import com.dtteam.dynamictrees.block.Growable;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
-import com.dtteam.dynamictrees.deserialization.deserializer.ResourceLocationDeserializer;
+import com.dtteam.dynamictrees.deserialization.deserializer.IdentifierDeserializer;
 import com.dtteam.dynamictrees.utility.NullUtils;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -86,9 +86,9 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
      * using the fruit's registry name)
      */
     @Nullable
-    private ResourceLocation getBlockRegistryName(Fruit fruit, JsonObject json) {
+    private Identifier getBlockRegistryName(Fruit fruit, JsonObject json) {
         return NullUtils.applyIfNonnull(json.get("block_registry_name"), element ->
-                ResourceLocationDeserializer.create(fruit.getRegistryName().getNamespace())
+                IdentifierDeserializer.create(fruit.getRegistryName().getNamespace())
                         .deserialize(element)
                         .orElse(null)
         );

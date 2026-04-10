@@ -9,7 +9,7 @@ import com.dtteam.dynamictrees.systems.genfeature.context.PreGenerationContext;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.utility.CoordUtils.Surround;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -25,7 +25,7 @@ public class MoundGenFeature extends GenFeature {
     public static final ConfigurationProperty<Integer> MOUND_CUTOFF_RADIUS = ConfigurationProperty.integer("mound_cutoff_radius");
     public static final ConfigurationProperty<Boolean> OFFSET = ConfigurationProperty.bool("offset");
 
-    public MoundGenFeature(ResourceLocation registryName) {
+    public MoundGenFeature(Identifier registryName) {
         super(registryName);
     }
 

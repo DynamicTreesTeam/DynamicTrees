@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.EventPriority;
@@ -62,7 +62,7 @@ public class NeoForgeRegistryHandler extends RegistryHandler {
      * @param modId The mod ID for the relevant mod.
      */
     public NeoForgeRegistryHandler(final String modId, IEventBus modEventBus) {
-        super(ResourceLocation.fromNamespaceAndPath(modId, modId));
+        super(Identifier.fromNamespaceAndPath(modId, modId));
         RegistryHandler.REGISTRY.register(this);
 
         modEventBus.register(new RegisterEventHandler<>(blocksDeferredRegister));
@@ -81,17 +81,17 @@ public class NeoForgeRegistryHandler extends RegistryHandler {
     }
 
     @Nullable
-    public Supplier<Block> getBlock(final ResourceLocation registryName) {
+    public Supplier<Block> getBlock(final Identifier registryName) {
         return DeferredHolder.create(BuiltInRegistries.BLOCK.key(), registryName);
     }
 
     @Nullable
-    public Supplier<Item> getItem(final ResourceLocation registryName) {
+    public Supplier<Item> getItem(final Identifier registryName) {
         return DeferredHolder.create(BuiltInRegistries.ITEM.key(), registryName);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Block> Supplier<T> putBlock(final ResourceLocation registryName, final Supplier<T> blockSup) {
+    public <T extends Block> Supplier<T> putBlock(final Identifier registryName, final Supplier<T> blockSup) {
         if (this.warnIfInvalid("Block", registryName)) {
             return (Supplier<T>) getBlock(registryName);
         }
@@ -100,7 +100,7 @@ public class NeoForgeRegistryHandler extends RegistryHandler {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Item> Supplier<T> putItem(final ResourceLocation registryName, final Supplier<T> itemSup) {
+    public <T extends Item> Supplier<T> putItem(final Identifier registryName, final Supplier<T> itemSup) {
         if (this.warnIfInvalid("Item", registryName)) {
             return (Supplier<T>) getItem(registryName);
         }
@@ -112,10 +112,10 @@ public class NeoForgeRegistryHandler extends RegistryHandler {
      * Checks if this {@link RegistryHandler} is valid, and if not prints a warning to the console.
      *
      * @param type The type of registry being added.
-     * @param registryName The {@link ResourceLocation} registry name.
+     * @param registryName The {@link Identifier} registry name.
      * @return True if it was invalid.
      */
-    private boolean warnIfInvalid(final String type, final ResourceLocation registryName) {
+    private boolean warnIfInvalid(final String type, final Identifier registryName) {
         if (!this.isValid()) {
             LogManager.getLogger().warn("{} '{}' was added to null registry handler.", type, registryName);
         }

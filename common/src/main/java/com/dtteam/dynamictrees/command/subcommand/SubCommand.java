@@ -20,13 +20,13 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.coordinates.Coordinates;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collection;
@@ -145,16 +145,16 @@ public abstract class SubCommand {
         return rootPos;
     }
 
-    protected static RequiredArgumentBuilder<CommandSourceStack, ResourceLocation> speciesArgument() {
-        return resourceLocationArgument(CommandConstants.SPECIES, Species.REGISTRY::getRegistryNames);
+    protected static RequiredArgumentBuilder<CommandSourceStack, Identifier> speciesArgument() {
+        return identifierArgument(CommandConstants.SPECIES, Species.REGISTRY::getRegistryNames);
     }
 
-//    protected static RequiredArgumentBuilder<CommandSourceStack, ResourceLocation> transformableSpeciesArgument() {
-//        return resourceLocationArgument(CommandConstants.SPECIES, TreeRegistry::getTransformableSpeciesLocations);
+//    protected static RequiredArgumentBuilder<CommandSourceStack, Identifier> transformableSpeciesArgument() {
+//        return identifierArgument(CommandConstants.SPECIES, TreeRegistry::getTransformableSpeciesLocations);
 //    }
 
     protected static Species speciesArgument(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        final ResourceLocation registryName = ResourceLocationArgument.getId(context, CommandConstants.SPECIES);
+        final Identifier registryName = IdentifierArgument.getId(context, CommandConstants.SPECIES);
         final Species species = Species.findSpecies(registryName);
 
         if (!species.isValid()) {
@@ -164,8 +164,8 @@ public abstract class SubCommand {
         return species;
     }
 
-    protected static RequiredArgumentBuilder<CommandSourceStack, ResourceLocation> resourceLocationArgument(final String name, final Supplier<Collection<ResourceLocation>> suggestionsSupplier) {
-        return Commands.argument(name, ResourceLocationArgument.id())
+    protected static RequiredArgumentBuilder<CommandSourceStack, Identifier> identifierArgument(final String name, final Supplier<Collection<Identifier>> suggestionsSupplier) {
+        return Commands.argument(name, IdentifierArgument.id())
                 .suggests((context, builder) -> SharedSuggestionProvider.suggestResource(suggestionsSupplier.get(), builder));
     }
 

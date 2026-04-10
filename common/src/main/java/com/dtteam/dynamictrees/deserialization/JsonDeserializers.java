@@ -34,7 +34,7 @@ import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -187,14 +187,14 @@ public final class JsonDeserializers {
             NUMBER.deserialize(input).map(Number::doubleValue)
     );
 
-    public static final JsonDeserializer<ResourceLocation> RESOURCE_LOCATION =
-            register(ResourceLocation.class, ResourceLocationDeserializer.create());
+    public static final JsonDeserializer<Identifier> RESOURCE_LOCATION =
+            register(Identifier.class, IdentifierDeserializer.create());
 
     /**
      * Alternative to {@link #RESOURCE_LOCATION}, defaulting the namespace to {@code dynamictrees}.
      */
-    public static final JsonDeserializer<ResourceLocation> DT_RESOURCE_LOCATION =
-            ResourceLocationDeserializer.create(DynamicTrees.MOD_ID);
+    public static final JsonDeserializer<Identifier> DT_RESOURCE_LOCATION =
+            IdentifierDeserializer.create(DynamicTrees.MOD_ID);
 
     public static JsonDeserializer<Block> BLOCK;
     public static JsonDeserializer<Item> ITEM;
@@ -233,8 +233,8 @@ public final class JsonDeserializers {
     public static final JsonDeserializer<FeatureCanceller> FEATURE_CANCELLER =
             register(FeatureCanceller.class, new RegistryEntryDeserializer<>(FeatureCanceller.REGISTRY));
 
-    public static final JsonDeserializer<Map<String, ResourceLocation>> RESOURCE_LOCATION_MAP =
-            register(MapDeserializer.getMapClass(String.class, ResourceLocation.class), new MapDeserializer<>(STRING, RESOURCE_LOCATION));
+    public static final JsonDeserializer<Map<String, Identifier>> RESOURCE_LOCATION_MAP =
+            register(MapDeserializer.getMapClass(String.class, Identifier.class), new MapDeserializer<>(STRING, RESOURCE_LOCATION));
 
 
     public static final JsonDeserializer<GenFeatureConfiguration> CONFIGURED_GEN_FEATURE =

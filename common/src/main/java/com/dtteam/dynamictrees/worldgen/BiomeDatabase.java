@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +22,7 @@ import java.util.function.Function;
 
 public class BiomeDatabase {
     private final Map<IDTBiomeHolderSet, JsonEntry> jsonEntries = new LinkedHashMap<>();
-    private final Map<ResourceLocation, Entry> entries = new HashMap<>();
+    private final Map<Identifier, Entry> entries = new HashMap<>();
 
     public JsonEntry getJsonEntry(IDTBiomeHolderSet biomes) {
         return this.jsonEntries.computeIfAbsent(biomes, k -> new JsonEntry(this));
@@ -33,7 +33,7 @@ public class BiomeDatabase {
     }
 
     public Entry getEntry(ResourceKey<Biome> biomeKey) {
-        ResourceLocation biomeRegistryName = biomeKey.location();
+        Identifier biomeRegistryName = biomeKey.location();
 
         if (this.entries.containsKey(biomeRegistryName))
             return this.entries.get(biomeRegistryName);
@@ -51,7 +51,7 @@ public class BiomeDatabase {
         return entry;
     }
 
-    public Entry getEntry(ResourceLocation biomeResLoc) {
+    public Entry getEntry(Identifier biomeResLoc) {
         return this.entries.get(biomeResLoc);
     }
 
@@ -73,7 +73,7 @@ public class BiomeDatabase {
     }
 
     public interface EntryReader {
-        static DataResult<EntryReader> read(ResourceLocation biomeName) {
+        static DataResult<EntryReader> read(Identifier biomeName) {
             EntryReader entry = BiomeDatabases.getDefault().getEntry(biomeName);
             return DataResult.success(entry);
         }

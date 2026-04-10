@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
@@ -49,7 +49,7 @@ public class BeeNestGenFeature extends GenFeature {
     private static final double RARE_CHANCE = 0.0002D;
     private static final double GROW_CHANCE = 0.001D;
 
-    public BeeNestGenFeature(ResourceLocation registryName) {
+    public BeeNestGenFeature(Identifier registryName) {
         super(registryName);
     }
 

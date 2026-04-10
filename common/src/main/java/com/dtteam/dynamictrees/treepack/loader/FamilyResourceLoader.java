@@ -10,9 +10,9 @@ import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.apache.logging.log4j.LogManager;
@@ -32,9 +32,9 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
     @Override
     public void registerAppliers() {
         this.commonAppliers
-                .register("common_species", ResourceLocation.class,
+                .register("common_species", Identifier.class,
                         (family, registryName) -> {
-                    registryName = ResourceLocationUtils.parseDTLocation(registryName);
+                    registryName = IdentifierUtils.parseDTLocation(registryName);
                     Species.REGISTRY.runOnNextLock(Species.REGISTRY.generateIfValidRunnable(registryName,
                             family::setCommonSpecies, setCommonWarn(family, registryName)));
                 })
@@ -47,8 +47,8 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("primitive_stripped_log", Block.class, Family::setPrimitiveStrippedLog)
                 .register("only_if_loaded", String.class, Family::setOnlyIfLoaded)
                 .registerArrayApplier("only_if_loaded", String.class, Family::setOnlyIfLoaded)
-                .registerMapApplier("texture_overrides", ResourceLocation.class, Family::setTextureOverrides)
-                .registerMapApplier("model_overrides", ResourceLocation.class, Family::setModelOverrides)
+                .registerMapApplier("texture_overrides", Identifier.class, Family::setTextureOverrides)
+                .registerMapApplier("model_overrides", Identifier.class, Family::setModelOverrides)
                 .registerMapApplier("lang_overrides", String.class, Family::setLangOverrides)
                 .register("stick", Item.class, Family::setStick);
 
@@ -104,7 +104,7 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
      * @param registryName the registry name of the requested family
      * @return a {@link Runnable} that logs the warning
      */
-    private static Runnable setCommonWarn(final Family family, final ResourceLocation registryName) {
+    private static Runnable setCommonWarn(final Family family, final Identifier registryName) {
         return () -> LOGGER.warn("Could not set common species for \"{}\" as species with name  \"{}\" was not found.", family, registryName);
     }
 

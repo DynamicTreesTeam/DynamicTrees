@@ -192,7 +192,7 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
     }
 
     public static void discoverWoodColors() {
-        final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance()
+        final Function<Identifier, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance()
                 .getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
 
         for (Family family : Family.REGISTRY.getAll()) {
@@ -208,7 +208,7 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
         }
     }
 
-    private static int getFaceColor(BlockState state, Direction face, Function<ResourceLocation, TextureAtlasSprite> textureGetter) {
+    private static int getFaceColor(BlockState state, Direction face, Function<Identifier, TextureAtlasSprite> textureGetter) {
         final BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
         if (model == null) {
             DynamicTrees.LOG.warn("Could not get model for {}! Branch needs to be handled manually!", state.getBlock());

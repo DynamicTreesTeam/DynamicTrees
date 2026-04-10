@@ -3,13 +3,13 @@ package com.dtteam.dynamictrees.event;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.SimpleRegistry;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 
 /**
  * Allows for registering {@link TypedRegistry.EntryType} objects to {@link SimpleRegistry} objects. Subscribers should use
- * {@link #registerType(ResourceLocation, TypedRegistry.EntryType)} to register their {@link TypedRegistry.EntryType}
+ * {@link #registerType(Identifier, TypedRegistry.EntryType)} to register their {@link TypedRegistry.EntryType}
  * objects, as full access to the {@link SimpleRegistry} is not given to prevent misuse of this event, for full access to
  * register {@link RegistryEntry} objects, use {@link RegistryEvent}.
  *
@@ -36,12 +36,12 @@ public final class TypeRegistryEvent<V extends RegistryEntry<V>> extends Event i
 
     /**
      * Registers a custom {@link TypedRegistry.EntryType}, allowing custom sub-classes of the registry entry to be
-     * created and then referenced from Json via the registry name {@link ResourceLocation}.
+     * created and then referenced from Json via the registry name {@link Identifier}.
      *
-     * @param registryName The registry name {@link ResourceLocation}.
+     * @param registryName The registry name {@link Identifier}.
      * @param type         The {@link TypedRegistry.EntryType} to register.
      */
-    public void registerType(final ResourceLocation registryName, final TypedRegistry.EntryType<V> type) {
+    public void registerType(final Identifier registryName, final TypedRegistry.EntryType<V> type) {
         this.registry.registerType(registryName, type);
     }
 

@@ -10,7 +10,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +23,7 @@ import java.util.function.Function;
  */
 public class RootsBlockModelGeometry extends BranchBlockModelGeometry {
 
-    public RootsBlockModelGeometry(@Nullable final ResourceLocation barkTextureLocation, @Nullable final ResourceLocation ringsTextureLocation, @Nullable final ResourceLocation familyName) {
+    public RootsBlockModelGeometry(@Nullable final Identifier barkTextureLocation, @Nullable final Identifier ringsTextureLocation, @Nullable final Identifier familyName) {
         super(barkTextureLocation, ringsTextureLocation, familyName, false);
     }
 

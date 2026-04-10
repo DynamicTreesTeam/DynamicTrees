@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.treepack;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.FileUtil;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources;
@@ -33,11 +33,11 @@ public class TreePackResources extends PathPackResources implements com.dtteam.d
     }
 
     @Override
-    public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation location) {
+    public IoSupplier<InputStream> getResource(PackType packType, Identifier location) {
         return this.getRootResource(getPathFromLocation(location));
     }
 
-    private static String[] getPathFromLocation(ResourceLocation location) {
+    private static String[] getPathFromLocation(Identifier location) {
         String[] parts = location.getPath().split("/");
         String[] result = new String[parts.length + 1];
         result[0] = location.getNamespace();
@@ -61,7 +61,7 @@ public class TreePackResources extends PathPackResources implements com.dtteam.d
                         .map(this.root::relativize)
                         .filter(p -> p.getNameCount() > 0) // Skip the root entry
                         .map(p -> p.toString().replaceAll("/$", "")) // Remove the trailing slash, if present
-                        .filter(s -> !s.isEmpty()) // Filter empty strings, otherwise empty strings default to minecraft namespace in ResourceLocations
+                        .filter(s -> !s.isEmpty()) // Filter empty strings, otherwise empty strings default to minecraft namespace in Identifiers
                         .collect(Collectors.toSet());
             }
         } catch (IOException | AssertionError e) {

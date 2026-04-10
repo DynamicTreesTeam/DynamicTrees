@@ -14,7 +14,7 @@ import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -26,8 +26,8 @@ import java.util.Optional;
 
 public class FabricBiomeModifications {
 
-    private static final ResourceLocation REMOVE_TREES_ID = DynamicTrees.location("remove_vanilla_trees");
-    private static final ResourceLocation ADD_TREES_ID = DynamicTrees.location("add_dynamic_trees");
+    private static final Identifier REMOVE_TREES_ID = DynamicTrees.location("remove_vanilla_trees");
+    private static final Identifier ADD_TREES_ID = DynamicTrees.location("add_dynamic_trees");
     public static final TagKey<PlacedFeature> FEATURE_CANCELLER_EXCLUSIONS_KEY = TagKey.create(
             net.minecraft.core.registries.Registries.PLACED_FEATURE,
             DynamicTrees.location("feature_canceller_exclusions"));

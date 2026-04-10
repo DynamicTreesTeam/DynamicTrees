@@ -9,7 +9,7 @@ import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
@@ -21,7 +21,7 @@ public class UndergrowthGenFeature extends GenFeature {
     public static final ConfigurationProperty<Species> SPECIES_B = ConfigurationProperty.property("secondary_undergrowth_species", Species.class);
     public static final ConfigurationProperty<Float> PROPORTION = ConfigurationProperty.floatProperty("proportion_of_secondary_species");
 
-    public UndergrowthGenFeature(ResourceLocation registryName) {
+    public UndergrowthGenFeature(Identifier registryName) {
         super(registryName);
     }
 

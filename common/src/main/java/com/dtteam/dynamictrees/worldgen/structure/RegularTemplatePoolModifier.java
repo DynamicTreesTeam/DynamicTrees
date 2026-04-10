@@ -5,7 +5,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
@@ -54,7 +54,7 @@ public class RegularTemplatePoolModifier implements TemplatePoolModifier {
     }
 
     public static TemplatePoolModifier village(HolderLookup.Provider lookupProvider, String type, String patternGroup) {
-        ResourceLocation patternName = ResourceLocation.parse("village/" + type + "/" + patternGroup);
+        Identifier patternName = Identifier.parse("village/" + type + "/" + patternGroup);
         return create(lookupProvider, ResourceKey.create(Registries.TEMPLATE_POOL, patternName));
     }
 

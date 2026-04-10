@@ -12,7 +12,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -46,7 +46,7 @@ public class VinesGenFeature extends GenFeature {
     public static final ConfigurationProperty<Block> TIP_BLOCK = ConfigurationProperty.block("tip_block");
     public static final ConfigurationProperty<VineType> VINE_TYPE = ConfigurationProperty.property("vine_type", VineType.class);
 
-    public VinesGenFeature(ResourceLocation registryName) {
+    public VinesGenFeature(Identifier registryName) {
         super(registryName);
     }
 

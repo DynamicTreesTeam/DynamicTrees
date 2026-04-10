@@ -1,9 +1,9 @@
 package com.dtteam.dynamictrees.client;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import net.minecraft.client.color.block.BlockColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -12,12 +12,12 @@ import java.util.Map;
 //
 public class BlockColorMultipliers {
 
-    private static Map<ResourceLocation, BlockColor> colorBase = new HashMap<>();
+    private static Map<Identifier, BlockColor> colorBase = new HashMap<>();
 
     public static void register(String label, BlockColor colorMultiplier) {
-        register(ResourceLocationUtils.parse(label, DynamicTrees.MOD_ID), colorMultiplier);
+        register(IdentifierUtils.parse(label, DynamicTrees.MOD_ID), colorMultiplier);
     }
-    public static void register(ResourceLocation label, BlockColor colorMultiplier) {
+    public static void register(Identifier label, BlockColor colorMultiplier) {
         if (colorBase == null)
             DynamicTrees.LOG.error("Error registering Color Multiplier \"{}\". Called too late, block color multipliers have already been registered.", label);
         else
@@ -26,10 +26,10 @@ public class BlockColorMultipliers {
 
     @Nullable
     public static BlockColor find(String label) {
-        return find(ResourceLocation.parse(label));
+        return find(Identifier.parse(label));
     }
     @Nullable
-    public static BlockColor find(ResourceLocation label) {
+    public static BlockColor find(Identifier label) {
         return colorBase.get(label);
     }
 

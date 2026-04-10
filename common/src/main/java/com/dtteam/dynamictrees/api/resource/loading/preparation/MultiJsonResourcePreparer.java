@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.api.resource.loading.preparation;
 import com.dtteam.dynamictrees.api.resource.DTResource;
 import com.dtteam.dynamictrees.api.resource.ResourceCollector;
 import com.google.gson.JsonElement;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -29,15 +29,15 @@ public final class MultiJsonResourcePreparer extends
     }
 
     @Override
-    protected void readAndPutResources(ResourceManager resourceManager, Map<ResourceLocation, Resource> resourceMap) {
+    protected void readAndPutResources(ResourceManager resourceManager, Map<Identifier, Resource> resourceMap) {
         resourceMap.forEach((location, resource) -> {
-            final ResourceLocation resourceName = this.getResourceName(location);
+            final Identifier resourceName = this.getResourceName(location);
             this.tryReadAndPutResource(resourceManager, location, resourceName);
         });
     }
 
-    private void tryReadAndPutResource(ResourceManager resourceManager, ResourceLocation location,
-                                       ResourceLocation resourceName) {
+    private void tryReadAndPutResource(ResourceManager resourceManager, Identifier location,
+                                       Identifier resourceName) {
         try {
             this.readAndPutResource(resourceManager, location, resourceName);
         } catch (PreparationException | IOException e) {
@@ -46,25 +46,25 @@ public final class MultiJsonResourcePreparer extends
     }
 
     @Override
-    protected void readAndPutResource(Resource resource, ResourceLocation resourceName)
+    protected void readAndPutResource(Resource resource, Identifier resourceName)
             throws PreparationException, IOException {
 
     }
 
-    private void readAndPutResource(ResourceManager resourceManager, ResourceLocation location,
-                                    ResourceLocation resourceName) throws PreparationException, IOException {
+    private void readAndPutResource(ResourceManager resourceManager, Identifier location,
+                                    Identifier resourceName) throws PreparationException, IOException {
         this.computeResourceListIfAbsent(resourceName)
                 .addAll(this.collectResources(resourceManager, location));
     }
 
-    private List<JsonElement> computeResourceListIfAbsent(ResourceLocation resourceName) {
+    private List<JsonElement> computeResourceListIfAbsent(Identifier resourceName) {
         return (List<JsonElement>)
                 this.resourceCollector.computeIfAbsent(resourceName,
                         () -> new DTResource<>(resourceName, new LinkedList<>())
                 ).resource();
     }
 
-    private List<JsonElement> collectResources(ResourceManager resourceManager, ResourceLocation location)
+    private List<JsonElement> collectResources(ResourceManager resourceManager, Identifier location)
             throws IOException, PreparationException {
         final List<JsonElement> resources = new LinkedList<>();
         for (Resource resource : resourceManager.getResourceStack(location)) {

@@ -33,7 +33,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -88,14 +88,14 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     /**
      * @param name name of branch, without a {@code _branch} suffix
      */
-    public BranchBlock(ResourceLocation name) {
+    public BranchBlock(Identifier name) {
         this(name, Properties.of().pushReaction(PushReaction.BLOCK));
     }
 
     /**
      * @param name name of branch, without a {@code _branch} suffix
      */
-    public BranchBlock(ResourceLocation name, Properties properties) {
+    public BranchBlock(Identifier name, Properties properties) {
         super(properties); //removes drops from block
         lootTableSupplier = new LootTableSupplier("trees/branches/", name);
     }
@@ -447,15 +447,15 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
             cutDir = Direction.DOWN;
         }
 
-        Pair<ResourceLocation, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getNormal()), false);
+        Pair<Identifier, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getNormal()), false);
         return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutPos, cutDir, toolDir, trunkHeight, cachedState);
     }
 
-    protected static @Nullable Pair<ResourceLocation, Integer> getCachedSoilState(Level level, BlockPos rootPos, boolean hasRoots) {
+    protected static @Nullable Pair<Identifier, Integer> getCachedSoilState(Level level, BlockPos rootPos, boolean hasRoots) {
         BlockState soilState = level.getBlockState(rootPos);
         SoilBlock soilBlock = TreeHelper.getRooty(soilState);
         if (soilBlock != null && soilBlock.fallWithTree(soilState, level, rootPos, hasRoots)){
-            ResourceLocation blockResLoc = BuiltInRegistries.BLOCK.getKey(soilBlock);
+            Identifier blockResLoc = BuiltInRegistries.BLOCK.getKey(soilBlock);
             int stateId = soilBlock.getStateIndex(soilState);
             return Pair.of(blockResLoc, stateId);
         }
@@ -555,7 +555,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return getPrimitiveLog().isPresent();
     }
 
-    public ResourceLocation getLootTableName() {
+    public Identifier getLootTableName() {
         return lootTableSupplier.getName();
     }
 

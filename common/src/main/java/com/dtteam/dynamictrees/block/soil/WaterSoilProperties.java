@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -37,7 +37,7 @@ public class WaterSoilProperties extends SoilProperties {
 
     public static final TypedRegistry.EntryType<SoilProperties> TYPE = TypedRegistry.newType(WaterSoilProperties::new);
 
-    public WaterSoilProperties(final ResourceLocation registryName) {
+    public WaterSoilProperties(final Identifier registryName) {
         super(null, registryName);
 
         this.soilStateGenerator.reset(blockStateGenerators.get(DynamicTrees.location("water_root_soil")));

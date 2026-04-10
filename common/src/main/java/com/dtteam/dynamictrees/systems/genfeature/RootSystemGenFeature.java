@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
@@ -24,7 +24,7 @@ public class RootSystemGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Integer> MAX_ROOT_COLUMN_HEIGHT = ConfigurationProperty.integer("max_root_column_height");
     public static final ConfigurationProperty<Integer> ROOT_RADIUS = ConfigurationProperty.integer("root_radius");
-    public static final ConfigurationProperty<ResourceLocation> ROOT_REPLACEABLE_TAG = ConfigurationProperty.property("root_replaceable_tag", ResourceLocation.class);
+    public static final ConfigurationProperty<Identifier> ROOT_REPLACEABLE_TAG = ConfigurationProperty.property("root_replaceable_tag", Identifier.class);
     public static final ConfigurationProperty<Integer> ROOT_PLACEMENT_ATTEMPTS = ConfigurationProperty.integer("root_replacement_attempts");
     public static final ConfigurationProperty<Block> ROOT_BLOCK = ConfigurationProperty.block("root_block");
     public static final ConfigurationProperty<Integer> HANGING_ROOT_RADIUS = ConfigurationProperty.integer("hanging_root_radius");
@@ -32,7 +32,7 @@ public class RootSystemGenFeature extends GenFeature {
     public static final ConfigurationProperty<Integer> HANGING_ROOT_PLACEMENT_ATTEMPTS = ConfigurationProperty.integer("hanging_root_replacement_attempts");
     public static final ConfigurationProperty<Block> HANGING_ROOT_BLOCK = ConfigurationProperty.block("hanging_root_block");
 
-    public RootSystemGenFeature(ResourceLocation registryName) {
+    public RootSystemGenFeature(Identifier registryName) {
         super(registryName);
     }
 

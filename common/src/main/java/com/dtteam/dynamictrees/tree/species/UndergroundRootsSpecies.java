@@ -19,7 +19,7 @@ import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -59,7 +59,7 @@ public class UndergroundRootsSpecies extends Species {
         this.updateSoilOnWaterRadius = updateSoilOnWaterRadius;
     }
 
-    public UndergroundRootsSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+    public UndergroundRootsSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
         if (!(family instanceof UndergroundRootsFamily)) {
             throw new RuntimeException("Family " + family.getRegistryName() + " for Underground Roots Species " + getRegistryName() + " is not of type "+ UndergroundRootsFamily.class);

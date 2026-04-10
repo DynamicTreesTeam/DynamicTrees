@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.data.builder;
 import com.dtteam.dynamictrees.event.handler.ClientModEventHandler;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 import net.neoforged.neoforge.client.model.generators.CustomLoaderBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -18,7 +18,7 @@ import java.util.function.BiFunction;
  */
 public final class BranchLoaderBuilder extends CustomLoaderBuilder<BlockModelBuilder> {
 
-    public static final HashMap<ResourceLocation, BiFunction<BlockModelBuilder, ExistingFileHelper, BranchLoaderBuilder>> branchBuilders = new HashMap<>();
+    public static final HashMap<Identifier, BiFunction<BlockModelBuilder, ExistingFileHelper, BranchLoaderBuilder>> branchBuilders = new HashMap<>();
 
     static {
         branchBuilders.put(
@@ -34,11 +34,11 @@ public final class BranchLoaderBuilder extends CustomLoaderBuilder<BlockModelBui
 
     private final Map<String, String> textures = new LinkedHashMap<>();
 
-    public BranchLoaderBuilder(ResourceLocation loaderId, BlockModelBuilder parent, ExistingFileHelper fileHelper) {
+    public BranchLoaderBuilder(Identifier loaderId, BlockModelBuilder parent, ExistingFileHelper fileHelper) {
         super(loaderId, parent, fileHelper, false);
     }
 
-    public BranchLoaderBuilder texture(String key, ResourceLocation location) {
+    public BranchLoaderBuilder texture(String key, Identifier location) {
         this.textures.put(key, location.toString());
         return this;
     }

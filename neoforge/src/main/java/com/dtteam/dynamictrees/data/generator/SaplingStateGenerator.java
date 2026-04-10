@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 
@@ -25,9 +25,9 @@ public class SaplingStateGenerator implements Generator<DTDataProvider.BlockStat
     @Override
     public void generate(DTDataProvider.BlockState prov, Species input, Dependencies dependencies) {
         if (prov instanceof DTBlockStateProvider provider){
-            final Optional<ResourceLocation> leavesTextureLocation = dependencies.getOptional(PRIMITIVE_LEAVES)
+            final Optional<Identifier> leavesTextureLocation = dependencies.getOptional(PRIMITIVE_LEAVES)
                     .map(primitiveLeaves -> provider.block(Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(primitiveLeaves))));
-            final ResourceLocation primitiveLogLocation = Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_LOG)));
+            final Identifier primitiveLogLocation = Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_LOG)));
 
             final BlockModelBuilder builder = provider.models().getBuilder(input.getSaplingModelName())
                     .parent(provider.models().getExistingFile(input.getSaplingSmartModelLocation()))

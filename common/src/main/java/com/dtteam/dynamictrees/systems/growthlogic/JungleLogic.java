@@ -6,14 +6,14 @@ import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionSelectionCon
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class JungleLogic extends GrowthLogicKit {
 
     public static final ConfigurationProperty<Integer> CANOPY_HEIGHT = ConfigurationProperty.integer("canopy_height");
     public static final ConfigurationProperty<Integer> BRANCH_OUT_CHANCE = ConfigurationProperty.integer("branch_out_chance");
 
-    public JungleLogic(final ResourceLocation registryName) {
+    public JungleLogic(final Identifier registryName) {
         super(registryName);
     }
 

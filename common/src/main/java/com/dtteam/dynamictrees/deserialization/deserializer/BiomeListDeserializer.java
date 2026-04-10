@@ -12,11 +12,11 @@ import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
@@ -46,14 +46,14 @@ public final class BiomeListDeserializer implements JsonDeserializer<IDTBiomeHol
             tagRegex = tagRegex.substring(1);
 
         try {
-            ResourceLocation tagLocation = ResourceLocation.parse(tagRegex);
+            Identifier tagLocation = Identifier.parse(tagRegex);
             TagKey<Biome> tagKey = TagKey.create(Registries.BIOME, tagLocation);
 
             // TODO UPDATE: This is used as a regex in 1.19.2. Double check!!!
             biomeList.addDelayedHolderSet(
                     (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()),
                     () -> DELAYED_BIOME_REGISTRY.get().getOrCreateTag(tagKey));
-        } catch (ResourceLocationException e) {
+        } catch (IdentifierException e) {
             return PropertyApplierResult.failure(e.getMessage());
         }
 

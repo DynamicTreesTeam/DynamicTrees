@@ -23,7 +23,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
@@ -57,7 +57,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
     public static final TypedRegistry.EntryType<SoilProperties> TYPE = TypedRegistry.newType(AerialRootsSoilProperties::new);
 
     protected UndergroundRootsFamily family;
-    public AerialRootsSoilProperties(final ResourceLocation registryName) {
+    public AerialRootsSoilProperties(final Identifier registryName) {
         super(registryName);
         this.soilStateGenerator.reset(blockStateGenerators.get(DynamicTrees.location("aerial_root_soil")));
     }

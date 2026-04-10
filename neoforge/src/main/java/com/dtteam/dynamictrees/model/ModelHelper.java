@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.client.RenderTypeGroup;
 import net.neoforged.neoforge.client.model.IModelBuilder;
@@ -73,7 +73,7 @@ public class ModelHelper {
     }
 
     public static IModelBuilder<?> getModelBuilder(IGeometryBakingContext context, TextureAtlasSprite particle) {
-        ResourceLocation renderTypeHint = context.getRenderTypeHint();
+        Identifier renderTypeHint = context.getRenderTypeHint();
         RenderTypeGroup renderTypes = renderTypeHint != null ? context.getRenderType(renderTypeHint) : RenderTypeGroup.EMPTY;
 
         return IModelBuilder.of(context.useAmbientOcclusion(), context.useBlockLight(), context.isGui3d(),
@@ -81,11 +81,11 @@ public class ModelHelper {
     }
 
     @SuppressWarnings("deprecation")
-    public static TextureAtlasSprite getTexture(ResourceLocation resLoc) {
+    public static TextureAtlasSprite getTexture(Identifier resLoc) {
         return getTexture(resLoc, TextureAtlas.LOCATION_BLOCKS);
     }
 
-    public static TextureAtlasSprite getTexture(ResourceLocation resLoc, ResourceLocation atlasResLoc) {
+    public static TextureAtlasSprite getTexture(Identifier resLoc, Identifier atlasResLoc) {
         return Minecraft.getInstance().getTextureAtlas(atlasResLoc).apply(resLoc);
     }
 

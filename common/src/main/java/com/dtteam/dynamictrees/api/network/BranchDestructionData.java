@@ -10,7 +10,7 @@ import com.google.common.collect.AbstractIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,7 +37,7 @@ public class BranchDestructionData {
     public final BlockPos cutPos; // The absolute(world) position of the block that was cut
     public final BlockPos basePos; // The absolute(world) position of base for the tree entity
     public final int trunkHeight;
-    public final Pair<ResourceLocation, Integer> soilState;
+    public final Pair<Identifier, Integer> soilState;
 
     public static final BlockPosBounds bounds = new BlockPosBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));
 
@@ -62,7 +62,7 @@ public class BranchDestructionData {
     private Map<BlockPos, BranchConnectionData> unencodedBranches;
     private Map<BlockPos, BlockState> unencodedLeaves;
     private List<BlockPos> unencodedEnds;
-    public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, NetVolumeNode.Volume volume, BlockPos cutPos, BlockPos basePos, Direction cutDir, Direction toolDir, int trunkHeight, @Nullable Pair<ResourceLocation, Integer> soilState) {
+    public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, NetVolumeNode.Volume volume, BlockPos cutPos, BlockPos basePos, Direction cutDir, Direction toolDir, int trunkHeight, @Nullable Pair<Identifier, Integer> soilState) {
         this.species = species;
         int[][] encodedBranchData = convertBranchesToIntArrays(branches);
         this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -112,7 +112,7 @@ public class BranchDestructionData {
         int newHeight = maxY - newBasePos.getY();
 
         //If the other brings soil accept it
-        Pair<ResourceLocation, Integer> soil = soilState == null ? other.soilState : soilState;
+        Pair<Identifier, Integer> soil = soilState == null ? other.soilState : soilState;
 
         //Finally the new destructionData is generated.
         // All other parameters use the values from the first destructionData (this).
@@ -123,7 +123,7 @@ public class BranchDestructionData {
     }
 
     public BranchDestructionData(CompoundTag nbt) {
-        this.species = Species.findSpecies(ResourceLocation.parse(nbt.getString("species")));
+        this.species = Species.findSpecies(Identifier.parse(nbt.getString("species")));
         this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos");
         this.destroyedBranchesConnections = nbt.getIntArray("branchcon");
         this.destroyedBranchesBlockIndex = nbt.getIntArray("branchblock");
@@ -138,7 +138,7 @@ public class BranchDestructionData {
         this.toolDir = Direction.values()[Mth.clamp(nbt.getInt("tooldir"), 0, Direction.values().length - 1)];
         this.trunkHeight = nbt.getInt("trunkheight");
         this.soilState = nbt.contains("soilblock") ?
-                Pair.of(ResourceLocation.parse(nbt.getString("soilblock")), nbt.getInt("soilstateid"))
+                Pair.of(Identifier.parse(nbt.getString("soilblock")), nbt.getInt("soilstateid"))
                 : null;
     }
 

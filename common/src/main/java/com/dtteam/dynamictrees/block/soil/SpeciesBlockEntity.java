@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -35,7 +35,7 @@ public class SpeciesBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         if (tag.contains("species")) {
-            ResourceLocation speciesName = ResourceLocation.parse(tag.getString("species"));
+            Identifier speciesName = Identifier.parse(tag.getString("species"));
             species = Species.findSpecies(speciesName);
         }
         super.loadAdditional(tag, registries);

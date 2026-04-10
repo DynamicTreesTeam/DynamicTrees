@@ -30,7 +30,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
@@ -57,7 +57,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.*;
+import static com.dtteam.dynamictrees.utility.IdentifierUtils.*;
 
 /**
  * This structure describes a Family whose member Species all have a common branch.
@@ -75,9 +75,9 @@ import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.*;
  */
 public class Family extends RegistryEntry<Family> implements Resettable<Family> {
 
-    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.BlockState, Family>>> blockStateGenerators = new HashMap<>();
-    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.ItemModel, Family>>> itemModelGenerators = new HashMap<>();
-    public static final HashMap<ResourceLocation, Supplier<Generator<DTDataProvider.Language, Family>>> languageGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, Family>>> blockStateGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, Family>>> itemModelGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, Family>>> languageGenerators = new HashMap<>();
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(Family::new);
 
@@ -195,9 +195,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     /**
      * Constructor suitable for derivative mods
      *
-     * @param name The ResourceLocation of the tree e.g. "mymod:poplar"
+     * @param name The Identifier of the tree e.g. "mymod:poplar"
      */
-    public Family(ResourceLocation name) {
+    public Family(Identifier name) {
         this.setRegistryName(name);
         this.commonSpecies = Species.NULL_SPECIES;
     }
@@ -307,11 +307,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return true;
     }
 
-    protected ResourceLocation getBranchName() {
+    protected Identifier getBranchName() {
         return getBranchName("");
     }
 
-    protected ResourceLocation getBranchName(final String prefix) {
+    protected Identifier getBranchName(final String prefix) {
         return prefix(this.getRegistryName(), prefix);
     }
 
@@ -325,7 +325,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      *
      * @return The instantiated {@link BranchBlock}.
      */
-    protected BranchBlock createBranchBlock(ResourceLocation name) {
+    protected BranchBlock createBranchBlock(Identifier name) {
         final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(name, this.getProperties()) :
                 new BasicBranchBlock(name, this.getProperties());
         if (this.isFireProof()) {
@@ -337,21 +337,21 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     /**
      * Creates branch block and adds it to the relevant {@link RegistryHandler}.
      *
-     * @param name The {@link ResourceLocation} registry name.
+     * @param name The {@link Identifier} registry name.
      * @return The created {@link BranchBlock}.
      */
-    protected Supplier<BranchBlock> createBranch(final ResourceLocation name) {
+    protected Supplier<BranchBlock> createBranch(final Identifier name) {
         return RegistryHandler.addBlock(suffix(name, getBranchNameSuffix()), () -> createBranchBlock(name));
     }
 
     /**
      * Creates and registers a {@link BlockItem} for the given branch with the given registry name.
      *
-     * @param registryName The {@link ResourceLocation} registry name for the item.
+     * @param registryName The {@link Identifier} registry name for the item.
      * @param branchSup    A supplier for the {@link BranchBlock} to create the {@link BlockItem} for.
      * @return A supplier for the {@link BlockItem}.
      */
-    public Supplier<BlockItem> createBranchItem(final ResourceLocation registryName, final Supplier<BranchBlock> branchSup) {
+    public Supplier<BlockItem> createBranchItem(final Identifier registryName, final Supplier<BranchBlock> branchSup) {
         return RegistryHandler.addItem(suffix(registryName, getBranchNameSuffix()), () -> new BlockItem(branchSup.get(), new Item.Properties()));
     }
 
@@ -847,13 +847,13 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     // DATA GENERATION
     ///////////////////////////////////////////
 
-    public ResourceLocation getSurfaceRootLoader(){
+    public Identifier getSurfaceRootLoader(){
         return DynamicTrees.location("surface_root");
     }
-    public ResourceLocation getBranchLoader(){
+    public Identifier getBranchLoader(){
         return DynamicTrees.location("branch");
     }
-    public ResourceLocation getRootsLoader(){
+    public Identifier getRootsLoader(){
         return DynamicTrees.location("roots");
     }
 
@@ -878,8 +878,8 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
                     DynamicTrees.location("family_lang")
             ));
 
-    public ResourceLocation getBranchItemParentLocation() {return DynamicTrees.location("item/branch");}
-    public ResourceLocation getRootItemParentLocation() {return DynamicTrees.location("item/root_branch");}
+    public Identifier getBranchItemParentLocation() {return DynamicTrees.location("item/branch");}
+    public Identifier getRootItemParentLocation() {return DynamicTrees.location("item/root_branch");}
 
     @Override
     public void generateStateData(DTDataProvider.BlockState provider) {
@@ -902,8 +902,8 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     protected List<String> onlyIfLoaded = new ArrayList<>();
     //Texture overrides
-    protected HashMap<String, ResourceLocation> textureOverrides = new HashMap<>();
-    protected HashMap<String, ResourceLocation> modelOverrides = new HashMap<>();
+    protected HashMap<String, Identifier> textureOverrides = new HashMap<>();
+    protected HashMap<String, Identifier> modelOverrides = new HashMap<>();
     protected HashMap<String, String> langOverrides = new HashMap<>();
     public static final String BRANCH = "branch";
     public static final String BRANCH_TOP = "branch_top";
@@ -921,19 +921,19 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return !onlyIfLoaded.isEmpty();
     }
 
-    public void setTextureOverrides(Map<String, ResourceLocation> textureOverrides) {
+    public void setTextureOverrides(Map<String, Identifier> textureOverrides) {
         this.textureOverrides.putAll(textureOverrides);
     }
 
-    public Optional<ResourceLocation> getTexturePath(String key) {
+    public Optional<Identifier> getTexturePath(String key) {
         return Optional.ofNullable(textureOverrides.getOrDefault(key, null));
     }
 
-    public void setModelOverrides(Map<String, ResourceLocation> modelOverrides) {
+    public void setModelOverrides(Map<String, Identifier> modelOverrides) {
         this.modelOverrides.putAll(modelOverrides);
     }
 
-    public Optional<ResourceLocation> getModelPath(String key) {
+    public Optional<Identifier> getModelPath(String key) {
         return Optional.ofNullable(modelOverrides.getOrDefault(key, null));
     }
 
@@ -945,9 +945,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return Optional.ofNullable(langOverrides.getOrDefault(key, null));
     }
 
-    public void addBranchTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation, Block sourceBlock) {
-        ResourceLocation bark = primitiveLogLocation;
-        ResourceLocation rings = suffix(primitiveLogLocation, "_top");
+    public void addBranchTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveLogLocation, Block sourceBlock) {
+        Identifier bark = primitiveLogLocation;
+        Identifier rings = suffix(primitiveLogLocation, "_top");
 
         AtomicBoolean isStripped = new AtomicBoolean(false);
         getPrimitiveStrippedLog().ifPresent(l -> isStripped.set(l.equals(sourceBlock)));
@@ -963,9 +963,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         textureConsumer.accept("rings", rings);
     }
 
-    public void addRootTextures(BiConsumer<String, ResourceLocation> textureConsumer, ResourceLocation primitiveLogLocation) {
-        ResourceLocation bark = suffix(primitiveLogLocation, "_side");
-        ResourceLocation rings = suffix(primitiveLogLocation, "_top");
+    public void addRootTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveLogLocation) {
+        Identifier bark = suffix(primitiveLogLocation, "_side");
+        Identifier rings = suffix(primitiveLogLocation, "_top");
 
         if (textureOverrides.containsKey(ROOTS_SIDE)) bark = textureOverrides.get(ROOTS_SIDE);
         if (textureOverrides.containsKey(ROOTS_TOP)) rings = textureOverrides.get(ROOTS_TOP);
@@ -974,8 +974,8 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         textureConsumer.accept("rings", rings);
     }
 
-    public List<ResourceLocation> topBranchTextureLocations(){
-        List<ResourceLocation> locations = new ArrayList<>();
+    public List<Identifier> topBranchTextureLocations(){
+        List<Identifier> locations = new ArrayList<>();
         if (getPrimitiveLog().isPresent()){
             locations.add(topBranchTextureLocation(getPrimitiveLog().get(), BRANCH_TOP));
         }
@@ -984,11 +984,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         }
         return locations;
     }
-    protected ResourceLocation topBranchTextureLocation(Block block, String key){
+    protected Identifier topBranchTextureLocation(Block block, String key){
         if (textureOverrides.containsKey(key)){
             return textureOverrides.get(key);
         } else {
-            ResourceLocation textureLoc = BuiltInRegistries.BLOCK.getKey(block);
+            Identifier textureLoc = BuiltInRegistries.BLOCK.getKey(block);
             textureLoc = surround(textureLoc, "block/", "_top");
             return textureLoc;
         }

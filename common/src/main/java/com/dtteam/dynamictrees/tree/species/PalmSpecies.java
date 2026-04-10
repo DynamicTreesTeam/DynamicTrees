@@ -16,7 +16,7 @@ import com.dtteam.dynamictrees.tree.family.PalmFamily;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -32,7 +32,7 @@ import java.util.Set;
 public class PalmSpecies extends Species {
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(PalmSpecies::new);
 
-    public PalmSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+    public PalmSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
         if (!(family instanceof PalmFamily)) {
             LogManager.getLogger().warn("Family {} for palm species {} is not of type {}", family.getRegistryName(), getRegistryName(), PalmFamily.class);

@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.api.configuration;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.google.common.collect.Sets;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -27,7 +27,7 @@ public abstract class ConfigurableRegistryEntry<T extends ConfigurableRegistryEn
         this.defaultConfiguration = this.createDefaultConfiguration();
     }
 
-    protected ConfigurableRegistryEntry(ResourceLocation registryName) {
+    protected ConfigurableRegistryEntry(Identifier registryName) {
         super(registryName);
         this.registerProperties();
 

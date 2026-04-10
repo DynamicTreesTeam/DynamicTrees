@@ -5,14 +5,14 @@ import com.dtteam.dynamictrees.systems.genfeature.context.*;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class RandomPredicateGenFeature extends GenFeature {
 
     public static final ConfigurationProperty<Boolean> ONLY_WORLD_GEN = ConfigurationProperty.bool("only_world_gen");
     public static final ConfigurationProperty<GenFeatureConfiguration> GEN_FEATURE = ConfigurationProperty.property("gen_feature", GenFeatureConfiguration.class);
 
-    public RandomPredicateGenFeature(ResourceLocation registryName) {
+    public RandomPredicateGenFeature(Identifier registryName) {
         super(registryName);
     }
 

@@ -14,7 +14,7 @@ import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.dtteam.dynamictrees.utility.CoordUtils.Surround;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
@@ -33,7 +33,7 @@ public class RootsGenFeature extends GenFeature {
 
     private final SimpleVoxmap[] rootMaps;
 
-    public RootsGenFeature(ResourceLocation registryName) {
+    public RootsGenFeature(Identifier registryName) {
         super(registryName);
 
         this.rootMaps = createRootMaps();

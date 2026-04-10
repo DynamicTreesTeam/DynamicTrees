@@ -3,9 +3,9 @@ package com.dtteam.dynamictrees.model.loader;
 import com.dtteam.dynamictrees.model.geometry.PalmLeavesModelGeometry;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +30,7 @@ public class PalmLeavesModelLoader implements IGeometryLoader<PalmLeavesModelGeo
         return new PalmLeavesModelGeometry(getTextureLocation(textures, FROND), frondType);
     }
 
-    protected ResourceLocation getTextureLocation (final JsonObject textureObject, final String textureElement) {
+    protected Identifier getTextureLocation (final JsonObject textureObject, final String textureElement) {
         try {
             return this.getResLocOrThrow(this.getOrThrow(textureObject, textureElement));
         } catch (final RuntimeException e) {
@@ -47,10 +47,10 @@ public class PalmLeavesModelLoader implements IGeometryLoader<PalmLeavesModelGeo
         return modelContents.getAsJsonObject(TEXTURES);
     }
 
-    protected ResourceLocation getResLocOrThrow(final String resLocStr) {
+    protected Identifier getResLocOrThrow(final String resLocStr) {
         try {
-            return ResourceLocation.parse(resLocStr);
-        } catch (ResourceLocationException e) {
+            return Identifier.parse(resLocStr);
+        } catch (IdentifierException e) {
             throw new RuntimeException(e);
         }
     }

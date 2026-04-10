@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.LevelAccessor;
@@ -72,7 +72,7 @@ public class SubterraneanGroundFinder implements GroundFinder {
         for (int y : layers) {
             BlockPos pos = new BlockPos(start.getX(), y, start.getZ());
             //We only want positions for underground biomes and underground dimensions
-            if (level.dimensionType().hasCeiling() || level.getBiome(pos).is(TagKey.create(Registries.BIOME, ResourceLocation.parse("c:is_underground"))))
+            if (level.dimensionType().hasCeiling() || level.getBiome(pos).is(TagKey.create(Registries.BIOME, Identifier.parse("c:is_underground"))))
                 positions.add(pos);
         }
 

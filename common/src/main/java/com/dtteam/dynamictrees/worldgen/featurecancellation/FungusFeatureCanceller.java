@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.worldgen.featurecancellation;
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
@@ -17,14 +17,14 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 public class FungusFeatureCanceller<T extends FeatureConfiguration> extends FeatureCanceller {
     private final Class<T> fungusFeatureConfigClass;
 
-    public FungusFeatureCanceller(final ResourceLocation registryName, final Class<T> fungusFeatureConfigClass) {
+    public FungusFeatureCanceller(final Identifier registryName, final Class<T> fungusFeatureConfigClass) {
         super(registryName);
         this.fungusFeatureConfigClass = fungusFeatureConfigClass;
     }
 
     @Override
     public boolean shouldCancel(ConfiguredFeature<?, ?> configuredFeature, BiomePropertySelectors.NormalFeatureCancellation featureCancellations) {
-        final ResourceLocation featureRegistryName = BuiltInRegistries.FEATURE.getKey(configuredFeature.feature());
+        final Identifier featureRegistryName = BuiltInRegistries.FEATURE.getKey(configuredFeature.feature());
 
         return featureRegistryName != null && this.fungusFeatureConfigClass.isInstance(configuredFeature.config()) &&
                 featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace());

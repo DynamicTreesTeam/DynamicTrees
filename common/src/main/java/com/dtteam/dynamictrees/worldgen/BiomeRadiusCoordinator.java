@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.worldgen;
 
 import com.dtteam.dynamictrees.api.worldgen.RadiusCoordinator;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -17,11 +17,11 @@ public class BiomeRadiusCoordinator implements RadiusCoordinator {
 
     public PerlinSimplexNoise noiseGenerator;
     protected final LevelAccessor level;
-    protected final ResourceLocation dimensionName;
+    protected final Identifier dimensionName;
     protected int pass;
     protected Function<Integer, Integer> chunkMultipass;
 
-    public BiomeRadiusCoordinator(ResourceLocation dimensionName, LevelAccessor level) {
+    public BiomeRadiusCoordinator(Identifier dimensionName, LevelAccessor level) {
         this.noiseGenerator = new PerlinSimplexNoise(new WorldgenRandom(WorldgenRandom.Algorithm.LEGACY.newInstance(96)), new ArrayList<>(Collections.singletonList(1)));
         this.level = level;
         this.dimensionName = dimensionName;

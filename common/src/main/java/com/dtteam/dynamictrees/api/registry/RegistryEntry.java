@@ -5,7 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.function.Consumer;
@@ -17,14 +17,14 @@ import java.util.function.Consumer;
  */
 public abstract class RegistryEntry<T extends RegistryEntry<T>> {
 
-    private ResourceLocation registryName;
+    private Identifier registryName;
     private boolean valid = true;
     private boolean generateData;
 
     protected RegistryEntry() {
     }
 
-    protected RegistryEntry(ResourceLocation registryName) {
+    protected RegistryEntry(Identifier registryName) {
         this.registryName = registryName;
     }
 
@@ -122,7 +122,7 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     public void generateLangData(DTDataProvider.Language provider) {
     }
 
-    public final ResourceLocation getRegistryName() {
+    public final Identifier getRegistryName() {
         return this.registryName;
     }
 
@@ -139,7 +139,7 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
     }
 
     @SuppressWarnings("unchecked")
-    public final T setRegistryName(final ResourceLocation registryName) {
+    public final T setRegistryName(final Identifier registryName) {
         this.registryName = registryName;
         return (T) this;
     }

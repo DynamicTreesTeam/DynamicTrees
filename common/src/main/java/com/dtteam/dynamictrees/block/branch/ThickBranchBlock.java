@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -34,7 +34,7 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
 
     protected static final VoxelShape[] trunkShapes = new VoxelShape[MAX_RADIUS_THICK];
 
-    public ThickBranchBlock(ResourceLocation name, Properties properties) {
+    public ThickBranchBlock(Identifier name, Properties properties) {
         super(name, properties, RADIUS_DOUBLE, MAX_RADIUS_THICK);
         precomputeTrunkShapes();
     }

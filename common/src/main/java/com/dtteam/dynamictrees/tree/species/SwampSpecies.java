@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class SwampSpecies extends Species {
 
@@ -18,7 +18,7 @@ public class SwampSpecies extends Species {
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(SwampSpecies::new);
 
-    public SwampSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+    public SwampSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
     }
 

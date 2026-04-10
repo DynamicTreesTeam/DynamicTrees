@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.provider.DTLangProvider;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemNameBlockItem;
@@ -47,7 +47,7 @@ public class LeavesPropertiesLangGenerator implements Generator<DTDataProvider.L
         provider.addBlock(() -> entry, blah.orElse(checkReplace(BuiltInRegistries.BLOCK.getKey(entry))));
     }
 
-    protected String checkReplace(ResourceLocation registryObject) {
+    protected String checkReplace(Identifier registryObject) {
         return Arrays.stream(registryObject.getPath().split("_"))
                 .map(StringUtils::capitalize)
                 .filter(s -> !s.isBlank())

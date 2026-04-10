@@ -20,7 +20,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -88,7 +88,7 @@ public class CommonEventHandler {
         }
 
         @Override
-        public ResourceLocation getFabricId() {
+        public Identifier getFabricId() {
             return DynamicTrees.location(DynamicTrees.MOD_ID);
         }
     }

@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.api.resource.loading.ApplierResourceLoader;
 import com.dtteam.dynamictrees.api.resource.loading.ResourceLoader;
 import com.dtteam.dynamictrees.utility.CommonCollectors;
 import com.google.common.collect.Lists;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -109,31 +109,31 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
     }
 
     @Override
-    public Optional<Resource> getResource(final ResourceLocation location) {
+    public Optional<Resource> getResource(final Identifier location) {
         final List<Resource> resources = this.getResourceStack(location);
         return resources.isEmpty() ? Optional.empty() : Optional.of(resources.getLast());
     }
 
     @Override
-    public Resource getResourceOrThrow(ResourceLocation location) throws FileNotFoundException {
+    public Resource getResourceOrThrow(Identifier location) throws FileNotFoundException {
         return getResource(location).orElseThrow(() -> new FileNotFoundException("Could not find path '" + location + "' in any tree packs."));
     }
 
     @Override
-    public List<Resource> getResourceStack(ResourceLocation path) {
+    public List<Resource> getResourceStack(Identifier path) {
         return this.resourcePacks.stream()
                 .filter(resourcePack -> resourcePack.hasResource(path))
                 .map(resourcePack -> getResource(path, resourcePack))
                 .toList();
     }
 
-    private Resource getResource(ResourceLocation path, TreeResourcePack resourcePack) {
+    private Resource getResource(Identifier path, TreeResourcePack resourcePack) {
         return new Resource(resourcePack, resourcePack.getResource(path));
     }
 
     @Override
-    public Map<ResourceLocation, Resource> listResources(String path, Predicate<ResourceLocation> filter) {
-        Map<ResourceLocation, Resource> resources = new LinkedHashMap<>();
+    public Map<Identifier, Resource> listResources(String path, Predicate<Identifier> filter) {
+        Map<Identifier, Resource> resources = new LinkedHashMap<>();
 
         for (TreeResourcePack pack : this.resourcePacks) {
             for (String namespace : pack.getNamespaces()) {
@@ -151,8 +151,8 @@ public final class TreesResourceManager implements ResourceManager, TreeResource
     }
 
     @Override
-    public Map<ResourceLocation, List<Resource>> listResourceStacks(String path, Predicate<ResourceLocation> filter) {
-        Map<ResourceLocation, List<Resource>> resources = new LinkedHashMap<>();
+    public Map<Identifier, List<Resource>> listResourceStacks(String path, Predicate<Identifier> filter) {
+        Map<Identifier, List<Resource>> resources = new LinkedHashMap<>();
 
         for (TreeResourcePack pack : this.resourcePacks) {
             for (String namespace : pack.getNamespaces()) {

@@ -8,7 +8,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 
 import java.util.function.Function;
@@ -19,7 +19,7 @@ import java.util.function.Function;
  * @author Harley O'Connor
  */
 public class SurfaceRootBlockModelGeometry extends BranchBlockModelGeometry {
-    public SurfaceRootBlockModelGeometry(final ResourceLocation barkResLoc) {
+    public SurfaceRootBlockModelGeometry(final Identifier barkResLoc) {
         super(barkResLoc, null, null, false);
     }
 

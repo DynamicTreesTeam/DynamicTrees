@@ -9,7 +9,7 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.InventoryMenu;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,12 +19,12 @@ import java.util.function.Function;
 
 public class BranchBlockUnbakedModel implements UnbakedModel {
 
-    protected final ResourceLocation barkTextureLocation;
-    protected final ResourceLocation ringsTextureLocation;
-    protected final ResourceLocation familyName;
+    protected final Identifier barkTextureLocation;
+    protected final Identifier ringsTextureLocation;
+    protected final Identifier familyName;
     protected final boolean forceThickness;
 
-    public BranchBlockUnbakedModel(ResourceLocation barkTextureLocation, ResourceLocation ringsTextureLocation, @Nullable ResourceLocation familyName, boolean forceThickness) {
+    public BranchBlockUnbakedModel(Identifier barkTextureLocation, Identifier ringsTextureLocation, @Nullable Identifier familyName, boolean forceThickness) {
         this.barkTextureLocation = barkTextureLocation;
         this.ringsTextureLocation = ringsTextureLocation;
         this.familyName = familyName;
@@ -32,12 +32,12 @@ public class BranchBlockUnbakedModel implements UnbakedModel {
     }
 
     @Override
-    public Collection<ResourceLocation> getDependencies() {
+    public Collection<Identifier> getDependencies() {
         return Collections.emptyList();
     }
 
     @Override
-    public void resolveParents(Function<ResourceLocation, UnbakedModel> resolver) {
+    public void resolveParents(Function<Identifier, UnbakedModel> resolver) {
     }
 
     @Override
@@ -49,7 +49,7 @@ public class BranchBlockUnbakedModel implements UnbakedModel {
         boolean useThickModel = forceThickness || (family != null && family.isThick());
 
         if (useThickModel) {
-            ResourceLocation thickRingsLocation = ringsTextureLocation.withSuffix("_thick");
+            Identifier thickRingsLocation = ringsTextureLocation.withSuffix("_thick");
             TextureAtlasSprite thickRingsSprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, thickRingsLocation));
             return new ThickBranchBlockBakedModel(barkSprite, ringsSprite, thickRingsSprite);
         }

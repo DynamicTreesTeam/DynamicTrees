@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.systems.genfeature.GenFeatures;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import static com.dtteam.dynamictrees.utility.ResourceLocationUtils.surround;
+import static com.dtteam.dynamictrees.utility.IdentifierUtils.surround;
 
 /**
  * @author Harley O'Connor
@@ -34,7 +34,7 @@ public class NetherFungusSpecies extends Species {
 
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(NetherFungusSpecies::new);
 
-    public NetherFungusSpecies(ResourceLocation name, Family family, LeavesProperties leavesProperties) {
+    public NetherFungusSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
         if (!(family instanceof NetherFungusFamily)) {
             LogManager.getLogger().warn("Family {} for nether fungus species {} is not of type {}", family.getRegistryName(), getRegistryName(), NetherFungusFamily.class);
@@ -94,9 +94,9 @@ public class NetherFungusSpecies extends Species {
     }
 
     @Override
-    public void addSaplingTextures(BiConsumer<String, ResourceLocation> textureConsumer,
-                                   ResourceLocation leavesTextureLocation, ResourceLocation barkTextureLocation) {
-        ResourceLocation capLoc = getTexturePath(SAPLING).orElse(surround(this.getRegistryName(), "block/", "_cap"));
+    public void addSaplingTextures(BiConsumer<String, Identifier> textureConsumer,
+                                   Identifier leavesTextureLocation, Identifier barkTextureLocation) {
+        Identifier capLoc = getTexturePath(SAPLING).orElse(surround(this.getRegistryName(), "block/", "_cap"));
         textureConsumer.accept("stem", capLoc);
         textureConsumer.accept("cap", capLoc);
     }

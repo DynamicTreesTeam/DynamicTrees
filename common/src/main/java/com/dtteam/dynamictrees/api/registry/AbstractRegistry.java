@@ -2,10 +2,10 @@ package com.dtteam.dynamictrees.api.registry;
 
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.utility.CommonCollectors;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
     protected final String name;
 
     /**
-     * The "null" value. This is what will be returned by {@link #get(ResourceLocation)} if the entry was not found in
+     * The "null" value. This is what will be returned by {@link #get(Identifier)} if the entry was not found in
      * the registry.
      */
     protected final V nullValue;
@@ -86,11 +86,11 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
         this.name = name;
         this.nullValue = nullValue.nullEntry();
         this.clearable = clearable;
-        this.getterCodec = ResourceLocation.CODEC.comapFlatMap(this::getAsDataResult, RegistryEntry::getRegistryName);
+        this.getterCodec = Identifier.CODEC.comapFlatMap(this::getAsDataResult, RegistryEntry::getRegistryName);
     }
 
     protected void assertValid(final V value) {
-        final ResourceLocation registryName = value.getRegistryName();
+        final Identifier registryName = value.getRegistryName();
 
         if (this.locked) {
             throw new RuntimeException(this.getErrorMessage(value, registryName, " to locked registry "));
@@ -101,7 +101,7 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
         }
     }
 
-    protected String getErrorMessage(final V value, final ResourceLocation registryName, final String message) {
+    protected String getErrorMessage(final V value, final Identifier registryName, final String message) {
         return "Tried to register '" + value + "' under registry name '" + registryName + "' " + message + " '" + this.name + "'.";
     }
 
@@ -121,47 +121,47 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
 
     @Override
     public final Optional<V> getOptional(final String registryName) {
-        return this.getOptional(ResourceLocation.tryParse(registryName));
+        return this.getOptional(Identifier.tryParse(registryName));
     }
 
     @Override
-    public final V get(final ResourceLocation registryName) {
+    public final V get(final Identifier registryName) {
         return this.getOptional(registryName).orElse(this.nullValue);
     }
 
     @Override
     public final V get(final String registryName) {
-        return this.get(ResourceLocation.tryParse(registryName));
+        return this.get(Identifier.tryParse(registryName));
     }
 
     @Override
-    public final DataResult<V> getAsDataResult(final ResourceLocation registryName) {
-        return this.getOptional(ResourceLocationUtils.parseDTLocation(registryName)).map(DataResult::success)
+    public final DataResult<V> getAsDataResult(final Identifier registryName) {
+        return this.getOptional(IdentifierUtils.parseDTLocation(registryName)).map(DataResult::success)
                 .orElse(DataResult.error(() -> "Could not find " + this.name + " '" + registryName + "'."));
     }
 
     @Override
-    public final boolean has(final ResourceLocation registryName) {
+    public final boolean has(final Identifier registryName) {
         return this.getAll().stream()
                 .map(RegistryEntry::getRegistryName)
                 .anyMatch(registryName::equals);
     }
 
     @Override
-    public final Optional<V> getOptional(final ResourceLocation registryName) {
+    public final Optional<V> getOptional(final Identifier registryName) {
         return this.getAll().stream()
                 .filter(entry -> entry.getRegistryName().equals(registryName))
                 .findFirst();
     }
 
     /**
-     * Gets all the registry name {@link ResourceLocation} objects of all the entries currently in this {@link
+     * Gets all the registry name {@link Identifier} objects of all the entries currently in this {@link
      * Registry}.
      *
      * @return The {@link Set} of registry names.
      */
     @Override
-    public final Set<ResourceLocation> getRegistryNames() {
+    public final Set<Identifier> getRegistryNames() {
         return this.getAll().stream().map(RegistryEntry::getRegistryName).collect(Collectors.toSet());
     }
 
@@ -237,15 +237,15 @@ public abstract class AbstractRegistry<V extends RegistryEntry<V>> implements Re
 
     /**
      * Generates a runnable that runs the given {@link Consumer} only if the {@link RegistryEntry} obtained from the
-     * given {@link ResourceLocation} is valid (not null), and if it's not runs the given {@link Runnable}.
+     * given {@link Identifier} is valid (not null), and if it's not runs the given {@link Runnable}.
      *
-     * @param registryName The {@link ResourceLocation} of the {@link RegistryEntry}.
+     * @param registryName The {@link Identifier} of the {@link RegistryEntry}.
      * @param consumer     The {@link Consumer} to accept if the {@link RegistryEntry} is vaid.
      * @param elseRunnable A {@link Runnable} to run if the entry is not valid.
      * @return The generated {@link Runnable}.
      */
     @Override
-    public final Runnable generateIfValidRunnable(final ResourceLocation registryName, final Consumer<V> consumer, final Runnable elseRunnable) {
+    public final Runnable generateIfValidRunnable(final Identifier registryName, final Consumer<V> consumer, final Runnable elseRunnable) {
         return () -> {
             if (!this.get(registryName).ifValid(consumer)) {
                 elseRunnable.run();

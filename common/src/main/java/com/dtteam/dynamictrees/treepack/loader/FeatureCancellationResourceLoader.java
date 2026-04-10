@@ -19,7 +19,7 @@ import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.dtteam.dynamictrees.worldgen.featurecancellation.FeatureCancellationRegistry;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import org.apache.logging.log4j.LogManager;
@@ -45,7 +45,7 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
     public static final String CANCELLATION_APPLIERS = "cancellations";
     public static final String CANCELLERS = "cancellers";
 
-    static boolean isCancellationFile(final ResourceLocation key) {
+    static boolean isCancellationFile(final Identifier key) {
         return key.getPath().equals(CANCELLATION_FILE);
     }
 
@@ -95,7 +95,7 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
         );
     }
 
-    private void readCancellers(final ResourceLocation location, final JsonElement json) {
+    private void readCancellers(final Identifier location, final JsonElement json) {
         LOGGER.debug("Reading cancellers from Json biome populator \"{}\".", location);
 
         try {
@@ -116,7 +116,7 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
         }
     }
 
-    private void readCancellersInSection(final ResourceLocation location, final JsonObject json)
+    private void readCancellersInSection(final Identifier location, final JsonObject json)
             throws DeserializationException, IgnoreThrowable {
 
         final Consumer<String> errorConsumer = error -> LOGGER.error("Error loading populator \"{}\": {}",
@@ -143,7 +143,7 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
     }
 
 
-    private PropertyApplierResult applyCanceller(ResourceLocation location,
+    private PropertyApplierResult applyCanceller(Identifier location,
                                                  Consumer<String> errorConsumer,
                                                  Consumer<String> warningConsumer, IDTBiomeHolderSet biomes,
                                                  JsonObject json) {
@@ -160,7 +160,7 @@ public class FeatureCancellationResourceLoader extends AbstractResourceLoader<It
         return PropertyApplierResult.success();
     }
 
-    private void applyCancellationAppliers(ResourceLocation location, JsonObject json, BiomePropertySelectors.FeatureCancellation cancellation) {
+    private void applyCancellationAppliers(Identifier location, JsonObject json, BiomePropertySelectors.FeatureCancellation cancellation) {
         this.cancellationAppliers.applyAll(new JsonMapWrapper(json), cancellation)
                 .forEachErrorWarning(
                         error -> LOGGER.error("Error whilst applying feature cancellations " +

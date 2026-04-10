@@ -5,17 +5,17 @@ import com.dtteam.dynamictrees.block.pod.PodBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
 public class WailaPodHandler implements IBlockComponentProvider {
-    private static final ResourceLocation POD_UID = DynamicTrees.location("pod");
+    private static final Identifier POD_UID = DynamicTrees.location("pod");
 
     /* Used to switch off component for cocoa, since Jade already supports this. */
-    public static final ResourceLocation COCOA = DynamicTrees.location("cocoa");
+    public static final Identifier COCOA = DynamicTrees.location("cocoa");
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
@@ -30,7 +30,7 @@ public class WailaPodHandler implements IBlockComponentProvider {
     }
 
     @Override
-    public ResourceLocation getUid() {
+    public Identifier getUid() {
         return POD_UID;
     }
 }

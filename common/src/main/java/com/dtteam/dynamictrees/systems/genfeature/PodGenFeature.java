@@ -12,7 +12,7 @@ import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,7 +25,7 @@ public class PodGenFeature extends GenFeature {
     public static final ConfigurationProperty<Integer> BLOCKS_PER_POD = ConfigurationProperty.integer("blocks_per_pod");
     public static final ConfigurationProperty<Integer> LOWEST_TRUNK_HEIGHT = ConfigurationProperty.integer("lowest_trunk_height");
 
-    public PodGenFeature(ResourceLocation registryName) {
+    public PodGenFeature(Identifier registryName) {
         super(registryName);
     }
 

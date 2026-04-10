@@ -8,7 +8,7 @@ import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.tree.species.NetherFungusSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -25,7 +25,7 @@ public class NetherFungusFamily extends Family {
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(NetherFungusFamily::new);
 
-    public NetherFungusFamily(ResourceLocation name) {
+    public NetherFungusFamily(Identifier name) {
         super(name);
     }
 

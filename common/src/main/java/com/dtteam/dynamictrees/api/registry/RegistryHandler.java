@@ -2,8 +2,8 @@ package com.dtteam.dynamictrees.api.registry;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
-import net.minecraft.resources.ResourceLocation;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +14,7 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     public static final ConcurrentRegistry<RegistryHandler> REGISTRY = new ConcurrentRegistry<>(RegistryHandler.class, Services.REGISTRY.newRegistryHandler(), true);
 
-    public RegistryHandler(final ResourceLocation modId) {
+    public RegistryHandler(final Identifier modId) {
         super(modId);
     }
 
@@ -33,7 +33,7 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
      * @return The {@link RegistryHandler} object.
      */
     public static RegistryHandler get(final String modId) {
-        return REGISTRY.get(ResourceLocation.fromNamespaceAndPath(modId, modId));
+        return REGISTRY.get(Identifier.fromNamespaceAndPath(modId, modId));
     }
 
     /**
@@ -50,16 +50,16 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
 
     /**
      * Ensures the given registry name is 'correct'. This will change the namespace to
-     * <code>dynamictrees</code> if the namespace for the given {@link ResourceLocation}
+     * <code>dynamictrees</code> if the namespace for the given {@link Identifier}
      * doesn't have a {@link RegistryHandler} registered, so that we don't register blocks or items to mod without a
      * {@link RegistryHandler} (non-add-on mods).
      *
-     * @param registryName The {@link ResourceLocation} registry name.
-     * @return The correct {@link ResourceLocation} registry name.
+     * @param registryName The {@link Identifier} registry name.
+     * @return The correct {@link Identifier} registry name.
      */
-    public static ResourceLocation correctRegistryName(ResourceLocation registryName) {
+    public static Identifier correctRegistryName(Identifier registryName) {
         if (!get(registryName.getNamespace()).isValid()) {
-            registryName = ResourceLocationUtils.namespace(registryName, DynamicTrees.MOD_ID);
+            registryName = IdentifierUtils.namespace(registryName, DynamicTrees.MOD_ID);
         }
         return registryName;
     }
@@ -67,12 +67,12 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
     /**
      * Adds a {@link Block} to be registered with the given registry name, for the namespace of that registry name.
      *
-     * @param registryName The {@link ResourceLocation} registry name to set for the block.
+     * @param registryName The {@link Identifier} registry name to set for the block.
      * @param blockSup The supplier of the {@link Block} object to register.
      * @param <T> The {@link Class} of the {@link Block}.
      * @return The supplier of the {@link Block}, allowing for this to be called in-line.
      */
-    public static <T extends Block> Supplier<T> addBlock(ResourceLocation registryName, Supplier<T> blockSup) {
+    public static <T extends Block> Supplier<T> addBlock(Identifier registryName, Supplier<T> blockSup) {
         registryName = correctRegistryName(registryName);
         return get(registryName.getNamespace()).putBlock(registryName, blockSup);
     }
@@ -80,24 +80,24 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
     /**
      * Adds an {@link Item} to be registered with the given registry name, for the namespace of that registry name.
      *
-     * @param registryName The {@link ResourceLocation} registry name to set for the block.
+     * @param registryName The {@link Identifier} registry name to set for the block.
      * @param itemSup The supplier of the {@link Item} object to register.
      * @param <T> The {@link Class} of the {@link Item}.
      * @return The supplier of the {@link Item}, allowing for this to be called in-line.
      */
-    public static <T extends Item> Supplier<T> addItem(ResourceLocation registryName, Supplier<T> itemSup) {
+    public static <T extends Item> Supplier<T> addItem(Identifier registryName, Supplier<T> itemSup) {
         registryName = correctRegistryName(registryName);
         return get(registryName.getNamespace()).putItem(registryName, itemSup);
     }
 
     @Nullable
-    public abstract Supplier<Block> getBlock(final ResourceLocation registryName);
+    public abstract Supplier<Block> getBlock(final Identifier registryName);
 
     @Nullable
-    public abstract Supplier<Item> getItem(final ResourceLocation registryName);
+    public abstract Supplier<Item> getItem(final Identifier registryName);
 
-    public abstract  <T extends Block> Supplier<T> putBlock(final ResourceLocation registryName, final Supplier<T> blockSup);
+    public abstract  <T extends Block> Supplier<T> putBlock(final Identifier registryName, final Supplier<T> blockSup);
 
-    public abstract  <T extends Item> Supplier<T> putItem(final ResourceLocation registryName, final Supplier<T> itemSup);
+    public abstract  <T extends Item> Supplier<T> putItem(final Identifier registryName, final Supplier<T> itemSup);
 
 }

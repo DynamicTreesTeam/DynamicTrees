@@ -17,7 +17,7 @@ import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
@@ -45,7 +45,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
     public static void setup() {
         concreteBlocks = Arrays.stream(DyeColor.values())
-                .map(color -> BuiltInRegistries.BLOCK.get(ResourceLocation.parse(color.getName() + "_concrete")))
+                .map(color -> BuiltInRegistries.BLOCK.get(Identifier.parse(color.getName() + "_concrete")))
                 .toArray(Block[]::new);
     }
 

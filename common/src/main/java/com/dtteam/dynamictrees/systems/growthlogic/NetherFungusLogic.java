@@ -8,14 +8,14 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public class NetherFungusLogic extends GrowthLogicKit {
 
     public static final ConfigurationProperty<Integer> MIN_CAP_HEIGHT = ConfigurationProperty.integer("min_cap_height");
 
-    public NetherFungusLogic(final ResourceLocation registryName) {
+    public NetherFungusLogic(final Identifier registryName) {
         super(registryName);
     }
 

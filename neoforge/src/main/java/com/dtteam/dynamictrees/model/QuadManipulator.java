@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -95,7 +95,7 @@ public class QuadManipulator {
     }
 
     @Nullable
-    public static ResourceLocation getModelTexture(BakedModel model, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter, BlockState state, Direction dir) {
+    public static Identifier getModelTexture(BakedModel model, Function<Identifier, TextureAtlasSprite> bakedTextureGetter, BlockState state, Direction dir) {
 
         float[] uvs = getSpriteUVFromBlockState(state, dir);
 
@@ -103,9 +103,9 @@ public class QuadManipulator {
             List<TextureAtlasSprite> sprites = new ArrayList<>();
 
             float closest = Float.POSITIVE_INFINITY;
-            ResourceLocation closestTex = ResourceLocation.parse("missingno");
+            Identifier closestTex = Identifier.parse("missingno");
             if (model != null) {
-                ResourceLocation tex = model.getParticleIcon(ModelData.EMPTY).contents().name();
+                Identifier tex = model.getParticleIcon(ModelData.EMPTY).contents().name();
                 TextureAtlasSprite tas = bakedTextureGetter.apply(tex);
                 float u = tas.getU(8);
                 float v = tas.getV(8);

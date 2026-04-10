@@ -4,11 +4,11 @@ import com.dtteam.dynamictrees.systems.growthlogic.context.DirectionManipulation
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class PalmGrowthLogic extends GrowthLogicKit {
 
-    public PalmGrowthLogic(ResourceLocation registryName) {
+    public PalmGrowthLogic(Identifier registryName) {
         super(registryName);
     }
 

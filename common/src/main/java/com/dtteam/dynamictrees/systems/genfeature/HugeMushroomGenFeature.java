@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.common.collect.Iterables;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -32,7 +32,7 @@ public class HugeMushroomGenFeature extends GenFeature {
 
     private int height = -1;
 
-    public HugeMushroomGenFeature(ResourceLocation registryName) {
+    public HugeMushroomGenFeature(Identifier registryName) {
         super(registryName);
     }
 

@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.client.ParticleHelper;
 import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -43,7 +43,7 @@ public class SpreadableSoilProperties extends SoilProperties {
         this.spread_item = item;
     }
 
-    public SpreadableSoilProperties(final ResourceLocation registryName) {
+    public SpreadableSoilProperties(final Identifier registryName) {
         super(null, registryName);
     }
 

@@ -8,7 +8,7 @@ import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
@@ -43,7 +43,7 @@ public class BushGenFeature extends GenFeature {
     public static final ConfigurationProperty<Integer> SECONDARY_LEAVES_CHANCE =
             ConfigurationProperty.integer("secondary_leaves_chance");
 
-    public BushGenFeature(ResourceLocation registryName) {
+    public BushGenFeature(Identifier registryName) {
         super(registryName);
     }
 

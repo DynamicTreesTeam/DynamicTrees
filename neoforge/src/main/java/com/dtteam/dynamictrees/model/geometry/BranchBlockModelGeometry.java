@@ -10,7 +10,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
 import org.jetbrains.annotations.Nullable;
@@ -30,17 +30,17 @@ import java.util.function.Function;
  */
 
 public class BranchBlockModelGeometry implements IUnbakedGeometry<BranchBlockModelGeometry> {
-    protected final Set<ResourceLocation> textures = new HashSet<>();
-    protected final ResourceLocation barkTextureLocation;
-    protected final ResourceLocation ringsTextureLocation;
+    protected final Set<Identifier> textures = new HashSet<>();
+    protected final Identifier barkTextureLocation;
+    protected final Identifier ringsTextureLocation;
     protected final boolean forceThickness;
 
-    protected ResourceLocation familyName;
+    protected Identifier familyName;
     protected Family family;
 
-    protected ResourceLocation thickRingsTextureLocation;
+    protected Identifier thickRingsTextureLocation;
 
-    public BranchBlockModelGeometry(@Nullable final ResourceLocation barkTextureLocation, @Nullable final ResourceLocation ringsTextureLocation, @Nullable final ResourceLocation familyName, final boolean forceThickness) {
+    public BranchBlockModelGeometry(@Nullable final Identifier barkTextureLocation, @Nullable final Identifier ringsTextureLocation, @Nullable final Identifier familyName, final boolean forceThickness) {
         this.barkTextureLocation = barkTextureLocation;
         this.ringsTextureLocation = ringsTextureLocation;
         this.familyName = familyName;
@@ -61,13 +61,13 @@ public class BranchBlockModelGeometry implements IUnbakedGeometry<BranchBlockMod
 
     private Family setFamily(String modelName) {
         if (this.family == null) {
-            this.family = Family.REGISTRY.get(this.setFamilyName(ResourceLocation.parse(modelName)));
+            this.family = Family.REGISTRY.get(this.setFamilyName(Identifier.parse(modelName)));
         }
         return this.family;
     }
-    private ResourceLocation setFamilyName(final ResourceLocation modelLocation) {
+    private Identifier setFamilyName(final Identifier modelLocation) {
         if (this.familyName == null) {
-            this.familyName = ResourceLocation.fromNamespaceAndPath(modelLocation.getNamespace(), modelLocation.getPath().replace("block/", "").replace("_branch", "").replace("stripped_", ""));
+            this.familyName = Identifier.fromNamespaceAndPath(modelLocation.getNamespace(), modelLocation.getPath().replace("block/", "").replace("_branch", "").replace("stripped_", ""));
         }
         return this.familyName;
     }

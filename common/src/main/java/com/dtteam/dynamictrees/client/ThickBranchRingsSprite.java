@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 
 public class ThickBranchRingsSprite extends SpriteContents {
@@ -15,7 +15,7 @@ public class ThickBranchRingsSprite extends SpriteContents {
             {0, 0, 1, 1}
     };
 
-    public ThickBranchRingsSprite(ResourceLocation name, SpriteContents originalSprite){
+    public ThickBranchRingsSprite(Identifier name, SpriteContents originalSprite){
         super(name, getFrameSize(originalSprite), processImage(originalSprite.originalImage), originalSprite.metadata());
     }
 

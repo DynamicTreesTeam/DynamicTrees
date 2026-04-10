@@ -6,8 +6,8 @@ import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
-import net.minecraft.resources.ResourceLocation;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
@@ -46,10 +46,10 @@ public final class AerialRootSoilGenerator extends SoilStateGenerator {
 
     private BlockModelBuilder soilModelBuilder(BlockStateProvider provider, SoilProperties input, int radius, String name, Block primitiveBlock, Block roots) {
         AerialRootsSoilProperties aerialInput = (AerialRootsSoilProperties)input;
-        ResourceLocation side = aerialInput.getFamily().getTexturePath(Family.BRANCH).orElse(provider.blockTexture(primitiveBlock));
-        ResourceLocation top = aerialInput.getFamily().getTexturePath(Family.BRANCH_TOP).orElse(ResourceLocationUtils.suffix(provider.blockTexture(primitiveBlock),"_top"));
-        ResourceLocation roots_side = aerialInput.getFamily().getTexturePath(Family.ROOTS_SIDE).orElse(ResourceLocationUtils.suffix(provider.blockTexture(roots), "_side"));
-        ResourceLocation roots_top = aerialInput.getFamily().getTexturePath(Family.ROOTS_SIDE).orElse(ResourceLocationUtils.suffix(provider.blockTexture(roots),"_top"));
+        Identifier side = aerialInput.getFamily().getTexturePath(Family.BRANCH).orElse(provider.blockTexture(primitiveBlock));
+        Identifier top = aerialInput.getFamily().getTexturePath(Family.BRANCH_TOP).orElse(IdentifierUtils.suffix(provider.blockTexture(primitiveBlock),"_top"));
+        Identifier roots_side = aerialInput.getFamily().getTexturePath(Family.ROOTS_SIDE).orElse(IdentifierUtils.suffix(provider.blockTexture(roots), "_side"));
+        Identifier roots_top = aerialInput.getFamily().getTexturePath(Family.ROOTS_SIDE).orElse(IdentifierUtils.suffix(provider.blockTexture(roots),"_top"));
         BlockModelBuilder builder = provider.models().withExistingParent(name+"_radius"+radius,  DynamicTrees.location("block/smartmodel/rooty/aerial_roots_radius"+ radius))
                 .texture("side", side)
                 .texture("end", top)

@@ -7,10 +7,10 @@ import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.dtteam.dynamictrees.deserialization.result.JsonResult;
 import com.dtteam.dynamictrees.deserialization.result.Result;
-import com.dtteam.dynamictrees.utility.ResourceLocationUtils;
+import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -38,7 +38,7 @@ public final class ConfiguredDeserializer<T extends Configuration<T, C>, C exten
         return JsonResult.forInput(jsonElement)
                 .mapIfType(String.class, (name, warningConsumer) -> {
                     final ConfigurationTemplate<T> template = getTemplate(
-                            ResourceLocationUtils.parse(name, DynamicTrees.MOD_ID)
+                            IdentifierUtils.parse(name, DynamicTrees.MOD_ID)
                     );
                     return template.apply(Properties.NONE).orElseThrow();
                 })
@@ -66,12 +66,12 @@ public final class ConfiguredDeserializer<T extends Configuration<T, C>, C exten
                 ((ConfigurableRegistryEntry<?, ?>) config.getConfigurable()).isValid());
     }
 
-    private ConfigurationTemplate<T> getTemplate(ResourceLocation templateName) throws DeserializationException {
+    private ConfigurationTemplate<T> getTemplate(Identifier templateName) throws DeserializationException {
         return this.templates.get(templateName)
                 .orElseThrow(() -> new DeserializationException("No such template \"" + templateName + "\" for \"" + configurableName + "\"."));
     }
 
-    private ResourceLocation getTemplateName(JsonObject json) throws DeserializationException {
+    private Identifier getTemplateName(JsonObject json) throws DeserializationException {
         return JsonHelper.getAsOptional(json, "name", JsonDeserializers.DT_RESOURCE_LOCATION)
                 .orElseThrow(() -> new DeserializationException("Configurable must state name of template to use."));
     }
