@@ -1,68 +1,48 @@
 package com.dtteam.dynamictrees.entity.render;
 
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
-import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
-import com.dtteam.dynamictrees.model.FallingTreeEntityModelTrackerCache;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.resources.Identifier;
 
-public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity> {
+public class FallingTreeRenderer extends EntityRenderer<FallingTreeEntity, FallingTreeRenderState> {
 
     public FallingTreeRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public Identifier getTextureLocation(FallingTreeEntity entity) {
-        return TextureAtlas.LOCATION_BLOCKS;
+    public FallingTreeRenderState createRenderState() {
+        return new FallingTreeRenderState();
     }
 
-    @Override
-    public void render(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
-
-        if (!entity.isClientBuilt() || !entity.shouldRender(entity.getX(), entity.getY(), entity.getX())) {
-            return;
-        }
-
-        RenderSystem.setShaderTexture(0, this.getTextureLocation(entity));
-
-        final FallingTreeEntityModel treeModel = FallingTreeEntityModelTrackerCache.getOrCreateModel(entity);
-        if (treeModel == null) return;
-
-        poseStack.pushPose();
-
-        final VertexConsumer vertexBuilder = bufferSource.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity)));
-
-//		if (entity.onFire) {
-//			renderFire(poseStack, vertexBuilder);
-//		}
-
-        entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTick, poseStack);
-
-        treeModel.renderToBuffer(poseStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1);
-
-        poseStack.popPose();
-    }
-
-//	private void renderFire(MatrixStack matrixStack, IVertexBuilder buffer) {
-//		matrixStack.push();
-//		matrixStack.translate(-0.5f, 0.0f, -0.5f);
-//		BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-//		BlockState fire = Blocks.FIRE.getDefaultState();
-//		IBakedModel model = dispatcher.getModelForState(fire);
+//    @Override
+//    public Identifier getTextureLocation(FallingTreeEntity entity) {
+//        return TextureAtlas.LOCATION_BLOCKS;
+//    }
 //
-//		drawBakedQuads(QuadManipulator.getQuads(model, fire, EmptyModelData.INSTANCE), matrixStack,255, 0xFFFFFFFF);
-//		matrixStack.pop();
-//	}
+//    @Override
+//    public void render(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+//        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+//
+//        if (!entity.isClientBuilt() || !entity.shouldRender(entity.getX(), entity.getY(), entity.getX())) {
+//            return;
+//        }
+//
+//        RenderSystem.setShaderTexture(0, this.getTextureLocation(entity));
+//
+//        final FallingTreeEntityModel treeModel = FallingTreeEntityModelTrackerCache.getOrCreateModel(entity);
+//        if (treeModel == null) return;
+//
+//        poseStack.pushPose();
+//
+//        final VertexConsumer vertexBuilder = bufferSource.getBuffer(RenderTypes.entityCutout(this.getTextureLocation(entity)));
+//
+//        entity.currentAnimationHandler.renderTransform(entity, entityYaw, partialTick, poseStack);
+//
+//        treeModel.renderToBuffer(poseStack, vertexBuilder, packedLight, OverlayTexture.NO_OVERLAY, 1);
+//
+//        poseStack.popPose();
+//    }
 
 }
 

@@ -4,13 +4,14 @@ import com.dtteam.dynamictrees.entity.LingeringEffectorEntity;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 
 /**
  * @author Harley O'Connor
  */
-public class LingeringEffectorRenderer extends EntityRenderer<LingeringEffectorEntity> {
+public class LingeringEffectorRenderer extends EntityRenderer<LingeringEffectorEntity, EntityRenderState> {
 
     public LingeringEffectorRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager);
@@ -22,8 +23,13 @@ public class LingeringEffectorRenderer extends EntityRenderer<LingeringEffectorE
     }
 
     @Override
-    public Identifier getTextureLocation(LingeringEffectorEntity entity) {
-        return MissingTextureAtlasSprite.getLocation();
+    public EntityRenderState createRenderState() {
+        return new EntityRenderState();
     }
+
+//    @Override
+//    public Identifier getTextureLocation(LingeringEffectorEntity entity) {
+//        return MissingTextureAtlasSprite.getLocation();
+//    }
 
 }

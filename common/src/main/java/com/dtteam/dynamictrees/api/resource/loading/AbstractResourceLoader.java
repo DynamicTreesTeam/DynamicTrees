@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.api.resource.loading;
 
 import com.dtteam.dynamictrees.api.resource.ResourceAccessor;
 import com.dtteam.dynamictrees.api.resource.loading.preparation.ResourcePreparer;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.concurrent.CompletableFuture;
