@@ -14,22 +14,22 @@ public final class DTLootParameterSets {
 
     public static final ContextKeySet LEAVES = register("leaves", builder ->
             builder.required(LootContextParams.BLOCK_STATE)
-                    .required(DTContextKeys.SPECIES)
-                    .required(DTContextKeys.SEASONAL_SEED_DROP_FACTOR)
+                    .required(DTLootContextParams.SPECIES)
+                    .required(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR)
                     .required(LootContextParams.TOOL)
                     .optional(LootContextParams.EXPLOSION_RADIUS)
     );
 
     public static final ContextKeySet VOLUNTARY = register("voluntary", builder ->
             builder.required(LootContextParams.BLOCK_STATE)
-                    .required(DTContextKeys.SEASONAL_SEED_DROP_FACTOR)
-                    .required(DTContextKeys.FERTILITY)
+                    .required(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR)
+                    .required(DTLootContextParams.FERTILITY)
     );
 
     public static final ContextKeySet BRANCHES = register("branches", builder ->
             builder.required(LootContextParams.TOOL)
-                    .required(DTContextKeys.SPECIES)
-                    .required(DTContextKeys.VOLUME)
+                    .required(DTLootContextParams.SPECIES)
+                    .required(DTLootContextParams.VOLUME)
                     .optional(LootContextParams.EXPLOSION_RADIUS)
     );
 

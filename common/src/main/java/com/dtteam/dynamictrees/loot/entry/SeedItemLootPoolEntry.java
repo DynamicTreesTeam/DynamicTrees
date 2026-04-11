@@ -1,13 +1,11 @@
 package com.dtteam.dynamictrees.loot.entry;
 
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
-import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -31,13 +29,18 @@ public final class SeedItemLootPoolEntry extends LootPoolSingletonContainer {
     }
 
     @Override
-    public LootPoolEntryType getType() {
-        return DTRegistries.SEED_ITEM.get();
+    public MapCodec<? extends LootPoolSingletonContainer> codec() {
+        return CODEC;
     }
+
+    //    @Override
+//    public LootPoolEntryType getType() {
+//        return DTRegistries.SEED_ITEM.get();
+//    }
 
     @Override
     protected void createItemStack(Consumer<ItemStack> stackConsumer, LootContext context) {
-        final Species species = context.getParamOrNull(DTLootContextParams.SPECIES);
+        final Species species = context.getOptionalParameter(DTLootContextParams.SPECIES);
         assert species != null;
         stackConsumer.accept(species.shouldDropSeeds() ? species.getSeedStack(1) : ItemStack.EMPTY);
     }

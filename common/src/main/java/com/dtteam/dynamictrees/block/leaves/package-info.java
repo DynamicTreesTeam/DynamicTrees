@@ -1,4 +1,4 @@
 @MethodsReturnNonnullByDefault
 package com.dtteam.dynamictrees.block.leaves;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;

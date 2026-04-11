@@ -9,7 +9,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import java.util.List;
@@ -28,13 +27,18 @@ public final class MultiplyByLogsCount extends LootItemConditionalFunction {
     }
 
     @Override
-    public LootItemFunctionType<? extends LootItemConditionalFunction> getType() {
-        return DTRegistries.MULTIPLY_LOGS_COUNT.get();
+    public MapCodec<? extends LootItemConditionalFunction> codec() {
+        return CODEC;
     }
+
+    //    @Override
+//    public LootItemFunctionType<? extends LootItemConditionalFunction> getType() {
+//        return DTRegistries.MULTIPLY_LOGS_COUNT.get();
+//    }
 
     @Override
     protected ItemStack run(ItemStack stack, LootContext context) {
-        final Integer volume = context.getParamOrNull(DTLootContextParams.VOLUME);
+        final Integer volume = context.getOptionalParameter(DTLootContextParams.VOLUME);
         assert volume != null;
         stack.setCount(stack.getCount() * (int) Math.floor((float) volume / NetVolumeNode.Volume.VOXELSPERLOG));
         return stack;

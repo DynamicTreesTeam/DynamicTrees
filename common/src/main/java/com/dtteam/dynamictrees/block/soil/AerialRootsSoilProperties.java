@@ -30,9 +30,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -127,11 +125,11 @@ public class AerialRootsSoilProperties extends SoilProperties {
         }
 
         @Override
-        public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
-            if (stateIn.getValue(WATERLOGGED)) {
-                level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
+            if (state.getValue(WATERLOGGED)) {
+                ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
             }
-            return super.updateShape(stateIn, facing, facingState, level, currentPos, facingPos);
+            return super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
         }
 
         @Override
@@ -204,11 +202,11 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
         @Override
         public void updateTree(BlockState rootyState, Level level, BlockPos rootPos, RandomSource random, boolean natural) {
-            int radOld = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getNormal()));
+            int radOld = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getUnitVec3i()));
 
             super.updateTree(rootyState, level, rootPos, random, natural);
 
-            int radNew = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getNormal()));
+            int radNew = TreeHelper.getRadius(level, rootPos.offset(getTrunkDirection(level, rootPos).getUnitVec3i()));
             //If the radius was updated, tick the root block
             if (radOld != radNew) level.scheduleTick(rootPos, this, 1);
         }
@@ -236,7 +234,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
         @Override
         public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-            if (!level.isClientSide)
+            if (!level.isClientSide())
                 this.dropWholeTree(level, pos, player, FallingTreeEntity.DestroyType.HARVEST);
             return level.isClientSide() ? level.setBlock(pos, fluid.createLegacyBlock(), 11) : level.removeBlock(pos, false);
         }

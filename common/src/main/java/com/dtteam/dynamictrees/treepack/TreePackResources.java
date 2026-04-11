@@ -1,12 +1,12 @@
 package com.dtteam.dynamictrees.treepack;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.FileUtil;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.resources.IoSupplier;
+import net.minecraft.util.FileUtil;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 

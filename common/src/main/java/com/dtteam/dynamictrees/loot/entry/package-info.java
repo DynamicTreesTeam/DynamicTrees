@@ -1,4 +1,4 @@
 @MethodsReturnNonnullByDefault
 package com.dtteam.dynamictrees.loot.entry;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;

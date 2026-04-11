@@ -14,6 +14,4 @@ public abstract class BiomeGenSettingsBuilderWrapper {
 
     public abstract List<Holder<PlacedFeature>> getFeatures(GenerationStep.Decoration stage);
 
-    public abstract List<Holder<ConfiguredWorldCarver<?>>> getCarvers(GenerationStep.Carving stage);
-
 }

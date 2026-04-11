@@ -143,7 +143,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     public BlockBehaviour.Properties getDefaultBlockProperties(MapColor mapColor) {
         return BlockBehaviour.Properties.of()
                 .mapColor(mapColor)
-                .noCollission()
+                .noCollision()
                 .sound(SoundType.CROP)
                 .randomTicks()
                 .strength(0.3F);

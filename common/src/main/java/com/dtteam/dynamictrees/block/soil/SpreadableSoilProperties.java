@@ -9,7 +9,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -81,7 +81,7 @@ public class SpreadableSoilProperties extends SoilProperties {
         }
 
         @Override
-        protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
             SpreadableSoilProperties properties = getSoilProperties();
             if (properties.spread_item != null) {
                 ItemStack handStack = player.getItemInHand(hand);
@@ -96,7 +96,7 @@ public class SpreadableSoilProperties extends SoilProperties {
                     }
                     if (!foundBlocks.isEmpty()) {
                         if (!level.isClientSide()) {
-                            int blockInt = level.random.nextInt(foundBlocks.size());
+                            int blockInt = level.getRandom().nextInt(foundBlocks.size());
                             this.getRootyBlock(foundBlocks.get(blockInt)).ifPresent(rootyBlock ->
                                     level.setBlock(pos, rootyBlock.defaultBlockState(), 3)
                             );
@@ -104,8 +104,8 @@ public class SpreadableSoilProperties extends SoilProperties {
                         if (!player.isCreative()) {
                             handStack.shrink(1);
                         }
-                        ParticleHelper.spawnParticles(level, ParticleTypes.HAPPY_VILLAGER, pos.above(), 2 + level.random.nextInt(5), level.random);
-                        return ItemInteractionResult.SUCCESS;
+                        ParticleHelper.spawnParticles(level, ParticleTypes.HAPPY_VILLAGER, pos.above(), 2 + level.getRandom().nextInt(5), level.getRandom());
+                        return InteractionResult.SUCCESS;
                     }
                 }
             }
@@ -117,7 +117,7 @@ public class SpreadableSoilProperties extends SoilProperties {
             super.randomTick(state, level, pos, random);
             SpreadableSoilProperties properties = getSoilProperties();
             //this is a similar behaviour to vanilla grass spreading but inverted to be handled by the dirt block
-            if (!level.isClientSide && properties.required_light != null) {
+            if (!level.isClientSide() && properties.required_light != null) {
                 if (!ChunkTreeHelper.canCheckSurroundings(level, pos, 3)) {
                     return; // Forge: prevent loading unloaded chunks when checking neighbor's light and spreading
                 }
@@ -134,7 +134,7 @@ public class SpreadableSoilProperties extends SoilProperties {
 
                         for (SoilProperties spreadable : properties.spreadable_soils) {
                             SoilBlock block = spreadable.getBlock().orElse(null);
-                            if (block != null && (thatState.getBlock() == spreadable.getPrimitiveSoilBlock() || thatState.getBlock() == block) && level.getMaxLocalRawBrightness(pos.above()) >= properties.required_light && thatStateUp.getLightBlock(level, thatPos.above()) <= 2) {
+                            if (block != null && (thatState.getBlock() == spreadable.getPrimitiveSoilBlock() || thatState.getBlock() == block) && level.getMaxLocalRawBrightness(pos.above()) >= properties.required_light && thatStateUp.getLightEmission() <= 2) {
                                 if (state.hasProperty(FERTILITY)) {
                                     level.setBlockAndUpdate(pos, block.defaultBlockState().setValue(FERTILITY, state.getValue(FERTILITY)));
                                 }

@@ -9,7 +9,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -22,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -85,13 +85,13 @@ public class PottedSaplingBlock extends BaseEntityBlock {
     ///////////////////////////////////////////
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         final Species species = this.getSpecies(level, pos);
-        if (!species.isValid()) return ItemInteractionResult.FAIL;
+        if (!species.isValid()) return InteractionResult.FAIL;
 
         removeSaplingFromPot(stack, species, player, level, pos);
 
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -101,7 +101,7 @@ public class PottedSaplingBlock extends BaseEntityBlock {
 
         removeSaplingFromPot(ItemStack.EMPTY, species, player, level, pos);
 
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.SUCCESS;
     }
 
     // Unlike a regular flower pot this is only used to eject the contents.
@@ -129,7 +129,7 @@ public class PottedSaplingBlock extends BaseEntityBlock {
      * Worse implementation for Fabric, as there's no HitResult
      */
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         final Species species = this.getSpecies(level, pos);
         if (species.isValid()) {
             return species.getSeedStack(1);
@@ -137,32 +137,32 @@ public class PottedSaplingBlock extends BaseEntityBlock {
         return new ItemStack(Items.FLOWER_POT);
     }
 
-    /** NeoForge Override */
-    @SuppressWarnings("unused")
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
-        if (target.getType() == HitResult.Type.BLOCK && ((BlockHitResult) target).getDirection() == Direction.UP) {
-            final Species species = this.getSpecies(level, pos);
-            if (species.isValid()) {
-                return species.getSeedStack(1);
-            }
-        }
-
-        final BlockState potState = NullUtils.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
-                PottedSaplingBlockEntity::getPot, Blocks.AIR.defaultBlockState());
-
-        if (potState.getBlock() == Blocks.FLOWER_POT) {
-            return new ItemStack(Items.FLOWER_POT);
-        }
-
-        if (potState.getBlock() instanceof FlowerPotBlock) {
-            return new ItemStack(potState.getBlock(), 1);
-        }
-
-        return new ItemStack(Items.FLOWER_POT);
-    }
+//    /** NeoForge Override */
+//    @SuppressWarnings("unused")
+//    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+//        if (target.getType() == HitResult.Type.BLOCK && ((BlockHitResult) target).getDirection() == Direction.UP) {
+//            final Species species = this.getSpecies(level, pos);
+//            if (species.isValid()) {
+//                return species.getSeedStack(1);
+//            }
+//        }
+//
+//        final BlockState potState = NullUtils.applyIfNonnull(this.getTileEntityPottedSapling(level, pos),
+//                PottedSaplingBlockEntity::getPot, Blocks.AIR.defaultBlockState());
+//
+//        if (potState.getBlock() == Blocks.FLOWER_POT) {
+//            return new ItemStack(Items.FLOWER_POT);
+//        }
+//
+//        if (potState.getBlock() instanceof FlowerPotBlock) {
+//            return new ItemStack(potState.getBlock(), 1);
+//        }
+//
+//        return new ItemStack(Items.FLOWER_POT);
+//    }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @org.jspecify.annotations.Nullable Orientation orientation, boolean movedByPiston) {
         if (!level.getBlockState(pos.below()).isFaceSturdy(level, pos, Direction.UP)) {
             this.spawnDrops(level, pos);
             level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
@@ -171,7 +171,7 @@ public class PottedSaplingBlock extends BaseEntityBlock {
 
     /** NeoForge Override */
     @SuppressWarnings("unused")
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid){
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid){
         if (willHarvest) {
             return true; // If it will harvest, delay deletion of the block until after getDrops.
         }

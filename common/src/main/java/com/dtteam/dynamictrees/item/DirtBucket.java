@@ -9,11 +9,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -26,53 +25,52 @@ public class DirtBucket extends Item {
     public DirtBucket() {
         super(new Properties().stacksTo(1));
         DTRegistries.CREATIVE_TAB_ITEMS.add(this);
-        craftingRemainingItem = this;
+        craftingRemainingItem = new ItemStackTemplate(this);
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
-
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         final ItemStack itemStack = player.getItemInHand(hand);
         final BlockHitResult blockRayTraceResult;
 
         {
-            blockRayTraceResult = getPlayerPOVHitResult(world, player, ClipContext.Fluid.NONE);
+            blockRayTraceResult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
             if (blockRayTraceResult.getType() != HitResult.Type.BLOCK) {
-                return new InteractionResultHolder<>(InteractionResult.FAIL, itemStack);
+                return InteractionResult.FAIL;
             }
         }
 
         if (DTConfigs.SERVER.dirtBucketPlacesDirt.get()) {
             if (blockRayTraceResult.getType() != HitResult.Type.BLOCK) {
-                return new InteractionResultHolder<>(InteractionResult.PASS, itemStack);
+                return InteractionResult.PASS;
             } else {
                 final BlockPos pos = blockRayTraceResult.getBlockPos();
 
-                if (!world.mayInteract(player, pos)) {
-                    return new InteractionResultHolder<>(InteractionResult.FAIL, itemStack);
+                if (!level.mayInteract(player, pos)) {
+                    return InteractionResult.FAIL;
                 } else {
-                    final boolean isReplaceable = world.getBlockState(pos).canBeReplaced();
+                    final boolean isReplaceable = level.getBlockState(pos).canBeReplaced();
                     final BlockPos workingPos = isReplaceable && blockRayTraceResult.getDirection() == Direction.UP ? pos : pos.relative(blockRayTraceResult.getDirection());
 
                     if (!player.mayUseItemAt(workingPos, blockRayTraceResult.getDirection(), itemStack)) {
-                        return new InteractionResultHolder<>(InteractionResult.FAIL, itemStack);
-                    } else if (this.tryPlaceContainedDirt(player, world, workingPos)) {
+                        return InteractionResult.FAIL;
+                    } else if (this.tryPlaceContainedDirt(player, level, workingPos)) {
                         player.awardStat(Stats.ITEM_USED.get(this));
-                        return !player.getAbilities().instabuild ? new InteractionResultHolder<>(InteractionResult.SUCCESS, new ItemStack(Items.BUCKET)) : new InteractionResultHolder<>(InteractionResult.SUCCESS, itemStack);
+                        return InteractionResult.SUCCESS;
                     } else {
-                        return new InteractionResultHolder<>(InteractionResult.FAIL, itemStack);
+                        return InteractionResult.FAIL;
                     }
                 }
             }
         } else {
-            return new InteractionResultHolder<>(InteractionResult.PASS, itemStack);
+            return InteractionResult.PASS;
         }
     }
 
     public boolean tryPlaceContainedDirt(@Nullable Player player, Level world, BlockPos posIn) {
         BlockState blockState = world.getBlockState(posIn);
         if (blockState.canBeReplaced()) {
-            if (!world.isClientSide && !blockState.isAir()) {
+            if (!world.isClientSide() && !blockState.isAir()) {
                 world.destroyBlock(posIn, true);
             }
 

@@ -3,8 +3,8 @@ package com.dtteam.dynamictrees.deserialization.deserializer;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.google.gson.JsonElement;
-import net.minecraft.Util;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.world.level.material.MapColor;
 
 import java.util.HashMap;

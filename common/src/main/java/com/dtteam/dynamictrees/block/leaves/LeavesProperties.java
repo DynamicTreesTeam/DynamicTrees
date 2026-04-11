@@ -25,6 +25,9 @@ import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockTintSource;
+import net.minecraft.client.color.block.BlockTintSources;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -38,7 +41,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -260,7 +262,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     public List<ItemStack> getDrops(Level level, BlockPos pos, ItemStack tool, Species species) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return Collections.emptyList();
         }
         if (level.getServer() == null) return List.of();
@@ -655,7 +657,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     //
-    private BlockColor colorMultiplier;
+    private BlockTintSource colorMultiplier;
 
     //
     public int treeFallColorMultiplier(BlockState state, BlockAndTintGetter level, BlockPos pos) {
@@ -667,41 +669,41 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         if (colorMultiplier == null) {
             return 0x00FF00FF; //purple if broken
         }
-        return colorMultiplier.getColor(state, level, pos, -1);
+        return colorMultiplier.colorInWorld(state, level, pos);
     }
 
-//    
-    private void processColor() {
-        int color = -1;
-        if (this.colorNumber != null) {
-            color = this.colorNumber;
-        } else if (this.colorString != null) {
-            String code = this.colorString;
-            if (code.startsWith("@")) {
-                code = code.substring(1);
-                if ("biome".equals(code)) { // Built in code since we need access to super.
-                    this.colorMultiplier = (state, level, pos, t) -> ((LevelAccessor) level).getBiome(pos).value().getFoliageColor();
-                    return;
-                }
-
-                BlockColor blockColor = BlockColorMultipliers.find(code);
-                if (blockColor != null) {
-                    colorMultiplier = blockColor;
-                    return;
-                } else {
-                    DynamicTrees.LOG.error("ColorMultiplier resource '{}' could not be found.", code);
-                }
-            } else {
-                color = Color.decode(code).getRGB();
-            }
-        }
-        int c = color;
-        this.colorMultiplier = (s, w, p, t) -> c == -1 ? Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), w, p, 0) : c;
-    }
+//    TODO
+//    private void processColor() {
+//        int color = -1;
+//        if (this.colorNumber != null) {
+//            color = this.colorNumber;
+//        } else if (this.colorString != null) {
+//            String code = this.colorString;
+//            if (code.startsWith("@")) {
+//                code = code.substring(1);
+//                if ("biome".equals(code)) { // Built in code since we need access to super.
+//                    this.colorMultiplier = BlockTintSources.foliage();
+//                    return;
+//                }
+//
+//                BlockTintSource blockColor = BlockColorMultipliers.find(code);
+//                if (blockColor != null) {
+//                    colorMultiplier = blockColor;
+//                    return;
+//                } else {
+//                    DynamicTrees.LOG.error("ColorMultiplier resource '{}' could not be found.", code);
+//                }
+//            } else {
+//                color = Color.decode(code).getRGB();
+//            }
+//        }
+//        int c = color;
+//        this.colorMultiplier = (s, w, p, t) -> c == -1 ? Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), w, p, 0) : c;
+//    }
 
     //
     public static void postInitClient() {
-        REGISTRY.getAll().forEach(LeavesProperties::processColor);
+//        REGISTRY.getAll().forEach(LeavesProperties::processColor);
     }
 
     ///////////////////////////////////////////
@@ -716,16 +718,16 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
                 Pair.of("connectAnyRadius", this.connectAnyRadius));
     }
 
-    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-        getDynamicLeavesBlock().ifPresent(leaves ->
-                defaultLeavesTags().forEach(tag -> {
-                    if (isOnlyIfLoaded()) {
-                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(leaves));
-                    } else {
-                        tagAppender.apply(tag).add(leaves);
-                    }
-                })
-        );
-    }
+//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
+//        getDynamicLeavesBlock().ifPresent(leaves ->
+//                defaultLeavesTags().forEach(tag -> {
+//                    if (isOnlyIfLoaded()) {
+//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(leaves));
+//                    } else {
+//                        tagAppender.apply(tag).add(leaves);
+//                    }
+//                })
+//        );
+//    }
 
 }

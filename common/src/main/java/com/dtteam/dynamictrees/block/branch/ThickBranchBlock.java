@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -78,9 +79,9 @@ public class ThickBranchBlock extends BasicBranchBlock implements Musable {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @org.jspecify.annotations.Nullable Orientation orientation, boolean movedByPiston) {
         updateTrunkShells(level, pos, getRadius(state), 6);
-        super.neighborChanged(state, level, pos, blockIn, fromPos, isMoving);
+        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
     }
 
     private boolean updateTrunkShells(LevelAccessor level, BlockPos pos, int radius, int flags) {

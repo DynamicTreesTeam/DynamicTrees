@@ -62,8 +62,8 @@ public abstract class BlockWithDynamicHardness extends Block {
      */
     protected final class DynamicHardnessBlockState extends BlockState {
 
-        public DynamicHardnessBlockState(Block block, Reference2ObjectArrayMap<Property<?>, Comparable<?>> propertiesToValueMap, MapCodec<BlockState> codec) {
-            super(block, propertiesToValueMap, codec);
+        public DynamicHardnessBlockState(Block owner, Property<?>[] propertyKeys, Comparable<?>[] propertyValues) {
+            super(owner, propertyKeys, propertyValues);
         }
 
         @Override

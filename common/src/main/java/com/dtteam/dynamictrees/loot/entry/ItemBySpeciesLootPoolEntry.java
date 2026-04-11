@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.loot.entry;
 
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
-import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -13,7 +12,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -43,13 +41,18 @@ public final class ItemBySpeciesLootPoolEntry extends LootPoolSingletonContainer
     }
 
     @Override
-    public LootPoolEntryType getType() {
-        return DTRegistries.ITEM_BY_SPECIES.get();
+    public MapCodec<? extends LootPoolSingletonContainer> codec() {
+        return CODEC;
     }
+
+    //    @Override
+//    public LootPoolEntryType getType() {
+//        return DTRegistries.ITEM_BY_SPECIES.get();
+//    }
 
     @Override
     protected void createItemStack(Consumer<ItemStack> stackConsumer, LootContext context) {
-        final Species species = context.getParamOrNull(DTLootContextParams.SPECIES);
+        final Species species = context.getOptionalParameter(DTLootContextParams.SPECIES);
         assert species != null;
         Holder<Item> itemHolder = items.get(species.getRegistryName());
         Item item = itemHolder == null ? Items.AIR : itemHolder.value();

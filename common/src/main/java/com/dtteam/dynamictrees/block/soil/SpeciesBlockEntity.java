@@ -9,6 +9,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * A TileEntity that holds a species value.
@@ -33,17 +35,19 @@ public class SpeciesBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains("species")) {
-            Identifier speciesName = Identifier.parse(tag.getString("species"));
+    protected void loadAdditional(ValueInput input) {
+        if (input.getString("species").isPresent()) {
+            Identifier speciesName = Identifier.parse(input.getString("species").get());
             species = Species.findSpecies(speciesName);
         }
-        super.loadAdditional(tag, registries);
+        super.loadAdditional(input);
     }
 
+
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.putString("species", species.getRegistryName().toString());
+    protected void saveAdditional(ValueOutput output) {
+        output.putString("species", species.getRegistryName().toString());
+        super.saveAdditional(output);
     }
 
     @Override
@@ -54,14 +58,8 @@ public class SpeciesBlockEntity extends BlockEntity {
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
-        this.saveAdditional(tag, registries);
+        tag.putString("species", species.getRegistryName().toString());
         return tag;
     }
-
-    //    @Override
-//    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet) {
-//        load(packet.getTag());
-//    }
-//
 
 }

@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -25,6 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +40,7 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     protected Species species;
 
     public DynamicSaplingBlock(Species species) {
-        super(Properties.of().mapColor(MapColor.PLANT).noCollission().pushReaction(PushReaction.DESTROY).instabreak().sound(SoundType.GRASS).randomTicks().noOcclusion());
+        super(Properties.of().mapColor(MapColor.PLANT).noCollision().pushReaction(PushReaction.DESTROY).instabreak().sound(SoundType.GRASS).randomTicks().noOcclusion());
         this.species = species;
     }
 
@@ -123,8 +125,9 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     // DROPS
     ///////////////////////////////////////////
 
+
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
         if (!this.canSurvive(state, level, pos)) {
             this.dropBlock(level, state, pos);
         }
@@ -138,7 +141,7 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return this.getSpecies().getSeedStack(1);
     }
 
@@ -147,7 +150,10 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
         if (!DTConfigs.SERVER.dynamicSaplingDrops.get())
             return Collections.emptyList();
         // If a loot table has been added load those drops instead.
-        LootTable loottable = builder.getLevel().getServer().reloadableRegistries().getLootTable(getLootTable());
+        LootTable loottable = LootTable.EMPTY;
+        if (getLootTable().isPresent())
+            loottable = builder.getLevel().getServer().reloadableRegistries().getLootTable(getLootTable().get());
+
         if (loottable == LootTable.EMPTY)
             return Collections.singletonList(this.getSpecies().getSeedStack(1));
 

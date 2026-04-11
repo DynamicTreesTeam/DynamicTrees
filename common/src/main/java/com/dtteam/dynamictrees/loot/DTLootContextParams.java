@@ -7,7 +7,7 @@ import net.minecraft.util.context.ContextKey;
 /**
  * @author Harley O'Connor
  */
-public final class DTContextKeys {
+public final class DTLootContextParams {
 
     public static final ContextKey<Species> SPECIES = create("species");
     public static final ContextKey<Integer> FERTILITY = create("fertility");

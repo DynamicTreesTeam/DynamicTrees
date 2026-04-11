@@ -6,7 +6,6 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
-import net.minecraft.client.renderer.texture.atlas.SpriteSourceType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -20,7 +19,6 @@ public class ThickBranchRingsSource implements SpriteSource {
                     Identifier.CODEC.fieldOf("resource").forGetter((singleFile) -> singleFile.resourceId)
             ).apply(instance, ThickBranchRingsSource::new)
     );
-    public static SpriteSourceType TYPE;
     private final Identifier resourceId;
 
     public ThickBranchRingsSource(Identifier resourceId) {
@@ -44,13 +42,8 @@ public class ThickBranchRingsSource implements SpriteSource {
     }
 
     @Override
-    public SpriteSourceType type() {
-        return TYPE;
-    }
-
-    public static SpriteSourceType setType (MapCodec<ThickBranchRingsSource> codec){
-        TYPE = new SpriteSourceType(codec);
-        return TYPE;
+    public MapCodec<? extends SpriteSource> codec() {
+        return CODEC;
     }
 
 }

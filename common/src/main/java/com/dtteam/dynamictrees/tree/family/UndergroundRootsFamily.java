@@ -23,7 +23,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -156,13 +155,13 @@ public class UndergroundRootsFamily extends Family {
         return Collections.singletonList(DTBlockTags.ROOTS);
     }
 
-    /**
-     * {@code null} = can harvest with hand
-     */
-    @Nullable
-    public Tier getDefaultRootsHarvestTier() {
-        return null;
-    }
+//    /**
+//     * {@code null} = can harvest with hand
+//     */
+//    @Nullable
+//    public Tier getDefaultRootsHarvestTier() {
+//        return null;
+//    }
 
     protected int rootSystemSoilTypeFlags = 0;
 
@@ -241,19 +240,19 @@ public class UndergroundRootsFamily extends Family {
         return Optionals.ofBlock(primitiveRootsCovered);
     }
 
-    @Override
-    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-        super.addGeneratedBlockTags(tagAppender);
-        //Create roots tag and root harvest tag if the family is mangrove-like.
-        getRoots().ifPresent(roots -> {
-            this.tierTag(getDefaultRootsHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(roots));
-            defaultRootsTags().forEach(tag -> {
-                if (!isOnlyIfLoaded()) {
-                    tagAppender.apply(tag).add(roots);
-                } else {
-                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(roots));
-                }
-            });
-        });
-    }
+//    @Override
+//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
+//        super.addGeneratedBlockTags(tagAppender);
+//        //Create roots tag and root harvest tag if the family is mangrove-like.
+//        getRoots().ifPresent(roots -> {
+//            this.tierTag(getDefaultRootsHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(roots));
+//            defaultRootsTags().forEach(tag -> {
+//                if (!isOnlyIfLoaded()) {
+//                    tagAppender.apply(tag).add(roots);
+//                } else {
+//                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(roots));
+//                }
+//            });
+//        });
+//    }
 }

@@ -28,6 +28,7 @@ import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.data.Generator;
@@ -41,12 +42,10 @@ import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
 import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
-import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
-import com.dtteam.dynamictrees.systems.season.ClimateHelper;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.genfeature.context.*;
@@ -54,6 +53,7 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.systems.nodemapper.*;
+import com.dtteam.dynamictrees.systems.season.ClimateHelper;
 import com.dtteam.dynamictrees.systems.season.NormalSeasonManager;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.systems.substance.FertilizeSubstance;
@@ -62,8 +62,8 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.CoordUtils;
-import com.dtteam.dynamictrees.utility.Optionals;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
+import com.dtteam.dynamictrees.utility.Optionals;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
@@ -75,6 +75,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -82,11 +83,11 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.ReloadableServerRegistries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -95,18 +96,23 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -117,7 +123,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -492,7 +497,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return defaultColor;
     }
 
-    public int leafColorMultiplier(Level level, BlockPos pos) {
+    public int leafColorMultiplier(BlockAndTintGetter level, BlockPos pos) {
         return getLeavesProperties().treeFallColorMultiplier(getLeavesProperties().getDynamicLeavesState(), level, pos);
     }
     //endregion
@@ -598,7 +603,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     //region loot
 
     public List<ItemStack> getVoluntaryDrops(Level level, BlockPos rootPos, int fertility) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return Collections.emptyList();
         }
         if (level.getServer() == null) return List.of();
@@ -631,7 +636,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     public List<ItemStack> getBranchesDrops(Level level, NetVolumeNode.Volume volume,
                                             ItemStack tool, @Nullable Float explosionRadius) {
         processVolume(volume);
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return Collections.emptyList();
         }
         final List<ItemStack> drops = new ArrayList<>();
@@ -717,15 +722,15 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      * @return true if seed was dropped
      */
     public boolean handleVoluntaryDrops(Level level, List<BlockPos> endPoints, BlockPos rootPos, BlockPos treePos, int fertility) {
-        int tickSpeed = level.getGameRules().getInt(GameRules.RULE_RANDOMTICKING);
+        int tickSpeed = level instanceof ServerLevel sLevel ? sLevel.getGameRules().get(GameRules.RANDOM_TICK_SPEED) : 3;
         if (tickSpeed > 0) {
             double slowFactor = 3.0 / tickSpeed; //This is to prevent high tick-speeds from spamming the floor with seeds
-            if (level.random.nextDouble() < slowFactor) {
+            if (level.getRandom().nextDouble() < slowFactor) {
                 final List<ItemStack> drops = getVoluntaryDrops(level, rootPos, fertility);
 
                 if (!drops.isEmpty() && !endPoints.isEmpty()) {
                     for (ItemStack drop : drops) {
-                        BlockPos branchPos = endPoints.get(level.random.nextInt(endPoints.size()));
+                        BlockPos branchPos = endPoints.get(level.getRandom().nextInt(endPoints.size()));
                         branchPos = branchPos.above();//We'll aim at the block above the end branch. Helps with Acacia leaf block formations
                         BlockPos itemPos = CoordUtils.getRayTraceFruitPos(level, this, treePos, branchPos, false);
 
@@ -734,7 +739,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
                             Vec3 motion = new Vec3(itemPos.getX(), itemPos.getY(), itemPos.getZ()).subtract(new Vec3(treePos.getX(), treePos.getY(), treePos.getZ()));
                             float distAngle = 15;//The spread angle(center to edge)
                             float launchSpeed = 4;//Blocks(meters) per second
-                            motion = new Vec3(motion.x, 0, motion.y).normalize().yRot((level.random.nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed / 20f);
+                            motion = new Vec3(motion.x, 0, motion.y).normalize().yRot((level.getRandom().nextFloat() * distAngle * 2) - distAngle).scale(launchSpeed / 20f);
                             itemEntity.setDeltaMovement(motion.x, motion.y, motion.z);
                             return level.addFreshEntity(itemEntity);
                         }
@@ -1553,7 +1558,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     protected GrowSignal sendGrowthSignal(TreePart treeBase, Level level, BlockPos treePos, BlockPos rootPos, Direction defaultDir){
-        final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.random, defaultDir);
+        final GrowSignal signal = new GrowSignal(this, rootPos, getEnergy(level, rootPos), level.getRandom(), defaultDir);
         return treeBase.growSignal(level, treePos, signal);
     }
 
@@ -1928,7 +1933,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         if (effect != null) {
             boolean applied = effect.apply(level, rootPos);
             if (applied && effect.isLingering() && !level.isClientSide()) {
-                LingeringEffectorEntity entity = DTRegistries.LINGERING_EFFECTOR.get().create(level);
+                LingeringEffectorEntity entity = DTRegistries.LINGERING_EFFECTOR.get().create(level, EntitySpawnReason.SPAWN_ITEM_USE);
                 if (entity != null){
                     entity.setData(level, rootPos, effect);
                     if (entity.isAlive()) {
@@ -2458,35 +2463,35 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return DynamicTrees.location("item/standard_seed");
     }
 
-    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-        // Create dynamic sapling block tags.
-        getSapling().ifPresent(sapling ->
-                defaultSaplingTags().forEach(tag -> {
-                    if (!isOnlyIfLoaded()) {
-                        tagAppender.apply(tag).add(sapling);
-                    } else {
-                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(sapling));
-                    }
-                })
-        );
-    }
-
-    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
-        // Some species return the common seed, so only return if the species has its own seed.
-        if (!hasSeed()) {
-            return;
-        }
-        // Create seed item tag.
-        getSeed().ifPresent(seed ->
-                defaultSeedTags().forEach(tag ->{
-                    if (!isOnlyIfLoaded()) {
-                        tagAppender.apply(tag).add(seed);
-                    } else {
-                        tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(seed));
-                    }
-                })
-        );
-    }
+//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
+//        // Create dynamic sapling block tags.
+//        getSapling().ifPresent(sapling ->
+//                defaultSaplingTags().forEach(tag -> {
+//                    if (!isOnlyIfLoaded()) {
+//                        tagAppender.apply(tag).add(sapling);
+//                    } else {
+//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(sapling));
+//                    }
+//                })
+//        );
+//    }
+//
+//    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
+//        // Some species return the common seed, so only return if the species has its own seed.
+//        if (!hasSeed()) {
+//            return;
+//        }
+//        // Create seed item tag.
+//        getSeed().ifPresent(seed ->
+//                defaultSeedTags().forEach(tag ->{
+//                    if (!isOnlyIfLoaded()) {
+//                        tagAppender.apply(tag).add(seed);
+//                    } else {
+//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(seed));
+//                    }
+//                })
+//        );
+//    }
 
     public boolean shouldGenerateVoluntaryDrops() {
         return this.seed != null;

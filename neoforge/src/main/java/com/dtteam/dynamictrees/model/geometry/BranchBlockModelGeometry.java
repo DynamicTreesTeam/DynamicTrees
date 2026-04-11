@@ -10,6 +10,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
@@ -29,7 +30,7 @@ import java.util.function.Function;
  * @author Harley O'Connor
  */
 
-public class BranchBlockModelGeometry implements IUnbakedGeometry<BranchBlockModelGeometry> {
+public class BranchBlockModelGeometry implements UnbakedModel {
     protected final Set<Identifier> textures = new HashSet<>();
     protected final Identifier barkTextureLocation;
     protected final Identifier ringsTextureLocation;
@@ -47,17 +48,17 @@ public class BranchBlockModelGeometry implements IUnbakedGeometry<BranchBlockMod
         this.forceThickness = forceThickness;
     }
 
-    @Override
-    public BakedModel bake(IGeometryBakingContext context, ModelBaker modelBaker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides itemOverrides) {
-        boolean useThickModel = this.useThickModel(this.setFamily(context.getModelName()));
-        if (!useThickModel) {
-            return new BasicBranchBlockBakedModel(context, this.barkTextureLocation, this.ringsTextureLocation, spriteGetter);
-        } else {
-            if (this.thickRingsTextureLocation == null)
-                this.thickRingsTextureLocation = this.ringsTextureLocation.withSuffix("_thick");
-            return new ThickBranchBlockBakedModel(context, this.barkTextureLocation, this.ringsTextureLocation, this.thickRingsTextureLocation, spriteGetter);
-        }
-    }
+//    @Override
+//    public BakedModel bake(IGeometryBakingContext context, ModelBaker modelBaker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides itemOverrides) {
+//        boolean useThickModel = this.useThickModel(this.setFamily(context.getModelName()));
+//        if (!useThickModel) {
+//            return new BasicBranchBlockBakedModel(context, this.barkTextureLocation, this.ringsTextureLocation, spriteGetter);
+//        } else {
+//            if (this.thickRingsTextureLocation == null)
+//                this.thickRingsTextureLocation = this.ringsTextureLocation.withSuffix("_thick");
+//            return new ThickBranchBlockBakedModel(context, this.barkTextureLocation, this.ringsTextureLocation, this.thickRingsTextureLocation, spriteGetter);
+//        }
+//    }
 
     private Family setFamily(String modelName) {
         if (this.family == null) {

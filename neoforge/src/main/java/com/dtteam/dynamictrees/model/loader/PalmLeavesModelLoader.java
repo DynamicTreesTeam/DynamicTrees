@@ -6,12 +6,12 @@ import com.google.gson.JsonObject;
 import net.minecraft.IdentifierException;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
+import net.neoforged.neoforge.client.model.UnbakedModelLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class PalmLeavesModelLoader implements IGeometryLoader<PalmLeavesModelGeometry> {
+public class PalmLeavesModelLoader implements UnbakedModelLoader<PalmLeavesModelGeometry> {
 
     public static final Logger LOGGER = LogManager.getLogger();
 

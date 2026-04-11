@@ -23,6 +23,9 @@ public class NeoForgeInteractionHelper implements IInteractionHelper {
         return stack.canPerformAction(ItemAbilities.AXE_DIG);
     }
 
+    /**
+     * TODO: this can be done better now
+     */
     @Override
     public int setSeedItemEntityLifespan(ItemEntity entityItem, Seed seed) {
         if (entityItem.lifespan == 6000) { // 6000 (5 minutes) is the default lifespan for an entity item

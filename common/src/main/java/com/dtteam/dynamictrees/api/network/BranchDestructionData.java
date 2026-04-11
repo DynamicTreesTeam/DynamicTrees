@@ -123,22 +123,22 @@ public class BranchDestructionData {
     }
 
     public BranchDestructionData(CompoundTag nbt) {
-        this.species = Species.findSpecies(Identifier.parse(nbt.getString("species")));
-        this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos");
-        this.destroyedBranchesConnections = nbt.getIntArray("branchcon");
-        this.destroyedBranchesBlockIndex = nbt.getIntArray("branchblock");
-        this.destroyedLeaves = nbt.getIntArray("leavespos");
-        this.destroyedLeavesBlockIndex = nbt.getIntArray("leavesblock");
+        this.species = Species.findSpecies(Identifier.parse(nbt.getString("species").orElse("")));
+        this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos").orElse(new int[]{});
+        this.destroyedBranchesConnections = nbt.getIntArray("branchcon").orElse(new int[]{});
+        this.destroyedBranchesBlockIndex = nbt.getIntArray("branchblock").orElse(new int[]{});
+        this.destroyedLeaves = nbt.getIntArray("leavespos").orElse(new int[]{});
+        this.destroyedLeavesBlockIndex = nbt.getIntArray("leavesblock").orElse(new int[]{});
         this.leavesDrops = new ArrayList<>();
-        this.endPoints = nbt.getIntArray("ends");
-        this.woodVolume = new NetVolumeNode.Volume(nbt.getIntArray("volume"));
-        this.cutPos = new BlockPos(nbt.getInt("cutx"), nbt.getInt("cuty"), nbt.getInt("cutz"));
-        this.basePos = new BlockPos(nbt.getInt("basex"), nbt.getInt("basey"), nbt.getInt("basez"));
-        this.cutDir = Direction.values()[Mth.clamp(nbt.getInt("cutdir"), 0, Direction.values().length - 1)];
-        this.toolDir = Direction.values()[Mth.clamp(nbt.getInt("tooldir"), 0, Direction.values().length - 1)];
-        this.trunkHeight = nbt.getInt("trunkheight");
+        this.endPoints = nbt.getIntArray("ends").orElse(new int[]{});
+        this.woodVolume = new NetVolumeNode.Volume(nbt.getIntArray("volume").orElse(new int[]{}));
+        this.cutPos = new BlockPos(nbt.getInt("cutx").get(), nbt.getInt("cuty").get(), nbt.getInt("cutz").get());
+        this.basePos = new BlockPos(nbt.getInt("basex").get(), nbt.getInt("basey").get(), nbt.getInt("basez").get());
+        this.cutDir = Direction.values()[Mth.clamp(nbt.getInt("cutdir").orElse(0), 0, Direction.values().length - 1)];
+        this.toolDir = Direction.values()[Mth.clamp(nbt.getInt("tooldir").orElse(0), 0, Direction.values().length - 1)];
+        this.trunkHeight = nbt.getInt("trunkheight").orElse(0);
         this.soilState = nbt.contains("soilblock") ?
-                Pair.of(Identifier.parse(nbt.getString("soilblock")), nbt.getInt("soilstateid"))
+                Pair.of(Identifier.parse(nbt.getString("soilblock").orElse("")), nbt.getInt("soilstateid").orElse(0))
                 : null;
     }
 

@@ -163,8 +163,8 @@ public class PalmLeavesProperties extends LeavesProperties {
         }
 
         @Override
-        public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
-            AABB base = super.getOcclusionShape(state, level, pos).bounds();
+        protected VoxelShape getOcclusionShape(BlockState state) {
+            AABB base = super.getOcclusionShape(state).bounds();
             base.inflate(1, 0, 1);
             base.inflate(-1, -0, -1);
             return Shapes.create(base);

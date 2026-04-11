@@ -23,7 +23,7 @@ public final class LevelContext {
 
     public LevelContext(ResourceKey<Level> dimensionKey, @Nullable Long seed, LevelAccessor accessor, Level level) {
         this.dimensionKey = dimensionKey;
-        this.dimensionName = dimensionKey.location();
+        this.dimensionName = dimensionKey.identifier();
         this.seed = seed;
         this.accessor = accessor;
         this.level = level;

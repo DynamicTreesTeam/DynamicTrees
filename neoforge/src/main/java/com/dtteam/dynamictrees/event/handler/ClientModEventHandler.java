@@ -111,7 +111,7 @@ public class ClientModEventHandler {
     @SubscribeEvent
     
 
-    public static void registerBlockColorHandlersEvent(RegisterColorHandlersEvent.Block event){
+    public static void registerBlockColorHandlersEvent(RegisterColorHandlersEvent event){
         final int white = 0xFFFFFFFF;
         final int magenta = 0x00FF00FF;//for errors.. because magenta sucks.
 
@@ -180,7 +180,7 @@ public class ClientModEventHandler {
     public static final Identifier SMALL_PALM_FRONDS = DynamicTrees.location("small_palm_fronds");
 
     @SubscribeEvent
-    public static void onModelRegistryEvent(ModelEvent.RegisterGeometryLoaders event) {
+    public static void onModelRegistryEvent(ModelEvent.RegisterLoaders event) {
         // Register model loaders for baked models.
         event.register(BRANCH, new BranchBlockModelLoader());
         event.register(SURFACE_ROOT, new SurfaceRootBlockModelLoader());

@@ -1,21 +1,9 @@
 package com.dtteam.dynamictrees.model.geometry;
 
-import com.dtteam.dynamictrees.model.baked.LargePalmLeavesBakedModel;
-import com.dtteam.dynamictrees.model.baked.MediumPalmLeavesBakedModel;
-import com.dtteam.dynamictrees.model.baked.SmallPalmLeavesBakedModel;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
 
-import java.util.function.Function;
-
-public class PalmLeavesModelGeometry implements IUnbakedGeometry<PalmLeavesModelGeometry> {
+public class PalmLeavesModelGeometry implements UnbakedModel {
 
     protected final Identifier frondsResLoc;
 
@@ -26,13 +14,13 @@ public class PalmLeavesModelGeometry implements IUnbakedGeometry<PalmLeavesModel
         this.frondType = type;
     }
 
-    @Override
-    public BakedModel bake(IGeometryBakingContext iGeometryBakingContext, ModelBaker modelBaker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides itemOverrides) {
-        return switch (frondType) {
-            default -> new LargePalmLeavesBakedModel(frondsResLoc, spriteGetter);
-            case 1 -> new MediumPalmLeavesBakedModel(frondsResLoc, spriteGetter);
-            case 2 -> new SmallPalmLeavesBakedModel(frondsResLoc, spriteGetter);
-        };
-    }
+//    @Override
+//    public BakedModel bake(IGeometryBakingContext iGeometryBakingContext, ModelBaker modelBaker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides itemOverrides) {
+//        return switch (frondType) {
+//            default -> new LargePalmLeavesBakedModel(frondsResLoc, spriteGetter);
+//            case 1 -> new MediumPalmLeavesBakedModel(frondsResLoc, spriteGetter);
+//            case 2 -> new SmallPalmLeavesBakedModel(frondsResLoc, spriteGetter);
+//        };
+//    }
 
 }

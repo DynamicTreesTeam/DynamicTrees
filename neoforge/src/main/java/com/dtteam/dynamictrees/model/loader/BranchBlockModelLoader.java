@@ -8,7 +8,7 @@ import com.google.gson.JsonParseException;
 import net.minecraft.IdentifierException;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
+import net.neoforged.neoforge.client.model.UnbakedModelLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Harley O'Connor
  */
-public class BranchBlockModelLoader implements IGeometryLoader<BranchBlockModelGeometry> {
+public class BranchBlockModelLoader implements UnbakedModelLoader<BranchBlockModelGeometry> {
 
     public static final Logger LOGGER = LogManager.getLogger();
 

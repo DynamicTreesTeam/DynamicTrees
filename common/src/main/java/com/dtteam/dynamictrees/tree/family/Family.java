@@ -178,9 +178,8 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
 
     protected float lootVolumeMultiplier = 1.0f;
 
-//    
     public int woodRingColor; // For rooty blocks
-//    
+
     public int woodBarkColor; // For rooty water
 
     /**
@@ -288,7 +287,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         if (this.hasStrippedBranch()) {
             this.getBranch().ifPresent(branch -> {
                 branch.stripBranch(state, level, pos, player, heldItem);
-                if (level.isClientSide) {
+                if (level.isClientSide()) {
                     level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
                     WailaHelper.invalidateWailaPosition();
                 }
@@ -518,21 +517,21 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.isFireProof = isFireProof;
     }
 
-    /**
-     * {@code null} = can harvest with hand
-     */
-    @Nullable
-    public Tier getDefaultBranchHarvestTier() {
-        return null;
-    }
-
-    /**
-     * {@code null} = can harvest with hand
-     */
-    @Nullable
-    public Tier getDefaultStrippedBranchHarvestTier() {
-        return null;
-    }
+//    /**
+//     * {@code null} = can harvest with hand
+//     */
+//    @Nullable
+//    public Tier getDefaultBranchHarvestTier() {
+//        return null;
+//    }
+//
+//    /**
+//     * {@code null} = can harvest with hand
+//     */
+//    @Nullable
+//    public Tier getDefaultStrippedBranchHarvestTier() {
+//        return null;
+//    }
 
     @Deprecated(forRemoval = true)
     public MapColor getDefaultBranchMapColor() {
@@ -797,51 +796,51 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
                 Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN);
     }
 
-    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-        getBranch().ifPresent(branch -> {
-            tierTag(getDefaultBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(branch));
-            defaultBranchTags().forEach(tag -> {
-                if (!isOnlyIfLoaded()) {
-                    tagAppender.apply(tag).add(branch);
-                } else {
-                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(branch));
-                }
-            });
-        });
-
-        // Create stripped branch tag and harvest tag if the family has a stripped branch.
-        getStrippedBranch().ifPresent(strippedBranch -> {
-            tierTag(getDefaultStrippedBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(strippedBranch));
-            defaultStrippedBranchTags().forEach(tag ->
-            {
-                if (!isOnlyIfLoaded()) {
-                    tagAppender.apply(tag).add(strippedBranch);
-                } else {
-                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(strippedBranch));
-                }
-            });
-        });
-    }
-
-    protected Optional<IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tierTag(@Nullable Tier tier, Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender) {
-        if (tier == null)
-            return Optional.empty();
-
-        TagKey<Block> tag = tier.getIncorrectBlocksForDrops();
-
-        return Optional.of(tagAppender.apply(tag));
-    }
-
-    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
-        getBranchItem().ifPresent(item -> {
-                    if (!isOnlyIfLoaded()) {
-                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).add(item));
-                    } else {
-                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(item)));
-                    }
-                }
-        );
-    }
+//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
+//        getBranch().ifPresent(branch -> {
+//            tierTag(getDefaultBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(branch));
+//            defaultBranchTags().forEach(tag -> {
+//                if (!isOnlyIfLoaded()) {
+//                    tagAppender.apply(tag).add(branch);
+//                } else {
+//                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(branch));
+//                }
+//            });
+//        });
+//
+//        // Create stripped branch tag and harvest tag if the family has a stripped branch.
+//        getStrippedBranch().ifPresent(strippedBranch -> {
+//            tierTag(getDefaultStrippedBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(strippedBranch));
+//            defaultStrippedBranchTags().forEach(tag ->
+//            {
+//                if (!isOnlyIfLoaded()) {
+//                    tagAppender.apply(tag).add(strippedBranch);
+//                } else {
+//                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(strippedBranch));
+//                }
+//            });
+//        });
+//    }
+//
+//    protected Optional<IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tierTag(@Nullable Tier tier, Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender) {
+//        if (tier == null)
+//            return Optional.empty();
+//
+//        TagKey<Block> tag = tier.getIncorrectBlocksForDrops();
+//
+//        return Optional.of(tagAppender.apply(tag));
+//    }
+//
+//    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
+//        getBranchItem().ifPresent(item -> {
+//                    if (!isOnlyIfLoaded()) {
+//                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).add(item));
+//                    } else {
+//                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(item)));
+//                    }
+//                }
+//        );
+//    }
 
     ///////////////////////////////////////////
     // DATA GENERATION

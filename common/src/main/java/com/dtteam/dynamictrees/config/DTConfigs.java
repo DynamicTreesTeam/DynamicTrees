@@ -1,12 +1,14 @@
 package com.dtteam.dynamictrees.config;
 
-import com.dtteam.dynamictrees.*;
-import com.dtteam.dynamictrees.block.branch.*;
-import com.dtteam.dynamictrees.systems.season.*;
-import com.dtteam.dynamictrees.tree.species.*;
-import org.apache.commons.lang3.tuple.*;
+import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
+import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
+import com.dtteam.dynamictrees.tree.species.SwampSpecies;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DTConfigs {
 

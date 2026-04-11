@@ -10,6 +10,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.stats.Stats;
@@ -17,7 +18,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -80,7 +81,7 @@ public class Seed extends Item {//implements IPlantable {
 
         if (entityItem.tickCount >= lifespan - 20) {//Perform this action 20 ticks(1 second) before dying
             final Level level = entityItem.level();
-            if (!level.isClientSide) {//Server side only
+            if (!level.isClientSide()) {//Server side only
                 final ItemStack seedStack = entityItem.getItem();
                 final BlockPos pos = new BlockPos(entityItem.blockPosition());
                 VoluntaryPlantEventResult result = Services.EVENT.postSeedVoluntaryPlantEvent(entityItem, this.getSpecies().selfOrLocationOverride(level, pos), pos, this.shouldPlant(level, pos, seedStack));
@@ -89,7 +90,7 @@ public class Seed extends Item {//implements IPlantable {
                 }
                 seedStack.setCount(0);
             }
-            entityItem.kill();
+            entityItem.discard();
         }
 
         return false;
@@ -100,7 +101,7 @@ public class Seed extends Item {//implements IPlantable {
     public boolean doPlanting(Level level, BlockPos pos, @Nullable Player planter, ItemStack seedStack) {
         final Species species = this.getSpecies().selfOrLocationOverride(level, pos);
         if (species.plantSapling(level, pos, this.getSpecies() != species)) { // Do the planting
-            String joCode = getCode(seedStack, level.random);
+            String joCode = getCode(seedStack, level.getRandom());
             if (!joCode.isEmpty()) {
                 level.removeBlock(pos, false); // Remove the newly created dynamic sapling
                 BlockPos rootPos = pos.below();
@@ -136,7 +137,7 @@ public class Seed extends Item {//implements IPlantable {
         }
         plantChance = 1.0f - accum;
 
-        return plantChance > level.random.nextFloat();
+        return plantChance > level.getRandom().nextFloat();
     }
 
     public boolean hasForcePlant(ItemStack seedStack) {
@@ -197,23 +198,21 @@ public class Seed extends Item {//implements IPlantable {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand pHand) {
-        // Handle planting seed on water
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         BlockHitResult blockhitresult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
         BlockPos fluidPos = blockhitresult.getBlockPos();
         if (getSpecies().selfOrLocationOverride(level, fluidPos).isPlantableOnFluid()){
-            ItemStack itemstack = player.getItemInHand(pHand);
+            ItemStack itemstack = player.getItemInHand(hand);
             if (blockhitresult.getType() == HitResult.Type.BLOCK && !level.getFluidState(fluidPos).isEmpty() &&
                     level.getFluidState(fluidPos.below()).isEmpty()) {
-                if (onItemUsePlantSeed(new UseOnContext(player, pHand, blockhitresult), true) == InteractionResult.SUCCESS) {
-                    return InteractionResultHolder.success(itemstack);
+                if (onItemUsePlantSeed(new UseOnContext(player, hand, blockhitresult), true) == InteractionResult.SUCCESS) {
+                    return InteractionResult.SUCCESS;
                 }
             }
-            return InteractionResultHolder.pass(itemstack);
+            return InteractionResult.PASS;
         }
-        return super.use(level, player, pHand);
+        return super.use(level, player, hand);
     }
-
 
     public InteractionResult onItemUsePlantSeed(UseOnContext context, boolean onFluid) {
 

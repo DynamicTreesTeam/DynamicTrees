@@ -15,6 +15,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -60,13 +62,6 @@ public class PottedSaplingBlockEntity extends BlockEntity {
             level.sendBlockUpdated(worldPosition, this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
     }
 
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
-        this.saveAdditional(tag, registries);
-        return tag;
-    }
-
     @Nullable
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
@@ -74,21 +69,29 @@ public class PottedSaplingBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains(POT_MIMIC_TAG)) {
-            Block block = BuiltInRegistries.BLOCK.get(Identifier.parse(tag.getString(POT_MIMIC_TAG)));
+    protected void loadAdditional(ValueInput input) {
+        if (input.getString(POT_MIMIC_TAG).isPresent()) {
+            Block block = BuiltInRegistries.BLOCK.get(Identifier.parse(input.getString(POT_MIMIC_TAG).get())).get().value();
             potState = block != Blocks.AIR ? block.defaultBlockState() : Blocks.FLOWER_POT.defaultBlockState();
         }
-        if (tag.contains(SPECIES_TAG)) {
-            this.species = Species.findSpecies(tag.getString(SPECIES_TAG));
+        if (input.getString(SPECIES_TAG).isPresent()) {
+            this.species = Species.findSpecies(input.getString(SPECIES_TAG).get());
         }
-        super.loadAdditional(tag, registries);
+        super.loadAdditional(input);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+    protected void saveAdditional(ValueOutput output) {
+        output.putString(POT_MIMIC_TAG, BuiltInRegistries.BLOCK.getKey(potState.getBlock()).toString());
+        output.putString(SPECIES_TAG, this.species.getRegistryName().toString());
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
         tag.putString(POT_MIMIC_TAG, BuiltInRegistries.BLOCK.getKey(potState.getBlock()).toString());
         tag.putString(SPECIES_TAG, this.species.getRegistryName().toString());
+        return tag;
     }
 
 }

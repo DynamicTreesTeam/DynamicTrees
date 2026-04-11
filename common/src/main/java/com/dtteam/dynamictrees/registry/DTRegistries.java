@@ -18,7 +18,6 @@ import com.dtteam.dynamictrees.loot.condition.SpeciesMatches;
 import com.dtteam.dynamictrees.loot.condition.VoluntarySeedDropChance;
 import com.dtteam.dynamictrees.loot.entry.ItemBySpeciesLootPoolEntry;
 import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
-import com.dtteam.dynamictrees.loot.entry.WeightedItemLootPoolEntry;
 import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyCount;
@@ -61,9 +60,6 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvi
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -138,18 +134,18 @@ public class DTRegistries {
     // CREATIVE TAB
     ///////////////////////////////////////////
 
-    public static final Supplier<CreativeModeTab> DT_CREATIVE_TAB = Services.REGISTRY.getRegistryLoader()
-            .registerCreativeTab(DynamicTrees.MOD_ID,
-                    ()-> Species.findSpecies(DynamicTrees.OAK).getSeedStack(1),
-                    Component.translatable("itemGroup.dynamictrees"),
-                    (parameters, output) -> {
-                        for (final DendroPotion.DendroPotionType potion : DendroPotion.DendroPotionType.values()) {
-                            if (potion.isActive()) {
-                                output.accept(DendroPotion.applyIndexTag(new ItemStack(DENDRO_POTION.get()), potion.getIndex()));
-                            }
-                        }
-                        CREATIVE_TAB_ITEMS.forEach(e -> output.accept(e.getDefaultInstance()));
-                    });
+//    public static final Supplier<CreativeModeTab> DT_CREATIVE_TAB = Services.REGISTRY.getRegistryLoader()
+//            .registerCreativeTab(DynamicTrees.MOD_ID,
+//                    ()-> Species.findSpecies(DynamicTrees.OAK).getSeedStack(1),
+//                    Component.translatable("itemGroup.dynamictrees"),
+//                    (parameters, output) -> {
+//                        for (final DendroPotion.DendroPotionType potion : DendroPotion.DendroPotionType.values()) {
+//                            if (potion.isActive()) {
+//                                output.accept(DendroPotion.applyIndexTag(new ItemStack(DENDRO_POTION.get()), potion.getIndex()));
+//                            }
+//                        }
+//                        CREATIVE_TAB_ITEMS.forEach(e -> output.accept(e.getDefaultInstance()));
+//                    });
 
     ///////////////////////////////////////////
     // ENTITIES
@@ -226,26 +222,26 @@ public class DTRegistries {
     // LOOT
     ///////////////////////////////////////////
 
-    public static final Supplier<LootItemConditionType> SPECIES_MATCHES = Services.REGISTRY.getRegistryLoader()
-            .registerLootConditionType("species_matches", SpeciesMatches.CODEC);
-    public static final Supplier<LootItemConditionType> SEASONAL_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
-            .registerLootConditionType("seasonal_seed_drop_chance", SeasonalSeedDropChance.CODEC);
-    public static final Supplier<LootItemConditionType> VOLUNTARY_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
-            .registerLootConditionType("voluntary_seed_drop_chance", VoluntarySeedDropChance.CODEC);
-
-    public static final Supplier<LootPoolEntryType> ITEM_BY_SPECIES = Services.REGISTRY.getRegistryLoader()
-            .registerLootPoolEntryType("item_by_species", ItemBySpeciesLootPoolEntry.CODEC);
-    public static final Supplier<LootPoolEntryType> SEED_ITEM = Services.REGISTRY.getRegistryLoader()
-            .registerLootPoolEntryType("seed_item", SeedItemLootPoolEntry.CODEC);
-    public static final Supplier<LootPoolEntryType> WEIGHTED_ITEM = Services.REGISTRY.getRegistryLoader()
-            .registerLootPoolEntryType("weighted_item", WeightedItemLootPoolEntry.CODEC);
-
-    public static final Supplier<LootItemFunctionType<MultiplyCount>> MULTIPLY_COUNT = Services.REGISTRY.getRegistryLoader()
-            .registerLootFunctionType("multiply_count", MultiplyCount.CODEC);
-    public static final Supplier<LootItemFunctionType<MultiplyByLogsCount>> MULTIPLY_LOGS_COUNT = Services.REGISTRY.getRegistryLoader()
-            .registerLootFunctionType("multiply_logs_count", MultiplyByLogsCount.CODEC);
-    public static final Supplier<LootItemFunctionType<MultiplyBySticksCount>> MULTIPLY_STICKS_COUNT = Services.REGISTRY.getRegistryLoader()
-            .registerLootFunctionType("multiply_sticks_count", MultiplyBySticksCount.CODEC);
+//    public static final Supplier<LootItemConditionType> SPECIES_MATCHES = Services.REGISTRY.getRegistryLoader()
+//            .registerLootConditionType("species_matches", SpeciesMatches.CODEC);
+//    public static final Supplier<LootItemConditionType> SEASONAL_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
+//            .registerLootConditionType("seasonal_seed_drop_chance", SeasonalSeedDropChance.CODEC);
+//    public static final Supplier<LootItemConditionType> VOLUNTARY_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
+//            .registerLootConditionType("voluntary_seed_drop_chance", VoluntarySeedDropChance.CODEC);
+//
+//    public static final Supplier<LootPoolEntryType> ITEM_BY_SPECIES = Services.REGISTRY.getRegistryLoader()
+//            .registerLootPoolEntryType("item_by_species", ItemBySpeciesLootPoolEntry.CODEC);
+//    public static final Supplier<LootPoolEntryType> SEED_ITEM = Services.REGISTRY.getRegistryLoader()
+//            .registerLootPoolEntryType("seed_item", SeedItemLootPoolEntry.CODEC);
+//    public static final Supplier<LootPoolEntryType> WEIGHTED_ITEM = Services.REGISTRY.getRegistryLoader()
+//            .registerLootPoolEntryType("weighted_item", WeightedItemLootPoolEntry.CODEC);
+//
+//    public static final Supplier<LootItemFunctionType<MultiplyCount>> MULTIPLY_COUNT = Services.REGISTRY.getRegistryLoader()
+//            .registerLootFunctionType("multiply_count", MultiplyCount.CODEC);
+//    public static final Supplier<LootItemFunctionType<MultiplyByLogsCount>> MULTIPLY_LOGS_COUNT = Services.REGISTRY.getRegistryLoader()
+//            .registerLootFunctionType("multiply_logs_count", MultiplyByLogsCount.CODEC);
+//    public static final Supplier<LootItemFunctionType<MultiplyBySticksCount>> MULTIPLY_STICKS_COUNT = Services.REGISTRY.getRegistryLoader()
+//            .registerLootFunctionType("multiply_sticks_count", MultiplyBySticksCount.CODEC);
 
     ///////////////////////////////////////////
     // WORLDGEN
@@ -274,8 +270,8 @@ public class DTRegistries {
     public static final Supplier<StructurePoolElementType<TreePoolElement>> TREE_STRUCTURE_POOL_ELEMENT_TYPE = Services.REGISTRY.getRegistryLoader()
             .registerStructurePoolElementType("tree_pool_element", () -> () -> TreePoolElement.CODEC);
 
-    public static final Supplier<RecipeSerializer<SeedConversionRecipe>> SEED_CONVERSION_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()
-            .registerRecipeType("seed_conversion", ()->new SimpleCraftingRecipeSerializer<>(SeedConversionRecipe::new));
-    public static final Supplier<RecipeSerializer<MegaSeedRecipe>> MEGA_SEED_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()
-            .registerRecipeType("mega_seed", ()->new SimpleCraftingRecipeSerializer<>(MegaSeedRecipe::new));
+//    public static final Supplier<RecipeSerializer<SeedConversionRecipe>> SEED_CONVERSION_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()
+//            .registerRecipeType("seed_conversion", ()->new SimpleCraftingRecipeSerializer<>(SeedConversionRecipe::new));
+//    public static final Supplier<RecipeSerializer<MegaSeedRecipe>> MEGA_SEED_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()
+//            .registerRecipeType("mega_seed", ()->new SimpleCraftingRecipeSerializer<>(MegaSeedRecipe::new));
 }

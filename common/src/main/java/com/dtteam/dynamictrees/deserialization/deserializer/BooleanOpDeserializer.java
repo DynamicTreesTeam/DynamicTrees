@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.world.phys.shapes.BooleanOp;
 
 import java.util.Map;
