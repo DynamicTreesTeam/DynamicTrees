@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.loot;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
@@ -12,32 +12,32 @@ import java.util.function.Consumer;
  */
 public final class DTLootParameterSets {
 
-    public static final LootContextParamSet LEAVES = register("leaves", builder ->
+    public static final ContextKeySet LEAVES = register("leaves", builder ->
             builder.required(LootContextParams.BLOCK_STATE)
-                    .required(DTLootContextParams.SPECIES)
-                    .required(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR)
+                    .required(DTContextKeys.SPECIES)
+                    .required(DTContextKeys.SEASONAL_SEED_DROP_FACTOR)
                     .required(LootContextParams.TOOL)
                     .optional(LootContextParams.EXPLOSION_RADIUS)
     );
 
-    public static final LootContextParamSet VOLUNTARY = register("voluntary", builder ->
+    public static final ContextKeySet VOLUNTARY = register("voluntary", builder ->
             builder.required(LootContextParams.BLOCK_STATE)
-                    .required(DTLootContextParams.SEASONAL_SEED_DROP_FACTOR)
-                    .required(DTLootContextParams.FERTILITY)
+                    .required(DTContextKeys.SEASONAL_SEED_DROP_FACTOR)
+                    .required(DTContextKeys.FERTILITY)
     );
 
-    public static final LootContextParamSet BRANCHES = register("branches", builder ->
+    public static final ContextKeySet BRANCHES = register("branches", builder ->
             builder.required(LootContextParams.TOOL)
-                    .required(DTLootContextParams.SPECIES)
-                    .required(DTLootContextParams.VOLUME)
+                    .required(DTContextKeys.SPECIES)
+                    .required(DTContextKeys.VOLUME)
                     .optional(LootContextParams.EXPLOSION_RADIUS)
     );
 
-    private static LootContextParamSet register(String path, Consumer<LootContextParamSet.Builder> builderConsumer) {
-        final LootContextParamSet.Builder builder = new LootContextParamSet.Builder();
+    private static ContextKeySet register(String path, Consumer<ContextKeySet.Builder> builderConsumer) {
+        final ContextKeySet.Builder builder = new ContextKeySet.Builder();
         builderConsumer.accept(builder);
 
-        final LootContextParamSet paramSet = builder.build();
+        final ContextKeySet paramSet = builder.build();
         LootContextParamSets.REGISTRY.put(DynamicTrees.location(path), paramSet);
 
         return paramSet;

@@ -7,9 +7,12 @@ import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
 import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
 import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
 import com.dtteam.dynamictrees.utility.ItemUtils;
-import net.minecraft.advancements.critereon.*;
+import net.minecraft.advancements.criterion.*;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.predicates.DataComponentPredicates;
+import net.minecraft.core.component.predicates.EnchantmentsPredicate;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -25,7 +28,6 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer
 import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.LimitCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.*;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -36,16 +38,15 @@ import java.util.List;
 
 public class DTLootTableBuilder {
 
-    protected static LootItemCondition.Builder hasSilkTouch(HolderLookup.Provider registries) {
-        HolderLookup.RegistryLookup<Enchantment> registrylookup = registries.lookupOrThrow(Registries.ENCHANTMENT);
+    private static LootItemCondition.Builder hasSilkTouch(HolderLookup.Provider registries) {
         return MatchTool.toolMatches(
-                ItemPredicate.Builder.item()
-                        .withSubPredicate(
-                                ItemSubPredicates.ENCHANTMENTS,
-                                ItemEnchantmentsPredicate.enchantments(
-                                        List.of(new EnchantmentPredicate(registrylookup.getOrThrow(Enchantments.SILK_TOUCH), MinMaxBounds.Ints.atLeast(1)))
-                                )
-                        )
+                ItemPredicate.Builder.item().withComponents(DataComponentMatchers.Builder.components().partial(
+                        DataComponentPredicates.ENCHANTMENTS,
+                        EnchantmentsPredicate.enchantments(List.of(new EnchantmentPredicate(
+                                registries.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH),
+                                MinMaxBounds.Ints.atLeast(1)
+                        )))
+                ).build())
         );
     }
 
@@ -54,7 +55,8 @@ public class DTLootTableBuilder {
     }
 
     private static LootItemCondition.Builder hasShearsOrSilkTouch(HolderLookup.Provider registries){
-        LootItemCondition.Builder hasShears = MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.SHEARS));
+        HolderLookup<Item> items = registries.lookupOrThrow(Registries.ITEM);
+        LootItemCondition.Builder hasShears = MatchTool.toolMatches(ItemPredicate.Builder.item().of(items, Items.SHEARS));
         return hasShears.or(hasSilkTouch(registries));
     }
 
@@ -101,10 +103,10 @@ public class DTLootTableBuilder {
         );
     }
 
-    public static LootTable.Builder createLeavesDrops(float[] seedChances, LootContextParamSet parameterSet, HolderLookup.Provider registries) {
+    public static LootTable.Builder createLeavesDrops(float[] seedChances, ContextKeySet parameterSet, HolderLookup.Provider registries) {
         return createLeavesDrops(seedChances, parameterSet, Items.STICK, registries);
     }
-    public static LootTable.Builder createLeavesDrops(float[] seedChances, LootContextParamSet parameterSet, Item stickItem, HolderLookup.Provider registries) {
+    public static LootTable.Builder createLeavesDrops(float[] seedChances, ContextKeySet parameterSet, Item stickItem, HolderLookup.Provider registries) {
         return LootTable.lootTable().withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
                         SeedItemLootPoolEntry.lootTableSeedItem()
@@ -126,7 +128,7 @@ public class DTLootTableBuilder {
         ).setParamSet(parameterSet);
     }
 
-    public static LootTable.Builder createPalmLeavesDrops(float[] seedChances, LootContextParamSet parameterSet, HolderLookup.Provider registries) {
+    public static LootTable.Builder createPalmLeavesDrops(float[] seedChances, ContextKeySet parameterSet, HolderLookup.Provider registries) {
         return LootTable.lootTable().withPool(
                 LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(
                         SeedItemLootPoolEntry.lootTableSeedItem()
