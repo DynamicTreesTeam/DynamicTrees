@@ -34,7 +34,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -97,7 +99,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      * @param name name of branch, without a {@code _branch} suffix
      */
     public BranchBlock(Identifier name, Properties properties) {
-        super(properties); //removes drops from block
+        super(properties.setId(ResourceKey.create(Registries.BLOCK, name))); //removes drops from block
         lootTableSupplier = new LootTableSupplier("trees/branches/", name);
     }
 

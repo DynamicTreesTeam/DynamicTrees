@@ -70,7 +70,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
     @Override
     protected SoilBlock createBlock(BlockBehaviour.Properties blockProperties) {
-        return new RootSoilBlock(this, blockProperties);
+        return new RootSoilBlock(getBlockRegistryName(), this, blockProperties);
     }
 
     @Override
@@ -90,8 +90,8 @@ public class AerialRootsSoilProperties extends SoilProperties {
         public static final IntegerProperty RADIUS = IntegerProperty.create("radius", MIN_RADIUS, MAX_RADIUS);
         public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-        public RootSoilBlock(SoilProperties properties, Properties blockProperties) {
-            super(properties, blockProperties);
+        public RootSoilBlock(Identifier id, SoilProperties properties, Properties blockProperties) {
+            super(id, properties, blockProperties);
             registerDefaultState(defaultBlockState().setValue(RADIUS, MAX_RADIUS).setValue(WATERLOGGED, false));
             soilBlockDecayer = (level, rootPos, rootyState, species) -> true;
         }

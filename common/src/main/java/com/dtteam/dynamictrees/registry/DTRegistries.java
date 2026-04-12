@@ -82,13 +82,13 @@ public class DTRegistries {
      * A potted sapling block, which is a normal pot but for dynamic saplings.
      */
     public static final Supplier<PottedSaplingBlock> POTTED_SAPLING = Services.REGISTRY.getRegistryLoader()
-            .registerBlock("potted_sapling", ()->new PottedSaplingBlock(DynamicTrees.location("potted_sapling")));
+            .registerBlock("potted_sapling", PottedSaplingBlock::new);
 
     /**
      * A trunk shell block, which is the outer block for thick branches.
      */
     public static final Supplier<TrunkShellBlock> TRUNK_SHELL = Services.REGISTRY.getRegistryLoader()
-            .registerBlock("trunk_shell", ()->new TrunkShellBlock(DynamicTrees.location("trunk_shell")));
+            .registerBlock("trunk_shell", TrunkShellBlock::new);
 
     private static void setupConnectables() {
         BranchConnectables.makeBlockConnectable(Blocks.BEE_NEST, (state, level, pos, side) -> {
@@ -116,36 +116,35 @@ public class DTRegistries {
      * A custom potion called the Dendro Potion, houses all tree potions.
      */
     public static final Supplier<DendroPotion> DENDRO_POTION = Services.REGISTRY.getRegistryLoader()
-            .registerItem("dendro_potion", ()-> new DendroPotion(DynamicTrees.location("dendro_potion")));
+            .registerItem("dendro_potion", DendroPotion::new);
 
     /**
      * A bucket of dirt item, for crafting saplings into seeds and vice versa.
      */
     public static final Supplier<DirtBucket> DIRT_BUCKET = Services.REGISTRY.getRegistryLoader()
-            .registerItem("dirt_bucket", ()-> new DirtBucket(DynamicTrees.location("dirt_bucket")));
+            .registerItem("dirt_bucket", DirtBucket::new);
 
     /**
      * A staff, a creative tool for copying and pasting tree shapes.
      */
     public static final Supplier<Staff> STAFF = Services.REGISTRY.getRegistryLoader()
-            .registerItem("staff", ()-> new Staff(DynamicTrees.location("staff")));
+            .registerItem("staff", Staff::new);
 
     ///////////////////////////////////////////
     // CREATIVE TAB
     ///////////////////////////////////////////
 
-//    public static final Supplier<CreativeModeTab> DT_CREATIVE_TAB = Services.REGISTRY.getRegistryLoader()
-//            .registerCreativeTab(DynamicTrees.MOD_ID,
-//                    ()-> Species.findSpecies(DynamicTrees.OAK).getSeedStack(1),
-//                    Component.translatable("itemGroup.dynamictrees"),
-//                    (parameters, output) -> {
-//                        for (final DendroPotion.DendroPotionType potion : DendroPotion.DendroPotionType.values()) {
-//                            if (potion.isActive()) {
-//                                output.accept(DendroPotion.applyIndexTag(new ItemStack(DENDRO_POTION.get()), potion.getIndex()));
-//                            }
-//                        }
-//                        CREATIVE_TAB_ITEMS.forEach(e -> output.accept(e.getDefaultInstance()));
-//                    });
+    public static final Supplier<CreativeModeTab> DT_CREATIVE_TAB = Services.REGISTRY.getRegistryLoader()
+            .registerCreativeTab(DynamicTrees.MOD_ID, ()-> Species.findSpecies(DynamicTrees.OAK).getSeedStack(1),
+                    Component.translatable("itemGroup.dynamictrees"),
+                    (_, output) -> {
+                        for (final DendroPotion.DendroPotionType potion : DendroPotion.DendroPotionType.values()) {
+                            if (potion.isActive()) {
+                                output.accept(DendroPotion.applyIndexTag(new ItemStack(DENDRO_POTION.get()), potion.getIndex()));
+                            }
+                        }
+                        CREATIVE_TAB_ITEMS.forEach(e -> output.accept(e.getDefaultInstance()));
+                    });
 
     ///////////////////////////////////////////
     // ENTITIES

@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.block.leaves;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
@@ -18,8 +19,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class SolidDynamicLeavesBlock extends DynamicLeavesBlock {
 
-    public SolidDynamicLeavesBlock(final LeavesProperties leavesProperties, final Properties properties) {
-        super(leavesProperties, properties);
+    public SolidDynamicLeavesBlock(Identifier id, final LeavesProperties leavesProperties, final Properties properties) {
+        super(id, leavesProperties, properties);
     }
 
     @Override

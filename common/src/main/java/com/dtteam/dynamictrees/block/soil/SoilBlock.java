@@ -19,6 +19,9 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -67,8 +70,8 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
 
     private final SoilProperties properties;
 
-    public SoilBlock(SoilProperties properties, Properties blockProperties) {
-        super(blockProperties.randomTicks().pushReaction(PushReaction.BLOCK));
+    public SoilBlock(Identifier id, SoilProperties properties, Properties blockProperties) {
+        super(blockProperties.randomTicks().pushReaction(PushReaction.BLOCK).setId(ResourceKey.create(Registries.BLOCK, id)));
         this.properties = properties;
         registerDefaultState(defaultBlockState().setValue(FERTILITY, 0).setValue(IS_VARIANT, false));
     }

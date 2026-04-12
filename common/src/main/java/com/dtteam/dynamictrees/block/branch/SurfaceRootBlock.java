@@ -8,6 +8,9 @@ import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -42,8 +45,8 @@ public class SurfaceRootBlock extends Block implements SimpleWaterloggedBlock {
 
     private final Family family;
 
-    public SurfaceRootBlock(Family family, Properties properties) {
-        super(properties.strength(2.5f, 1.0F));
+    public SurfaceRootBlock(Identifier id, Family family, Properties properties) {
+        super(properties.strength(2.5f, 1.0F).setId(ResourceKey.create(Registries.BLOCK, id)));
 
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
         this.family = family;

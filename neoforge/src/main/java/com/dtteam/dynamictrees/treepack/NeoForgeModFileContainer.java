@@ -4,7 +4,10 @@ import net.neoforged.neoforgespi.language.IModInfo;
 import net.neoforged.neoforgespi.locating.IModFile;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public class NeoForgeModFileContainer extends ModFileContainer {
@@ -20,7 +23,14 @@ public class NeoForgeModFileContainer extends ModFileContainer {
     //TODO: not sure if this works
     @Override
     public @NotNull Optional<Path> findResource(String strings) {
-        return Optional.of(Path.of(modFile.getFilePath().toString(), strings));
+        Collection<Path> rootPaths = modFile.getContents().getContentRoots();
+        for (Path rootPath : rootPaths) {
+            Path resourcePath = rootPath.resolve(strings);
+            if (Files.exists(resourcePath)) {
+                return Optional.of(resourcePath);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.worldgen.featurecancellation;
 
 import com.dtteam.dynamictrees.api.worldgen.BiomePropertySelectors;
 import com.dtteam.dynamictrees.api.worldgen.FeatureCanceller;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -33,13 +34,15 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
             return this.doesContainTrees((RandomFeatureConfiguration) featureConfig, featureCancellations);
         } else if (this.treeFeatureConfigClass.isInstance(featureConfig)) {
             String nameSpace = "";
-            final ConfiguredFeature<?, ?> nextConfiguredFeature = configuredFeature.getSubFeatures().findFirst().get().value();
+            final ConfiguredFeature<?, ?> nextConfiguredFeature = configuredFeature.getSubFeatures()
+                    .findFirst().map(Holder::value).orElse(null);
+            if (nextConfiguredFeature == null) return false;
             final FeatureConfiguration nextFeatureConfig = nextConfiguredFeature.config();
             final Identifier featureRegistryName = BuiltInRegistries.FEATURE.getKey(nextConfiguredFeature.feature());
             if (featureRegistryName != null) {
                 nameSpace = featureRegistryName.getNamespace();
             }
-            if (this.treeFeatureConfigClass.isInstance(nextFeatureConfig) && !nameSpace.equals("") &&
+            if (this.treeFeatureConfigClass.isInstance(nextFeatureConfig) && !nameSpace.isEmpty() &&
                 featureCancellations.shouldCancelNamespace(nameSpace)) {
                 return true; // Removes any individual trees.
             } else if (nextFeatureConfig instanceof RandomFeatureConfiguration) {
@@ -55,7 +58,10 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
     private boolean doesContainTrees(RandomFeatureConfiguration featureConfig, BiomePropertySelectors.NormalFeatureCancellation featureCancellations) {
         for (WeightedPlacedFeature feature : featureConfig.features) {
             final PlacedFeature currentConfiguredFeature = feature.feature.value();
-            final Identifier featureRegistryName = BuiltInRegistries.FEATURE.getKey(currentConfiguredFeature.getFeatures().findFirst().get().value().feature());
+            ConfiguredFeature<?,?> cf = currentConfiguredFeature.getFeatures()
+                    .findFirst().map(Holder::value).orElse(null);
+            if (cf == null) return false;
+            final Identifier featureRegistryName = BuiltInRegistries.FEATURE.getKey(cf.feature());
 
             if (this.treeFeatureConfigClass.isInstance(currentConfiguredFeature.placement()) && featureRegistryName != null &&
                 featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace())) {

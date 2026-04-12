@@ -8,6 +8,9 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -44,8 +47,8 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
         super(properties);
         pod = Pod.NULL;
     }
-    public PodBlock(Properties properties, Pod pod) {
-        super(properties);
+    public PodBlock(Identifier id, Properties properties, Pod pod) {
+        super(properties.setId(ResourceKey.create(Registries.BLOCK, id)));
         this.pod = pod;
 
         // Reset block state definition, as we need the pod to be set to create it properly.

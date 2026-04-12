@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -27,6 +28,7 @@ import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -34,9 +36,9 @@ public abstract class RegistryLoader {
 
     abstract public Supplier<CreativeModeTab> registerCreativeTab(String name, Supplier<ItemStack> icon, MutableComponent title, CreativeModeTab.DisplayItemsGenerator displayItems);
 
-    abstract public <T extends Block> Supplier<T> registerBlock(String name, Supplier<T> newBlock);
+    abstract public <T extends Block> Supplier<T> registerBlock(String name, Function<Identifier, T> newBlock);
 
-    abstract public <T extends Item> Supplier<T> registerItem(String name, Supplier<T> newBlock);
+    abstract public <T extends Item> Supplier<T> registerItem(String name, Function<Identifier, T> newBlock);
 
     abstract public <T extends Recipe<?>> Supplier<RecipeSerializer<T>> registerRecipeType(String name, Supplier<RecipeSerializer<T>> newBlock);
 

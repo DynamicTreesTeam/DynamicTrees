@@ -6,6 +6,9 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
@@ -39,8 +42,16 @@ public class DynamicSaplingBlock extends Block implements BonemealableBlock {
 
     protected Species species;
 
-    public DynamicSaplingBlock(Species species) {
-        super(Properties.of().mapColor(MapColor.PLANT).noCollision().pushReaction(PushReaction.DESTROY).instabreak().sound(SoundType.GRASS).randomTicks().noOcclusion());
+    public DynamicSaplingBlock(Identifier id, Species species) {
+        super(Properties.of()
+                .mapColor(MapColor.PLANT)
+                .noCollision()
+                .pushReaction(PushReaction.DESTROY)
+                .instabreak()
+                .sound(SoundType.GRASS)
+                .randomTicks()
+                .noOcclusion()
+                .setId(ResourceKey.create(Registries.BLOCK, id)));
         this.species = species;
     }
 

@@ -29,8 +29,10 @@ import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
@@ -351,7 +353,8 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @return A supplier for the {@link BlockItem}.
      */
     public Supplier<BlockItem> createBranchItem(final Identifier registryName, final Supplier<BranchBlock> branchSup) {
-        return RegistryHandler.addItem(suffix(registryName, getBranchNameSuffix()), () -> new BlockItem(branchSup.get(), new Item.Properties()));
+        Identifier id = suffix(registryName, getBranchNameSuffix());
+        return RegistryHandler.addItem(id, () -> new BlockItem(branchSup.get(), new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
     }
 
     protected Family setBranch(final Supplier<BranchBlock> branchSup) {
@@ -711,7 +714,8 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     }
 
     public Supplier<SurfaceRootBlock> createSurfaceRoot() {
-        return RegistryHandler.addBlock(suffix(this.getRegistryName(), "_root"), () -> new SurfaceRootBlock(this, getDefaultBranchProperties()));
+        Identifier id = suffix(this.getRegistryName(), "_root");
+        return RegistryHandler.addBlock(id, () -> new SurfaceRootBlock(id, this, getDefaultBranchProperties()));
     }
 
     public Optional<SurfaceRootBlock> getSurfaceRoot() {

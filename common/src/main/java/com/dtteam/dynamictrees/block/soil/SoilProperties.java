@@ -181,7 +181,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     }
 
     protected SoilBlock createBlock(BlockBehaviour.Properties blockProperties) {
-        return new SoilBlock(this, blockProperties);
+        return new SoilBlock(blockRegistryName, this, blockProperties);
     }
 
     public void setBlock(SoilBlock soilBlock) {

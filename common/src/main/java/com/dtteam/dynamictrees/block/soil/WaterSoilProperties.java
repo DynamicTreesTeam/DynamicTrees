@@ -43,7 +43,7 @@ public class WaterSoilProperties extends SoilProperties {
 
     @Override
     protected SoilBlock createBlock(BlockBehaviour.Properties blockProperties) {
-        return new SoilWaterBlock(this, blockProperties);
+        return new SoilWaterBlock(getBlockRegistryName(), this, blockProperties);
     }
 
     @Override
@@ -56,8 +56,8 @@ public class WaterSoilProperties extends SoilProperties {
         protected static final AABB WATER_ROOTS_AABB = new AABB(0.1, 0.0, 0.1, 0.9, 1.0, 0.9);
         public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-        public SoilWaterBlock(SoilProperties properties, Properties blockProperties) {
-            super(properties, blockProperties);
+        public SoilWaterBlock(Identifier id, SoilProperties properties, Properties blockProperties) {
+            super(id, properties, blockProperties);
             registerDefaultState(defaultBlockState().setValue(WATERLOGGED, true));
         }
 

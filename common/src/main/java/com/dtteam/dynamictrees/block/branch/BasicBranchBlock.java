@@ -17,7 +17,9 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -63,8 +65,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     /**
      * @param name name of branch, without a {@code _branch} suffix
      */
-    public BasicBranchBlock(Identifier name, BlockBehaviour.Properties properties, IntegerProperty radiusProperty,
-                            int maxRadius) {
+    public BasicBranchBlock(Identifier name, BlockBehaviour.Properties properties, IntegerProperty radiusProperty, int maxRadius) {
         super(name, properties);
 
         // Create branch state cache.

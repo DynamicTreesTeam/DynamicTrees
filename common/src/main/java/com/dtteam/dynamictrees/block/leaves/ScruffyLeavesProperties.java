@@ -27,7 +27,7 @@ public class ScruffyLeavesProperties extends LeavesProperties {
 
     @Override
     protected DynamicLeavesBlock createDynamicLeaves(final Block.Properties properties) {
-        return new DynamicLeavesBlock(this, properties){
+        return new DynamicLeavesBlock(getBlockRegistryName(),this, properties){
             public int getHydrationLevelFromNeighbors(LevelAccessor level, BlockPos pos, LeavesProperties leavesProperties) {
                 int hydro = super.getHydrationLevelFromNeighbors(level, pos, leavesProperties);
                 if (hydro <= maxHydro){

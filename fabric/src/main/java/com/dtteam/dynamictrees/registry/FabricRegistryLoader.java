@@ -37,6 +37,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -48,15 +49,15 @@ public class FabricRegistryLoader extends RegistryLoader {
     }
 
     @Override
-    public <T extends Block> Supplier<T> registerBlock(String name, Supplier<T> newBlock) {
-        T block = Registry.register(BuiltInRegistries.BLOCK, DynamicTrees.location(name), newBlock.get());
-        return ()-> block;
+    public <T extends Block> Supplier<T> registerBlock(String name, Function<Identifier, T> newBlock) {
+        Identifier id = DynamicTrees.location(name);
+        return ()-> Registry.register(BuiltInRegistries.BLOCK, id, newBlock.apply(id));
     }
 
     @Override
-    public <T extends Item> Supplier<T> registerItem(String name, Supplier<T> newBlock) {
-        T item = Registry.register(BuiltInRegistries.ITEM, DynamicTrees.location(name), newBlock.get());
-        return ()-> item;
+    public <T extends Item> Supplier<T> registerItem(String name, Function<Identifier, T> newBlock) {
+        Identifier id = DynamicTrees.location(name);
+        return ()-> Registry.register(BuiltInRegistries.ITEM, id, newBlock.apply(id));
     }
 
     @Override
@@ -68,7 +69,7 @@ public class FabricRegistryLoader extends RegistryLoader {
     @Override
     public Supplier<CreativeModeTab> registerCreativeTab(String name, Supplier<ItemStack> icon, MutableComponent title, CreativeModeTab.DisplayItemsGenerator displayItems) {
         CreativeModeTab tab = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, DynamicTrees.location(DynamicTrees.MOD_ID),
-                FabricItemGroup.builder().icon(icon).title(title).displayItems(displayItems).build());
+                CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0).icon(icon).title(title).displayItems(displayItems).build());
         return ()-> tab;
     }
 

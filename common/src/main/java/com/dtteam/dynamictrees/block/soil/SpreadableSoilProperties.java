@@ -49,7 +49,7 @@ public class SpreadableSoilProperties extends SoilProperties {
 
     @Override
     protected SoilBlock createBlock(BlockBehaviour.Properties blockProperties) {
-        return new SpreadableSoilBlock(this, blockProperties);
+        return new SpreadableSoilBlock(getBlockRegistryName(), this, blockProperties);
     }
 
     public void addSpreadableSoils(Block... blocks) {
@@ -67,8 +67,8 @@ public class SpreadableSoilProperties extends SoilProperties {
 
     public static class SpreadableSoilBlock extends SoilBlock {
 
-        public SpreadableSoilBlock(SpreadableSoilProperties properties, Properties blockProperties) {
-            super(properties, blockProperties);
+        public SpreadableSoilBlock(Identifier id, SpreadableSoilProperties properties, Properties blockProperties) {
+            super(id, properties, blockProperties);
         }
 
         @Override

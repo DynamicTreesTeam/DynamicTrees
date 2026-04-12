@@ -64,13 +64,13 @@ public class FabricRegistryHandler extends RegistryHandler {
 
     @Override
     public @Nullable Supplier<Block> getBlock(Identifier registryName) {
-        Block block = BuiltInRegistries.BLOCK.get(registryName);
+        Block block = BuiltInRegistries.BLOCK.get(registryName).get().value();
         return () -> block;
     }
 
     @Override
     public @Nullable Supplier<Item> getItem(Identifier registryName) {
-        Item item = BuiltInRegistries.ITEM.get(registryName);
+        Item item = BuiltInRegistries.ITEM.get(registryName).get().value();
         return () -> item;
     }
 

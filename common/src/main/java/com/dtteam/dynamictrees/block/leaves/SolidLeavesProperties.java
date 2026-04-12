@@ -36,7 +36,7 @@ public class SolidLeavesProperties extends LeavesProperties {
 
     @Override
     protected DynamicLeavesBlock createDynamicLeaves(BlockBehaviour.Properties properties) {
-        return new SolidDynamicLeavesBlock(this, properties);
+        return new SolidDynamicLeavesBlock(getBlockRegistryName(),this, properties);
     }
 
 }

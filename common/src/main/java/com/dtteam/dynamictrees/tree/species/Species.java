@@ -582,7 +582,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public Species generateSeed() {
         return !this.shouldGenerateSeed() || this.seed != null ? this :
-                this.setSeed(RegistryHandler.addItem(getSeedName(), () -> new Seed(this)));
+                this.setSeed(RegistryHandler.addItem(getSeedName(), () -> new Seed(getSeedName(),this)));
     }
 
     /**
@@ -838,7 +838,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public Species generateSapling() {
         return !this.shouldGenerateSapling() || this.saplingBlock != null ? this :
-                this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), () -> new DynamicSaplingBlock(this)));
+                this.setSapling(RegistryHandler.addBlock(this.getSaplingRegName(), () -> new DynamicSaplingBlock(getSaplingRegName(),this)));
     }
 
     /**

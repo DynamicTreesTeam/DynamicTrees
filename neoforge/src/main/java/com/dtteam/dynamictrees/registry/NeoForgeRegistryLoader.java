@@ -16,6 +16,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
@@ -42,6 +43,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.holdersets.HolderSetType;
 
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -86,16 +88,18 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     }
 
     @Override
-    public <T extends Block> Supplier<T> registerBlock (String name, Supplier<T> newBlock){
-        Supplier<T> sup = Suppliers.memoize(newBlock::get);
-        RegistryHandler.addBlock(DynamicTrees.location(name), sup);
+    public <T extends Block> Supplier<T> registerBlock (String name, Function<Identifier, T> newBlock){
+        Identifier id = DynamicTrees.location(name);
+        Supplier<T> sup = Suppliers.memoize(()->newBlock.apply(id));
+        RegistryHandler.addBlock(id, sup);
         return sup;
     }
 
     @Override
-    public <T extends Item> Supplier<T> registerItem (String name, Supplier<T> newBlock){
-        Supplier<T> sup = Suppliers.memoize(newBlock::get);
-        RegistryHandler.addItem(DynamicTrees.location(name), sup);
+    public <T extends Item> Supplier<T> registerItem (String name, Function<Identifier, T> newItem){
+        Identifier id = DynamicTrees.location(name);
+        Supplier<T> sup = Suppliers.memoize(()->newItem.apply(id));
+        RegistryHandler.addItem(id, sup);
         return sup;
     }
 

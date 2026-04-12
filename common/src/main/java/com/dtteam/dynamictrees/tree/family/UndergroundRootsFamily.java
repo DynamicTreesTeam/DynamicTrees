@@ -17,8 +17,10 @@ import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -94,7 +96,8 @@ public class UndergroundRootsFamily extends Family {
         return branch;
     }
     public Supplier<BlockItem> createRootsItem(final Identifier registryName, final Supplier<BranchBlock> rootsSup) {
-        return RegistryHandler.addItem(suffix(registryName, getRootsNameSuffix()), () -> new BlockItem(rootsSup.get(), new Item.Properties()));
+        Identifier id = suffix(registryName, getRootsNameSuffix());
+        return RegistryHandler.addItem(id, () -> new BlockItem(rootsSup.get(), new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
     }
 
     protected String getRootsNameSuffix() {

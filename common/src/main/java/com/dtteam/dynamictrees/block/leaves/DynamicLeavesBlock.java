@@ -22,6 +22,9 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -56,14 +59,14 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
     public LeavesProperties properties = LeavesProperties.NULL;
 
-    public DynamicLeavesBlock(final LeavesProperties leavesProperties, final Properties properties) {
-        this(properties);
+    public DynamicLeavesBlock(Identifier id, final LeavesProperties leavesProperties, final Properties properties) {
+        this(id, properties);
         this.properties = leavesProperties;
         leavesProperties.setDynamicLeavesState(defaultBlockState());
     }
 
-    public DynamicLeavesBlock(Properties properties) {
-        super(0, properties.pushReaction(PushReaction.DESTROY));
+    public DynamicLeavesBlock(Identifier id, Properties properties) {
+        super(0, properties.pushReaction(PushReaction.DESTROY).setId(ResourceKey.create(Registries.BLOCK, id)));
         this.registerDefaultState(this.stateDefinition.any().setValue(DISTANCE, LeavesProperties.maxHydro).setValue(PERSISTENT, false).setValue(WATERLOGGED, false));
     }
 

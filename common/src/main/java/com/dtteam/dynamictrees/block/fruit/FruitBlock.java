@@ -5,6 +5,9 @@ import com.dtteam.dynamictrees.block.Growable;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -31,8 +34,8 @@ public class FruitBlock extends Block implements BonemealableBlock, Growable {
 
     protected final Fruit fruit;
 
-    public FruitBlock(Properties properties, Fruit fruit) {
-        super(properties);
+    public FruitBlock(Identifier id, Properties properties, Fruit fruit) {
+        super(properties.setId(ResourceKey.create(Registries.BLOCK, id)));
         this.fruit = fruit;
 
         // Reset block state definition, as we need the fruit to be set to create it properly.

@@ -37,7 +37,7 @@ public class PalmLeavesProperties extends LeavesProperties {
 
     @Override
     protected DynamicLeavesBlock createDynamicLeaves(BlockBehaviour.Properties properties) {
-        return new DynamicPalmLeavesBlock(this, properties);
+        return new DynamicPalmLeavesBlock(getBlockRegistryName(),this, properties);
     }
 
     Identifier frondLoader = DynamicTrees.location("large_palm_fronds");
@@ -117,8 +117,8 @@ public class PalmLeavesProperties extends LeavesProperties {
             super.randomTick(state, level, pos, rand);
         }
 
-        public DynamicPalmLeavesBlock(LeavesProperties leavesProperties, Properties properties) {
-            super(leavesProperties, properties);
+        public DynamicPalmLeavesBlock(Identifier id, LeavesProperties leavesProperties, Properties properties) {
+            super(id, leavesProperties, properties);
             registerDefaultState(defaultBlockState().setValue(DIRECTION, 0));
         }
 

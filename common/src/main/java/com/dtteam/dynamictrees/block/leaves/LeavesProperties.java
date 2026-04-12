@@ -408,7 +408,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     protected DynamicLeavesBlock createDynamicLeaves(final BlockBehaviour.Properties properties) {
-        return new DynamicLeavesBlock(this, properties);
+        return new DynamicLeavesBlock(blockRegistryName,this, properties);
     }
 
     public void generateDynamicLeaves(final BlockBehaviour.Properties properties) {

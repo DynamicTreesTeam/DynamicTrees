@@ -3,6 +3,9 @@ package com.dtteam.dynamictrees.block.pod;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -16,8 +19,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class OffsetablePodBlock extends PodBlock{
 
-    public OffsetablePodBlock(Properties properties, Pod pod) {
-        super(properties, pod);
+    public OffsetablePodBlock(Identifier id, Properties properties, Pod pod) {
+        super(id, properties, pod);
     }
 
     @Override

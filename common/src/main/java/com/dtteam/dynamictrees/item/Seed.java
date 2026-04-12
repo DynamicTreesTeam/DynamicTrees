@@ -1,5 +1,6 @@
 package com.dtteam.dynamictrees.item;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
@@ -13,6 +14,9 @@ import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -55,12 +59,12 @@ public class Seed extends Item {//implements IPlantable {
 
     //This constructor is only used for the null registration
     public Seed() {
-        super(new Properties());
+        super(new Properties().setId(ResourceKey.create(Registries.ITEM, DynamicTrees.NULL)));
         this.species = Species.NULL_SPECIES;
     }
 
-    public Seed(Species species) {
-        this(species, new Properties());
+    public Seed(Identifier id, Species species) {
+        this(species, new Properties().setId(ResourceKey.create(Registries.ITEM, id)));
     }
 
     public Seed(@NotNull Species species, Properties properties) {
