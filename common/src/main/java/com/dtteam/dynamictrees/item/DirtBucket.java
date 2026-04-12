@@ -4,6 +4,9 @@ import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -22,10 +25,10 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class DirtBucket extends Item {
-    public DirtBucket() {
-        super(new Properties().stacksTo(1));
+    public DirtBucket(Identifier id) {
+        super(new Properties().stacksTo(1).setId(ResourceKey.create(Registries.ITEM, id)));
         DTRegistries.CREATIVE_TAB_ITEMS.add(this);
-        craftingRemainingItem = new ItemStackTemplate(this);
+        //craftingRemainingItem = new ItemStackTemplate(this);
     }
 
     @Override

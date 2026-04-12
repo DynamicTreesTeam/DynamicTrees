@@ -14,7 +14,10 @@ import com.dtteam.dynamictrees.worldgen.RootsJoCode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
@@ -49,14 +52,14 @@ public class Staff extends Item {
 
     public final static float REACH_DISTANCE = 512;
 
-    public Staff() {
+    public Staff(Identifier id) {
         super(new Properties().stacksTo(1).component(DataComponents.RARITY, Rarity.RARE).component(DataComponents.ATTRIBUTE_MODIFIERS,
                 ItemAttributeModifiers.builder()
                         //.add(Attributes.BLOCK_INTERACTION_RANGE, new AttributeModifier(DynamicTrees.location("dynamictrees_staff_range"), REACH_DISTANCE, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.HAND)
                         .add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 5.0, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
                         .add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -2.4, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
                         .build()
-        ));
+        ).setId(ResourceKey.create(Registries.ITEM, id)));
         DTRegistries.CREATIVE_TAB_ITEMS.add(this);
     }
 

@@ -45,7 +45,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
 
     public static void setup() {
         concreteBlocks = Arrays.stream(DyeColor.values())
-                .map(color -> BuiltInRegistries.BLOCK.get(Identifier.parse(color.getName() + "_concrete")))
+                .map(color -> BuiltInRegistries.BLOCK.get(Identifier.parse(color.getName() + "_concrete")).get().value())
                 .toArray(Block[]::new);
     }
 

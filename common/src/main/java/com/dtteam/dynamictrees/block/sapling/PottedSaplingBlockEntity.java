@@ -33,7 +33,7 @@ public class PottedSaplingBlockEntity extends BlockEntity {
     protected Species species = Species.NULL_SPECIES;
 
     public PottedSaplingBlockEntity(BlockPos pos, BlockState state) {
-        super(DTRegistries.POTTED_SAPLING_BLOCK_ENTITY.get(), pos, state); //
+        super(DTRegistries.POTTED_SAPLING_BLOCK_ENTITY.get(), pos, state);
     }
 
     public Species getSpecies() {

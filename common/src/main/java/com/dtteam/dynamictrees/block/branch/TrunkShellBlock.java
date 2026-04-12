@@ -8,6 +8,9 @@ import com.dtteam.dynamictrees.utility.NullUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -53,13 +56,14 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         }
     }
 
-    public TrunkShellBlock() {
+    public TrunkShellBlock(Identifier id) {
         super(Properties.of()
                 .ignitedByLava()
                 .pushReaction(PushReaction.BLOCK)
                 .sound(SoundType.WOOD)
                 .explosionResistance(3.0F)
-                .noOcclusion());
+                .noOcclusion()
+                .setId(ResourceKey.create(Registries.BLOCK, id)));
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
     }
 

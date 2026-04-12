@@ -54,7 +54,7 @@ public class DynamicTreesNeoForge {
         DynamicTrees.commonSetup();
     }
 
-    private void gatherData(final GatherDataEvent event) {
+    private void gatherData(final GatherDataEvent.Client event) {
         //Generate the tree block and item data
         Resources.MANAGER.gatherData();
         GatherDataHelper.gatherAllData(

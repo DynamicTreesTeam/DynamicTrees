@@ -90,20 +90,20 @@ public class ClientModEventHandler {
 //        BlockColorMultipliers.register("birch", (state, level, pos, tintIndex) -> FoliageColor.getBirchColor());
 //        BlockColorMultipliers.register("spruce", (state, level, pos, tintIndex) -> FoliageColor.getEvergreenColor());
 //    }
-//
-//    @SubscribeEvent
-//    public static void registerItemColorHandlersEvent(RegisterColorHandlersEvent.Item event){
+
+    @SubscribeEvent
+    public static void registerItemColorHandlersEvent(RegisterColorHandlersEvent.ItemTintSources event){
 //        // Register Potion Colorizer
 //        event.register(DTRegistries.DENDRO_POTION.get()::getColor, DTRegistries.DENDRO_POTION.get());
 //        // Register Woodland Staff Colorizer
 //        event.register(DTRegistries.STAFF.get()::getColor, DTRegistries.STAFF.get());
-//    }
+    }
 
     @SubscribeEvent
-    public static void registerBlockColorHandlersEvent(RegisterColorHandlersEvent event){
-        final int white = 0xFFFFFFFF;
-        final int magenta = 0x00FF00FF;//for errors.. because magenta sucks.
-
+    public static void registerBlockColorHandlersEvent(RegisterColorHandlersEvent.ColorResolvers event){
+//        final int white = 0xFFFFFFFF;
+//        final int magenta = 0x00FF00FF;//for errors... because magenta sucks.
+//
 //        // Register Rooty Colorizers
 //        for (SoilProperties soil : SoilProperties.REGISTRY) {
 //            if (soil.getBlock().isEmpty()) continue;

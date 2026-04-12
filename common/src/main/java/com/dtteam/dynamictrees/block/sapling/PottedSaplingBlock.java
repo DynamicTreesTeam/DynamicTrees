@@ -7,6 +7,9 @@ import com.dtteam.dynamictrees.utility.NullUtils;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -34,8 +37,8 @@ public class PottedSaplingBlock extends BaseEntityBlock {
 
     protected static final AABB FLOWER_POT_AABB = new AABB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 
-    public PottedSaplingBlock() {
-        super(Properties.of().instabreak().noOcclusion().pushReaction(PushReaction.DESTROY));
+    public PottedSaplingBlock(Identifier id) {
+        super(Properties.of().instabreak().noOcclusion().pushReaction(PushReaction.DESTROY).setId(ResourceKey.create(Registries.BLOCK, id)));
     }
 
     //////////////////////////////
