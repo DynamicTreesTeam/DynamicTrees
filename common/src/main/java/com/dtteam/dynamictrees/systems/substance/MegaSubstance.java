@@ -7,6 +7,8 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.PowerParticleOption;
+import net.minecraft.core.particles.SpellParticleOption;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -17,6 +19,7 @@ public class MegaSubstance implements SubstanceEffect {
 
         BlockState blockState = level.getBlockState(rootPos);
         SoilBlock dirt = TreeHelper.getRooty(blockState);
+        if (dirt == null) return false;
         final Species species = dirt.getSpecies(blockState, level, rootPos);
         final Species megaSpecies = species.getMegaSpecies();
 
@@ -26,9 +29,10 @@ public class MegaSubstance implements SubstanceEffect {
 
             blockState = level.getBlockState(rootPos);
             dirt = TreeHelper.getRooty(blockState);
+            if (dirt == null) return false;
 
             if (dirt.getSpecies(blockState, level, rootPos) == megaSpecies) {
-                TreeHelper.treeParticles(level, rootPos, ParticleTypes.DRAGON_BREATH, 8);
+                TreeHelper.treeParticles(level, rootPos, PowerParticleOption.create(ParticleTypes.DRAGON_BREATH, 1.0F), 8);
                 WailaHelper.invalidateWailaPosition();
                 return true;
             }

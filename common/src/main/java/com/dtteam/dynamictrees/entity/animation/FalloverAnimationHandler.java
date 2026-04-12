@@ -56,7 +56,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     protected void playStartSound(FallingTreeEntity entity){
-        if (!getData(entity).startSoundPlayed && entity.level().isClientSide){
+        if (!getData(entity).startSoundPlayed && entity.level().isClientSide()){
             Species species = entity.getSpecies();
             SoundEvent sound = species.getFallingTreeStartSound(entity.getVolume(), entity.hasLeaves());
             SoundInstanceHandler.playSoundInstance(sound, species.getFallingTreePitch(entity.getVolume()), entity.position(), entity);
@@ -64,7 +64,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
     protected void playEndSound(FallingTreeEntity entity){
         if (!getData(entity).endSoundPlayed){
-            if (entity.level().isClientSide){
+            if (entity.level().isClientSide()){
                 SoundInstanceHandler.stopSoundInstance(entity);
             } else {
                 Species species = entity.getSpecies();
@@ -118,7 +118,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
             limitChance = maxParticleBlocks / (double)data.getNumLeaves();
         limitChance *= Math.exp(-bounces);
 
-        RandomSource rand = entity.level().random;
+        RandomSource rand = entity.level().getRandom();
         int particleCount = (int)((bounces == 0 ? (int)(fallSpeed*5) : 1) * data.species.falloverParticleFlingMultiplier());
 
         if (particleCount == 0) return;
@@ -223,18 +223,18 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
         //Crush living things with clumsy dead trees
         Level level = entity.level();
-        if (DTConfigs.SERVER.enableFallingTreeDamage.get() && !level.isClientSide) {
+        if (DTConfigs.SERVER.enableFallingTreeDamage.get() && !level.isClientSide()) {
             List<LivingEntity> elist = testEntityCollision(entity);
             for (LivingEntity living : elist) {
-                if (!getData(entity).entitiesHit.contains(living) && !living.getType().is(DTEntityTypeTags.FALLING_TREE_DAMAGE_IMMUNE)) {
+                if (!getData(entity).entitiesHit.contains(living) && !living.is(DTEntityTypeTags.FALLING_TREE_DAMAGE_IMMUNE)) {
                     getData(entity).entitiesHit.add(living);
                     float damage = entity.getDestroyData().woodVolume.getVolume() * Math.abs(fallSpeed) * 3f;
                     if (getData(entity).bounces == 0 && damage > 2) {
                         living.setDeltaMovement(
-                                living.getDeltaMovement().x + (level.random.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getStepX() * damage * 0.2f),
-                                living.getDeltaMovement().y + (level.random.nextFloat() * fallSpeed * 0.25f),
-                                living.getDeltaMovement().z + (level.random.nextFloat() * entity.getDestroyData().toolDir.getOpposite().getStepZ() * damage * 0.2f));
-                        living.setDeltaMovement(living.getDeltaMovement().x + (level.random.nextFloat() - 0.5), living.getDeltaMovement().y, living.getDeltaMovement().z + (level.random.nextFloat() - 0.5));
+                                living.getDeltaMovement().x + (level.getRandom().nextFloat() * entity.getDestroyData().toolDir.getOpposite().getStepX() * damage * 0.2f),
+                                living.getDeltaMovement().y + (level.getRandom().nextFloat() * fallSpeed * 0.25f),
+                                living.getDeltaMovement().z + (level.getRandom().nextFloat() * entity.getDestroyData().toolDir.getOpposite().getStepZ() * damage * 0.2f));
+                        living.setDeltaMovement(living.getDeltaMovement().x + (level.getRandom().nextFloat() - 0.5), living.getDeltaMovement().y, living.getDeltaMovement().z + (level.getRandom().nextFloat() - 0.5));
                         damage *= DTConfigs.SERVER.fallingTreeDamageMultiplier.get();
                         living.hurt(AnimationConstants.treeDamage(level.registryAccess()), damage);
                     }
@@ -373,7 +373,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
                         entity.landed ||
                         entity.tickCount > 120 + (entity.getDestroyData().trunkHeight);
 
-        if (dead && entity.level().isClientSide) {
+        if (dead && entity.level().isClientSide()) {
             SoundInstanceHandler.stopSoundInstance(entity);
         }
 

@@ -5,15 +5,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.client.RenderTypeGroup;
-import net.neoforged.neoforge.client.model.IModelBuilder;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
+import net.neoforged.neoforge.model.data.ModelProperty;
 import org.joml.Vector3f;
 
 public class ModelHelper {
@@ -68,25 +64,25 @@ public class ModelHelper {
         };
     }
 
-    public static BakedQuad makeBakedQuad(BlockElement blockPart, BlockElementFace partFace, TextureAtlasSprite atlasSprite, Direction dir, BlockModelRotation modelRotation) {
-        return new FaceBakery().bakeQuad(blockPart.from, blockPart.to, partFace, atlasSprite, dir, modelRotation, blockPart.rotation, true);
-    }
-
-    public static IModelBuilder<?> getModelBuilder(IGeometryBakingContext context, TextureAtlasSprite particle) {
-        Identifier renderTypeHint = context.getRenderTypeHint();
-        RenderTypeGroup renderTypes = renderTypeHint != null ? context.getRenderType(renderTypeHint) : RenderTypeGroup.EMPTY;
-
-        return IModelBuilder.of(context.useAmbientOcclusion(), context.useBlockLight(), context.isGui3d(),
-                context.getTransforms(), ItemOverrides.EMPTY, particle, renderTypes);
-    }
-
-    @SuppressWarnings("deprecation")
-    public static TextureAtlasSprite getTexture(Identifier resLoc) {
-        return getTexture(resLoc, TextureAtlas.LOCATION_BLOCKS);
-    }
-
-    public static TextureAtlasSprite getTexture(Identifier resLoc, Identifier atlasResLoc) {
-        return Minecraft.getInstance().getTextureAtlas(atlasResLoc).apply(resLoc);
-    }
+//    public static BakedQuad makeBakedQuad(BlockElement blockPart, BlockElementFace partFace, TextureAtlasSprite atlasSprite, Direction dir, BlockModelRotation modelRotation) {
+//        return new FaceBakery().bakeQuad(blockPart.from, blockPart.to, partFace, atlasSprite, dir, modelRotation, blockPart.rotation, true);
+//    }
+//
+//    public static IModelBuilder<?> getModelBuilder(IGeometryBakingContext context, TextureAtlasSprite particle) {
+//        Identifier renderTypeHint = context.getRenderTypeHint();
+//        RenderTypeGroup renderTypes = renderTypeHint != null ? context.getRenderType(renderTypeHint) : RenderTypeGroup.EMPTY;
+//
+//        return IModelBuilder.of(context.useAmbientOcclusion(), context.useBlockLight(), context.isGui3d(),
+//                context.getTransforms(), ItemOverrides.EMPTY, particle, renderTypes);
+//    }
+//
+//    @SuppressWarnings("deprecation")
+//    public static TextureAtlasSprite getTexture(Identifier resLoc) {
+//        return getTexture(resLoc, TextureAtlas.LOCATION_BLOCKS);
+//    }
+//
+//    public static TextureAtlasSprite getTexture(Identifier resLoc, Identifier atlasResLoc) {
+//        return Minecraft.getInstance().getTextureAtlas(atlasResLoc).apply(resLoc);
+//    }
 
 }

@@ -6,6 +6,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
@@ -29,9 +30,10 @@ public class DTReplaceNyliumFungiBlockStateProvider extends BlockStateProvider {
     }
 
     @Override
-    public BlockState getState(RandomSource random, BlockPos state) {
+    public BlockState getState(WorldGenLevel worldGenLevel, RandomSource randomSource, BlockPos blockPos) {
         return DTConfigs.COMMON.replaceNyliumFungi.get()
-                ? this.enabled.getState(random, state)
-                : this.disabled.getState(random, state);
+                ? this.enabled.getState(worldGenLevel, randomSource, blockPos)
+                : this.disabled.getState(worldGenLevel, randomSource, blockPos);
     }
+
 }

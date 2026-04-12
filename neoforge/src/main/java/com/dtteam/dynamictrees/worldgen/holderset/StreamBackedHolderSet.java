@@ -1,11 +1,11 @@
 package com.dtteam.dynamictrees.worldgen.holderset;
 
 import com.mojang.datafixers.util.Either;
-import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.Util;
 
 import java.util.*;
 import java.util.stream.Collectors;

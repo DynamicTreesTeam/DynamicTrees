@@ -28,8 +28,6 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.ui.IElement;
-import snownee.jade.impl.ui.ElementHelper;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -43,96 +41,96 @@ public class WailaBranchHandler implements IBlockComponentProvider {
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-        if (WailaHelper.invalid) {
-            lastPos = BlockPos.ZERO;
-            lastSpecies = Species.NULL_SPECIES;
-            lastVolume = new NetVolumeNode.Volume();
-
-            WailaHelper.invalid = false;
-        }
-
-        CompoundTag nbtData = accessor.getServerData();
-        BlockPos pos = accessor.getPosition();
-        Species species = Species.NULL_SPECIES;
-
-        //Attempt to get species from server via NBT data
-        if (nbtData.contains("species")) {
-            species = Species.findSpecies(Identifier.parse(nbtData.getString("species")));
-        }
-
-        //Attempt to get species by checking if we're still looking at the same block
-        if (species == Species.NULL_SPECIES && lastPos.equals(pos)) {
-            species = lastSpecies;
-        }
-
-        //Attempt to get species from the world as a last resort as the operation can be rather expensive
-        if (species == Species.NULL_SPECIES) {
-            species = getWailaSpecies(accessor.getLevel(), pos);
-        }
-
-        if (!species.useDefaultWailaBody()) {
-            return;
-        }
-
-        if (!lastPos.equals(pos)) {
-            lastVolume = getTreeVolume(accessor.getLevel(), pos, species);
-        }
-
-        //Update the cached species and position
-        lastSpecies = species;
-        lastPos = pos;
-
-        if (species != Species.NULL_SPECIES) {
-            if (species.showSpeciesOnWaila()) {
-                tooltip.add(Component.translatable("tooltip.dynamictrees.species", species.getTextComponent()));
-            }
-
-            if (Minecraft.getInstance().options.advancedItemTooltips) {
-                tooltip.add(Component.literal(ChatFormatting.DARK_GRAY + species.getRegistryName().toString()));
-            }
-
-            ItemStack seedStack = species.getSeedStack(1);
-
-            List<IElement> elements = new LinkedList<>();
-            elements.add(getElement(seedStack)); //adds seed;
-
-            if (species.hasFruits()){
-                for (Fruit fruit : species.getFruits()){
-                    ItemStack fruitStack = fruit.getItemStack();
-                    if (fruitStack.getItem() != seedStack.getItem())
-                        elements.add(getElement(fruitStack));
-                }
-            }
-            if (species.hasPods()){
-                for (Pod pod : species.getPods()){
-                    ItemStack podStack = pod.getItemStack();
-                    if (podStack.getItem() != seedStack.getItem())
-                        elements.add(getElement(podStack));
-                }
-            }
-
-            int silkTouch = ItemUtils.getEnchantmentLevel(Enchantments.SILK_TOUCH, accessor.getPlayer().getMainHandItem(), accessor.getPlayer().registryAccess());
-            int fortune = ItemUtils.getEnchantmentLevel(Enchantments.FORTUNE, accessor.getPlayer().getMainHandItem(), accessor.getPlayer().registryAccess());
-            if (lastVolume.getVolume() > 0) {
-                LogsAndSticks las = species.getLogsAndSticks(lastVolume, silkTouch > 0, fortune);
-                List<ItemStack> logStacks = las.logs;
-                if (!logStacks.isEmpty()) {
-                    for (ItemStack logStack : logStacks) {
-                        elements.add(getElement(logStack));
-                    }
-                }
-                if (las.sticks > 0) {
-                    ItemStack stickStack = species.getFamily().getStick(las.sticks);
-                    if (!stickStack.isEmpty()) {
-                        elements.add(getElement(stickStack));
-                    }
-                }
-            }
-
-            tooltip.add(elements.removeFirst());
-            elements.forEach(tooltip::append);
-            tooltip.add(ElementHelper.INSTANCE.spacer(0, 2));
-        }
+//        if (WailaHelper.invalid) {
+//            lastPos = BlockPos.ZERO;
+//            lastSpecies = Species.NULL_SPECIES;
+//            lastVolume = new NetVolumeNode.Volume();
+//
+//            WailaHelper.invalid = false;
+//        }
+//
+//        CompoundTag nbtData = accessor.getServerData();
+//        BlockPos pos = accessor.getPosition();
+//        Species species = Species.NULL_SPECIES;
+//
+//        //Attempt to get species from server via NBT data
+//        if (nbtData.contains("species")) {
+//            species = Species.findSpecies(Identifier.parse(nbtData.getString("species").get()));
+//        }
+//
+//        //Attempt to get species by checking if we're still looking at the same block
+//        if (species == Species.NULL_SPECIES && lastPos.equals(pos)) {
+//            species = lastSpecies;
+//        }
+//
+//        //Attempt to get species from the world as a last resort as the operation can be rather expensive
+//        if (species == Species.NULL_SPECIES) {
+//            species = getWailaSpecies(accessor.getLevel(), pos);
+//        }
+//
+//        if (!species.useDefaultWailaBody()) {
+//            return;
+//        }
+//
+//        if (!lastPos.equals(pos)) {
+//            lastVolume = getTreeVolume(accessor.getLevel(), pos, species);
+//        }
+//
+//        //Update the cached species and position
+//        lastSpecies = species;
+//        lastPos = pos;
+//
+//        if (species != Species.NULL_SPECIES) {
+//            if (species.showSpeciesOnWaila()) {
+//                tooltip.add(Component.translatable("tooltip.dynamictrees.species", species.getTextComponent()));
+//            }
+//
+//            if (Minecraft.getInstance().options.advancedItemTooltips) {
+//                tooltip.add(Component.literal(ChatFormatting.DARK_GRAY + species.getRegistryName().toString()));
+//            }
+//
+//            ItemStack seedStack = species.getSeedStack(1);
+//
+//            List<IElement> elements = new LinkedList<>();
+//            elements.add(getElement(seedStack)); //adds seed;
+//
+//            if (species.hasFruits()){
+//                for (Fruit fruit : species.getFruits()){
+//                    ItemStack fruitStack = fruit.getItemStack();
+//                    if (fruitStack.getItem() != seedStack.getItem())
+//                        elements.add(getElement(fruitStack));
+//                }
+//            }
+//            if (species.hasPods()){
+//                for (Pod pod : species.getPods()){
+//                    ItemStack podStack = pod.getItemStack();
+//                    if (podStack.getItem() != seedStack.getItem())
+//                        elements.add(getElement(podStack));
+//                }
+//            }
+//
+//            int silkTouch = ItemUtils.getEnchantmentLevel(Enchantments.SILK_TOUCH, accessor.getPlayer().getMainHandItem(), accessor.getPlayer().registryAccess());
+//            int fortune = ItemUtils.getEnchantmentLevel(Enchantments.FORTUNE, accessor.getPlayer().getMainHandItem(), accessor.getPlayer().registryAccess());
+//            if (lastVolume.getVolume() > 0) {
+//                LogsAndSticks las = species.getLogsAndSticks(lastVolume, silkTouch > 0, fortune);
+//                List<ItemStack> logStacks = las.logs;
+//                if (!logStacks.isEmpty()) {
+//                    for (ItemStack logStack : logStacks) {
+//                        elements.add(getElement(logStack));
+//                    }
+//                }
+//                if (las.sticks > 0) {
+//                    ItemStack stickStack = species.getFamily().getStick(las.sticks);
+//                    if (!stickStack.isEmpty()) {
+//                        elements.add(getElement(stickStack));
+//                    }
+//                }
+//            }
+//
+//            tooltip.add(elements.removeFirst());
+//            elements.forEach(tooltip::append);
+//            tooltip.add(ElementHelper.INSTANCE.spacer(0, 2));
+//        }
     }
 
     private NetVolumeNode.Volume getTreeVolume(Level level, BlockPos pos, Species species) {
@@ -167,13 +165,13 @@ public class WailaBranchHandler implements IBlockComponentProvider {
         return TreeHelper.getBestGuessSpecies(level, pos);
     }
 
-    private static IElement getElement(ItemStack stack) {
-        if (!stack.isEmpty()) {
-            return ElementHelper.INSTANCE.item(stack);
-        } else {
-            return ElementHelper.INSTANCE.spacer(0, 0);
-        }
-    }
+//    private static IElement getElement(ItemStack stack) {
+//        if (!stack.isEmpty()) {
+//            return ElementHelper.INSTANCE.item(stack);
+//        } else {
+//            return ElementHelper.INSTANCE.spacer(0, 0);
+//        }
+//    }
 
     @Override
     public Identifier getUid() {

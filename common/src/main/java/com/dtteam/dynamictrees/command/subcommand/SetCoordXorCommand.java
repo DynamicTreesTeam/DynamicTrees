@@ -4,8 +4,10 @@ import com.dtteam.dynamictrees.command.CommandConstants;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.PermissionCheck;
 
 import java.util.Collections;
 
@@ -17,8 +19,8 @@ public final class SetCoordXorCommand extends SubCommand {
     }
 
     @Override
-    protected int getPermissionLevel() {
-        return 2;
+    protected PermissionCheck getPermissionLevel() {
+        return Commands.LEVEL_GAMEMASTERS;
     }
 
     private static final String XOR = "xor";

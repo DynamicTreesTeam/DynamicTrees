@@ -72,7 +72,7 @@ public class WaterSoilProperties extends SoilProperties {
         }
 
         @Override
-        public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+        protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
             BlockState upState = level.getBlockState(pos.above());
             if (TreeHelper.isBranch(upState)) {
                 return TreeHelper.getBranch(upState).getFamily().getBranchItem()

@@ -12,7 +12,6 @@ import net.minecraft.world.level.material.FluidState;
 public interface IInteractionHelper {
 
     boolean canToolAxeStrip(ItemStack stack);
-    boolean canToolAxeDig (ItemStack stack);
     int setSeedItemEntityLifespan (ItemEntity entityItem, Seed seed);
     boolean blockDestroyByPlayer (BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluidState);
 

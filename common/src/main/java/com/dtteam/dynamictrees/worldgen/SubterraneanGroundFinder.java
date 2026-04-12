@@ -34,7 +34,7 @@ public class SubterraneanGroundFinder implements GroundFinder {
 
     protected ArrayList<Integer> findSubterraneanLayerHeights(final LevelAccessor level, final BlockPos start) {
         final int maxY = this.getTopY(level, start);
-        final int minY = level.getMinBuildHeight();
+        final int minY = level.getMinY();
         final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(start.getX(), minY, start.getZ());
         final ArrayList<Integer> layers = new ArrayList<>();
 

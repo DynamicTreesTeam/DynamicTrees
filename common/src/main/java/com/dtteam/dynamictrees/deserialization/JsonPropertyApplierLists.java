@@ -12,7 +12,7 @@ import net.minecraft.world.level.material.MapColor;
 public final class JsonPropertyApplierLists {
 
     public static final JsonPropertyAppliers<BlockBehaviour.Properties> PROPERTIES = new JsonPropertyAppliers<>(BlockBehaviour.Properties.class)
-            .registerIfTrueApplier("no_collision", BlockBehaviour.Properties::noCollission)
+            .registerIfTrueApplier("no_collision", BlockBehaviour.Properties::noCollision)
             .registerIfTrueApplier("not_occlusion", BlockBehaviour.Properties::noOcclusion)
             .register("friction", Float.class, BlockBehaviour.Properties::friction)
             .register("speed_factor", Float.class, BlockBehaviour.Properties::speedFactor)

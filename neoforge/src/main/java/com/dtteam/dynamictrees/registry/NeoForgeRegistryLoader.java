@@ -16,13 +16,15 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -33,12 +35,6 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
-import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -60,9 +56,9 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     public static final DeferredRegister<StructurePoolElementType<?>> STRUCTURE_POOL_ELEMENT_TYPES = DeferredRegister.create(Registries.STRUCTURE_POOL_ELEMENT, DynamicTrees.MOD_ID);
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENT_TYPES = DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, DynamicTrees.MOD_ID);
-    public static final DeferredRegister<LootItemConditionType> LOOT_CONDITION_TYPES = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, DynamicTrees.MOD_ID);
-    public static final DeferredRegister<LootPoolEntryType> LOOT_POOL_ENTRY_TYPES = DeferredRegister.create(Registries.LOOT_POOL_ENTRY_TYPE, DynamicTrees.MOD_ID);
-    public static final DeferredRegister<LootItemFunctionType<?>> LOOT_FUNCTION_TYPES = DeferredRegister.create(Registries.LOOT_FUNCTION_TYPE, DynamicTrees.MOD_ID);
+//    public static final DeferredRegister<LootItemConditionType> LOOT_CONDITION_TYPES = DeferredRegister.create(Registries.LOOT_CONDITION_TYPE, DynamicTrees.MOD_ID);
+//    public static final DeferredRegister<LootPoolEntryType> LOOT_POOL_ENTRY_TYPES = DeferredRegister.create(Registries.LOOT_POOL_ENTRY_TYPE, DynamicTrees.MOD_ID);
+//    public static final DeferredRegister<LootItemFunctionType<?>> LOOT_FUNCTION_TYPES = DeferredRegister.create(Registries.LOOT_FUNCTION_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZER = DeferredRegister.create(Registries.RECIPE_SERIALIZER, DynamicTrees.MOD_ID);
 
 
@@ -77,9 +73,9 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         STRUCTURE_POOL_ELEMENT_TYPES.register(modBus);
         DATA_COMPONENT_TYPES.register(modBus);
         ARGUMENT_TYPES.register(modBus);
-        LOOT_POOL_ENTRY_TYPES.register(modBus);
-        LOOT_CONDITION_TYPES.register(modBus);
-        LOOT_FUNCTION_TYPES.register(modBus);
+//        LOOT_POOL_ENTRY_TYPES.register(modBus);
+//        LOOT_CONDITION_TYPES.register(modBus);
+//        LOOT_FUNCTION_TYPES.register(modBus);
         RECIPE_SERIALIZER.register(modBus);
 
         //NeoForge
@@ -118,13 +114,13 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     public <T extends Entity> Supplier<EntityType<T>> registerEntity(String name, EntityType.Builder<T> builder, boolean isTree) {
         if (isTree)
             builder.setShouldReceiveVelocityUpdates(true).setTrackingRange(512).setUpdateInterval(Integer.MAX_VALUE);
-        return ENTITY_TYPES.register(name, () -> builder.build(name));
+        return ENTITY_TYPES.register(name, () -> builder.build(ResourceKey.create(ENTITY_TYPES.getRegistryKey(), DynamicTrees.location(name))));
     }
 
     @Override
     public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String name, BlockEntityType.BlockEntitySupplier<? extends T> newBlockEntity, Supplier<Set<Block>> validBlocks) {
         return BLOCK_ENTITY_TYPES.register(name, () ->
-                new BlockEntityType<>(newBlockEntity, validBlocks.get(), null));
+                new BlockEntityType<>(newBlockEntity, validBlocks.get()));
     }
 
     @Override
@@ -142,20 +138,20 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         return ARGUMENT_TYPES.register(name, () -> ArgumentTypeInfos.registerByClass(infoClass, argumentTypeInfo));
     }
 
-    @Override
-    public Supplier<LootItemConditionType> registerLootConditionType(String name, MapCodec<? extends LootItemCondition> serializerFactory) {
-        return LOOT_CONDITION_TYPES.register(name, () -> new LootItemConditionType(serializerFactory));
-    }
-
-    @Override
-    public Supplier<LootPoolEntryType> registerLootPoolEntryType(String name, MapCodec<? extends LootPoolEntryContainer> serializerFactory) {
-        return LOOT_POOL_ENTRY_TYPES.register(name, () -> new LootPoolEntryType(serializerFactory));
-    }
-
-    @Override
-    public <L extends LootItemFunction> Supplier<LootItemFunctionType<L>> registerLootFunctionType(String name, MapCodec<L> serializerFactory) {
-        return LOOT_FUNCTION_TYPES.register(name, () -> new LootItemFunctionType<>(serializerFactory));
-    }
+//    @Override
+//    public Supplier<LootItemConditionType> registerLootConditionType(String name, MapCodec<? extends LootItemCondition> serializerFactory) {
+//        return LOOT_CONDITION_TYPES.register(name, () -> new LootItemConditionType(serializerFactory));
+//    }
+//
+//    @Override
+//    public Supplier<LootPoolEntryType> registerLootPoolEntryType(String name, MapCodec<? extends LootPoolEntryContainer> serializerFactory) {
+//        return LOOT_POOL_ENTRY_TYPES.register(name, () -> new LootPoolEntryType(serializerFactory));
+//    }
+//
+//    @Override
+//    public <L extends LootItemFunction> Supplier<LootItemFunctionType<L>> registerLootFunctionType(String name, MapCodec<L> serializerFactory) {
+//        return LOOT_FUNCTION_TYPES.register(name, () -> new LootItemFunctionType<>(serializerFactory));
+//    }
 
     ///////////////////////////////////////////
     // WORLD GEN

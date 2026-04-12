@@ -4,7 +4,7 @@
   "package": "com.dtteam.dynamictrees.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "MixinBushBlock"
+    "MixinVegetationBlock"
   ],
   "client": [],
   "server": [],

@@ -42,13 +42,13 @@ public final class DTJeiPlugin implements IModPlugin {
             return null;
         }
 
-        @Override
-        public String getLegacyStringSubtypeInfo(ItemStack itemStack, UidContext uidContext) {
-            if (itemStack.getItem() instanceof DendroPotion){
-                return DendroPotion.getPotionType(itemStack).getName();
-            }
-            return "";
-        }
+//        @Override
+//        public String getLegacyStringSubtypeInfo(ItemStack itemStack, UidContext uidContext) {
+//            if (itemStack.getItem() instanceof DendroPotion){
+//                return DendroPotion.getPotionType(itemStack).getName();
+//            }
+//            return "";
+//        }
     }
 
     @Override
@@ -68,7 +68,7 @@ public final class DTJeiPlugin implements IModPlugin {
     }
 
     private static IJeiBrewingRecipe makeJeiBrewingRecipe(IVanillaRecipeFactory factory, final ItemStack inputStack, final ItemStack ingredientStack, ItemStack output) {
-        return factory.createBrewingRecipe(Collections.singletonList(ingredientStack), inputStack, output);
+        return factory.createBrewingRecipe(Collections.singletonList(ingredientStack), inputStack, output, Identifier.parse(""));
     }
 
 }

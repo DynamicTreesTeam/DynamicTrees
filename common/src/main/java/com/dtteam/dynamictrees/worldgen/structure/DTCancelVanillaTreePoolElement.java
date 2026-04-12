@@ -52,7 +52,7 @@ public class DTCancelVanillaTreePoolElement extends StructurePoolElement {
     }
 
     @Override
-    public List<StructureTemplate.StructureBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager structureTemplateManager, BlockPos pos, Rotation rotation, RandomSource random) {
+    public List<StructureTemplate.JigsawBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager structureTemplateManager, BlockPos pos, Rotation rotation, RandomSource random) {
         return this.isEnabled()
                 ? this.enabled.getShuffledJigsawBlocks(structureTemplateManager, pos, rotation, random)
                 : this.disabled.getShuffledJigsawBlocks(structureTemplateManager, pos, rotation, random);

@@ -27,8 +27,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.permissions.PermissionCheck;
 import net.minecraft.world.level.block.state.BlockState;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -62,11 +64,11 @@ public abstract class SubCommand {
      *
      * @return Permission level required.
      */
-    protected abstract int getPermissionLevel();
+    protected abstract PermissionCheck getPermissionLevel();
 
     public ArgumentBuilder<CommandSourceStack, ?> register() {
         final LiteralArgumentBuilder<CommandSourceStack> argumentBuilder = Commands.literal(this.getName())
-                .requires(commandSource -> commandSource.hasPermission(this.getPermissionLevel()));
+                .requires(Commands.hasPermission(getPermissionLevel()));
 
         this.registerArguments().forEach(argumentBuilder::then);
         return argumentBuilder;

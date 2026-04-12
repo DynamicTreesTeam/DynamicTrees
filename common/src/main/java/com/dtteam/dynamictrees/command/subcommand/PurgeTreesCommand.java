@@ -3,7 +3,9 @@ package com.dtteam.dynamictrees.command.subcommand;
 import com.dtteam.dynamictrees.command.CommandConstants;
 import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.PermissionCheck;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 
@@ -18,8 +20,8 @@ public final class PurgeTreesCommand extends ChunkBasedCommand {
     }
 
     @Override
-    protected int getPermissionLevel() {
-        return 2;
+    protected PermissionCheck getPermissionLevel() {
+        return Commands.LEVEL_GAMEMASTERS;
     }
 
     @Override

@@ -9,7 +9,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemNameBlockItem;
 import net.minecraft.world.level.block.Block;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,11 +32,11 @@ public class LeavesPropertiesLangGenerator implements Generator<DTDataProvider.L
         return new Dependencies();
     }
 
-    protected void itemLang(Item entry, Optional<String> override) {
-        if (!(entry instanceof BlockItem) || entry instanceof ItemNameBlockItem) {
-            provider.addItem(() -> entry, override.orElse(checkReplace(BuiltInRegistries.ITEM.getKey(entry))));
-        }
-    }
+//    protected void itemLang(Item entry, Optional<String> override) {
+//        if (!(entry instanceof BlockItem) || entry instanceof ItemNameBlockItem) {
+//            provider.addItem(() -> entry, override.orElse(checkReplace(BuiltInRegistries.ITEM.getKey(entry))));
+//        }
+//    }
 
     protected void speciesLang(Species entry, Optional<String> override) {
         provider.add(entry.getLocalizedName(), override.orElse(checkReplace(entry.getRegistryName())));

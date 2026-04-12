@@ -21,9 +21,6 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 public class LingeringEffectorEntity extends Entity {
-    public LingeringEffectorEntity(EntityType<?> type, Level level) {
-        super(type, level);
-    }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -43,18 +40,18 @@ public class LingeringEffectorEntity extends Entity {
     @Override
     protected void addAdditionalSaveData(ValueOutput valueOutput) {
 
-    }// implements IEntityAdditionalSpawnData {
-//
+    }
+
 //    public static final EntityDataAccessor<CompoundTag> effectorDataParameter = SynchedEntityData.defineId(LingeringEffectorEntity.class, EntityDataSerializers.COMPOUND_TAG);
-//
-//    private BlockPos blockPos;
-//    private SubstanceEffect effect;
-//    protected boolean clientBuilt = false;
-//
-//    public LingeringEffectorEntity(EntityType<? extends LingeringEffectorEntity> entityTypeIn, Level level) {
-//        super(entityTypeIn, level);
-//    }
-//
+
+    private BlockPos blockPos;
+    private SubstanceEffect effect;
+    protected boolean clientBuilt = false;
+
+    public LingeringEffectorEntity(EntityType<? extends LingeringEffectorEntity> entityTypeIn, Level level) {
+        super(entityTypeIn, level);
+    }
+
     public void setData (Level level, BlockPos pos, SubstanceEffect effect){
 //        this.noPhysics = true;
 //        this.setBlockPos(pos);
@@ -71,29 +68,29 @@ public class LingeringEffectorEntity extends Entity {
 //
 //        setEffectorData(buildEffectorData(pos, effect));
     }
-//
-//    public static boolean treeHasEffectorForEffect(LevelAccessor level, BlockPos pos, SubstanceEffect effect) {
-//        for (final LingeringEffectorEntity effector : level.getEntitiesOfClass(LingeringEffectorEntity.class, new AABB(pos))) {
-//            if (effector.getEffect() != null && effector.getEffect().getName().equals(effect.getName())) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    public void setBlockPos(BlockPos pos) {
-//        this.blockPos = pos;
-//        setPos(this.blockPos.getX() + 0.5, this.blockPos.getY(), this.blockPos.getZ() + 0.5);
-//    }
-//
-//    public BlockPos getBlockPos() {
-//        return blockPos;
-//    }
-//
-//    public SubstanceEffect getEffect() {
-//        return this.effect;
-//    }
-//
+
+    public static boolean treeHasEffectorForEffect(LevelAccessor level, BlockPos pos, SubstanceEffect effect) {
+        for (final LingeringEffectorEntity effector : level.getEntitiesOfClass(LingeringEffectorEntity.class, new AABB(pos))) {
+            if (effector.getEffect() != null && effector.getEffect().getName().equals(effect.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setBlockPos(BlockPos pos) {
+        this.blockPos = pos;
+        setPos(this.blockPos.getX() + 0.5, this.blockPos.getY(), this.blockPos.getZ() + 0.5);
+    }
+
+    public BlockPos getBlockPos() {
+        return blockPos;
+    }
+
+    public SubstanceEffect getEffect() {
+        return this.effect;
+    }
+
 //    @Override
 //    protected void defineSynchedData(SynchedEntityData.Builder builder) {
 //        builder.define(effectorDataParameter, new CompoundTag());

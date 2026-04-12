@@ -36,7 +36,7 @@ public class NormalSeasonManager implements SeasonManager {
     }
 
     private SeasonContext getContext(Level level) {
-        return seasonContextMap.computeIfAbsent(level.dimension().location(), d -> {
+        return seasonContextMap.computeIfAbsent(level.dimension().identifier(), d -> {
             Tuple<SeasonProvider, SeasonGrowthCalculator> tuple = createProvider(level);
             return new SeasonContext(tuple.getA(), tuple.getB());
         });

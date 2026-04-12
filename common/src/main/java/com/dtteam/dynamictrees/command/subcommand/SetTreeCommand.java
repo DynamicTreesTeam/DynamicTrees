@@ -10,11 +10,13 @@ import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.permissions.PermissionCheck;
 
 import java.util.stream.Collectors;
 
@@ -28,8 +30,8 @@ public final class SetTreeCommand extends SubCommand {
     }
 
     @Override
-    protected int getPermissionLevel() {
-        return 2;
+    protected PermissionCheck getPermissionLevel() {
+        return Commands.LEVEL_GAMEMASTERS;
     }
 
     private static final int DEFAULT_FERTILITY = 0;

@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.permissions.PermissionCheck;
 
 /**
  * An extension of {@link SubCommand} for simple commands (in this case, a command is considered "simple" if it does not
@@ -15,7 +16,7 @@ public abstract class SimpleSubCommand extends SubCommand {
 
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> register() {
-        return Commands.literal(this.getName()).requires(commandSource -> commandSource.hasPermission(this.getPermissionLevel()))
+        return Commands.literal(this.getName()).requires(Commands.hasPermission(getPermissionLevel()))
                 .executes(context -> executesSuccess(() -> this.execute(context)));
     }
 
@@ -33,8 +34,8 @@ public abstract class SimpleSubCommand extends SubCommand {
      * @return A permission level of {@code 0}.
      */
     @Override
-    protected int getPermissionLevel() {
-        return 0;
+    protected PermissionCheck getPermissionLevel() {
+        return Commands.LEVEL_ALL;
     }
 
     @Override

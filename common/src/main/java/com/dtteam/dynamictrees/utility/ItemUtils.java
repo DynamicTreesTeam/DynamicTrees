@@ -68,7 +68,8 @@ public final class ItemUtils {
      * @param forBlockBreak If this function was used for breaking a block, as minecraft already did 1 value of damage.
      */
     public static void damageAxe(final LivingEntity entity, @Nullable final ItemStack heldItem, final int radius, final NetVolumeNode.Volume woodVolume, final boolean forBlockBreak) {
-        if (heldItem == null || !Services.INTERACTION.canToolAxeDig(heldItem)) {
+        //TODO: Check axe dig
+        if (heldItem == null) { // || !Services.INTERACTION.canToolAxeDig(heldItem)
             return;
         }
 

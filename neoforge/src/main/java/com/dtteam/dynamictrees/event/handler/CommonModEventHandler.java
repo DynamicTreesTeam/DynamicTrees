@@ -35,7 +35,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@EventBusSubscriber(modid = DynamicTrees.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DynamicTrees.MOD_ID)
 public class CommonModEventHandler {
 
     @SubscribeEvent

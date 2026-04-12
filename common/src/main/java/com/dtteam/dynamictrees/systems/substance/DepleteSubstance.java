@@ -15,7 +15,7 @@ public class DepleteSubstance implements SubstanceEffect {
     public boolean apply(Level level, BlockPos rootPos) {
         final SoilBlock dirt = TreeHelper.getRooty(level.getBlockState(rootPos));
 
-        if (dirt.fertilize(level, rootPos, -amount)) {
+        if (dirt != null && dirt.fertilize(level, rootPos, -amount)) {
             TreeHelper.treeParticles(level, rootPos, ParticleTypes.ANGRY_VILLAGER, 8);
             return true;
         }

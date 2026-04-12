@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> {
@@ -19,8 +20,8 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> 
     protected final int entityId;
     protected final Species species;
 
-    public FallingTreeEntityModel(ModelPart root, FallingTreeEntity entity) {
-        super(root);
+    public FallingTreeEntityModel(FallingTreeEntity entity) {
+        super(new ModelPart(List.of(), Map.of()));
         BranchDestructionData destructionData = entity.getDestroyData();
         Species species = destructionData.species;
 

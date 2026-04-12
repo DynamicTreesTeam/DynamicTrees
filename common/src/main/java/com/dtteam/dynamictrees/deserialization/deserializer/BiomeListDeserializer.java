@@ -34,7 +34,7 @@ public final class BiomeListDeserializer implements JsonDeserializer<IDTBiomeHol
         MinecraftServer currentServer = Services.MISC.getCurrentServer();
         if (currentServer == null)
             throw new IllegalStateException("Queried biome registry too early; server does not exist yet!");
-        return currentServer.registryAccess().registryOrThrow(Registries.BIOME);
+        return currentServer.registryAccess().lookupOrThrow(Registries.BIOME);
     };
 
     private static final Applier<IDTBiomeHolderSet, String> TAG_APPLIER = (biomeList, tagRegex) -> {
@@ -52,7 +52,7 @@ public final class BiomeListDeserializer implements JsonDeserializer<IDTBiomeHol
             // TODO UPDATE: This is used as a regex in 1.19.2. Double check!!!
             biomeList.addDelayedHolderSet(
                     (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()),
-                    () -> DELAYED_BIOME_REGISTRY.get().getOrCreateTag(tagKey));
+                    () -> DELAYED_BIOME_REGISTRY.get().getOrThrow(tagKey));
         } catch (IdentifierException e) {
             return PropertyApplierResult.failure(e.getMessage());
         }
@@ -71,7 +71,7 @@ public final class BiomeListDeserializer implements JsonDeserializer<IDTBiomeHol
         String finalNameRegex = nameRegex;
         biomeList.addNameRegexMatch(
                 (notOperator ? biomeList.getExcludeComponents() : biomeList.getIncludeComponents()),
-                ()->DELAYED_BIOME_REGISTRY.get().asLookup(), finalNameRegex);
+                DELAYED_BIOME_REGISTRY::get, finalNameRegex);
     };
 
     private static boolean usingNotOperator(String categoryString) {
@@ -94,7 +94,7 @@ public final class BiomeListDeserializer implements JsonDeserializer<IDTBiomeHol
             String finalNameRegex = nameRegex;
             biomeList.addNameRegexMatch(
                     (notOperator ? orExcludes : orIncludes),
-                    ()->DELAYED_BIOME_REGISTRY.get().asLookup(), finalNameRegex);
+                    DELAYED_BIOME_REGISTRY::get, finalNameRegex);
         });
 
         if (!orIncludes.isEmpty())
@@ -120,7 +120,7 @@ public final class BiomeListDeserializer implements JsonDeserializer<IDTBiomeHol
 
             biomeList.addTagsRegexMatch(
                     (notOperator ? orExcludes : orIncludes),
-                    ()->DELAYED_BIOME_REGISTRY.get().asLookup(), tagRegex);
+                    DELAYED_BIOME_REGISTRY::get, tagRegex);
         });
 
         if (!orIncludes.isEmpty())
@@ -182,7 +182,7 @@ public final class BiomeListDeserializer implements JsonDeserializer<IDTBiomeHol
         return JsonResult.forInput(input)
                 .mapIfType(String.class, biomeName -> {
                     IDTBiomeHolderSet biomes = Services.MISC.newDTBiomeHolderSet();
-                    biomes.addNameRegexMatch(biomes.getIncludeComponents(), ()->DELAYED_BIOME_REGISTRY.get().asLookup(), biomeName.toLowerCase(Locale.ENGLISH));
+                    biomes.addNameRegexMatch(biomes.getIncludeComponents(), DELAYED_BIOME_REGISTRY::get, biomeName.toLowerCase(Locale.ENGLISH));
                     return biomes;
                 })
                 .elseMapIfType(JsonObject.class, selectorObject -> {

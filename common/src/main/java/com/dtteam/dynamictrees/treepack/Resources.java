@@ -139,15 +139,13 @@ public final class Resources {
         }
 
         @Override
-        public CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager,
-                                              ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
-                                              Executor backgroundExecutor, Executor gameExecutor) {
-            final CompletableFuture<?>[] futures = MANAGER.prepareReload(gameExecutor, backgroundExecutor);
+        public CompletableFuture<Void> reload(SharedState sharedState, Executor executor, PreparationBarrier preparationBarrier, Executor executor1) {
+            final CompletableFuture<?>[] futures = MANAGER.prepareReload(executor, executor1);
 
             // Reload all reload listeners in the trees resource manager and registers dirt bucket recipes.
             return CompletableFuture.allOf(futures)
-                    .thenCompose(stage::wait)
-                    .thenAcceptAsync(v -> MANAGER.reload(futures), gameExecutor);
+                    .thenCompose(preparationBarrier::wait)
+                    .thenAcceptAsync(v -> MANAGER.reload(futures), executor);
         }
 
     }

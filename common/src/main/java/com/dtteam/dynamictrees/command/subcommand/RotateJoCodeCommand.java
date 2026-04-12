@@ -4,8 +4,10 @@ import com.dtteam.dynamictrees.command.CommandConstants;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.PermissionCheck;
 
 import java.util.Collections;
 
@@ -19,8 +21,8 @@ public final class RotateJoCodeCommand extends SubCommand {
     }
 
     @Override
-    protected int getPermissionLevel() {
-        return 0;
+    protected PermissionCheck getPermissionLevel() {
+        return Commands.LEVEL_ALL;
     }
 
     @Override

@@ -277,7 +277,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     // RENDERING
     ///////////////////////////////////////////
 
-    public Connections getConnectionData(@NotNull BlockAndTintGetter level, @NotNull BlockPos pos, @NotNull BlockState state) {
+    public Connections getConnectionData(@NotNull LevelAccessor level, @NotNull BlockPos pos, @NotNull BlockState state) {
         final Connections connections = new Connections();
 
         if (state.getBlock() != this) {

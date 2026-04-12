@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
@@ -37,16 +38,15 @@ public class OffsetablePodBlock extends PodBlock{
         return null;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @org.jspecify.annotations.Nullable Orientation orientation, boolean movedByPiston) {
         Direction direction = state.getValue(FACING);
         int currentOffset = state.getValue(pod.getOffsetProperty());
-        int newOffset = TreeHelper.getRadius(level, pos.offset(direction.getNormal()));
+        int newOffset = TreeHelper.getRadius(level, pos.offset(direction.getUnitVec3i()));
         if (currentOffset != newOffset && pod.isValidRadius(newOffset)){
             level.setBlock(pos, state.setValue(pod.getOffsetProperty(), newOffset), 2);
         }
-        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
     }
 
     @Override

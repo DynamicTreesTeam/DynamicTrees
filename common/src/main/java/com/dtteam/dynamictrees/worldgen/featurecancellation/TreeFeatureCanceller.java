@@ -33,7 +33,7 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
             return this.doesContainTrees((RandomFeatureConfiguration) featureConfig, featureCancellations);
         } else if (this.treeFeatureConfigClass.isInstance(featureConfig)) {
             String nameSpace = "";
-            final ConfiguredFeature<?, ?> nextConfiguredFeature = configuredFeature.getFeatures().findFirst().get();
+            final ConfiguredFeature<?, ?> nextConfiguredFeature = configuredFeature.getSubFeatures().findFirst().get().value();
             final FeatureConfiguration nextFeatureConfig = nextConfiguredFeature.config();
             final Identifier featureRegistryName = BuiltInRegistries.FEATURE.getKey(nextConfiguredFeature.feature());
             if (featureRegistryName != null) {
@@ -55,7 +55,7 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
     private boolean doesContainTrees(RandomFeatureConfiguration featureConfig, BiomePropertySelectors.NormalFeatureCancellation featureCancellations) {
         for (WeightedPlacedFeature feature : featureConfig.features) {
             final PlacedFeature currentConfiguredFeature = feature.feature.value();
-            final Identifier featureRegistryName = BuiltInRegistries.FEATURE.getKey(currentConfiguredFeature.getFeatures().findFirst().get().feature());
+            final Identifier featureRegistryName = BuiltInRegistries.FEATURE.getKey(currentConfiguredFeature.getFeatures().findFirst().get().value().feature());
 
             if (this.treeFeatureConfigClass.isInstance(currentConfiguredFeature.placement()) && featureRegistryName != null &&
                 featureCancellations.shouldCancelNamespace(featureRegistryName.getNamespace())) {

@@ -4,6 +4,8 @@ import com.dtteam.dynamictrees.api.registry.Registries;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.permissions.PermissionCheck;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,8 +27,8 @@ public final class RegistryCommand extends SubCommand {
     }
 
     @Override
-    protected int getPermissionLevel() {
-        return 0;
+    protected PermissionCheck getPermissionLevel() {
+        return Commands.LEVEL_ALL;
     }
 
     @Override

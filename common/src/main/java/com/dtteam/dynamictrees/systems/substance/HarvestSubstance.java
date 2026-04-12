@@ -16,6 +16,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SpellParticleOption;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -110,13 +111,13 @@ public class HarvestSubstance implements SubstanceEffect {
             return false;
         }
 
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             if (deltaTicks % this.ticksPerParticlePulse == 0) {
                 // Recalculate fruit positions every time in case new fruit spawned.
                 this.recalculateFruitPositions(level, rootPos, soilBlock);
 
                 this.fruitPositions.forEach(fruitPos ->
-                        ParticleHelper.spawnParticles(level, ParticleTypes.EFFECT, fruitPos.getX(), fruitPos.getY(),
+                        ParticleHelper.spawnParticles(level, SpellParticleOption.create(ParticleTypes.EFFECT, -1, 1.0F), fruitPos.getX(), fruitPos.getY(),
                                 fruitPos.getZ(), 3, level.getRandom())
                 );
             }
@@ -140,7 +141,7 @@ public class HarvestSubstance implements SubstanceEffect {
 
                     // Force tick for each fruit block - effectively multiplies growth speed.
                     for (int i = 0; i < this.growthPulses; i++) {
-                        ((FruitBlock) block).doTick(state, level, fruitPos, level.random);
+                        ((FruitBlock) block).doTick(state, level, fruitPos, level.getRandom());
                     }
                     return false;
                 });

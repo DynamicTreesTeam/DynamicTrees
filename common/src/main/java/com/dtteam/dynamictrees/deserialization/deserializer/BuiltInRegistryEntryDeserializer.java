@@ -3,10 +3,13 @@ package com.dtteam.dynamictrees.deserialization.deserializer;
 import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.result.Result;
 import com.google.gson.JsonElement;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.Reference;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
@@ -46,7 +49,7 @@ public final class BuiltInRegistryEntryDeserializer<T> implements JsonDeserializ
                         return this.nullValue;
                     }
 
-                    return this.registry.get(registryName);
+                    return this.registry.get(registryName).map(Holder.Reference::value).orElse(this.nullValue);
                 }, value -> intentionallyNull.get() || this.validator.test(value),
                 "Could not find " + this.registryDisplayName + " for registry name '{}'.");
     }

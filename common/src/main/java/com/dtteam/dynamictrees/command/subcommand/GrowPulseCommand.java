@@ -11,6 +11,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.PermissionCheck;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -24,8 +25,8 @@ public final class GrowPulseCommand extends SubCommand {
     }
 
     @Override
-    protected int getPermissionLevel() {
-        return 2;
+    protected PermissionCheck getPermissionLevel() {
+        return Commands.LEVEL_GAMEMASTERS;
     }
 
     private static final String NUMBER = "number";

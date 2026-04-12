@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SpellParticleOption;
 import net.minecraft.world.level.Level;
 
 public class GrowthSubstance implements SubstanceEffect {
@@ -39,7 +40,7 @@ public class GrowthSubstance implements SubstanceEffect {
         	new FertilizeSubstance().setAmount(15).setDisplayParticles(false).apply(level, rootPos);
 		}
 
-        TreeHelper.treeParticles(level, rootPos, ParticleTypes.EFFECT, 8);
+        TreeHelper.treeParticles(level, rootPos, SpellParticleOption.create(ParticleTypes.EFFECT, -1, 1.0F), 8);
         return true;
     }
 
@@ -54,7 +55,7 @@ public class GrowthSubstance implements SubstanceEffect {
 
         if (level.isClientSide()) {
             if (deltaTicks % this.ticksPerParticlePulse == 0) {
-                TreeHelper.rootParticles(level, rootPos, Direction.UP, ParticleTypes.EFFECT, 1);
+                TreeHelper.rootParticles(level, rootPos, Direction.UP, SpellParticleOption.create(ParticleTypes.EFFECT, -1, 1.0F), 1);
             }
         } else {
             if (deltaTicks % this.ticksPerPulse == 0) {

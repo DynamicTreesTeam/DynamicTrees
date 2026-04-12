@@ -10,6 +10,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.PermissionCheck;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Objects;
@@ -25,8 +26,8 @@ public final class FertilityCommand extends SubCommand {
     }
 
     @Override
-    protected int getPermissionLevel() {
-        return 0;
+    protected PermissionCheck getPermissionLevel() {
+        return Commands.LEVEL_ALL;
     }
 
     private static final String FERTILITY = CommandConstants.FERTILITY;
@@ -38,7 +39,7 @@ public final class FertilityCommand extends SubCommand {
                 .then(booleanArgument(RAW).executes(context -> executesSuccess(() -> this.getFertility(context.getSource(),
                         rootPosArgument(context), booleanArgument(context, RAW)))))
                 .then(Commands.argument(FERTILITY, IntegerArgumentType.integer(0, 15)).suggests(FERTILITY_SUGGESTIONS)
-                        .requires(commandSource -> commandSource.hasPermission(2)) // Setting fertility requires higher permission level.
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)) // Setting fertility requires higher permission level.
                         .executes(context -> executesSuccess(() -> this.setFertility(context.getSource(), rootPosArgument(context),
                                 intArgument(context, FERTILITY)))));
     }

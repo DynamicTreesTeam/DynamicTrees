@@ -38,6 +38,6 @@ public class MushroomFeatureCanceller<T extends FeatureConfiguration> extends Fe
     }
 
     private Stream<FeatureConfiguration> getConfigs(final RandomFeatureConfiguration twoFeatureConfig) {
-        return twoFeatureConfig.getFeatures().map(ConfiguredFeature::config);
+        return twoFeatureConfig.getSubFeatures().map(c -> c.value().config());
     }
 }

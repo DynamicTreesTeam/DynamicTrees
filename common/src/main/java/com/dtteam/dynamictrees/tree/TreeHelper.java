@@ -18,6 +18,8 @@ import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.RootsJoCode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -47,7 +49,7 @@ public class TreeHelper {
         BlockState rootyState = level.getBlockState(rootPos);
         SoilBlock dirt = TreeHelper.getRooty(rootyState);
         if (dirt != null) {
-            dirt.updateTree(rootyState, level, rootPos, level.random, false);
+            dirt.updateTree(rootyState, level, rootPos, level.getRandom(), false);
             ageVolume(level, rootPos, 8, 32, 1, false);//blindly age a cuboid volume
         }
     }
@@ -251,18 +253,16 @@ public class TreeHelper {
     /**
      * Convenience function that spawns particles all over the tree branches
      */
-    public static void treeParticles(Level level, BlockPos rootPos, SimpleParticleType type, int num) {
-        if (level.isClientSide) {
+    public static void treeParticles(Level level, BlockPos rootPos, ParticleOptions type, int num) {
+        if (level.isClientSide()) {
             startAnalysisFromRoot(level, rootPos, new MapSignal(new TwinkleNode(type, num)));
         }
     }
 
-    public static void rootParticles(Level level, BlockPos rootPos, Direction offset, SimpleParticleType type, int num) {
-        if (level.isClientSide) {
-            if (level.isClientSide() && level.getBlockState(rootPos).getBlock() instanceof SoilBlock) {
-                final BlockPos particlePos = rootPos.offset(offset.getNormal());
-                ParticleHelper.spawnParticles(level, type, particlePos.getX(), particlePos.getY(), particlePos.getZ(), num, level.getRandom());
-            }
+    public static void rootParticles(Level level, BlockPos rootPos, Direction offset, ParticleOptions type, int num) {
+        if (level.isClientSide() && level.getBlockState(rootPos).getBlock() instanceof SoilBlock) {
+            final BlockPos particlePos = rootPos.offset(offset.getUnitVec3i());
+            ParticleHelper.spawnParticles(level, type, particlePos.getX(), particlePos.getY(), particlePos.getZ(), num, level.getRandom());
         }
     }
 

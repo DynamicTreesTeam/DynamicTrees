@@ -16,6 +16,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.PermissionCheck;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ import java.util.stream.Stream;
 
 import static com.dtteam.dynamictrees.command.CommandConstants.DEFAULT_JO_CODE;
 import static com.dtteam.dynamictrees.command.CommandConstants.JO_CODE;
+import static net.minecraft.commands.Commands.LEVEL_GAMEMASTERS;
 
 public final class CreateStaffCommand extends SubCommand {
 
@@ -32,8 +34,8 @@ public final class CreateStaffCommand extends SubCommand {
     }
 
     @Override
-    protected int getPermissionLevel() {
-        return 2;
+    protected PermissionCheck getPermissionLevel() {
+        return LEVEL_GAMEMASTERS;
     }
 
     private static final String COLOR = "color";

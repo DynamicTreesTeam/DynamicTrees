@@ -17,6 +17,12 @@ import java.util.stream.Stream;
 
 public class TagsRegexMatchHolderSet<T> extends RegexMatchHolderSet<T> {
 
+    //TODO: ???
+    @Override
+    public boolean isBound() {
+        return true;
+    }
+
     public static class Type implements HolderSetType {
         @Override
         public <T> MapCodec<? extends ICustomHolderSet<T>> makeCodec(ResourceKey<? extends Registry<T>> resourceKey, Codec<Holder<T>> codec, boolean b) {

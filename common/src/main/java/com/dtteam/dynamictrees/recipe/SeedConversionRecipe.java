@@ -13,9 +13,9 @@ import java.util.*;
 
 public class SeedConversionRecipe extends CustomRecipe {
 
-    public SeedConversionRecipe(CraftingBookCategory category) {
-        super(category);
-    }
+//    public SeedConversionRecipe(CraftingBookCategory category) {
+//        super(category);
+//    }
 
     @Override
     public boolean matches(CraftingInput craftingInput, Level level) {
@@ -57,7 +57,7 @@ public class SeedConversionRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput craftingInput, HolderLookup.Provider provider) {
+    public ItemStack assemble(CraftingInput craftingInput) {
         for(Species species : Species.REGISTRY) {
             for (SeedSaplingRecipe recipe : species.getPrimitiveSaplingRecipes()) {
                 if (recipe.canCraftSaplingToSeed()) {
@@ -80,15 +80,8 @@ public class SeedConversionRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean canCraftInDimensions(int i, int i1) {
-        return true;
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
+//        return DTRegistries.SEED_CONVERSION_RECIPE_TYPE.get();
+        return null;
     }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
-        return DTRegistries.SEED_CONVERSION_RECIPE_TYPE.get();
-    }
-
-
-
 }

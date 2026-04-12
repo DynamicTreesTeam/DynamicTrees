@@ -60,7 +60,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
 
         //playStartSound(entity);
 
-        final long seed = entity.level().random.nextLong();
+        final long seed = entity.level().getRandom().nextLong();
         final RandomSource random = RandomSource.create(seed ^ (((long) cutPos.getX()) << 32 | ((long) cutPos.getZ())));
         final float mass = entity.getDestroyData().woodVolume.getVolume();
         final float inertialMass = Mth.clamp(mass, 1, 3);

@@ -26,7 +26,7 @@ public final class OverworldGroundFinder implements GroundFinder {
 		//Then we do a very sparse check to find underground biomes
 		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(start.getX(), 0, start.getZ());
 		boolean caveBiomeFound = false;
-		while (CoordUtils.inRange(pos, level.getMinBuildHeight(), surfaceBlock.getY())) {
+		while (CoordUtils.inRange(pos, level.getMinY(), surfaceBlock.getY())) {
 			if (level.getBiome(pos).is(TagKey.create(Registries.BIOME, Identifier.parse("c:is_underground")))){
 				caveBiomeFound = true;
 				break;

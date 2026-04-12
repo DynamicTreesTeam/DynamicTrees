@@ -33,7 +33,7 @@ public class BiomeDatabase {
     }
 
     public Entry getEntry(ResourceKey<Biome> biomeKey) {
-        Identifier biomeRegistryName = biomeKey.location();
+        Identifier biomeRegistryName = biomeKey.identifier();
 
         if (this.entries.containsKey(biomeRegistryName))
             return this.entries.get(biomeRegistryName);

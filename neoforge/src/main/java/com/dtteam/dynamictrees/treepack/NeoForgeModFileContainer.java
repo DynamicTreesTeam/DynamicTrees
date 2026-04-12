@@ -17,9 +17,10 @@ public class NeoForgeModFileContainer extends ModFileContainer {
         this.modFile = modInfo.getOwningFile().getFile();
     }
 
+    //TODO: not sure if this works
     @Override
     public @NotNull Optional<Path> findResource(String strings) {
-        return Optional.of(modFile.findResource(strings));
+        return Optional.of(Path.of(modFile.getFilePath().toString(), strings));
     }
 
     @Override

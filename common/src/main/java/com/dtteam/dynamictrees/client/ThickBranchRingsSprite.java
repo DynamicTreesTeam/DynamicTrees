@@ -6,6 +6,8 @@ import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 
+import java.util.Optional;
+
 
 public class ThickBranchRingsSprite extends SpriteContents {
     private static final int RESOLUTION = 16;
@@ -16,12 +18,13 @@ public class ThickBranchRingsSprite extends SpriteContents {
     };
 
     public ThickBranchRingsSprite(Identifier name, SpriteContents originalSprite){
-        super(name, getFrameSize(originalSprite), processImage(originalSprite.originalImage), originalSprite.metadata());
+        super(name, getFrameSize(originalSprite), processImage(originalSprite.originalImage), Optional.empty(), originalSprite.additionalMetadata, Optional.empty());
     }
 
     private static FrameSize getFrameSize(SpriteContents sprite){
         return new FrameSize(sprite.width() * LAYERS, sprite.height() * LAYERS);
     }
+
     private static int centerCorner(){
         return (RESOLUTION/2) * (LAYERS-1);
     }

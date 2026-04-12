@@ -7,8 +7,7 @@
   "mixins": [
     "MixinBrewingStandBlockEntity",
     "MixinBrewingStandMenu",
-    "MixinBushBlock",
-    "MixinChunkSerializer",
+    "MixinVegetationBlock",
     "MixinMinecraftServer",
     "MixinPotionBrewing",
     "MixinSaplingBlock"

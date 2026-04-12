@@ -17,6 +17,12 @@ import java.util.stream.Stream;
 
 public class NameRegexMatchHolderSet<T> extends RegexMatchHolderSet<T> {
 
+    //TODO: ???
+    @Override
+    public boolean isBound() {
+        return true;
+    }
+
     public static class Type implements HolderSetType {
         @Override
         public <T> MapCodec<? extends ICustomHolderSet<T>> makeCodec(ResourceKey<? extends Registry<T>> resourceKey, Codec<Holder<T>> codec, boolean b) {
@@ -35,7 +41,7 @@ public class NameRegexMatchHolderSet<T> extends RegexMatchHolderSet<T> {
 
     @Override
     protected Stream<String> getInput(Holder<T> holder) {
-        return holder.unwrapKey().stream().map(key -> key.location().toString());
+        return holder.unwrapKey().stream().map(key -> key.identifier().toString());
     }
 
     @Override

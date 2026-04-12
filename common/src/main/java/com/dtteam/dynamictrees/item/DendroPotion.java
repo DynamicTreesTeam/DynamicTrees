@@ -100,10 +100,10 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
         };
     }
 
-    @Override
-    public String getDescriptionId(ItemStack stack) {
-        return this.getDescriptionId() + "." + getPotionType(stack).getName();
-    }
+//    @Override
+//    public String getDescriptionId(ItemStack stack) {
+//        return this.getDescriptionId() + "." + getPotionType(stack).getName();
+//    }
 
     public int getColor(ItemStack stack, int tint) {
         return tint == 0 ? getPotionType(stack).getColor() : 0xFFFFFFFF;

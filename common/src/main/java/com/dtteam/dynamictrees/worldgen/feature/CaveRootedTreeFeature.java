@@ -24,7 +24,7 @@ public class CaveRootedTreeFeature extends DynamicTreeFeature {
     @Override
     public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
         WorldGenLevel level = context.level();
-        Identifier dimensionName = level.getLevel().dimension().location();
+        Identifier dimensionName = level.getLevel().dimension().identifier();
 
         // Do not generate if the current dimension is blacklisted.
         if (BiomeDatabases.isBlacklisted(dimensionName)) {
@@ -32,7 +32,7 @@ public class CaveRootedTreeFeature extends DynamicTreeFeature {
         }
 
         BlockPos originPos = context.origin();
-        ChunkPos chunkPos = new ChunkPos(originPos);
+        ChunkPos chunkPos = ChunkPos.containing(originPos);
         LevelContext levelContext = LevelContext.create(level);
 
         PoissonDisc disc = getDisc(levelContext, chunkPos, originPos).orElse(null);

@@ -52,7 +52,7 @@ public class NetherFungusLogic extends GrowthLogicKit {
             } else if (!context.species().isMegaSpecies()) {
                 for (Direction direction : CoordUtils.HORIZONTALS) {
                     if (TreeHelper.isBranch(
-                            context.level().getBlockState(context.pos().offset(direction.getOpposite().getNormal())))) {
+                            context.level().getBlockState(context.pos().offset(direction.getOpposite().getUnitVec3i())))) {
                         probMap[direction.get3DDataValue()] = 0;
                     }
                 }

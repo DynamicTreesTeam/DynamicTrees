@@ -56,7 +56,7 @@ public class MushroomRotGenFeature extends GenFeature {
     }
 
     private boolean mayMushroomPlaceOn(final LevelAccessor level, final BlockPos pos) {
-        return level.getBlockState(pos).isSolidRender(level, pos);
+        return level.getBlockState(pos).isSolidRender();
     }
 
 }

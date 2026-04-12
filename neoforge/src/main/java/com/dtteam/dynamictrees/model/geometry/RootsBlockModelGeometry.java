@@ -1,6 +1,5 @@
 package com.dtteam.dynamictrees.model.geometry;
 
-import com.dtteam.dynamictrees.model.baked.SurfaceRootBlockBakedModel;
 import com.dtteam.dynamictrees.model.loader.SurfaceRootBlockModelLoader;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.resources.Identifier;

@@ -31,23 +31,23 @@ public class UniversalPoissonDiscProvider {
 
     public List<PoissonDisc> getPoissonDiscs(LevelContext levelContext, ChunkPos chunkPos) {
         final PoissonDiscProvider provider = getProvider(levelContext);
-        return provider.getPoissonDiscs(chunkPos.x, 0, chunkPos.z);
+        return provider.getPoissonDiscs(chunkPos.x(), 0, chunkPos.z());
     }
 
     public void unloadWorld(ServerLevel level) {
-        this.providerMap.remove(level.dimension().location());
+        this.providerMap.remove(level.dimension().identifier());
     }
 
     public void setChunkPoissonData(LevelContext levelContext, ChunkPos chunkPos, byte[] circleData) {
-        this.getProvider(levelContext).setChunkPoissonData(chunkPos.x, 0, chunkPos.z, circleData);
+        this.getProvider(levelContext).setChunkPoissonData(chunkPos.x(), 0, chunkPos.z(), circleData);
     }
 
     public byte[] getChunkPoissonData(LevelContext levelContext, ChunkPos chunkPos) {
-        return this.getProvider(levelContext).getChunkPoissonData(chunkPos.x, 0, chunkPos.z);
+        return this.getProvider(levelContext).getChunkPoissonData(chunkPos.x(), 0, chunkPos.z());
     }
 
     public void unloadChunkPoissonData(LevelContext levelContext, ChunkPos chunkPos) {
-        this.getProvider(levelContext).unloadChunkPoissonData(chunkPos.x, 0, chunkPos.z);
+        this.getProvider(levelContext).unloadChunkPoissonData(chunkPos.x(), 0, chunkPos.z());
     }
 
 }

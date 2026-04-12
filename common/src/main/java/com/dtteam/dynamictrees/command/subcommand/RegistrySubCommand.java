@@ -8,6 +8,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.PermissionCheck;
 
 import java.util.Locale;
 
@@ -30,8 +31,8 @@ public final class RegistrySubCommand<V extends RegistryEntry<V>> extends SubCom
     }
 
     @Override
-    protected int getPermissionLevel() {
-        return 0;
+    protected PermissionCheck getPermissionLevel() {
+        return Commands.LEVEL_ALL;
     }
 
     @Override

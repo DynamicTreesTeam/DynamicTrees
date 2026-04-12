@@ -160,7 +160,7 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
         species.setShouldGenerateSeed(false);
         species.setShouldGenerateSapling(false);
         DynamicTrees.runOnCommonSetup(() -> {
-            final Item seed = BuiltInRegistries.ITEM.get(processedSeedName);
+            final Item seed = BuiltInRegistries.ITEM.get(processedSeedName).get().value();
             if (seed instanceof Seed) {
                 species.setSeed(() -> (Seed) seed);
             } else {

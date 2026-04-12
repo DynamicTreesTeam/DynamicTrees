@@ -21,7 +21,7 @@ public class FertilizeSubstance implements SubstanceEffect {
         final SoilBlock dirt = TreeHelper.getRooty(level.getBlockState(rootPos));
 
         if (dirt != null && dirt.fertilize(level, rootPos, this.amount) || this.grow) {
-            if (displayParticles && level.isClientSide) {
+            if (displayParticles && level.isClientSide()) {
                 TreeHelper.treeParticles(level, rootPos, ParticleTypes.HAPPY_VILLAGER, 8);
             } else {
                 if (this.grow) {

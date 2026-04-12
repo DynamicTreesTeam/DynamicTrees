@@ -1,9 +1,11 @@
 package com.dtteam.dynamictrees.entity;
 
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandlers;
 import com.dtteam.dynamictrees.entity.animation.DataAnimationHandler;
+import com.dtteam.dynamictrees.model.FallingTreeEntityModelTrackerCache;
 import com.dtteam.dynamictrees.model.ModelTracker;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
@@ -15,6 +17,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
@@ -277,27 +281,27 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         return species;
     }
 
-//    @Override
-//    public void setPos(double x, double y, double z) {
-//        //This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
-//        this.setPosRaw(x, y, z);
-//        //This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
-//        this.setBoundingBox(this.normalBB != null ? this.normalBB.move(x, y, z) : new AABB(BlockPos.ZERO));
-//        this.cullingBB = cullingNormalBB != null ? cullingNormalBB.move(x, y, z) : new AABB(BlockPos.ZERO);
-//    }
-//
+    @Override
+    public void setPos(double x, double y, double z) {
+        //This comes to the client as a packet from the server. But it doesn't set up the bounding box correctly
+        this.setPosRaw(x, y, z);
+        //This function is called by the Entity constructor during which normAABB hasn't yet been assigned.
+        this.setBoundingBox(this.normalBB != null ? this.normalBB.move(x, y, z) : new AABB(BlockPos.ZERO));
+        this.cullingBB = cullingNormalBB != null ? cullingNormalBB.move(x, y, z) : new AABB(BlockPos.ZERO);
+    }
+
 //    @Override
 //    public void tick() {
 //        super.tick();
 //
-//        if (this.level().isClientSide && !this.clientBuilt) {
+//        if (this.level().isClientSide() && !this.clientBuilt) {
 //            this.buildClient();
 //            if (!isAlive()) {
 //                return;
 //            }
 //        }
 //
-//        if (!this.level().isClientSide && this.firstUpdate) {
+//        if (!this.level().isClientSide() && this.firstUpdate) {
 //            this.updateNeighbors();
 //        }
 //
@@ -314,7 +318,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 //
 //        this.firstUpdate = false;
 //    }
-//
+
 //    /**
 //     * This is run server side to update all of the neighbors
 //     */
@@ -338,11 +342,11 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 //        //Update each of the blocks that need to be updated
 //        toUpdate.forEach(pos -> level().neighborChanged(pos, Blocks.AIR, pos));
 //    }
-//
-//    protected AnimationHandler selectAnimationHandler() {
-//        return DTConfigs.SERVER.enableFallingTrees.get() ? destroyData.species.selectAnimationHandler(this) : AnimationHandlers.voidAnimationHandler;
-//    }
-//
+
+    protected AnimationHandler selectAnimationHandler() {
+        return DTConfigs.SERVER.enableFallingTrees.get() ? destroyData.species.selectAnimationHandler(this) : AnimationHandlers.voidAnimationHandler;
+    }
+
     public AnimationHandler defaultAnimationHandler() {
         if (destroyType == DestroyType.VOID || destroyType == DestroyType.ROOT) {
             return AnimationHandlers.voidAnimationHandler;
@@ -366,74 +370,74 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
         return AnimHandlerDrop;
     }
-//
-//    @Override
-//    public void modelCleanup() {
-//        if (level().isClientSide()){
-//            FallingTreeEntityModelTrackerCache.cleanupModels(level(), this);
-//        }
-//    }
-//
-//    public void handleMotion() {
-//        if (firstUpdate) {
-//            currentAnimationHandler = selectAnimationHandler();
-//            currentAnimationHandler.initMotion(this);
-//        } else {
-//            currentAnimationHandler.handleMotion(this);
-//        }
-//    }
-//
-//    public void dropPayLoad() {
-//        if (!level().isClientSide) {
-//            currentAnimationHandler.dropPayload(this);
-//        }
-//    }
-//
-//    public boolean shouldDie() {
-//        return tickCount > 20 && currentAnimationHandler.shouldDie(this); //Give the entity 20 ticks to receive it's data from the server.
-//    }
-//
-//    @Override
-//    public boolean shouldRender(double x, double y, double z) {
-//        return currentAnimationHandler.shouldRender(this, x, y, z);
-//    }
-//
-//    /**
-//     * Same style payload droppers that have always existed in Dynamic Trees.
-//     * <p>
-//     * Drops wood materials at the cut position Leaves drops fall from their original location
-//     *
-//     * @param entity The {@link FallingTreeEntity} object.
-//     */
-//    public static void standardDropLogsPayload(FallingTreeEntity entity) {
-//        Level level = entity.level();
-//        if (!level.isClientSide) {
-//            BlockPos cutPos = entity.getDestroyData().cutPos;
-//            entity.getPayload().forEach(i -> spawnItemAsEntity(level, cutPos, i));
-//        }
-//    }
-//
-//    public static void standardDropLeavesPayLoad(FallingTreeEntity entity) {
-//        Level level = entity.level();
-//        if (!level.isClientSide) {
-//            BlockPos cutPos = entity.getDestroyData().cutPos;
-//            entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(level, cutPos.offset(bis.pos), bis.stack));
-//        }
-//    }
-//
-//    /**
-//     * Same as Block.spawnAsEntity only this arrests the entityItem's random motion. Useful for CC turtles to pick up
-//     * the loot.
-//     */
-//    public static void spawnItemAsEntity(Level level, BlockPos pos, ItemStack stack) {
-//        if (!level.isClientSide && !stack.isEmpty() && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !Services.MISC.isLevelRestoringBlockSnapshots(level)) { // do not drop items while restoring blockstates, prevents item dupe
+
+    @Override
+    public void modelCleanup() {
+        if (level().isClientSide()){
+            FallingTreeEntityModelTrackerCache.cleanupModels(level(), this);
+        }
+    }
+
+    public void handleMotion() {
+        if (firstUpdate) {
+            currentAnimationHandler = selectAnimationHandler();
+            currentAnimationHandler.initMotion(this);
+        } else {
+            currentAnimationHandler.handleMotion(this);
+        }
+    }
+
+    public void dropPayLoad() {
+        if (!level().isClientSide()) {
+            currentAnimationHandler.dropPayload(this);
+        }
+    }
+
+    public boolean shouldDie() {
+        return tickCount > 20 && currentAnimationHandler.shouldDie(this); //Give the entity 20 ticks to receive it's data from the server.
+    }
+
+    @Override
+    public boolean shouldRender(double x, double y, double z) {
+        return currentAnimationHandler.shouldRender(this, x, y, z);
+    }
+
+    /**
+     * Same style payload droppers that have always existed in Dynamic Trees.
+     * <p>
+     * Drops wood materials at the cut position Leaves drops fall from their original location
+     *
+     * @param entity The {@link FallingTreeEntity} object.
+     */
+    public static void standardDropLogsPayload(FallingTreeEntity entity) {
+        Level level = entity.level();
+        if (!level.isClientSide()) {
+            BlockPos cutPos = entity.getDestroyData().cutPos;
+            entity.getPayload().forEach(i -> spawnItemAsEntity(level, cutPos, i));
+        }
+    }
+
+    public static void standardDropLeavesPayLoad(FallingTreeEntity entity) {
+        Level level = entity.level();
+        if (!level.isClientSide()) {
+            BlockPos cutPos = entity.getDestroyData().cutPos;
+            entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(level, cutPos.offset(bis.pos), bis.stack));
+        }
+    }
+
+    /**
+     * Same as Block.spawnAsEntity only this arrests the entityItem's random motion. Useful for CC turtles to pick up
+     * the loot.
+     */
+    public static void spawnItemAsEntity(Level level, BlockPos pos, ItemStack stack) {
+//        if (!level.isClientSide() && !stack.isEmpty() && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !Services.MISC.isLevelRestoringBlockSnapshots(level)) { // do not drop items while restoring blockstates, prevents item dupe
 //            ItemEntity entityitem = new ItemEntity(level, (double) pos.getX() + 0.5F, (double) pos.getY() + 0.5F, (double) pos.getZ() + 0.5F, stack);
 //            entityitem.setDeltaMovement(0, 0, 0);
 //            entityitem.setDefaultPickUpDelay();
 //            level.addFreshEntity(entityitem);
 //        }
-//    }
-//
+    }
+
 //    @Override
 //    protected void defineSynchedData(SynchedEntityData.Builder builder) {
 //        builder.define(voxelDataParameter, new CompoundTag());

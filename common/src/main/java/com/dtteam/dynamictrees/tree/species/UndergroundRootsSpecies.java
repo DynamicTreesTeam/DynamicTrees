@@ -206,7 +206,7 @@ public class UndergroundRootsSpecies extends Species {
             BlockPos belowPos = rootPos.below();
             BlockState belowState = level.getBlockState(belowPos);
             if (TreeHelper.isBranch(belowState)){
-                GrowSignal rootGrowSignal = new GrowSignal(this, rootPos, getRootEnergy(level, rootPos), level.random, defaultDir.getOpposite());
+                GrowSignal rootGrowSignal = new GrowSignal(this, rootPos, getRootEnergy(level, rootPos), level.getRandom(), defaultDir.getOpposite());
                 return TreeHelper.getTreePart(belowState).growSignal(level, belowPos, rootGrowSignal);
             } else if (isAcceptableSoil(belowState)) {
                 getFamily().getRoots().ifPresent(branch -> branch.setRadius(level, belowPos, family.getPrimaryThickness(), null));

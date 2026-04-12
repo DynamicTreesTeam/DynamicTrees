@@ -5,7 +5,11 @@ import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
 import com.dtteam.dynamictrees.platform.services.IClientHelper;
 import com.dtteam.dynamictrees.registry.FallingTreeEntityModelNF;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+
+import java.util.List;
+import java.util.Map;
 
 public class NeoForgeClientHelper implements IClientHelper {
 

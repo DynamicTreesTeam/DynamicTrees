@@ -47,7 +47,7 @@ public class PodGenerationNode implements NodeInspector {
                 int radius = branch.getRadius(state);
                 if (pod.isValidRadius(radius)){
                     for (Direction dir : Direction.Plane.HORIZONTAL){
-                        int hashCode = CoordUtils.coordHashCode(pos.offset(dir.getNormal()), 1);
+                        int hashCode = CoordUtils.coordHashCode(pos.offset(dir.getUnitVec3i()), 1);
                         if ((hashCode % 97) % blocksPerPlacedPod == 0) {
                             BlockPos deltaPos = pos.relative(dir);
                             if (level.isEmptyBlock(deltaPos) || level.getBlockState(deltaPos).getBlock() instanceof TrunkShellBlock) {
