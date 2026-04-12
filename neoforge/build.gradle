@@ -11,6 +11,8 @@ neoForge {
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
+    def mainResources = project(":common").file("src/main/resources")
+    def genResources = project(":common").file("src/generated/resources")
     runs {
         configureEach {
             systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
@@ -25,7 +27,10 @@ neoForge {
             gameDirectory = this.mkdir(this.file("runs/data"))
             // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+            programArguments.addAll '--all',
+                    '--mod', project.mod_id,
+                    '--existing', mainResources.getAbsolutePath(),
+                    '--output', genResources.getAbsolutePath()
         }
         server {
             server()
@@ -59,8 +64,6 @@ neoForge {
         runtimeOnly "curse.maven:spark-361579:7815877"
     }
 }
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
