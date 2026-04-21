@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.event.handler;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.entity.render.FallingTreeRenderer;
 import com.dtteam.dynamictrees.entity.render.LingeringEffectorRenderer;
-import com.dtteam.dynamictrees.model.BranchBlockStateModel;
+import com.dtteam.dynamictrees.model.branch.BranchBlockStateModel;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;

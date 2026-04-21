@@ -2,7 +2,6 @@ package com.dtteam.dynamictrees.registry;
 
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
-import net.minecraft.client.model.geom.ModelPart;
 
 public class FallingTreeEntityModelNF extends FallingTreeEntityModel {
 

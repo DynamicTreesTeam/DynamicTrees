@@ -1,14 +1,11 @@
-package com.dtteam.dynamictrees.model;
+package com.dtteam.dynamictrees.model.branch;
 
 import com.mojang.blaze3d.platform.Transparency;
 import com.mojang.math.Quadrant;
 import com.mojang.math.Transformation;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.client.resources.model.cuboid.CuboidFace;
 import net.minecraft.client.resources.model.cuboid.FaceBakery;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -23,7 +20,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
-public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbientOcclusion, Material.Baked particleMaterial) implements BlockStateModelPart {
+public record BranchBlockStateModelPartSleeve(QuadCollection quads, boolean useAmbientOcclusion, Material.Baked particleMaterial) implements BlockStateModelPart {
 
     @Override
     public List<BakedQuad> getQuads(@Nullable Direction direction) {
@@ -35,36 +32,23 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
         return this.quads.materialFlags();
     }
 
-    public record Unbaked(Identifier bark, Identifier rings) implements BlockStateModelPart.Unbaked {
-
-        private static final String BARK_TEXTURE = "bark_texture";
-        private static final String RINGS_TEXTURE = "rings_texture";
-
-        public static final MapCodec<Unbaked> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                Identifier.CODEC.fieldOf(BARK_TEXTURE).forGetter(Unbaked::bark),
-                Identifier.CODEC.fieldOf(RINGS_TEXTURE).forGetter(Unbaked::rings)
-        ).apply(i, Unbaked::new));
+    public record Unbaked(Material.Baked material) implements BlockStateModelPart.Unbaked {
 
         @Override
-        public void resolveDependencies(ResolvableModel.Resolver resolver) {}
+        public void resolveDependencies(Resolver resolver) {}
 
         @Override
-        public BlockStateModelPart bake(ModelBaker baker) {
-            return bakeAll(baker)[0];
+        public BranchBlockStateModelPartSleeve bake(ModelBaker baker) {
+            return bake(baker, 0, Direction.UP);
         }
 
-        public BranchBlockStateModelPart[] bakeAll(ModelBaker baker) {
-            Material.Baked barkMaterial = baker.materials().get(new Material(bark, false), ()->BARK_TEXTURE);
-            Material.Baked ringsMaterial = baker.materials().get(new Material(rings, false), ()->RINGS_TEXTURE);
+        public BranchBlockStateModelPartSleeve bake(ModelBaker baker, int radius, Direction direction) {
 
-            return new BranchBlockStateModelPart[] {
-                    buildPart(baker, ringsMaterial, ringsMaterial, barkMaterial, 0f, 1f),
-                    buildPart(baker, ringsMaterial, ringsMaterial, barkMaterial, 0f, 0.5f)
-            };
+            return buildPart(baker, material, material, material, -0.5f, 0.5f);
         }
 
         //Test part builder
-        private BranchBlockStateModelPart buildPart(ModelBaker baker, Material.Baked topSprite, Material.Baked bottomSprite, Material.Baked sideSprite, float yMin, float yMax) {
+        private BranchBlockStateModelPartSleeve buildPart(ModelBaker baker, Material.Baked topSprite, Material.Baked bottomSprite, Material.Baked sideSprite, float yMin, float yMax) {
 
             QuadCollection.Builder builder = new QuadCollection.Builder();
 
@@ -77,7 +61,7 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
 
                 MutableQuad quad = new MutableQuad();
                 quad.setSprite(sprite, Transparency.NONE);
-                quad.setCubeFace(dir, 0f, yMin, 0f, 1f, yMax, 1f);
+                quad.setCubeFace(dir, 0.25f, yMin, 0.25f, 0.75f, yMax, 0.75f);
                 quad.bakeUvsFromPosition();
                 quad.recalculateWinding();
 
@@ -90,7 +74,7 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
                 }
             }
 
-            return new BranchBlockStateModelPart(builder.build(), true, sideSprite);
+            return new BranchBlockStateModelPartSleeve(builder.build(), true, sideSprite);
         }
 
         private static @NotNull BakedQuad testFace(ModelBaker baker, Material.Baked particle) {

@@ -1,10 +1,22 @@
 package com.dtteam.dynamictrees.model;
 
 import com.dtteam.dynamictrees.api.network.RootConnections;
+import com.mojang.math.Quadrant;
+import com.mojang.math.Transformation;
+import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.cuboid.CuboidFace;
+import net.minecraft.client.resources.model.cuboid.CuboidModelElement;
+import net.minecraft.client.resources.model.cuboid.CuboidRotation;
+import net.minecraft.client.resources.model.cuboid.FaceBakery;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.model.data.ModelProperty;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class ModelHelper {
@@ -30,17 +42,27 @@ public class ModelHelper {
      * @return
      */
     public static int getFaceAngle(Axis axis, Direction face) {
+        return switch (getFaceQuadrant(axis, face).ordinal()) {
+            case 0 -> 0;
+            case 1 -> 90;
+            case 2 -> 180;
+            case 3 -> 270;
+            default -> throw new MatchException(null, null);
+        };
+    }
+
+    public static Quadrant getFaceQuadrant(Axis axis, Direction face) {
         if (axis == Axis.Y) { //UP / DOWN
-            return 0;
+            return Quadrant.R0;
         } else if (axis == Axis.Z) {//NORTH / SOUTH
             return switch (face) {
-                case UP -> 0;
-                case WEST, NORTH -> 270;
-                case DOWN -> 180;
-                default -> 90;
+                case UP -> Quadrant.R0;
+                case WEST, NORTH -> Quadrant.R270;
+                case DOWN -> Quadrant.R180;
+                default -> Quadrant.R90;
             };
         } else { //EAST/WEST
-            return (face == Direction.NORTH) ? 270 : 90;
+            return (face == Direction.NORTH) ? Quadrant.R270 : Quadrant.R90;
         }
     }
 
@@ -59,9 +81,11 @@ public class ModelHelper {
         };
     }
 
-//    public static BakedQuad makeBakedQuad(BlockElement blockPart, BlockElementFace partFace, TextureAtlasSprite atlasSprite, Direction dir, BlockModelRotation modelRotation) {
-//        return FaceBakery.bakeQuad(blockPart.from, blockPart.to, partFace, atlasSprite, dir, modelRotation, blockPart.rotation, true);
-//    }
+    public static BakedQuad makeBakedQuad(ModelBaker baker, CuboidModelElement blockPart, CuboidFace partFace, Material.Baked material, Direction dir) {
+        CuboidRotation noRotation = new CuboidRotation(new Vector3f(0,0,0), Matrix4f::new, false);
+        ModelState noState = new ModelState() { @Override public Transformation transformation() {return ModelState.super.transformation();} };
+        return FaceBakery.bakeQuad(baker, blockPart.from(), blockPart.to(), partFace, material, dir, noState, noRotation, true, 0);
+    }
 
 //    public static IModelBuilder<?> getModelBuilder(IGeometryBakingContext context, TextureAtlasSprite particle) {
 //        Identifier renderTypeHint = context.getRenderTypeHint();
