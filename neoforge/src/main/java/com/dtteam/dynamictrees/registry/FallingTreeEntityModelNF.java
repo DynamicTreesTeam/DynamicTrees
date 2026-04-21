@@ -47,7 +47,7 @@ public class FallingTreeEntityModelNF extends FallingTreeEntityModel {
 //                }
 //
 //                BakedModel branchModel = dispatcher.getBlockModel(exState);
-//                //Draw the ring texture cap on the cut block if the bottom connection is above 0
+//                //Draw the ring texture cap on the cut block if the rings connection is above 0
 //                destructionData.getConnections(0, connectionArray);
 //                boolean bottomRingsAdded = false;
 //                if (!rootyBlockAdded && connectionArray[cutDir.get3DDataValue()] > 0) {

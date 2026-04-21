@@ -1,7 +1,9 @@
 {
   "variants": {
     "": {
-      "model": "dynamictrees:block/oak_branch"
+      "type": "dynamictrees:branch",
+      "bark_texture": "minecraft:block/oak_log",
+      "rings_texture": "minecraft:block/oak_log_top"
     }
   }
 }

@@ -1,41 +1,19 @@
 package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
-import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
-import com.dtteam.dynamictrees.block.soil.SoilBlock;
-import com.dtteam.dynamictrees.block.soil.SoilProperties;
-import com.dtteam.dynamictrees.client.BlockColorMultipliers;
-import com.dtteam.dynamictrees.client.TextureHelper;
-import com.dtteam.dynamictrees.client.ThickBranchRingsSource;
 import com.dtteam.dynamictrees.entity.render.FallingTreeRenderer;
 import com.dtteam.dynamictrees.entity.render.LingeringEffectorRenderer;
-import com.dtteam.dynamictrees.model.loader.*;
+import com.dtteam.dynamictrees.model.BranchBlockStateModel;
 import com.dtteam.dynamictrees.registry.DTRegistries;
-import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.species.Species;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.FoliageColor;
-import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.*;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterBlockStateModels;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @EventBusSubscriber(modid = DynamicTrees.MOD_ID, value = Dist.CLIENT)
 public class ClientModEventHandler {
@@ -169,15 +147,15 @@ public class ClientModEventHandler {
     public static final Identifier SMALL_PALM_FRONDS = DynamicTrees.location("small_palm_fronds");
 
     @SubscribeEvent
-    public static void onModelRegistryEvent(ModelEvent.RegisterLoaders event) {
+    public static void onModelRegistryEvent(RegisterBlockStateModels event) {
         // Register model loaders for baked models.
-        event.register(BRANCH, new BranchBlockModelLoader());
-        event.register(SURFACE_ROOT, new SurfaceRootBlockModelLoader());
-        event.register(THICK_BRANCH, new ThickBranchBlockModelLoader());
-        event.register(ROOTS, new RootsBlockModelLoader());
-        event.register(LARGE_PALM_FRONDS, new PalmLeavesModelLoader(0));
-        event.register(MEDIUM_PALM_FRONDS, new PalmLeavesModelLoader(1));
-        event.register(SMALL_PALM_FRONDS, new PalmLeavesModelLoader(2));
+        event.registerModel(BRANCH, BranchBlockStateModel.Unbaked.CODEC);
+//        event.register(SURFACE_ROOT, new SurfaceRootBlockModelLoader());
+//        event.register(THICK_BRANCH, new ThickBranchBlockModelLoader());
+//        event.register(ROOTS, new RootsBlockModelLoader());
+//        event.register(LARGE_PALM_FRONDS, new PalmLeavesModelLoader(0));
+//        event.register(MEDIUM_PALM_FRONDS, new PalmLeavesModelLoader(1));
+//        event.register(SMALL_PALM_FRONDS, new PalmLeavesModelLoader(2));
     }
 
 //    @SubscribeEvent

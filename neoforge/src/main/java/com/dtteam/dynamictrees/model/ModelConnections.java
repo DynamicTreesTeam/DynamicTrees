@@ -1,4 +1,4 @@
-package com.dtteam.dynamictrees.model.modeldata;
+package com.dtteam.dynamictrees.model;
 
 import com.dtteam.dynamictrees.api.network.Connections;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;

@@ -13,11 +13,11 @@ import com.dtteam.dynamictrees.block.FutureBreakable;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
-import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.loot.LootTableSupplier;
-import com.dtteam.dynamictrees.platform.*;
+import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.nodemapper.DestroyerNode;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
@@ -29,7 +29,6 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.EntityUtils;
 import com.dtteam.dynamictrees.utility.ItemUtils;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -279,7 +278,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     // RENDERING
     ///////////////////////////////////////////
 
-    public Connections getConnectionData(@NotNull LevelAccessor level, @NotNull BlockPos pos, @NotNull BlockState state) {
+    public Connections getConnectionData(@NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull BlockState state) {
         final Connections connections = new Connections();
 
         if (state.getBlock() != this) {

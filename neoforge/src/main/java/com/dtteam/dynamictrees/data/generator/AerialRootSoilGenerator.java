@@ -47,12 +47,12 @@
 //    private BlockModelBuilder soilModelBuilder(BlockStateProvider provider, SoilProperties input, int radius, String name, Block primitiveBlock, Block roots) {
 //        AerialRootsSoilProperties aerialInput = (AerialRootsSoilProperties)input;
 //        Identifier side = aerialInput.getFamily().getTexturePath(Family.BRANCH).orElse(provider.blockTexture(primitiveBlock));
-//        Identifier top = aerialInput.getFamily().getTexturePath(Family.BRANCH_TOP).orElse(IdentifierUtils.suffix(provider.blockTexture(primitiveBlock),"_top"));
+//        Identifier bark = aerialInput.getFamily().getTexturePath(Family.BRANCH_TOP).orElse(IdentifierUtils.suffix(provider.blockTexture(primitiveBlock),"_top"));
 //        Identifier roots_side = aerialInput.getFamily().getTexturePath(Family.ROOTS_SIDE).orElse(IdentifierUtils.suffix(provider.blockTexture(roots), "_side"));
 //        Identifier roots_top = aerialInput.getFamily().getTexturePath(Family.ROOTS_SIDE).orElse(IdentifierUtils.suffix(provider.blockTexture(roots),"_top"));
 //        BlockModelBuilder builder = provider.models().withExistingParent(name+"_radius"+radius,  DynamicTrees.location("block/smartmodel/rooty/aerial_roots_radius"+ radius))
 //                .texture("side", side)
-//                .texture("end", top)
+//                .texture("end", bark)
 //                .texture("overlay", roots_side)
 //                .texture("overlay_end", roots_top);
 //        input.getTexturePath(SoilProperties.ROOTS).ifPresent((r)->builder.texture("roots", r));
