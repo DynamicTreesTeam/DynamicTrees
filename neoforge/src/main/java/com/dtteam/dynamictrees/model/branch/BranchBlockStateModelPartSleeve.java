@@ -1,5 +1,7 @@
 package com.dtteam.dynamictrees.model.branch;
 
+import com.dtteam.dynamictrees.model.ModelHelper;
+import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.Transparency;
 import com.mojang.math.Quadrant;
 import com.mojang.math.Transformation;
@@ -7,18 +9,21 @@ import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.cuboid.CuboidFace;
+import net.minecraft.client.resources.model.cuboid.CuboidModelElement;
 import net.minecraft.client.resources.model.cuboid.FaceBakery;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.client.model.ExtraFaceData;
 import net.neoforged.neoforge.client.model.quad.MutableQuad;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 public record BranchBlockStateModelPartSleeve(QuadCollection quads, boolean useAmbientOcclusion, Material.Baked particleMaterial) implements BlockStateModelPart {
 
@@ -43,45 +48,62 @@ public record BranchBlockStateModelPartSleeve(QuadCollection quads, boolean useA
         }
 
         public BranchBlockStateModelPartSleeve bake(ModelBaker baker, int radius, Direction direction) {
-
-            return buildPart(baker, material, material, material, -0.5f, 0.5f);
-        }
-
-        //Test part builder
-        private BranchBlockStateModelPartSleeve buildPart(ModelBaker baker, Material.Baked topSprite, Material.Baked bottomSprite, Material.Baked sideSprite, float yMin, float yMax) {
-
+            CuboidModelElement part = generateSleevePart(radius, direction, false);
             QuadCollection.Builder builder = new QuadCollection.Builder();
 
-            for (Direction dir : Direction.values()) {
-                Material.Baked sprite = switch (dir) {
-                    case UP -> topSprite;
-                    case DOWN -> bottomSprite;
-                    default -> sideSprite;
-                };
+            for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
+                Direction face = e.getKey();
+                builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+            }
 
-                MutableQuad quad = new MutableQuad();
-                quad.setSprite(sprite, Transparency.NONE);
-                quad.setCubeFace(dir, 0.25f, yMin, 0.25f, 0.75f, yMax, 0.75f);
-                quad.bakeUvsFromPosition();
-                quad.recalculateWinding();
+            return new BranchBlockStateModelPartSleeve(builder.build(), true, material);
+        }
 
-                if ((dir == Direction.UP && yMax == 1f) || (dir == Direction.DOWN && yMin == 0f)) {
-                    builder.addCulledFace(dir, quad.toBakedQuad());
-                } else if (dir.getAxis().isHorizontal()) {
-                    builder.addCulledFace(dir, quad.toBakedQuad());
-                } else {
-                    builder.addUnculledFace(quad.toBakedQuad());
+        public CuboidModelElement generateSleevePart(int radius, Direction dir, boolean flipNormals){
+            //Work in double units(*2)
+            int dradius = radius * 2;
+            int halfSize = (16 - dradius) / 2;
+            int halfSizeX = dir.getStepX() != 0 ? halfSize : dradius;
+            int halfSizeY = dir.getStepY() != 0 ? halfSize : dradius;
+            int halfSizeZ = dir.getStepZ() != 0 ? halfSize : dradius;
+            int move = 16 - halfSize;
+            int centerX = 16 + (dir.getStepX() * move);
+            int centerY = 16 + (dir.getStepY() * move);
+            int centerZ = 16 + (dir.getStepZ() * move);
+
+            Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2f, (centerY - halfSizeY) / 2f, (centerZ - halfSizeZ) / 2f);
+            Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2f, (centerY + halfSizeY) / 2f, (centerZ + halfSizeZ) / 2f);
+            if (flipNormals){
+                Vector3f aux = posFrom;
+                posFrom = posTo;
+                posTo = aux;
+                dir = dir.getOpposite();
+            }
+
+            boolean negative = dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE;
+            if (dir.getAxis() == Direction.Axis.Z) {//North/South
+                negative = !negative;
+            }
+
+            Map<Direction, CuboidFace> mapFacesIn = Maps.newEnumMap(Direction.class);
+
+            for (Direction face : Direction.values()) {
+                if (dir.getOpposite() != face) { //Discard side of sleeve that faces core
+                    CuboidFace.UVs uvface = null;
+                    if (dir == face) {//Side of sleeve that faces away from core
+                        if (radius == 1) { //We're only interested in end faces for radius == 1
+                            uvface = new CuboidFace.UVs(8 - radius, 8 - radius, 8 + radius, 8 + radius);
+                        }
+                    } else { //UV for Bark texture
+                        uvface = new CuboidFace.UVs(8 - radius, negative ? 16 - halfSize : 0, 8 + radius, negative ? 16 : halfSize);
+                    }
+                    if (uvface != null) {
+                        mapFacesIn.put(face, new CuboidFace(null, -1, material.toString(), uvface, ModelHelper.getFaceQuadrant(dir.getAxis(), face)));
+                    }
                 }
             }
 
-            return new BranchBlockStateModelPartSleeve(builder.build(), true, sideSprite);
-        }
-
-        private static @NotNull BakedQuad testFace(ModelBaker baker, Material.Baked particle) {
-            ModelState noState = new ModelState() {@Override public Transformation transformation() {return ModelState.super.transformation();}};
-            CuboidFace face = new CuboidFace(null, 0, "bark", new CuboidFace.UVs(0,0,16,16), Quadrant.R0);
-            BakedQuad quad = FaceBakery.bakeQuad(baker, new Vector3f(0,0,0), new Vector3f(4,4,4), face, particle, Direction.UP, noState, null, true, 0);
-            return quad;
+            return new CuboidModelElement(posFrom, posTo, mapFacesIn, ExtraFaceData.DEFAULT);
         }
     }
 }

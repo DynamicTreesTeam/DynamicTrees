@@ -1,9 +1,6 @@
 package com.dtteam.dynamictrees.model;
 
-import com.dtteam.dynamictrees.api.network.RootConnections;
 import com.mojang.math.Quadrant;
-import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.cuboid.CuboidFace;
@@ -15,13 +12,10 @@ import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.model.data.ModelProperty;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class ModelHelper {
-
-    public static final ModelProperty<RootConnections> ROOT_CONNECTIONS_PROPERTY = new ModelProperty<>();
 
     public static float[] getUVs(AABB box, Direction face) {
         return switch (face) {
@@ -83,25 +77,10 @@ public class ModelHelper {
 
     public static BakedQuad makeBakedQuad(ModelBaker baker, CuboidModelElement blockPart, CuboidFace partFace, Material.Baked material, Direction dir) {
         CuboidRotation noRotation = new CuboidRotation(new Vector3f(0,0,0), Matrix4f::new, false);
-        ModelState noState = new ModelState() { @Override public Transformation transformation() {return ModelState.super.transformation();} };
+        ModelState noState = new NoModelState();
         return FaceBakery.bakeQuad(baker, blockPart.from(), blockPart.to(), partFace, material, dir, noState, noRotation, true, 0);
     }
 
-//    public static IModelBuilder<?> getModelBuilder(IGeometryBakingContext context, TextureAtlasSprite particle) {
-//        Identifier renderTypeHint = context.getRenderTypeHint();
-//        RenderTypeGroup renderTypes = renderTypeHint != null ? context.getRenderType(renderTypeHint) : RenderTypeGroup.EMPTY;
-//
-//        return IModelBuilder.of(context.useAmbientOcclusion(), context.useBlockLight(), context.isGui3d(),
-//                context.getTransforms(), ItemOverrides.EMPTY, particle, renderTypes);
-//    }
-//
-//    @SuppressWarnings("deprecation")
-//    public static TextureAtlasSprite getTexture(Identifier resLoc) {
-//        return getTexture(resLoc, TextureAtlas.LOCATION_BLOCKS);
-//    }
-//
-//    public static TextureAtlasSprite getTexture(Identifier resLoc, Identifier atlasResLoc) {
-//        return Minecraft.getInstance().getTextureAtlas(atlasResLoc).apply(resLoc);
-//    }
+    private static class NoModelState implements ModelState{ }
 
 }

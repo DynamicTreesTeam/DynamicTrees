@@ -91,7 +91,7 @@ public record BranchBlockStateModel(
                         final int connRadius = connections[idx];
                         // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius-1 connections for leaves (which are partly transparent).
                         if (connRadius > 0 && (connRadius <= twigRadius.get() || face != connDir)) {
-                            //parts.add(sleeves[idx][connRadius - 1]);
+                            parts.add(sleeves[idx][connRadius - 1]);
                         }
                     }
                 }
@@ -114,7 +114,7 @@ public record BranchBlockStateModel(
     /**
      * Locates the side with the largest neighbor radius that's equal to or greater than this branch block
      *
-     * @param coreRadius
+     * @param coreRadius the radius of the branch block
      * @param connections an array of 6 integers, one for the radius of each connecting side. DUNSWE.
      */
     @Nullable
@@ -138,9 +138,6 @@ public record BranchBlockStateModel(
 
     /**
      * Converts direction DUNSWE to 3 axis numbers for Y,Z,X
-     *
-     * @param dir
-     * @return
      */
     private int resolveCoreDir(@Nullable Direction dir) {
         if (dir == null) {
