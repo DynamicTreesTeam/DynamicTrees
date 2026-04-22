@@ -53,7 +53,7 @@ public record BranchBlockStateModelPartSleeve(QuadCollection quads, boolean useA
 
             for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
                 Direction face = e.getKey();
-                builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+                builder.addUnculledFace(ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
             }
 
             return new BranchBlockStateModelPartSleeve(builder.build(), true, material);
@@ -61,11 +61,11 @@ public record BranchBlockStateModelPartSleeve(QuadCollection quads, boolean useA
 
         public CuboidModelElement generateSleevePart(int radius, Direction dir, boolean flipNormals){
             //Work in double units(*2)
-            int dradius = radius * 2;
-            int halfSize = (16 - dradius) / 2;
-            int halfSizeX = dir.getStepX() != 0 ? halfSize : dradius;
-            int halfSizeY = dir.getStepY() != 0 ? halfSize : dradius;
-            int halfSizeZ = dir.getStepZ() != 0 ? halfSize : dradius;
+            int diameter = radius * 2;
+            int halfSize = (16 - diameter) / 2;
+            int halfSizeX = dir.getStepX() != 0 ? halfSize : diameter;
+            int halfSizeY = dir.getStepY() != 0 ? halfSize : diameter;
+            int halfSizeZ = dir.getStepZ() != 0 ? halfSize : diameter;
             int move = 16 - halfSize;
             int centerX = 16 + (dir.getStepX() * move);
             int centerY = 16 + (dir.getStepY() * move);
@@ -98,7 +98,7 @@ public record BranchBlockStateModelPartSleeve(QuadCollection quads, boolean useA
                         uvface = new CuboidFace.UVs(8 - radius, negative ? 16 - halfSize : 0, 8 + radius, negative ? 16 : halfSize);
                     }
                     if (uvface != null) {
-                        mapFacesIn.put(face, new CuboidFace(null, -1, material.toString(), uvface, ModelHelper.getFaceQuadrant(dir.getAxis(), face)));
+                        mapFacesIn.put(face, new CuboidFace(face, -1, material.toString(), uvface, ModelHelper.getFaceQuadrant(dir.getAxis(), face)));
                     }
                 }
             }

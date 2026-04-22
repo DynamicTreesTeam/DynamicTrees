@@ -34,21 +34,12 @@ public class TreeFeatureCanceller<T extends FeatureConfiguration> extends Featur
             return this.doesContainTrees((RandomFeatureConfiguration) featureConfig, featureCancellations);
         } else if (this.treeFeatureConfigClass.isInstance(featureConfig)) {
             String nameSpace = "";
-            final ConfiguredFeature<?, ?> nextConfiguredFeature = configuredFeature.getSubFeatures()
-                    .findFirst().map(Holder::value).orElse(null);
-            if (nextConfiguredFeature == null) return false;
-            final FeatureConfiguration nextFeatureConfig = nextConfiguredFeature.config();
-            final Identifier featureRegistryName = BuiltInRegistries.FEATURE.getKey(nextConfiguredFeature.feature());
+            final Identifier featureRegistryName = BuiltInRegistries.FEATURE.getKey(configuredFeature.feature());
             if (featureRegistryName != null) {
                 nameSpace = featureRegistryName.getNamespace();
             }
-            if (this.treeFeatureConfigClass.isInstance(nextFeatureConfig) && !nameSpace.isEmpty() &&
-                featureCancellations.shouldCancelNamespace(nameSpace)) {
-                return true; // Removes any individual trees.
-            } else if (nextFeatureConfig instanceof RandomFeatureConfiguration) {
-                // Removes configuredFeature if it contains trees.
-                return this.doesContainTrees((RandomFeatureConfiguration) nextFeatureConfig, featureCancellations);
-            }
+            // Removes any individual trees if the namespace matches
+            return !nameSpace.isEmpty() && featureCancellations.shouldCancelNamespace(nameSpace);
         }
 
         return false;

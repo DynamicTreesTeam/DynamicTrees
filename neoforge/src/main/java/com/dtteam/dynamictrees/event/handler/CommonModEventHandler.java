@@ -126,7 +126,7 @@ public class CommonModEventHandler {
         if (event.getRegistryKey() != BuiltInRegistries.BLOCK.key()) {
             return;
         }
-        // Register any registry entries from Json files.
+        // Register any registry entries from JSON files.
         Resources.MANAGER.load();
         // Lock all the registries.
         Registries.REGISTRIES.stream()

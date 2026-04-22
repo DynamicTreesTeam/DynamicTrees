@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.event.handler;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.command.DTCommand;
 import com.dtteam.dynamictrees.recipe.DendroPotionRecipeHandler;
+import com.dtteam.dynamictrees.systems.FutureBreak;
 import com.dtteam.dynamictrees.systems.season.SeasonCompatibilityHandler;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.BiomeDatabases;
@@ -14,7 +15,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
-import net.neoforged.neoforge.event.level.ChunkDataEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -28,9 +28,9 @@ public class CommonGameEventHandler {
 
     @SubscribeEvent
     public static void onPreLevelTick(LevelTickEvent.Pre event) {
-//        if (!event.getLevel().isClientSide()) {
-//            FutureBreak.process(event.getLevel());
-//        }
+        if (!event.getLevel().isClientSide()) {
+            FutureBreak.process(event.getLevel());
+        }
 //        SeasonHelper.updateTick(event.getLevel(), event.getLevel().getDayTime());
     }
 
@@ -54,25 +54,25 @@ public class CommonGameEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onChunkDataLoad(ChunkDataEvent.Load event) {
+    //TODO: use Data Attachments
+//    @SubscribeEvent
+//    @SuppressWarnings("ConstantConditions")
+//    public static void onChunkDataLoad(ChunkDataEvent.Load event) {
 //        if (!DTConfigs.SERVER.worldGen.get()) return;
 //
 //        final LevelAccessor level = event.getLevel();
 //
-//		if (level == null || level.isClientSide()) {
-//			return;
-//		}
+//		if (level == null || level.isClientSide()) return;
 //
-//        final byte[] circleData = event.getData().getByteArray(UniversalPoissonDiscProvider.CIRCLE_DATA_ID);
+//        final byte[] circleData = readChunkByteArray(event.getData(), UniversalPoissonDiscProvider.CIRCLE_DATA_ID);
 //        final UniversalPoissonDiscProvider discProvider = DynamicTreeFeature.DISC_PROVIDER;
 //
 //        final ChunkPos chunkPos = event.getChunk().getPos();
 //        discProvider.setChunkPoissonData(LevelContext.create(level), chunkPos, circleData);
-    }
-
-    @SubscribeEvent
-    public static void onChunkDataSave(ChunkDataEvent.Save event) {
+//    }
+//
+//    @SubscribeEvent
+//    public static void onChunkDataSave(ChunkDataEvent.Save event) {
 //        if (!DTConfigs.SERVER.worldGen.get()) return;
 //
 //        final LevelContext levelContext = LevelContext.create(event.getLevel());
@@ -81,12 +81,34 @@ public class CommonGameEventHandler {
 //        final ChunkPos chunkPos = chunk.getPos();
 //
 //        final byte[] circleData = discProvider.getChunkPoissonData(levelContext, chunkPos);
-//        event.getData().putByteArray(UniversalPoissonDiscProvider.CIRCLE_DATA_ID, circleData); // Set circle data.
+//        writeChunkByteArray(event.getData(), UniversalPoissonDiscProvider.CIRCLE_DATA_ID, circleData); // Set circle data.
 //
 //		if (chunk instanceof LevelChunk && !((LevelChunk) chunk).loaded) {
 //			discProvider.unloadChunkPoissonData(levelContext, chunkPos);
 //		}
-    }
+//    }
+//
+//    private static byte[] readChunkByteArray(SerializableChunkData data, String key){
+//        CompoundTag tag = data.attachmentData();
+//        try {
+//            assert tag != null;
+//            if (tag.contains(key)) return ((ByteArrayTag) Objects.requireNonNull(tag.get(key))).getAsByteArray();
+//        } catch (ClassCastException classcastexception) {
+//            throw new NbtException(String.format("Exception loading %s tag from Chunk Data", key));
+//        }
+//
+//        return new byte[0];
+//    }
+//
+//    private static void writeChunkByteArray(SerializableChunkData data, String key, byte[] bytes){
+//        CompoundTag tag = data.attachmentData();
+//        try {
+//            assert tag != null;
+//            tag.put(key, new ByteArrayTag(bytes));
+//        } catch (AssertionError exception) {
+//            throw new NbtException(String.format("Exception saving %s tag into Chunk Data", key));
+//        }
+//    }
 
     ///////////////////////////////////////////
     // SERVER

@@ -56,7 +56,11 @@ public record BranchBlockStateModelPartCore(QuadCollection quads, boolean useAmb
 
             for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
                 Direction face = e.getKey();
-                builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+                if (radius == 8){
+                    builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+                } else {
+                    builder.addUnculledFace(ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+                }
             }
 
             return new BranchBlockStateModelPartCore(builder.build(), true, material);
@@ -75,7 +79,7 @@ public record BranchBlockStateModelPartCore(QuadCollection quads, boolean useAmb
 
             for (Direction face : Direction.values()) {
                 CuboidFace.UVs uvface = new CuboidFace.UVs(8 - radius, 8 - radius, 8 + radius, 8 + radius);
-                mapFacesIn.put(face, new CuboidFace(null, -1, material.toString(), uvface, ModelHelper.getFaceQuadrant(axis, face)));
+                mapFacesIn.put(face, new CuboidFace(face, -1, material.toString(), uvface, ModelHelper.getFaceQuadrant(axis, face)));
             }
 
             return new CuboidModelElement(posFrom, posTo, mapFacesIn, ExtraFaceData.DEFAULT);

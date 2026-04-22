@@ -1,19 +1,37 @@
 package com.dtteam.dynamictrees.event.handler;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.client.BlockColorMultipliers;
+import com.dtteam.dynamictrees.client.TextureHelper;
+import com.dtteam.dynamictrees.client.ThickBranchRingsSource;
 import com.dtteam.dynamictrees.entity.render.FallingTreeRenderer;
 import com.dtteam.dynamictrees.entity.render.LingeringEffectorRenderer;
 import com.dtteam.dynamictrees.model.branch.BranchBlockStateModel;
 import com.dtteam.dynamictrees.registry.DTRegistries;
+import com.dtteam.dynamictrees.tree.family.Family;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.FoliageColor;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterBlockStateModels;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterSpriteSourcesEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @EventBusSubscriber(modid = DynamicTrees.MOD_ID, value = Dist.CLIENT)
 public class ClientModEventHandler {
@@ -25,60 +43,71 @@ public class ClientModEventHandler {
 
     public static void discoverWoodColors() {
 
-//        final Function<Identifier, TextureAtlasSprite> bakedTextureGetter = Minecraft.getInstance()
-//                .getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
-//
-//        for (Family family : Family.REGISTRY.getAll()) {
-//            family.woodRingColor = 0xFFF1AE;
-//            family.woodBarkColor = 0xB3A979;
-//            if (family != Family.NULL_FAMILY) {
-//                family.getPrimitiveLog().ifPresent(branch -> {
-//                    BlockState state = branch.defaultBlockState();
-//                    family.woodRingColor = getFaceColor(state, Direction.DOWN, bakedTextureGetter);
-//                    family.woodBarkColor = getFaceColor(state, Direction.NORTH, bakedTextureGetter);
-//                });
-//            }
-//        }
+        for (Family family : Family.REGISTRY.getAll()) {
+            family.woodRingColor = 0xFFF1AE;
+            family.woodBarkColor = 0xB3A979;
+            if (family != Family.NULL_FAMILY) {
+                family.getPrimitiveLog().ifPresent(branch -> {
+                    BlockState state = branch.defaultBlockState();
+                    family.woodRingColor = getFaceColor(state, Direction.DOWN);
+                    family.woodBarkColor = getFaceColor(state, Direction.NORTH);
+                });
+            }
+        }
     }
 
 
-//    private static int getFaceColor(BlockState state, Direction face, Function<Identifier, TextureAtlasSprite> textureGetter) {
-//        final BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-//        List<BakedQuad> quads = model.getQuads(state, face, RandomSource.create(), ModelData.EMPTY, null);
-//        if (quads.isEmpty()) // If the quad list is empty, means there is no face on that side, so we try with null.
-//        {
-//            quads = model.getQuads(state, null, RandomSource.create(), ModelData.EMPTY, null);
-//        }
-//        if (quads.isEmpty()) { // If null still returns empty, there is nothing we can do so we just warn and exit.
-//            DynamicTrees.LOG.warn("Could not get color of {} side for {}! Branch needs to be handled manually!", face, state.getBlock());
-//            return 0;
-//        }
-//        TextureAtlasSprite sprite = quads.getFirst().getSprite();
-//        final TextureHelper.PixelBuffer pixelBuffer = new TextureHelper.PixelBuffer(sprite);
-//        final int u = pixelBuffer.w / 16;
-//        final TextureHelper.PixelBuffer center = new TextureHelper.PixelBuffer(u * 8, u * 8);
-//        pixelBuffer.blit(center, u * -8, u * -8);
-//
-//        return center.averageColor();
-//    }
-//
-//    @SubscribeEvent
-//
-//    public static void registerColorResolversEvent(RegisterColorHandlersEvent.ColorResolvers event){
-//        BlockColorMultipliers.register("birch", (state, level, pos, tintIndex) -> FoliageColor.getBirchColor());
-//        BlockColorMultipliers.register("spruce", (state, level, pos, tintIndex) -> FoliageColor.getEvergreenColor());
-//    }
+    private static int getFaceColor(BlockState state, Direction face) {
+        final BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(state);
+        List<BakedQuad> quads = getQuads(state, face, model);
+        if (quads == null) return 0;
+        TextureAtlasSprite sprite = quads.getFirst().materialInfo().sprite();
+        final TextureHelper.PixelBuffer pixelBuffer = new TextureHelper.PixelBuffer(sprite);
+        final int u = pixelBuffer.w / 16;
+        final TextureHelper.PixelBuffer center = new TextureHelper.PixelBuffer(u * 8, u * 8);
+        pixelBuffer.blit(center, u * -8, u * -8);
+
+        return center.averageColor();
+    }
+
+    private static List<BakedQuad> getQuads(BlockState state, Direction face, BlockStateModel model) {
+        List<BlockStateModelPart> parts = new ArrayList<>();
+        model.collectParts(BlockAndTintGetter.EMPTY, BlockPos.ZERO, state, RandomSource.create(), parts);
+
+        if (parts.isEmpty()) { // No parts? empty model
+            DynamicTrees.LOG.warn("Could not get any color from {}, model is empty! Branch color needs to be handled manually.", state.getBlock());
+            return null;
+        }
+        //We only care about the first, we assume these are all regular blocks
+        List<BakedQuad> quads = parts.getFirst().getQuads(face);
+        if (quads.isEmpty()) // If the quad list is empty, means there is no face on that side, so we try with null.
+        {
+            quads = parts.getFirst().getQuads(null);
+        }
+        if (quads.isEmpty()) { // If null still returns empty, there is nothing we can do so we just warn and exit.
+            DynamicTrees.LOG.warn("Could not get color of {} side for {}! Branch color needs to be handled manually.", face, state.getBlock());
+            return null;
+        }
+        return quads;
+    }
+
+    @SubscribeEvent
+
+    public static void registerColorResolversEvent(RegisterColorHandlersEvent.ColorResolvers event){
+        BlockColorMultipliers.register("birch", List.of(_ -> FoliageColor.FOLIAGE_BIRCH));
+        BlockColorMultipliers.register("spruce", List.of(_ -> FoliageColor.FOLIAGE_EVERGREEN));
+    }
 
     @SubscribeEvent
     public static void registerItemColorHandlersEvent(RegisterColorHandlersEvent.ItemTintSources event){
 //        // Register Potion Colorizer
-//        event.register(DTRegistries.DENDRO_POTION.get()::getColor, DTRegistries.DENDRO_POTION.get());
+//        event.register(DynamicTrees.location("dendro_potion"), DTRegistries.DENDRO_POTION.get()::getColor);
 //        // Register Woodland Staff Colorizer
-//        event.register(DTRegistries.STAFF.get()::getColor, DTRegistries.STAFF.get());
+//        event.register(DynamicTrees.location("staff"), DTRegistries.STAFF.get()::getColor);
     }
 
     @SubscribeEvent
-    public static void registerBlockColorHandlersEvent(RegisterColorHandlersEvent.ColorResolvers event){
+    public static void registerBlockColorHandlersEvent(RegisterColorHandlersEvent.BlockTintSources event){
 //        final int white = 0xFFFFFFFF;
 //        final int magenta = 0x00FF00FF;//for errors... because magenta sucks.
 //
@@ -112,12 +141,6 @@ public class ClientModEventHandler {
 //                    leaves);
 //        }
     }
-
-//    @SuppressWarnings("deprecation")
-//    private static void setRenderLayerCutoutMipped(SoilBlock roots) {
-//        //Unfortunately there's no way around this. We do not own the models to set the renderType there.
-//        ItemBlockRenderTypes.setRenderLayer(roots, RenderType.cutoutMipped());
-//    }
 
     private static boolean isValidPos(BlockGetter level, BlockPos pos) {
         return level != null && pos != null;
@@ -161,12 +184,12 @@ public class ClientModEventHandler {
 //    @SubscribeEvent
 //    public static void onModelModifyBakingResultResult(ModelEvent.ModifyBakingResult event) {
 //        // Put bonsai pot baked model into its model location.
-//        event.getModels().computeIfPresent(new ModelIdentifier(DynamicTrees.location("potted_sapling"), ""), (k, val) -> new BakedModelBlockPottedSapling(val));
+//        event.getBakingResult().blockStateModels().computeIfPresent(new ModelIdentifier(DynamicTrees.location("potted_sapling"), ""), (k, val) -> new BakedModelBlockPottedSapling(val));
 //    }
-//
-//    @SubscribeEvent
-//    public static void stitchTextureAtlas(RegisterSpriteSourceTypesEvent event) {
-//        event.register(ThickBranchRingsSource.ID, ThickBranchRingsSource.setType(ThickBranchRingsSource.CODEC));
-//    }
+
+    @SubscribeEvent
+    public static void stitchTextureAtlas(RegisterSpriteSourcesEvent event) {
+        event.register(ThickBranchRingsSource.ID, ThickBranchRingsSource.CODEC);
+    }
 
 }
