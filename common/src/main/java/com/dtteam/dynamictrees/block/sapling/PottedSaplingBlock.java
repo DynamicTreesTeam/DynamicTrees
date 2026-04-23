@@ -1,10 +1,14 @@
 package com.dtteam.dynamictrees.block.sapling;
 
+import com.dtteam.dynamictrees.client.GeneratesTintSources;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.ItemUtils;
 import com.dtteam.dynamictrees.utility.NullUtils;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.block.BlockTintSource;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -18,7 +22,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -27,13 +34,12 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class PottedSaplingBlock extends BaseEntityBlock {
+public class PottedSaplingBlock extends BaseEntityBlock implements GeneratesTintSources {
 
     protected static final AABB FLOWER_POT_AABB = new AABB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 
@@ -225,4 +231,17 @@ public class PottedSaplingBlock extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
 
+    @Override
+    public BlockTintSource generateTintSource(BlockColors blockColors, int tintIndex) {
+        return new BlockTintSource() {
+            @Override
+            public int color(BlockState blockState) {
+                return 0xFFFFFF;
+            }
+            @Override
+            public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+                return getSpecies(level, pos).getSaplingTintSource().colorInWorld(state, level, pos);
+            }
+        };
+    }
 }

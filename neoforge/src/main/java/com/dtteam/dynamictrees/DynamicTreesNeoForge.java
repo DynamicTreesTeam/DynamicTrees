@@ -46,7 +46,6 @@ public class DynamicTreesNeoForge {
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
-        LeavesProperties.postInitClient();
         BlockColorMultipliers.cleanUp();
     }
 

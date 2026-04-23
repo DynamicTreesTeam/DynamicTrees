@@ -4,15 +4,11 @@ import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -46,7 +42,7 @@ public class ParticleHelper {
     }
 
     private static int getFoliageColor(LeavesProperties leavesProperties, ClientLevel level, BlockState blockState, BlockPos pos) {
-        return leavesProperties.foliageColorMultiplier(blockState, level, pos);
+        return leavesProperties.getFoliageColor(blockState, level, pos);
     }
     public static void crushLeavesBlock(Level level, BlockPos pos, BlockState blockState, Entity entity) {
         if (level instanceof ClientLevel cLevel) {

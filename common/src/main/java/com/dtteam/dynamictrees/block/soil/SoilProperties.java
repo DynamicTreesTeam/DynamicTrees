@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.client.GeneratesTintSources;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
@@ -13,8 +14,10 @@ import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.block.BlockTintSource;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
@@ -26,7 +29,6 @@ import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.dtteam.dynamictrees.utility.IdentifierUtils.prefix;
@@ -34,7 +36,7 @@ import static com.dtteam.dynamictrees.utility.IdentifierUtils.prefix;
 /**
  * @author Max Hyper
  */
-public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties> {
+public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties>, GeneratesTintSources {
 
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, SoilProperties>>> blockStateGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, SoilProperties>>> itemModelGenerators = new HashMap<>();
@@ -307,6 +309,36 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
 //                    }
 //                }));
 //    }
+
+
+    ///////////////////////////////////////////
+    // ROOT COLORS
+    ///////////////////////////////////////////
+
+    @Override
+    public BlockTintSource generateTintSource (BlockColors blockColors, int tintIndex){
+        final int white = 0xFFFFFFFF;
+        if (tintIndex == foliageTintIndex)
+            blockColors.getTintSource(getPrimitiveSoilState(getBlock().get().defaultBlockState()), tintIndex);
+        else if (tintIndex == rootsTintIndex)
+            return new BlockTintSource() {
+                @Override
+                public int color(BlockState blockState) {
+                    return white;
+                }
+
+                @Override
+                public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+                    return state.getBlock() instanceof SoilBlock sBlock ? sBlock.rootColor(state, level, pos) : white;
+                }
+            };
+        return _ -> white;
+    }
+
+    @Override
+    public int maxTintIndex(){
+        return Math.max(foliageTintIndex, rootsTintIndex);
+    }
 
     //////////////////////////////
     // JAVA OBJECT STUFF

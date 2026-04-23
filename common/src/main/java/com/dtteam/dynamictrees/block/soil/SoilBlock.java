@@ -544,15 +544,6 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
     // RENDERING
     ///////////////////////////////////////////
 
-//    public int colorMultiplier(BlockColors blockColors, BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int tintIndex) {
-//        final int white = 0xFFFFFFFF;
-//        if (tintIndex == getSoilProperties().foliageTintIndex)
-//            return blockColors.getColor(getPrimitiveSoilState(state), level, pos, tintIndex);
-//        else if (tintIndex == getSoilProperties().rootsTintIndex)
-//            return state.getBlock() instanceof SoilBlock ? rootColor(state, level, pos) : white;
-//        return white;
-//    }
-
     public boolean getColorFromBark() {
         return false;
     }

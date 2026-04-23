@@ -28,6 +28,7 @@ import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
+import com.dtteam.dynamictrees.client.GeneratesTintSources;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
@@ -75,6 +76,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -130,7 +133,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class Species extends RegistryEntry<Species> implements Resettable<Species> {
+public class Species extends RegistryEntry<Species> implements Resettable<Species>, GeneratesTintSources {
 
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, Species>>> blockStateGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, Species>>> itemModelGenerators = new HashMap<>();
@@ -498,7 +501,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public int leafColorMultiplier(BlockAndTintGetter level, BlockPos pos) {
-        return getLeavesProperties().treeFallColorMultiplier(getLeavesProperties().getDynamicLeavesState(), level, pos);
+        return getLeavesProperties().getFoliageColor(getLeavesProperties().getDynamicLeavesState(), level, pos);
     }
     //endregion
 
@@ -1004,15 +1007,33 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.tintSapling = tintSapling;
     }
 
-    public int saplingColorMultiplier(BlockState state, BlockAndTintGetter level, BlockPos pos, int tintIndex) {
-        if (tintSapling){
-            if (tintIndex == 0)
-                return getLeavesProperties().foliageColorMultiplier(state, level, pos);
-            if (tintIndex == 1)
-                return family.getRootColor(state, true);
-            return -1;
-        } else return 0xFFFFFFFF;
+    private BlockTintSource saplingTintSource;
 
+    public BlockTintSource getSaplingTintSource() {
+        return saplingTintSource;
+    }
+
+    @Override
+    public BlockTintSource generateTintSource(BlockColors blockColors, int tintIndex) {
+        int white = 0xFFFFFFFF;
+        if (saplingTintSource == null){
+            if (!tintSapling) {
+                saplingTintSource = _ -> white;
+                return saplingTintSource;
+            }
+            if (tintIndex == 0)
+                saplingTintSource = getLeavesProperties().generateTintSource(blockColors, tintIndex);
+            else if (tintIndex == 1)
+                saplingTintSource = state -> family.getRootColor(state, true);
+            else
+                saplingTintSource = _ -> white;
+        }
+        return saplingTintSource;
+    }
+
+    @Override
+    public int maxTintIndex() {
+        return 1;
     }
 
     private SoundType saplingSound = SoundType.GRASS;

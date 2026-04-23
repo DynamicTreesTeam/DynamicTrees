@@ -9,6 +9,8 @@ import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
+import com.dtteam.dynamictrees.client.CloneTintSource;
+import com.dtteam.dynamictrees.client.GeneratesTintSources;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.data.Generator;
@@ -20,19 +22,17 @@ import com.dtteam.dynamictrees.systems.cell.CellKits;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
-import com.dtteam.dynamictrees.utility.Optionals;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
+import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.color.block.BlockTintSources;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.tags.TagKey;
@@ -61,7 +61,6 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -70,7 +69,7 @@ import java.util.function.Supplier;
  *
  * @author ferreusveritas
  */
-public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties> {
+public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties>, GeneratesTintSources {
 
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, LeavesProperties>>> blockStateGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, LeavesProperties>>> itemModelGenerators = new HashMap<>();
@@ -656,54 +655,44 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.colorString = colorString;
     }
 
-    //
-    private BlockTintSource colorMultiplier;
+    private BlockTintSource tintSource = null;
 
-    //
-    public int treeFallColorMultiplier(BlockState state, BlockAndTintGetter level, BlockPos pos) {
-        return this.foliageColorMultiplier(state, level, pos);
-    }
-
-    //
-    public int foliageColorMultiplier(BlockState state, BlockAndTintGetter level, BlockPos pos) {
-        if (colorMultiplier == null) {
-            return 0x00FF00FF; //purple if broken
+    @Override
+    public BlockTintSource generateTintSource(BlockColors blockColors, int tintIndex) {
+        if (tintSource == null){
+            int color = -1;
+            if (this.colorNumber != null) {
+                color = this.colorNumber;
+            } else if (this.colorString != null) {
+                String code = this.colorString;
+                if (code.startsWith("@")) {
+                    code = code.substring(1);
+                    if ("biome".equals(code)) {
+                        this.tintSource = BlockTintSources.foliage();
+                        return tintSource;
+                    }
+                    BlockTintSource source = BlockColorMultipliers.find(code);
+                    if (source != null) {
+                        tintSource = source;
+                        return tintSource;
+                    } else {
+                        DynamicTrees.LOG.error("ColorMultiplier resource '{}' could not be found.", code);
+                    }
+                } else {
+                    color = Color.decode(code).getRGB();
+                }
+            }
+            int c = color;
+            if (c == -1){
+                this.tintSource = new CloneTintSource(()->blockColors.getTintSource(getPrimitiveLeaves(), tintIndex));
+            } else this.tintSource = _ -> c;
         }
-        return colorMultiplier.colorInWorld(state, level, pos);
+        return tintSource;
     }
 
-//    TODO
-//    private void processColor() {
-//        int color = -1;
-//        if (this.colorNumber != null) {
-//            color = this.colorNumber;
-//        } else if (this.colorString != null) {
-//            String code = this.colorString;
-//            if (code.startsWith("@")) {
-//                code = code.substring(1);
-//                if ("biome".equals(code)) { // Built in code since we need access to super.
-//                    this.colorMultiplier = BlockTintSources.foliage();
-//                    return;
-//                }
-//
-//                BlockTintSource blockColor = BlockColorMultipliers.find(code);
-//                if (blockColor != null) {
-//                    colorMultiplier = blockColor;
-//                    return;
-//                } else {
-//                    DynamicTrees.LOG.error("ColorMultiplier resource '{}' could not be found.", code);
-//                }
-//            } else {
-//                color = Color.decode(code).getRGB();
-//            }
-//        }
-//        int c = color;
-//        this.colorMultiplier = (s, w, p, t) -> c == -1 ? Minecraft.getInstance().getBlockColors().getColor(getPrimitiveLeaves(), w, p, 0) : c;
-//    }
-
-    //
-    public static void postInitClient() {
-//        REGISTRY.getAll().forEach(LeavesProperties::processColor);
+    public int getFoliageColor(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+        if (tintSource == null) return 0;
+        return tintSource.colorInWorld(state, level, pos);
     }
 
     ///////////////////////////////////////////
