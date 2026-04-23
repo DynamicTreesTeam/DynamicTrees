@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.client.CloneTintSource;
 import com.dtteam.dynamictrees.client.GeneratesTintSources;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
@@ -318,12 +319,16 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     @Override
     public BlockTintSource generateTintSource (BlockColors blockColors, int tintIndex){
         final int white = 0xFFFFFFFF;
-        if (tintIndex == foliageTintIndex)
-            blockColors.getTintSource(getPrimitiveSoilState(getBlock().get().defaultBlockState()), tintIndex);
+        if (tintIndex == foliageTintIndex){
+            return new CloneTintSource(()->
+                    getBlock().isPresent() ?
+                            blockColors.getTintSource(getPrimitiveSoilState(getBlock().get().defaultBlockState()), tintIndex)
+                            : _ -> white
+            );
+        }
         else if (tintIndex == rootsTintIndex)
             return new BlockTintSource() {
-                @Override
-                public int color(BlockState blockState) {
+                @Override public int color(BlockState blockState) {
                     return white;
                 }
 
