@@ -28,6 +28,18 @@ public record BranchBlockStateModelPartSleeve(QuadCollection quads, boolean useA
         return this.quads.materialFlags();
     }
 
+    public BranchBlockStateModelPartSleeve faceOnly(@Nullable Direction direction, boolean cull){
+        QuadCollection.Builder builder = new QuadCollection.Builder();
+        for (BakedQuad quad : getQuads(direction)){
+            if (direction != null && cull){
+                builder.addCulledFace(direction, quad);
+            } else {
+                builder.addUnculledFace(quad);
+            }
+        }
+        return new BranchBlockStateModelPartSleeve(builder.build(), useAmbientOcclusion, particleMaterial);
+    }
+
     public record Unbaked(Material.Baked material) implements BlockStateModelPart.Unbaked {
 
         @Override
@@ -44,7 +56,7 @@ public record BranchBlockStateModelPartSleeve(QuadCollection quads, boolean useA
 
             for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
                 Direction face = e.getKey();
-                builder.addUnculledFace(ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+                builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
             }
 
             return new BranchBlockStateModelPartSleeve(builder.build(), true, material);

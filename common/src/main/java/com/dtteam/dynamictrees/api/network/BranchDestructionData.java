@@ -94,7 +94,7 @@ public class BranchDestructionData {
         other.unencodedLeaves.forEach((key, value) -> newLeaves.put(key.offset(offset), value));
         //Merge and offset leaves drops
         List<BranchBlock.ItemStackPos> newLeavesDrops = new LinkedList<>(leavesDrops);
-        newLeavesDrops.addAll(other.leavesDrops.stream().map(a->new BranchBlock.ItemStackPos(a.stack, a.pos.offset(offset))).toList());
+        newLeavesDrops.addAll(other.leavesDrops.stream().map(a->new BranchBlock.ItemStackPos(a.stack(), a.pos().offset(offset))).toList());
         //Merge and offset ends
         List<BlockPos> newEnds = new LinkedList<>(unencodedEnds);
         newEnds.addAll(other.unencodedEnds.stream().map(e->e.offset(offset)).toList());

@@ -34,6 +34,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -209,6 +210,12 @@ public class DTRegistries {
     public static final Supplier<DataComponentType<VoxelDataComponent>> VOXEL_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
             registerDataComponentType("voxel_data", builder -> builder.persistent(VoxelDataComponent.CODEC));//.networkSynchronized()
 
+    ///////////////////////////////////////////
+    // ENTITY DATA SERIALIZERS
+    ///////////////////////////////////////////
+
+    public static final Supplier<EntityDataSerializer<VoxelDataComponent>> VOXEL_DATA_ENTITY_SERIALIZER = Services.REGISTRY.getRegistryLoader().
+            registerEntityDataSerializer("voxel_data", () -> EntityDataSerializer.forValueType(VoxelDataComponent.STREAM_CODEC));
 
     ///////////////////////////////////////////
     // COMMAND ARGUMENTS

@@ -308,7 +308,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     }
 
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
         if (isFullBlock(state)){
             level.setBlock(pos, state.setValue(LAYER, Layer.FILLED), level.isClientSide() ? 11 : 3);
             this.spawnDestroyParticles(level, player, pos, state);
@@ -331,7 +331,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
                 level.scheduleTick(signal.root, level.getBlockState(signal.root).getBlock(), 2);
             }
         }
-        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+        return super.onDestroyedByPlayer(state, level, pos, player, toolStack, willHarvest, fluid);
     }
 
     @Override

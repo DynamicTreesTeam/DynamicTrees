@@ -11,7 +11,6 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.MathUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -381,13 +380,10 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     @Override
-//    
     public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack) {
 
         float yaw = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTick));
         float pit = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTick));
-
-        //Vec3d mc = entity.getMassCenter();
 
         int radius = entity.getDestroyData().getBranchRadius(0);
 
@@ -404,7 +400,6 @@ public class FalloverAnimationHandler implements AnimationHandler {
     }
 
     @Override
-//    
     public boolean shouldRender(FallingTreeEntity entity, double x, double y, double z) {
         return true;
     }

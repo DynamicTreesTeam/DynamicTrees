@@ -29,6 +29,8 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.EntityUtils;
 import com.dtteam.dynamictrees.utility.ItemUtils;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -391,19 +393,6 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     }
 
     /**
-     * Holds an {@link ItemStack} and the {@link BlockPos} in which it should be dropped.
-     */
-    public static class ItemStackPos {
-        public final ItemStack stack;
-        public final BlockPos pos;
-
-        public ItemStackPos(ItemStack stack, BlockPos pos) {
-            this.stack = stack;
-            this.pos = pos;
-        }
-    }
-
-    /**
      * Destroys all branches recursively not facing the branching direction with the root node
      *
      * @param level     The {@link Level} instance.
@@ -622,7 +611,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
 
     /** NeoForge Override */
     @SuppressWarnings("unused")
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid){
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
         FutureBreak.add(new FutureBreak(state, level, pos, player, 0));
         return false;
     }
@@ -781,6 +770,15 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return TreePartType.BRANCH;
     }
 
+    /**
+     * Holds an {@link ItemStack} and the {@link BlockPos} in which it should be dropped.
+     */
+    public record ItemStackPos(ItemStack stack, BlockPos pos) {
+        private static final Codec<ItemStackPos> CODEC = RecordCodecBuilder.create(i -> i.group(
+                ItemStack.CODEC.fieldOf("stack").forGetter(ItemStackPos::stack),
+                BlockPos.CODEC.fieldOf("pos").forGetter(ItemStackPos::pos)
+        ).apply(i, ItemStackPos::new));
 
+    }
 
 }

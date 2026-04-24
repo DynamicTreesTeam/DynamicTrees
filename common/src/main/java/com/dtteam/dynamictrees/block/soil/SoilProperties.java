@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.client.CloneTintSource;
-import com.dtteam.dynamictrees.client.GeneratesTintSources;
+import com.dtteam.dynamictrees.client.GeneratesBlockTintSources;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
@@ -37,7 +37,7 @@ import static com.dtteam.dynamictrees.utility.IdentifierUtils.prefix;
 /**
  * @author Max Hyper
  */
-public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties>, GeneratesTintSources {
+public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties>, GeneratesBlockTintSources {
 
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, SoilProperties>>> blockStateGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, SoilProperties>>> itemModelGenerators = new HashMap<>();

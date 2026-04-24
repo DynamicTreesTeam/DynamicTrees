@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.client.CloneTintSource;
-import com.dtteam.dynamictrees.client.GeneratesTintSources;
+import com.dtteam.dynamictrees.client.GeneratesBlockTintSources;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.data.Generator;
@@ -69,7 +69,7 @@ import java.util.function.Supplier;
  *
  * @author ferreusveritas
  */
-public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties>, GeneratesTintSources {
+public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties>, GeneratesBlockTintSources {
 
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, LeavesProperties>>> blockStateGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, LeavesProperties>>> itemModelGenerators = new HashMap<>();

@@ -153,7 +153,7 @@ public class PhysicsAnimationHandler implements AnimationHandler {
     public void dropPayload(FallingTreeEntity entity) {
         final Level level = entity.level();
         entity.getPayload().forEach(i -> Block.popResource(level, BlockPos.containing(entity.getX(), entity.getY(), entity.getZ()), i));
-        entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(level, entity.getDestroyData().cutPos.offset(bis.pos), bis.stack));
+        entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(level, entity.getDestroyData().cutPos.offset(bis.pos()), bis.stack()));
     }
 
     public boolean shouldDie(FallingTreeEntity entity) {

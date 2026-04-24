@@ -1,6 +1,6 @@
 package com.dtteam.dynamictrees.block.sapling;
 
-import com.dtteam.dynamictrees.client.GeneratesTintSources;
+import com.dtteam.dynamictrees.client.GeneratesBlockTintSources;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.ItemUtils;
@@ -39,7 +39,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class PottedSaplingBlock extends BaseEntityBlock implements GeneratesTintSources {
+public class PottedSaplingBlock extends BaseEntityBlock implements GeneratesBlockTintSources {
 
     protected static final AABB FLOWER_POT_AABB = new AABB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 

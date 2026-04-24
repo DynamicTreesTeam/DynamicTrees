@@ -68,7 +68,7 @@ public record BranchBlockStateModel(
         }
 
         if (numConnections == 0 && forceRingDir != null) {
-            parts.add(rings[coreRadius - 1]);
+            parts.add(rings[coreRadius - 1].faceOnly(forceRingDir, false));
         } else {
             // The source direction is the biggest connection from one of the 6 directions.
             final Direction sourceDir = getSourceDir(coreRadius, connections);
@@ -81,9 +81,9 @@ public record BranchBlockStateModel(
                 // Get quads for core model.
                 if (coreRadius != connections[face.get3DDataValue()]) {
                     if ((coreRingDir == null || coreRingDir != face)) {
-                        parts.add(cores[coreDir][coreRadius - 1]);
+                        parts.add(cores[coreDir][coreRadius - 1].faceOnly(face, coreRadius == 8));
                     } else {
-                        parts.add(rings[coreRadius - 1]);
+                        parts.add(rings[coreRadius - 1].faceOnly(face, false));
                     }
                 }
                 // Get quads for sleeves models.
@@ -93,7 +93,7 @@ public record BranchBlockStateModel(
                         final int connRadius = connections[idx];
                         // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius-1 connections for leaves (which are partly transparent).
                         if (connRadius > 0 && (connRadius <= twigRadius.get() || face != connDir)) {
-                            parts.add(sleeves[idx][connRadius - 1]);
+                            parts.add(sleeves[idx][connRadius - 1].faceOnly(face, false));
                         }
                     }
                 }

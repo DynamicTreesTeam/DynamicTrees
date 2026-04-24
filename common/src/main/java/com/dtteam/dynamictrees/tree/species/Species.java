@@ -28,7 +28,7 @@ import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
-import com.dtteam.dynamictrees.client.GeneratesTintSources;
+import com.dtteam.dynamictrees.client.GeneratesBlockTintSources;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
@@ -41,7 +41,6 @@ import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
-import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
 import com.dtteam.dynamictrees.model.entity.FallingTreeEntityModel;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.registry.DTRegistries;
@@ -75,6 +74,7 @@ import com.mojang.datafixers.util.Function3;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.block.BlockTintSource;
@@ -87,6 +87,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.ReloadableServerRegistries;
@@ -133,11 +134,51 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class Species extends RegistryEntry<Species> implements Resettable<Species>, GeneratesTintSources {
+public class Species extends RegistryEntry<Species> implements Resettable<Species>, GeneratesBlockTintSources {
 
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, Species>>> blockStateGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, Species>>> itemModelGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, Species>>> languageGenerators = new HashMap<>();
+
+    public static final Codec<Species> CODEC = Identifier.CODEC.comapFlatMap(Species::read, Species::getRegistryName);
+
+    public static final StreamCodec<ByteBuf, Species> STREAM_CODEC = Identifier.STREAM_CODEC.map((a)->read(a).getOrThrow(), Species::getRegistryName);
+
+    /** How quickly the branch thickens on its own without branch merges [default = 0.3]*/
+    protected float tapering = 0.3f;
+    /** The probability that the direction decider will choose up out of the other possible direction weights [default = 2]*/
+    protected int upProbability = 2;
+    /** Number of blocks high we have to be before a branch is allowed to form [default = 3] (Just high enough to walk under) */
+    protected int lowestBranchHeight = 3;
+    /** Ideal signal energy. Greatest possible height that branches can reach from the root node [default = 16] */
+    protected float signalEnergy = 16.0f;
+    /** Ideal growth rate [default = 1.0] */
+    protected float growthRate = 1.0f;
+    /** Chance for soil to deplete while growing. Larger number means soil lasts longer. [default = 8] */
+    protected int soilLongevity = 8;
+
+    protected Family family = Family.NULL_FAMILY;
+    protected GrowthLogicKitConfiguration logicKit = GrowthLogicKitConfiguration.getDefault();
+    protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
+
+    protected SoilProperties forceSoil;
+    protected int soilTypeFlags = 0;
+    protected int worldGenSoilTypeFlags = 0;
+    protected int maxBranchRadius = 8;
+    protected final List<Block> acceptableBlocksForGrowth = Lists.newArrayList();
+    protected CommonOverride commonOverride;
+
+    protected LeavesProperties leavesProperties = LeavesProperties.NULL;
+    private final List<LeavesProperties> validLeaves = new LinkedList<>();
+
+    protected Supplier<Seed> seed;
+    protected Boolean dropSeeds = null;
+    protected Supplier<DynamicSaplingBlock> saplingBlock;
+    protected Boolean tintSapling = true;
+
+    private String unlocalizedName = "";
+    private final Set<Fruit> fruits = new HashSet<>();
+    private final Set<Pod> pods = new HashSet<>();
 
     public static final Species NULL_SPECIES = new Species() {
         @Override
@@ -185,135 +226,12 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             return false;
         }
     };
-
     public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(Species::new);
-
-    public static final Codec<Species> CODEC = Identifier.CODEC.comapFlatMap(Species::read, Species::getRegistryName);
-
-    public static TypedRegistry.EntryType<Species> createDefaultType(final Function3<Identifier, Family, LeavesProperties, Species> constructor) {
-        return TypedRegistry.newType(createDefaultCodec(constructor));
-    }
-
-    public static Codec<Species> createDefaultCodec(final Function3<Identifier, Family, LeavesProperties, Species> constructor) {
-        return RecordCodecBuilder.create(instance -> instance
-                .group(Identifier.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString())
-                                .forGetter(Species::getRegistryName),
-                        Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
-                        LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
-                                LeavesProperties.NULL).forGetter(Species::getLeavesProperties))
-                .apply(instance, constructor));
-    }
-
-    private static DataResult<Species> read(Identifier name) {
-        final Species species = Species.REGISTRY.get(name);
-        return species == null ? DataResult.error(() -> "Species not found: " + name) : DataResult.success(species);
-    }
 
     /**
      * Central registry for all {@link Species} objects.
      */
     public static final TypedRegistry<Species> REGISTRY = new TypedRegistry<>(Species.class, NULL_SPECIES, TYPE);
-
-    /**
-     * The family of tree this belongs to. E.g. "Oak" and "Swamp Oak" belong to the "Oak" Family
-     */
-    protected Family family = Family.NULL_FAMILY;
-
-    /**
-     * Logic kit for standardized extended growth behavior
-     */
-    protected GrowthLogicKitConfiguration logicKit = GrowthLogicKitConfiguration.getDefault();
-
-    /**
-     * How quickly the branch thickens on its own without branch merges [default = 0.3]
-     */
-    protected float tapering = 0.3f;
-    /**
-     * The probability that the direction decider will choose up out of the other possible direction weights [default =
-     * 2]
-     */
-    protected int upProbability = 2;
-    /**
-     * Number of blocks high we have to be before a branch is allowed to form [default = 3] (Just high enough to walk
-     * under)
-     */
-    protected int lowestBranchHeight = 3;
-    /**
-     * Ideal signal energy. Greatest possible height that branches can reach from the root node [default = 16]
-     */
-    protected float signalEnergy = 16.0f;
-    /**
-     * Ideal growth rate [default = 1.0]
-     */
-    protected float growthRate = 1.0f;
-    /**
-     * If set, the soil beneath this tree will always be changed to the set soil on worldgen and when growing from seeds.
-     */
-    protected SoilProperties forceSoil;
-    /**
-     * Ideal soil longevity [default = 8]
-     */
-    protected int soilLongevity = 8;
-    /**
-     * The tags for the types of soil the tree can be planted on
-     */
-    protected int soilTypeFlags = 0;
-    /**
-     * The tags for the types of soil the tree can be planted on during world gen, or {@code 0} to use
-     * {@link #soilTypeFlags}.
-     */
-    protected int worldGenSoilTypeFlags = 0;
-
-    // TODO: Make sure this is implemented properly.
-    protected int maxBranchRadius = 8;
-
-    /**
-     * If this is not empty, saplings will only grow when planted on these blocks.
-     */
-    protected final List<Block> acceptableBlocksForGrowth = Lists.newArrayList();
-
-    //Leaves
-    protected LeavesProperties leavesProperties = LeavesProperties.NULL;
-
-    /**
-     * A list of leaf blocks the species accepts as its own. Used for the falling tree renderer
-     */
-    private final List<LeavesProperties> validLeaves = new LinkedList<>();
-
-    //Seeds
-    /**
-     * The seed used to reproduce this species.  Drops from the tree and can plant itself
-     */
-    protected Supplier<Seed> seed;
-
-    /**
-     * If non-null, overrides result of {@link #shouldDropSeeds}, preventing this species from dropping seeds from
-     * leaves if {@link SeedItemLootPoolEntry} is used.
-     */
-    protected Boolean dropSeeds = null;
-
-    /**
-     * A blockState that will turn itself into this tree
-     */
-    protected Supplier<DynamicSaplingBlock> saplingBlock;
-
-    /**
-     * Wether the sapling block should be tinted with the leaves' tint index/
-     */
-    protected Boolean tintSapling = true;
-
-    protected final List<GenFeatureConfiguration> genFeatures = new ArrayList<>();
-
-    /**
-     * A {@link BiPredicate} that returns true if this species should override the common in the given position.
-     */
-    protected CommonOverride commonOverride;
-
-    private String unlocalizedName = "";
-
-    private final Set<Fruit> fruits = new HashSet<>();
-
-    private final Set<Pod> pods = new HashSet<>();
 
     /**
      * Blank constructor for {@link #NULL_SPECIES}.
@@ -345,6 +263,25 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         this.family = family;
         this.family.addSpecies(this);
         this.setLeavesProperties(leavesProperties.isValid() ? leavesProperties : family.getCommonLeaves());
+    }
+
+    public static TypedRegistry.EntryType<Species> createDefaultType(final Function3<Identifier, Family, LeavesProperties, Species> constructor) {
+        return TypedRegistry.newType(createDefaultCodec(constructor));
+    }
+
+    public static Codec<Species> createDefaultCodec(final Function3<Identifier, Family, LeavesProperties, Species> constructor) {
+        return RecordCodecBuilder.create(instance -> instance
+                .group(Identifier.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString())
+                                .forGetter(Species::getRegistryName),
+                        Family.REGISTRY.getGetterCodec().fieldOf("family").forGetter(Species::getFamily),
+                        LeavesProperties.REGISTRY.getGetterCodec().optionalFieldOf("leaves_properties",
+                                LeavesProperties.NULL).forGetter(Species::getLeavesProperties))
+                .apply(instance, constructor));
+    }
+
+    private static DataResult<Species> read(Identifier name) {
+        final Species species = Species.REGISTRY.get(name);
+        return species == null ? DataResult.error(() -> "Species not found: " + name) : DataResult.success(species);
     }
 
     /**

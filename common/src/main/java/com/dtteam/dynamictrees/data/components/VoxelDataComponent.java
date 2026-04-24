@@ -17,16 +17,15 @@ public record VoxelDataComponent(
         float volume,
         boolean hasLeaves
 ) {
-    private static final Codec<Vec3> VEC3_CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.DOUBLE.fieldOf("x").forGetter(Vec3::x),
-            Codec.DOUBLE.fieldOf("y").forGetter(Vec3::y),
-            Codec.DOUBLE.fieldOf("z").forGetter(Vec3::z)
-    ).apply(i, Vec3::new));
+
+    public VoxelDataComponent(){
+        this(new BranchDestructionData(), Vec3.ZERO, Vec3.ZERO, FallingTreeEntity.DestroyType.VOID, false, 0, false);
+    }
 
     public static final Codec<VoxelDataComponent> CODEC = RecordCodecBuilder.create(i -> i.group(
             BranchDestructionDataComponent.CODEC.fieldOf("destroy_data").forGetter(VoxelDataComponent::destroyData),
-            VEC3_CODEC.fieldOf("geom_center").forGetter(VoxelDataComponent::geomCenter),
-            VEC3_CODEC.fieldOf("mass_center").forGetter(VoxelDataComponent::massCenter),
+            Vec3.CODEC.fieldOf("geom_center").forGetter(VoxelDataComponent::geomCenter),
+            Vec3.CODEC.fieldOf("mass_center").forGetter(VoxelDataComponent::massCenter),
             Codec.STRING.fieldOf("destroy_type").forGetter(c -> c.destroyType().toString()),
             Codec.BOOL.fieldOf("on_fire").forGetter(VoxelDataComponent::onFire),
             Codec.FLOAT.fieldOf("volume").forGetter(VoxelDataComponent::volume),
@@ -35,5 +34,30 @@ public record VoxelDataComponent(
             new VoxelDataComponent(destroyData, geom, mass, FallingTreeEntity.DestroyType.valueOf(destroyTypeName), onFire, volume, hasLeaves)
     ));
 
-    public static final StreamCodec<ByteBuf, VoxelDataComponent> STREAM_CODEC = null;
+    public static final StreamCodec<ByteBuf, VoxelDataComponent> STREAM_CODEC = new StreamCodec<>() {
+
+        @Override
+        public VoxelDataComponent decode(ByteBuf buf) {
+            BranchDestructionData destroyData = BranchDestructionDataComponent.STREAM_CODEC.decode(buf);
+            Vec3 geomCenter = Vec3.STREAM_CODEC.decode(buf);
+            Vec3 massCenter = Vec3.STREAM_CODEC.decode(buf);
+            FallingTreeEntity.DestroyType destroyType = FallingTreeEntity.DestroyType.values()[buf.readByte()];
+            boolean onFire = buf.readBoolean();
+            float volume = buf.readFloat();
+            boolean hasLeaves = buf.readBoolean();
+            return new VoxelDataComponent(destroyData, geomCenter, massCenter, destroyType, onFire, volume, hasLeaves);
+        }
+
+        @Override
+        public void encode(ByteBuf buf, VoxelDataComponent c) {
+            BranchDestructionDataComponent.STREAM_CODEC.encode(buf, c.destroyData());
+            Vec3.STREAM_CODEC.encode(buf, c.geomCenter());
+            Vec3.STREAM_CODEC.encode(buf, c.massCenter());
+            buf.writeByte(c.destroyType().ordinal());
+            buf.writeBoolean(c.onFire());
+            buf.writeFloat(c.volume());
+            buf.writeBoolean(c.hasLeaves());
+        }
+    };
+
 }

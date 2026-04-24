@@ -19,8 +19,6 @@ import com.dtteam.dynamictrees.worldgen.RootsJoCode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -307,7 +305,7 @@ public class TreeHelper {
         BranchDestructionData destructionData = cutBlock.destroyBranchFromNode(level, cutPos, Direction.DOWN, false, player);
 
         // Allow drop consumer callback to handle drops
-        destructionData.leavesDrops.forEach(stackData -> dropConsumer.accept(stackData.pos, stackData.stack));
+        destructionData.leavesDrops.forEach(stackData -> dropConsumer.accept(stackData.pos(), stackData.stack()));
         destructionData.species.getBranchesDrops(level, destructionData.woodVolume).forEach(stack -> dropConsumer.accept(startPos, stack));
     }
 

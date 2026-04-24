@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.entity;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
+import com.dtteam.dynamictrees.api.voxmap.BlockPosBounds;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.components.VoxelDataComponent;
@@ -15,8 +16,10 @@ import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.google.common.collect.Iterables;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -35,6 +38,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.apache.logging.log4j.LogManager;
 import oshi.util.tuples.Pair;
 
 import java.util.ArrayList;
@@ -54,7 +58,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         ROOT
     }
 
-//    public static final EntityDataAccessor<VoxelDataComponent> voxelDataParameter = SynchedEntityData.defineId(FallingTreeEntity.class, () -> VoxelDataComponent.STREAM_CODEC);
+    public static final EntityDataAccessor<VoxelDataComponent> voxelDataParameter = SynchedEntityData.defineId(FallingTreeEntity.class, DTRegistries.VOXEL_DATA_ENTITY_SERIALIZER.get());
 
     //Not needed in client
     protected List<ItemStack> payload = new ArrayList<>(0);
@@ -141,9 +145,9 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
         geomCenter = geomCenter.scale(1.0 / numBlocks);
         massCenter = massCenter.scale(1.0 / totalMass);
-//
-//        setVoxelData(buildVoxelData(destroyData));
-//
+
+        setVoxelData(buildVoxelData(destroyData));
+
         return this;
     }
 
@@ -171,21 +175,21 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     public void buildClient() {
 
-//        VoxelDataComponent tag = getVoxelData();
+        VoxelDataComponent tag = getVoxelData();
 
-//        if (tag != null && tag.destroyData() != null) {
-//            setupFromComponent(tag);
-//            clientBuilt = true;
-//        } else {
-//            //System.out.println("Error: No species tag has been set");
-//            LogManager.getLogger().error("Error: Could not setup client for Falling Tree Entity {}",this.uuid);
-//        }
-//
-//        BlockPosBounds renderBounds = new BlockPosBounds(destroyData.cutPos);
-//
-//        cleanupShellBlocks(destroyData);
-//
-//        Minecraft.getInstance().levelRenderer.setBlocksDirty(renderBounds.getMin().getX(), renderBounds.getMin().getY(), renderBounds.getMin().getZ(), renderBounds.getMax().getX(), renderBounds.getMax().getY(), renderBounds.getMax().getZ());//This forces the client to rerender the chunks
+        if (tag != null && tag.destroyData() != null) {
+            setupFromComponent(tag);
+            clientBuilt = true;
+        } else {
+            //System.out.println("Error: No species tag has been set");
+            LogManager.getLogger().error("Error: Could not setup client for Falling Tree Entity {}",this.uuid);
+        }
+
+        BlockPosBounds renderBounds = new BlockPosBounds(destroyData.cutPos);
+
+        cleanupShellBlocks(destroyData);
+
+        Minecraft.getInstance().levelRenderer.setBlocksDirty(renderBounds.getMin().getX(), renderBounds.getMin().getY(), renderBounds.getMin().getZ(), renderBounds.getMax().getX(), renderBounds.getMax().getY(), renderBounds.getMax().getZ());//This forces the client to rerender the chunks
     }
 
     protected void cleanupShellBlocks(BranchDestructionData destroyData) {
@@ -398,7 +402,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         Level level = entity.level();
         if (!level.isClientSide()) {
             BlockPos cutPos = entity.getDestroyData().cutPos;
-            entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(level, cutPos.offset(bis.pos), bis.stack));
+            entity.getDestroyData().leavesDrops.forEach(bis -> Block.popResource(level, cutPos.offset(bis.pos()), bis.stack()));
         }
     }
 
@@ -420,20 +424,20 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
-//        builder.define(voxelDataParameter, Component.empty());
+        builder.define(voxelDataParameter, new VoxelDataComponent());
     }
 
-//    //This is shipped off to the clients
-//    public void setVoxelData(CompoundTag tag) {
-//        this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
-//        this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
-//
-//        getEntityData().set(voxelDataParameter, CustomData.of(tag));
-//    }
-//
-//    public Component getVoxelData() {
-//        return getEntityData().get(voxelDataParameter);
-//    }
+    //This is shipped off to the clients
+    public void setVoxelData(VoxelDataComponent voxelData) {
+        this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
+        this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
+
+        getEntityData().set(voxelDataParameter, voxelData);
+    }
+
+    public VoxelDataComponent getVoxelData() {
+        return getEntityData().get(voxelDataParameter);
+    }
 
     @Override
     protected void readAdditionalSaveData(ValueInput valueInput) {

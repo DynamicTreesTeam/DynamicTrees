@@ -1,15 +1,15 @@
 package com.dtteam.dynamictrees.client;
 
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.color.block.BlockTintSource;
+import net.minecraft.client.color.item.ItemTintSource;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public interface GeneratesTintSources {
+public interface GeneratesItemTintSources {
 
-    default List<BlockTintSource> tintSources (BlockColors blockColors){
-        List<BlockTintSource> list = new LinkedList<>();
+    default List<ItemTintSource> tintSources (BlockColors blockColors){
+        List<ItemTintSource> list = new LinkedList<>();
         int maxIndex = maxTintIndex();
         for (int i=0; i<=maxIndex; i++){
             list.add(generateTintSource(blockColors, i));
@@ -21,6 +21,6 @@ public interface GeneratesTintSources {
         return 0;
     }
 
-    BlockTintSource generateTintSource (BlockColors blockColors, int tintIndex);
+    ItemTintSource generateTintSource (BlockColors blockColors, int tintIndex);
 
 }

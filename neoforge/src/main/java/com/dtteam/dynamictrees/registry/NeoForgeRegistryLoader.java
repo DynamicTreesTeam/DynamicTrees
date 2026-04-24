@@ -16,6 +16,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
@@ -62,6 +63,7 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
 //    public static final DeferredRegister<LootPoolEntryType> LOOT_POOL_ENTRY_TYPES = DeferredRegister.create(Registries.LOOT_POOL_ENTRY_TYPE, DynamicTrees.MOD_ID);
 //    public static final DeferredRegister<LootItemFunctionType<?>> LOOT_FUNCTION_TYPES = DeferredRegister.create(Registries.LOOT_FUNCTION_TYPE, DynamicTrees.MOD_ID);
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZER = DeferredRegister.create(Registries.RECIPE_SERIALIZER, DynamicTrees.MOD_ID);
+    public static final DeferredRegister<EntityDataSerializer<?>> ENTITY_DATA_SERIALIZER = DeferredRegister.create(NeoForgeRegistries.ENTITY_DATA_SERIALIZERS, DynamicTrees.MOD_ID);
 
 
     public static void setup(IEventBus modBus) {
@@ -83,6 +85,7 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
         //NeoForge
         BIOME_MODIFIER_SERIALIZERS.register(modBus);
         HOLDER_SET_TYPES.register(modBus);
+        ENTITY_DATA_SERIALIZER.register(modBus);
 
         DTRegistries.setup();
     }
@@ -135,6 +138,11 @@ public class NeoForgeRegistryLoader extends RegistryLoader {
     @Override
     public <T> Supplier<DataComponentType<T>> registerDataComponentType (String name, UnaryOperator<DataComponentType.Builder<T>> operator){
         return DATA_COMPONENT_TYPES.register(name, ()->operator.apply(DataComponentType.builder()).build());
+    }
+
+    @Override
+    public <T> Supplier<EntityDataSerializer<T>> registerEntityDataSerializer(String name, Supplier<EntityDataSerializer<T>> serializer) {
+        return ENTITY_DATA_SERIALIZER.register(name, serializer);
     }
 
     @Override
