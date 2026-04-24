@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.registry;
 
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
-import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
+import com.dtteam.dynamictrees.model.entity.FallingTreeEntityModel;
 
 public class FallingTreeEntityModelNF extends FallingTreeEntityModel {
 

@@ -1,7 +1,9 @@
-package com.dtteam.dynamictrees.model.branch;
+package com.dtteam.dynamictrees.model.blockstate;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.model.ModelConnections;
+import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPartCore;
+import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPartSleeve;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;

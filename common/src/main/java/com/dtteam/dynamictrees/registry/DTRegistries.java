@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.registry;
 
 import com.dtteam.dynamictrees.DynamicTrees;
+import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
@@ -8,21 +9,14 @@ import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlockEntity;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
 import com.dtteam.dynamictrees.command.HexColorArgument;
+import com.dtteam.dynamictrees.data.components.BranchDestructionDataComponent;
+import com.dtteam.dynamictrees.data.components.VoxelDataComponent;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.entity.LingeringEffectorEntity;
 import com.dtteam.dynamictrees.item.DendroPotion;
 import com.dtteam.dynamictrees.item.DirtBucket;
 import com.dtteam.dynamictrees.item.Staff;
-import com.dtteam.dynamictrees.loot.condition.SeasonalSeedDropChance;
-import com.dtteam.dynamictrees.loot.condition.SpeciesMatches;
-import com.dtteam.dynamictrees.loot.condition.VoluntarySeedDropChance;
-import com.dtteam.dynamictrees.loot.entry.ItemBySpeciesLootPoolEntry;
-import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
-import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
-import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
-import com.dtteam.dynamictrees.loot.function.MultiplyCount;
 import com.dtteam.dynamictrees.platform.Services;
-import com.dtteam.dynamictrees.recipe.*;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -50,7 +44,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.DyedItemColor;
-import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -60,6 +53,7 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvi
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -150,10 +144,10 @@ public class DTRegistries {
     // ENTITIES
     ///////////////////////////////////////////
 
-    public static final Supplier<EntityType<FallingTreeEntity>> FALLING_TREE = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<EntityType<@NotNull FallingTreeEntity>> FALLING_TREE = Services.REGISTRY.getRegistryLoader()
             .registerEntity("falling_tree", EntityType.Builder.of(FallingTreeEntity::new, MobCategory.MISC), true);
 
-    public static final Supplier<EntityType<LingeringEffectorEntity>> LINGERING_EFFECTOR = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<EntityType<@NotNull LingeringEffectorEntity>> LINGERING_EFFECTOR = Services.REGISTRY.getRegistryLoader()
             .registerEntity("lingering_effector", EntityType.Builder.of(LingeringEffectorEntity::new, MobCategory.MISC), false);
 //            .setCustomClientFactory((spawnEntity, level) ->
 //                    new LingeringEffectorEntity(level, BlockPos.containing(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), null))
@@ -162,9 +156,9 @@ public class DTRegistries {
     // TILE ENTITIES
     ///////////////////////////////////////////
 
-    public static Supplier<BlockEntityType<SpeciesBlockEntity>> SPECIES_BLOCK_ENTITY = Services.REGISTRY.getRegistryLoader()
+    public static Supplier<BlockEntityType<@NotNull SpeciesBlockEntity>> SPECIES_BLOCK_ENTITY = Services.REGISTRY.getRegistryLoader()
             .registerBlockEntity("tile_entity_species", SpeciesBlockEntity::new, getAllRootyBlocks());
-    public static Supplier<BlockEntityType<PottedSaplingBlockEntity>> POTTED_SAPLING_BLOCK_ENTITY = Services.REGISTRY.getRegistryLoader()
+    public static Supplier<BlockEntityType<@NotNull PottedSaplingBlockEntity>> POTTED_SAPLING_BLOCK_ENTITY = Services.REGISTRY.getRegistryLoader()
             .registerBlockEntity("potted_sapling", Services.REGISTRY.getPottedSaplingBlockEntity(), ()->Set.of(POTTED_SAPLING.get()));
 
     public static Supplier<Set<Block>> getAllRootyBlocks(){
@@ -210,11 +204,17 @@ public class DTRegistries {
     public static final Supplier<DataComponentType<Integer>> DENDRO_POTION_INDEX_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
             registerDataComponentType("potion_index", builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
 
+    public static final Supplier<DataComponentType<BranchDestructionData>> BRANCH_DESTRUCTION_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("branch_destruction_data", builder -> builder.persistent(BranchDestructionDataComponent.CODEC));//.networkSynchronized()
+    public static final Supplier<DataComponentType<VoxelDataComponent>> VOXEL_DATA_COMPONENT = Services.REGISTRY.getRegistryLoader().
+            registerDataComponentType("voxel_data", builder -> builder.persistent(VoxelDataComponent.CODEC));//.networkSynchronized()
+
+
     ///////////////////////////////////////////
     // COMMAND ARGUMENTS
     ///////////////////////////////////////////
 
-    public static final Supplier<SingletonArgumentInfo<HexColorArgument>> HEX_COLOR = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<SingletonArgumentInfo<@NotNull HexColorArgument>> HEX_COLOR = Services.REGISTRY.getRegistryLoader()
             .registerCommandArgumentType("hex_color", HexColorArgument.class, SingletonArgumentInfo.contextFree(HexColorArgument::hex));
 
     ///////////////////////////////////////////
@@ -252,7 +252,7 @@ public class DTRegistries {
     /** Placement for trees that generate on the surface above the target biome. This is used for trees like the azalea. */
     public static final ResourceKey<PlacedFeature> CAVE_ROOTED_TREE_PLACED_FEATURE = ResourceKey.create(Registries.PLACED_FEATURE,DynamicTrees.location("cave_rooted_tree"));
 
-    public static final Supplier<PlacementModifierType<CaveRootedTreePlacement>> CAVE_ROOTED_TREE_PLACEMENT_MODIFIER_TYPE = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<PlacementModifierType<@NotNull CaveRootedTreePlacement>> CAVE_ROOTED_TREE_PLACEMENT_MODIFIER_TYPE = Services.REGISTRY.getRegistryLoader()
             .registerPlacementModifierType("cave_rooted_tree", () -> () -> CaveRootedTreePlacement.CODEC);
 
     public static final Supplier<DynamicTreeFeature> DYNAMIC_TREE_FEATURE = Services.REGISTRY.getRegistryLoader()
@@ -260,13 +260,13 @@ public class DTRegistries {
     public static final Supplier<CaveRootedTreeFeature> CAVE_ROOTED_TREE_FEATURE = Services.REGISTRY.getRegistryLoader()
             .registerFeature("cave_rooted_tree", CaveRootedTreeFeature::new);
 
-    public static final Supplier<BlockStateProviderType<DTReplaceNyliumFungiBlockStateProvider>> REPLACE_NYLIUM_FUNGI_BLOCK_STATE_PROVIDER_TYPE = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<BlockStateProviderType<@NotNull DTReplaceNyliumFungiBlockStateProvider>> REPLACE_NYLIUM_FUNGI_BLOCK_STATE_PROVIDER_TYPE = Services.REGISTRY.getRegistryLoader()
             .registerBlockStateProviderType("replace_nylium_fungi", () -> new BlockStateProviderType<>(DTReplaceNyliumFungiBlockStateProvider.CODEC));
 
-    public static final Supplier<StructurePoolElementType<DTCancelVanillaTreePoolElement>> CANCEL_VANILLA_VILLAGE_TREE_STRUCTURE_POOL_ELEMENT_TYPE = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<StructurePoolElementType<@NotNull DTCancelVanillaTreePoolElement>> CANCEL_VANILLA_VILLAGE_TREE_STRUCTURE_POOL_ELEMENT_TYPE = Services.REGISTRY.getRegistryLoader()
             .registerStructurePoolElementType("cancel_vanilla_village_tree_element", () -> () -> DTCancelVanillaTreePoolElement.CODEC);
 
-    public static final Supplier<StructurePoolElementType<TreePoolElement>> TREE_STRUCTURE_POOL_ELEMENT_TYPE = Services.REGISTRY.getRegistryLoader()
+    public static final Supplier<StructurePoolElementType<@NotNull TreePoolElement>> TREE_STRUCTURE_POOL_ELEMENT_TYPE = Services.REGISTRY.getRegistryLoader()
             .registerStructurePoolElementType("tree_pool_element", () -> () -> TreePoolElement.CODEC);
 
 //    public static final Supplier<RecipeSerializer<SeedConversionRecipe>> SEED_CONVERSION_RECIPE_TYPE = Services.REGISTRY.getRegistryLoader()

@@ -9,9 +9,6 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
@@ -37,7 +34,10 @@ public class BranchDestructionData {
     public final BlockPos cutPos; // The absolute(world) position of the block that was cut
     public final BlockPos basePos; // The absolute(world) position of base for the tree entity
     public final int trunkHeight;
-    public final Pair<Identifier, Integer> soilState;
+    public final @Nullable BlockState soilState;
+    private Map<BlockPos, BranchConnectionData> unencodedBranches;
+    private Map<BlockPos, BlockState> unencodedLeaves;
+    private List<BlockPos> unencodedEnds;
 
     public static final BlockPosBounds bounds = new BlockPosBounds(new BlockPos(-64, -64, -64), new BlockPos(64, 64, 64));
 
@@ -59,10 +59,7 @@ public class BranchDestructionData {
         this.soilState = null;
     }
 
-    private Map<BlockPos, BranchConnectionData> unencodedBranches;
-    private Map<BlockPos, BlockState> unencodedLeaves;
-    private List<BlockPos> unencodedEnds;
-    public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, NetVolumeNode.Volume volume, BlockPos cutPos, BlockPos basePos, Direction cutDir, Direction toolDir, int trunkHeight, @Nullable Pair<Identifier, Integer> soilState) {
+    public BranchDestructionData(Species species, Map<BlockPos, BranchConnectionData> branches, Map<BlockPos, BlockState> leaves, List<BranchBlock.ItemStackPos> leavesDrops, List<BlockPos> ends, NetVolumeNode.Volume volume, BlockPos cutPos, BlockPos basePos, Direction cutDir, Direction toolDir, int trunkHeight, @Nullable BlockState soilState) {
         this.species = species;
         int[][] encodedBranchData = convertBranchesToIntArrays(branches);
         this.destroyedBranchesRadiusPosition = encodedBranchData[0];
@@ -112,7 +109,7 @@ public class BranchDestructionData {
         int newHeight = maxY - newBasePos.getY();
 
         //If the other brings soil accept it
-        Pair<Identifier, Integer> soil = soilState == null ? other.soilState : soilState;
+        BlockState soil = soilState == null ? other.soilState : soilState;
 
         //Finally the new destructionData is generated.
         // All other parameters use the values from the first destructionData (this).
@@ -122,49 +119,22 @@ public class BranchDestructionData {
         );
     }
 
-    public BranchDestructionData(CompoundTag nbt) {
-        this.species = Species.findSpecies(Identifier.parse(nbt.getString("species").orElse("")));
-        this.destroyedBranchesRadiusPosition = nbt.getIntArray("branchpos").orElse(new int[]{});
-        this.destroyedBranchesConnections = nbt.getIntArray("branchcon").orElse(new int[]{});
-        this.destroyedBranchesBlockIndex = nbt.getIntArray("branchblock").orElse(new int[]{});
-        this.destroyedLeaves = nbt.getIntArray("leavespos").orElse(new int[]{});
-        this.destroyedLeavesBlockIndex = nbt.getIntArray("leavesblock").orElse(new int[]{});
+    public BranchDestructionData(Species species, int[] branchpos, int[] branchcon, int[] branchblock, int[] leavespos, int[] leavesblock, int[] ends, int[] volume, BlockPos cutPos, BlockPos basePos, Direction cutDir, Direction toolDir, int trunkHeight, @Nullable BlockState soilState) {
+        this.species = species;
+        this.destroyedBranchesRadiusPosition = branchpos;
+        this.destroyedBranchesConnections = branchcon;
+        this.destroyedBranchesBlockIndex = branchblock;
+        this.destroyedLeaves = leavespos;
+        this.destroyedLeavesBlockIndex = leavesblock;
         this.leavesDrops = new ArrayList<>();
-        this.endPoints = nbt.getIntArray("ends").orElse(new int[]{});
-        this.woodVolume = new NetVolumeNode.Volume(nbt.getIntArray("volume").orElse(new int[]{}));
-        this.cutPos = new BlockPos(nbt.getInt("cutx").get(), nbt.getInt("cuty").get(), nbt.getInt("cutz").get());
-        this.basePos = new BlockPos(nbt.getInt("basex").get(), nbt.getInt("basey").get(), nbt.getInt("basez").get());
-        this.cutDir = Direction.values()[Mth.clamp(nbt.getInt("cutdir").orElse(0), 0, Direction.values().length - 1)];
-        this.toolDir = Direction.values()[Mth.clamp(nbt.getInt("tooldir").orElse(0), 0, Direction.values().length - 1)];
-        this.trunkHeight = nbt.getInt("trunkheight").orElse(0);
-        this.soilState = nbt.contains("soilblock") ?
-                Pair.of(Identifier.parse(nbt.getString("soilblock").orElse("")), nbt.getInt("soilstateid").orElse(0))
-                : null;
-    }
-
-    public CompoundTag writeToNBT(CompoundTag tag) {
-        tag.putString("species", species.getRegistryName().toString());
-        tag.putIntArray("branchpos", destroyedBranchesRadiusPosition);
-        tag.putIntArray("branchcon", destroyedBranchesConnections);
-        tag.putIntArray("branchblock", destroyedBranchesBlockIndex);
-        tag.putIntArray("leavespos", destroyedLeaves);
-        tag.putIntArray("leavesblock", destroyedLeavesBlockIndex);
-        tag.putIntArray("ends", endPoints);
-        tag.putIntArray("volume", woodVolume.getRawVolumesArray());
-        tag.putInt("cutx", cutPos.getX());
-        tag.putInt("cuty", cutPos.getY());
-        tag.putInt("cutz", cutPos.getZ());
-        tag.putInt("basex", basePos.getX());
-        tag.putInt("basey", basePos.getY());
-        tag.putInt("basez", basePos.getZ());
-        tag.putInt("cutdir", cutDir.get3DDataValue());
-        tag.putInt("tooldir", toolDir.get3DDataValue());
-        tag.putInt("trunkheight", trunkHeight);
-        if (soilState != null) {
-            tag.putString("soilblock", soilState.getLeft().toString());
-            tag.putInt("soilstateid", soilState.getRight());
-        }
-        return tag;
+        this.endPoints = ends;
+        this.woodVolume = new NetVolumeNode.Volume(volume);;
+        this.cutPos = cutPos;
+        this.basePos = basePos;
+        this.cutDir = cutDir;
+        this.toolDir = toolDir;
+        this.trunkHeight = trunkHeight;
+        this.soilState = soilState;
     }
 
     ///////////////////////////////////////////////////////////
@@ -180,9 +150,9 @@ public class BranchDestructionData {
         //Ensure the origin block is at the first index
         BranchConnectionData origConnData = branchList.get(BlockPos.ZERO);
         if (origConnData != null) {
-            BlockState origState = origConnData.getBlockState();
+            BlockState origState = origConnData.blockState();
             radPosData[index] = encodeBranchesRadiusPos(BlockPos.ZERO, (BranchBlock) origState.getBlock(), origState);
-            connectionData[index] = encodeBranchesConnections(origConnData.getConnections());
+            connectionData[index] = encodeBranchesConnections(origConnData.connections());
             blockIndexData[index++] = encodeBranchBlocks((BranchBlock) origState.getBlock());
         }
 
@@ -191,12 +161,12 @@ public class BranchDestructionData {
             if (set.getKey().equals(BlockPos.ZERO)) continue;
             BlockPos relPos = set.getKey();
             BranchConnectionData connData = set.getValue();
-            BlockState state = connData.getBlockState();
+            BlockState state = connData.blockState();
             Block block = state.getBlock();
 
             if (block instanceof BranchBlock && bounds.inBounds(relPos)) { //Place comfortable limits on the system
                 radPosData[index] = encodeBranchesRadiusPos(relPos, (BranchBlock) block, state);
-                connectionData[index] = encodeBranchesConnections(connData.getConnections());
+                connectionData[index] = encodeBranchesConnections(connData.connections());
                 blockIndexData[index++] = encodeBranchBlocks((BranchBlock) block);
             }
         }

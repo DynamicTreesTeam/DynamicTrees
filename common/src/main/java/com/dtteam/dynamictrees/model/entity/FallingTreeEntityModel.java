@@ -1,4 +1,4 @@
-package com.dtteam.dynamictrees.model;
+package com.dtteam.dynamictrees.model.entity;
 
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;

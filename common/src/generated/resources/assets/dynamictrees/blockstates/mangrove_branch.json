@@ -1,7 +1,9 @@
 {
   "variants": {
     "": {
-      "model": "dynamictrees:block/mangrove_branch"
+      "type": "dynamictrees:branch",
+      "bark_texture": "minecraft:block/mangrove_log",
+      "rings_texture": "minecraft:block/mangrove_log_top"
     }
   }
 }

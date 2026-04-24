@@ -1,7 +1,9 @@
 {
   "variants": {
     "": {
-      "model": "dynamictrees:block/crimson_branch"
+      "type": "dynamictrees:branch",
+      "bark_texture": "minecraft:block/crimson_log",
+      "rings_texture": "minecraft:block/crimson_log_top"
     }
   }
 }

@@ -1,4 +1,4 @@
-package com.dtteam.dynamictrees.model;
+package com.dtteam.dynamictrees.model.entity;
 
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.platform.ClientServices;

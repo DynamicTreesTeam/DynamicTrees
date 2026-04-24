@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.platform;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
-import com.dtteam.dynamictrees.model.FallingTreeEntityModel;
+import com.dtteam.dynamictrees.model.entity.FallingTreeEntityModel;
 import com.dtteam.dynamictrees.model.FallingTreeEntityModelFabric;
 import com.dtteam.dynamictrees.platform.services.IClientHelper;
 import com.mojang.blaze3d.platform.NativeImage;

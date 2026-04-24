@@ -1,4 +1,4 @@
-package com.dtteam.dynamictrees.model;
+package com.dtteam.dynamictrees.model.entity;
 
 public interface ModelTracker {
 

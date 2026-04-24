@@ -1,25 +1,16 @@
-package com.dtteam.dynamictrees.model.branch;
+package com.dtteam.dynamictrees.model.parts;
 
 import com.dtteam.dynamictrees.model.ModelHelper;
 import com.google.common.collect.Maps;
-import com.mojang.blaze3d.platform.Transparency;
-import com.mojang.math.Quadrant;
-import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.cuboid.CuboidFace;
 import net.minecraft.client.resources.model.cuboid.CuboidModelElement;
-import net.minecraft.client.resources.model.cuboid.FaceBakery;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.client.model.ExtraFaceData;
-import net.neoforged.neoforge.client.model.quad.MutableQuad;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -103,7 +94,7 @@ public record BranchBlockStateModelPartSleeve(QuadCollection quads, boolean useA
                 }
             }
 
-            return new CuboidModelElement(posFrom, posTo, mapFacesIn, ExtraFaceData.DEFAULT);
+            return new CuboidModelElement(posFrom, posTo, mapFacesIn);
         }
     }
 }

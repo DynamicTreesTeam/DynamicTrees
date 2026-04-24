@@ -1,7 +1,9 @@
 {
   "variants": {
     "": {
-      "model": "dynamictrees:block/jungle_branch"
+      "type": "dynamictrees:branch",
+      "bark_texture": "minecraft:block/jungle_log",
+      "rings_texture": "minecraft:block/jungle_log_top"
     }
   }
 }

@@ -1,29 +1,44 @@
 package com.dtteam.dynamictrees.entity;
 
+import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
+import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.config.DTConfigs;
+import com.dtteam.dynamictrees.data.components.VoxelDataComponent;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandlers;
 import com.dtteam.dynamictrees.entity.animation.DataAnimationHandler;
-import com.dtteam.dynamictrees.model.FallingTreeEntityModelTrackerCache;
-import com.dtteam.dynamictrees.model.ModelTracker;
+import com.dtteam.dynamictrees.model.entity.FallingTreeEntityModelTrackerCache;
+import com.dtteam.dynamictrees.model.entity.ModelTracker;
+import com.dtteam.dynamictrees.platform.Services;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.species.Species;
+import com.dtteam.dynamictrees.utility.CoordUtils;
+import com.google.common.collect.Iterables;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import oshi.util.tuples.Pair;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -39,31 +54,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         ROOT
     }
 
-    public FallingTreeEntity(EntityType<?> type, Level level) {
-        super(type, level);
-    }
-
-    @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-
-    }
-
-    @Override
-    public boolean hurtServer(ServerLevel serverLevel, DamageSource damageSource, float v) {
-        return false;
-    }
-
-    @Override
-    protected void readAdditionalSaveData(ValueInput valueInput) {
-
-    }
-
-    @Override
-    protected void addAdditionalSaveData(ValueOutput valueOutput) {
-
-    }
-
-//    public static final EntityDataAccessor<CompoundTag> voxelDataParameter = SynchedEntityData.defineId(FallingTreeEntity.class, EntityDataSerializers.COMPOUND_TAG);
+//    public static final EntityDataAccessor<VoxelDataComponent> voxelDataParameter = SynchedEntityData.defineId(FallingTreeEntity.class, () -> VoxelDataComponent.STREAM_CODEC);
 
     //Not needed in client
     protected List<ItemStack> payload = new ArrayList<>(0);
@@ -82,7 +73,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public DestroyType destroyType = DestroyType.HARVEST;
     public boolean onFire = false;
     protected AABB cullingBB;
-    protected Species species;
 
     public static AnimationHandler AnimHandlerFall = AnimationHandlers.falloverAnimationHandler;
     public static AnimationHandler AnimHandlerDrop = AnimationHandlers.defaultAnimationHandler;
@@ -94,113 +84,101 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     public DataAnimationHandler dataAnimationHandler = null;
 
 
-//
-//    public FallingTreeEntity(EntityType<? extends FallingTreeEntity> type, Level level) {
-//        super(type, level);
-//    }
-//
-//    public boolean isClientBuilt() {
-//        return clientBuilt;
-//    }
-//
-//    /**
-//     * This is only run by the server to set up the object data
-//     *
-//     * @param destroyData
-//     * @param payload
-//     */
-//    public FallingTreeEntity setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
-//        this.destroyData = destroyData;
-//        if (destroyData.getNumBranches() == 0) { //If the entity contains no branches there's no reason to create it at all
-//            DynamicTrees.LOG.error("Warning: Tried to create a EntityFallingTree with no branch blocks. This shouldn't be possible.");
-//            new Exception().printStackTrace();
-//            kill();
-//            return this;
-//        }
-//        BlockPos basePos = destroyData.basePos;
-//        this.payload = payload;
-//        this.destroyType = destroyType;
-//        this.onFire = destroyType == DestroyType.FIRE;
-//
-//        //these variables are used for the falling tree sound
-//        this.volume = destroyData.woodVolume.getVolume();
-//        this.hasLeaves = destroyData.getNumLeaves() > 0;
-//
-//        this.species = destroyData.species;
-//
-//        this.setPosRaw(basePos.getX() + 0.5, basePos.getY(), basePos.getZ() + 0.5);
-//
-//        int numBlocks = destroyData.getNumBranches();
-//        geomCenter = new Vec3(0, 0, 0);
-//        double totalMass = 0;
-//
-//        //Calculate center of geometry, center of mass and bounding box, remap to relative coordinates
-//        for (int index = 0; index < destroyData.getNumBranches(); index++) {
-//            BlockPos relPos = destroyData.getBranchRelPos(index);
-//
-//            int radius = destroyData.getBranchRadius(index);
-//            float mass = (radius * radius * 64) / 4096f;//Assume full height cuboids for simplicity
-//            totalMass += mass;
-//
-//            Vec3 relVec = new Vec3(relPos.getX(), relPos.getY(), relPos.getZ());
-//            geomCenter = geomCenter.add(relVec);
-//            massCenter = massCenter.add(relVec.scale(mass));
-//        }
-//
-//        geomCenter = geomCenter.scale(1.0 / numBlocks);
-//        massCenter = massCenter.scale(1.0 / totalMass);
+    public FallingTreeEntity(EntityType<? extends FallingTreeEntity> type, Level level) {
+        super(type, level);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource damageSource, float v) {
+        return false;
+    }
+
+    public boolean isClientBuilt() {
+        return clientBuilt;
+    }
+
+    /**
+     * This is only run by the server to set up the object data
+     *
+     * @param destroyData
+     * @param payload
+     */
+    public FallingTreeEntity setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
+        this.destroyData = destroyData;
+        if (destroyData.getNumBranches() == 0) { //If the entity contains no branches there's no reason to create it at all
+            DynamicTrees.LOG.error("Warning: Tried to create a EntityFallingTree with no branch blocks. This shouldn't be possible.");
+            //new Exception().printStackTrace();
+            this.remove(RemovalReason.DISCARDED);
+            return this;
+        }
+        BlockPos basePos = destroyData.basePos;
+        this.payload = payload;
+        this.destroyType = destroyType;
+        this.onFire = destroyType == DestroyType.FIRE;
+
+        //these variables are used for the falling tree sound
+        this.volume = destroyData.woodVolume.getVolume();
+        this.hasLeaves = destroyData.getNumLeaves() > 0;
+
+        this.setPosRaw(basePos.getX() + 0.5, basePos.getY(), basePos.getZ() + 0.5);
+
+        int numBlocks = destroyData.getNumBranches();
+        geomCenter = new Vec3(0, 0, 0);
+        double totalMass = 0;
+
+        //Calculate center of geometry, center of mass and bounding box, remap to relative coordinates
+        for (int index = 0; index < destroyData.getNumBranches(); index++) {
+            BlockPos relPos = destroyData.getBranchRelPos(index);
+
+            int radius = destroyData.getBranchRadius(index);
+            float mass = (radius * radius * 64) / 4096f;//Assume full height cuboids for simplicity
+            totalMass += mass;
+
+            Vec3 relVec = new Vec3(relPos.getX(), relPos.getY(), relPos.getZ());
+            geomCenter = geomCenter.add(relVec);
+            massCenter = massCenter.add(relVec.scale(mass));
+        }
+
+        geomCenter = geomCenter.scale(1.0 / numBlocks);
+        massCenter = massCenter.scale(1.0 / totalMass);
 //
 //        setVoxelData(buildVoxelData(destroyData));
 //
-//        return this;
-//    }
-//
-//    public CompoundTag buildVoxelData(BranchDestructionData destroyData) {
-//        CompoundTag tag = destroyData.writeToNBT(new CompoundTag());
-//
-//        tag.putDouble("geomx", geomCenter.x);
-//        tag.putDouble("geomy", geomCenter.y);
-//        tag.putDouble("geomz", geomCenter.z);
-//        tag.putDouble("massx", massCenter.x);
-//        tag.putDouble("massy", massCenter.y);
-//        tag.putDouble("massz", massCenter.z);
-//        tag.putInt("destroytype", destroyType.ordinal());
-//        tag.putBoolean("onfire", onFire);
-//        tag.putFloat("volume", volume);
-//        tag.putBoolean("hasleaves", hasLeaves);
-//        tag.putString("species", species.getRegistryName().toString());
-//
-//        return tag;
-//    }
-//
-//    public void setupFromNBT(CompoundTag tag) {
-//        destroyData = new BranchDestructionData(tag);
-//        if (destroyData.getNumBranches() == 0) {
-//            kill();
-//        }
-//        destroyType = DestroyType.values()[tag.getInt("destroytype")];
-//        geomCenter = new Vec3(tag.getDouble("geomx"), tag.getDouble("geomy"), tag.getDouble("geomz"));
-//        massCenter = new Vec3(tag.getDouble("massx"), tag.getDouble("massy"), tag.getDouble("massz"));
-//
-//        this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
-//        this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
-//
-//        volume = tag.getFloat("volume");
-//        hasLeaves = tag.getBoolean("hasleaves");
-//        species = Species.REGISTRY.get(tag.getString("species"));
-//
-//        onFire = tag.getBoolean("onfire");
-//    }
-//
-//    public void buildClient() {
-//
-//        CompoundTag tag = getVoxelData();
-//
-//        if (tag.contains("species")) {
-//            setupFromNBT(tag);
+        return this;
+    }
+
+    public VoxelDataComponent buildVoxelData(BranchDestructionData destroyData) {
+        return new VoxelDataComponent(destroyData, geomCenter, massCenter, destroyType, onFire, volume, hasLeaves);
+    }
+
+    public void setupFromComponent(VoxelDataComponent voxelData) {
+        destroyData = voxelData.destroyData();
+        if (destroyData.getNumBranches() == 0) {
+            remove(RemovalReason.DISCARDED);
+        }
+        destroyType = voxelData.destroyType();
+        geomCenter = voxelData.geomCenter();
+        massCenter = voxelData.massCenter();
+
+        this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
+        this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
+
+        volume = voxelData.volume();
+        hasLeaves = voxelData.hasLeaves();
+
+        onFire = voxelData.onFire();
+    }
+
+    public void buildClient() {
+
+//        VoxelDataComponent tag = getVoxelData();
+
+//        if (tag != null && tag.destroyData() != null) {
+//            setupFromComponent(tag);
 //            clientBuilt = true;
 //        } else {
-//            System.out.println("Error: No species tag has been set");
+//            //System.out.println("Error: No species tag has been set");
+//            LogManager.getLogger().error("Error: Could not setup client for Falling Tree Entity {}",this.uuid);
 //        }
 //
 //        BlockPosBounds renderBounds = new BlockPosBounds(destroyData.cutPos);
@@ -208,49 +186,49 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 //        cleanupShellBlocks(destroyData);
 //
 //        Minecraft.getInstance().levelRenderer.setBlocksDirty(renderBounds.getMin().getX(), renderBounds.getMin().getY(), renderBounds.getMin().getZ(), renderBounds.getMax().getX(), renderBounds.getMax().getY(), renderBounds.getMax().getZ());//This forces the client to rerender the chunks
-//    }
-//
-//    protected void cleanupShellBlocks(BranchDestructionData destroyData) {
-//        BlockPos cutPos = destroyData.cutPos;
-//        for (int i = 0; i < destroyData.getNumBranches(); i++) {
-//            if (destroyData.getBranchRadius(i) > 8) {
-//                BlockPos pos = destroyData.getBranchRelPos(i).offset(cutPos);
-//                for (Surround dir : Surround.values()) {
-//                    BlockPos dPos = pos.offset(dir.getOffset());
-//                    if (level().getBlockState(dPos).getBlock() instanceof TrunkShellBlock) {
-//                        level().removeBlock(dPos, false);
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    public AABB buildAABBFromDestroyData(BranchDestructionData destroyData) {
-//
-//        normalBB = new AABB(BlockPos.ZERO);
-//
-//        for (BlockPos relPos : destroyData.getPositions(BranchDestructionData.PosType.BRANCHES, false)) {
-//            normalBB = normalBB.minmax(new AABB(relPos));
-//        }
-//        if (destroyData.species.leavesAreSolid()){
-//            for (BlockPos relPos : destroyData.getPositions(BranchDestructionData.PosType.LEAVES, false)) {
-//                normalBB = normalBB.minmax(new AABB(relPos));
-//            }
-//        }
-//
-//        //Adjust the bounding box to account for the tree falling over
-//        double height = normalBB.maxY - normalBB.minY;
-//        double width = Mth.absMax(normalBB.maxX - normalBB.minX, normalBB.maxZ - normalBB.minZ);
-//        double grow = Math.max(0, height - (width / 2)) + 2;
-//        cullingNormalBB = normalBB.inflate(grow + 4, 4, grow + 4);
-//
-//        return normalBB;
-//    }
-//
-//    @Override
-//    public AABB getBoundingBoxForCulling() {
-//        return this.cullingBB;
-//    }
+    }
+
+    protected void cleanupShellBlocks(BranchDestructionData destroyData) {
+        BlockPos cutPos = destroyData.cutPos;
+        for (int i = 0; i < destroyData.getNumBranches(); i++) {
+            if (destroyData.getBranchRadius(i) > 8) {
+                BlockPos pos = destroyData.getBranchRelPos(i).offset(cutPos);
+                for (CoordUtils.Surround dir : CoordUtils.Surround.values()) {
+                    BlockPos dPos = pos.offset(dir.getOffset());
+                    if (level().getBlockState(dPos).getBlock() instanceof TrunkShellBlock) {
+                        level().removeBlock(dPos, false);
+                    }
+                }
+            }
+        }
+    }
+
+    public AABB buildAABBFromDestroyData(BranchDestructionData destroyData) {
+
+        normalBB = new AABB(BlockPos.ZERO);
+
+        for (BlockPos relPos : destroyData.getPositions(BranchDestructionData.PosType.BRANCHES, false)) {
+            normalBB = normalBB.minmax(new AABB(relPos));
+        }
+        if (destroyData.species.leavesAreSolid()){
+            for (BlockPos relPos : destroyData.getPositions(BranchDestructionData.PosType.LEAVES, false)) {
+                normalBB = normalBB.minmax(new AABB(relPos));
+            }
+        }
+
+        //Adjust the bounding box to account for the tree falling over
+        double height = normalBB.maxY - normalBB.minY;
+        double width = Mth.absMax(normalBB.maxX - normalBB.minX, normalBB.maxZ - normalBB.minZ);
+        double grow = Math.max(0, height - (width / 2)) + 2;
+        cullingNormalBB = normalBB.inflate(grow + 4, 4, grow + 4);
+
+        return normalBB;
+    }
+
+    @Override
+    protected AABB makeBoundingBox(Vec3 position) {
+        return this.cullingBB;
+    }
 
     public BranchDestructionData getDestroyData() {
         return destroyData;
@@ -277,7 +255,7 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
     }
 
     public Species getSpecies() {
-        return species;
+        return destroyData.species;
     }
 
     @Override
@@ -289,58 +267,58 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         this.cullingBB = cullingNormalBB != null ? cullingNormalBB.move(x, y, z) : new AABB(BlockPos.ZERO);
     }
 
-//    @Override
-//    public void tick() {
-//        super.tick();
-//
-//        if (this.level().isClientSide() && !this.clientBuilt) {
-//            this.buildClient();
-//            if (!isAlive()) {
-//                return;
-//            }
-//        }
-//
-//        if (!this.level().isClientSide() && this.firstUpdate) {
-//            this.updateNeighbors();
-//        }
-//
-//        this.handleMotion();
-//
-//        this.setBoundingBox(this.normalBB.move(this.getX(), this.getY(), this.getZ()));
-//        this.cullingBB = cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
-//
-//        if (this.shouldDie()) {
-//            this.dropPayLoad();
-//            this.kill();
-//            this.modelCleanup();
-//        }
-//
-//        this.firstUpdate = false;
-//    }
+    @Override
+    public void tick() {
+        super.tick();
 
-//    /**
-//     * This is run server side to update all of the neighbors
-//     */
-//    protected void updateNeighbors() {
-//        HashSet<BlockPos> destroyed = new HashSet<>();
-//        HashSet<BlockPos> toUpdate = new HashSet<>();
-//
-//        //Gather a set of all of the block positions that were recently destroyed
-//        Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES)).forEach(destroyed::add);
-//
-//        //Gather a list of all of the non-destroyed blocks surrounding each destroyed block
-//        for (BlockPos d : destroyed) {
-//            for (Direction dir : Direction.values()) {
-//                BlockPos dPos = d.relative(dir);
-//                if (!destroyed.contains(dPos)) {
-//                    toUpdate.add(dPos);
-//                }
-//            }
-//        }
-//
-//        //Update each of the blocks that need to be updated
-//        toUpdate.forEach(pos -> level().neighborChanged(pos, Blocks.AIR, pos));
-//    }
+        if (this.level().isClientSide() && !this.clientBuilt) {
+            this.buildClient();
+            if (!isAlive()) {
+                return;
+            }
+        }
+
+        if (!this.level().isClientSide() && this.firstUpdate) {
+            this.updateNeighbors();
+        }
+
+        this.handleMotion();
+
+        this.setBoundingBox(this.normalBB.move(this.getX(), this.getY(), this.getZ()));
+        this.cullingBB = cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
+
+        if (this.shouldDie()) {
+            this.dropPayLoad();
+            this.remove(RemovalReason.KILLED);
+            this.modelCleanup();
+        }
+
+        this.firstUpdate = false;
+    }
+
+    /**
+     * This is run server side to update all of the neighbors
+     */
+    protected void updateNeighbors() {
+        HashSet<BlockPos> destroyed = new HashSet<>();
+        HashSet<Pair<BlockPos, Direction>> toUpdate = new HashSet<>();
+
+        //Gather a set of all the block positions that were recently destroyed
+        Iterables.concat(destroyData.getPositions(BranchDestructionData.PosType.BRANCHES), destroyData.getPositions(BranchDestructionData.PosType.LEAVES)).forEach(destroyed::add);
+
+        //Gather a list of all the non-destroyed blocks surrounding each destroyed block
+        for (BlockPos d : destroyed) {
+            for (Direction dir : Direction.values()) {
+                BlockPos dPos = d.relative(dir);
+                if (!destroyed.contains(dPos)) {
+                    toUpdate.add(new Pair<>(dPos, dir));
+                }
+            }
+        }
+
+        //Update each of the blocks that need to be updated
+        toUpdate.forEach(pos -> level().neighborChanged(pos.getA(), Blocks.AIR, Orientation.fromIndex(pos.getB().ordinal())));
+    }
 
     protected AnimationHandler selectAnimationHandler() {
         return DTConfigs.SERVER.enableFallingTrees.get() ? destroyData.species.selectAnimationHandler(this) : AnimationHandlers.voidAnimationHandler;
@@ -429,33 +407,36 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
      * the loot.
      */
     public static void spawnItemAsEntity(Level level, BlockPos pos, ItemStack stack) {
-//        if (!level.isClientSide() && !stack.isEmpty() && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !Services.MISC.isLevelRestoringBlockSnapshots(level)) { // do not drop items while restoring blockstates, prevents item dupe
-//            ItemEntity entityitem = new ItemEntity(level, (double) pos.getX() + 0.5F, (double) pos.getY() + 0.5F, (double) pos.getZ() + 0.5F, stack);
-//            entityitem.setDeltaMovement(0, 0, 0);
-//            entityitem.setDefaultPickUpDelay();
-//            level.addFreshEntity(entityitem);
-//        }
+        if (level.isClientSide() || level.getServer() == null
+                || !level.getServer().getGameRules().get(GameRules.BLOCK_DROPS)
+                || Services.MISC.isLevelRestoringBlockSnapshots(level)) // do not drop items while restoring block states, prevents item dupes
+            return;
+
+        ItemEntity itemEntity = new ItemEntity(level, (double) pos.getX() + 0.5F, (double) pos.getY() + 0.5F, (double) pos.getZ() + 0.5F, stack);
+        itemEntity.setDeltaMovement(0, 0, 0);
+        itemEntity.setDefaultPickUpDelay();
+        level.addFreshEntity(itemEntity);
     }
 
-//    @Override
-//    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-//        builder.define(voxelDataParameter, new CompoundTag());
-//    }
-//
-//
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+//        builder.define(voxelDataParameter, Component.empty());
+    }
+
 //    //This is shipped off to the clients
 //    public void setVoxelData(CompoundTag tag) {
 //        this.setBoundingBox(this.buildAABBFromDestroyData(this.destroyData).move(this.getX(), this.getY(), this.getZ()));
 //        this.cullingBB = this.cullingNormalBB.move(this.getX(), this.getY(), this.getZ());
-//        getEntityData().set(voxelDataParameter, tag);
+//
+//        getEntityData().set(voxelDataParameter, CustomData.of(tag));
 //    }
 //
-//    public CompoundTag getVoxelData() {
+//    public Component getVoxelData() {
 //        return getEntityData().get(voxelDataParameter);
 //    }
-//
-//    @Override
-//    protected void readAdditionalSaveData(CompoundTag compound) {
+
+    @Override
+    protected void readAdditionalSaveData(ValueInput valueInput) {
 //        CompoundTag vox = (CompoundTag) compound.get("vox");
 //        setupFromNBT(vox);
 //        setVoxelData(vox);
@@ -469,10 +450,10 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 //                }
 //            }
 //        }
-//    }
-//
-//    @Override
-//    protected void addAdditionalSaveData(CompoundTag compound) {
+    }
+
+    @Override
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
 //        compound.put("vox", getVoxelData());
 //
 //        if (!payload.isEmpty()) {
@@ -484,21 +465,21 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 //
 //            compound.put("payload", list);
 //        }
-//    }
-//
+    }
 
     public static FallingTreeEntity dropTree(Level level, BranchDestructionData destroyData, List<ItemStack> woodDropList, DestroyType destroyType) {
-//        //Spawn the appropriate item entities into the level
-//        if (!level.isClientSide()) {// Only spawn entities server side
-//            FallingTreeEntity entity = DTRegistries.FALLING_TREE.get().create(level);
-//            if (entity == null) return null;
-//            entity.setData(destroyData, woodDropList, destroyType);
-//            if (entity.isAlive()) {
-//                level.addFreshEntity(entity);
-//            }
-//            return entity;
-//        }
-//
+        //Spawn the appropriate item entities into the level
+        if (level instanceof ServerLevel serverLevel) {// Only spawn entities server side
+
+            FallingTreeEntity entity = DTRegistries.FALLING_TREE.get().create(serverLevel, EntitySpawnReason.NATURAL);
+            if (entity == null) return null;
+            entity.setData(destroyData, woodDropList, destroyType);
+            if (entity.isAlive()) {
+                level.addFreshEntity(entity);
+            }
+            return entity;
+        }
+
         return null;
 }
 

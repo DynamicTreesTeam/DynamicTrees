@@ -1,7 +1,9 @@
 {
   "variants": {
     "": {
-      "model": "dynamictrees:block/acacia_branch"
+      "type": "dynamictrees:branch",
+      "bark_texture": "minecraft:block/acacia_log",
+      "rings_texture": "minecraft:block/acacia_log_top"
     }
   }
 }

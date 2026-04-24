@@ -5,6 +5,7 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.model.baked.BasicBranchBlockBakedModel;
+import com.dtteam.dynamictrees.model.entity.FallingTreeEntityModel;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.client.Minecraft;
@@ -48,9 +49,9 @@ public class FallingTreeEntityModelFabric extends FallingTreeEntityModel {
 
                 boolean rootyBlockAdded = false;
                 if (destructionData.soilState != null) {
-                    SoilBlock soilBlock = TreeHelper.getRooty(BuiltInRegistries.BLOCK.get(destructionData.soilState.getLeft()));
-                    if (soilBlock != null) {
-                        BlockState soilState = soilBlock.GetStateFromIndex(destructionData.soilState.getRight());
+                    BlockState soilState = destructionData.soilState;
+                    if (soilState != null) {
+                        BlockState soilBlock = soilState.getBlock();
                         BakedModel rootyModel = dispatcher.getBlockModel(soilState);
                         BlockPos cutOffset = destructionData.getRelativeCutPos();
                         treeQuads.addAll(toTreeQuadData(

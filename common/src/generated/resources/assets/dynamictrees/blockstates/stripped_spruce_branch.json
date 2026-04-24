@@ -1,7 +1,9 @@
 {
   "variants": {
     "": {
-      "model": "dynamictrees:block/stripped_spruce_branch"
+      "type": "dynamictrees:branch",
+      "bark_texture": "minecraft:block/stripped_spruce_log",
+      "rings_texture": "minecraft:block/stripped_spruce_log_top"
     }
   }
 }
