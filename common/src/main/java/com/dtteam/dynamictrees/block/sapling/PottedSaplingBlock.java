@@ -1,14 +1,10 @@
 package com.dtteam.dynamictrees.block.sapling;
 
-import com.dtteam.dynamictrees.client.GeneratesBlockTintSources;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.ItemUtils;
 import com.dtteam.dynamictrees.utility.NullUtils;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.color.block.BlockTintSource;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -39,7 +35,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class PottedSaplingBlock extends BaseEntityBlock implements GeneratesBlockTintSources {
+public class PottedSaplingBlock extends BaseEntityBlock {
 
     protected static final AABB FLOWER_POT_AABB = new AABB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.375D, 0.6875D);
 
@@ -231,17 +227,17 @@ public class PottedSaplingBlock extends BaseEntityBlock implements GeneratesBloc
         return RenderShape.MODEL;
     }
 
-    @Override
-    public BlockTintSource generateTintSource(BlockColors blockColors, int tintIndex) {
-        return new BlockTintSource() {
-            @Override
-            public int color(BlockState blockState) {
-                return 0xFFFFFF;
-            }
-            @Override
-            public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
-                return getSpecies(level, pos).getSaplingTintSource().colorInWorld(state, level, pos);
-            }
-        };
-    }
+//    @Override
+//    public BlockTintSource generateTintSource(BlockColors blockColors, int tintIndex) {
+//        return new BlockTintSource() {
+//            @Override
+//            public int color(BlockState blockState) {
+//                return 0xFFFFFF;
+//            }
+//            @Override
+//            public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+//                return getSpecies(level, pos).getSaplingTintSource().colorInWorld(state, level, pos);
+//            }
+//        };
+//    }
 }

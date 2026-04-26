@@ -8,9 +8,6 @@ import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.client.BlockColorMultipliers;
-import com.dtteam.dynamictrees.client.CloneTintSource;
-import com.dtteam.dynamictrees.client.GeneratesBlockTintSources;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
 import com.dtteam.dynamictrees.data.Generator;
@@ -26,10 +23,6 @@ import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.color.block.BlockTintSource;
-import net.minecraft.client.color.block.BlockTintSources;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -42,6 +35,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.FoliageColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -69,7 +63,7 @@ import java.util.function.Supplier;
  *
  * @author ferreusveritas
  */
-public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties>, GeneratesBlockTintSources {
+public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties> {
 
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, LeavesProperties>>> blockStateGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, LeavesProperties>>> itemModelGenerators = new HashMap<>();
@@ -144,6 +138,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         public boolean updateTick(LevelAccessor level, BlockPos pos, BlockState state, RandomSource rand) {
             return false;
         }
+
     }.setRegistryName(DynamicTrees.NULL).setBlockRegistryName(DynamicTrees.NULL);
 
     /**
@@ -174,7 +169,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     protected AgeingConfiguration ageingConfiguration = AgeingConfiguration.ALWAYS;
     protected boolean connectAnyRadius = false;
     protected boolean requiresShears = true;
-    protected boolean hasTickParticles = false;
     protected boolean waterResistant = false;
 
     private LeavesProperties() {
@@ -583,6 +577,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     public BlockBehaviour.Properties getDefaultBlockProperties() {
         return BlockBehaviour.Properties.of()
+                .speedFactor(0.25f)
                 .mapColor(MapColor.PLANT)
                 .ignitedByLava()
                 .pushReaction(PushReaction.DESTROY)
@@ -620,10 +615,6 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.requiresShears = requiresShears;
     }
 
-    public void setHasTickParticles(boolean hasTickParticles) {
-        this.hasTickParticles = hasTickParticles;
-    }
-
     public void setWaterResistant(boolean waterResistant) {
         this.waterResistant = waterResistant;
     }
@@ -644,55 +635,46 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     // LEAVES COLORS
     ///////////////////////////////////////////
 
-    protected Integer colorNumber;
     protected String colorString;
-
-    public void setColorNumber(Integer colorNumber) {
-        this.colorNumber = colorNumber;
-    }
+    protected int foliageTintLayerCount = 1;
 
     public void setColorString(String colorString) {
         this.colorString = colorString;
     }
 
-    private BlockTintSource tintSource = null;
-
-    @Override
-    public BlockTintSource generateTintSource(BlockColors blockColors, int tintIndex) {
-        if (tintSource == null){
-            int color = -1;
-            if (this.colorNumber != null) {
-                color = this.colorNumber;
-            } else if (this.colorString != null) {
-                String code = this.colorString;
-                if (code.startsWith("@")) {
-                    code = code.substring(1);
-                    if ("biome".equals(code)) {
-                        this.tintSource = BlockTintSources.foliage();
-                        return tintSource;
-                    }
-                    BlockTintSource source = BlockColorMultipliers.find(code);
-                    if (source != null) {
-                        tintSource = source;
-                        return tintSource;
-                    } else {
-                        DynamicTrees.LOG.error("ColorMultiplier resource '{}' could not be found.", code);
-                    }
-                } else {
-                    color = Color.decode(code).getRGB();
-                }
-            }
-            int c = color;
-            if (c == -1){
-                this.tintSource = new CloneTintSource(()->blockColors.getTintSource(getPrimitiveLeaves(), tintIndex));
-            } else this.tintSource = _ -> c;
-        }
-        return tintSource;
+    public boolean hasCustomColor(){
+        return colorString != null;
     }
 
-    public int getFoliageColor(BlockState state, BlockAndTintGetter level, BlockPos pos) {
-        if (tintSource == null) return 0;
-        return tintSource.colorInWorld(state, level, pos);
+    /**
+     * @return null to default back to Biome color. Return any number to use a fixed color otherwise.
+     * To fall back to cloning the primitive block, #colorString must be null and this method will not be called.
+     */
+    public @Nullable Integer getCustomColor(){
+        if (colorString != null){
+            if (colorString.startsWith("@")){
+                String code = colorString.substring(1).toLowerCase(Locale.ENGLISH);
+                return switch (code){
+                    case "birch" -> FoliageColor.FOLIAGE_BIRCH;
+                    case "evergreen" -> FoliageColor.FOLIAGE_EVERGREEN;
+                    case "default" -> FoliageColor.FOLIAGE_DEFAULT;
+                    case "mangrove" -> FoliageColor.FOLIAGE_MANGROVE;
+                    case "biome" -> null;
+                    default -> -1;
+                };
+            } else {
+                return Color.decode(colorString).getRGB();
+            }
+        }
+        return -1;
+    }
+
+    public int getFoliageTintLayerCount(){
+        return foliageTintLayerCount;
+    }
+
+    public void setFoliageTintLayerCount(int primitiveBlockTintLayerCount) {
+        this.foliageTintLayerCount = primitiveBlockTintLayerCount;
     }
 
     ///////////////////////////////////////////

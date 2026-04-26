@@ -103,17 +103,14 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
     /**
      * This is only run by the server to set up the object data
-     *
-     * @param destroyData
-     * @param payload
      */
-    public FallingTreeEntity setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
+    public void setData(BranchDestructionData destroyData, List<ItemStack> payload, DestroyType destroyType) {
         this.destroyData = destroyData;
         if (destroyData.getNumBranches() == 0) { //If the entity contains no branches there's no reason to create it at all
             DynamicTrees.LOG.error("Warning: Tried to create a EntityFallingTree with no branch blocks. This shouldn't be possible.");
             //new Exception().printStackTrace();
             this.remove(RemovalReason.DISCARDED);
-            return this;
+            return;
         }
         BlockPos basePos = destroyData.basePos;
         this.payload = payload;
@@ -148,7 +145,6 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
 
         setVoxelData(buildVoxelData(destroyData));
 
-        return this;
     }
 
     public VoxelDataComponent buildVoxelData(BranchDestructionData destroyData) {

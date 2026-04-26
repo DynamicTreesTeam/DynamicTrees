@@ -36,7 +36,8 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
                             registryName = IdentifierUtils.parseDTLocation(registryName);
                             SoilProperties.REGISTRY.runOnNextLock(SoilProperties.REGISTRY.generateIfValidRunnable(registryName,
                                     soilProperties::setSubstitute, setSubstituteWarn(soilProperties, registryName)));
-                        });
+                        })
+                .register("foliage_tint_layer_count", Integer.class, SoilProperties::setFoliageTintLayerCount);
 
         // Primitive soil is needed before gathering data.
         this.gatherDataAppliers
@@ -49,9 +50,9 @@ public final class SoilPropertiesResourceLoader extends JsonRegistryResourceLoad
         this.setupAppliers
                 .register("primitive_soil", Block.class, SoilProperties::setPrimitiveSoilBlock);
 
-        this.reloadAppliers
-                .register("foliage_tint_index", Integer.class, SoilProperties::setFoliageTintIndex)
-                .register("roots_tint_index", Integer.class, SoilProperties::setRootsTintIndex);
+//        this.reloadAppliers
+//                .register("foliage_tint_index", Integer.class, SoilProperties::setFoliageTintIndex)
+//                .register("roots_tint_index", Integer.class, SoilProperties::setRootsTintIndex);
         this.registerSpreadableAppliers();
 
         this.commonAppliers

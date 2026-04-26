@@ -41,16 +41,13 @@ public class ParticleHelper {
         }
     }
 
-    private static int getFoliageColor(LeavesProperties leavesProperties, ClientLevel level, BlockState blockState, BlockPos pos) {
-        return leavesProperties.getFoliageColor(blockState, level, pos);
-    }
     public static void crushLeavesBlock(Level level, BlockPos pos, BlockState blockState, Entity entity) {
         if (level instanceof ClientLevel cLevel) {
             RandomSource random = cLevel.getRandom();
             TreePart treePart = TreeHelper.getTreePart(blockState);
             if (treePart instanceof DynamicLeavesBlock leaves) {
                 LeavesProperties leavesProperties = leaves.getLeavesProperties();
-                int color = getFoliageColor(leavesProperties, cLevel, blockState, pos);
+                int color = TintSourceHelper.getFoliageColor(leavesProperties, cLevel, blockState, pos);
                 float r = (color >> 16 & 255) / 255.0F;
                 float g = (color >> 8 & 255) / 255.0F;
                 float b = (color & 255) / 255.0F;

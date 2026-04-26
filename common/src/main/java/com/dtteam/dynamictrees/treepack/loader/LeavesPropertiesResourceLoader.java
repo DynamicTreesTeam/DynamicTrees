@@ -31,7 +31,7 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
     @Override
     public void registerAppliers() {
         this.loadAppliers.register("color", String.class, LeavesProperties::setColorString)
-                .register("color", Integer.class, LeavesProperties::setColorNumber);
+                .register("foliage_tint_layer_count", Integer.class, LeavesProperties::setFoliageTintLayerCount);
 
         // Primitive leaves are needed before gathering data.
         this.gatherDataAppliers
@@ -67,7 +67,6 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                 .register("does_age", String.class, (Applier<LeavesProperties, String>) this::readDoesAge)
                 .register("ageing_configuration", LeavesProperties.AgeingConfiguration.class, LeavesProperties::setAgeingConfiguration)
                 .register("can_grow_on_ground", Boolean.class, LeavesProperties::setCanGrowOnGround)
-                .register("has_tick_particles", Boolean.class, LeavesProperties::setHasTickParticles)
                 .register("water_resistant", Boolean.class, LeavesProperties::setWaterResistant)
                 .register("scruffy_leaf_chance", ScruffyLeavesProperties.class, Float.class, ScruffyLeavesProperties::setLeafChance)
                 .register("scruffy_max_hydro", ScruffyLeavesProperties.class, Integer.class, ScruffyLeavesProperties::setMaxHydro);

@@ -6,8 +6,6 @@ import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-import com.dtteam.dynamictrees.client.CloneTintSource;
-import com.dtteam.dynamictrees.client.GeneratesBlockTintSources;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
@@ -15,10 +13,6 @@ import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.color.block.BlockTintSource;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
@@ -37,7 +31,7 @@ import static com.dtteam.dynamictrees.utility.IdentifierUtils.prefix;
 /**
  * @author Max Hyper
  */
-public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties>, GeneratesBlockTintSources {
+public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties> {
 
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, SoilProperties>>> blockStateGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, SoilProperties>>> itemModelGenerators = new HashMap<>();
@@ -80,8 +74,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     private Identifier blockRegistryName;
     protected boolean generateBlock = true;
     protected List<String> onlyIfLoaded = new ArrayList<>();
-    protected int foliageTintIndex = 0;
-    protected int rootsTintIndex = 1;
+    protected int foliageTintLayerCount = 1;
 
     //used for null soil properties
     protected SoilProperties() {
@@ -203,12 +196,12 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         this.block = () -> substituteSoilProperties.block.get();
     }
 
-    public void setFoliageTintIndex(int foliageTintIndex) {
-        this.foliageTintIndex = foliageTintIndex;
+    public int getFoliageTintLayerCount(){
+        return foliageTintLayerCount;
     }
 
-    public void setRootsTintIndex(int rootsTintIndex) {
-        this.rootsTintIndex = rootsTintIndex;
+    public void setFoliageTintLayerCount(int primitiveBlockTintLayerCount) {
+        this.foliageTintLayerCount = primitiveBlockTintLayerCount;
     }
 
     ///////////////////////////////////////////
@@ -316,34 +309,12 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     // ROOT COLORS
     ///////////////////////////////////////////
 
-    @Override
-    public BlockTintSource generateTintSource (BlockColors blockColors, int tintIndex){
-        final int white = 0xFFFFFFFF;
-        if (tintIndex == foliageTintIndex){
-            return new CloneTintSource(()->
-                    getBlock().isPresent() ?
-                            blockColors.getTintSource(getPrimitiveSoilState(getBlock().get().defaultBlockState()), tintIndex)
-                            : _ -> white
-            );
-        }
-        else if (tintIndex == rootsTintIndex)
-            return new BlockTintSource() {
-                @Override public int color(BlockState blockState) {
-                    return white;
-                }
-
-                @Override
-                public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
-                    return state.getBlock() instanceof SoilBlock sBlock ? sBlock.rootColor(state, level, pos) : white;
-                }
-            };
-        return _ -> white;
-    }
-
-    @Override
-    public int maxTintIndex(){
-        return Math.max(foliageTintIndex, rootsTintIndex);
-    }
+//    public List<Identifier> tintSources(){
+//        List<Identifier> sources = new ArrayList<>();
+//        sources.add(DynamicTrees.location("clone_primitive_soil"));
+//        sources.add(DynamicTrees.location("soil_roots"));
+//        return sources;
+//    }
 
     //////////////////////////////
     // JAVA OBJECT STUFF

@@ -28,7 +28,6 @@ import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
-import com.dtteam.dynamictrees.client.GeneratesBlockTintSources;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
@@ -76,9 +75,6 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.color.block.BlockTintSource;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -134,7 +130,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class Species extends RegistryEntry<Species> implements Resettable<Species>, GeneratesBlockTintSources {
+public class Species extends RegistryEntry<Species> implements Resettable<Species> {
 
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, Species>>> blockStateGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, Species>>> itemModelGenerators = new HashMap<>();
@@ -174,7 +170,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     protected Supplier<Seed> seed;
     protected Boolean dropSeeds = null;
     protected Supplier<DynamicSaplingBlock> saplingBlock;
-    protected Boolean tintSapling = true;
+    protected boolean tintSapling = true;
 
     private String unlocalizedName = "";
     private final Set<Fruit> fruits = new HashSet<>();
@@ -435,10 +431,6 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
 
     public int colorTreeQuads(int defaultColor, FallingTreeEntityModel.TreeQuadData treeQuad) {
         return defaultColor;
-    }
-
-    public int leafColorMultiplier(BlockAndTintGetter level, BlockPos pos) {
-        return getLeavesProperties().getFoliageColor(getLeavesProperties().getDynamicLeavesState(), level, pos);
     }
     //endregion
 
@@ -940,38 +932,31 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         saplingName = name;
     }
 
-    public void setTintSapling(Boolean tintSapling) {
+    public void setTintSapling(boolean tintSapling) {
         this.tintSapling = tintSapling;
     }
 
-    private BlockTintSource saplingTintSource;
-
-    public BlockTintSource getSaplingTintSource() {
-        return saplingTintSource;
+    public boolean shouldTintSapling() {
+        return tintSapling;
     }
 
-    @Override
-    public BlockTintSource generateTintSource(BlockColors blockColors, int tintIndex) {
-        int white = 0xFFFFFFFF;
-        if (saplingTintSource == null){
-            if (!tintSapling) {
-                saplingTintSource = _ -> white;
-                return saplingTintSource;
-            }
-            if (tintIndex == 0)
-                saplingTintSource = getLeavesProperties().generateTintSource(blockColors, tintIndex);
-            else if (tintIndex == 1)
-                saplingTintSource = state -> family.getRootColor(state, true);
-            else
-                saplingTintSource = _ -> white;
-        }
-        return saplingTintSource;
-    }
-
-    @Override
-    public int maxTintIndex() {
-        return 1;
-    }
+//    @Override
+//    public BlockTintSource generateTintSource(BlockColors blockColors, int tintIndex) {
+//        int white = 0xFFFFFFFF;
+//        if (saplingTintSource == null){
+//            if (!tintSapling) {
+//                saplingTintSource = _ -> white;
+//                return saplingTintSource;
+//            }
+//            if (tintIndex == 0)
+//                saplingTintSource = getLeavesProperties().generateTintSource(blockColors, tintIndex);
+//            else if (tintIndex == 1)
+//                saplingTintSource = state -> family.getRootColor(state, true);
+//            else
+//                saplingTintSource = _ -> white;
+//        }
+//        return saplingTintSource;
+//    }
 
     private SoundType saplingSound = SoundType.GRASS;
 

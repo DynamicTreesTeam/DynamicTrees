@@ -6,17 +6,22 @@ import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
-import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.client.TextureHelper;
 import com.dtteam.dynamictrees.client.ThickBranchRingsSource;
+import com.dtteam.dynamictrees.client.TintSources.CloneTintSource;
+import com.dtteam.dynamictrees.client.TintSources.PottedSaplingTintSource;
+import com.dtteam.dynamictrees.client.TintSources.SaplingTintSource;
+import com.dtteam.dynamictrees.client.TintSources.SoilRootsTintSource;
+import com.dtteam.dynamictrees.model.blockstate.BranchBlockStateModel;
 import com.dtteam.dynamictrees.model.entity.render.FallingTreeRenderer;
 import com.dtteam.dynamictrees.model.entity.render.LingeringEffectorRenderer;
-import com.dtteam.dynamictrees.model.blockstate.BranchBlockStateModel;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.block.BlockTintSource;
+import net.minecraft.client.color.block.BlockTintSources;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
@@ -26,7 +31,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.FoliageColor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -99,13 +103,6 @@ public class ClientModEventHandler {
     }
 
     @SubscribeEvent
-
-    public static void registerColorResolversEvent(RegisterColorHandlersEvent.ColorResolvers event){
-        BlockColorMultipliers.register("birch", _ -> FoliageColor.FOLIAGE_BIRCH);
-        BlockColorMultipliers.register("spruce", _ -> FoliageColor.FOLIAGE_EVERGREEN);
-    }
-
-    @SubscribeEvent
     public static void registerItemColorHandlersEvent(RegisterColorHandlersEvent.ItemTintSources event){
 //        // Register Potion Colorizer
 //        event.register(DynamicTrees.location("dendro_potion"), DTRegistries.DENDRO_POTION.get()::getColor);
@@ -119,20 +116,39 @@ public class ClientModEventHandler {
 
         // Register Rooty Colorizers
         for (SoilBlock soilBlock : SoilProperties.REGISTRY.getAll().stream().filter(sp -> sp.getBlock().isPresent()).map(sp -> sp.getBlock().get()).collect(Collectors.toSet())) {
-            event.register(soilBlock.getSoilProperties().tintSources(blockColors), soilBlock);
+            SoilProperties properties = soilBlock.getSoilProperties();
+            List<BlockTintSource> sources = CloneTintSource.cloneAllSources(
+                    blockColors,
+                    ()->properties.getPrimitiveSoilState(soilBlock.defaultBlockState()),
+                    properties.getFoliageTintLayerCount());
+            sources.add(new SoilRootsTintSource(soilBlock));
+            event.register(sources, soilBlock);
+        }
+
+        // Register Leaves Colorizers
+        for (DynamicLeavesBlock leaves : LeavesProperties.REGISTRY.getAll().stream().filter(lp -> lp.getDynamicLeavesBlock().isPresent()).map(lp -> lp.getDynamicLeavesBlock().get()).collect(Collectors.toSet())) {
+            LeavesProperties properties = leaves.getLeavesProperties();
+            if (properties.hasCustomColor()) {
+                Integer customColor = properties.getCustomColor();
+                if (customColor == null) //we use null as a way to default back to "biome" tint source.
+                    event.register(List.of(BlockTintSources.foliage()), leaves);
+                else
+                    event.register(List.of(BlockTintSources.constant(customColor)), leaves);
+            } else {
+                event.register(
+                        CloneTintSource.cloneAllSources(blockColors, properties::getPrimitiveLeaves, properties.getFoliageTintLayerCount()),
+                        leaves);
+            }
         }
 
         // Register Bonsai Pot Colorizer
-        event.register(DTRegistries.POTTED_SAPLING.get().tintSources(blockColors), DTRegistries.POTTED_SAPLING.get());
+        event.register(List.of(new PottedSaplingTintSource(blockColors)), DTRegistries.POTTED_SAPLING.get());
 
         // Register Sapling Colorizer
         for (DynamicSaplingBlock sapling : Species.REGISTRY.getAll().stream().filter(s -> s.getSapling().isPresent()).map(s -> s.getSapling().get()).collect(Collectors.toSet())) {
-            event.register(sapling.getSpecies().tintSources(blockColors), sapling);
+            event.register(List.of(new SaplingTintSource(blockColors, sapling.getSpecies())), sapling);
         }
-        // Register Leaves Colorizers
-        for (DynamicLeavesBlock leaves : LeavesProperties.REGISTRY.getAll().stream().filter(lp -> lp.getDynamicLeavesBlock().isPresent()).map(lp -> lp.getDynamicLeavesBlock().get()).collect(Collectors.toSet())) {
-            event.register(leaves.getLeavesProperties().tintSources(blockColors), leaves);
-        }
+
     }
 
     ///////////////////////////////////////////

@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.model.entity;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.soil.SoilBlock;
+import com.dtteam.dynamictrees.client.TintSourceHelper;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.model.ModelConnections;
 import com.dtteam.dynamictrees.model.QuadManipulator;
@@ -23,6 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
@@ -78,7 +80,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> 
                         BlockStateModel rootyModel = modelSet.get(soilState);
                         BlockPos cutOffset = destructionData.getRelativeCutPos();
                         treeQuads.addAll(toTreeQuadData(QuadManipulator.getQuads(rootyModel, soilState, new Vec3(cutOffset.getX(), cutOffset.getY()-1, cutOffset.getZ()), entity.getRandom(), null),
-                                species.getFamily().getRootColor(soilState, soilBlock.getColorFromBark()),
+                                species.getFamily().getRootColor(soilState, soilBlock != null && soilBlock.getColorFromBark()),
                                 soilState));
                         rootyBlockAdded = true;
                     }
@@ -100,8 +102,9 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> 
 
                 //Draw the rest of the tree/branch
                 for (int index = 0; index < destructionData.getNumBranches(); index++) {
-                    Block previousBranch = exState.getBlock();
+                    Block previousBranch = exState == null ? Blocks.AIR : exState.getBlock();
                     exState = destructionData.getBranchBlockState(index);
+                    if (exState == null) continue;
                     if (!previousBranch.equals(exState.getBlock())) //Update the branch model only if the block is different
                     {
                         branchModel = modelSet.get(exState);
@@ -122,7 +125,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> 
                     List<BakedQuad> bakedQuads = QuadManipulator.getQuads(modelSet.get(leafState), leafState, new Vec3(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), entity.getRandom(), null);
 
                     ClientLevel level = Minecraft.getInstance().level;
-                    int leavesColor = level == null ? 0xFFFFFF : species.leafColorMultiplier(level, cutPos.offset(leafLoc.getKey()));
+                    int leavesColor = level == null ? 0xFFFFFF : TintSourceHelper.getLeavesColor(species, level, cutPos.offset(leafLoc.getKey()));
                     treeQuads.addAll(toTreeQuadData(bakedQuads, leavesColor, leafState));
                 }
             }

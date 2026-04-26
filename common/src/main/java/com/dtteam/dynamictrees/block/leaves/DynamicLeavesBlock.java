@@ -9,10 +9,10 @@ import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.Ageable;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.client.ParticleHelper;
+import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.tags.DTEntityTypeTags;
 import com.dtteam.dynamictrees.item.Seed;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
-import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.GrowSignal;
 import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
@@ -55,7 +55,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable {
+public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements TreePart, Ageable {
 
     public LeavesProperties properties = LeavesProperties.NULL;
 
@@ -66,7 +66,7 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     }
 
     public DynamicLeavesBlock(Identifier id, Properties properties) {
-        super(0, properties.pushReaction(PushReaction.DESTROY).setId(ResourceKey.create(Registries.BLOCK, id)));
+        super(0.01F, properties.pushReaction(PushReaction.DESTROY).setId(ResourceKey.create(Registries.BLOCK, id)));
         this.registerDefaultState(this.stateDefinition.any().setValue(DISTANCE, LeavesProperties.maxHydro).setValue(PERSISTENT, false).setValue(WATERLOGGED, false));
     }
 
@@ -551,8 +551,8 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
     protected static final VoxelShape SUPPORT_SHAPE = Shapes.join(Shapes.block(), box(2.0D, 14.0D, 2.0D, 14.0D, 16.0D, 14.0D), BooleanOp.ONLY_FIRST);
 
     @Override
-    public MapCodec<? extends LeavesBlock> codec() {
-        return null;
+    public MapCodec<? extends TintedParticleLeavesBlock> codec() {
+        return super.codec();
     }
 
     @Override
@@ -628,7 +628,8 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
                     BlockState crashState = level.getBlockState(iPos);
                     if (TreeHelper.isLeaves(crashState)) {
                         hasLeaves = true; // This layer has leaves
-                        ParticleHelper.crushLeavesBlock(level, iPos, crashState, entity);
+                        if (level.isClientSide())
+                            ParticleHelper.crushLeavesBlock(level, iPos, crashState, entity);
                         level.removeBlock(iPos, false);
                     } else if (!level.isEmptyBlock(iPos)) {
                         crushing = false; // We hit something solid thus no longer crushing leaves layers
@@ -812,19 +813,17 @@ public class DynamicLeavesBlock extends LeavesBlock implements TreePart, Ageable
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (properties.hasTickParticles && properties.getPrimitiveLeavesBlock().isPresent()) {
+        if (leafParticleChance > 0 && properties.getPrimitiveLeavesBlock().isPresent()) {
             properties.getPrimitiveLeavesBlock().ifPresent((b)->b.animateTick(state,level,pos,random));
         } else {
             super.animateTick(state, level, pos, random);
         }
     }
 
+    /**
+     * Handled by calling animateTick on the primitive
+     */
     @Override
-    protected void spawnFallingLeavesParticle(Level level, BlockPos blockPos, RandomSource randomSource) {
-//        properties.getPrimitiveLeavesBlock().ifPresent(p -> {
-//            if (p instanceof LeavesBlock l)
-//                l.spawnFallingLeavesParticle(level, blockPos, randomSource);
-//        });
-    }
+    protected void spawnFallingLeavesParticle(Level level, BlockPos blockPos, RandomSource randomSource) {}
 
 }
