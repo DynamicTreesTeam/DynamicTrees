@@ -397,8 +397,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             }
         }
 
-        //Pair<Identifier, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getUnitVec3i()), true);
-        BlockState soilState = level.getBlockState(cutPos.offset(cutDir.getUnitVec3i()));
+        BlockState soilState = getCachedSoilState(level, cutPos.offset(cutDir.getUnitVec3i()), true);
 
         return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), new HashMap<>(), new ArrayList<>(), destroyer.getEnds(), volumeSum.getVolume(), cutPos, basePos, cutDir, toolDir, trunkHeight, soilState);
     }

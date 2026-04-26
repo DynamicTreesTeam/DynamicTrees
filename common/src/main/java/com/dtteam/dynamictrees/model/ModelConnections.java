@@ -56,4 +56,14 @@ public class ModelConnections extends Connections {
         ringOnly = ringSide;
     }
 
+//    public static final ModelProperty<ModelConnections> CONNECTIONS_PROPERTY = new ModelProperty<>();
+//
+//    public ModelData toModelData() {
+//        return ModelData.builder().with(CONNECTIONS_PROPERTY, this).build();
+//    }
+//
+//    public ModelData toModelData(ModelData baseData) {
+//        return baseData.derive().with(CONNECTIONS_PROPERTY, this).build();
+//    }
+
 }

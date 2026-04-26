@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.model.blockstate;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.model.BlockStateModelWithConnectionData;
 import com.dtteam.dynamictrees.model.ModelConnections;
 import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPartCore;
 import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPartSleeve;
@@ -31,7 +32,7 @@ public record BranchBlockStateModel(
         BranchBlockStateModelPartSleeve[][] sleeves,
         BranchBlockStateModelPartCore[] rings,
         Material.Baked particleMaterial
-) implements DynamicBlockStateModel {
+) implements DynamicBlockStateModel, BlockStateModelWithConnectionData {
 
     @Override
     public @BakedQuad.MaterialFlags int materialFlags() {
@@ -44,7 +45,7 @@ public record BranchBlockStateModel(
     }
 
     @Override
-    public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
+    public void collectParts(BlockState state, List<BlockStateModelPart> parts, ModelConnections connectionsData) {
         final int coreRadius = getRadius(state);
         if (coreRadius > 8) return;
 
@@ -52,7 +53,6 @@ public record BranchBlockStateModel(
         Direction forceRingDir = null;
         final AtomicInteger twigRadius = new AtomicInteger(1);
 
-        ModelConnections connectionsData = getModelConnections(level, pos, state);
         if (connectionsData != null) {
             connections = connectionsData.getAllRadii();
             forceRingDir = connectionsData.getRingOnly();
@@ -100,6 +100,12 @@ public record BranchBlockStateModel(
 
             }
         }
+    }
+
+    @Override
+    public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
+        ModelConnections connectionsData = getModelConnections(level, pos, state);
+        collectParts(state, parts, connectionsData);
     }
 
     public ModelConnections getModelConnections(@NotNull BlockAndTintGetter world, @NotNull BlockPos pos, @NotNull BlockState state) {

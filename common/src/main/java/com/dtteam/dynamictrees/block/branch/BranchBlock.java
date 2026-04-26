@@ -34,7 +34,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -65,7 +64,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -438,19 +436,16 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
             cutDir = Direction.DOWN;
         }
 
-        //Pair<Identifier, Integer> cachedState = getCachedSoilState(level, cutPos.offset(cutDir.getUnitVec3i()), false);
-        BlockState soilState = level.getBlockState(cutPos.offset(cutDir.getUnitVec3i()));
+        BlockState soilState = getCachedSoilState(level, cutPos.offset(cutDir.getUnitVec3i()), false);
 
         return new BranchDestructionData(species, stateMapper.getBranchConnectionMap(), destroyedLeaves, leavesDropsList, endPoints, volumeSum.getVolume(), cutPos, cutPos, cutDir, toolDir, trunkHeight, soilState);
     }
 
-    protected static @Nullable Pair<Identifier, Integer> getCachedSoilState(Level level, BlockPos rootPos, boolean hasRoots) {
+    protected static @Nullable BlockState getCachedSoilState(Level level, BlockPos rootPos, boolean hasRoots) {
         BlockState soilState = level.getBlockState(rootPos);
         SoilBlock soilBlock = TreeHelper.getRooty(soilState);
         if (soilBlock != null && soilBlock.fallWithTree(soilState, level, rootPos, hasRoots)){
-            Identifier blockResLoc = BuiltInRegistries.BLOCK.getKey(soilBlock);
-            int stateId = soilBlock.getStateIndex(soilState);
-            return Pair.of(blockResLoc, stateId);
+            return soilState;
         }
         return null;
     }

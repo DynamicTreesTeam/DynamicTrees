@@ -14,10 +14,8 @@ public interface AnimationHandler {
 
     boolean shouldDie(FallingTreeEntity entity);
 
-//    
     void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack);
 
-//    
     boolean shouldRender(FallingTreeEntity entity, double x, double y, double z);
 
 }
