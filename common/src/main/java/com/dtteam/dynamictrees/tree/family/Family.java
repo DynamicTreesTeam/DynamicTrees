@@ -20,17 +20,17 @@ import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
 import com.dtteam.dynamictrees.entity.animation.AnimationHandler;
-import com.dtteam.dynamictrees.platform.services.IConfigHelper;
 import com.dtteam.dynamictrees.systems.cell.MetadataCell;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.Optionals;
+import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
@@ -520,21 +520,21 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.isFireProof = isFireProof;
     }
 
-//    /**
-//     * {@code null} = can harvest with hand
-//     */
-//    @Nullable
-//    public Tier getDefaultBranchHarvestTier() {
-//        return null;
-//    }
-//
-//    /**
-//     * {@code null} = can harvest with hand
-//     */
-//    @Nullable
-//    public Tier getDefaultStrippedBranchHarvestTier() {
-//        return null;
-//    }
+    /**
+     * {@code null} = can harvest with hand
+     */
+    @Nullable
+    public ToolMaterial getDefaultBranchHarvestTier() {
+        return null;
+    }
+
+    /**
+     * {@code null} = can harvest with hand
+     */
+    @Nullable
+    public ToolMaterial getDefaultStrippedBranchHarvestTier() {
+        return null;
+    }
 
     @Deprecated(forRemoval = true)
     public MapColor getDefaultBranchMapColor() {
@@ -800,51 +800,51 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
                 Collections.singletonList(DTBlockTags.STRIPPED_BRANCHES_THAT_BURN);
     }
 
-//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-//        getBranch().ifPresent(branch -> {
-//            tierTag(getDefaultBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(branch));
-//            defaultBranchTags().forEach(tag -> {
-//                if (!isOnlyIfLoaded()) {
-//                    tagAppender.apply(tag).add(branch);
-//                } else {
-//                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(branch));
-//                }
-//            });
-//        });
-//
-//        // Create stripped branch tag and harvest tag if the family has a stripped branch.
-//        getStrippedBranch().ifPresent(strippedBranch -> {
-//            tierTag(getDefaultStrippedBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(strippedBranch));
-//            defaultStrippedBranchTags().forEach(tag ->
-//            {
-//                if (!isOnlyIfLoaded()) {
-//                    tagAppender.apply(tag).add(strippedBranch);
-//                } else {
-//                    tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(strippedBranch));
-//                }
-//            });
-//        });
-//    }
-//
-//    protected Optional<IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tierTag(@Nullable Tier tier, Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender) {
-//        if (tier == null)
-//            return Optional.empty();
-//
-//        TagKey<Block> tag = tier.getIncorrectBlocksForDrops();
-//
-//        return Optional.of(tagAppender.apply(tag));
-//    }
-//
-//    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
-//        getBranchItem().ifPresent(item -> {
-//                    if (!isOnlyIfLoaded()) {
-//                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).add(item));
-//                    } else {
-//                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(item)));
-//                    }
-//                }
-//        );
-//    }
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
+        getBranch().ifPresent(branch -> {
+            tierTag(getDefaultBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(branch));
+            defaultBranchTags().forEach(tag -> {
+                if (!isOnlyIfLoaded()) {
+                    tagAppender.apply(tag).add(branch);
+                } else {
+                    tagAppender.apply(tag).addOptional(branch);
+                }
+            });
+        });
+
+        // Create stripped branch tag and harvest tag if the family has a stripped branch.
+        getStrippedBranch().ifPresent(strippedBranch -> {
+            tierTag(getDefaultStrippedBranchHarvestTier(), tagAppender).ifPresent(tagBuilder -> tagBuilder.add(strippedBranch));
+            defaultStrippedBranchTags().forEach(tag ->
+            {
+                if (!isOnlyIfLoaded()) {
+                    tagAppender.apply(tag).add(strippedBranch);
+                } else {
+                    tagAppender.apply(tag).addOptional(strippedBranch);
+                }
+            });
+        });
+    }
+
+    protected Optional<TagAppender<Block, Block>> tierTag(@Nullable ToolMaterial tier, Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender) {
+        if (tier == null)
+            return Optional.empty();
+
+        TagKey<Block> tag = tier.incorrectBlocksForDrops();
+
+        return Optional.of(tagAppender.apply(tag));
+    }
+
+    public void addGeneratedItemTags (Function<TagKey<Item>, TagAppender<Item, Item>> tagAppender){
+        getBranchItem().ifPresent(item -> {
+                    if (!isOnlyIfLoaded()) {
+                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).add(item));
+                    } else {
+                        defaultBranchItemTags().forEach(tag -> tagAppender.apply(tag).addOptional(item));
+                    }
+                }
+        );
+    }
 
     ///////////////////////////////////////////
     // DATA GENERATION
@@ -885,7 +885,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public Identifier getRootItemParentLocation() {return DynamicTrees.location("item/root_branch");}
 
     @Override
-    public void generateStateData(DTDataProvider.BlockState provider) {
+    public void generateStateData(BlockModelGenerators generator, DTDataProvider.BlockState provider) {
         // Generate branch block state and model.
         this.branchStateGenerator.get().generate(provider, this);
         this.strippedBranchStateGenerator.get().generate(provider, this);

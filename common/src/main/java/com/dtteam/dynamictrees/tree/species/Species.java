@@ -75,6 +75,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -82,6 +83,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.tags.TagAppender;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
@@ -2334,7 +2336,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             ));
 
     @Override
-    public void generateStateData(DTDataProvider.BlockState provider) {
+    public void generateStateData(BlockModelGenerators generators, DTDataProvider.BlockState provider) {
         // Generate sapling block state and model.
         this.saplingStateGenerator.get().generate(provider, this);
     }
@@ -2406,35 +2408,35 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         return DynamicTrees.location("item/standard_seed");
     }
 
-//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-//        // Create dynamic sapling block tags.
-//        getSapling().ifPresent(sapling ->
-//                defaultSaplingTags().forEach(tag -> {
-//                    if (!isOnlyIfLoaded()) {
-//                        tagAppender.apply(tag).add(sapling);
-//                    } else {
-//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(sapling));
-//                    }
-//                })
-//        );
-//    }
-//
-//    public void addGeneratedItemTags (Function<TagKey<Item>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item>> tagAppender){
-//        // Some species return the common seed, so only return if the species has its own seed.
-//        if (!hasSeed()) {
-//            return;
-//        }
-//        // Create seed item tag.
-//        getSeed().ifPresent(seed ->
-//                defaultSeedTags().forEach(tag ->{
-//                    if (!isOnlyIfLoaded()) {
-//                        tagAppender.apply(tag).add(seed);
-//                    } else {
-//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.ITEM.getKey(seed));
-//                    }
-//                })
-//        );
-//    }
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
+        // Create dynamic sapling block tags.
+        getSapling().ifPresent(sapling ->
+                defaultSaplingTags().forEach(tag -> {
+                    if (!isOnlyIfLoaded()) {
+                        tagAppender.apply(tag).add(sapling);
+                    } else {
+                        tagAppender.apply(tag).addOptional(sapling);
+                    }
+                })
+        );
+    }
+
+    public void addGeneratedItemTags (Function<TagKey<Item>, TagAppender<Item, Item>> tagAppender){
+        // Some species return the common seed, so only return if the species has its own seed.
+        if (!hasSeed()) {
+            return;
+        }
+        // Create seed item tag.
+        getSeed().ifPresent(seed ->
+                defaultSeedTags().forEach(tag ->{
+                    if (!isOnlyIfLoaded()) {
+                        tagAppender.apply(tag).add(seed);
+                    } else {
+                        tagAppender.apply(tag).addOptional(seed);
+                    }
+                })
+        );
+    }
 
     public boolean shouldGenerateVoluntaryDrops() {
         return this.seed != null;

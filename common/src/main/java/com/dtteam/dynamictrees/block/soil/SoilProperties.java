@@ -13,6 +13,8 @@ import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
@@ -24,6 +26,7 @@ import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.dtteam.dynamictrees.utility.IdentifierUtils.prefix;
@@ -253,7 +256,7 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
             ));
 
     @Override
-    public void generateStateData(DTDataProvider.BlockState provider) {
+    public void generateStateData(BlockModelGenerators generators, DTDataProvider.BlockState provider) {
         // Generate soil state and model.
         this.soilStateGenerator.get().generate(provider, this);
     }
@@ -292,29 +295,17 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
         this.onlyIfLoaded.add(onlyIfLoaded);
     }
 
-//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-//        // add rooty blocks to the rooty soil tag.
-//        getBlock().ifPresent(rootyBlock ->
-//                defaultSoilBlockTags().forEach(tag -> {
-//                    if (!isOnlyIfLoaded()) {
-//                        tagAppender.apply(tag).add(rootyBlock);
-//                    } else {
-//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(rootyBlock));
-//                    }
-//                }));
-//    }
-
-
-    ///////////////////////////////////////////
-    // ROOT COLORS
-    ///////////////////////////////////////////
-
-//    public List<Identifier> tintSources(){
-//        List<Identifier> sources = new ArrayList<>();
-//        sources.add(DynamicTrees.location("clone_primitive_soil"));
-//        sources.add(DynamicTrees.location("soil_roots"));
-//        return sources;
-//    }
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
+        // add rooty blocks to the rooty soil tag.
+        getBlock().ifPresent(rootyBlock ->
+                defaultSoilBlockTags().forEach(tag -> {
+                    if (!isOnlyIfLoaded()) {
+                        tagAppender.apply(tag).add(rootyBlock);
+                    } else {
+                        tagAppender.apply(tag).addOptional(rootyBlock);
+                    }
+                }));
+    }
 
     //////////////////////////////
     // JAVA OBJECT STUFF

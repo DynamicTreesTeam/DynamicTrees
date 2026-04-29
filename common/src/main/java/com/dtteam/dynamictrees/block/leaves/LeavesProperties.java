@@ -23,9 +23,11 @@ import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.tags.TagKey;
@@ -53,8 +55,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -282,7 +285,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
             ));
 
     @Override
-    public void generateStateData(DTDataProvider.BlockState provider) {
+    public void generateStateData(BlockModelGenerators generators, DTDataProvider.BlockState provider) {
         // Generate leaves block state and model.
         this.leavesStateGenerator.get().generate(provider, this);
     }
@@ -689,16 +692,16 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
                 Pair.of("connectAnyRadius", this.connectAnyRadius));
     }
 
-//    public void addGeneratedBlockTags (Function<TagKey<Block>, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> tagAppender){
-//        getDynamicLeavesBlock().ifPresent(leaves ->
-//                defaultLeavesTags().forEach(tag -> {
-//                    if (isOnlyIfLoaded()) {
-//                        tagAppender.apply(tag).addOptional(BuiltInRegistries.BLOCK.getKey(leaves));
-//                    } else {
-//                        tagAppender.apply(tag).add(leaves);
-//                    }
-//                })
-//        );
-//    }
+    public void addGeneratedBlockTags (Function<TagKey<Block>, TagAppender<Block, Block>> tagAppender){
+        getDynamicLeavesBlock().ifPresent(leaves ->
+                defaultLeavesTags().forEach(tag -> {
+                    if (isOnlyIfLoaded()) {
+                        tagAppender.apply(tag).addOptional(leaves);
+                    } else {
+                        tagAppender.apply(tag).add(leaves);
+                    }
+                })
+        );
+    }
 
 }

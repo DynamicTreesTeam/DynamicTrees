@@ -8,6 +8,7 @@ import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
+import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -52,7 +53,7 @@ public class PalmLeavesProperties extends LeavesProperties {
             ));
 
     @Override
-    public void generateStateData(DTDataProvider.BlockState provider) {
+    public void generateStateData(BlockModelGenerators generators, DTDataProvider.BlockState provider) {
         // Generate leaves block state and model.
         this.frondsStateGenerator.get().generate(provider, this);
     }

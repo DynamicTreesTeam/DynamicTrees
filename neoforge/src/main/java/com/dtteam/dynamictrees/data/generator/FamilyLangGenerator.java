@@ -21,12 +21,8 @@ public class FamilyLangGenerator implements Generator<DTDataProvider.Language, F
         if (prov instanceof DTLangProvider provider1) {
             this.provider = provider1;
             input.getBranch().ifPresent(branch -> treeLang(branch, input, input.getLangOverride("branch")));
-//        if(input.hasSurfaceRoot()){
-//            blockLang(input.getSurfaceRoot().get(), input.getLangOverride("surface_root"));
-//        }
             if(input instanceof UndergroundRootsFamily mgf){
                 mgf.getRoots().ifPresent(root -> treeLang(root, input, input.getLangOverride("roots")));
-                //mgf.getDefaultSoil().getBlock().ifPresent(soil -> blockLang(soil, input.getLangOverride("soil")));
             }
         }
     }

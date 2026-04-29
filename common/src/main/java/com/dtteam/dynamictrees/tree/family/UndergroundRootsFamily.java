@@ -15,10 +15,9 @@ import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.utility.Optionals;
+import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
@@ -29,12 +28,10 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.dtteam.dynamictrees.utility.IdentifierUtils.suffix;
@@ -139,8 +136,8 @@ public class UndergroundRootsFamily extends Family {
             ));
 
     @Override
-    public void generateStateData(DTDataProvider.BlockState provider) {
-        super.generateStateData(provider);
+    public void generateStateData(BlockModelGenerators generators, DTDataProvider.BlockState provider) {
+        super.generateStateData(generators, provider);
         this.rootsStateGenerator.get().generate(provider, this);
     }
 
