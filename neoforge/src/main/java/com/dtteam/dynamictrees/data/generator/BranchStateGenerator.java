@@ -28,11 +28,13 @@ public class BranchStateGenerator implements Generator<BlockModelGenerators, Fam
         final Block primitiveLog = dependencies.get(PRIMITIVE_LOG);
         Identifier primitiveLogPath = Generator.blockPath(BuiltInRegistries.BLOCK.getKey(primitiveLog));
 
-        Map<String, Identifier> textures = new HashMap<>();
+        final Map<String, Identifier> textures = new HashMap<>();
         input.addBranchTextures(textures::put, primitiveLogPath, primitiveLog);
 
+        BranchLoaderBuilder builder = BranchLoaderBuilder.branchBuilders.get(input.getBranchLoader()).apply(textures, input);
+
         generator.blockStateOutput.accept(
-                MultiVariantGenerator.dispatch(branch, MultiVariant.of(new BranchLoaderBuilder(textures))));
+                MultiVariantGenerator.dispatch(branch, MultiVariant.of(builder)));
     }
 
     @Override

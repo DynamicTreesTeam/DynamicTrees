@@ -25,6 +25,8 @@ import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.Optionals;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.core.BlockPos;
@@ -81,6 +83,8 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public static final HashMap<Identifier, Supplier<Generator<BlockModelGenerators, Family>>> blockStateGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<ItemModelGenerators, Family>>> itemModelGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, Family>>> languageGenerators = new HashMap<>();
+
+    public static final Codec<Family> CODEC = Identifier.CODEC.comapFlatMap(Family::read, Family::getRegistryName);
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(Family::new);
 
@@ -202,6 +206,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public Family(Identifier name) {
         this.setRegistryName(name);
         this.commonSpecies = Species.NULL_SPECIES;
+    }
+
+    private static DataResult<Family> read(Identifier name) {
+        final Family family = Family.REGISTRY.get(name);
+        return family == null ? DataResult.error(() -> "Family not found: " + name) : DataResult.success(family);
     }
 
     public void setupBlocks() {
@@ -339,7 +348,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     /**
      * Creates branch block and adds it to the relevant {@link RegistryHandler}.
      *
-     * @param name The {@link Identifier} registry name.
+     * @param id The {@link Identifier} registry name.
      * @return The created {@link BranchBlock}.
      */
     protected Supplier<BranchBlock> createBranch(final Identifier id) {

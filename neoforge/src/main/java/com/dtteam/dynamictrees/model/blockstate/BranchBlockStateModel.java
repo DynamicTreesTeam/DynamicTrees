@@ -3,24 +3,16 @@ package com.dtteam.dynamictrees.model.blockstate;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.model.BlockStateModelWithConnectionData;
 import com.dtteam.dynamictrees.model.ModelConnections;
-import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPartCore;
-import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPartSleeve;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPart;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.DynamicBlockStateModel;
-import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,9 +20,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public record BranchBlockStateModel(
-        BranchBlockStateModelPartCore[][] cores,
-        BranchBlockStateModelPartSleeve[][] sleeves,
-        BranchBlockStateModelPartCore[] rings,
+        BranchBlockStateModelPart[][] cores,
+        BranchBlockStateModelPart[][] sleeves,
+        BranchBlockStateModelPart[] rings,
         Material.Baked particleMaterial
 ) implements DynamicBlockStateModel, BlockStateModelWithConnectionData {
 
@@ -74,7 +66,7 @@ public record BranchBlockStateModel(
             final Direction sourceDir = getSourceDir(coreRadius, connections);
             final int coreDir = resolveCoreDir(sourceDir);
 
-            // This is for drawing the rings on a terminating branch.
+            // This is for drawing the isRings on a terminating branch.
             final Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
 
             for (Direction face : Direction.values()) {
@@ -159,52 +151,4 @@ public record BranchBlockStateModel(
         return ((BranchBlock) blockState.getBlock()).getRadius(blockState);
     }
 
-    public record Unbaked(Identifier barkTexture, Identifier ringsTexture) implements CustomUnbakedBlockStateModel {
-
-        public static final String BARK_TEXTURE = "bark_texture";
-        public static final String RINGS_TEXTURE = "rings_texture";
-
-        public static final MapCodec<Unbaked> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                Identifier.CODEC.fieldOf(BARK_TEXTURE).forGetter(Unbaked::barkTexture),
-                Identifier.CODEC.fieldOf(RINGS_TEXTURE).forGetter(Unbaked::ringsTexture)
-        ).apply(i, Unbaked::new));
-
-        @Override
-        public MapCodec<? extends CustomUnbakedBlockStateModel> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public void resolveDependencies(ResolvableModel.Resolver resolver) {}
-
-        @Override
-        public BlockStateModel bake(ModelBaker baker) {
-            BranchBlockStateModelPartSleeve[][] sleeves = new BranchBlockStateModelPartSleeve[6][7];
-            BranchBlockStateModelPartCore[][] cores = new BranchBlockStateModelPartCore[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-            BranchBlockStateModelPartCore[] rings = new BranchBlockStateModelPartCore[8]; // 8 Cores with the ring textures on all 6 sides.
-
-            Material.Baked barkMat = baker.materials().get(new Material(barkTexture, false), barkTexture::toDebugFileName);
-            Material.Baked ringsMat = baker.materials().get(new Material(ringsTexture, false), ringsTexture::toDebugFileName);
-
-            BranchBlockStateModelPartCore.Unbaked unbakedCores = new BranchBlockStateModelPartCore.Unbaked(barkMat, false);
-            BranchBlockStateModelPartSleeve.Unbaked unbakedSleeves = new BranchBlockStateModelPartSleeve.Unbaked(barkMat);
-            BranchBlockStateModelPartCore.Unbaked unbakedRings = new BranchBlockStateModelPartCore.Unbaked(ringsMat, false);
-
-            for (int i = 0; i < 8; i++) {
-                int radius = i + 1;
-                if (radius < 8) {
-                    for (Direction dir : Direction.values()) {
-                        sleeves[dir.get3DDataValue()][i] = unbakedSleeves.bake(baker, radius, dir);
-                    }
-                }
-                cores[0][i] = unbakedCores.bake(baker, radius, Direction.Axis.Y); //DOWN<->UP
-                cores[1][i] = unbakedCores.bake(baker, radius, Direction.Axis.Z); //NORTH<->SOUTH
-                cores[2][i] = unbakedCores.bake(baker, radius, Direction.Axis.X); //WEST<->EAST
-
-                rings[i] = unbakedRings.bake(baker, radius, Direction.Axis.Y);
-            }
-
-            return new BranchBlockStateModel(cores, sleeves, rings, barkMat);
-        }
-    }
 }

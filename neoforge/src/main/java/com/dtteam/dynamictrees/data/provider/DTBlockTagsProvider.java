@@ -76,10 +76,10 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
 
         this.tag(BlockTags.WART_BLOCKS)
                 .addTag(DTBlockTags.WART_BLOCKS);
-//
-//        this.tag(BlockTags.MINEABLE_WITH_AXE)
-//                .addTag(DTBlockTags.ROOTS)
-//                .addTag(DTBlockTags.AERIAL_ROOTS_ROOTY_SOIL);
+
+        this.tag(BlockTags.MINEABLE_WITH_AXE)
+                .addTag(DTBlockTags.ROOTS)
+                .addTag(DTBlockTags.AERIAL_ROOTS_ROOTY_SOIL);
     }
 
     protected void addDTTags() {
