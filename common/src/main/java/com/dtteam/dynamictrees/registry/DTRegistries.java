@@ -16,6 +16,15 @@ import com.dtteam.dynamictrees.entity.LingeringEffectorEntity;
 import com.dtteam.dynamictrees.item.DendroPotion;
 import com.dtteam.dynamictrees.item.DirtBucket;
 import com.dtteam.dynamictrees.item.Staff;
+import com.dtteam.dynamictrees.loot.condition.SeasonalSeedDropChance;
+import com.dtteam.dynamictrees.loot.condition.SpeciesMatches;
+import com.dtteam.dynamictrees.loot.condition.VoluntarySeedDropChance;
+import com.dtteam.dynamictrees.loot.entry.ItemBySpeciesLootPoolEntry;
+import com.dtteam.dynamictrees.loot.entry.SeedItemLootPoolEntry;
+import com.dtteam.dynamictrees.loot.entry.WeightedItemLootPoolEntry;
+import com.dtteam.dynamictrees.loot.function.MultiplyByLogsCount;
+import com.dtteam.dynamictrees.loot.function.MultiplyBySticksCount;
+import com.dtteam.dynamictrees.loot.function.MultiplyCount;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.tree.TreeHelper;
@@ -27,6 +36,7 @@ import com.dtteam.dynamictrees.worldgen.feature.DynamicTreeFeature;
 import com.dtteam.dynamictrees.worldgen.structure.DTCancelVanillaTreePoolElement;
 import com.dtteam.dynamictrees.worldgen.structure.TreePoolElement;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentType;
@@ -150,8 +160,6 @@ public class DTRegistries {
 
     public static final Supplier<EntityType<@NotNull LingeringEffectorEntity>> LINGERING_EFFECTOR = Services.REGISTRY.getRegistryLoader()
             .registerEntity("lingering_effector", EntityType.Builder.of(LingeringEffectorEntity::new, MobCategory.MISC), false);
-//            .setCustomClientFactory((spawnEntity, level) ->
-//                    new LingeringEffectorEntity(level, BlockPos.containing(spawnEntity.getPosX(), spawnEntity.getPosY(), spawnEntity.getPosZ()), null))
 
     ///////////////////////////////////////////
     // TILE ENTITIES
@@ -228,26 +236,26 @@ public class DTRegistries {
     // LOOT
     ///////////////////////////////////////////
 
-//    public static final Supplier<LootItemConditionType> SPECIES_MATCHES = Services.REGISTRY.getRegistryLoader()
-//            .registerLootConditionType("species_matches", SpeciesMatches.CODEC);
-//    public static final Supplier<LootItemConditionType> SEASONAL_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
-//            .registerLootConditionType("seasonal_seed_drop_chance", SeasonalSeedDropChance.CODEC);
-//    public static final Supplier<LootItemConditionType> VOLUNTARY_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
-//            .registerLootConditionType("voluntary_seed_drop_chance", VoluntarySeedDropChance.CODEC);
-//
-//    public static final Supplier<LootPoolEntryType> ITEM_BY_SPECIES = Services.REGISTRY.getRegistryLoader()
-//            .registerLootPoolEntryType("item_by_species", ItemBySpeciesLootPoolEntry.CODEC);
-//    public static final Supplier<LootPoolEntryType> SEED_ITEM = Services.REGISTRY.getRegistryLoader()
-//            .registerLootPoolEntryType("seed_item", SeedItemLootPoolEntry.CODEC);
-//    public static final Supplier<LootPoolEntryType> WEIGHTED_ITEM = Services.REGISTRY.getRegistryLoader()
-//            .registerLootPoolEntryType("weighted_item", WeightedItemLootPoolEntry.CODEC);
-//
-//    public static final Supplier<LootItemFunctionType<MultiplyCount>> MULTIPLY_COUNT = Services.REGISTRY.getRegistryLoader()
-//            .registerLootFunctionType("multiply_count", MultiplyCount.CODEC);
-//    public static final Supplier<LootItemFunctionType<MultiplyByLogsCount>> MULTIPLY_LOGS_COUNT = Services.REGISTRY.getRegistryLoader()
-//            .registerLootFunctionType("multiply_logs_count", MultiplyByLogsCount.CODEC);
-//    public static final Supplier<LootItemFunctionType<MultiplyBySticksCount>> MULTIPLY_STICKS_COUNT = Services.REGISTRY.getRegistryLoader()
-//            .registerLootFunctionType("multiply_sticks_count", MultiplyBySticksCount.CODEC);
+    public static final Supplier<MapCodec<SpeciesMatches>> SPECIES_MATCHES = Services.REGISTRY.getRegistryLoader()
+            .registerLootConditionType("species_matches", SpeciesMatches.CODEC);
+    public static final Supplier<MapCodec<SeasonalSeedDropChance>> SEASONAL_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
+            .registerLootConditionType("seasonal_seed_drop_chance", SeasonalSeedDropChance.CODEC);
+    public static final Supplier<MapCodec<VoluntarySeedDropChance>> VOLUNTARY_SEED_DROP_CHANCE = Services.REGISTRY.getRegistryLoader()
+            .registerLootConditionType("voluntary_seed_drop_chance", VoluntarySeedDropChance.CODEC);
+
+    public static final Supplier<MapCodec<ItemBySpeciesLootPoolEntry>> ITEM_BY_SPECIES = Services.REGISTRY.getRegistryLoader()
+            .registerLootPoolEntryType("item_by_species", ItemBySpeciesLootPoolEntry.CODEC);
+    public static final Supplier<MapCodec<SeedItemLootPoolEntry>> SEED_ITEM = Services.REGISTRY.getRegistryLoader()
+            .registerLootPoolEntryType("seed_item", SeedItemLootPoolEntry.CODEC);
+    public static final Supplier<MapCodec<WeightedItemLootPoolEntry>> WEIGHTED_ITEM = Services.REGISTRY.getRegistryLoader()
+            .registerLootPoolEntryType("weighted_item", WeightedItemLootPoolEntry.CODEC);
+
+    public static final Supplier<MapCodec<MultiplyCount>> MULTIPLY_COUNT = Services.REGISTRY.getRegistryLoader()
+            .registerLootFunctionType("multiply_count", MultiplyCount.CODEC);
+    public static final Supplier<MapCodec<MultiplyByLogsCount>> MULTIPLY_LOGS_COUNT = Services.REGISTRY.getRegistryLoader()
+            .registerLootFunctionType("multiply_logs_count", MultiplyByLogsCount.CODEC);
+    public static final Supplier<MapCodec<MultiplyBySticksCount>> MULTIPLY_STICKS_COUNT = Services.REGISTRY.getRegistryLoader()
+            .registerLootFunctionType("multiply_sticks_count", MultiplyBySticksCount.CODEC);
 
     ///////////////////////////////////////////
     // WORLDGEN

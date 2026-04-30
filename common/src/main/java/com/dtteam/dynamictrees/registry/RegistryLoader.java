@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.registry;
 
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.MutableComponent;
@@ -24,6 +25,9 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import java.util.Set;
 import java.util.function.Function;
@@ -53,11 +57,11 @@ public abstract class RegistryLoader {
     abstract public <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>, I extends ArgumentTypeInfo<A, T>>
     Supplier<I> registerCommandArgumentType(String name, Class<A> infoClass, I argumentTypeInfo);
 
-//    abstract public Supplier<LootItemConditionType> registerLootConditionType(String name, MapCodec<? extends LootItemCondition> serializerFactory);
-//
-//    abstract public Supplier<LootPoolEntryType> registerLootPoolEntryType(String name, MapCodec<? extends LootPoolEntryContainer> serializerFactory);
-//
-//    abstract public <L extends LootItemFunction> Supplier<LootItemFunctionType<L>> registerLootFunctionType(String name, MapCodec<L> serializerFactory);
+    abstract public <L extends LootItemCondition> Supplier<MapCodec<L>> registerLootConditionType(String name, MapCodec<L> serializerFactory);
+
+    abstract public <L extends LootPoolEntryContainer> Supplier<MapCodec<L>> registerLootPoolEntryType(String name, MapCodec<L> serializerFactory);
+
+    abstract public <L extends LootItemFunction> Supplier<MapCodec<L>> registerLootFunctionType(String name, MapCodec<L> serializerFactory);
 
     abstract public <T extends PlacementModifier> Supplier<PlacementModifierType<T>> registerPlacementModifierType(String name, Supplier<PlacementModifierType<T>> supplier);
 

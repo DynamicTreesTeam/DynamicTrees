@@ -1,4 +1,4 @@
-// 1.21.1	2025-12-09T00:46:30.1770573	dynamictrees DT Block Tags
+// 26.1.1	2026-04-30T13:57:11.481706216	dynamictrees DT Block Tags
 89563876084509cc93d596004b67e412d78ebf3b data/dynamictrees/tags/block/aerial_roots_rooty_soil.json
 0852fd1f90777eeab7126995157c4b1242a44700 data/dynamictrees/tags/block/branches.json
 a2572689ed7e96c6b505b27867c5ef842778f52c data/dynamictrees/tags/block/branches_that_burn.json
@@ -6,7 +6,6 @@ a35ba2be56262c0e1c60fe1c229b57c0afbf8fb2 data/dynamictrees/tags/block/foliage.js
 265c9a52b7eb0cfd09154318ed7e17789980c9a6 data/dynamictrees/tags/block/fungus_branches.json
 cf4be9c1ca2574082d949974a51893f920497a90 data/dynamictrees/tags/block/fungus_caps.json
 d5e282c9638555a573bc736c203eaade162ca0ce data/dynamictrees/tags/block/leaves.json
-40de46457ac325dc281c1862bf4d99eb12daec0f data/dynamictrees/tags/block/roots.json
 1df26ecb356d3110588af4d183830f072a5b7f95 data/dynamictrees/tags/block/rooty_soil.json
 c61a0a877b55384cff44acca27bf874fe63a8de1 data/dynamictrees/tags/block/saplings.json
 ef507377a99fc5ec5cc3ca9cdd35486ea719a119 data/dynamictrees/tags/block/stripped_branches.json
@@ -19,6 +18,5 @@ bb90442c6cad4ad25a29f41c20d4540e8bd80799 data/minecraft/tags/block/flower_pots.j
 5d45d3e56c20aa5b2eacc4ae25a9815459a664ef data/minecraft/tags/block/leaves.json
 c6cbc2390b831eca0a8a61bd1a5faee1cf798f13 data/minecraft/tags/block/logs.json
 bc2b505c9efcae8fad28abd2638a512645158332 data/minecraft/tags/block/logs_that_burn.json
-54774cb7e6ab420204d58ad3c265d6ac24eb1046 data/minecraft/tags/block/mineable/axe.json
 b1d094064f3a9f87563f9c43b97ddd084255a7d1 data/minecraft/tags/block/saplings.json
 145d07f74a6f711d7e0f71365129d520a3d65269 data/minecraft/tags/block/wart_blocks.json
