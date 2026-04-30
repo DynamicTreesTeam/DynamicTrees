@@ -9,13 +9,13 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
-import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -82,8 +82,9 @@ public class UndergroundRootsFamily extends Family {
         this.setRootsItem(this.createRootsItem(this.getBranchName(), this.roots));
     }
 
-    protected Supplier<BranchBlock> createRoots(final Identifier name) {
-        return RegistryHandler.addBlock(suffix(name, getRootsNameSuffix()), () -> createRootsBlock(name));
+    protected Supplier<BranchBlock> createRoots(final Identifier id) {
+        Identifier name = suffix(id, getRootsNameSuffix());
+        return RegistryHandler.addBlock(name, () -> createRootsBlock(name));
     }
     protected BranchBlock createRootsBlock(Identifier name) {
         final BasicRootsBlock branch = new BasicRootsBlock(name, this.getProperties());
@@ -126,25 +127,27 @@ public class UndergroundRootsFamily extends Family {
     // DATA GENERATION
     ///////////////////////////////////////////
 
-    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> rootsStateGenerator =
+    protected final MutableLazyValue<Generator<BlockModelGenerators, Family>> rootsStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("roots")
             ));
-    protected final MutableLazyValue<Generator<DTDataProvider.ItemModel, Family>> rootsItemModelGenerator =
+    protected final MutableLazyValue<Generator<ItemModelGenerators, Family>> rootsItemModelGenerator =
             MutableLazyValue.supplied(itemModelGenerators.get(
                     DynamicTrees.location("roots_item")
             ));
 
     @Override
-    public void generateStateData(BlockModelGenerators generators, DTDataProvider.BlockState provider) {
-        super.generateStateData(generators, provider);
-        this.rootsStateGenerator.get().generate(provider, this);
+    public void generateStateData(BlockModelGenerators generators) {
+        super.generateStateData(generators);
+        if (rootsStateGenerator.isPresent())
+            this.rootsStateGenerator.get().generate(generators, this);
     }
 
     @Override
-    public void generateItemModelData(DTDataProvider.ItemModel provider) {
-        super.generateItemModelData(provider);
-        this.rootsItemModelGenerator.get().generate(provider, this);
+    public void generateItemModelData(ItemModelGenerators generators) {
+        super.generateItemModelData(generators);
+        if (rootsItemModelGenerator.isPresent())
+            this.rootsItemModelGenerator.get().generate(generators, this);
     }
 
     public Identifier getBranchItemParentLocation() {

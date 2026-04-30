@@ -14,6 +14,7 @@ import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
@@ -36,8 +37,8 @@ import static com.dtteam.dynamictrees.utility.IdentifierUtils.prefix;
  */
 public class SoilProperties extends RegistryEntry<SoilProperties> implements Resettable<SoilProperties> {
 
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, SoilProperties>>> blockStateGenerators = new HashMap<>();
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, SoilProperties>>> itemModelGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<BlockModelGenerators, SoilProperties>>> blockStateGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<ItemModelGenerators, SoilProperties>>> itemModelGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, SoilProperties>>> languageGenerators = new HashMap<>();
 
     public static final Codec<SoilProperties> CODEC = RecordCodecBuilder.create(instance -> instance
@@ -250,15 +251,16 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     // DATA GENERATION
     ///////////////////////////////////////////
 
-    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, SoilProperties>> soilStateGenerator =
+    protected final MutableLazyValue<Generator<BlockModelGenerators, SoilProperties>> soilStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("soil")
             ));
 
     @Override
-    public void generateStateData(BlockModelGenerators generators, DTDataProvider.BlockState provider) {
+    public void generateStateData(BlockModelGenerators generators) {
         // Generate soil state and model.
-        this.soilStateGenerator.get().generate(provider, this);
+        if (soilStateGenerator.isPresent())
+            this.soilStateGenerator.get().generate(generators, this);
     }
 
     protected HashMap<String, Identifier> textureOverrides = new HashMap<>();

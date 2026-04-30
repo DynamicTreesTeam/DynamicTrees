@@ -552,7 +552,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
     }
 
     public LootTable.Builder createBranchDrops(HolderLookup.Provider registries) {
-        return DTLootTableBuilder.createBranchDrops(getPrimitiveLog().get(), family.getStick(1).getItem(), registries);
+        return DTLootTableBuilder.createBranchDrops(getPrimitiveLog().get(), family.getStick(), registries);
     }
 
     public float getPrimitiveLogs(float volumeIn, List<ItemStack> drops) {

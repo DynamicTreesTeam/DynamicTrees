@@ -26,6 +26,7 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -77,8 +78,8 @@ import static com.dtteam.dynamictrees.utility.IdentifierUtils.*;
  */
 public class Family extends RegistryEntry<Family> implements Resettable<Family> {
 
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, Family>>> blockStateGenerators = new HashMap<>();
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, Family>>> itemModelGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<BlockModelGenerators, Family>>> blockStateGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<ItemModelGenerators, Family>>> itemModelGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, Family>>> languageGenerators = new HashMap<>();
 
     public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(Family::new);
@@ -99,7 +100,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         }
 
         @Override
-        public ItemStack getStick(int qty) {
+        public ItemStack getStickStack(int qty) {
             return ItemStack.EMPTY;
         }
 
@@ -341,8 +342,9 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @param name The {@link Identifier} registry name.
      * @return The created {@link BranchBlock}.
      */
-    protected Supplier<BranchBlock> createBranch(final Identifier name) {
-        return RegistryHandler.addBlock(suffix(name, getBranchNameSuffix()), () -> createBranchBlock(name));
+    protected Supplier<BranchBlock> createBranch(final Identifier id) {
+        Identifier name = suffix(id, getBranchNameSuffix());
+        return RegistryHandler.addBlock(name, () -> createBranchBlock(name));
     }
 
     /**
@@ -456,8 +458,12 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
      * @param qty Number of sticks
      * @return an {@link ItemStack} of sticky things
      */
-    public ItemStack getStick(int qty) {
+    public ItemStack getStickStack(int qty) {
         return this.stick == Items.AIR ? ItemStack.EMPTY : new ItemStack(this.stick, Mth.clamp(qty, 0, 64));
+    }
+
+    public Item getStick() {
+        return stick;
     }
 
     /**
@@ -860,19 +866,19 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return DynamicTrees.location("roots");
     }
 
-    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> branchStateGenerator =
+    protected final MutableLazyValue<Generator<BlockModelGenerators, Family>> branchStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("branch")
             ));
-    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> strippedBranchStateGenerator =
+    protected final MutableLazyValue<Generator<BlockModelGenerators, Family>> strippedBranchStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("stripped_branch")
             ));
-    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Family>> surfaceRootStateGenerator =
+    protected final MutableLazyValue<Generator<BlockModelGenerators, Family>> surfaceRootStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("surface_root")
             ));
-    protected final MutableLazyValue<Generator<DTDataProvider.ItemModel, Family>> branchItemModelGenerator =
+    protected final MutableLazyValue<Generator<ItemModelGenerators, Family>> branchItemModelGenerator =
             MutableLazyValue.supplied(itemModelGenerators.get(
                     DynamicTrees.location("branch_item")
             ));
@@ -885,22 +891,27 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     public Identifier getRootItemParentLocation() {return DynamicTrees.location("item/root_branch");}
 
     @Override
-    public void generateStateData(BlockModelGenerators generator, DTDataProvider.BlockState provider) {
+    public void generateStateData(BlockModelGenerators generators) {
         // Generate branch block state and model.
-        this.branchStateGenerator.get().generate(provider, this);
-        this.strippedBranchStateGenerator.get().generate(provider, this);
+        if (branchStateGenerator.isPresent())
+            this.branchStateGenerator.get().generate(generators, this);
+        if (strippedBranchStateGenerator.isPresent())
+            this.strippedBranchStateGenerator.get().generate(generators, this);
 
         // Generate surface root block state and model.
-        this.surfaceRootStateGenerator.get().generate(provider, this);
+        if (surfaceRootStateGenerator.isPresent())
+            this.surfaceRootStateGenerator.get().generate(generators, this);
     }
     @Override
-    public void generateItemModelData(DTDataProvider.ItemModel provider) {
+    public void generateItemModelData(ItemModelGenerators generators) {
         // Generate branch item models.
-        this.branchItemModelGenerator.get().generate(provider, this);
+        if (branchItemModelGenerator.isPresent())
+            this.branchItemModelGenerator.get().generate(generators, this);
     }
     @Override
     public void generateLangData(DTDataProvider.Language provider) {
-        this.familyLangGenerator.get().generate(provider, this);
+        if (familyLangGenerator.isPresent())
+            this.familyLangGenerator.get().generate(provider, this);
     }
 
     protected List<String> onlyIfLoaded = new ArrayList<>();

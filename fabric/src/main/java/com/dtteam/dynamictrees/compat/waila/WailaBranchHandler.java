@@ -122,7 +122,7 @@ public class WailaBranchHandler implements IBlockComponentProvider {
                     }
                 }
                 if (las.sticks > 0) {
-                    ItemStack stickStack = species.getFamily().getStick(las.sticks);
+                    ItemStack stickStack = species.getFamily().getStickStack(las.sticks);
                     if (!stickStack.isEmpty()) {
                         elements.add(getElement(stickStack));
                     }

@@ -24,6 +24,7 @@ import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -68,8 +69,8 @@ import java.util.function.Supplier;
  */
 public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties> {
 
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, LeavesProperties>>> blockStateGenerators = new HashMap<>();
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, LeavesProperties>>> itemModelGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<BlockModelGenerators, LeavesProperties>>> blockStateGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<ItemModelGenerators, LeavesProperties>>> itemModelGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, LeavesProperties>>> languageGenerators = new HashMap<>();
 
     public static final Codec<LeavesProperties> CODEC = RecordCodecBuilder.create(instance -> instance
@@ -234,9 +235,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     public LootTable.Builder createBlockDrops(HolderLookup.Provider registries) {
         if (primitiveLeaves != null && getPrimitiveLeavesBlock().isPresent()) {
-            return DTLootTableBuilder.createLeavesBlockDrops(primitiveLeaves.getBlock(), seedDropChances, getFamily().getStick(1).getItem(), registries);
+            return DTLootTableBuilder.createLeavesBlockDrops(primitiveLeaves.getBlock(), seedDropChances, getFamily().getStick(), registries);
         }
-        return DTLootTableBuilder.createLeavesDrops(seedDropChances, LootContextParamSets.BLOCK, getFamily().getStick(1).getItem(), registries);
+        return DTLootTableBuilder.createLeavesDrops(seedDropChances, LootContextParamSets.BLOCK, getFamily().getStick(), registries);
     }
 
     private final LootTableSupplier lootTableSupplier;
@@ -254,7 +255,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     }
 
     public LootTable.Builder createDrops(HolderLookup.Provider registries) {
-        return DTLootTableBuilder.createLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES, getFamily().getStick(1).getItem(), registries);
+        return DTLootTableBuilder.createLeavesDrops(seedDropChances, DTLootParameterSets.LEAVES, getFamily().getStick(), registries);
     }
 
     public List<ItemStack> getDrops(Level level, BlockPos pos, ItemStack tool, Species species) {
@@ -275,7 +276,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
                 .create(DTLootParameterSets.LEAVES);
     }
 
-    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, LeavesProperties>> leavesStateGenerator =
+    protected final MutableLazyValue<Generator<BlockModelGenerators, LeavesProperties>> leavesStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("leaves")
             ));
@@ -285,9 +286,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
             ));
 
     @Override
-    public void generateStateData(BlockModelGenerators generators, DTDataProvider.BlockState provider) {
+    public void generateStateData(BlockModelGenerators generators) {
         // Generate leaves block state and model.
-        this.leavesStateGenerator.get().generate(provider, this);
+        this.leavesStateGenerator.get().generate(generators, this);
     }
 
     @Override

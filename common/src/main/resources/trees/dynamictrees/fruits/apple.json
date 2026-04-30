@@ -1,5 +1,5 @@
 {
-  "item_stack": "apple",
+  "item": "apple",
   "block_shapes": [
     { "function": "fruit", "parameters": { "width": 2, "height": 1, "stem_length": 0 } },
     { "function": "fruit", "parameters": { "width": 3, "height": 3, "stem_length": 0 } },

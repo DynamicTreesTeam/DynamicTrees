@@ -24,16 +24,16 @@ public final class GatherDataHelper {
     }
     public static void gatherClientData(final String modId, final GatherDataEvent.Client event, Registry<?>... registries) {
         gatherLangData(modId, event, registries);
-        gatherBlockStateAndModelData(modId, event, registries);
-        gatherItemModelData(modId, event, registries);
-    }
-
-    public static void gatherServerData(final String modId, final GatherDataEvent.Server event, Registry<?>... registries) {
+        gatherSpriteAndModelData(modId, event, registries);
         gatherTagData(modId, event);
         gatherLootData(modId, event);
     }
 
-    public static void gatherTagData(final String modId, final GatherDataEvent.Server event) {
+    public static void gatherServerData(final String modId, final GatherDataEvent.Server event, Registry<?>... registries) {
+
+    }
+
+    public static void gatherTagData(final String modId, final GatherDataEvent.Client event) {
         final DataGenerator generator = event.getGenerator();
         PackOutput packOutput = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
@@ -45,22 +45,18 @@ public final class GatherDataHelper {
         generator.addProvider(true, itemTagsProvider);
     }
 
-    public static void gatherBlockStateAndModelData(final String modId, final GatherDataEvent.Client event, Registry<?>... registries) {
+    public static void gatherSpriteAndModelData(final String modId, final GatherDataEvent.Client event, Registry<?>... registries) {
         event.getGenerator().addProvider(true,
                 new DTSpriteSourceProvider(event.getGenerator().getPackOutput(), event.getLookupProvider(), modId, registries));
         event.getGenerator().addProvider(true,
-                new DTBlockStateProvider(event.getGenerator().getPackOutput(), modId, Arrays.asList(registries)));
+                new DTModelProvider(event.getGenerator().getPackOutput(), modId, Arrays.asList(registries)));
     }
 
-    public static void gatherItemModelData(final String modId, final GatherDataEvent.Client event, Registry<?>... registries) {
-        event.getGenerator().addProvider(true,
-                new DTItemModelProvider(event.getGenerator().getPackOutput(), modId, Arrays.asList(registries)));
-    }
-
-    public static void gatherLootData(final String modId, final GatherDataEvent.Server event) {
+    public static void gatherLootData(final String modId, final GatherDataEvent.Client event) {
         event.getGenerator().addProvider(true,
                 new DTLootTableProvider(event.getGenerator().getPackOutput(), modId, event.getLookupProvider()));
     }
+
     public static void gatherLangData(final String modId, final GatherDataEvent.Client event, Registry<?>... registries){
         event.getGenerator().addProvider(true,
                 new DTLangProvider(event.getGenerator().getPackOutput(), modId, Arrays.asList(registries))

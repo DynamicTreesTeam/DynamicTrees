@@ -1,30 +1,22 @@
-//package com.dtteam.dynamictrees.data.generator;
-//
-//import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
-//import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
-//import com.dtteam.dynamictrees.block.leaves.PalmLeavesProperties;
-//import com.dtteam.dynamictrees.data.DTDataProvider;
-//import com.dtteam.dynamictrees.data.Generator;
-//import com.dtteam.dynamictrees.data.builder.PalmLeavesLoaderBuilder;
-//import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
-//import com.dtteam.dynamictrees.utility.IdentifierUtils;
-//import net.minecraft.core.registries.BuiltInRegistries;
-//import net.minecraft.resources.Identifier;
-//import net.minecraft.world.level.block.Block;
-//import net.minecraft.world.level.block.state.properties.IntegerProperty;
-//import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
-//import net.neoforged.neoforge.client.model.generators.ModelFile;
-//
-///**
-// * @author Harley O'Connor
-// */
-//public class PalmLeavesStateGenerator implements Generator<DTDataProvider.BlockState, LeavesProperties> {
-//
-//    public static final DependencyKey<DynamicLeavesBlock> LEAVES = new DependencyKey<>("leaves");
-//    public static final DependencyKey<Block> PRIMITIVE_LEAVES = new DependencyKey<>("primitive_leaves");
-//
-//    @Override
-//    public void generate(DTDataProvider.BlockState prov, LeavesProperties input, Dependencies dependencies) {
+package com.dtteam.dynamictrees.data.generator;
+
+import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
+import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.data.Generator;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.world.level.block.Block;
+
+/**
+ * @author Harley O'Connor
+ */
+public class PalmLeavesStateGenerator implements Generator<BlockModelGenerators, LeavesProperties> {
+
+    public static final DependencyKey<DynamicLeavesBlock> LEAVES = new DependencyKey<>("leaves");
+    public static final DependencyKey<Block> PRIMITIVE_LEAVES = new DependencyKey<>("primitive_leaves");
+
+    @Override
+    public void generate(BlockModelGenerators generators, LeavesProperties input, Dependencies dependencies) {
+        generators.createTrivialCube(dependencies.get(LEAVES));
 //        if (prov instanceof DTBlockStateProvider provider){
 //            Identifier defaultFrondsTexture = provider.block(IdentifierUtils.suffix(input.getRegistryName(), "_frond"));
 //            Identifier defaultCoreTexture = provider.block(IdentifierUtils.suffix(input.getRegistryName(), "_base"));
@@ -75,13 +67,13 @@
 //                    .end();
 //
 //        }
-//    }
-//
-//    @Override
-//    public Dependencies gatherDependencies(LeavesProperties input) {
-//        return new Dependencies()
-//                .append(LEAVES, input.getDynamicLeavesBlock())
-//                .append(PRIMITIVE_LEAVES, input.getPrimitiveLeavesBlock());
-//    }
-//
-//}
+    }
+
+    @Override
+    public Dependencies gatherDependencies(LeavesProperties input) {
+        return new Dependencies()
+                .append(LEAVES, input.getDynamicLeavesBlock())
+                .append(PRIMITIVE_LEAVES, input.getPrimitiveLeavesBlock());
+    }
+
+}

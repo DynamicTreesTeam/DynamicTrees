@@ -6,19 +6,18 @@ import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
-import com.dtteam.dynamictrees.api.season.ClimateZoneType;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.DynamicBlockProperties;
 import com.dtteam.dynamictrees.block.Growable;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
-import com.dtteam.dynamictrees.systems.season.SeasonHelper;
 import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -33,13 +32,11 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.apache.commons.lang3.function.TriFunction;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
 /**
@@ -83,6 +80,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      * up using vanilla loot tables.
      */
     private ItemStack itemStack;
+    private Item item;
 
     private float growthChance = 0.2F;
     private float requiredProductionFactor = 0.3F;
@@ -197,15 +195,21 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
      * @return a copy of this fruit's item stack
      */
     public final ItemStack getItemStack() {
-        if (itemStack == null) {
-            LogManager.getLogger().warn("Invoked too early or item was not set on \"{}\".", getRegistryName());
-            return new ItemStack(Items.AIR);
-        }
-        return itemStack.copy();
+        if (itemStack != null)
+            return itemStack.copy();
+        else if (item != null)
+            return new ItemStack(item);
+        LogManager.getLogger().warn("Invoked too early or item was not set on \"{}\".", getRegistryName());
+        return new ItemStack(Items.AIR);
     }
 
-    public void setItemStack(ItemStack itemStack) {
-        this.itemStack = itemStack;
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    public void setItemStack(ItemStack stack) {
+        this.itemStack = stack;
+        this.item = stack.getItem();
     }
 
     public final float getGrowthChance() {
@@ -294,7 +298,7 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     public LootTable.Builder createBlockDrops(HolderLookup.Provider registries) {
         if (minDropCount > maxDropCount || maxDropCount <= 0)
             throw new IllegalArgumentException("Attempted to create loot tables for "+getRegistryName()+" with an invalid drop count range ["+minDropCount+","+maxDropCount+"].");
-        return DTLootTableBuilder.createFruitPodDrops(block.get(), getItemStack().getItem(), ageProperty, maxAge, minDropCount, maxDropCount, registries);
+        return DTLootTableBuilder.createFruitPodDrops(block.get(), item, ageProperty, maxAge, minDropCount, maxDropCount, registries);
     }
 
     @NotNull

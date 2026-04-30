@@ -19,4 +19,6 @@ public interface MutableLazyValue<T> {
         return new MutableSuppliedLazyValue<>(supplier);
     }
 
+    boolean isPresent();
+
 }

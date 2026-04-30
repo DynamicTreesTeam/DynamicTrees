@@ -1,60 +1,38 @@
 package com.dtteam.dynamictrees.data.builder;
 
-import com.dtteam.dynamictrees.event.handler.ClientModEventHandler;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.dtteam.dynamictrees.model.blockstate.BranchBlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.VariantMutator;
 import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.client.model.generators.template.CustomLoaderBuilder;
+import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
+import net.neoforged.neoforge.client.model.generators.blockstate.CustomBlockStateModelBuilder;
+import net.neoforged.neoforge.client.model.generators.blockstate.UnbakedMutator;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * @author Harley O'Connor
  */
-public final class BranchLoaderBuilder extends CustomLoaderBuilder {
+public final class BranchLoaderBuilder extends CustomBlockStateModelBuilder {
 
-    public static final HashMap<Identifier, Supplier<BranchLoaderBuilder>> branchBuilders = new HashMap<>();
+    private final Map<String, Identifier> textures;
 
-    static {
-        branchBuilders.put(
-                ClientModEventHandler.BRANCH, ()-> new BranchLoaderBuilder(ClientModEventHandler.BRANCH));
-        branchBuilders.put(
-                ClientModEventHandler.SURFACE_ROOT, ()-> new BranchLoaderBuilder(ClientModEventHandler.SURFACE_ROOT));
-        branchBuilders.put(
-                ClientModEventHandler.ROOTS, ()-> new BranchLoaderBuilder(ClientModEventHandler.ROOTS));
+    public BranchLoaderBuilder(Map<String, Identifier> textures) {
+        super();
+        this.textures = textures;
     }
 
-    private final Map<String, String> textures = new LinkedHashMap<>();
-
-    public BranchLoaderBuilder(Identifier loaderId) {
-        super(loaderId, false);
-    }
-
-    public BranchLoaderBuilder texture(String key, Identifier location) {
-        this.textures.put(key, location.toString());
+    @Override
+    public CustomBlockStateModelBuilder with(VariantMutator variantMutator) {
         return this;
     }
 
     @Override
-    protected CustomLoaderBuilder copyInternal() {
-        BranchLoaderBuilder copy = new BranchLoaderBuilder(this.loaderId);
-        copy.textures.putAll(this.textures);
-        return copy;
+    public CustomBlockStateModelBuilder with(UnbakedMutator unbakedMutator) {
+        return this;
     }
 
     @Override
-    public JsonObject toJson(JsonObject json) {
-        json = super.toJson(json);
-
-        final JsonObject textures = new JsonObject();
-        this.textures.forEach((key, location) ->
-                textures.add(key, new JsonPrimitive(location)));
-        json.add("textures", textures);
-
-        return json;
+    public CustomUnbakedBlockStateModel toUnbaked() {
+        return new BranchBlockStateModel.Unbaked(textures.get("bark"), textures.get("rings"));
     }
-
 }

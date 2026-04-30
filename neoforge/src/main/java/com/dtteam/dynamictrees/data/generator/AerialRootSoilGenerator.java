@@ -1,26 +1,20 @@
-//package com.dtteam.dynamictrees.data.generator;
-//
-//import com.dtteam.dynamictrees.DynamicTrees;
-//import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
-//import com.dtteam.dynamictrees.block.soil.SoilProperties;
-//import com.dtteam.dynamictrees.data.DTDataProvider;
-//import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
-//import com.dtteam.dynamictrees.tree.family.Family;
-//import com.dtteam.dynamictrees.utility.IdentifierUtils;
-//import net.minecraft.resources.Identifier;
-//import net.minecraft.world.level.block.Block;
-//import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
-//import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-//import net.neoforged.neoforge.client.model.generators.VariantBlockStateBuilder;
-//
-///**
-// * @author Max Hyper
-// */
-//public final class AerialRootSoilGenerator extends SoilStateGenerator {
-//
-//    public static final DependencyKey<Block> ROOTS = new DependencyKey<>("roots");
-//    @Override
-//    public void generate(DTDataProvider.BlockState prov, SoilProperties input, Dependencies dependencies) {
+package com.dtteam.dynamictrees.data.generator;
+
+import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
+import com.dtteam.dynamictrees.block.soil.SoilProperties;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.world.level.block.Block;
+
+/**
+ * @author Max Hyper
+ */
+public final class AerialRootSoilGenerator extends SoilStateGenerator {
+
+    public static final DependencyKey<Block> ROOTS = new DependencyKey<>("roots");
+
+    @Override
+    public void generate(BlockModelGenerators generators, SoilProperties input, Dependencies dependencies) {
+        generators.createTrivialCube(dependencies.get(SOIL));
 //        if (prov instanceof DTBlockStateProvider provider){
 //            VariantBlockStateBuilder builder = provider.getVariantBuilder(dependencies.get(SOIL));
 //            for (int i=1; i<=8; i++){
@@ -33,17 +27,17 @@
 //                        ).addModel();
 //            }
 //        }
-//    }
-//
-//    @Override
-//    public Dependencies gatherDependencies(SoilProperties input) {
-//        AerialRootsSoilProperties aerialInput = (AerialRootsSoilProperties) input;
-//        return new Dependencies()
-//                .append(SOIL, input.getBlock())
-//                .append(PRIMITIVE_SOIL, input.getPrimitiveSoilBlockOptional())
-//                .append(ROOTS, aerialInput.getFamily().getPrimitiveRoots());
-//    }
-//
+    }
+
+    @Override
+    public Dependencies gatherDependencies(SoilProperties input) {
+        AerialRootsSoilProperties aerialInput = (AerialRootsSoilProperties) input;
+        return new Dependencies()
+                .append(SOIL, input.getBlock())
+                .append(PRIMITIVE_SOIL, input.getPrimitiveSoilBlockOptional())
+                .append(ROOTS, aerialInput.getFamily().getPrimitiveRoots());
+    }
+
 //    private BlockModelBuilder soilModelBuilder(BlockStateProvider provider, SoilProperties input, int radius, String name, Block primitiveBlock, Block roots) {
 //        AerialRootsSoilProperties aerialInput = (AerialRootsSoilProperties)input;
 //        Identifier side = aerialInput.getFamily().getTexturePath(Family.BRANCH).orElse(provider.blockTexture(primitiveBlock));
@@ -58,5 +52,5 @@
 //        input.getTexturePath(SoilProperties.ROOTS).ifPresent((r)->builder.texture("roots", r));
 //        return builder;
 //    }
-//
-//}
+
+}

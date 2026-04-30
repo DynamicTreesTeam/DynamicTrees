@@ -1,12 +1,15 @@
 package com.dtteam.dynamictrees.data;
 
 import net.minecraft.data.DataProvider;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.dtteam.dynamictrees.utility.IdentifierUtils.prefix;
 
 /**
  * A generator for a resource, providing the means to construct a Json file using provided {@link Dependencies} and
@@ -16,7 +19,7 @@ import java.util.Optional;
  * @param <I> the type of the input to get the dependencies from
  * @author Harley O'Connor
  */
-public interface Generator<P extends DTDataProvider, I> {
+public interface Generator<P, I> {
 
     /**
      * Gathers dependencies from the specified {@code input}, then generating the relevant files if dependencies and
@@ -35,7 +38,7 @@ public interface Generator<P extends DTDataProvider, I> {
     }
 
     /**
-     * Handles generating the relevant files. External invokers should prefer using {@link #generate(DTDataProvider, Object)}
+     * Handles generating the relevant files. External invokers should prefer using {@link #generate(Object, Object)}
      * to this method since it gathers dependencies automatically.
      *
      * @param provider the provider to use to generate
@@ -187,6 +190,14 @@ public interface Generator<P extends DTDataProvider, I> {
                     .map(Map.Entry::getValue)
                     .allMatch(Optional::isPresent);
         }
+    }
+
+    static Identifier blockPath(Identifier blockLocation) {
+        return prefix(blockLocation, "block/");
+    }
+
+    static Identifier itemPath(Identifier identifier) {
+        return prefix(identifier, "item/");
     }
 
 }

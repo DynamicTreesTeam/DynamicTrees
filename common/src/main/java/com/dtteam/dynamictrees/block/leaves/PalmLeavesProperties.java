@@ -4,7 +4,6 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
@@ -47,15 +46,15 @@ public class PalmLeavesProperties extends LeavesProperties {
     }
     public Identifier getFrondLoader () { return frondLoader; }
 
-    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, LeavesProperties>> frondsStateGenerator =
+    protected final MutableLazyValue<Generator<BlockModelGenerators, LeavesProperties>> frondsStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("palm_fronds")
             ));
 
     @Override
-    public void generateStateData(BlockModelGenerators generators, DTDataProvider.BlockState provider) {
+    public void generateStateData(BlockModelGenerators generators) {
         // Generate leaves block state and model.
-        this.frondsStateGenerator.get().generate(provider, this);
+        this.frondsStateGenerator.get().generate(generators, this);
     }
 
     public String getFrondsModelName(){

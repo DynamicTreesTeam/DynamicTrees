@@ -21,4 +21,8 @@ public class SuppliedLazyValue<T> implements LazyValue<T> {
         return this.object;
     }
 
+    public boolean isPresent(){
+        return supplier != null;
+    }
+
 }

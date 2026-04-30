@@ -76,6 +76,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -134,8 +135,8 @@ import java.util.stream.Collectors;
 
 public class Species extends RegistryEntry<Species> implements Resettable<Species> {
 
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.BlockState, Species>>> blockStateGenerators = new HashMap<>();
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.ItemModel, Species>>> itemModelGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<BlockModelGenerators, Species>>> blockStateGenerators = new HashMap<>();
+    public static final HashMap<Identifier, Supplier<Generator<ItemModelGenerators, Species>>> itemModelGenerators = new HashMap<>();
     public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, Species>>> languageGenerators = new HashMap<>();
 
     public static final Codec<Species> CODEC = Identifier.CODEC.comapFlatMap(Species::read, Species::getRegistryName);
@@ -2322,11 +2323,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     ///////////////////////////////////////////
     //region data-generation
 
-    protected final MutableLazyValue<Generator<DTDataProvider.BlockState, Species>> saplingStateGenerator =
+    protected final MutableLazyValue<Generator<BlockModelGenerators, Species>> saplingStateGenerator =
             MutableLazyValue.supplied(blockStateGenerators.get(
                     DynamicTrees.location("sapling")
             ));
-    protected final MutableLazyValue<Generator<DTDataProvider.ItemModel, Species>> seedItemModelGenerator =
+    protected final MutableLazyValue<Generator<ItemModelGenerators, Species>> seedItemModelGenerator =
             MutableLazyValue.supplied(itemModelGenerators.get(
                     DynamicTrees.location("seed_item")
             ));
@@ -2336,18 +2337,21 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
             ));
 
     @Override
-    public void generateStateData(BlockModelGenerators generators, DTDataProvider.BlockState provider) {
+    public void generateStateData(BlockModelGenerators generators) {
         // Generate sapling block state and model.
-        this.saplingStateGenerator.get().generate(provider, this);
+        if (saplingStateGenerator.isPresent())
+            this.saplingStateGenerator.get().generate(generators, this);
     }
     @Override
-    public void generateItemModelData(DTDataProvider.ItemModel provider) {
+    public void generateItemModelData(ItemModelGenerators generators) {
         // Generate seed models.
-        this.seedItemModelGenerator.get().generate(provider, this);
+        if (seedItemModelGenerator.isPresent())
+            this.seedItemModelGenerator.get().generate(generators, this);
     }
     @Override
     public void generateLangData(DTDataProvider.Language provider) {
-        this.speciesLangGenerator.get().generate(provider, this);
+        if (speciesLangGenerator.isPresent())
+            this.speciesLangGenerator.get().generate(provider, this);
     }
 
     protected List<String> onlyIfLoaded = new ArrayList<>();
@@ -2412,10 +2416,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         // Create dynamic sapling block tags.
         getSapling().ifPresent(sapling ->
                 defaultSaplingTags().forEach(tag -> {
-                    if (!isOnlyIfLoaded()) {
-                        tagAppender.apply(tag).add(sapling);
-                    } else {
+                    if (isOnlyIfLoaded()) {
                         tagAppender.apply(tag).addOptional(sapling);
+                    } else {
+                        tagAppender.apply(tag).add(sapling);
                     }
                 })
         );
@@ -2429,10 +2433,10 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         // Create seed item tag.
         getSeed().ifPresent(seed ->
                 defaultSeedTags().forEach(tag ->{
-                    if (!isOnlyIfLoaded()) {
-                        tagAppender.apply(tag).add(seed);
-                    } else {
+                    if (isOnlyIfLoaded()) {
                         tagAppender.apply(tag).addOptional(seed);
+                    } else {
+                        tagAppender.apply(tag).add(seed);
                     }
                 })
         );

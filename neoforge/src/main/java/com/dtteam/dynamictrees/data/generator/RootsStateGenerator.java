@@ -1,30 +1,25 @@
-//package com.dtteam.dynamictrees.data.generator;
-//
-//import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
-//import com.dtteam.dynamictrees.block.branch.BranchBlock;
-//import com.dtteam.dynamictrees.data.DTDataProvider;
-//import com.dtteam.dynamictrees.data.Generator;
-//import com.dtteam.dynamictrees.data.builder.BranchLoaderBuilder;
-//import com.dtteam.dynamictrees.data.provider.DTBlockStateProvider;
-//import com.dtteam.dynamictrees.tree.family.Family;
-//import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
-//import net.minecraft.core.registries.BuiltInRegistries;
-//import net.minecraft.world.level.block.Block;
-//
-//import java.util.Objects;
-//
-///**
-// * @author Max Hyper
-// */
-//public class RootsStateGenerator implements Generator<DTDataProvider.BlockState, Family> {
-//
-//    public static final DependencyKey<BranchBlock> ROOT = new DependencyKey<>("root");
-//    public static final DependencyKey<Block> PRIMITIVE_ROOT = new DependencyKey<>("primitive_root");
-//    public static final DependencyKey<Block> PRIMITIVE_FILLED_ROOT = new DependencyKey<>("filled_primitive_root");
-//    public static final DependencyKey<Block> PRIMITIVE_COVERED_ROOT = new DependencyKey<>("covered_primitive_root");
-//
-//    @Override
-//    public void generate(DTDataProvider.BlockState prov, Family input, Dependencies dependencies) {
+package com.dtteam.dynamictrees.data.generator;
+
+import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.data.Generator;
+import com.dtteam.dynamictrees.tree.family.Family;
+import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.world.level.block.Block;
+
+/**
+ * @author Max Hyper
+ */
+public class RootsStateGenerator implements Generator<BlockModelGenerators, Family> {
+
+    public static final DependencyKey<BranchBlock> ROOT = new DependencyKey<>("root");
+    public static final DependencyKey<Block> PRIMITIVE_ROOT = new DependencyKey<>("primitive_root");
+    public static final DependencyKey<Block> PRIMITIVE_FILLED_ROOT = new DependencyKey<>("filled_primitive_root");
+    public static final DependencyKey<Block> PRIMITIVE_COVERED_ROOT = new DependencyKey<>("covered_primitive_root");
+
+    @Override
+    public void generate(BlockModelGenerators generators, Family input, Dependencies dependencies) {
+        generators.createTrivialCube(dependencies.get(ROOT));
 //        if (prov instanceof DTBlockStateProvider provider){
 //            final BranchBlock root = dependencies.get(ROOT);
 //            final BranchLoaderBuilder builderExposed = provider.models().getBuilder(
@@ -48,16 +43,16 @@
 //                            .orElse(provider.blockTexture(dependencies.get(PRIMITIVE_COVERED_ROOT)))
 //                    )).addModel();
 //        }
-//    }
-//
-//    @Override
-//    public Dependencies gatherDependencies(Family input) {
-//        UndergroundRootsFamily mangroveInput = (UndergroundRootsFamily) input;
-//        return new Dependencies()
-//                .append(ROOT, mangroveInput.getRoots())
-//                .append(PRIMITIVE_ROOT, mangroveInput.getPrimitiveRoots())
-//                .append(PRIMITIVE_FILLED_ROOT, mangroveInput.getPrimitiveFilledRoots())
-//                .append(PRIMITIVE_COVERED_ROOT, mangroveInput.getPrimitiveCoveredRoots());
-//    }
-//
-//}
+    }
+
+    @Override
+    public Dependencies gatherDependencies(Family input) {
+        UndergroundRootsFamily mangroveInput = (UndergroundRootsFamily) input;
+        return new Dependencies()
+                .append(ROOT, mangroveInput.getRoots())
+                .append(PRIMITIVE_ROOT, mangroveInput.getPrimitiveRoots())
+                .append(PRIMITIVE_FILLED_ROOT, mangroveInput.getPrimitiveFilledRoots())
+                .append(PRIMITIVE_COVERED_ROOT, mangroveInput.getPrimitiveCoveredRoots());
+    }
+
+}

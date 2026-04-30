@@ -41,11 +41,11 @@ public final class PodResourceLoader extends JsonRegistryResourceLoader<Pod> {
 
         // Item is needed on datagen and setup
         this.gatherDataAppliers
-                .register("item_stack", Item.class, (pod, item) -> pod.setItemStack(new ItemStack(item)))
+                .register("item", Item.class, Pod::setItem)
                 .register("drop_count", Integer.class, Pod::setDropCount)
                 .register("min_drop_count", Integer.class, Pod::setMinDropCount)
                 .register("max_drop_count", Integer.class, Pod::setMaxDropCount);
-        this.setupAppliers.register("item_stack", Item.class, (pod, item) -> pod.setItemStack(new ItemStack(item)));
+        this.setupAppliers.register("item", Item.class, Pod::setItem);
 
         this.reloadAppliers
                 .register("item_stack", ItemStack.class, Pod::setItemStack)

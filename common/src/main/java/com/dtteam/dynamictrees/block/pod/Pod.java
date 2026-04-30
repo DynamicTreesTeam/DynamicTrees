@@ -20,6 +20,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -110,6 +111,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
      * up using vanilla loot tables.
      */
     private ItemStack itemStack;
+    private Item item;
 
     private float growthChance = 0.2F;
     private float requiredProductionFactor = 0.3F;
@@ -229,22 +231,21 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
      * @return a copy of this pod's item stack
      */
     public final ItemStack getItemStack() {
-        if (itemStack == null) {
-            LogManager.getLogger().warn("Invoked too early or item was not set on \"" + getRegistryName() + "\".");
-            return new ItemStack(Items.AIR);
-        }
-        return itemStack.copy();
+        if (itemStack != null)
+            return itemStack.copy();
+        else if (item != null)
+            return new ItemStack(item);
+        LogManager.getLogger().warn("Invoked too early or item was not set on \"{}\".", getRegistryName());
+        return new ItemStack(Items.AIR);
     }
 
-    /**
-     * @return {@code true} if the given {@code itemStack} matches this Pod's item
-     */
-    public boolean isItem(ItemStack itemStack) {
-        return ItemStack.matches(this.itemStack, itemStack);
+    public void setItem(Item item) {
+        this.item = item;
     }
 
-    public void setItemStack(ItemStack itemStack) {
-        this.itemStack = itemStack;
+    public void setItemStack(ItemStack stack) {
+        this.itemStack = stack;
+        this.item = stack.getItem();
     }
 
     public final float getGrowthChance() {
@@ -332,7 +333,7 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
     public LootTable.Builder createBlockDrops(HolderLookup.Provider registries) {
         if (minDropCount > maxDropCount || maxDropCount <= 0)
             throw new IllegalArgumentException("Attempted to create loot tables for "+getRegistryName()+" with an invalid drop count range ["+minDropCount+","+maxDropCount+"].");
-        return DTLootTableBuilder.createFruitPodDrops(block.get(), itemStack.getItem(), ageProperty, maxAge, minDropCount, maxDropCount, registries);
+        return DTLootTableBuilder.createFruitPodDrops(block.get(), item, ageProperty, maxAge, minDropCount, maxDropCount, registries);
     }
 
     public void setMaxRadius(int maxRadius) {

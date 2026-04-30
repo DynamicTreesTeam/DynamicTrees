@@ -1,30 +1,38 @@
 package com.dtteam.dynamictrees.data.generator;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
+import com.dtteam.dynamictrees.data.builder.BranchLoaderBuilder;
 import com.dtteam.dynamictrees.tree.family.Family;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.MultiVariant;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Harley O'Connor
  */
-public class BranchStateGenerator implements Generator<DTDataProvider.BlockState, Family> {
+public class BranchStateGenerator implements Generator<BlockModelGenerators, Family> {
 
     public static final DependencyKey<BranchBlock> BRANCH = new DependencyKey<>("branch");
     public static final DependencyKey<Block> PRIMITIVE_LOG = new DependencyKey<>("primitive_log");
 
     @Override
-    public void generate(DTDataProvider.BlockState prov, Family input, Dependencies dependencies) {
-//        if (prov instanceof DTBlockStateProvider provider) {
-//            final BranchBlock branch = dependencies.get(BRANCH);
-//            final BranchLoaderBuilder builder = provider.models().getBuilder(
-//                    Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(branch)).getPath()
-//            ).customLoader(BranchLoaderBuilder.branchBuilders.get(input.getBranchLoader()));
-//            Block block = dependencies.get(PRIMITIVE_LOG);
-//            input.addBranchTextures(builder::texture, provider.block(BuiltInRegistries.BLOCK.getKey(block)), block);
-//            provider.simpleBlock(branch, builder.end());
-//        }
+    public void generate(BlockModelGenerators generator, Family input, Dependencies dependencies) {
+        final BranchBlock branch = dependencies.get(BRANCH);
+        final Block primitiveLog = dependencies.get(PRIMITIVE_LOG);
+        Identifier primitiveLogPath = Generator.blockPath(BuiltInRegistries.BLOCK.getKey(primitiveLog));
+
+        Map<String, Identifier> textures = new HashMap<>();
+        input.addBranchTextures(textures::put, primitiveLogPath, primitiveLog);
+
+        generator.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(branch, MultiVariant.of(new BranchLoaderBuilder(textures))));
     }
 
     @Override
