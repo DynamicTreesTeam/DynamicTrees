@@ -1,9 +1,11 @@
 package com.dtteam.dynamictrees.model.blockstate;
 
-import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.api.network.Connections;
 import com.dtteam.dynamictrees.model.BlockStateModelWithConnectionData;
 import com.dtteam.dynamictrees.model.ModelConnections;
+import com.dtteam.dynamictrees.model.ModelHelper;
 import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPart;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -13,7 +15,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.DynamicBlockStateModel;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -33,23 +34,23 @@ public record BranchBlockStateModel(
 
     @Override
     public Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
-        return getModelConnections(level, pos, state);
+        return ModelHelper.getModelConnections(level, pos, state);
     }
 
     @Override
-    public void collectParts(BlockState state, List<BlockStateModelPart> parts, ModelConnections connectionsData) {
-        final int coreRadius = getRadius(state);
-        if (coreRadius > 8) return;
+    public void collectParts(BlockState state, List<BlockStateModelPart> parts, Connections connectionsData) {
+        final int coreRadius = TreeHelper.getRadius(state);
+        if (coreRadius > 8 || coreRadius == 0) return;
 
         int[] connections = new int[]{0, 0, 0, 0, 0, 0};
         Direction forceRingDir = null;
         final AtomicInteger twigRadius = new AtomicInteger(1);
 
-        if (connectionsData != null) {
-            connections = connectionsData.getAllRadii();
-            forceRingDir = connectionsData.getRingOnly();
+        if (connectionsData instanceof ModelConnections branchConnections) {
+            connections = branchConnections.getAllRadii();
+            forceRingDir = branchConnections.getRingOnly();
 
-            connectionsData.getFamily().ifValid(family ->
+            branchConnections.getFamily().ifValid(family ->
                     twigRadius.set(family.getPrimaryThickness()));
         }
 
@@ -63,7 +64,7 @@ public record BranchBlockStateModel(
             parts.add(rings[coreRadius - 1].faceOnly(forceRingDir, false));
         } else {
             // The source direction is the biggest connection from one of the 6 directions.
-            final Direction sourceDir = getSourceDir(coreRadius, connections);
+            final Direction sourceDir = get3DSourceDir(coreRadius, connections);
             final int coreDir = resolveCoreDir(sourceDir);
 
             // This is for drawing the isRings on a terminating branch.
@@ -75,7 +76,7 @@ public record BranchBlockStateModel(
                     if ((coreRingDir == null || coreRingDir != face)) {
                         parts.add(cores[coreDir][coreRadius - 1].faceOnly(face, coreRadius == 8));
                     } else {
-                        parts.add(rings[coreRadius - 1].faceOnly(face, false));
+                        parts.add(rings[coreRadius - 1].faceOnly(face, coreRadius == 8));
                     }
                 }
                 // Get quads for sleeves models.
@@ -94,31 +95,8 @@ public record BranchBlockStateModel(
         }
     }
 
-    @Override
-    public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
-        ModelConnections connectionsData = getModelConnections(level, pos, state);
-        collectParts(state, parts, connectionsData);
-    }
-
-    public ModelConnections getModelConnections(@NotNull BlockAndTintGetter world, @NotNull BlockPos pos, @NotNull BlockState state) {
-        ModelConnections modelConnections;
-        if (state.getBlock() instanceof BranchBlock branchBlock) {
-            modelConnections = new ModelConnections(branchBlock.getConnectionData(world, pos, state)).setFamily(branchBlock.getFamily());
-        } else {
-            modelConnections = new ModelConnections();
-        }
-
-        return modelConnections;
-    }
-
-    /**
-     * Locates the side with the largest neighbor radius that's equal to or greater than this branch block
-     *
-     * @param coreRadius the radius of the branch block
-     * @param connections an array of 6 integers, one for the radius of each connecting side. DUNSWE.
-     */
     @Nullable
-    private Direction getSourceDir(int coreRadius, int[] connections) {
+    public static Direction get3DSourceDir(int coreRadius, int[] connections) {
         int largestConnection = 0;
         Direction sourceDir = null;
 
@@ -139,16 +117,17 @@ public record BranchBlockStateModel(
     /**
      * Converts direction DUNSWE to 3 axis numbers for Y,Z,X
      */
-    private int resolveCoreDir(@Nullable Direction dir) {
+    public static int resolveCoreDir(@Nullable Direction dir) {
         if (dir == null) {
             return 0;
         }
         return dir.get3DDataValue() >> 1;
     }
 
-    private int getRadius(BlockState blockState) {
-        // This way works with branches that don't have the RADIUS property, like cactus
-        return ((BranchBlock) blockState.getBlock()).getRadius(blockState);
+    @Override
+    public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
+        ModelConnections connectionsData = ModelHelper.getModelConnections(level, pos, state);
+        collectParts(state, parts, connectionsData);
     }
 
 }

@@ -8,14 +8,12 @@ import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.GatherDataHelper;
 import com.dtteam.dynamictrees.data.generator.DTExtraLangGenerator;
 import com.dtteam.dynamictrees.data.generator.DataGenerators;
-import com.dtteam.dynamictrees.data.provider.DTDatapackBuiltinEntriesProvider;
 import com.dtteam.dynamictrees.event.handler.OptionalHandlers;
 import com.dtteam.dynamictrees.registry.NeoForgeRegistryHandler;
 import com.dtteam.dynamictrees.registry.NeoForgeRegistryLoader;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.treepack.Resources;
-import net.minecraft.data.DataGenerator;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -23,8 +21,6 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-
-import java.util.Set;
 
 @Mod(DynamicTrees.MOD_ID)
 public class DynamicTreesNeoForge {
@@ -59,19 +55,11 @@ public class DynamicTreesNeoForge {
     }
 
     private void gatherServerData(final GatherDataEvent.Server event) {
-        Resources.MANAGER.gatherData();
-        GatherDataHelper.gatherServerData(
-                DynamicTrees.MOD_ID, event,
-                SoilProperties.REGISTRY,
-                Family.REGISTRY,
-                Species.REGISTRY,
-                LeavesProperties.REGISTRY
-        );
-        //Generate the feature replacement data
-        DataGenerator dataGen = event.getGenerator();
-        dataGen.addProvider(true, new DTDatapackBuiltinEntriesProvider(
-                dataGen.getPackOutput(), event.getLookupProvider(), Set.of(DynamicTrees.MOD_ID, DynamicTrees.MINECRAFT)
-        ));
+//        //Generate the feature replacement data
+//        DataGenerator dataGen = event.getGenerator();
+//        dataGen.addProvider(true, new DTDatapackBuiltinEntriesProvider(
+//                dataGen.getPackOutput(), event.getLookupProvider(), Set.of(DynamicTrees.MOD_ID, DynamicTrees.MINECRAFT)
+//        ));
     }
 
     private void gatherClientData(final GatherDataEvent.Client event) {

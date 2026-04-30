@@ -90,7 +90,6 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
         BranchBlockStateModelPart.UnbakedThickTrunk unbakedThickTrunk = new BranchBlockStateModelPart.UnbakedThickTrunk(barkMat, false);
         BranchBlockStateModelPart.UnbakedThickTrunk unbakedThickRings = new BranchBlockStateModelPart.UnbakedThickTrunk(ringsMat, true);
 
-
         for (int i = 0; i < ThickBranchBlock.MAX_RADIUS_THICK - BranchBlock.MAX_RADIUS; i++) {
             int radius = i + BranchBlock.MAX_RADIUS + 1;
             trunksSideBark[i] = unbakedThickTrunk.bake(baker, radius, EnumSet.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST));

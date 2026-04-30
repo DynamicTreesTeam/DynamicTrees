@@ -12,6 +12,7 @@ import com.dtteam.dynamictrees.client.TintSources.CloneTintSource;
 import com.dtteam.dynamictrees.client.TintSources.PottedSaplingTintSource;
 import com.dtteam.dynamictrees.client.TintSources.SaplingTintSource;
 import com.dtteam.dynamictrees.client.TintSources.SoilRootsTintSource;
+import com.dtteam.dynamictrees.model.blockstate.SurfaceRootBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.UnbakedBranchModel;
 import com.dtteam.dynamictrees.model.entity.render.FallingTreeRenderer;
 import com.dtteam.dynamictrees.model.entity.render.LingeringEffectorRenderer;
@@ -178,7 +179,7 @@ public class ClientModEventHandler {
     public static void onModelRegistryEvent(RegisterBlockStateModels event) {
         // Register model loaders for baked models.
         event.registerModel(BRANCH, UnbakedBranchModel.CODEC);
-//        event.register(SURFACE_ROOT, new SurfaceRootBlockModelLoader());
+        event.registerModel(SURFACE_ROOT, SurfaceRootBlockStateModel.Unbaked.CODEC);
 //        event.register(ROOTS, new RootsBlockModelLoader());
 //        event.register(LARGE_PALM_FRONDS, new PalmLeavesModelLoader(0));
 //        event.register(MEDIUM_PALM_FRONDS, new PalmLeavesModelLoader(1));

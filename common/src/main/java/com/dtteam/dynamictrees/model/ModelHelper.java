@@ -1,6 +1,10 @@
 package com.dtteam.dynamictrees.model;
 
+import com.dtteam.dynamictrees.api.network.RootConnections;
+import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
 import com.mojang.math.Quadrant;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.cuboid.CuboidFace;
@@ -9,9 +13,12 @@ import net.minecraft.client.resources.model.cuboid.CuboidRotation;
 import net.minecraft.client.resources.model.cuboid.FaceBakery;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -82,5 +89,22 @@ public class ModelHelper {
     }
 
     private static class NoModelState implements ModelState{ }
+
+    public static ModelConnections getModelConnections(@NotNull BlockAndTintGetter world, @NotNull BlockPos pos, @NotNull BlockState state) {
+        ModelConnections modelConnections;
+        if (state.getBlock() instanceof BranchBlock branchBlock) {
+            modelConnections = new ModelConnections(branchBlock.getConnectionData(world, pos, state)).setFamily(branchBlock.getFamily());
+        } else {
+            modelConnections = new ModelConnections();
+        }
+
+        return modelConnections;
+    }
+
+    public static RootConnections getRootConnections(@NotNull BlockAndTintGetter world, @NotNull BlockPos pos, @NotNull BlockState state) {
+        return state.getBlock() instanceof SurfaceRootBlock surfaceRootBlock
+                ? new RootConnections(surfaceRootBlock.getConnectionData(world, pos))
+                : new RootConnections();
+    }
 
 }

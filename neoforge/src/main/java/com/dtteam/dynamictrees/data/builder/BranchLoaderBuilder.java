@@ -1,6 +1,7 @@
 package com.dtteam.dynamictrees.data.builder;
 
 import com.dtteam.dynamictrees.event.handler.ClientModEventHandler;
+import com.dtteam.dynamictrees.model.blockstate.SurfaceRootBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.UnbakedBranchModel;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.client.renderer.block.dispatch.VariantMutator;
@@ -25,9 +26,9 @@ public final class BranchLoaderBuilder extends CustomBlockStateModelBuilder {
         branchBuilders.put(
                 ClientModEventHandler.BRANCH, (textures, family)->
                         new BranchLoaderBuilder(()-> new UnbakedBranchModel(textures.get("bark"), textures.get("rings"), Optional.of(family))));
-//        branchBuilders.put(
-//                ClientModEventHandler.SURFACE_ROOT, (textures)->
-//                        new BranchLoaderBuilder(textures, ()-> new SurfaceRootBlockStateModel.Unbaked(textures.get("bark"), textures.get("rings"))));
+        branchBuilders.put(
+                ClientModEventHandler.SURFACE_ROOT, (textures, _)->
+                        new BranchLoaderBuilder(()-> new SurfaceRootBlockStateModel.Unbaked(textures.get("bark"))));
 //        branchBuilders.put(
 //                ClientModEventHandler.ROOTS, (textures)->
 //                        new BranchLoaderBuilder(textures, ()-> new RootsBlockStateModel.Unbaked(textures.get("bark"), textures.get("rings"))));

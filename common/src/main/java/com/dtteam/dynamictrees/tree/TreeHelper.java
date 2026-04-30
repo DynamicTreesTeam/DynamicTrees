@@ -359,6 +359,10 @@ public class TreeHelper {
 
     public static int getRadius(BlockGetter level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
+        return getRadius(state);
+    }
+
+    public static int getRadius(BlockState state) {
         return getTreePart(state).getRadius(state);
     }
 

@@ -23,7 +23,7 @@ public class BranchStateGenerator implements Generator<BlockModelGenerators, Fam
     public static final DependencyKey<Block> PRIMITIVE_LOG = new DependencyKey<>("primitive_log");
 
     @Override
-    public void generate(BlockModelGenerators generator, Family input, Dependencies dependencies) {
+    public void generate(BlockModelGenerators generators, Family input, Dependencies dependencies) {
         final BranchBlock branch = dependencies.get(BRANCH);
         final Block primitiveLog = dependencies.get(PRIMITIVE_LOG);
         Identifier primitiveLogPath = Generator.blockPath(BuiltInRegistries.BLOCK.getKey(primitiveLog));
@@ -31,9 +31,10 @@ public class BranchStateGenerator implements Generator<BlockModelGenerators, Fam
         final Map<String, Identifier> textures = new HashMap<>();
         input.addBranchTextures(textures::put, primitiveLogPath, primitiveLog);
 
-        BranchLoaderBuilder builder = BranchLoaderBuilder.branchBuilders.get(input.getBranchLoader()).apply(textures, input);
+        BranchLoaderBuilder builder = BranchLoaderBuilder.branchBuilders.get(input.getBranchLoader())
+                .apply(textures, input);
 
-        generator.blockStateOutput.accept(
+        generators.blockStateOutput.accept(
                 MultiVariantGenerator.dispatch(branch, MultiVariant.of(builder)));
     }
 
