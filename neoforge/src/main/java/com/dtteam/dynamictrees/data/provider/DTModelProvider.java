@@ -5,11 +5,13 @@ import com.dtteam.dynamictrees.api.registry.Registry;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.pod.Pod;
 import com.dtteam.dynamictrees.data.DTDataProvider;
+import com.dtteam.dynamictrees.data.builder.PottedSaplingLoaderBuilder;
 import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.renderer.block.dispatch.Variant;
@@ -54,7 +56,7 @@ public class DTModelProvider extends ModelProvider implements DTDataProvider {
         blockModels.blockStateOutput.accept(
                 MultiVariantGenerator.dispatch(
                         DTRegistries.POTTED_SAPLING.get(),
-                        BlockModelGenerators.variant(new Variant(Identifier.withDefaultNamespace("block/flower_pot")))
+                        MultiVariant.of(new PottedSaplingLoaderBuilder(Identifier.withDefaultNamespace("block/flower_pot")))
                 )
         );
         blockModels.createTrivialCube(Fruit.REGISTRY.get(DynamicTrees.location("apple")).getBlock());

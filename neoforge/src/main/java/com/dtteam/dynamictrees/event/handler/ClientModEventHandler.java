@@ -12,6 +12,7 @@ import com.dtteam.dynamictrees.client.TintSources.CloneTintSource;
 import com.dtteam.dynamictrees.client.TintSources.PottedSaplingTintSource;
 import com.dtteam.dynamictrees.client.TintSources.SaplingTintSource;
 import com.dtteam.dynamictrees.client.TintSources.SoilRootsTintSource;
+import com.dtteam.dynamictrees.model.blockstate.PottedSaplingBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.SurfaceRootBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.UnbakedBranchModel;
 import com.dtteam.dynamictrees.model.entity.render.FallingTreeRenderer;
@@ -174,12 +175,14 @@ public class ClientModEventHandler {
     public static final Identifier LARGE_PALM_FRONDS = DynamicTrees.location("large_palm_fronds");
     public static final Identifier MEDIUM_PALM_FRONDS = DynamicTrees.location("medium_palm_fronds");
     public static final Identifier SMALL_PALM_FRONDS = DynamicTrees.location("small_palm_fronds");
+    public static final Identifier POTTED_DYNAMIC_SAPLING = DynamicTrees.location("potted_dynamic_sapling");
 
     @SubscribeEvent
     public static void onModelRegistryEvent(RegisterBlockStateModels event) {
         // Register model loaders for baked models.
         event.registerModel(BRANCH, UnbakedBranchModel.CODEC);
         event.registerModel(SURFACE_ROOT, SurfaceRootBlockStateModel.Unbaked.CODEC);
+        event.registerModel(POTTED_DYNAMIC_SAPLING, PottedSaplingBlockStateModel.Unbaked.CODEC);
 //        event.register(ROOTS, new RootsBlockModelLoader());
 //        event.register(LARGE_PALM_FRONDS, new PalmLeavesModelLoader(0));
 //        event.register(MEDIUM_PALM_FRONDS, new PalmLeavesModelLoader(1));

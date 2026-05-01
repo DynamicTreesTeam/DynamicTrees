@@ -21,7 +21,7 @@ public class QuadManipulator {
 
     public static final Direction[] everyFace = {Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, null};
 
-    public static List<BakedQuad> getQuads(BlockStateModel modelIn, BlockState stateIn, Vec3 offset, RandomSource rand, ModelConnections modelData) {
+    public static List<BakedQuad> getQuads(BlockStateModel modelIn, BlockState stateIn, Vec3 offset, RandomSource rand, @Nullable ModelConnections modelData) {
         return getQuads(modelIn, stateIn, offset, everyFace, rand, modelData);
     }
 
