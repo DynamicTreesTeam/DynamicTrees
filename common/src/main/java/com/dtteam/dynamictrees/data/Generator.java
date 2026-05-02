@@ -1,6 +1,5 @@
 package com.dtteam.dynamictrees.data;
 
-import net.minecraft.data.DataProvider;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -10,7 +9,7 @@ import java.util.Optional;
 
 /**
  * A generator for a resource, providing the means to construct a Json file using provided {@link Dependencies} and
- * using a provided {@link DataProvider}.
+ * using a provided Generator.
  *
  * @param <P> the type of the data provider to use
  * @param <I> the type of the input to get the dependencies from

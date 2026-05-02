@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.GatherDataHelper;
 import com.dtteam.dynamictrees.data.generator.DTExtraLangGenerator;
+import com.dtteam.dynamictrees.data.generator.DTExtraModelGenerator;
 import com.dtteam.dynamictrees.data.generator.DataGenerators;
 import com.dtteam.dynamictrees.event.handler.OptionalHandlers;
 import com.dtteam.dynamictrees.registry.NeoForgeRegistryHandler;
@@ -63,11 +64,11 @@ public class DynamicTreesNeoForge {
     }
 
     private void gatherClientData(final GatherDataEvent.Client event) {
-        //Lang generators
         Resources.MANAGER.gatherData();
+        GatherDataHelper.addModelGenerator(DynamicTrees.MOD_ID, new DTExtraModelGenerator());
+        GatherDataHelper.addLangGenerator(DynamicTrees.MOD_ID, new DTExtraLangGenerator());
         GatherDataHelper.gatherClientData(
                 DynamicTrees.MOD_ID, event,
-                new DTExtraLangGenerator(),
                 SoilProperties.REGISTRY,
                 Family.REGISTRY,
                 Species.REGISTRY,

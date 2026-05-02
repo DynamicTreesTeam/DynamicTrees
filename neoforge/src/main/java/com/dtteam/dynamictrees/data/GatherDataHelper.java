@@ -2,6 +2,8 @@ package com.dtteam.dynamictrees.data;
 
 import com.dtteam.dynamictrees.api.registry.Registry;
 import com.dtteam.dynamictrees.data.provider.*;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -17,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public final class GatherDataHelper {
     private static final Map<String, Generator<DTDataProvider.Language, String>> extraLangGenerators = new HashMap<>();
+    private static final Map<String, BiGenerator<BlockModelGenerators, ItemModelGenerators, String>> extraModelGenerators = new HashMap<>();
 
     public static void gatherClientData(final String modId, final GatherDataEvent.Client event, Generator<DTDataProvider.Language, String> generator, Registry<?>... registries) {
         addLangGenerator(modId, generator);
@@ -67,7 +70,15 @@ public final class GatherDataHelper {
         GatherDataHelper.extraLangGenerators.put(modId,generator);
     }
 
-    public static Map<String,Generator<DTDataProvider.Language, String>> getExtraLangGenerators() {
-        return GatherDataHelper.extraLangGenerators;
+    public static Generator<DTDataProvider.Language, String> getExtraLangGenerator(String modId) {
+        return extraLangGenerators.get(modId);
+    }
+
+    public static void addModelGenerator(String modId, BiGenerator<BlockModelGenerators, ItemModelGenerators, String> generator) {
+        GatherDataHelper.extraModelGenerators.put(modId,generator);
+    }
+
+    public static BiGenerator<BlockModelGenerators, ItemModelGenerators, String> getExtraModelGenerator(String modId) {
+        return extraModelGenerators.get(modId);
     }
 }

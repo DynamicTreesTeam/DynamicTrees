@@ -28,7 +28,7 @@ public class DTLangProvider extends LanguageProvider implements DTDataProvider.L
                         entry.generateLangData(this)
                 )
         );
-        Generator<DTDataProvider.Language, String> generator = GatherDataHelper.getExtraLangGenerators().get(modId);
+        var generator = GatherDataHelper.getExtraLangGenerator(modId);
         if (generator != null) {
             generator.generate(this, "", new Generator.Dependencies());
         }
