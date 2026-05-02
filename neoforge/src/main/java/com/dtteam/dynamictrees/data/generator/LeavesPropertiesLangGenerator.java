@@ -3,12 +3,9 @@ package com.dtteam.dynamictrees.data.generator;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
-import com.dtteam.dynamictrees.data.provider.DTLangProvider;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,14 +14,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class LeavesPropertiesLangGenerator implements Generator<DTDataProvider.Language, LeavesProperties> {
-    DTLangProvider provider;
+    DTDataProvider.Language provider;
 
     @Override
     public void generate(DTDataProvider.Language prov, LeavesProperties input, Dependencies dependencies) {
-        if (prov instanceof DTLangProvider provider1){
-            this.provider = provider1;
-            //input.getDynamicLeavesBlock().ifPresent(leaves -> blockLang(leaves, input.getLangOverride("leaves")));
-        }
+        this.provider = prov;
+        //input.getDynamicLeavesBlock().ifPresent(leaves -> blockLang(leaves, input.getLangOverride("leaves")));
     }
 
     @Override

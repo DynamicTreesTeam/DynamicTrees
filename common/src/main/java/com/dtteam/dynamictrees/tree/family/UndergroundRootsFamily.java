@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.tree.family;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
@@ -9,13 +8,10 @@ import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.soil.AerialRootsSoilProperties;
 import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
-import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
 import com.dtteam.dynamictrees.utility.Optionals;
-import net.minecraft.client.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.tags.TagAppender;
@@ -33,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -131,27 +128,18 @@ public class UndergroundRootsFamily extends Family {
     // DATA GENERATION
     ///////////////////////////////////////////
 
-    protected final MutableLazyValue<Generator<BlockModelGenerators, Family>> rootsStateGenerator =
-            MutableLazyValue.supplied(blockStateGenerators.get(
-                    DynamicTrees.location("roots")
-            ));
-    protected final MutableLazyValue<Generator<ItemModelGenerators, Family>> rootsItemModelGenerator =
-            MutableLazyValue.supplied(itemModelGenerators.get(
-                    DynamicTrees.location("roots_item")
-            ));
-
     @Override
-    public void generateStateData(BlockModelGenerators generators) {
-        super.generateStateData(generators);
-        if (rootsStateGenerator.isPresent())
-            this.rootsStateGenerator.get().generate(generators, this);
+    public List<Identifier> getBlockModelGenerators() {
+        List<Identifier> list = new LinkedList<>(super.getBlockModelGenerators());
+        list.add(DynamicTrees.location("roots"));
+        return list;
     }
 
     @Override
-    public void generateItemModelData(ItemModelGenerators generators) {
-        super.generateItemModelData(generators);
-        if (rootsItemModelGenerator.isPresent())
-            this.rootsItemModelGenerator.get().generate(generators, this);
+    public List<Identifier> getItemModelGenerators() {
+        List<Identifier> list = new LinkedList<>(super.getItemModelGenerators());
+        list.add(DynamicTrees.location("roots_item"));
+        return list;
     }
 
     public List<TagKey<Block>> defaultRootsTags() {

@@ -1,7 +1,9 @@
 package com.dtteam.dynamictrees;
 
 
+import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.block.pod.Pod;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.client.BlockColorMultipliers;
 import com.dtteam.dynamictrees.config.DTConfigs;
@@ -72,7 +74,9 @@ public class DynamicTreesNeoForge {
                 SoilProperties.REGISTRY,
                 Family.REGISTRY,
                 Species.REGISTRY,
-                LeavesProperties.REGISTRY
+                LeavesProperties.REGISTRY,
+                Fruit.REGISTRY,
+                Pod.REGISTRY
         );
     }
 

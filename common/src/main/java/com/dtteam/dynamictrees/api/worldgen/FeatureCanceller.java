@@ -24,6 +24,11 @@ public abstract class FeatureCanceller extends RegistryEntry<FeatureCanceller> {
         super(registryName);
     }
 
+    @Override
+    public final Class<FeatureCanceller> getRegistryType() {
+        return REGISTRY.getType();
+    }
+
     /**
      * Works out if the configured feature in the given biome should be cancelled or not.
      *

@@ -55,6 +55,11 @@ public abstract class GrowthLogicKit extends ConfigurableRegistryEntry<GrowthLog
     protected void registerProperties() {
     }
 
+    @Override
+    public final Class<GrowthLogicKit> getRegistryType() {
+        return REGISTRY.getType();
+    }
+
     /**
      * Selects and returns a new direction for the branch {@linkplain GrowSignal signal} to turn to.
      * <p>

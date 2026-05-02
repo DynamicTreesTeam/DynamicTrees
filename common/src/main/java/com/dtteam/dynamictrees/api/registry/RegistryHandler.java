@@ -26,6 +26,11 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
         this(DynamicTrees.NULL);
     }
 
+    @Override
+    public final Class<RegistryHandler> getRegistryType() {
+        return REGISTRY.getType();
+    }
+
     /**
      * Gets the {@link RegistryHandler} for the given mod ID, or the null registry handler if it doesn't exist.
      *

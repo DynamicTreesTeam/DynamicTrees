@@ -2,7 +2,6 @@ package com.dtteam.dynamictrees.tree.species;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.lazyvalue.LazyValue;
-import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.network.NodeInspector;
@@ -29,9 +28,7 @@ import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.block.soil.SpeciesBlockEntity;
 import com.dtteam.dynamictrees.config.DTConfigs;
-import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
-import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
@@ -75,8 +72,6 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -134,10 +129,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Species extends RegistryEntry<Species> implements Resettable<Species> {
-
-    public static final HashMap<Identifier, Supplier<Generator<BlockModelGenerators, Species>>> blockStateGenerators = new HashMap<>();
-    public static final HashMap<Identifier, Supplier<Generator<ItemModelGenerators, Species>>> itemModelGenerators = new HashMap<>();
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, Species>>> languageGenerators = new HashMap<>();
 
     public static final Codec<Species> CODEC = Identifier.CODEC.comapFlatMap(Species::read, Species::getRegistryName);
 
@@ -281,6 +272,11 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     private static DataResult<Species> read(Identifier name) {
         final Species species = Species.REGISTRY.get(name);
         return species == null ? DataResult.error(() -> "Species not found: " + name) : DataResult.success(species);
+    }
+
+    @Override
+    public final Class<Species> getRegistryType() {
+        return REGISTRY.getType();
     }
 
     /**
@@ -2323,35 +2319,17 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     ///////////////////////////////////////////
     //region data-generation
 
-    protected final MutableLazyValue<Generator<BlockModelGenerators, Species>> saplingStateGenerator =
-            MutableLazyValue.supplied(blockStateGenerators.get(
-                    DynamicTrees.location("sapling")
-            ));
-    protected final MutableLazyValue<Generator<ItemModelGenerators, Species>> seedItemModelGenerator =
-            MutableLazyValue.supplied(itemModelGenerators.get(
-                    DynamicTrees.location("seed_item")
-            ));
-    protected final MutableLazyValue<Generator<DTDataProvider.Language, Species>> speciesLangGenerator =
-            MutableLazyValue.supplied(languageGenerators.get(
-                    DynamicTrees.location("species_lang")
-            ));
-
     @Override
-    public void generateStateData(BlockModelGenerators generators) {
-        // Generate sapling block state and model.
-        if (saplingStateGenerator.isPresent())
-            this.saplingStateGenerator.get().generate(generators, this);
+    public List<Identifier> getBlockModelGenerators() {
+        return List.of(DynamicTrees.location("sapling"));
     }
     @Override
-    public void generateItemModelData(ItemModelGenerators generators) {
-        // Generate seed models.
-        if (seedItemModelGenerator.isPresent())
-            this.seedItemModelGenerator.get().generate(generators, this);
+    public List<Identifier> getItemModelGenerators() {
+        return List.of(DynamicTrees.location("seed_item"));
     }
     @Override
-    public void generateLangData(DTDataProvider.Language provider) {
-        if (speciesLangGenerator.isPresent())
-            this.speciesLangGenerator.get().generate(provider, this);
+    public List<Identifier> getLangGenerators() {
+        return List.of(DynamicTrees.location("species_lang"));
     }
 
     protected List<String> onlyIfLoaded = new ArrayList<>();

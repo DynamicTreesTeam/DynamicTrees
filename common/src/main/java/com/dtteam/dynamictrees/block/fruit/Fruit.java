@@ -36,6 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -95,6 +96,11 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
 
     public Fruit(Identifier registryName) {
         super(registryName);
+    }
+
+    @Override
+    public final Class<Fruit> getRegistryType() {
+        return REGISTRY.getType();
     }
 
     public void setSeasonalFactorGetter(BiFunction<LevelContext, BlockPos, Float> seasonalFactorGetter) {
@@ -312,4 +318,8 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
         return this;
     }
 
+    @Override
+    public List<Identifier> getBlockModelGenerators() {
+        return List.of(DynamicTrees.location("fruit"));
+    }
 }

@@ -2,7 +2,6 @@ package com.dtteam.dynamictrees.data.generator;
 
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
-import com.dtteam.dynamictrees.data.provider.DTLangProvider;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -16,19 +15,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SpeciesLangGenerator implements Generator<DTDataProvider.Language, Species> {
-    DTLangProvider provider;
+    DTDataProvider.Language provider;
 
     @Override
     public void generate(DTDataProvider.Language prov, Species input, Dependencies dependencies) {
-        if (prov instanceof DTLangProvider provider1){
-            this.provider = provider1;
-            speciesLang(input, input.getLangOverride("species"));
-            if(input.hasSeed()) {
-                itemLang(input.getSeed().get(), input.getLangOverride("seed"));
-            }
-            //input.getSapling().ifPresent(sapling -> blockLang(sapling, input.getLangOverride("sapling")));
+        this.provider = prov;
+        speciesLang(input, input.getLangOverride("species"));
+        if(input.hasSeed()) {
+            itemLang(input.getSeed().get(), input.getLangOverride("seed"));
         }
-
+        //input.getSapling().ifPresent(sapling -> blockLang(sapling, input.getLangOverride("sapling")));
     }
 
     @Override

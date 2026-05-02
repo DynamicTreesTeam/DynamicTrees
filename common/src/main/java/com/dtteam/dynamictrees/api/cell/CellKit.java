@@ -48,6 +48,11 @@ public abstract class CellKit extends RegistryEntry<CellKit> {
         this.setRegistryName(registryName);
     }
 
+    @Override
+    public final Class<CellKit> getRegistryType() {
+        return REGISTRY.getType();
+    }
+
     public abstract Cell getCellForLeaves(int distance);
 
     public abstract Cell getCellForBranch(int radius, int meta);

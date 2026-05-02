@@ -20,6 +20,11 @@ public class GenFeatureConfiguration extends Configuration<GenFeatureConfigurati
         super(genFeature);
     }
 
+    @Override
+    public final Class<GenFeatureConfiguration> getRegistryType() {
+        return GenFeatureConfiguration.class;
+    }
+
     public GenFeature getGenFeature() {
         return this.configurable;
     }

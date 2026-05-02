@@ -131,6 +131,11 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         super(registryName);
     }
 
+    @Override
+    public final Class<Pod> getRegistryType() {
+        return REGISTRY.getType();
+    }
+
     public void setSeasonalFactorGetter(BiFunction<LevelContext, BlockPos, Float> seasonalFactorGetter) {
         this.seasonalFactorGetter = seasonalFactorGetter;
     }

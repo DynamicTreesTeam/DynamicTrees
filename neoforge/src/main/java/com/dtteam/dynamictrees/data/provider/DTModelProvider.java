@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.api.registry.Registry;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.GatherDataHelper;
 import com.dtteam.dynamictrees.data.Generator;
+import com.dtteam.dynamictrees.data.generator.DataGenerators;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
@@ -29,8 +30,12 @@ public class DTModelProvider extends ModelProvider implements DTDataProvider {
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
         this.registries.forEach(registry ->
                 registry.dataGenerationStream(this.modId).forEach(entry -> {
-                            entry.generateStateData(blockModels);
-                            entry.generateItemModelData(itemModels);
+                            entry.getBlockModelGenerators().forEach(id ->
+                                    DataGenerators.runBlockModelGenerator(blockModels, entry, id)
+                            );
+                            entry.getItemModelGenerators().forEach(id ->
+                                    DataGenerators.runItemModelGenerator(itemModels, entry, id)
+                            );
                         }
                 ));
         var generator = GatherDataHelper.getExtraModelGenerator(this.modId);

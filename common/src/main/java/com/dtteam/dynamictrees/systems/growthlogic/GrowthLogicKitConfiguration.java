@@ -25,6 +25,11 @@ public final class GrowthLogicKitConfiguration extends Configuration<GrowthLogic
         return duplicateLogicKit;
     }
 
+    @Override
+    public final Class<GrowthLogicKitConfiguration> getRegistryType() {
+        return GrowthLogicKitConfiguration.class;
+    }
+
     /**
      * Invokes {@link GrowthLogicKit#selectNewDirection(GrowthLogicKitConfiguration, DirectionSelectionContext)} for this
      * configured kit's growth logic kit.

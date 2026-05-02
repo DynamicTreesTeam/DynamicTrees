@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.tree.family;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
@@ -14,8 +13,6 @@ import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.compat.WailaHelper;
 import com.dtteam.dynamictrees.config.DTConfigs;
-import com.dtteam.dynamictrees.data.DTDataProvider;
-import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.data.tags.DTItemTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
@@ -27,8 +24,6 @@ import com.dtteam.dynamictrees.treepack.Resettable;
 import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.client.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -79,10 +74,6 @@ import static com.dtteam.dynamictrees.utility.IdentifierUtils.*;
  * @author ferreusveritas
  */
 public class Family extends RegistryEntry<Family> implements Resettable<Family> {
-
-    public static final HashMap<Identifier, Supplier<Generator<BlockModelGenerators, Family>>> blockStateGenerators = new HashMap<>();
-    public static final HashMap<Identifier, Supplier<Generator<ItemModelGenerators, Family>>> itemModelGenerators = new HashMap<>();
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, Family>>> languageGenerators = new HashMap<>();
 
     public static final Codec<Family> CODEC = Identifier.CODEC.comapFlatMap(Family::read, Family::getRegistryName);
 
@@ -211,6 +202,11 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
     private static DataResult<Family> read(Identifier name) {
         final Family family = Family.REGISTRY.get(name);
         return family == null ? DataResult.error(() -> "Family not found: " + name) : DataResult.success(family);
+    }
+
+    @Override
+    public final Class<Family> getRegistryType() {
+        return REGISTRY.getType();
     }
 
     public void setupBlocks() {
@@ -875,52 +871,26 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return DynamicTrees.location("roots");
     }
 
-    protected final MutableLazyValue<Generator<BlockModelGenerators, Family>> branchStateGenerator =
-            MutableLazyValue.supplied(blockStateGenerators.get(
-                    DynamicTrees.location("branch")
-            ));
-    protected final MutableLazyValue<Generator<BlockModelGenerators, Family>> strippedBranchStateGenerator =
-            MutableLazyValue.supplied(blockStateGenerators.get(
-                    DynamicTrees.location("stripped_branch")
-            ));
-    protected final MutableLazyValue<Generator<BlockModelGenerators, Family>> surfaceRootStateGenerator =
-            MutableLazyValue.supplied(blockStateGenerators.get(
-                    DynamicTrees.location("surface_root")
-            ));
-    protected final MutableLazyValue<Generator<ItemModelGenerators, Family>> branchItemModelGenerator =
-            MutableLazyValue.supplied(itemModelGenerators.get(
-                    DynamicTrees.location("branch_item")
-            ));
-    protected final MutableLazyValue<Generator<DTDataProvider.Language, Family>> familyLangGenerator =
-            MutableLazyValue.supplied(languageGenerators.get(
-                    DynamicTrees.location("family_lang")
-            ));
-
     public Identifier getBranchItemParentLocation() {return DynamicTrees.location("branch");}
     public Identifier getRootItemParentLocation() {return DynamicTrees.location("root_branch");}
 
     @Override
-    public void generateStateData(BlockModelGenerators generators) {
-        // Generate branch block state and model.
-        if (branchStateGenerator.isPresent())
-            this.branchStateGenerator.get().generate(generators, this);
-        if (strippedBranchStateGenerator.isPresent())
-            this.strippedBranchStateGenerator.get().generate(generators, this);
-
-        // Generate surface root block state and model.
-        if (surfaceRootStateGenerator.isPresent())
-            this.surfaceRootStateGenerator.get().generate(generators, this);
+    public List<Identifier> getBlockModelGenerators() {
+        List<Identifier> generators = new LinkedList<>();
+        generators.add(DynamicTrees.location("branch"));
+        if (hasStrippedBranch())
+            generators.add(DynamicTrees.location("stripped_branch"));
+        if (hasSurfaceRoot())
+            generators.add(DynamicTrees.location("surface_root"));
+        return generators;
     }
     @Override
-    public void generateItemModelData(ItemModelGenerators generators) {
-        // Generate branch item models.
-        if (branchItemModelGenerator.isPresent())
-            this.branchItemModelGenerator.get().generate(generators, this);
+    public List<Identifier> getItemModelGenerators() {
+        return List.of(DynamicTrees.location("branch_item"));
     }
     @Override
-    public void generateLangData(DTDataProvider.Language provider) {
-        if (familyLangGenerator.isPresent())
-            this.familyLangGenerator.get().generate(provider, this);
+    public List<Identifier> getLangGenerators() {
+        return List.of(DynamicTrees.location("family_lang"));
     }
 
     protected List<String> onlyIfLoaded = new ArrayList<>();

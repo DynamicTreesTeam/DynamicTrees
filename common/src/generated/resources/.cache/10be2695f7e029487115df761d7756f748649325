@@ -1,8 +1,8 @@
-// 26.1.1	2026-05-02T13:20:03.5977825	Model Definitions - dynamictrees
+// 26.1.1	2026-05-02T16:31:42.1959066	Model Definitions - dynamictrees
 293dd53335481225100f40111f64c5ed18a21ebe assets/dynamictrees/blockstates/acacia_branch.json
 2606791521eac27fa77ebbeeea442b8073802a51 assets/dynamictrees/blockstates/acacia_leaves.json
 28a0cd7b38e1a854acd4f0c477573a9460811d82 assets/dynamictrees/blockstates/acacia_sapling.json
-4ab61ffd52ecc1d7edb6f1e78816b0f6d11a3792 assets/dynamictrees/blockstates/apple.json
+f5038cff2ab51e64d093792ed333c629e4e84122 assets/dynamictrees/blockstates/apple.json
 f2d9f42b7fafdaf70df5ef24f8bfdb0eea3c2441 assets/dynamictrees/blockstates/apple_oak_sapling.json
 5a49eaf2e8e03519cd1c8bb9acc727119658c60e assets/dynamictrees/blockstates/azalea_leaves.json
 f89a6342d969c1795a5e753608022cb17aefe4b3 assets/dynamictrees/blockstates/azalea_sapling.json
@@ -120,7 +120,6 @@ f9ac835a541e590f163bc3641b055d228453d98d assets/dynamictrees/items/mega_crimson_
 42dbbae455e419b0cbb31464bbb5c7cd6b21355e assets/dynamictrees/items/staff.json
 afe58e0e012d17d7762dd66b95cb62a460754ad4 assets/dynamictrees/items/warped_branch.json
 475b7117ddb1545dead743977ad75ab7e3aaae7d assets/dynamictrees/items/warped_seed.json
-9222efb2226cb003537113fc7b5842f639c37f4a assets/dynamictrees/models/block/apple.json
 c7d39ea6b72b7067e9b49b4a2858613baa962fda assets/dynamictrees/models/block/cocoa.json
 d7087e75ae64fec294712d3559c18c8399922149 assets/dynamictrees/models/block/mangrove_roots.json
 f3acebe3c8470980f95bef0e7df6bd337a605c6a assets/dynamictrees/models/block/rooty_mangrove_aerial_roots.json

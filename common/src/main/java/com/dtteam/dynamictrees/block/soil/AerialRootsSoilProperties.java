@@ -4,23 +4,18 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.api.network.MapSignal;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
-import com.dtteam.dynamictrees.api.treedata.TreePart;
 import com.dtteam.dynamictrees.block.BlockWithDynamicHardness;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
-import com.dtteam.dynamictrees.entity.animation.*;
+import com.dtteam.dynamictrees.entity.animation.FalloverAnimationHandler;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.systems.nodemapper.RootIntegrityNode;
-import com.dtteam.dynamictrees.tree.ChunkTreeHelper;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
-import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.EntityUtils;
 import com.dtteam.dynamictrees.utility.ItemUtils;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -57,7 +52,11 @@ public class AerialRootsSoilProperties extends SoilProperties {
     protected UndergroundRootsFamily family;
     public AerialRootsSoilProperties(final Identifier registryName) {
         super(registryName);
-        this.soilStateGenerator.reset(blockStateGenerators.get(DynamicTrees.location("aerial_root_soil")));
+    }
+
+    @Override
+    public List<Identifier> getBlockModelGenerators() {
+        return List.of(DynamicTrees.location("aerial_root_soil"));
     }
 
     public void setFamily(UndergroundRootsFamily family) {

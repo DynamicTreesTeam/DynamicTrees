@@ -79,6 +79,11 @@ public abstract class GenFeature extends ConfigurableRegistryEntry<GenFeature, G
         super(registryName);
     }
 
+    @Override
+    public final Class<GenFeature> getRegistryType() {
+        return REGISTRY.getType();
+    }
+
     ///////////////////////////////////////////
     // CONFIGURATION                         //
     ///////////////////////////////////////////

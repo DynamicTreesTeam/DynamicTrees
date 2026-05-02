@@ -11,7 +11,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -22,11 +25,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.List;
 
 /**
  * @author Max Hyper
@@ -37,8 +41,11 @@ public class WaterSoilProperties extends SoilProperties {
 
     public WaterSoilProperties(final Identifier registryName) {
         super(null, registryName);
+    }
 
-        this.soilStateGenerator.reset(blockStateGenerators.get(DynamicTrees.location("water_root_soil")));
+    @Override
+    public List<Identifier> getBlockModelGenerators() {
+        return List.of(DynamicTrees.location("water_root_soil"));
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.api.registry.Registry;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.GatherDataHelper;
 import com.dtteam.dynamictrees.data.Generator;
+import com.dtteam.dynamictrees.data.generator.DataGenerators;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
@@ -25,7 +26,9 @@ public class DTLangProvider extends LanguageProvider implements DTDataProvider.L
     protected void addTranslations() {
         this.registries.forEach(registry ->
                 registry.dataGenerationStream(this.modId).forEach(entry ->
-                        entry.generateLangData(this)
+                        entry.getLangGenerators().forEach(id ->
+                                DataGenerators.runLangGenerator(this, entry, id)
+                        )
                 )
         );
         var generator = GatherDataHelper.getExtraLangGenerator(modId);

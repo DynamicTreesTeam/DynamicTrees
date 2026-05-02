@@ -1,15 +1,13 @@
 package com.dtteam.dynamictrees.api.registry;
 
-import com.dtteam.dynamictrees.data.DTDataProvider;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.Identifier;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -115,13 +113,16 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
         this.generateData = generateData;
     }
 
-    public void generateStateData(BlockModelGenerators generators) {
+    public List<Identifier> getBlockModelGenerators() {
+        return List.of();
     }
 
-    public void generateItemModelData(ItemModelGenerators generators) {
+    public List<Identifier> getItemModelGenerators() {
+        return List.of();
     }
 
-    public void generateLangData(DTDataProvider.Language provider) {
+    public List<Identifier> getLangGenerators() {
+        return List.of();
     }
 
     public final Identifier getRegistryName() {
@@ -168,5 +169,7 @@ public abstract class RegistryEntry<T extends RegistryEntry<T>> {
 
         return stringBuilder.toString();
     }
+
+    public abstract Class<T> getRegistryType();
 
 }

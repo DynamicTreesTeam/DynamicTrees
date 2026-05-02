@@ -2,7 +2,6 @@ package com.dtteam.dynamictrees.data.generator;
 
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
-import com.dtteam.dynamictrees.data.provider.DTLangProvider;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -15,26 +14,24 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FamilyLangGenerator implements Generator<DTDataProvider.Language, Family> {
-    DTLangProvider provider;
+    DTDataProvider.Language provider;
 
     @Override
     public void generate(DTDataProvider.Language prov, Family input, Dependencies dependencies) {
-        if (prov instanceof DTLangProvider provider1) {
-            this.provider = provider1;
-            input.getBranch().ifPresent(branch ->
-                    treeLang(branch, input, input.getLangOverride("branch"))
+        this.provider = prov;
+        input.getBranch().ifPresent(branch ->
+                treeLang(branch, input, input.getLangOverride("branch"))
+        );
+        input.getBranchItem().ifPresent(branch ->
+                treeLang(branch, input.getLangOverride("branch_item"))
+        );
+        if(input instanceof UndergroundRootsFamily rootsFamily){
+            rootsFamily.getRoots().ifPresent(root ->
+                    treeLang(root, input, input.getLangOverride("roots"))
             );
-            input.getBranchItem().ifPresent(branch ->
-                    treeLang(branch, input.getLangOverride("branch_item"))
+            rootsFamily.getRootsItem().ifPresent(root ->
+                    treeLang(root, input.getLangOverride("roots_item"))
             );
-            if(input instanceof UndergroundRootsFamily rootsFamily){
-                rootsFamily.getRoots().ifPresent(root ->
-                        treeLang(root, input, input.getLangOverride("roots"))
-                );
-                rootsFamily.getRootsItem().ifPresent(root ->
-                        treeLang(root, input.getLangOverride("roots_item"))
-                );
-            }
         }
     }
 
@@ -43,16 +40,16 @@ public class FamilyLangGenerator implements Generator<DTDataProvider.Language, F
         return new Dependencies();
     }
 
-    protected void treeLang(Block entry, Family family, Optional<String> defaultName) {
+    protected void treeLang(Block entry, Family family, Optional<String> override) {
         provider.addBlock(() -> entry,
-                defaultName.orElse(checkReplace(
+                override.orElse(checkReplace(
                         family.getRegistryName().getPath()+ "_tree"
                 ))
         );
     }
-    protected void treeLang(Item entry, Optional<String> defaultName) {
+    protected void treeLang(Item entry, Optional<String> override) {
         provider.addItem(() -> entry,
-                defaultName.orElse(checkReplace(
+                override.orElse(checkReplace(
                         BuiltInRegistries.ITEM.getKey(entry).getPath()
                 ))
         );

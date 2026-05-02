@@ -2,15 +2,12 @@ package com.dtteam.dynamictrees.block.leaves;
 
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.cell.CellKit;
-import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.api.worldgen.LevelContext;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.DTLootTableBuilder;
-import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.loot.DTLootContextParams;
 import com.dtteam.dynamictrees.loot.DTLootParameterSets;
@@ -23,8 +20,6 @@ import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.dtteam.dynamictrees.utility.Optionals;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.data.models.BlockModelGenerators;
-import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -59,7 +54,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * This class provides a means of holding individual properties for leaves.  This is necessary since leaves can contain
@@ -68,10 +62,6 @@ import java.util.function.Supplier;
  * @author ferreusveritas
  */
 public class LeavesProperties extends RegistryEntry<LeavesProperties> implements Resettable<LeavesProperties> {
-
-    public static final HashMap<Identifier, Supplier<Generator<BlockModelGenerators, LeavesProperties>>> blockStateGenerators = new HashMap<>();
-    public static final HashMap<Identifier, Supplier<Generator<ItemModelGenerators, LeavesProperties>>> itemModelGenerators = new HashMap<>();
-    public static final HashMap<Identifier, Supplier<Generator<DTDataProvider.Language, LeavesProperties>>> languageGenerators = new HashMap<>();
 
     public static final Codec<LeavesProperties> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(Identifier.CODEC.fieldOf(TypedRegistry.RESOURCE_LOCATION.toString()).forGetter(LeavesProperties::getRegistryName))
@@ -198,6 +188,11 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
         this.lootTableSupplier = new LootTableSupplier("trees/leaves/", registryName);
     }
 
+    @Override
+    public final Class<LeavesProperties> getRegistryType() {
+        return REGISTRY.getType();
+    }
+
     ///////////////////////////////////////////
     // DATA GENERATION
     ///////////////////////////////////////////
@@ -276,24 +271,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
                 .create(DTLootParameterSets.LEAVES);
     }
 
-    protected final MutableLazyValue<Generator<BlockModelGenerators, LeavesProperties>> leavesStateGenerator =
-            MutableLazyValue.supplied(blockStateGenerators.get(
-                    DynamicTrees.location("leaves")
-            ));
-    protected final MutableLazyValue<Generator<DTDataProvider.Language, LeavesProperties>> leavesLangGenerator =
-            MutableLazyValue.supplied(languageGenerators.get(
-                    DynamicTrees.location("leaves_lang")
-            ));
-
     @Override
-    public void generateStateData(BlockModelGenerators generators) {
-        // Generate leaves block state and model.
-        this.leavesStateGenerator.get().generate(generators, this);
-    }
-
-    @Override
-    public void generateLangData(DTDataProvider.Language provider) {
-        this.leavesLangGenerator.get().generate(provider, this);
+    public List<Identifier> getBlockModelGenerators() {
+        return List.of(DynamicTrees.location("leaves"));
     }
 
     ///////////////////////////////////////////

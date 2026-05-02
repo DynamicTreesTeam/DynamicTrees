@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.block.soil;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.api.registry.RegistryHandler;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
@@ -100,6 +99,11 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     public SoilProperties(@Nullable final Block primitiveBlock, final Identifier registryName) {
         super(registryName);
         this.primitiveSoilBlock = primitiveBlock != null ? primitiveBlock : Blocks.AIR;
+    }
+
+    @Override
+    public final Class<SoilProperties> getRegistryType() {
+        return REGISTRY.getType();
     }
 
     ///////////////////////////////////////////
@@ -251,16 +255,9 @@ public class SoilProperties extends RegistryEntry<SoilProperties> implements Res
     // DATA GENERATION
     ///////////////////////////////////////////
 
-    protected final MutableLazyValue<Generator<BlockModelGenerators, SoilProperties>> soilStateGenerator =
-            MutableLazyValue.supplied(blockStateGenerators.get(
-                    DynamicTrees.location("soil")
-            ));
-
     @Override
-    public void generateStateData(BlockModelGenerators generators) {
-        // Generate soil state and model.
-        if (soilStateGenerator.isPresent())
-            this.soilStateGenerator.get().generate(generators, this);
+    public List<Identifier> getBlockModelGenerators() {
+        return List.of(DynamicTrees.location("soil"));
     }
 
     protected HashMap<String, Identifier> textureOverrides = new HashMap<>();

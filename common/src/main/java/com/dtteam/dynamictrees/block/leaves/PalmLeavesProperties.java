@@ -1,13 +1,10 @@
 package com.dtteam.dynamictrees.block.leaves;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.api.lazyvalue.MutableLazyValue;
 import com.dtteam.dynamictrees.api.registry.TypedRegistry;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
-import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.CoordUtils;
-import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -25,6 +22,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 
 public class PalmLeavesProperties extends LeavesProperties {
@@ -46,15 +44,9 @@ public class PalmLeavesProperties extends LeavesProperties {
     }
     public Identifier getFrondLoader () { return frondLoader; }
 
-    protected final MutableLazyValue<Generator<BlockModelGenerators, LeavesProperties>> frondsStateGenerator =
-            MutableLazyValue.supplied(blockStateGenerators.get(
-                    DynamicTrees.location("palm_fronds")
-            ));
-
     @Override
-    public void generateStateData(BlockModelGenerators generators) {
-        // Generate leaves block state and model.
-        this.frondsStateGenerator.get().generate(generators, this);
+    public List<Identifier> getBlockModelGenerators() {
+        return List.of(DynamicTrees.location("palm_fronds"));
     }
 
     public String getFrondsModelName(){
