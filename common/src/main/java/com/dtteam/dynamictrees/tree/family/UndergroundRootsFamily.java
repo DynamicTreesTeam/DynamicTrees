@@ -154,10 +154,6 @@ public class UndergroundRootsFamily extends Family {
             this.rootsItemModelGenerator.get().generate(generators, this);
     }
 
-    public Identifier getBranchItemParentLocation() {
-        return DynamicTrees.location("item/branch");
-    }
-
     public List<TagKey<Block>> defaultRootsTags() {
         return Collections.singletonList(DTBlockTags.ROOTS);
     }

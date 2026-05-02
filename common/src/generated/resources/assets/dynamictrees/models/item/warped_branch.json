@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "dynamictrees:item/branch",
   "textures": {
-    "layer0": "dynamictrees:item/warped_branch"
+    "bark": "minecraft:block/warped_stem",
+    "rings": "minecraft:block/warped_stem_top"
   }
 }

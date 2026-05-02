@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.data.provider.DTLangProvider;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,9 +21,19 @@ public class FamilyLangGenerator implements Generator<DTDataProvider.Language, F
     public void generate(DTDataProvider.Language prov, Family input, Dependencies dependencies) {
         if (prov instanceof DTLangProvider provider1) {
             this.provider = provider1;
-            input.getBranch().ifPresent(branch -> treeLang(branch, input, input.getLangOverride("branch")));
-            if(input instanceof UndergroundRootsFamily mgf){
-                mgf.getRoots().ifPresent(root -> treeLang(root, input, input.getLangOverride("roots")));
+            input.getBranch().ifPresent(branch ->
+                    treeLang(branch, input, input.getLangOverride("branch"))
+            );
+            input.getBranchItem().ifPresent(branch ->
+                    treeLang(branch, input.getLangOverride("branch_item"))
+            );
+            if(input instanceof UndergroundRootsFamily rootsFamily){
+                rootsFamily.getRoots().ifPresent(root ->
+                        treeLang(root, input, input.getLangOverride("roots"))
+                );
+                rootsFamily.getRootsItem().ifPresent(root ->
+                        treeLang(root, input.getLangOverride("roots_item"))
+                );
             }
         }
     }
@@ -32,12 +43,19 @@ public class FamilyLangGenerator implements Generator<DTDataProvider.Language, F
         return new Dependencies();
     }
 
-    protected void treeLang(Block entry, Family family, Optional<String> blah) {
-        provider.addBlock(() -> entry, blah.orElse(checkReplace(family.getRegistryName().getPath()+"_tree")));
+    protected void treeLang(Block entry, Family family, Optional<String> defaultName) {
+        provider.addBlock(() -> entry,
+                defaultName.orElse(checkReplace(
+                        family.getRegistryName().getPath()+ "_tree"
+                ))
+        );
     }
-
-    protected void blockLang(Block entry, Optional<String> blah) {
-        provider.addBlock(() -> entry, blah.orElse(checkReplace(BuiltInRegistries.BLOCK.getKey(entry).getPath())));
+    protected void treeLang(Item entry, Optional<String> defaultName) {
+        provider.addItem(() -> entry,
+                defaultName.orElse(checkReplace(
+                        BuiltInRegistries.ITEM.getKey(entry).getPath()
+                ))
+        );
     }
 
     protected String checkReplace(String path) {

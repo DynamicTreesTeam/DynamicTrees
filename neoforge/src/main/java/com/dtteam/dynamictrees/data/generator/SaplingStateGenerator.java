@@ -2,12 +2,15 @@ package com.dtteam.dynamictrees.data.generator;
 
 import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
 import com.dtteam.dynamictrees.data.Generator;
+import com.dtteam.dynamictrees.data.GeneratorHelper;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
-import net.minecraft.client.data.models.model.*;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.data.models.model.ModelTemplate;
+import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.renderer.block.dispatch.Variant;
-import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
@@ -34,11 +37,10 @@ public class SaplingStateGenerator implements Generator<BlockModelGenerators, Sp
 
         DynamicSaplingBlock saplingBlock = dependencies.get(SAPLING);
 
-        TextureSlot[] slots = createSlots(textures);
+        TextureSlot[] slots = GeneratorHelper.createSlots(textures);
         ModelTemplate saplingTemplate = ModelTemplates.create(input.getSaplingSmartModelLocation().toString(), slots);
-
         Identifier modelLocation = input.getRegistryName().withPrefix("block/saplings/");
-        Identifier model = saplingTemplate.create(modelLocation, createMapping(textures, slots), generators.modelOutput);
+        Identifier model = saplingTemplate.create(modelLocation, GeneratorHelper.createMapping(textures, slots), generators.modelOutput);
 
         generators.blockStateOutput.accept(
                 MultiVariantGenerator.dispatch(
@@ -46,18 +48,6 @@ public class SaplingStateGenerator implements Generator<BlockModelGenerators, Sp
                         BlockModelGenerators.variant(new Variant(model))
                 )
         );
-    }
-
-    private static TextureSlot[] createSlots(Map<String, Identifier> textures) {
-        return textures.keySet().stream().map(TextureSlot::create).toArray(TextureSlot[]::new);
-    }
-
-    private static TextureMapping createMapping(Map<String, Identifier> textures, TextureSlot[] slots) {
-        TextureMapping mapping = new TextureMapping();
-        for (TextureSlot slot : slots) {
-            mapping.put(slot, new Material(textures.get(slot.getId()).withPrefix("block/")));
-        }
-        return mapping;
     }
 
     @Override

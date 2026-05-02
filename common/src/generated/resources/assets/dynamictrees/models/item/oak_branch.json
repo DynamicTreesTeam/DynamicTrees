@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "dynamictrees:item/branch",
   "textures": {
-    "layer0": "dynamictrees:item/oak_branch"
+    "bark": "minecraft:block/oak_log",
+    "rings": "minecraft:block/oak_log_top"
   }
 }

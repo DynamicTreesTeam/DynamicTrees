@@ -2393,7 +2393,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public Identifier getSaplingSmartModelLocation() {
         if (modelOverrides.containsKey(SAPLING)) return modelOverrides.get(SAPLING);
-        return DynamicTrees.location("block/smartmodel/sapling");
+        return DynamicTrees.location("smartmodel/sapling");
     }
 
     public void addSaplingTextures(BiConsumer<String, Identifier> textureConsumer,

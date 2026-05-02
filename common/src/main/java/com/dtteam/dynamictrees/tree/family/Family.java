@@ -318,7 +318,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         return true;
     }
 
-    protected Identifier getBranchName() {
+    public Identifier getBranchName() {
         return getBranchName("");
     }
 
@@ -896,8 +896,8 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
                     DynamicTrees.location("family_lang")
             ));
 
-    public Identifier getBranchItemParentLocation() {return DynamicTrees.location("item/branch");}
-    public Identifier getRootItemParentLocation() {return DynamicTrees.location("item/root_branch");}
+    public Identifier getBranchItemParentLocation() {return DynamicTrees.location("branch");}
+    public Identifier getRootItemParentLocation() {return DynamicTrees.location("root_branch");}
 
     @Override
     public void generateStateData(BlockModelGenerators generators) {

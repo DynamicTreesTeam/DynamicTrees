@@ -1,7 +1,7 @@
 {
   "parent": "dynamictrees:block/block/smartmodel/water_sapling_thin",
   "textures": {
-    "leaves": "minecraft:block/block/mangrove_leaves",
-    "log": "minecraft:block/block/mangrove_log"
+    "leaves": "minecraft:block/mangrove_leaves",
+    "log": "minecraft:block/mangrove_log"
   }
 }
