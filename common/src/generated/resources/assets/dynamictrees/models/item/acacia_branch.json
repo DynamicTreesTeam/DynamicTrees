@@ -1,7 +1,6 @@
 {
-  "parent": "dynamictrees:item/branch",
+  "parent": "minecraft:item/generated",
   "textures": {
-    "bark": "minecraft:block/acacia_log",
-    "rings": "minecraft:block/acacia_log_top"
+    "layer0": "dynamictrees:item/acacia_branch"
   }
 }

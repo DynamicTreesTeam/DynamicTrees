@@ -3,6 +3,7 @@
     "": {
       "type": "dynamictrees:branch",
       "bark_texture": "minecraft:block/oak_log",
+      "family": "dynamictrees:oak",
       "rings_texture": "minecraft:block/oak_log_top"
     }
   }

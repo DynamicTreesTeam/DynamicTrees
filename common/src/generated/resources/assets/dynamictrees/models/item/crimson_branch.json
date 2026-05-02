@@ -1,7 +1,6 @@
 {
-  "parent": "dynamictrees:item/branch",
+  "parent": "minecraft:item/generated",
   "textures": {
-    "bark": "minecraft:block/crimson_stem",
-    "rings": "minecraft:block/crimson_stem_top"
+    "layer0": "dynamictrees:item/crimson_branch"
   }
 }

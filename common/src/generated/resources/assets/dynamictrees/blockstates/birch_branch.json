@@ -3,6 +3,7 @@
     "": {
       "type": "dynamictrees:branch",
       "bark_texture": "minecraft:block/birch_log",
+      "family": "dynamictrees:birch",
       "rings_texture": "minecraft:block/birch_log_top"
     }
   }

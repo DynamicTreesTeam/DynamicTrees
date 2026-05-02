@@ -1,7 +1,8 @@
 {
   "variants": {
     "": {
-      "model": "dynamictrees:block/jungle_root"
+      "type": "dynamictrees:surface_root",
+      "bark_texture": "minecraft:block/jungle_log"
     }
   }
 }

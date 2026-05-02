@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
@@ -26,7 +26,7 @@ public class BranchStateGenerator implements Generator<BlockModelGenerators, Fam
     public void generate(BlockModelGenerators generators, Family input, Dependencies dependencies) {
         final BranchBlock branch = dependencies.get(BRANCH);
         final Block primitiveLog = dependencies.get(PRIMITIVE_LOG);
-        Identifier primitiveLogPath = Generator.blockPath(BuiltInRegistries.BLOCK.getKey(primitiveLog));
+        Identifier primitiveLogPath = ModelLocationUtils.getModelLocation(primitiveLog);
 
         final Map<String, Identifier> textures = new HashMap<>();
         input.addBranchTextures(textures::put, primitiveLogPath, primitiveLog);

@@ -59,7 +59,7 @@ public abstract class RegistryHandler extends RegistryEntry<RegistryHandler> {
      */
     public static Identifier correctRegistryName(Identifier registryName) {
         if (!get(registryName.getNamespace()).isValid()) {
-            registryName = IdentifierUtils.namespace(registryName, DynamicTrees.MOD_ID);
+            registryName = IdentifierUtils.changeNamespace(registryName, DynamicTrees.MOD_ID);
         }
         return registryName;
     }

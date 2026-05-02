@@ -17,20 +17,20 @@ public final class IdentifierUtils {
         return Identifier.parse(string);
     }
 
-    public static Identifier namespace(final Identifier identifier, final String namespace) {
+    public static Identifier changeNamespace(final Identifier identifier, final String namespace) {
         return Identifier.fromNamespaceAndPath(namespace, identifier.getPath());
     }
 
     public static Identifier prefix(final Identifier identifier, final String prefix) {
-        return Identifier.fromNamespaceAndPath(identifier.getNamespace(), prefix + identifier.getPath());
+        return identifier.withPrefix(prefix);
     }
 
     public static Identifier suffix(final Identifier identifier, final String suffix) {
-        return Identifier.fromNamespaceAndPath(identifier.getNamespace(), identifier.getPath() + suffix);
+        return identifier.withSuffix(suffix);
     }
 
     public static Identifier surround(final Identifier identifier, final String prefix, final String suffix) {
-        return Identifier.fromNamespaceAndPath(identifier.getNamespace(), prefix + identifier.getPath() + suffix);
+        return identifier.withPrefix(prefix).withSuffix(suffix);
     }
 
     /**

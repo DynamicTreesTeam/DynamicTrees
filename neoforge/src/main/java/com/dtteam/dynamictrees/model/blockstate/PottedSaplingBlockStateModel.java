@@ -1,6 +1,5 @@
 package com.dtteam.dynamictrees.model.blockstate;
 
-import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
 import com.dtteam.dynamictrees.model.ModelHelper;
 import com.dtteam.dynamictrees.registry.PottedSaplingBlockEntityNF;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -85,7 +84,6 @@ public record PottedSaplingBlockStateModel(
 
             for (Species species : Species.REGISTRY){
                 if (species.getSapling().isPresent()){
-                    DynamicSaplingBlock saplingBlock = species.getSapling().get();
                     Identifier modelLocation = species.getRegistryName().withPrefix("block/saplings/");
                     ResolvedModel resolved = modelBaker.getModel(modelLocation);
 

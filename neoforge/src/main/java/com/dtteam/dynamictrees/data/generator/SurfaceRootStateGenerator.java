@@ -7,7 +7,7 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
@@ -28,7 +28,7 @@ public class SurfaceRootStateGenerator implements Generator<BlockModelGenerators
 
         final Map<String, Identifier> textures = new HashMap<>();
         textures.put("bark", input.getTexturePath(Family.BRANCH)
-                        .orElse(Generator.blockPath(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_LOG)))));
+                        .orElse(ModelLocationUtils.getModelLocation(dependencies.get(PRIMITIVE_LOG))));
 
         BranchLoaderBuilder builder = BranchLoaderBuilder.branchBuilders.get(input.getSurfaceRootLoader())
                 .apply(textures, input);

@@ -3,6 +3,7 @@
     "": {
       "type": "dynamictrees:branch",
       "bark_texture": "minecraft:block/mangrove_log",
+      "family": "dynamictrees:mangrove",
       "rings_texture": "minecraft:block/mangrove_log_top"
     }
   }

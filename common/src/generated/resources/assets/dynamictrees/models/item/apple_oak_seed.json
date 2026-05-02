@@ -1,5 +1,5 @@
 {
-  "parent": "dynamictrees:item/standard_seed",
+  "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "dynamictrees:item/apple_oak_seed"
   }

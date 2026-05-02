@@ -4,7 +4,15 @@ import com.dtteam.dynamictrees.block.sapling.DynamicSaplingBlock;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.model.*;
+import net.minecraft.client.renderer.block.dispatch.Variant;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Harley O'Connor
@@ -17,18 +25,39 @@ public class SaplingStateGenerator implements Generator<BlockModelGenerators, Sp
 
     @Override
     public void generate(BlockModelGenerators generators, Species input, Dependencies dependencies) {
-        generators.createTrivialCube(dependencies.get(SAPLING));
-//        if (prov instanceof DTBlockStateProvider provider){
-//            final Optional<Identifier> leavesTextureLocation = dependencies.getOptional(PRIMITIVE_LEAVES)
-//                    .map(primitiveLeaves -> provider.block(Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(primitiveLeaves))));
-//            final Identifier primitiveLogLocation = Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_LOG)));
-//
-//            final BlockModelBuilder builder = provider.models().getBuilder(input.getSaplingModelName())
-//                    .parent(provider.models().getExistingFile(input.getSaplingSmartModelLocation()))
-//                    .renderType("cutout_mipped");
-//            input.addSaplingTextures(builder::texture, leavesTextureLocation.orElse(primitiveLogLocation), provider.block(primitiveLogLocation));
-//            provider.simpleBlock(dependencies.get(SAPLING), builder);
-//        }
+        Block log = dependencies.get(PRIMITIVE_LOG);
+        Identifier logTexture = ModelLocationUtils.getModelLocation(log);
+        Identifier leavesTexture = ModelLocationUtils.getModelLocation(dependencies.getOptional(PRIMITIVE_LEAVES).orElse(log));
+
+        final Map<String, Identifier> textures = new HashMap<>();
+        input.addSaplingTextures(textures::put, leavesTexture, logTexture);
+
+        DynamicSaplingBlock saplingBlock = dependencies.get(SAPLING);
+
+        TextureSlot[] slots = createSlots(textures);
+        ModelTemplate saplingTemplate = ModelTemplates.create(input.getSaplingSmartModelLocation().toString(), slots);
+
+        Identifier modelLocation = input.getRegistryName().withPrefix("block/saplings/");
+        Identifier model = saplingTemplate.create(modelLocation, createMapping(textures, slots), generators.modelOutput);
+
+        generators.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(
+                        saplingBlock,
+                        BlockModelGenerators.variant(new Variant(model))
+                )
+        );
+    }
+
+    private static TextureSlot[] createSlots(Map<String, Identifier> textures) {
+        return textures.keySet().stream().map(TextureSlot::create).toArray(TextureSlot[]::new);
+    }
+
+    private static TextureMapping createMapping(Map<String, Identifier> textures, TextureSlot[] slots) {
+        TextureMapping mapping = new TextureMapping();
+        for (TextureSlot slot : slots) {
+            mapping.put(slot, new Material(textures.get(slot.getId()).withPrefix("block/")));
+        }
+        return mapping;
     }
 
     @Override

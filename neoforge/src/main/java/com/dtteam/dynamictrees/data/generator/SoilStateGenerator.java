@@ -4,7 +4,12 @@ import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.data.Generator;
 import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.blockstates.MultiPartGenerator;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.renderer.block.dispatch.Variant;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 /**
  * @author Harley O'Connor
@@ -16,14 +21,17 @@ public class SoilStateGenerator implements Generator<BlockModelGenerators, SoilP
 
     @Override
     public void generate(BlockModelGenerators generators, SoilProperties input, Dependencies dependencies) {
-        generators.createTrivialCube(dependencies.get(SOIL));
-//        if (prov instanceof DTBlockStateProvider provider){
-//            provider.getMultipartBuilder(dependencies.get(SOIL))
-//                    .part().modelFile(provider.models().getExistingFile(
-//                            input.getModelPath(SoilProperties.SOIL_BLOCK).orElse(provider.block(Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_SOIL)))))
-//                    )).addModel().end()
-//                    .part().modelFile(provider.models().getExistingFile(input.getRootsOverlayModelLocation())).addModel().end();
-//        }
+        Identifier soilModel = input.getModelPath(SoilProperties.SOIL_BLOCK)
+                .orElse(ModelLocationUtils.getModelLocation(dependencies.getOptional(PRIMITIVE_SOIL).orElse(Blocks.AIR)));
+        Identifier rootsModel = input.getRootsOverlayModelLocation();
+
+        SoilBlock soilBLock = dependencies.get(SOIL);
+
+        generators.blockStateOutput.accept(
+                MultiPartGenerator.multiPart(soilBLock)
+                        .with(BlockModelGenerators.variant(new Variant(soilModel)))
+                        .with(BlockModelGenerators.variant(new Variant(rootsModel)))
+        );
     }
 
     @Override

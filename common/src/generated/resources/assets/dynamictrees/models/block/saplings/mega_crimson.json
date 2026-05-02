@@ -1,8 +1,7 @@
 {
-  "parent": "dynamictrees:block/smartmodel/large_mushroom_round",
-  "render_type": "minecraft:cutout_mipped",
+  "parent": "dynamictrees:block/block/smartmodel/large_mushroom_round",
   "textures": {
-    "cap": "dynamictrees:block/mega_crimson_cap",
-    "stem": "dynamictrees:block/mega_crimson_cap"
+    "cap": "dynamictrees:block/block/mega_crimson_cap",
+    "stem": "dynamictrees:block/block/mega_crimson_cap"
   }
 }

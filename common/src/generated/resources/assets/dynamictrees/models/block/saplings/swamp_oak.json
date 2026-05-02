@@ -1,8 +1,7 @@
 {
-  "parent": "dynamictrees:block/smartmodel/water_sapling",
-  "render_type": "minecraft:cutout_mipped",
+  "parent": "dynamictrees:block/block/smartmodel/water_sapling",
   "textures": {
-    "leaves": "minecraft:block/oak_leaves",
-    "log": "minecraft:block/oak_log"
+    "leaves": "minecraft:block/block/oak_leaves",
+    "log": "minecraft:block/block/oak_log"
   }
 }

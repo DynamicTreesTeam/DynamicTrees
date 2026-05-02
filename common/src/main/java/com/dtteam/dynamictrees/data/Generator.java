@@ -1,15 +1,12 @@
 package com.dtteam.dynamictrees.data;
 
 import net.minecraft.data.DataProvider;
-import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import static com.dtteam.dynamictrees.utility.IdentifierUtils.prefix;
 
 /**
  * A generator for a resource, providing the means to construct a Json file using provided {@link Dependencies} and
@@ -191,13 +188,4 @@ public interface Generator<P, I> {
                     .allMatch(Optional::isPresent);
         }
     }
-
-    static Identifier blockPath(Identifier blockLocation) {
-        return prefix(blockLocation, "block/");
-    }
-
-    static Identifier itemPath(Identifier identifier) {
-        return prefix(identifier, "item/");
-    }
-
 }

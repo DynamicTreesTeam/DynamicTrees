@@ -4,6 +4,10 @@ import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.data.Generator;
 import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.renderer.block.dispatch.Variant;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
 /**
@@ -16,14 +20,15 @@ public class LeavesStateGenerator implements Generator<BlockModelGenerators, Lea
 
     @Override
     public void generate(BlockModelGenerators generators, LeavesProperties input, Dependencies dependencies) {
-        generators.createTrivialCube(dependencies.get(LEAVES));
-//        if (prov instanceof DTBlockStateProvider provider){
-//            provider.simpleBlock(dependencies.get(LEAVES), provider..getExistingFile(
-//                    input.getModelPath(LeavesProperties.LEAVES).orElse(
-//                            provider.block(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_LEAVES)))
-//                    )
-//            ));
-//        }
+
+        Identifier leavesModel = input.getModelPath(LeavesProperties.LEAVES)
+                .orElse(ModelLocationUtils.getModelLocation(dependencies.get(PRIMITIVE_LEAVES)));
+
+        DynamicLeavesBlock leavesBlock = dependencies.get(LEAVES);
+
+        generators.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(leavesBlock, BlockModelGenerators.variant(new Variant(leavesModel)))
+        );
     }
 
     @Override

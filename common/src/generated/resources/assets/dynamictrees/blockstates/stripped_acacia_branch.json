@@ -3,6 +3,7 @@
     "": {
       "type": "dynamictrees:branch",
       "bark_texture": "minecraft:block/stripped_acacia_log",
+      "family": "dynamictrees:acacia",
       "rings_texture": "minecraft:block/stripped_acacia_log_top"
     }
   }
