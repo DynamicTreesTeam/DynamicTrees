@@ -2,7 +2,9 @@
   "variants": {
     "": {
       "type": "dynamictrees:surface_root",
-      "bark_texture": "minecraft:block/dark_oak_log"
+      "textures": {
+        "bark": "minecraft:block/dark_oak_log"
+      }
     }
   }
 }

@@ -2,9 +2,11 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
-      "bark_texture": "minecraft:block/jungle_log",
       "family": "dynamictrees:jungle",
-      "rings_texture": "minecraft:block/jungle_log_top"
+      "textures": {
+        "bark": "minecraft:block/jungle_log",
+        "rings": "minecraft:block/jungle_log_top"
+      }
     }
   }
 }

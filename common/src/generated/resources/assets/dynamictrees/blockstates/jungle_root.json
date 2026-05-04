@@ -2,7 +2,9 @@
   "variants": {
     "": {
       "type": "dynamictrees:surface_root",
-      "bark_texture": "minecraft:block/jungle_log"
+      "textures": {
+        "bark": "minecraft:block/jungle_log"
+      }
     }
   }
 }

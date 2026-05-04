@@ -20,15 +20,22 @@ import java.util.Optional;
 
 public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture, Optional<Family> family) implements CustomUnbakedBlockStateModel {
 
-    public static final String BARK_TEXTURE = "bark_texture";
-    public static final String RINGS_TEXTURE = "rings_texture";
+    public static final String BARK_TEXTURE = "bark";
+    public static final String RINGS_TEXTURE = "rings";
+    public static final String TEXTURES = "textures";
     public static final String FAMILY = "family";
 
+    private record BranchTextures(Identifier bark, Identifier rings) {
+        public static final MapCodec<BranchTextures> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                Identifier.CODEC.fieldOf(BARK_TEXTURE).forGetter(BranchTextures::bark),
+                Identifier.CODEC.fieldOf(RINGS_TEXTURE).forGetter(BranchTextures::rings)
+        ).apply(i, BranchTextures::new));
+    }
+
     public static final MapCodec<UnbakedBranchModel> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-            Identifier.CODEC.fieldOf(BARK_TEXTURE).forGetter(UnbakedBranchModel::barkTexture),
-            Identifier.CODEC.fieldOf(RINGS_TEXTURE).forGetter(UnbakedBranchModel::ringsTexture),
+            BranchTextures.CODEC.codec().fieldOf(TEXTURES).forGetter(m -> new BranchTextures(m.barkTexture(), m.ringsTexture())),
             Family.CODEC.optionalFieldOf(FAMILY).forGetter(UnbakedBranchModel::family)
-    ).apply(i, UnbakedBranchModel::new));
+    ).apply(i, (textures, family) -> new UnbakedBranchModel(textures.bark(), textures.rings(), family)));
 
     @Override
     public MapCodec<? extends CustomUnbakedBlockStateModel> codec() {

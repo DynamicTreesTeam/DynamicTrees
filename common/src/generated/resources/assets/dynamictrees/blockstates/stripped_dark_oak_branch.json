@@ -2,9 +2,11 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
-      "bark_texture": "minecraft:block/stripped_dark_oak_log",
       "family": "dynamictrees:dark_oak",
-      "rings_texture": "minecraft:block/stripped_dark_oak_log_top"
+      "textures": {
+        "bark": "minecraft:block/stripped_dark_oak_log",
+        "rings": "minecraft:block/stripped_dark_oak_log_top"
+      }
     }
   }
 }

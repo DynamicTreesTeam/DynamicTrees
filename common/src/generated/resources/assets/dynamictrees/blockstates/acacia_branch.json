@@ -2,9 +2,11 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
-      "bark_texture": "minecraft:block/acacia_log",
       "family": "dynamictrees:acacia",
-      "rings_texture": "minecraft:block/acacia_log_top"
+      "textures": {
+        "bark": "minecraft:block/acacia_log",
+        "rings": "minecraft:block/acacia_log_top"
+      }
     }
   }
 }

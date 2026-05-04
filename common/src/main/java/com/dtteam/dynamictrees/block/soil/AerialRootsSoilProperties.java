@@ -302,5 +302,8 @@ public class AerialRootsSoilProperties extends SoilProperties {
         return defaultTags;
     }
 
+    public Identifier getSoilLoader(){
+        return DynamicTrees.location("aerial_roots_soil");
+    }
 
 }

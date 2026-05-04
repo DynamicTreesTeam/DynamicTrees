@@ -2,9 +2,11 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
-      "bark_texture": "minecraft:block/spruce_log",
       "family": "dynamictrees:spruce",
-      "rings_texture": "minecraft:block/spruce_log_top"
+      "textures": {
+        "bark": "minecraft:block/spruce_log",
+        "rings": "minecraft:block/spruce_log_top"
+      }
     }
   }
 }

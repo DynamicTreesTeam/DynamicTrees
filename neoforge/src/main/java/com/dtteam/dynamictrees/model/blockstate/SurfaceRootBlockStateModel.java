@@ -130,11 +130,18 @@ public record SurfaceRootBlockStateModel(
 
     public record Unbaked(Identifier barkTexture) implements CustomUnbakedBlockStateModel {
 
-        public static final String BARK_TEXTURE = "bark_texture";
+        public static final String TEXTURES = "textures";
+        public static final String BARK_TEXTURE = "bark";
+
+        private record Textures(Identifier bark) {
+            public static final MapCodec<Textures> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                    Identifier.CODEC.fieldOf(BARK_TEXTURE).forGetter(Textures::bark)
+            ).apply(i, Textures::new));
+        }
 
         public static final MapCodec<Unbaked> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                Identifier.CODEC.fieldOf(BARK_TEXTURE).forGetter(Unbaked::barkTexture)
-        ).apply(i, Unbaked::new));
+                Textures.CODEC.codec().fieldOf(TEXTURES).forGetter(m -> new Textures(m.barkTexture()))
+        ).apply(i, textures -> new Unbaked(textures.bark())));
 
         @Override
         public MapCodec<? extends CustomUnbakedBlockStateModel> codec() {

@@ -2,9 +2,11 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
-      "bark_texture": "minecraft:block/stripped_warped_stem",
       "family": "dynamictrees:warped",
-      "rings_texture": "minecraft:block/stripped_warped_stem_top"
+      "textures": {
+        "bark": "minecraft:block/stripped_warped_stem",
+        "rings": "minecraft:block/stripped_warped_stem_top"
+      }
     }
   }
 }

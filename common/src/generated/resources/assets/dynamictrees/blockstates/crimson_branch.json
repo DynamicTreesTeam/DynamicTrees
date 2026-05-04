@@ -2,9 +2,11 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
-      "bark_texture": "minecraft:block/crimson_stem",
       "family": "dynamictrees:crimson",
-      "rings_texture": "minecraft:block/crimson_stem_top"
+      "textures": {
+        "bark": "minecraft:block/crimson_stem",
+        "rings": "minecraft:block/crimson_stem_top"
+      }
     }
   }
 }

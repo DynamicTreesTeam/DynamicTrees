@@ -2,9 +2,11 @@
   "variants": {
     "": {
       "type": "dynamictrees:branch",
-      "bark_texture": "minecraft:block/cherry_log",
       "family": "dynamictrees:cherry",
-      "rings_texture": "minecraft:block/cherry_log_top"
+      "textures": {
+        "bark": "minecraft:block/cherry_log",
+        "rings": "minecraft:block/cherry_log_top"
+      }
     }
   }
 }
