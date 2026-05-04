@@ -38,7 +38,8 @@ public final class FruitResourceLoader extends JsonRegistryResourceLoader<Fruit>
                 .register("item", Item.class, Fruit::setItem)
                 .register("drop_count", Integer.class, Fruit::setDropCount)
                 .register("min_drop_count", Integer.class, Fruit::setMinDropCount)
-                .register("max_drop_count", Integer.class, Fruit::setMaxDropCount);
+                .register("max_drop_count", Integer.class, Fruit::setMaxDropCount)
+                .register("rotate_model", Boolean.class, Fruit::setRotateModel);
         this.setupAppliers.register("item", Item.class, Fruit::setItem);
 
         this.reloadAppliers

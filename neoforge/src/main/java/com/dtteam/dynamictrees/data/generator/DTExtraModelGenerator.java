@@ -1,7 +1,6 @@
 package com.dtteam.dynamictrees.data.generator;
 
 import com.dtteam.dynamictrees.DynamicTrees;
-import com.dtteam.dynamictrees.block.pod.Pod;
 import com.dtteam.dynamictrees.data.BiGenerator;
 import com.dtteam.dynamictrees.data.builder.PottedSaplingLoaderBuilder;
 import com.dtteam.dynamictrees.registry.DTRegistries;
@@ -36,8 +35,6 @@ public class DTExtraModelGenerator implements BiGenerator<BlockModelGenerators, 
                         MultiVariant.of(new PottedSaplingLoaderBuilder(Identifier.withDefaultNamespace("block/flower_pot")))
                 )
         );
-
-        blockModels.createTrivialCube(Pod.REGISTRY.get(DynamicTrees.location("cocoa")).getBlock());
     }
 
     @Override

@@ -7,9 +7,6 @@ import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
 import net.neoforged.neoforge.client.model.generators.blockstate.CustomBlockStateModelBuilder;
 import net.neoforged.neoforge.client.model.generators.blockstate.UnbakedMutator;
 
-/**
- * @author Harley O'Connor
- */
 public final class PottedSaplingLoaderBuilder extends CustomBlockStateModelBuilder {
 
     private Identifier potModel;

@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.data.generator;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.fruit.FruitBlock;
 import com.dtteam.dynamictrees.data.Generator;
+import com.mojang.math.Quadrant;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
@@ -20,12 +21,27 @@ public class FruitsStateGenerator implements Generator<BlockModelGenerators, Fru
         FruitBlock fruitBlock = dependencies.get(FRUIT_BLOCK);
 
         var propertyDispatch = PropertyDispatch.initial(input.getAgeProperty()).generate(
-                age -> BlockModelGenerators.variant(new Variant(modelLocation(age, input)))
+                age -> {
+                    if (age > 0 && input.rotateModel()){
+                        return BlockModelGenerators.variants(
+                                new Variant(modelLocation(age, input)),
+                                rotatedVariant(modelLocation(age, input), Quadrant.R90),
+                                rotatedVariant(modelLocation(age, input), Quadrant.R180),
+                                rotatedVariant(modelLocation(age, input), Quadrant.R270)
+                        );
+                    } else {
+                        return BlockModelGenerators.variant(new Variant(modelLocation(age, input)));
+                    }
+                }
         );
 
         generators.blockStateOutput.accept(
                 MultiVariantGenerator.dispatch(fruitBlock).with(propertyDispatch)
         );
+    }
+
+    private static Variant rotatedVariant(Identifier modelLocation, Quadrant yRot){
+        return new Variant(modelLocation, Variant.SimpleModelState.DEFAULT.withY(yRot));
     }
 
     protected Identifier modelLocation(int age, Fruit fruit){

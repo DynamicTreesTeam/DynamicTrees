@@ -4,6 +4,7 @@ import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.registry.RegistryEntry;
 import com.dtteam.dynamictrees.block.fruit.Fruit;
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
+import com.dtteam.dynamictrees.block.pod.Pod;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
@@ -48,6 +49,7 @@ public class DataGenerators {
         registerBlockModelGenerator(SoilProperties.class, DynamicTrees.location("aerial_root_soil"), AerialRootSoilGenerator::new);
 
         registerBlockModelGenerator(Fruit.class, DynamicTrees.location("fruit"), FruitsStateGenerator::new);
+        registerBlockModelGenerator(Pod.class, DynamicTrees.location("pod"), PodsStateGenerator::new);
 
     }
 

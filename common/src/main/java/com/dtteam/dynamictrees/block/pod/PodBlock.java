@@ -264,4 +264,7 @@ public class PodBlock extends HorizontalDirectionalBlock implements Bonemealable
         return false;
     }
 
+    public Pod getPod() {
+        return pod;
+    }
 }

@@ -41,6 +41,7 @@ import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -372,6 +373,11 @@ public class Pod extends RegistryEntry<Pod> implements Resettable<Pod> {
         seasonalFactorGetter = (l,b)-> 1.0f;
         floweringPeriodPredicate = (l, b, s)-> false;
         return this;
+    }
+
+    @Override
+    public List<Identifier> getBlockModelGenerators() {
+        return List.of(DynamicTrees.location("pod"));
     }
 
 }

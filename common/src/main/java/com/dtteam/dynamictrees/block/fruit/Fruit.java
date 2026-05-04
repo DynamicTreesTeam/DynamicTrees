@@ -58,7 +58,9 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
 
     private Supplier<FruitBlock> block;
 
-
+    /**
+     * Remember that 0 is a valid age. So the number of states is maxAge + 1.
+     */
     private int maxAge = 3;
 
     /**
@@ -93,6 +95,8 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
 
     private int minDropCount = 1;
     private int maxDropCount = 1;
+
+    private boolean rotateModel = false;
 
     public Fruit(Identifier registryName) {
         super(registryName);
@@ -172,6 +176,14 @@ public class Fruit extends RegistryEntry<Fruit> implements Resettable<Fruit> {
     }
     public void setMinDropCount(int minDropCount) {
         this.minDropCount = minDropCount;
+    }
+
+    public void setRotateModel(boolean rotateModel) {
+        this.rotateModel = rotateModel;
+    }
+
+    public boolean rotateModel() {
+        return rotateModel;
     }
 
     public final VoxelShape getBlockShape(int age) {

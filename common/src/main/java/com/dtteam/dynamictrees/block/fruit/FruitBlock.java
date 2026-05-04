@@ -228,4 +228,8 @@ public class FruitBlock extends Block implements BonemealableBlock, Growable {
     protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
+
+    public Fruit getFruit() {
+        return fruit;
+    }
 }
