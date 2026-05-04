@@ -1,5 +1,5 @@
 {
-  "parent": "dynamictrees:block/block/smartmodel/water_sapling",
+  "parent": "dynamictrees:block/smartmodel/water_sapling",
   "textures": {
     "leaves": "minecraft:block/oak_leaves",
     "log": "minecraft:block/oak_log"

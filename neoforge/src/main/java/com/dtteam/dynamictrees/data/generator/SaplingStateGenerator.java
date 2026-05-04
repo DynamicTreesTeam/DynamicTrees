@@ -8,7 +8,6 @@ import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.ModelTemplate;
-import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.resources.Identifier;
@@ -16,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Harley O'Connor
@@ -38,8 +38,8 @@ public class SaplingStateGenerator implements Generator<BlockModelGenerators, Sp
         DynamicSaplingBlock saplingBlock = dependencies.get(SAPLING);
 
         TextureSlot[] slots = GeneratorHelper.createSlots(textures);
-        ModelTemplate saplingTemplate = ModelTemplates.create(input.getSaplingSmartModelLocation().toString(), slots);
-        Identifier modelLocation = input.getRegistryName().withPrefix("block/saplings/");
+        ModelTemplate saplingTemplate = new ModelTemplate(Optional.of(input.getSaplingSmartModelLocation()), Optional.empty(), slots);
+        Identifier modelLocation = input.getSaplingModelLocation();
         Identifier model = saplingTemplate.create(modelLocation, GeneratorHelper.createMapping(textures, slots), generators.modelOutput);
 
         generators.blockStateOutput.accept(

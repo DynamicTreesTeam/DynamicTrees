@@ -1,5 +1,5 @@
 {
-  "parent": "dynamictrees:block/block/smartmodel/large_sapling",
+  "parent": "dynamictrees:block/smartmodel/large_sapling",
   "textures": {
     "leaves": "minecraft:block/jungle_leaves",
     "log": "minecraft:block/jungle_log"

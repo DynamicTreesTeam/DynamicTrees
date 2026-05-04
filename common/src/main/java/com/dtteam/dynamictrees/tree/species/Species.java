@@ -923,8 +923,8 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
         }
     }
 
-    public String getSaplingModelName() {
-        return "block/saplings/" + Objects.requireNonNullElseGet(saplingName, () -> this.getRegistryName().getPath());
+    public Identifier getSaplingModelLocation() {
+        return this.getRegistryName().withPrefix("block/saplings/");
     }
 
     public void setSaplingName(String name) {
@@ -2371,7 +2371,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
      */
     public Identifier getSaplingSmartModelLocation() {
         if (modelOverrides.containsKey(SAPLING)) return modelOverrides.get(SAPLING);
-        return DynamicTrees.location("smartmodel/sapling");
+        return DynamicTrees.location("block/smartmodel/sapling");
     }
 
     public void addSaplingTextures(BiConsumer<String, Identifier> textureConsumer,
