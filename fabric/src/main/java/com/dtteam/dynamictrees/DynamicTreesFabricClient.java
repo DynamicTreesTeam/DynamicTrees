@@ -102,7 +102,7 @@ public class DynamicTreesFabricClient implements ClientModInitializer {
         }
 
         for (Family family : Family.REGISTRY.getAll()) {
-            if (family instanceof UndergroundRootsFamily rootsFamily) {
+            if (family instanceof AerialRootsFamily rootsFamily) {
                 rootsFamily.getRoots().ifPresent(roots ->
                     BlockRenderLayerMap.INSTANCE.putBlock(roots, RenderType.cutoutMipped())
                 );

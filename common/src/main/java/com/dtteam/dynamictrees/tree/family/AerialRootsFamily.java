@@ -10,7 +10,7 @@ import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.data.tags.DTBlockTags;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
+import com.dtteam.dynamictrees.tree.species.AerialRootsSpecies;
 import com.dtteam.dynamictrees.utility.Optionals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -37,23 +37,23 @@ import java.util.function.Supplier;
 
 import static com.dtteam.dynamictrees.utility.IdentifierUtils.suffix;
 
-public class UndergroundRootsFamily extends Family {
+public class AerialRootsFamily extends Family {
 
-    public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(UndergroundRootsFamily::new);
+    public static final TypedRegistry.EntryType<Family> TYPE = TypedRegistry.newType(AerialRootsFamily::new);
     private AerialRootsSoilProperties defaultSoil;
     private Supplier<BranchBlock> roots;
     private Supplier<Item> rootsItem;
     private Block primitiveRoots, primitiveRootsFilled, primitiveRootsCovered;
 
-    public UndergroundRootsFamily(Identifier name) {
+    public AerialRootsFamily(Identifier name) {
         super(name);
     }
 
     @Override
     public void setCommonSpecies(Species species) {
         super.setCommonSpecies(species);
-        if (!(species instanceof UndergroundRootsSpecies)) {
-            LogManager.getLogger().warn("Common species {} for Underground Roots Family {} is not of type {}", species.getRegistryName(), getRegistryName(), UndergroundRootsSpecies.class);
+        if (!(species instanceof AerialRootsSpecies)) {
+            LogManager.getLogger().warn("Common species {} for Aerial Roots Family {} is not of type {}", species.getRegistryName(), getRegistryName(), AerialRootsSpecies.class);
         }
     }
 
@@ -63,7 +63,7 @@ public class UndergroundRootsFamily extends Family {
 
     public void setDefaultSoil(SoilProperties defaultSoil) {
         if (!(defaultSoil instanceof AerialRootsSoilProperties))
-            throw new RuntimeException("Soil "+ defaultSoil.toString() +" for Underground Roots Family "+ this +" is not of type "+ AerialRootsSoilProperties.class);
+            throw new RuntimeException("Soil "+ defaultSoil.toString() +" for Aerial Roots Family "+ this +" is not of type "+ AerialRootsSoilProperties.class);
         this.defaultSoil = (AerialRootsSoilProperties) defaultSoil;
         this.defaultSoil.setFamily(this);
     }

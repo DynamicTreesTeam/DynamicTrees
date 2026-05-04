@@ -13,7 +13,7 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.context.PositionalSpeciesContext;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import com.dtteam.dynamictrees.worldgen.DynamicTreeGenerationContext;
 import com.dtteam.dynamictrees.worldgen.JoCode;
 import com.dtteam.dynamictrees.worldgen.JoCodeRegistry;
@@ -32,9 +32,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class UndergroundRootsSpecies extends Species {
+public class AerialRootsSpecies extends Species {
 
-    public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(UndergroundRootsSpecies::new);
+    public static final TypedRegistry.EntryType<Species> TYPE = createDefaultType(AerialRootsSpecies::new);
 
     protected GrowthLogicKitConfiguration rootLogicKit = GrowthLogicKitConfiguration.getDefault();
     private int minWorldGenHeightOffset = 2;
@@ -59,15 +59,15 @@ public class UndergroundRootsSpecies extends Species {
         this.updateSoilOnWaterRadius = updateSoilOnWaterRadius;
     }
 
-    public UndergroundRootsSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
+    public AerialRootsSpecies(Identifier name, Family family, LeavesProperties leavesProperties) {
         super(name, family, leavesProperties);
-        if (!(family instanceof UndergroundRootsFamily)) {
-            throw new RuntimeException("Family " + family.getRegistryName() + " for Underground Roots Species " + getRegistryName() + " is not of type "+ UndergroundRootsFamily.class);
+        if (!(family instanceof AerialRootsFamily)) {
+            throw new RuntimeException("Family " + family.getRegistryName() + " for Aerial Roots Species " + getRegistryName() + " is not of type "+ AerialRootsFamily.class);
         }
     }
 
-    public UndergroundRootsFamily getFamily() {
-        return (UndergroundRootsFamily) family;
+    public AerialRootsFamily getFamily() {
+        return (AerialRootsFamily) family;
     }
 
     //////////////////////

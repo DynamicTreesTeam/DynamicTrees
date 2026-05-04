@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.data.generator;
 import com.dtteam.dynamictrees.data.DTDataProvider;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -25,7 +25,7 @@ public class FamilyLangGenerator implements Generator<DTDataProvider.Language, F
         input.getBranchItem().ifPresent(branch ->
                 treeLang(branch, input.getLangOverride("branch_item"))
         );
-        if(input instanceof UndergroundRootsFamily rootsFamily){
+        if(input instanceof AerialRootsFamily rootsFamily){
             rootsFamily.getRoots().ifPresent(root ->
                     treeLang(root, input, input.getLangOverride("roots"))
             );

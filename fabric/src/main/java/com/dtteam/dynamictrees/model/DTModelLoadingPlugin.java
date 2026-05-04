@@ -9,7 +9,7 @@ import com.dtteam.dynamictrees.model.baked.BasicRootsBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.SurfaceRootBlockBakedModel;
 import com.dtteam.dynamictrees.model.baked.ThickBranchBlockBakedModel;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -103,11 +103,11 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
                 });
             });
 
-            if (family instanceof UndergroundRootsFamily undergroundFamily) {
-                undergroundFamily.getRoots().ifPresent(roots -> {
+            if (family instanceof AerialRootsFamily rootsFamily) {
+                rootsFamily.getRoots().ifPresent(roots -> {
                     Identifier blockId = BuiltInRegistries.BLOCK.getKey(roots);
 
-                    undergroundFamily.getPrimitiveRoots().ifPresent(primitiveRoots -> {
+                    rootsFamily.getPrimitiveRoots().ifPresent(primitiveRoots -> {
                         Identifier primitiveRootsId = BuiltInRegistries.BLOCK.getKey(primitiveRoots);
                         Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_side");
                         Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveRootsId.getNamespace(), "block/" + primitiveRootsId.getPath() + "_top");
@@ -122,7 +122,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
                         UNDERGROUND_ROOTS_MODEL_CACHE.put(blockId.withSuffix("_exposed"), model);
                     });
 
-                    undergroundFamily.getPrimitiveFilledRoots().ifPresent(primitiveFilledRoots -> {
+                    rootsFamily.getPrimitiveFilledRoots().ifPresent(primitiveFilledRoots -> {
                         Identifier primitiveFilledRootsId = BuiltInRegistries.BLOCK.getKey(primitiveFilledRoots);
                         Identifier barkTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_side");
                         Identifier ringsTexture = Identifier.fromNamespaceAndPath(primitiveFilledRootsId.getNamespace(), "block/" + primitiveFilledRootsId.getPath() + "_top");
@@ -161,7 +161,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
         return new BasicRootsBlockBakedModel(barkSprite, ringsSprite);
     }
 
-    private BakedModel createFallbackRootsModel(UndergroundRootsFamily family, String variant, Function<Material, TextureAtlasSprite> spriteGetter) {
+    private BakedModel createFallbackRootsModel(AerialRootsFamily family, String variant, Function<Material, TextureAtlasSprite> spriteGetter) {
         if (variant.contains("layer=exposed")) {
             return family.getPrimitiveRoots().map(primitiveRoots -> {
                 Identifier primitiveRootsId = BuiltInRegistries.BLOCK.getKey(primitiveRoots);
@@ -211,7 +211,7 @@ public class DTModelLoadingPlugin implements ModelLoadingPlugin {
                 return rootsModel;
             }
 
-            if (rootsBlock.getFamily() instanceof UndergroundRootsFamily undergroundFamily) {
+            if (rootsBlock.getFamily() instanceof AerialRootsFamily undergroundFamily) {
                 BakedModel fallbackModel = createFallbackRootsModel(undergroundFamily, variant, context.textureGetter());
                 if (fallbackModel != null) {
                     UNDERGROUND_ROOTS_MODEL_CACHE.put(cacheKey, fallbackModel);

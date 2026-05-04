@@ -13,7 +13,7 @@ import com.dtteam.dynamictrees.entity.animation.FalloverAnimationHandler;
 import com.dtteam.dynamictrees.systems.nodemapper.NetVolumeNode;
 import com.dtteam.dynamictrees.systems.nodemapper.RootIntegrityNode;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import com.dtteam.dynamictrees.utility.EntityUtils;
 import com.dtteam.dynamictrees.utility.ItemUtils;
 import net.minecraft.core.BlockPos;
@@ -49,7 +49,7 @@ public class AerialRootsSoilProperties extends SoilProperties {
 
     public static final TypedRegistry.EntryType<SoilProperties> TYPE = TypedRegistry.newType(AerialRootsSoilProperties::new);
 
-    protected UndergroundRootsFamily family;
+    protected AerialRootsFamily family;
     public AerialRootsSoilProperties(final Identifier registryName) {
         super(registryName);
     }
@@ -59,11 +59,11 @@ public class AerialRootsSoilProperties extends SoilProperties {
         return List.of(DynamicTrees.location("aerial_root_soil"));
     }
 
-    public void setFamily(UndergroundRootsFamily family) {
+    public void setFamily(AerialRootsFamily family) {
         this.family = family;
     }
 
-    public UndergroundRootsFamily getFamily() {
+    public AerialRootsFamily getFamily() {
         return family;
     }
 

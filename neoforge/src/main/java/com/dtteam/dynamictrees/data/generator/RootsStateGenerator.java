@@ -3,7 +3,7 @@ package com.dtteam.dynamictrees.data.generator;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.data.Generator;
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.world.level.block.Block;
 
@@ -47,7 +47,7 @@ public class RootsStateGenerator implements Generator<BlockModelGenerators, Fami
 
     @Override
     public Dependencies gatherDependencies(Family input) {
-        UndergroundRootsFamily mangroveInput = (UndergroundRootsFamily) input;
+        AerialRootsFamily mangroveInput = (AerialRootsFamily) input;
         return new Dependencies()
                 .append(ROOT, mangroveInput.getRoots())
                 .append(PRIMITIVE_ROOT, mangroveInput.getPrimitiveRoots())

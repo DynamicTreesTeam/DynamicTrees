@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.data.generator;
 
 import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
@@ -24,7 +24,7 @@ public class RootsItemModelGenerator extends BranchItemModelGenerator {
 
     @Override
     public Dependencies gatherDependencies(Family input) {
-        UndergroundRootsFamily mangroveInput = (UndergroundRootsFamily) input;
+        AerialRootsFamily mangroveInput = (AerialRootsFamily) input;
         return new Dependencies()
                 .append(BRANCH_ITEM, mangroveInput.getRootsItem())
                 .append(PRIMITIVE_BLOCK, mangroveInput.getPrimitiveRoots());

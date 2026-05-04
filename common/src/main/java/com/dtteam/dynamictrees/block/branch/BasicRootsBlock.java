@@ -20,9 +20,9 @@ import com.dtteam.dynamictrees.systems.nodemapper.RootsDestroyerNode;
 import com.dtteam.dynamictrees.systems.nodemapper.SpeciesNode;
 import com.dtteam.dynamictrees.systems.nodemapper.StateNode;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
+import com.dtteam.dynamictrees.tree.species.AerialRootsSpecies;
 import com.dtteam.dynamictrees.utility.EntityUtils;
 import com.dtteam.dynamictrees.utility.ItemUtils;
 import net.minecraft.core.BlockPos;
@@ -78,18 +78,18 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     private static final Logger log = LoggerFactory.getLogger(BasicRootsBlock.class);
 
     public enum Layer implements StringRepresentable {
-        EXPOSED (UndergroundRootsFamily::getPrimitiveRoots),
-        FILLED (UndergroundRootsFamily::getPrimitiveFilledRoots),
-        COVERED (UndergroundRootsFamily::getPrimitiveCoveredRoots);
-        final Function<UndergroundRootsFamily, Optional<Block>> primitiveFunc;
-        Layer(Function<UndergroundRootsFamily, Optional<Block>> primitiveFunc){
+        EXPOSED (AerialRootsFamily::getPrimitiveRoots),
+        FILLED (AerialRootsFamily::getPrimitiveFilledRoots),
+        COVERED (AerialRootsFamily::getPrimitiveCoveredRoots);
+        final Function<AerialRootsFamily, Optional<Block>> primitiveFunc;
+        Layer(Function<AerialRootsFamily, Optional<Block>> primitiveFunc){
             this.primitiveFunc = primitiveFunc;
         }
         @Override public @NotNull String getSerializedName() {
             return toString().toLowerCase(Locale.ENGLISH);
         }
 
-        public Optional<Block> getPrimitive (UndergroundRootsFamily family){
+        public Optional<Block> getPrimitive (AerialRootsFamily family){
             return primitiveFunc.apply(family);
         }
     }
@@ -106,8 +106,8 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public boolean isFullBlock (BlockState state){
         return state.getValue(LAYER) == Layer.COVERED;
     }
-    public UndergroundRootsFamily getFamily() {
-        return (UndergroundRootsFamily) super.getFamily();
+    public AerialRootsFamily getFamily() {
+        return (AerialRootsFamily) super.getFamily();
     }
 
     /** NeoForge override */
@@ -569,7 +569,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         final BlockState currBlockState = level.getBlockState(pos);
         final Species species = signal.getSpecies();
         //Family must be "mangrove" for trees to have roots
-        if (!(species instanceof UndergroundRootsSpecies speciesMangrove)) return signal;
+        if (!(species instanceof AerialRootsSpecies speciesMangrove)) return signal;
 
         final Direction originDir = signal.dir.getOpposite();// Direction this signal originated from
         Direction targetDir = speciesMangrove.getRootsGrowthLogicKit().selectNewDirection( // This must be cached on the stack for proper recursion

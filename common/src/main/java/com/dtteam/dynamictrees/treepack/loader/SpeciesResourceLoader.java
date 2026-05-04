@@ -18,7 +18,7 @@ import com.dtteam.dynamictrees.systems.SeedSaplingRecipe;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatureConfiguration;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKitConfiguration;
 import com.dtteam.dynamictrees.tree.species.Species;
-import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
+import com.dtteam.dynamictrees.tree.species.AerialRootsSpecies;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -146,13 +146,13 @@ public final class SpeciesResourceLoader extends JsonRegistryResourceLoader<Spec
 
     private void registerMangroveAppliers(){
         this.reloadAppliers
-                .register("min_world_gen_height_offset", UndergroundRootsSpecies.class, Integer.class, UndergroundRootsSpecies::setMinWorldGenHeightOffset)
-                .register("max_world_gen_height_offset", UndergroundRootsSpecies.class, Integer.class, UndergroundRootsSpecies::setMaxWorldGenHeightOffset)
-                .register("roots_growth_logic_kit", UndergroundRootsSpecies.class, GrowthLogicKitConfiguration.class, UndergroundRootsSpecies::setRootsGrowthLogicKit)
-                .register("root_growth_multiplier", UndergroundRootsSpecies.class, Integer.class, UndergroundRootsSpecies::setRootGrowthMultiplier)
-                .register("root_tapering", UndergroundRootsSpecies.class, Float.class, UndergroundRootsSpecies::setRootTapering)
-                .register("root_signal_energy", UndergroundRootsSpecies.class, Float.class, UndergroundRootsSpecies::setRootSignalEnergy)
-                .register("update_soil_on_water_radius", UndergroundRootsSpecies.class, Integer.class, UndergroundRootsSpecies::setUpdateSoilOnWaterRadius);
+                .register("min_world_gen_height_offset", AerialRootsSpecies.class, Integer.class, AerialRootsSpecies::setMinWorldGenHeightOffset)
+                .register("max_world_gen_height_offset", AerialRootsSpecies.class, Integer.class, AerialRootsSpecies::setMaxWorldGenHeightOffset)
+                .register("roots_growth_logic_kit", AerialRootsSpecies.class, GrowthLogicKitConfiguration.class, AerialRootsSpecies::setRootsGrowthLogicKit)
+                .register("root_growth_multiplier", AerialRootsSpecies.class, Integer.class, AerialRootsSpecies::setRootGrowthMultiplier)
+                .register("root_tapering", AerialRootsSpecies.class, Float.class, AerialRootsSpecies::setRootTapering)
+                .register("root_signal_energy", AerialRootsSpecies.class, Float.class, AerialRootsSpecies::setRootSignalEnergy)
+                .register("update_soil_on_water_radius", AerialRootsSpecies.class, Integer.class, AerialRootsSpecies::setUpdateSoilOnWaterRadius);
     }
 
     private void setSeed(Species species, Identifier seedName) {

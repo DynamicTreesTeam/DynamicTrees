@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.systems.nodemapper;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
@@ -11,8 +11,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class RootsDestroyerNode extends FindEndsNode {
 
-    final UndergroundRootsFamily family;
-    public RootsDestroyerNode(UndergroundRootsFamily family) {
+    final AerialRootsFamily family;
+    public RootsDestroyerNode(AerialRootsFamily family) {
         super();
         this.family = family;
     }

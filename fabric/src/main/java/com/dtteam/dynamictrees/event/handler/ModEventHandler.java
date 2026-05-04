@@ -24,12 +24,12 @@ import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKits;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
 import com.dtteam.dynamictrees.tree.family.PalmFamily;
-import com.dtteam.dynamictrees.tree.family.UndergroundRootsFamily;
+import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import com.dtteam.dynamictrees.tree.species.NetherFungusSpecies;
 import com.dtteam.dynamictrees.tree.species.PalmSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.tree.species.SwampSpecies;
-import com.dtteam.dynamictrees.tree.species.UndergroundRootsSpecies;
+import com.dtteam.dynamictrees.tree.species.AerialRootsSpecies;
 import com.dtteam.dynamictrees.treepack.Resources;
 import com.dtteam.dynamictrees.worldgen.featurecancellation.FeatureCancellers;
 
@@ -78,7 +78,7 @@ public class ModEventHandler {
 
     private static void registerFamilyTypes() {
         Family.REGISTRY.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
-        Family.REGISTRY.registerType(DynamicTrees.location("underground_roots"), UndergroundRootsFamily.TYPE);
+        Family.REGISTRY.registerType(DynamicTrees.location("aerial_roots"), AerialRootsFamily.TYPE);
         Family.REGISTRY.registerType(DynamicTrees.location("palm"), PalmFamily.TYPE);
     }
 
@@ -86,7 +86,7 @@ public class ModEventHandler {
         Species.REGISTRY.registerType(DynamicTrees.location("nether_fungus"), NetherFungusSpecies.TYPE);
         Species.REGISTRY.registerType(DynamicTrees.location("swamp"), SwampSpecies.TYPE);
         Species.REGISTRY.registerType(DynamicTrees.location("palm"), PalmSpecies.TYPE);
-        Species.REGISTRY.registerType(DynamicTrees.location("underground_roots"), UndergroundRootsSpecies.TYPE);
+        Species.REGISTRY.registerType(DynamicTrees.location("aerial_roots"), AerialRootsSpecies.TYPE);
     }
 
     private static void registerSoilPropertiesTypes() {
