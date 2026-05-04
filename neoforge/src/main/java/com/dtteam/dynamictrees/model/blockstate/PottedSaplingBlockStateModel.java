@@ -84,7 +84,7 @@ public record PottedSaplingBlockStateModel(
 
             for (Species species : Species.REGISTRY){
                 if (species.getSapling().isPresent()){
-                    Identifier modelLocation = species.getRegistryName().withPrefix("block/saplings/");
+                    Identifier modelLocation = species.getSaplingModelLocation();
                     ResolvedModel resolved = modelBaker.getModel(modelLocation);
 
                     TextureSlots saplingSlots = resolved.getTopTextureSlots();

@@ -558,7 +558,8 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
 
     public float getPrimitiveLogs(float volumeIn, List<ItemStack> drops) {
         int numLogs = (int) volumeIn;
-        for (ItemStack stack : primitiveLogDrops.stream().map(Supplier::get).collect(Collectors.toSet())) {
+        for (Supplier<ItemStack> sup : primitiveLogDrops) {
+            ItemStack stack = sup.get();
             int num = numLogs * stack.getCount();
             while (num > 0) {
                 ItemStack drop = stack.copy();

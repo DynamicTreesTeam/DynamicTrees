@@ -129,7 +129,7 @@ public class ChunkTreeHelper {
         BlockPosBounds bounds = new BlockPosBounds(level, chunkPos);
 
         bounds.shrink(Direction.UP, (level.getHeight() - 1) - (getTopFilledSegment(chunk) + 16));
-        for (Direction dir : Direction.Plane.HORIZONTAL.stream().toList()) {
+        for (Direction dir : CoordUtils.HORIZONTALS) {
             bounds.expand(dir, radius * CHUNK_WIDTH);
         }
 
