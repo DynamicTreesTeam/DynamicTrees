@@ -68,6 +68,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class BranchBlock extends BlockWithDynamicHardness implements TreePart, FutureBreakable, BonemealableBlock {
@@ -84,7 +85,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
      * The {@link Family} for this {@link BranchBlock}.
      */
     private Family family = Family.NULL_FAMILY;
-    private ItemStack[] primitiveLogDrops = new ItemStack[]{};
+    private List<Supplier<ItemStack>> primitiveLogDrops = new LinkedList<>();
     private boolean canBeStripped;
 
     /**
@@ -557,7 +558,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
 
     public float getPrimitiveLogs(float volumeIn, List<ItemStack> drops) {
         int numLogs = (int) volumeIn;
-        for (ItemStack stack : primitiveLogDrops) {
+        for (ItemStack stack : primitiveLogDrops.stream().map(Supplier::get).collect(Collectors.toSet())) {
             int num = numLogs * stack.getCount();
             while (num > 0) {
                 ItemStack drop = stack.copy();
@@ -569,7 +570,7 @@ public abstract class BranchBlock extends BlockWithDynamicHardness implements Tr
         return volumeIn - numLogs;
     }
 
-    public BranchBlock setPrimitiveLogDrops(ItemStack... drops) {
+    public BranchBlock setPrimitiveLogDrops(List<Supplier<ItemStack>> drops) {
         primitiveLogDrops = drops;
         return this;
     }

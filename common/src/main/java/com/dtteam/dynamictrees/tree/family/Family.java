@@ -482,7 +482,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.primitiveLog = primitiveLog;
 
         if (this.branch != null) {
-            this.branch.get().setPrimitiveLogDrops(new ItemStack(primitiveLog));
+            this.branch.get().setPrimitiveLogDrops(List.of(()->new ItemStack(primitiveLog)));
         }
 
         return this;
@@ -492,7 +492,7 @@ public class Family extends RegistryEntry<Family> implements Resettable<Family> 
         this.primitiveStrippedLog = primitiveStrippedLog;
 
         if (this.strippedBranch != null) {
-            this.strippedBranch.get().setPrimitiveLogDrops(new ItemStack(primitiveStrippedLog));
+            this.strippedBranch.get().setPrimitiveLogDrops(List.of(()->new ItemStack(primitiveStrippedLog)));
         }
 
         return this;

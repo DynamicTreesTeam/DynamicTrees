@@ -211,7 +211,7 @@ public class UndergroundRootsFamily extends Family {
     public void setPrimitiveRoots(Block primitiveRoots) {
         this.primitiveRoots = primitiveRoots;
         if (this.roots != null) {
-            this.roots.get().setPrimitiveLogDrops(new ItemStack(primitiveRoots));
+            this.roots.get().setPrimitiveLogDrops(List.of(()->new ItemStack(primitiveRoots)));
         }
     }
     public void setPrimitiveRootsFilled(Block primitiveRootsFilled) {
