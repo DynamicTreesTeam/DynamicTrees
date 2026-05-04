@@ -1,4 +1,4 @@
-// 26.1.1	2026-05-04T11:33:43.559763	Model Definitions - dynamictrees
+// 26.1.1	2026-05-04T12:36:19.5806057	Model Definitions - dynamictrees
 293dd53335481225100f40111f64c5ed18a21ebe assets/dynamictrees/blockstates/acacia_branch.json
 2606791521eac27fa77ebbeeea442b8073802a51 assets/dynamictrees/blockstates/acacia_leaves.json
 28a0cd7b38e1a854acd4f0c477573a9460811d82 assets/dynamictrees/blockstates/acacia_sapling.json
@@ -102,7 +102,7 @@ e19985d73765a944753557ce524edcd53bd6a0fe assets/dynamictrees/items/crimson_branc
 c8cc6d6371649dfbd0e4dd1325059961c345fec7 assets/dynamictrees/items/crimson_seed.json
 b83bfb74668fb79649564fe739362110a906f2df assets/dynamictrees/items/dark_oak_branch.json
 a677ea07c3aea3407cc57613bea5afa7df163dbc assets/dynamictrees/items/dark_oak_seed.json
-2b2e18b8b3c1a13d51462fc7813903fd190e1416 assets/dynamictrees/items/dendro_potion.json
+b689f734f8ebf4ccc6477f6f60c8f3a1d87ab001 assets/dynamictrees/items/dendro_potion.json
 7c20dd9a74962b94241247749a74f523afe976e9 assets/dynamictrees/items/dirt_bucket.json
 9ba98ad67daaf5a4757df4876e46bc7d3c9d9066 assets/dynamictrees/items/jungle_branch.json
 4997c07ac3ad315db5dfe8ddab506b277d2ad813 assets/dynamictrees/items/jungle_seed.json
@@ -117,7 +117,7 @@ f9ac835a541e590f163bc3641b055d228453d98d assets/dynamictrees/items/mega_crimson_
 398789302454457c1c43fb94663173498604baf3 assets/dynamictrees/items/oak_seed.json
 9debe2146399bb9ac5ab0f14c7649faf731d5015 assets/dynamictrees/items/spruce_branch.json
 80cb2f002a1019278aa1e4870b968e94fd598c37 assets/dynamictrees/items/spruce_seed.json
-42dbbae455e419b0cbb31464bbb5c7cd6b21355e assets/dynamictrees/items/staff.json
+0e65fd5441d6bd0178402a5098ecd1d123105610 assets/dynamictrees/items/staff.json
 afe58e0e012d17d7762dd66b95cb62a460754ad4 assets/dynamictrees/items/warped_branch.json
 475b7117ddb1545dead743977ad75ab7e3aaae7d assets/dynamictrees/items/warped_seed.json
 d7087e75ae64fec294712d3559c18c8399922149 assets/dynamictrees/models/block/mangrove_roots.json
@@ -154,7 +154,7 @@ a85a3970fac6077acbe31e1022eee462642db463 assets/dynamictrees/models/item/cocoa_s
 b5352275c22641fae2fcf4e948bc15ce8458bce1 assets/dynamictrees/models/item/crimson_seed.json
 a32c202fbb6da4e7a874208dd9cec27baf149104 assets/dynamictrees/models/item/dark_oak_branch.json
 e68d71b11ff4641cf87c5ba63277ab98a18a5696 assets/dynamictrees/models/item/dark_oak_seed.json
-a2a1cd6718f082a9ab469f013648613ab4a99f32 assets/dynamictrees/models/item/dendro_potion.json
+b27c4582898e32227969c768cf54d2bd86308dc2 assets/dynamictrees/models/item/dendro_potion.json
 e82ba01b74a2b7164cc8dac6aed7393a27770480 assets/dynamictrees/models/item/dirt_bucket.json
 88c3f02ac8ae87a85cffc2ecc1cb25886a237677 assets/dynamictrees/models/item/jungle_branch.json
 d75113b069d93de548636fb7cccacf8b2db5eb23 assets/dynamictrees/models/item/jungle_seed.json
@@ -169,6 +169,6 @@ cd7509aee134e96aeb879581006d0afb0f5ea454 assets/dynamictrees/models/item/mega_wa
 e4d85b1dd7a0924fae1ef4265652934967cbd728 assets/dynamictrees/models/item/oak_seed.json
 86cc99a83f65af4a568a8cd18f083ba1131a084c assets/dynamictrees/models/item/spruce_branch.json
 6367ed974102118a4389a6c09bc06f7aa1f0d074 assets/dynamictrees/models/item/spruce_seed.json
-6d5428a0798cec593b240eba3169147994459548 assets/dynamictrees/models/item/staff.json
+63b26c43959530d6eb0af707a6caf6458aa81983 assets/dynamictrees/models/item/staff.json
 d0fda0f42af26639766d71a6317ad5ef30287f67 assets/dynamictrees/models/item/warped_branch.json
 f9f4468443d148465f4ce584cd001dd800552d25 assets/dynamictrees/models/item/warped_seed.json

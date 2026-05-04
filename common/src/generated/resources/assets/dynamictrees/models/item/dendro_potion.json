@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "dynamictrees:item/dendro_potion_overlay",
+    "layer1": "dynamictrees:item/dendro_potion"
+  }
+}

@@ -1,6 +1,14 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "dynamictrees:item/staff"
+    "model": "dynamictrees:item/staff",
+    "tints": [
+      {
+        "type": "dynamictrees:staff_handle"
+      },
+      {
+        "type": "dynamictrees:staff_crystal"
+      }
+    ]
   }
 }

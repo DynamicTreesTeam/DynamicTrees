@@ -8,10 +8,7 @@ import com.dtteam.dynamictrees.block.soil.SoilBlock;
 import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.client.TextureHelper;
 import com.dtteam.dynamictrees.client.ThickBranchRingsSource;
-import com.dtteam.dynamictrees.client.TintSources.CloneTintSource;
-import com.dtteam.dynamictrees.client.TintSources.PottedSaplingTintSource;
-import com.dtteam.dynamictrees.client.TintSources.SaplingTintSource;
-import com.dtteam.dynamictrees.client.TintSources.SoilRootsTintSource;
+import com.dtteam.dynamictrees.client.TintSources.*;
 import com.dtteam.dynamictrees.model.blockstate.PottedSaplingBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.SurfaceRootBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.UnbakedBranchModel;
@@ -106,17 +103,18 @@ public class ClientModEventHandler {
 
     @SubscribeEvent
     public static void registerItemColorHandlersEvent(RegisterColorHandlersEvent.ItemTintSources event){
-//        // Register Potion Colorizer
-//        event.register(DynamicTrees.location("dendro_potion"), DTRegistries.DENDRO_POTION.get()::getColor);
-//        // Register Woodland Staff Colorizer
-//        event.register(DynamicTrees.location("staff"), DTRegistries.STAFF.get()::getColor);
+        // Register Potion Tint Source
+        event.register(DynamicTrees.location("dendro_potion"), DendroPotionItemTintSource.MAP_CODEC);
+        // Register Woodland Tint Sources
+        event.register(DynamicTrees.location("staff_handle"), StaffHandleItemTintSource.MAP_CODEC);
+        event.register(DynamicTrees.location("staff_crystal"), StaffCrystalItemTintSource.MAP_CODEC);
     }
 
     @SubscribeEvent
     public static void registerBlockColorHandlersEvent(RegisterColorHandlersEvent.BlockTintSources event){
         BlockColors blockColors = event.getBlockColors();
 
-        // Register Rooty Colorizers
+        // Register Rooty Tint Sources
         for (SoilBlock soilBlock : SoilProperties.REGISTRY.getAll().stream().filter(sp -> sp.getBlock().isPresent()).map(sp -> sp.getBlock().get()).collect(Collectors.toSet())) {
             SoilProperties properties = soilBlock.getSoilProperties();
             List<BlockTintSource> sources = CloneTintSource.cloneAllSources(
@@ -127,12 +125,12 @@ public class ClientModEventHandler {
             event.register(sources, soilBlock);
         }
 
-        // Register Leaves Colorizers
+        // Register Leaves Tint Sources
         for (DynamicLeavesBlock leaves : LeavesProperties.REGISTRY.getAll().stream().filter(lp -> lp.getDynamicLeavesBlock().isPresent()).map(lp -> lp.getDynamicLeavesBlock().get()).collect(Collectors.toSet())) {
             LeavesProperties properties = leaves.getLeavesProperties();
             if (properties.hasCustomColor()) {
                 Integer customColor = properties.getCustomColor();
-                if (customColor == null) //we use null as a way to default back to "biome" tint source.
+                if (customColor == null) //we use null as a way to default back to "biome" index source.
                     event.register(List.of(BlockTintSources.foliage()), leaves);
                 else
                     event.register(List.of(BlockTintSources.constant(customColor)), leaves);
@@ -143,10 +141,10 @@ public class ClientModEventHandler {
             }
         }
 
-        // Register Bonsai Pot Colorizer
+        // Register Bonsai Pot Tint Sources
         event.register(List.of(new PottedSaplingTintSource(blockColors)), DTRegistries.POTTED_SAPLING.get());
 
-        // Register Sapling Colorizer
+        // Register Sapling TintSources
         for (DynamicSaplingBlock sapling : Species.REGISTRY.getAll().stream().filter(s -> s.getSapling().isPresent()).map(s -> s.getSapling().get()).collect(Collectors.toSet())) {
             event.register(List.of(new SaplingTintSource(blockColors, sapling.getSpecies())), sapling);
         }

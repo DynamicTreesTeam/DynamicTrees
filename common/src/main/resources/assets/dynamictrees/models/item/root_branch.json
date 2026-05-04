@@ -1,6 +1,11 @@
 {
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
+	"textures": {
+		"bark": "block/oak_log",
+		"rings": "block/oak_log_top",
+		"particle": "#bark"
+	},
 	"elements": [
 		{
 			"name": "Trunk",

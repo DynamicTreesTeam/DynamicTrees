@@ -40,7 +40,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 
@@ -161,29 +160,28 @@ public class Staff extends Item {
         return 1 - damage;
     }
 
-    public boolean isReadOnly(ItemStack itemStack) {
+    public static boolean isReadOnly(ItemStack itemStack) {
         return itemStack.has(DTRegistries.READ_ONLY_DATA_COMPONENT.get());
     }
 
-    public Staff setReadOnly(ItemStack itemStack, boolean readonly) {
+    public static void setReadOnly(ItemStack itemStack, boolean readonly) {
         itemStack.set(DTRegistries.READ_ONLY_DATA_COMPONENT.get(), Unit.INSTANCE);
-        return this;
     }
 
-    public void setSpecies(ItemStack itemStack, Species species) {
+    public static void setSpecies(ItemStack itemStack, Species species) {
         String name = species.getRegistryName().toString();
         itemStack.set(DTRegistries.SPECIES_DATA_COMPONENT.get(), name);
     }
 
-    public void setCode(ItemStack itemStack, String code) {
+    public static void setCode(ItemStack itemStack, String code) {
         itemStack.set(DTRegistries.JOCODE_DATA_COMPONENT.get(), code);
     }
 
-    public void setRootsCode(ItemStack itemStack, String code) {
+    public static void setRootsCode(ItemStack itemStack, String code) {
         itemStack.set(DTRegistries.ROOTS_JOCODE_DATA_COMPONENT.get(), code);
     }
 
-    public Species getSpecies(ItemStack itemStack) {
+    public static Species getSpecies(ItemStack itemStack) {
         if (itemStack.has(DTRegistries.SPECIES_DATA_COMPONENT.get())) {
             return Species.findSpecies(itemStack.get(DTRegistries.SPECIES_DATA_COMPONENT.get()));
         } else {

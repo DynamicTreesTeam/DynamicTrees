@@ -1,5 +1,7 @@
 {
-    "textures": {},
+    "textures": {
+        "particle": "dynamictrees:block/air"
+    },
     "elements": [],
     "render_type": "cutout"
 }

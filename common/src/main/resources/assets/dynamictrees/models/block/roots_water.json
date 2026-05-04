@@ -4,8 +4,8 @@
 	"render_type": "cutout_mipped",
 	"texture_size": [48, 48],
 	"textures": {
-		"particle": "dynamictrees:block/water_roots",
-		"roots": "dynamictrees:block/water_roots"
+		"roots": "dynamictrees:block/water_roots",
+		"particle": "#roots"
 	},
 	"elements": [
 		{

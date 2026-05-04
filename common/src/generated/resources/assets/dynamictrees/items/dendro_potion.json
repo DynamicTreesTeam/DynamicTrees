@@ -1,6 +1,11 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "dynamictrees:item/dendro_potion"
+    "model": "dynamictrees:item/dendro_potion",
+    "tints": [
+      {
+        "type": "dynamictrees:dendro_potion"
+      }
+    ]
   }
 }
