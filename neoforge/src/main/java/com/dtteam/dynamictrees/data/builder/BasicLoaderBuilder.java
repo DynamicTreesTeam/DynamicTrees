@@ -2,6 +2,7 @@ package com.dtteam.dynamictrees.data.builder;
 
 import com.dtteam.dynamictrees.event.handler.ClientModEventHandler;
 import com.dtteam.dynamictrees.model.blockstate.AerialRootsSoilBlockStateModel;
+import com.dtteam.dynamictrees.model.blockstate.RootsBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.SurfaceRootBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.UnbakedBranchModel;
 import com.dtteam.dynamictrees.tree.family.Family;
@@ -24,9 +25,9 @@ public final class BasicLoaderBuilder extends InvariantLoaderBuilder {
         loaderBuilders.put(
                 ClientModEventHandler.SURFACE_ROOT, (textures, _)->
                         new BasicLoaderBuilder(()-> new SurfaceRootBlockStateModel.Unbaked(textures.get("bark"))));
-//        branchBuilders.put(
-//                ClientModEventHandler.ROOTS, (textures)->
-//                        new BranchLoaderBuilder(textures, ()-> new RootsBlockStateModel.Unbaked(textures.get("bark"), textures.get("rings"))));
+        loaderBuilders.put(
+                ClientModEventHandler.ROOTS, (textures, _)->
+                        new BasicLoaderBuilder(()-> new RootsBlockStateModel.Unbaked(textures.get("bark"), textures.get("rings"))));
         loaderBuilders.put(
                 ClientModEventHandler.AERIAL_ROOTS_SOIL, (textures, family)->
                         new BasicLoaderBuilder(()-> new AerialRootsSoilBlockStateModel.Unbaked(
