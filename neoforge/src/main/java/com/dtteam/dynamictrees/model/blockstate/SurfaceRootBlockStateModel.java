@@ -5,7 +5,7 @@ import com.dtteam.dynamictrees.api.network.RootConnections;
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
 import com.dtteam.dynamictrees.model.BlockStateModelWithConnectionData;
 import com.dtteam.dynamictrees.model.ModelHelper;
-import com.dtteam.dynamictrees.model.parts.SurfaceRootBlockStateModelPart;
+import com.dtteam.dynamictrees.model.parts.SurfaceRootModelPart;
 import com.dtteam.dynamictrees.utility.CoordUtils;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -29,9 +29,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public record SurfaceRootBlockStateModel(
-        SurfaceRootBlockStateModelPart[][] cores,
-        SurfaceRootBlockStateModelPart[][] sleeves,
-        SurfaceRootBlockStateModelPart[][] verts,
+        SurfaceRootModelPart[][] cores,
+        SurfaceRootModelPart[][] sleeves,
+        SurfaceRootModelPart[][] verts,
         Material.Baked particleMaterial
 ) implements DynamicBlockStateModel, BlockStateModelWithConnectionData {
 
@@ -153,15 +153,15 @@ public record SurfaceRootBlockStateModel(
 
         @Override
         public BlockStateModel bake(ModelBaker baker) {
-            SurfaceRootBlockStateModelPart[][] sleeves = new SurfaceRootBlockStateModelPart[4][7];
-            SurfaceRootBlockStateModelPart[][] cores = new SurfaceRootBlockStateModelPart[2][8]; //8 Cores for 2 axis(X, Z) with the bark texture on all 6 sides rotated appropriately.
-            SurfaceRootBlockStateModelPart[][] verts = new SurfaceRootBlockStateModelPart[4][8];
+            SurfaceRootModelPart[][] sleeves = new SurfaceRootModelPart[4][7];
+            SurfaceRootModelPart[][] cores = new SurfaceRootModelPart[2][8]; //8 Cores for 2 axis(X, Z) with the bark texture on all 6 sides rotated appropriately.
+            SurfaceRootModelPart[][] verts = new SurfaceRootModelPart[4][8];
 
             Material.Baked barkMat = baker.materials().get(new Material(barkTexture, false), barkTexture::toDebugFileName);
 
-            SurfaceRootBlockStateModelPart.UnbakedCore unbakedCores = new SurfaceRootBlockStateModelPart.UnbakedCore(barkMat);
-            SurfaceRootBlockStateModelPart.UnbakedSleeve unbakedSleeves = new SurfaceRootBlockStateModelPart.UnbakedSleeve(barkMat);
-            SurfaceRootBlockStateModelPart.UnbakedVert unbakedRings = new SurfaceRootBlockStateModelPart.UnbakedVert(barkMat);
+            SurfaceRootModelPart.UnbakedCore unbakedCores = new SurfaceRootModelPart.UnbakedCore(barkMat);
+            SurfaceRootModelPart.UnbakedSleeve unbakedSleeves = new SurfaceRootModelPart.UnbakedSleeve(barkMat);
+            SurfaceRootModelPart.UnbakedVert unbakedRings = new SurfaceRootModelPart.UnbakedVert(barkMat);
 
             for (int r = 0; r < 8; r++) {
                 int radius = r + 1;

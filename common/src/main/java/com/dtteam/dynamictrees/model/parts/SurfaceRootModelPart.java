@@ -17,7 +17,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 
-public record SurfaceRootBlockStateModelPart(QuadCollection quads, boolean useAmbientOcclusion, Material.Baked particleMaterial) implements BlockStateModelPart {
+public record SurfaceRootModelPart(QuadCollection quads, boolean useAmbientOcclusion, Material.Baked particleMaterial) implements BlockStateModelPart {
 
     @Override
     public List<BakedQuad> getQuads(@Nullable Direction direction) {
@@ -35,11 +35,11 @@ public record SurfaceRootBlockStateModelPart(QuadCollection quads, boolean useAm
         public void resolveDependencies(Resolver resolver) {}
 
         @Override
-        public SurfaceRootBlockStateModelPart bake(ModelBaker baker) {
+        public SurfaceRootModelPart bake(ModelBaker baker) {
             return bake(baker, 8, Direction.Axis.Y);
         }
 
-        public SurfaceRootBlockStateModelPart bake(ModelBaker baker, int radius, Direction.Axis axis) {
+        public SurfaceRootModelPart bake(ModelBaker baker, int radius, Direction.Axis axis) {
 
             CuboidModelElement part = generateCorePart(radius, axis);
             QuadCollection.Builder builder = new QuadCollection.Builder();
@@ -49,7 +49,7 @@ public record SurfaceRootBlockStateModelPart(QuadCollection quads, boolean useAm
                     builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
             }
 
-            return new SurfaceRootBlockStateModelPart(builder.build(), true, material);
+            return new SurfaceRootModelPart(builder.build(), true, material);
         }
 
         private CuboidModelElement generateCorePart(int radius, Direction.Axis axis){
@@ -82,11 +82,11 @@ public record SurfaceRootBlockStateModelPart(QuadCollection quads, boolean useAm
         public void resolveDependencies(Resolver resolver) {}
 
         @Override
-        public SurfaceRootBlockStateModelPart bake(ModelBaker baker) {
+        public SurfaceRootModelPart bake(ModelBaker baker) {
             return bake(baker, 0, Direction.UP);
         }
 
-        public SurfaceRootBlockStateModelPart bake(ModelBaker baker, int radius, Direction direction) {
+        public SurfaceRootModelPart bake(ModelBaker baker, int radius, Direction direction) {
             CuboidModelElement part = generateSleevePart(radius, direction, false);
             QuadCollection.Builder builder = new QuadCollection.Builder();
 
@@ -95,7 +95,7 @@ public record SurfaceRootBlockStateModelPart(QuadCollection quads, boolean useAm
                 builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
             }
 
-            return new SurfaceRootBlockStateModelPart(builder.build(), true, material);
+            return new SurfaceRootModelPart(builder.build(), true, material);
         }
 
         public CuboidModelElement generateSleevePart(int radius, Direction dir, boolean flipNormals){
@@ -143,11 +143,11 @@ public record SurfaceRootBlockStateModelPart(QuadCollection quads, boolean useAm
         public void resolveDependencies(Resolver resolver) {}
 
         @Override
-        public SurfaceRootBlockStateModelPart bake(ModelBaker baker) {
+        public SurfaceRootModelPart bake(ModelBaker baker) {
             return bake(baker, 0, Direction.UP);
         }
 
-        public SurfaceRootBlockStateModelPart bake(ModelBaker baker, int radius, Direction direction) {
+        public SurfaceRootModelPart bake(ModelBaker baker, int radius, Direction direction) {
             int radialHeight = radius * 2;
             QuadCollection.Builder builder = new QuadCollection.Builder();
 
@@ -171,7 +171,7 @@ public record SurfaceRootBlockStateModelPart(QuadCollection quads, boolean useAm
                 }
             }
 
-            return new SurfaceRootBlockStateModelPart(builder.build(), true, material);
+            return new SurfaceRootModelPart(builder.build(), true, material);
         }
 
     }

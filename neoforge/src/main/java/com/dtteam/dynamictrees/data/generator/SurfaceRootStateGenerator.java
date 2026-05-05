@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.data.generator;
 
 import com.dtteam.dynamictrees.block.branch.SurfaceRootBlock;
 import com.dtteam.dynamictrees.data.Generator;
-import com.dtteam.dynamictrees.data.builder.BranchLoaderBuilder;
+import com.dtteam.dynamictrees.data.builder.BasicLoaderBuilder;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.MultiVariant;
@@ -30,7 +30,7 @@ public class SurfaceRootStateGenerator implements Generator<BlockModelGenerators
         textures.put("bark", input.getTexturePath(Family.BRANCH)
                         .orElse(ModelLocationUtils.getModelLocation(dependencies.get(PRIMITIVE_LOG))));
 
-        BranchLoaderBuilder builder = BranchLoaderBuilder.branchBuilders.get(input.getSurfaceRootLoader())
+        BasicLoaderBuilder builder = BasicLoaderBuilder.loaderBuilders.get(input.getSurfaceRootLoader())
                 .apply(textures, input);
 
         generators.blockStateOutput.accept(

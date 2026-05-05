@@ -1,4 +1,4 @@
-// 26.1.1	2026-05-04T18:27:24.340665851	Model Definitions - dynamictrees
+// 26.1.1	2026-05-05T10:04:13.4513035	Model Definitions - dynamictrees
 aed0fb7708785b5f2b1e0eefdbc26f0044b9614c assets/dynamictrees/blockstates/acacia_branch.json
 2606791521eac27fa77ebbeeea442b8073802a51 assets/dynamictrees/blockstates/acacia_leaves.json
 28a0cd7b38e1a854acd4f0c477573a9460811d82 assets/dynamictrees/blockstates/acacia_sapling.json
@@ -50,7 +50,7 @@ e665108cdd9fc72a93831b42e9311801e02498b2 assets/dynamictrees/blockstates/rooty_e
 cad544911a9b4552440ee10dbcfa810117a33a7c assets/dynamictrees/blockstates/rooty_grass_block.json
 8468b2f6c09edc3cd0c22712e2fdf8f1b0851592 assets/dynamictrees/blockstates/rooty_gravel.json
 bcfd19c10fcd2ccf06c7e62fdb3f186cc1539f61 assets/dynamictrees/blockstates/rooty_light_gray_terracotta.json
-5f60d97a6e531025b7238e6b379a7158825a9c18 assets/dynamictrees/blockstates/rooty_mangrove_aerial_roots.json
+60c509b932590fc0abebf5179fe96a5c31bf6bcf assets/dynamictrees/blockstates/rooty_mangrove_aerial_roots.json
 06c5057254ac35f559f7af4e1fcf6c720eb70809 assets/dynamictrees/blockstates/rooty_moss.json
 06c5057254ac35f559f7af4e1fcf6c720eb70809 assets/dynamictrees/blockstates/rooty_moss_block.json
 6ea17a2b27c40127a71b5cf675fd5547453ec6d0 assets/dynamictrees/blockstates/rooty_mud.json
@@ -121,7 +121,6 @@ f9ac835a541e590f163bc3641b055d228453d98d assets/dynamictrees/items/mega_crimson_
 afe58e0e012d17d7762dd66b95cb62a460754ad4 assets/dynamictrees/items/warped_branch.json
 475b7117ddb1545dead743977ad75ab7e3aaae7d assets/dynamictrees/items/warped_seed.json
 d7087e75ae64fec294712d3559c18c8399922149 assets/dynamictrees/models/block/mangrove_roots.json
-f3acebe3c8470980f95bef0e7df6bd337a605c6a assets/dynamictrees/models/block/rooty_mangrove_aerial_roots.json
 e343a1ff79677f6e05534ab9433ac8dcd8780145 assets/dynamictrees/models/block/saplings/acacia.json
 b164be1fcfede78a61d64ff051d1db9dbbb4b256 assets/dynamictrees/models/block/saplings/apple_oak.json
 1405671f7e415b29ee34f7c30d31ad3ad8a84d44 assets/dynamictrees/models/block/saplings/azalea.json

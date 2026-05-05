@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.data.generator;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.data.Generator;
-import com.dtteam.dynamictrees.data.builder.BranchLoaderBuilder;
+import com.dtteam.dynamictrees.data.builder.BasicLoaderBuilder;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.MultiVariant;
@@ -31,7 +31,7 @@ public class BranchStateGenerator implements Generator<BlockModelGenerators, Fam
         final Map<String, Identifier> textures = new HashMap<>();
         input.addBranchTextures(textures::put, primitiveLogPath, primitiveLog);
 
-        BranchLoaderBuilder builder = BranchLoaderBuilder.branchBuilders.get(input.getBranchLoader())
+        BasicLoaderBuilder builder = BasicLoaderBuilder.loaderBuilders.get(input.getBranchLoader())
                 .apply(textures, input);
 
         generators.blockStateOutput.accept(

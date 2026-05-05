@@ -6,6 +6,7 @@ import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.client.TextureHelper;
 import com.dtteam.dynamictrees.client.ThickBranchRingsSource;
 import com.dtteam.dynamictrees.client.TintSources.*;
+import com.dtteam.dynamictrees.model.blockstate.AerialRootsSoilBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.PottedSaplingBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.SurfaceRootBlockStateModel;
 import com.dtteam.dynamictrees.model.blockstate.UnbakedBranchModel;
@@ -174,6 +175,7 @@ public class ClientModEventHandler {
     public static final Identifier MEDIUM_PALM_FRONDS = DynamicTrees.location("medium_palm_fronds");
     public static final Identifier SMALL_PALM_FRONDS = DynamicTrees.location("small_palm_fronds");
     public static final Identifier POTTED_DYNAMIC_SAPLING = DynamicTrees.location("potted_dynamic_sapling");
+    public static final Identifier AERIAL_ROOTS_SOIL = DynamicTrees.location("aerial_roots_soil");
 
     @SubscribeEvent
     public static void onModelRegistryEvent(RegisterBlockStateModels event) {
@@ -185,6 +187,7 @@ public class ClientModEventHandler {
 //        event.register(LARGE_PALM_FRONDS, new PalmLeavesModelLoader(0));
 //        event.register(MEDIUM_PALM_FRONDS, new PalmLeavesModelLoader(1));
 //        event.register(SMALL_PALM_FRONDS, new PalmLeavesModelLoader(2));
+        event.registerModel(AERIAL_ROOTS_SOIL, AerialRootsSoilBlockStateModel.Unbaked.CODEC);
     }
 
     @SubscribeEvent

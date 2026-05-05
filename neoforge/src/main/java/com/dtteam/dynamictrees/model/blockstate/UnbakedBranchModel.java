@@ -2,7 +2,7 @@ package com.dtteam.dynamictrees.model.blockstate;
 
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
-import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPart;
+import com.dtteam.dynamictrees.model.parts.BranchModelPart;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.mojang.serialization.MapCodec;
@@ -55,16 +55,16 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
     }
 
     public BranchBlockStateModel bakeRegular(ModelBaker baker) {
-        BranchBlockStateModelPart[][] sleeves = new BranchBlockStateModelPart[6][7];
-        BranchBlockStateModelPart[][] cores = new BranchBlockStateModelPart[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
-        BranchBlockStateModelPart[] rings = new BranchBlockStateModelPart[8]; // 8 Cores with the ring textures on all 6 sides.
+        BranchModelPart[][] sleeves = new BranchModelPart[6][7];
+        BranchModelPart[][] cores = new BranchModelPart[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
+        BranchModelPart[] rings = new BranchModelPart[8]; // 8 Cores with the ring textures on all 6 sides.
 
         Material.Baked barkMat = baker.materials().get(new Material(barkTexture, false), barkTexture::toDebugFileName);
         Material.Baked ringsMat = baker.materials().get(new Material(ringsTexture, false), ringsTexture::toDebugFileName);
 
-        BranchBlockStateModelPart.UnbakedCore unbakedCores = new BranchBlockStateModelPart.UnbakedCore(barkMat, false);
-        BranchBlockStateModelPart.UnbakedSleeve unbakedSleeves = new BranchBlockStateModelPart.UnbakedSleeve(barkMat);
-        BranchBlockStateModelPart.UnbakedCore unbakedRings = new BranchBlockStateModelPart.UnbakedCore(ringsMat, false);
+        BranchModelPart.UnbakedCore unbakedCores = new BranchModelPart.UnbakedCore(barkMat, false);
+        BranchModelPart.UnbakedSleeve unbakedSleeves = new BranchModelPart.UnbakedSleeve(barkMat);
+        BranchModelPart.UnbakedCore unbakedRings = new BranchModelPart.UnbakedCore(ringsMat, false);
 
         for (int i = 0; i < 8; i++) {
             int radius = i + 1;
@@ -84,18 +84,18 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
     }
 
     public ThickBranchBlockStateModel bakeThick(ModelBaker baker, BranchBlockStateModel fallback) {
-        BranchBlockStateModelPart[] trunksSideBark = new BranchBlockStateModelPart[16]; // The trunk will always feature bark on its sides.
-        BranchBlockStateModelPart[] trunksTopBark = new BranchBlockStateModelPart[16]; // The trunk will feature bark on its top when there's a branch on top of it.
-        BranchBlockStateModelPart[] trunksTopRings = new BranchBlockStateModelPart[16]; // The trunk will feature rings on its top when there's no branches on top of it.
-        BranchBlockStateModelPart[] trunksBotRings = new BranchBlockStateModelPart[16]; // The trunk will always feature rings on its bottom surface if nothing is below it.
+        BranchModelPart[] trunksSideBark = new BranchModelPart[16]; // The trunk will always feature bark on its sides.
+        BranchModelPart[] trunksTopBark = new BranchModelPart[16]; // The trunk will feature bark on its top when there's a branch on top of it.
+        BranchModelPart[] trunksTopRings = new BranchModelPart[16]; // The trunk will feature rings on its top when there's no branches on top of it.
+        BranchModelPart[] trunksBotRings = new BranchModelPart[16]; // The trunk will always feature rings on its bottom surface if nothing is below it.
 
         Identifier thickRings = IdentifierUtils.suffix(ringsTexture, "_thick");
 
         Material.Baked barkMat = baker.materials().get(new Material(barkTexture, false), barkTexture::toDebugFileName);
         Material.Baked ringsMat = baker.materials().get(new Material(thickRings, false), thickRings::toDebugFileName);
 
-        BranchBlockStateModelPart.UnbakedThickTrunk unbakedThickTrunk = new BranchBlockStateModelPart.UnbakedThickTrunk(barkMat, false);
-        BranchBlockStateModelPart.UnbakedThickTrunk unbakedThickRings = new BranchBlockStateModelPart.UnbakedThickTrunk(ringsMat, true);
+        BranchModelPart.UnbakedThickTrunk unbakedThickTrunk = new BranchModelPart.UnbakedThickTrunk(barkMat, false);
+        BranchModelPart.UnbakedThickTrunk unbakedThickRings = new BranchModelPart.UnbakedThickTrunk(ringsMat, true);
 
         for (int i = 0; i < ThickBranchBlock.MAX_RADIUS_THICK - BranchBlock.MAX_RADIUS; i++) {
             int radius = i + BranchBlock.MAX_RADIUS + 1;

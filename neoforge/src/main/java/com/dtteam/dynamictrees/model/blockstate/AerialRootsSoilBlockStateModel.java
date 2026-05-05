@@ -1,6 +1,8 @@
 package com.dtteam.dynamictrees.model.blockstate;
 
+import com.dtteam.dynamictrees.model.parts.AerialRootSoilModelPart;
 import com.dtteam.dynamictrees.registry.PottedSaplingBlockEntityNF;
+import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -21,13 +23,8 @@ import java.util.List;
 import java.util.Optional;
 
 public record AerialRootsSoilBlockStateModel(
-        Material.Baked particleMaterial
+        AerialRootSoilModelPart[] soilParts
 ) implements DynamicBlockStateModel {
-
-    @Override
-    public @BakedQuad.MaterialFlags int materialFlags() {
-        return 0;
-    }
 
     @Override
     public Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
@@ -36,7 +33,9 @@ public record AerialRootsSoilBlockStateModel(
 
     @Override
     public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
-
+        int radius = TreeHelper.getRadius(state);
+        if (radius == 0 || radius > 8) return;
+        parts.add(soilParts[radius-1]);
     }
 
     public record Unbaked(Identifier end, Identifier overlay, Identifier overlay_end, Identifier side, Optional<Family> family) implements CustomUnbakedBlockStateModel {
@@ -70,14 +69,40 @@ public record AerialRootsSoilBlockStateModel(
         }
 
         @Override
-        public BlockStateModel bake(ModelBaker modelBaker) {
+        public BlockStateModel bake(ModelBaker baker) {
+            AerialRootSoilModelPart[] soilParts = new AerialRootSoilModelPart[8];
 
-            return new AerialRootsSoilBlockStateModel(null);
+            Material.Baked endMat = bakeMaterial(baker, end);
+            Material.Baked overlayMat = bakeMaterial(baker, overlay);
+            Material.Baked overlayEndMat = bakeMaterial(baker, overlay_end);
+            Material.Baked sideMat = bakeMaterial(baker, side);
+
+            AerialRootSoilModelPart.UnbakedPart unbakedPart = new AerialRootSoilModelPart.UnbakedPart(endMat, overlayMat, overlayEndMat, sideMat);
+
+            for (int i=0; i<8; i++){
+                soilParts[i] = unbakedPart.bake(baker, i+1);
+            }
+
+            return new AerialRootsSoilBlockStateModel(soilParts);
+        }
+
+        private Material.Baked bakeMaterial(ModelBaker baker, Identifier texture){
+            return baker.materials().get(new Material(texture, false), texture::toDebugFileName);
         }
 
         @Override
         public void resolveDependencies(Resolver resolver) {
 
         }
+    }
+
+    @Override
+    public @BakedQuad.MaterialFlags int materialFlags() {
+        return soilParts[0].materialFlags();
+    }
+
+    @Override
+    public Material.Baked particleMaterial() {
+        return soilParts[0].particleMaterial();
     }
 }

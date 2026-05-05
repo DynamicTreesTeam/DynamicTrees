@@ -6,7 +6,7 @@ import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.model.BlockStateModelWithConnectionData;
 import com.dtteam.dynamictrees.model.ModelConnections;
 import com.dtteam.dynamictrees.model.ModelHelper;
-import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPart;
+import com.dtteam.dynamictrees.model.parts.BranchModelPart;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
@@ -24,10 +24,10 @@ import java.util.List;
 
 public record ThickBranchBlockStateModel(
         BranchBlockStateModel fallback,
-        BranchBlockStateModelPart[] trunksSideBark,
-        BranchBlockStateModelPart[] trunksTopBark,
-        BranchBlockStateModelPart[] trunksTopRings,
-        BranchBlockStateModelPart[] trunksBotRings
+        BranchModelPart[] trunksSideBark,
+        BranchModelPart[] trunksTopBark,
+        BranchModelPart[] trunksTopRings,
+        BranchModelPart[] trunksBotRings
 ) implements DynamicBlockStateModel, BlockStateModelWithConnectionData {
 
     @Override

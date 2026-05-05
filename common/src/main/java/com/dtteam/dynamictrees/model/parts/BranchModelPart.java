@@ -24,7 +24,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbientOcclusion, Material.Baked particleMaterial) implements BlockStateModelPart {
+public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion, Material.Baked particleMaterial) implements BlockStateModelPart {
 
     @Override
     public List<BakedQuad> getQuads(@Nullable Direction direction) {
@@ -36,7 +36,7 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
         return this.quads.materialFlags();
     }
 
-    public BranchBlockStateModelPart faceOnly(@Nullable Direction direction, boolean cull){
+    public BranchModelPart faceOnly(@Nullable Direction direction, boolean cull){
         QuadCollection.Builder builder = new QuadCollection.Builder();
         for (BakedQuad quad : getQuads(direction)){
             if (direction != null && cull){
@@ -45,7 +45,7 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
                 builder.addUnculledFace(quad);
             }
         }
-        return new BranchBlockStateModelPart(builder.build(), useAmbientOcclusion, particleMaterial);
+        return new BranchModelPart(builder.build(), useAmbientOcclusion, particleMaterial);
     }
 
     public record UnbakedCore(Material.Baked material, boolean flipNormals) implements BlockStateModelPart.Unbaked {
@@ -54,11 +54,11 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
         public void resolveDependencies(Resolver resolver) {}
 
         @Override
-        public BranchBlockStateModelPart bake(ModelBaker baker) {
+        public BranchModelPart bake(ModelBaker baker) {
             return bake(baker, 8, Direction.Axis.Y);
         }
 
-        public BranchBlockStateModelPart bake(ModelBaker baker, int radius, Direction.Axis axis) {
+        public BranchModelPart bake(ModelBaker baker, int radius, Direction.Axis axis) {
 
             CuboidModelElement part = generateCorePart(radius, axis);
             QuadCollection.Builder builder = new QuadCollection.Builder();
@@ -68,7 +68,7 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
                     builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
             }
 
-            return new BranchBlockStateModelPart(builder.build(), true, material);
+            return new BranchModelPart(builder.build(), true, material);
         }
 
         private CuboidModelElement generateCorePart(int radius, Direction.Axis axis){
@@ -98,11 +98,11 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
         public void resolveDependencies(Resolver resolver) {}
 
         @Override
-        public BranchBlockStateModelPart bake(ModelBaker baker) {
+        public BranchModelPart bake(ModelBaker baker) {
             return bake(baker, 0, Direction.UP);
         }
 
-        public BranchBlockStateModelPart bake(ModelBaker baker, int radius, Direction direction) {
+        public BranchModelPart bake(ModelBaker baker, int radius, Direction direction) {
             CuboidModelElement part = generateSleevePart(radius, direction, false);
             QuadCollection.Builder builder = new QuadCollection.Builder();
 
@@ -111,7 +111,7 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
                 builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
             }
 
-            return new BranchBlockStateModelPart(builder.build(), true, material);
+            return new BranchModelPart(builder.build(), true, material);
         }
 
         public CuboidModelElement generateSleevePart(int radius, Direction dir, boolean flipNormals){
@@ -168,11 +168,11 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
         public void resolveDependencies(Resolver resolver) {}
 
         @Override
-        public BranchBlockStateModelPart bake(ModelBaker baker) {
+        public BranchModelPart bake(ModelBaker baker) {
             return bake(baker, BranchBlock.MAX_RADIUS+1, EnumSet.noneOf(Direction.class));
         }
 
-        public BranchBlockStateModelPart bake(ModelBaker baker, int radius, EnumSet<Direction> faces) {
+        public BranchModelPart bake(ModelBaker baker, int radius, EnumSet<Direction> faces) {
 
             QuadCollection.Builder builder = new QuadCollection.Builder();
             AABB wholeVolume = new AABB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
@@ -211,7 +211,7 @@ public record BranchBlockStateModelPart(QuadCollection quads, boolean useAmbient
                 }
             }
 
-            return new BranchBlockStateModelPart(builder.build(), true, material);
+            return new BranchModelPart(builder.build(), true, material);
         }
 
         private static float @NotNull [] getUvs(Direction face, AABB partBoundary, int wholeVolumeWidth) {

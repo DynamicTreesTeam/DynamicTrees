@@ -4,7 +4,7 @@ import com.dtteam.dynamictrees.api.network.Connections;
 import com.dtteam.dynamictrees.model.BlockStateModelWithConnectionData;
 import com.dtteam.dynamictrees.model.ModelConnections;
 import com.dtteam.dynamictrees.model.ModelHelper;
-import com.dtteam.dynamictrees.model.parts.BranchBlockStateModelPart;
+import com.dtteam.dynamictrees.model.parts.BranchModelPart;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public record BranchBlockStateModel(
-        BranchBlockStateModelPart[][] cores,
-        BranchBlockStateModelPart[][] sleeves,
-        BranchBlockStateModelPart[] rings,
+        BranchModelPart[][] cores,
+        BranchModelPart[][] sleeves,
+        BranchModelPart[] rings,
         Material.Baked particleMaterial
 ) implements DynamicBlockStateModel, BlockStateModelWithConnectionData {
 
