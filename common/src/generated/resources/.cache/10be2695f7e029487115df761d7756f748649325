@@ -1,4 +1,4 @@
-// 26.1.1	2026-05-05T10:04:13.4513035	Model Definitions - dynamictrees
+// 26.1.1	2026-05-08T15:10:13.108414087	Model Definitions - dynamictrees
 aed0fb7708785b5f2b1e0eefdbc26f0044b9614c assets/dynamictrees/blockstates/acacia_branch.json
 2606791521eac27fa77ebbeeea442b8073802a51 assets/dynamictrees/blockstates/acacia_leaves.json
 28a0cd7b38e1a854acd4f0c477573a9460811d82 assets/dynamictrees/blockstates/acacia_sapling.json
@@ -29,7 +29,7 @@ a82f9fc1c2378f77e75442eb41b6eff31ae0c687 assets/dynamictrees/blockstates/jungle_
 a82f9fc1c2378f77e75442eb41b6eff31ae0c687 assets/dynamictrees/blockstates/jungle_undergrowth_leaves.json
 2ad15d3eec753f9baa724145dfbe5a55d972fa17 assets/dynamictrees/blockstates/mangrove_branch.json
 e8323999fd52df15a0a4a6644543902710c6192a assets/dynamictrees/blockstates/mangrove_leaves.json
-612d9d6792c4414278d35843f2ea9c9b24663136 assets/dynamictrees/blockstates/mangrove_roots.json
+72f627757e74ccdd9005c4d9c52e33b5658287f0 assets/dynamictrees/blockstates/mangrove_roots.json
 ec8ab110c9a7deb973ad5c223fa05d2391f77c44 assets/dynamictrees/blockstates/mangrove_sapling.json
 470eb20b798907acc619885b20efefe632f08f37 assets/dynamictrees/blockstates/mega_crimson_sapling.json
 31d65eee663350c211f1129d2be13ebe4698a3e2 assets/dynamictrees/blockstates/mega_jungle_sapling.json
@@ -120,7 +120,6 @@ f9ac835a541e590f163bc3641b055d228453d98d assets/dynamictrees/items/mega_crimson_
 0e65fd5441d6bd0178402a5098ecd1d123105610 assets/dynamictrees/items/staff.json
 afe58e0e012d17d7762dd66b95cb62a460754ad4 assets/dynamictrees/items/warped_branch.json
 475b7117ddb1545dead743977ad75ab7e3aaae7d assets/dynamictrees/items/warped_seed.json
-d7087e75ae64fec294712d3559c18c8399922149 assets/dynamictrees/models/block/mangrove_roots.json
 e343a1ff79677f6e05534ab9433ac8dcd8780145 assets/dynamictrees/models/block/saplings/acacia.json
 b164be1fcfede78a61d64ff051d1db9dbbb4b256 assets/dynamictrees/models/block/saplings/apple_oak.json
 1405671f7e415b29ee34f7c30d31ad3ad8a84d44 assets/dynamictrees/models/block/saplings/azalea.json

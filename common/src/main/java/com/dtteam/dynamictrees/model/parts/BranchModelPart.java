@@ -19,10 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion, Material.Baked particleMaterial) implements BlockStateModelPart {
 
@@ -231,6 +228,152 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
             return new float[]{minX, minZ, maxX, maxZ};
         }
 
+    }
+
+    public record UnbakedRootsSleeveCross(Material.Baked material) implements BlockStateModelPart.Unbaked {
+
+        @Override
+        public void resolveDependencies(Resolver resolver) {}
+
+        @Override
+        public BranchModelPart bake(ModelBaker baker) {
+            return bake(baker, 0, Direction.UP);
+        }
+
+        public BranchModelPart bake(ModelBaker baker, int radius, Direction direction) {
+            QuadCollection.Builder builder = new QuadCollection.Builder();
+
+            for (Direction.Axis axis : Direction.Axis.values()){
+                if (axis == direction.getAxis()) continue;
+                CuboidModelElement insideCross = generateSleeveAxisPlane(radius, axis, direction);
+                for (Map.Entry<Direction, CuboidFace> e : insideCross.faces().entrySet()) {
+                    Direction face = e.getKey();
+                    builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, insideCross, e.getValue(), material, face));
+                }
+            }
+
+            return new BranchModelPart(builder.build(), true, material);
+        }
+
+        public CuboidModelElement generateSleeveAxisPlane(int radius, Direction.Axis axis, Direction dir){
+            Direction[] axisDirections = directionsOfAxis(axis);
+
+            int diameter = radius * 2;
+            int halfSize = (16 - diameter) / 2;
+            int halfSizeX = dir.getStepX() != 0 ? halfSize : diameter;
+            int halfSizeY = dir.getStepY() != 0 ? halfSize : diameter;
+            int halfSizeZ = dir.getStepZ() != 0 ? halfSize : diameter;
+            int move = 16 - halfSize;
+            int centerX = 16 + (dir.getStepX() * move);
+            int centerY = 16 + (dir.getStepY() * move);
+            int centerZ = 16 + (dir.getStepZ() * move);
+
+            Map<Direction, CuboidFace> mapFacesIn = Maps.newEnumMap(Direction.class);
+
+            Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2f, (centerY - halfSizeY) / 2f, (centerZ - halfSizeZ) / 2f);
+            Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2f, (centerY + halfSizeY) / 2f, (centerZ + halfSizeZ) / 2f);
+
+            if (axis == Direction.Axis.X){
+                posFrom = new Vector3f(8, posFrom.y(), posFrom.z());
+                posTo = new Vector3f(8, posTo.y(), posTo.z());
+            } else if (axis == Direction.Axis.Y){
+                posFrom = new Vector3f(posFrom.x(), 8, posFrom.z());
+                posTo = new Vector3f(posTo.x(), 8, posTo.z());
+            } else if (axis == Direction.Axis.Z){
+                posFrom = new Vector3f(posFrom.x(), posFrom.y(), 8);
+                posTo = new Vector3f(posTo.x(), posTo.y(), 8);
+            }
+
+            for (Direction face : axisDirections){
+
+                boolean negative = dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE;
+                if (dir.getAxis() == Direction.Axis.Z) {
+                    negative = !negative;
+                }
+
+                CuboidFace.UVs uvface = new CuboidFace.UVs(
+                        8 - radius, negative ? 16 - halfSize : 0, 8 + radius, negative ? 16 : halfSize);
+
+                mapFacesIn.put(face, new CuboidFace(null, -1, "", uvface, ModelHelper.getFaceQuadrant(dir.getAxis(), face.getOpposite())));
+            }
+
+            return new CuboidModelElement(posFrom, posTo, mapFacesIn);
+        }
+
+        private Direction[] directionsOfAxis(Direction.Axis axis){
+            return Arrays.stream(Direction.values()).filter(d -> d.getAxis() == axis).toList().toArray(Direction[]::new);
+        }
+
+    }
+
+    public record UnbakedRootsSleeveFace(Material.Baked material) implements BlockStateModelPart.Unbaked {
+
+        @Override
+        public void resolveDependencies(Resolver resolver) {}
+
+        @Override
+        public BranchModelPart bake(ModelBaker baker) {
+            return bake(baker, 0, Direction.UP);
+        }
+
+        public BranchModelPart bake(ModelBaker baker, int radius, Direction direction) {
+            CuboidModelElement part = generateSleevePart(radius, direction, false);
+            QuadCollection.Builder builder = new QuadCollection.Builder();
+
+            for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
+                Direction face = e.getKey();
+                builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+            }
+
+            return new BranchModelPart(builder.build(), true, material);
+        }
+
+        public CuboidModelElement generateSleevePart(int radius, Direction dir, boolean flipNormals){
+            //Work in double units(*2)
+            int diameter = radius * 2;
+            int halfSize = (16 - diameter) / 2;
+            int halfSizeX = dir.getStepX() != 0 ? halfSize : diameter;
+            int halfSizeY = dir.getStepY() != 0 ? halfSize : diameter;
+            int halfSizeZ = dir.getStepZ() != 0 ? halfSize : diameter;
+            int move = 16 - halfSize;
+            int centerX = 16 + (dir.getStepX() * move);
+            int centerY = 16 + (dir.getStepY() * move);
+            int centerZ = 16 + (dir.getStepZ() * move);
+
+            Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2f, (centerY - halfSizeY) / 2f, (centerZ - halfSizeZ) / 2f);
+            Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2f, (centerY + halfSizeY) / 2f, (centerZ + halfSizeZ) / 2f);
+            if (flipNormals){
+                Vector3f aux = posFrom;
+                posFrom = posTo;
+                posTo = aux;
+                dir = dir.getOpposite();
+            }
+
+            boolean negative = dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE;
+            if (dir.getAxis() == Direction.Axis.Z) {//North/South
+                negative = !negative;
+            }
+
+            Map<Direction, CuboidFace> mapFacesIn = Maps.newEnumMap(Direction.class);
+
+            for (Direction face : Direction.values()) {
+                if (dir.getOpposite() != face) { //Discard side of sleeve that faces core
+                    CuboidFace.UVs uvface = null;
+                    if (dir == face) {//Side of sleeve that faces away from core
+                        if (radius == 1) { //We're only interested in end faces for radius == 1
+                            uvface = new CuboidFace.UVs(8 - radius, 8 - radius, 8 + radius, 8 + radius);
+                        }
+                    } else { //UV for Bark texture
+                        uvface = new CuboidFace.UVs(8 - radius, negative ? 16 - halfSize : 0, 8 + radius, negative ? 16 : halfSize);
+                    }
+                    if (uvface != null) {
+                        mapFacesIn.put(face, new CuboidFace(face, -1, material.toString(), uvface, ModelHelper.getFaceQuadrant(dir.getAxis(), face)));
+                    }
+                }
+            }
+
+            return new CuboidModelElement(posFrom, posTo, mapFacesIn);
+        }
     }
 
 }

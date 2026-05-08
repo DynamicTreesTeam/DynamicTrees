@@ -1,7 +1,23 @@
 {
   "variants": {
-    "": {
-      "model": "dynamictrees:block/mangrove_roots"
+    "layer=covered": {
+      "model": "minecraft:block/mud"
+    },
+    "layer=exposed": {
+      "type": "dynamictrees:roots",
+      "opaque": false,
+      "textures": {
+        "side": "minecraft:block/mangrove_roots_side",
+        "top": "minecraft:block/mangrove_roots_top"
+      }
+    },
+    "layer=filled": {
+      "type": "dynamictrees:roots",
+      "opaque": false,
+      "textures": {
+        "side": "minecraft:block/muddy_mangrove_roots_side",
+        "top": "minecraft:block/muddy_mangrove_roots_top"
+      }
     }
   }
 }

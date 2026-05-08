@@ -1,11 +1,22 @@
 package com.dtteam.dynamictrees.data.generator;
 
+import com.dtteam.dynamictrees.block.branch.BasicRootsBlock;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.data.Generator;
-import com.dtteam.dynamictrees.tree.family.Family;
+import com.dtteam.dynamictrees.data.builder.BasicLoaderBuilder;
 import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
+import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.MultiVariant;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.blockstates.PropertyDispatch;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.renderer.block.dispatch.Variant;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Max Hyper
@@ -19,30 +30,31 @@ public class RootsStateGenerator implements Generator<BlockModelGenerators, Fami
 
     @Override
     public void generate(BlockModelGenerators generators, Family input, Dependencies dependencies) {
-        generators.createTrivialCube(dependencies.get(ROOT));
-//        if (prov instanceof DTBlockStateProvider provider){
-//            final BranchBlock root = dependencies.get(ROOT);
-//            final BranchLoaderBuilder builderExposed = provider.models().getBuilder(
-//                    Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(root)).getPath()
-//            ).customLoader(BranchLoaderBuilder.branchBuilders.get(input.getRootsLoader()));
-//            input.addRootTextures(builderExposed::texture, provider.block(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_ROOT))));
-//
-//            final BranchLoaderBuilder builderFilled = provider.models().getBuilder(
-//                    Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(root)).getPath() + "_filled"
-//            ).customLoader(BranchLoaderBuilder.branchBuilders.get(input.getRootsLoader()));
-//            input.addRootTextures(builderFilled::texture, provider.block(BuiltInRegistries.BLOCK.getKey(dependencies.get(PRIMITIVE_FILLED_ROOT))));
-//
-//            provider.getVariantBuilder(root)
-//                    .partialState().with(BasicRootsBlock.LAYER, BasicRootsBlock.Layer.EXPOSED)
-//                    .modelForState().modelFile(builderExposed.end().renderType("cutout_mipped")).addModel()
-//                    .partialState().with(BasicRootsBlock.LAYER, BasicRootsBlock.Layer.FILLED)
-//                    .modelForState().modelFile(builderFilled.end()).addModel()
-//                    .partialState().with(BasicRootsBlock.LAYER, BasicRootsBlock.Layer.COVERED)
-//                    .modelForState().modelFile(provider.models().getExistingFile(input
-//                            .getModelPath(Family.COVERED_ROOTS_BLOCK)
-//                            .orElse(provider.blockTexture(dependencies.get(PRIMITIVE_COVERED_ROOT)))
-//                    )).addModel();
-//        }
+        final BranchBlock branch = dependencies.get(ROOT);
+        final Block primitiveExposed = dependencies.get(PRIMITIVE_ROOT);
+        final Block primitiveFilled = dependencies.get(PRIMITIVE_FILLED_ROOT);
+        final Block primitiveCovered = dependencies.get(PRIMITIVE_COVERED_ROOT);
+        Identifier primitiveExposedPath = ModelLocationUtils.getModelLocation(primitiveExposed);
+        Identifier primitiveFilledPath = ModelLocationUtils.getModelLocation(primitiveFilled);
+        Identifier primitiveCoveredPath = ModelLocationUtils.getModelLocation(primitiveCovered);
+
+        final Map<String, Identifier> exposedTextures = new HashMap<>();
+        final Map<String, Identifier> filledTextures = new HashMap<>();
+        input.addRootTextures(exposedTextures::put, primitiveExposedPath);
+        input.addRootTextures(filledTextures::put, primitiveFilledPath);
+
+        BasicLoaderBuilder exposedBuilder = BasicLoaderBuilder.loaderBuilders.get(input.getRootsLoader()).apply(exposedTextures, input);
+        BasicLoaderBuilder filledBuilder = BasicLoaderBuilder.loaderBuilders.get(input.getRootsLoader()).apply(filledTextures, input);
+
+        var propertyDispatch = PropertyDispatch.initial(BasicRootsBlock.LAYER).generate(
+                layer -> switch (layer){
+                    case EXPOSED -> MultiVariant.of(exposedBuilder);
+                    case FILLED -> MultiVariant.of(filledBuilder);
+                    default -> BlockModelGenerators.variant(new Variant(primitiveCoveredPath));
+                }
+        );
+
+        generators.blockStateOutput.accept(MultiVariantGenerator.dispatch(branch).with(propertyDispatch));
     }
 
     @Override

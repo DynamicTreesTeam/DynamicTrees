@@ -47,14 +47,14 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
 
     @Override
     public BlockStateModel bake(ModelBaker baker) {
-        BranchBlockStateModel regular = bakeRegular(baker);
+        BranchBlockStateModel regular = bakeRegular(baker, barkTexture, ringsTexture);
         if (family.isPresent() && family.get().isThick()){
-            return bakeThick(baker, regular);
+            return bakeThick(baker, regular, barkTexture, ringsTexture);
         }
         return regular;
     }
 
-    public BranchBlockStateModel bakeRegular(ModelBaker baker) {
+    public static BranchBlockStateModel bakeRegular(ModelBaker baker, Identifier barkTexture, Identifier ringsTexture) {
         BranchModelPart[][] sleeves = new BranchModelPart[6][7];
         BranchModelPart[][] cores = new BranchModelPart[3][8]; // 8 Cores for 3 axis with the bark texture all all 6 sides rotated appropriately.
         BranchModelPart[] rings = new BranchModelPart[8]; // 8 Cores with the ring textures on all 6 sides.
@@ -83,7 +83,7 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
         return new BranchBlockStateModel(cores, sleeves, rings, barkMat);
     }
 
-    public ThickBranchBlockStateModel bakeThick(ModelBaker baker, BranchBlockStateModel fallback) {
+    public static ThickBranchBlockStateModel bakeThick(ModelBaker baker, BranchBlockStateModel fallback, Identifier ringsTexture, Identifier barkTexture) {
         BranchModelPart[] trunksSideBark = new BranchModelPart[16]; // The trunk will always feature bark on its sides.
         BranchModelPart[] trunksTopBark = new BranchModelPart[16]; // The trunk will feature bark on its top when there's a branch on top of it.
         BranchModelPart[] trunksTopRings = new BranchModelPart[16]; // The trunk will feature rings on its top when there's no branches on top of it.

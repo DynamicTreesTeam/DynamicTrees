@@ -201,7 +201,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
         if (isFullBlock(state) && getFamily().getPrimitiveCoveredRoots().isPresent()){
             return new ItemStack(getFamily().getPrimitiveCoveredRoots().get());
         }
-        return super.getCloneItemStack(level, pos, state, includeData);
+        return this.getFamily().getRootsItem().map(ItemStack::new).orElse(ItemStack.EMPTY);
     }
 
     //////////////////////////////
