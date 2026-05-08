@@ -13,7 +13,7 @@
     },
     "layer=filled": {
       "type": "dynamictrees:roots",
-      "opaque": false,
+      "opaque": true,
       "textures": {
         "side": "minecraft:block/muddy_mangrove_roots_side",
         "top": "minecraft:block/muddy_mangrove_roots_top"

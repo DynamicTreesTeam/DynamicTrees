@@ -29,6 +29,9 @@ public final class BasicLoaderBuilder extends InvariantLoaderBuilder {
                 ClientModEventHandler.ROOTS, (textures, _)->
                         new BasicLoaderBuilder(()-> new RootsBlockStateModel.Unbaked(textures.get("bark"), textures.get("rings"), false)));
         loaderBuilders.put(
+                ClientModEventHandler.ROOTS.withSuffix("_opaque"), (textures, _)->
+                        new BasicLoaderBuilder(()-> new RootsBlockStateModel.Unbaked(textures.get("bark"), textures.get("rings"), true)));
+        loaderBuilders.put(
                 ClientModEventHandler.AERIAL_ROOTS_SOIL, (textures, family)->
                         new BasicLoaderBuilder(()-> new AerialRootsSoilBlockStateModel.Unbaked(
                                 textures.get("end"),

@@ -21,8 +21,8 @@ import com.dtteam.dynamictrees.systems.nodemapper.SpeciesNode;
 import com.dtteam.dynamictrees.systems.nodemapper.StateNode;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
-import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.tree.species.AerialRootsSpecies;
+import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.EntityUtils;
 import com.dtteam.dynamictrees.utility.ItemUtils;
 import net.minecraft.core.BlockPos;
@@ -63,8 +63,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -75,7 +73,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
     public static final IntegerProperty RADIUS = IntegerProperty.create("radius", 1, 8);
     public static final EnumProperty<Layer> LAYER = EnumProperty.create("layer", Layer.class);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    private static final Logger log = LoggerFactory.getLogger(BasicRootsBlock.class);
 
     public enum Layer implements StringRepresentable {
         EXPOSED (AerialRootsFamily::getPrimitiveRoots),
@@ -509,12 +506,6 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
             return Shapes.empty();
         }
         return super.getVisualShape(pState, pReader, pPos, pContext);
-    }
-
-    @Override
-    public boolean skipRendering(BlockState pState, BlockState pAdjacentBlockState, Direction pSide) {
-        return (pAdjacentBlockState.is(this) && pAdjacentBlockState.getValue(LAYER).ordinal() >= pState.getValue(LAYER).ordinal())
-                || super.skipRendering(pState, pAdjacentBlockState, pSide);
     }
 
     public static boolean isTransparent (BlockState state){
