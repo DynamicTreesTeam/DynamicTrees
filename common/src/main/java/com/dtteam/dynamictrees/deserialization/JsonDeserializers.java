@@ -33,6 +33,8 @@ import com.dtteam.dynamictrees.worldgen.BiomeDatabase;
 import com.dtteam.dynamictrees.worldgen.IDTBiomeHolderSet;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
@@ -198,6 +200,7 @@ public final class JsonDeserializers {
 
     public static JsonDeserializer<Block> BLOCK;
     public static JsonDeserializer<Item> ITEM;
+    public static JsonDeserializer<ParticleType<?>> PARTICLE_TYPE;
 
     // TODO: Read json object for quantity and NBT.
     public static JsonDeserializer<ItemStack> ITEM_STACK = register(ItemStack.class,
@@ -297,10 +300,12 @@ public final class JsonDeserializers {
      * Registers {@link BuiltInRegistryEntryDeserializer} objects. This should be called after the registries are
      * initiated to avoid giving null to the getters.
      */
+    @SuppressWarnings("unchecked")
     public static void registerRegistryEntryGetters() {
         BLOCK = register(Block.class,
                 new BuiltInRegistryEntryDeserializer<>(BuiltInRegistries.BLOCK, "block", Blocks.AIR));
         ITEM = register(Item.class, new BuiltInRegistryEntryDeserializer<>(BuiltInRegistries.ITEM, "item", Items.AIR));
+        PARTICLE_TYPE = register((Class<ParticleType<?>>) (Class<?>) ParticleType.class, new BuiltInRegistryEntryDeserializer<>(BuiltInRegistries.PARTICLE_TYPE, "particle_type", ParticleTypes.CLOUD));
     }
 
     public static void postRegistryEvent() {

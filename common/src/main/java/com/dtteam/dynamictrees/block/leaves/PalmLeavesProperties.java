@@ -31,6 +31,7 @@ public class PalmLeavesProperties extends LeavesProperties {
 
     public PalmLeavesProperties(Identifier registryName) {
         super(registryName);
+        this.leavesParticleChance = 0;
     }
 
     @Override

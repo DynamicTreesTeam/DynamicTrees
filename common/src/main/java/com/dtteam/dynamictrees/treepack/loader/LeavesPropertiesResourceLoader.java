@@ -5,6 +5,7 @@ import com.dtteam.dynamictrees.api.resource.loading.preparation.JsonRegistryReso
 import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.block.leaves.PalmLeavesProperties;
 import com.dtteam.dynamictrees.block.leaves.ScruffyLeavesProperties;
+import com.dtteam.dynamictrees.deserialization.JsonDeserializers;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.dtteam.dynamictrees.deserialization.applier.Applier;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
@@ -14,10 +15,16 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.utility.IdentifierUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
+import net.minecraft.core.particles.ColorParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.apache.logging.log4j.LogManager;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Harley O'Connor
@@ -55,7 +62,9 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                                     "Could not set family for leaves properties with name \"" + leavesProperties
                                             + "\" as family \"" + processedRegName + "\" was not found.")
                     ));
-                });
+                })
+                .register("particle_chance", Float.class, LeavesProperties::setLeavesParticleChance)
+                .register("particle", JsonElement.class, this::processParticle);
 
         this.reloadAppliers.register("requires_shears", Boolean.class, LeavesProperties::setRequiresShears)
                 .register("cell_kit", CellKit.class, LeavesProperties::setCellKit)
@@ -106,11 +115,9 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
 
     private void readCustomBlockRegistryName(LeavesProperties leavesProperties, JsonObject json) {
         JsonResult.forInput(json)
-                .mapIfContains("block_registry_name", JsonElement.class, input ->
-                        IdentifierDeserializer.create(leavesProperties.getRegistryName().getNamespace())
-                                .deserialize(input).orElseThrow(), leavesProperties.getBlockRegistryName()
+                .mapIfContains("particle_chance", JsonElement.class, JsonDeserializers.FLOAT::deserialize
                 ).ifSuccessOrElse(
-                        leavesProperties::setBlockRegistryName,
+                        chance->leavesProperties.setLeavesParticleChance(chance.get()),
                         error -> this.logError(leavesProperties.getRegistryName(), error),
                         warning -> this.logWarning(leavesProperties.getRegistryName(), warning)
                 );
@@ -130,8 +137,33 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
 
         leavesProperties.setRequiresShears(true);
 
+        JsonResult.forInput(json)
+                .mapIfContains("block_registry_name", JsonElement.class, input ->
+                        IdentifierDeserializer.create(leavesProperties.getRegistryName().getNamespace())
+                                .deserialize(input).orElseThrow(), leavesProperties.getBlockRegistryName()
+                ).ifSuccessOrElse(
+                        leavesProperties::setBlockRegistryName,
+                        error -> this.logError(leavesProperties.getRegistryName(), error),
+                        warning -> this.logWarning(leavesProperties.getRegistryName(), warning)
+                );
 
         leavesProperties.generateDynamicLeaves(blockProperties);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void processParticle(LeavesProperties leavesProperties, JsonElement json){
+        ParticleType<?> particle = JsonDeserializers.PARTICLE_TYPE.deserialize(json).orElse(null);
+        if (particle instanceof SimpleParticleType simpleParticle){
+            leavesProperties.setLeavesParticle(simpleParticle);
+        } else if (particle != null){
+            JsonObject dummy = new JsonObject();
+            dummy.addProperty("color", 0xFFFFFF);
+            ParticleOptions options = particle.codec().codec()
+                    .parse(JsonOps.INSTANCE, dummy).result().orElse(null);
+            if (options instanceof ColorParticleOption){
+                leavesProperties.setLeavesParticle((ParticleType<@NotNull ColorParticleOption>) particle);
+            }
+        }
     }
 
 }

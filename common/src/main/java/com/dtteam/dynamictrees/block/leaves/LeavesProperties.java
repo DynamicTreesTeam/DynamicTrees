@@ -23,6 +23,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ColorParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerRegistries;
@@ -48,6 +52,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -164,6 +169,9 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     protected boolean connectAnyRadius = false;
     protected boolean requiresShears = true;
     protected boolean waterResistant = false;
+    protected float leavesParticleChance = 0.01F;
+    protected @Nullable ParticleType<ColorParticleOption> coloredLeavesParticle = null;
+    protected @Nullable SimpleParticleType simpleLeavesParticle = null;
 
     private LeavesProperties() {
         this.blockLootTableSupplier = new LootTableSupplier("null/", DynamicTrees.NULL);
@@ -659,6 +667,29 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     public void setFoliageTintLayerCount(int primitiveBlockTintLayerCount) {
         this.foliageTintLayerCount = primitiveBlockTintLayerCount;
+    }
+
+    public void setLeavesParticleChance(float leavesParticleChance) {
+        this.leavesParticleChance = leavesParticleChance;
+    }
+
+    public float getLeavesParticleChance() {
+        return leavesParticleChance;
+    }
+
+    public void setLeavesParticle(ParticleType<@NotNull ColorParticleOption> leavesParticle) {
+        this.coloredLeavesParticle = leavesParticle;
+    }
+    public void setLeavesParticle(SimpleParticleType leavesParticle){
+        this.simpleLeavesParticle = leavesParticle;
+    }
+
+    @Nullable
+    public ParticleOptions getLeavesParticle(int color) {
+        if (coloredLeavesParticle != null)
+            return ColorParticleOption.create(coloredLeavesParticle, color);
+        if (simpleLeavesParticle != null) return simpleLeavesParticle;
+        return null;
     }
 
     ///////////////////////////////////////////

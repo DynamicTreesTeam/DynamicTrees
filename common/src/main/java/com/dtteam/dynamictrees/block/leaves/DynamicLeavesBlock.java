@@ -22,12 +22,14 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.ParticleUtils;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
@@ -60,13 +62,13 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
     public LeavesProperties properties = LeavesProperties.NULL;
 
     public DynamicLeavesBlock(Identifier id, final LeavesProperties leavesProperties, final Properties properties) {
-        this(id, properties);
+        this(id, properties,leavesProperties.getLeavesParticleChance());
         this.properties = leavesProperties;
         leavesProperties.setDynamicLeavesState(defaultBlockState());
     }
 
-    public DynamicLeavesBlock(Identifier id, Properties properties) {
-        super(0.01F, properties.pushReaction(PushReaction.DESTROY).setId(ResourceKey.create(Registries.BLOCK, id)));
+    public DynamicLeavesBlock(Identifier id, Properties properties, float leafParticleChance) {
+        super(leafParticleChance, properties.pushReaction(PushReaction.DESTROY).setId(ResourceKey.create(Registries.BLOCK, id)));
         this.registerDefaultState(this.stateDefinition.any().setValue(DISTANCE, LeavesProperties.maxHydro).setValue(PERSISTENT, false).setValue(WATERLOGGED, false));
     }
 
@@ -813,17 +815,19 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (leafParticleChance > 0 && properties.getPrimitiveLeavesBlock().isPresent()) {
+        if (leafParticleChance > 0 && getLeavesProperties().getLeavesParticle(0) == null) {
             properties.getPrimitiveLeavesBlock().ifPresent((b)->b.animateTick(state,level,pos,random));
         } else {
             super.animateTick(state, level, pos, random);
         }
     }
 
-    /**
-     * Handled by calling animateTick on the primitive
-     */
     @Override
-    protected void spawnFallingLeavesParticle(Level level, BlockPos blockPos, RandomSource randomSource) {}
+    protected void spawnFallingLeavesParticle(Level level, BlockPos pos, RandomSource random) {
+        ParticleOptions particle = getLeavesProperties().getLeavesParticle(level.getClientLeafTintColor(pos));
+        if (particle != null){
+            ParticleUtils.spawnParticleBelow(level, pos, random, particle);
+        }
+    }
 
 }
