@@ -483,4 +483,17 @@ public class FallingTreeEntity extends Entity implements ModelTracker {
         return null;
 }
 
+
+    private float unboundXRot;
+
+    @Override
+    public void setXRot(float xRot) {
+        unboundXRot = xRot;
+        super.setXRot(xRot);
+    }
+
+    @Override
+    public float getXRot() {
+        return unboundXRot;
+    }
 }

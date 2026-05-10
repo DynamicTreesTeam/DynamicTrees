@@ -382,8 +382,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
     @Override
     public void renderTransform(FallingTreeEntity entity, float entityYaw, float partialTick, PoseStack poseStack) {
 
-        float yaw = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTick));
-        float pit = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTick));
+        float yRotDiff = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.yRotO, entity.getYRot(), partialTick));
+        float xRotDiff = Mth.wrapDegrees(MathUtils.angleDegreesInterpolate(entity.xRotO, entity.getXRot(), partialTick));
 
         int radius = entity.getDestroyData().getBranchRadius(0);
 
@@ -391,8 +391,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
         Vec3 toolVec = new Vec3(toolDir.getStepX(), toolDir.getStepY(), toolDir.getStepZ()).scale(radius / 16.0f);
 
         poseStack.translate(-toolVec.x, -toolVec.y, -toolVec.z);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(yaw));
-        poseStack.mulPose(Axis.XP.rotationDegrees(pit));
+        poseStack.mulPose(Axis.ZN.rotationDegrees(yRotDiff));
+        poseStack.mulPose(Axis.XP.rotationDegrees(xRotDiff));
         poseStack.translate(toolVec.x, toolVec.y, toolVec.z);
 
         poseStack.translate(-0.5, 0, -0.5);
