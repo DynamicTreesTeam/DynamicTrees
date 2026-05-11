@@ -83,7 +83,7 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
         return new BranchBlockStateModel(cores, sleeves, rings, barkMat);
     }
 
-    public static ThickBranchBlockStateModel bakeThick(ModelBaker baker, BranchBlockStateModel fallback, Identifier ringsTexture, Identifier barkTexture) {
+    public static ThickBranchBlockStateModel bakeThick(ModelBaker baker, BranchBlockStateModel fallback, Identifier barkTexture, Identifier ringsTexture) {
         BranchModelPart[] trunksSideBark = new BranchModelPart[16]; // The trunk will always feature bark on its sides.
         BranchModelPart[] trunksTopBark = new BranchModelPart[16]; // The trunk will feature bark on its top when there's a branch on top of it.
         BranchModelPart[] trunksTopRings = new BranchModelPart[16]; // The trunk will feature rings on its top when there's no branches on top of it.

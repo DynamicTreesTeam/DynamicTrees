@@ -554,7 +554,7 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
 
     @Override
     public MapCodec<? extends TintedParticleLeavesBlock> codec() {
-        return super.codec();
+        return CODEC;
     }
 
     @Override
@@ -815,7 +815,8 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (leafParticleChance > 0 && getLeavesProperties().getLeavesParticle(0) == null) {
+        if (leafParticleChance <= 0) return;
+        if (getLeavesProperties().getLeavesParticle(0) == null) {
             properties.getPrimitiveLeavesBlock().ifPresent((b)->b.animateTick(state,level,pos,random));
         } else {
             super.animateTick(state, level, pos, random);

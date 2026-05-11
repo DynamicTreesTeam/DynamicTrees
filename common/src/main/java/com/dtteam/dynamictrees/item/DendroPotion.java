@@ -103,11 +103,10 @@ public class DendroPotion extends Item implements SubstanceEffectProvider, Empti
         };
     }
 
-
-//    @Override
-//    public String getDescriptionId(ItemStack stack) {
-//        return this.getDescriptionId() + "." + getPotionType(stack).getName();
-//    }
+    @Override
+    public Component getName(ItemStack stack) {
+        return Component.translatable(this.getDescriptionId() + "." + getPotionType(stack).getName());
+    }
 
     @Override
     public ItemStack getEmptyContainer() {
