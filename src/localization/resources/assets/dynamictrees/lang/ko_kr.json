@@ -20,7 +20,7 @@
   "commands.dynamictrees.error.not_transformable": "종 %s은(는) 변환할 수 없습니다.",
   "commands.dynamictrees.error.species_equal": "대상 종이 지정한 종과 같습니다.",
   "commands.dynamictrees.error.unknown_species": "알 수 없는 종: %s",
-  "commands.dynamictrees.success.clear_orphaned": "고아 가지 네트워크 %s개를 제거했습니다.",
+  "commands.dynamictrees.success.clear_orphaned": "고정된 가지 네트워크 %s개를 제거했습니다.",
   "commands.dynamictrees.success.create_staff": "종 %s, 코드 %s, 색상 %s, 읽기 전용 %s, 최대 사용 횟수 %s의 지팡이를 %s 위치에 생성했습니다.",
   "commands.dynamictrees.success.create_transform_potion": "%s 종용 변환 물약을 %s 위치에 생성했습니다.",
   "commands.dynamictrees.success.get_fertility": "%s 위치 나무의 비옥도는 %s입니다.",
