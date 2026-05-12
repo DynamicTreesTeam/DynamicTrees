@@ -59,16 +59,16 @@ import java.util.*;
 
 public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements TreePart, Ageable {
 
-    public LeavesProperties properties = LeavesProperties.NULL;
+    protected LeavesProperties leavesProperties = LeavesProperties.NULL;
 
     public DynamicLeavesBlock(Identifier id, final LeavesProperties leavesProperties, final Properties properties) {
         this(id, properties,leavesProperties.getLeavesParticleChance());
-        this.properties = leavesProperties;
+        this.leavesProperties = leavesProperties;
         leavesProperties.setDynamicLeavesState(defaultBlockState());
     }
 
-    public DynamicLeavesBlock(Identifier id, Properties properties, float leafParticleChance) {
-        super(leafParticleChance, properties.pushReaction(PushReaction.DESTROY).setId(ResourceKey.create(Registries.BLOCK, id)));
+    public DynamicLeavesBlock(Identifier id, Properties leavesProperties, float leafParticleChance) {
+        super(leafParticleChance, leavesProperties.pushReaction(PushReaction.DESTROY).setId(ResourceKey.create(Registries.BLOCK, id)));
         this.registerDefaultState(this.stateDefinition.any().setValue(DISTANCE, LeavesProperties.maxHydro).setValue(PERSISTENT, false).setValue(WATERLOGGED, false));
     }
 
@@ -82,7 +82,7 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
     }
 
     public LeavesProperties getLeavesProperties() {
-        return properties;
+        return leavesProperties;
     }
 
     @Override
@@ -303,7 +303,7 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
             return false; //leaves can't grow on leaves duh.
         }
 
-        if (!blockState.getFluidState().isEmpty() && !properties.waterResistant) {
+        if (!blockState.getFluidState().isEmpty() && !this.leavesProperties.waterResistant) {
             return false; //leaves drown inside water
         }
 
@@ -374,7 +374,7 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
     public boolean removeIfInvalid(BlockState state, LevelAccessor level, BlockPos pos, RandomSource rand){
         if (getLeavesProperties().updateTick(level, pos, state, rand)) {
             //waterlogged leaves drown
-            if (state.getValue(WATERLOGGED) && !properties.waterResistant) {
+            if (state.getValue(WATERLOGGED) && !leavesProperties.waterResistant) {
                 level.setBlock(pos, getFluidState(state).createLegacyBlock(), 3);
                 return true;
             }
@@ -817,7 +817,7 @@ public class DynamicLeavesBlock extends TintedParticleLeavesBlock implements Tre
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (leafParticleChance <= 0) return;
         if (getLeavesProperties().getLeavesParticle(0) == null) {
-            properties.getPrimitiveLeavesBlock().ifPresent((b)->b.animateTick(state,level,pos,random));
+            leavesProperties.getPrimitiveLeavesBlock().ifPresent((b)->b.animateTick(state,level,pos,random));
         } else {
             super.animateTick(state, level, pos, random);
         }

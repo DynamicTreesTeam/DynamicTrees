@@ -93,11 +93,11 @@ public class AlternativeLeavesGenFeature extends GenFeature {
         if (originalLeaves != null && altLeaves != null) {
             if (worldgen || world.getRandom().nextFloat() < configuration.get(PLACE_CHANCE)) {
                 if (state.getBlock() == originalLeaves) {
-                    return altLeaves.properties.getDynamicLeavesState(state.getValue(LeavesBlock.DISTANCE));
+                    return altLeaves.getLeavesProperties().getDynamicLeavesState(state.getValue(LeavesBlock.DISTANCE));
                 }
             } else {
                 if (state.getBlock() == altLeaves) {
-                    return originalLeaves.properties.getDynamicLeavesState(state.getValue(LeavesBlock.DISTANCE));
+                    return originalLeaves.getLeavesProperties().getDynamicLeavesState(state.getValue(LeavesBlock.DISTANCE));
                 }
             }
         }
