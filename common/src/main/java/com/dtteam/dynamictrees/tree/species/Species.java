@@ -398,7 +398,7 @@ public class Species extends RegistryEntry<Species> implements Resettable<Specie
     }
 
     public int getLeafBlockIndex(DynamicLeavesBlock block) {
-        int index = validLeaves.indexOf(block.properties);
+        int index = validLeaves.indexOf(block.getLeavesProperties());
         if (index < 0) {
             DynamicTrees.LOG.warn("Block {} not valid leaves for {}.", block, this);
             return 0;

@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -91,15 +92,44 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     // INTERACTION
     ///////////////////////////////////////////
 
-    /** NeoForge override */
-    @SuppressWarnings("unused")
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> Services.INTERACTION.blockDestroyByPlayer(muse.state, level, muse.pos, player, willHarvest, level.getFluidState(pos)), false);
+    /** NeoForge override */ @SuppressWarnings("unused")
+    public boolean  onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos),
+                muse -> Services.INTERACTION.blockDestroyByPlayer(muse.state, level, muse.pos, player, willHarvest, level.getFluidState(pos)),
+                false
+        );
+    }
+
+    /** NeoForge override */ @SuppressWarnings("unused")
+    public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, @org.jspecify.annotations.Nullable Entity entity) {
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos),
+                muse -> muse.state.getBlock().defaultBlockState().getSoundType(),
+                SoundType.WOOD
+        );
+    }
+
+    /** NeoForge override */ @SuppressWarnings("unused")
+    public float getExplosionResistance(BlockState state, BlockGetter level, BlockPos pos, Explosion explosion){
+        return NullUtils.applyIfNonnull(this.getMuse(level, pos),
+                muse -> muse.state.getBlock().getExplosionResistance(),
+                0f
+        );
     }
 
     @Override
     protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
-        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getDestroyProgress(player, level, muse.pos), 0f);
+        return NullUtils.applyIfNonnull(this.getMuse(level, state, pos),
+                muse -> muse.state.getDestroyProgress(player, level, muse.pos),
+                0f
+        );
+    }
+
+    @Override
+    public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
+        return NullUtils.applyIfNonnull(this.getMuse(level, pos),
+                muse -> ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(state, level, muse.pos),
+                super.getHardness(state, level, pos)
+        );
     }
 
     @Override
@@ -110,27 +140,6 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         return state;
     }
-
-    @Override
-    public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-        return NullUtils.applyIfNonnull(this.getMuse(level, pos), muse -> ((BlockWithDynamicHardness) muse.state.getBlock()).getHardness(state, level, muse.pos), super.getHardness(state, level, pos));
-    }
-
-    //Better than nothing, for now.
-    @Override
-    protected SoundType getSoundType(BlockState state) {
-        return SoundType.WOOD;
-    }
-
-    //    @Override
-//    public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, @Nullable Entity entity) {
-//        return Null.applyIfNonnull(this.getMuse(level, state, pos), muse -> muse.state.getBlock().getSoundType(muse.state, level, muse.pos, entity), SoundType.WOOD);
-//    }
-//
-//    @Override
-//    public float getExplosionResistance(BlockState state, BlockGetter level, BlockPos pos, Explosion explosion) {
-//        return Null.applyIfNonnull(this.getMuse(level, pos), muse -> muse.state.getBlock().getExplosionResistance(level.getBlockState(pos), level, muse.pos, explosion), 0f);
-//    }
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext useContext) {
@@ -218,13 +227,13 @@ public class TrunkShellBlock extends BlockWithDynamicHardness implements SimpleW
         return NullUtils.applyIfNonnull(this.getMuse(level, state, pos), muse -> Shapes.create(muse.state.getShape(level, muse.pos).bounds().move(muse.museOffset)), Shapes.empty());
     }
 
-//    @Override
-//    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
-//        return NullUtils.applyIfNonnull(
-//                this.getMuse(level, state, pos),
-//                muse -> muse.state.getBlock().getCloneItemStack(level, muse.pos, muse.state), ItemStack.EMPTY
-//        );
-//    }
+    @Override
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
+        return NullUtils.applyIfNonnull(
+                this.getMuse(level, state, pos),
+                muse -> muse.state.getBlock().defaultBlockState().getCloneItemStack(level, muse.pos, includeData), ItemStack.EMPTY
+        );
+    }
 
     @Override
     protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
