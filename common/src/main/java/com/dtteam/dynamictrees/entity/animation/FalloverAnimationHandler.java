@@ -2,7 +2,10 @@ package com.dtteam.dynamictrees.entity.animation;
 
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.leaves.DynamicLeavesBlock;
+import com.dtteam.dynamictrees.block.leaves.LeavesProperties;
 import com.dtteam.dynamictrees.client.SoundInstanceHandler;
+import com.dtteam.dynamictrees.client.TintSourceHelper;
 import com.dtteam.dynamictrees.config.DTConfigs;
 import com.dtteam.dynamictrees.data.tags.DTEntityTypeTags;
 import com.dtteam.dynamictrees.entity.FallingTreeEntity;
@@ -11,9 +14,13 @@ import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.utility.MathUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ColorParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -34,6 +41,7 @@ import java.util.stream.Collectors;
 public class FalloverAnimationHandler implements AnimationHandler {
 
     public static final int TICKS_BEFORE_CHECKING_COLLISION = 10;
+    public static final float LEAVES_TO_BLOCK_PARTICLE_RATIO = 0.1f;
 
     @Override
     public String getName() {
@@ -137,14 +145,36 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
     protected void spawnParticlesAtLeaves(FallingTreeEntity entity, BlockPos leavesPos, BlockState leavesState, Vec3 velocity, RandomSource rand, int particleCount, double limitChance){
         Vec3 newPos = getRelativeLeavesPosition(entity, leavesPos.getCenter());
+        if (leavesState == null) return;
+        ParticleOptions leavesParticle = getParticle(entity, leavesState, leavesPos);
+        ParticleOptions blockParticle = new BlockParticleOption(ParticleTypes.BLOCK, leavesState);
         for (int j=0; j<particleCount; j++){
             if (rand.nextDouble() < limitChance){
-                if (leavesState != null)
-                    entity.level().addParticle(new BlockParticleOption(ParticleTypes.BLOCK, leavesState),
-                            newPos.x+rand.nextFloat(), newPos.y+rand.nextFloat(), newPos.z+rand.nextFloat(),
-                            velocity.x+rand.nextFloat(), velocity.y+rand.nextFloat(), velocity.z+rand.nextFloat());
+                entity.level().addParticle(rand.nextFloat() > LEAVES_TO_BLOCK_PARTICLE_RATIO ? blockParticle : leavesParticle,
+                        newPos.x+rand.nextFloat(), newPos.y+rand.nextFloat(), newPos.z+rand.nextFloat(),
+                        velocity.x+rand.nextFloat(), velocity.y+rand.nextFloat(), velocity.z+rand.nextFloat());
             }
         }
+    }
+
+    private ParticleOptions getParticle(FallingTreeEntity entity, BlockState leavesState, BlockPos leavesPos){
+        BlockAndTintGetter level = Minecraft.getInstance().level;
+        if (level != null) {
+            BlockPos absolutePos = entity.getDestroyData().basePos.offset(leavesPos);
+            if (leavesState.getBlock() instanceof DynamicLeavesBlock leavesBlock){
+                int leavesColor = TintSourceHelper.getLeavesColor(entity.getSpecies(), level, absolutePos);
+                LeavesProperties properties = leavesBlock.getLeavesProperties();
+
+                //if the chance is 0 it means we do not want leaves particles, so use block particles.
+                if (properties.getLeavesParticleChance() > 0){
+                    ParticleOptions opts = properties.getLeavesParticle(leavesColor);
+                    //if it's not null then we have custom particles, otherwise do regular
+                    if (opts != null) return opts;
+                    return ColorParticleOption.create(ParticleTypes.TINTED_LEAVES, leavesColor);
+                }
+            }
+        }
+        return new BlockParticleOption(ParticleTypes.BLOCK, leavesState);
     }
 
     protected Vec3 getRelativeLeavesPosition(FallingTreeEntity entity, Vec3 leaves){
