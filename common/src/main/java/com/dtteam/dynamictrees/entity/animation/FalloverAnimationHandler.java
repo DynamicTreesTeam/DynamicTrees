@@ -110,6 +110,28 @@ public class FalloverAnimationHandler implements AnimationHandler {
         return new Vec3(xPrime, yPrime, zPrime);
     }
 
+    protected void spawnLeavesParticlesWhileFalling(FallingTreeEntity entity, float fallSpeed){
+        BranchDestructionData data = entity.getDestroyData();
+        RandomSource rand = entity.level().getRandom();
+        int particleCount = (int)(fallSpeed * data.species.falloverParticleFlingMultiplier());
+
+        if (particleCount == 0) return;
+
+        for (int j=0; j<particleCount; j++){
+            Pair<BlockPos, BlockState> leafLoc = data.getAllLeavesWithPos().get(rand.nextInt(data.getAllLeavesWithPos().size()));
+            BlockPos leavesPos = leafLoc.getKey().offset(data.basePos);
+            BlockState leavesState = leafLoc.getValue();
+            if (leavesState == null) return;
+
+            Vec3 newPos = getRelativeLeavesPosition(entity, leavesPos.getCenter());
+            ParticleOptions leavesParticle = getParticle(entity, leavesState, leavesPos);
+
+            entity.level().addParticle(leavesParticle,
+                    newPos.x+rand.nextFloat(), newPos.y+rand.nextFloat(), newPos.z+rand.nextFloat(),
+                    rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+        }
+    }
+
     protected void flingLeavesParticles(FallingTreeEntity entity, float fallSpeed){
         int bounces = getData(entity).bounces;
         if (bounces > 1) return;
@@ -160,9 +182,8 @@ public class FalloverAnimationHandler implements AnimationHandler {
     private ParticleOptions getParticle(FallingTreeEntity entity, BlockState leavesState, BlockPos leavesPos){
         BlockAndTintGetter level = Minecraft.getInstance().level;
         if (level != null) {
-            BlockPos absolutePos = entity.getDestroyData().basePos.offset(leavesPos);
             if (leavesState.getBlock() instanceof DynamicLeavesBlock leavesBlock){
-                int leavesColor = TintSourceHelper.getLeavesColor(entity.getSpecies(), level, absolutePos);
+                int leavesColor = TintSourceHelper.getLeavesColor(entity.getSpecies(), level, leavesPos);
                 LeavesProperties properties = leavesBlock.getLeavesProperties();
 
                 //if the chance is 0 it means we do not want leaves particles, so use block particles.
@@ -207,6 +228,7 @@ public class FalloverAnimationHandler implements AnimationHandler {
         if (entity.onGround()) {
             float height = (float) entity.getMassCenter().y * 2;
             fallSpeed += (float) (0.2 / height);
+            spawnLeavesParticlesWhileFalling(entity, fallSpeed);
             addRotation(entity, fallSpeed);
         }
 
