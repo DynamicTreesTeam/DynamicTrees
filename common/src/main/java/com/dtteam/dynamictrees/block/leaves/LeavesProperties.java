@@ -171,6 +171,7 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
     protected boolean waterResistant = false;
     protected float leavesParticleChance = 0.01F;
     protected @Nullable ParticleType<ColorParticleOption> coloredLeavesParticle = null;
+    protected @Nullable Integer forceParticleColor = null;
     protected @Nullable SimpleParticleType simpleLeavesParticle = null;
 
     private LeavesProperties() {
@@ -686,10 +687,20 @@ public class LeavesProperties extends RegistryEntry<LeavesProperties> implements
 
     @Nullable
     public ParticleOptions getLeavesParticle(int color) {
-        if (coloredLeavesParticle != null)
+        if (coloredLeavesParticle != null){
+            color = forceParticleColor == null ? color : forceParticleColor;
             return ColorParticleOption.create(coloredLeavesParticle, color);
+        }
         if (simpleLeavesParticle != null) return simpleLeavesParticle;
         return null;
+    }
+
+    public void setForceParticleColor(@Nullable Integer forceParticleColor) {
+        this.forceParticleColor = forceParticleColor;
+    }
+
+    public @Nullable Integer getForceParticleColor() {
+        return forceParticleColor;
     }
 
     ///////////////////////////////////////////

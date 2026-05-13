@@ -183,8 +183,9 @@ public class FalloverAnimationHandler implements AnimationHandler {
         BlockAndTintGetter level = Minecraft.getInstance().level;
         if (level != null) {
             if (leavesState.getBlock() instanceof DynamicLeavesBlock leavesBlock){
-                int leavesColor = TintSourceHelper.getLeavesColor(entity.getSpecies(), level, leavesPos);
                 LeavesProperties properties = leavesBlock.getLeavesProperties();
+                Integer leavesColor = properties.getForceParticleColor();
+                if (leavesColor == null) leavesColor = TintSourceHelper.getLeavesColor(entity.getSpecies(), level, leavesPos);
 
                 //if the chance is 0 it means we do not want leaves particles, so use block particles.
                 if (properties.getLeavesParticleChance() > 0){
