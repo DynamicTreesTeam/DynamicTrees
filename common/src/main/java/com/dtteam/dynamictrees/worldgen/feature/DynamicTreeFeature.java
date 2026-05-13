@@ -120,7 +120,7 @@ public class DynamicTreeFeature extends Feature<NoneFeatureConfiguration> {
                 if (species.isAcceptableSoilForWorldgen(levelContext.accessor(), groundPos, dirtState)) {
                     if (getChanceSelector(biomeEntry).getChance(RANDOM, species, circle.radius) == BiomePropertySelectors.Chance.OK) {
                         Holder<Biome> biome = getNoiseBiome(levelContext, groundPos);
-                        if (!species.generate(new DynamicTreeGenerationContext(levelContext, species, originPos, groundPos.mutable(), biome, CoordUtils.getRandomDir(RANDOM), circle.radius, true))) {
+                        if (!species.generate(new DynamicTreeGenerationContext(levelContext, species, originPos, groundPos.mutable(), biome, CoordUtils.getRandom2DDir(RANDOM), circle.radius, true))) {
                             result = GeneratorResult.FAIL_GENERATION;
                         }
                     } else {

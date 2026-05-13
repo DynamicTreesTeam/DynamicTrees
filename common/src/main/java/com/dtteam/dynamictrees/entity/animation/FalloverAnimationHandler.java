@@ -112,23 +112,21 @@ public class FalloverAnimationHandler implements AnimationHandler {
 
     protected void spawnLeavesParticlesWhileFalling(FallingTreeEntity entity, float fallSpeed){
         BranchDestructionData data = entity.getDestroyData();
-        RandomSource rand = entity.level().getRandom();
-        int particleCount = (int)(fallSpeed * data.species.falloverParticleFlingMultiplier());
+        if (data.getAllLeavesWithPos().isEmpty()) return;
 
+        int particleCount = (int)(fallSpeed * data.species.falloverParticleFlingMultiplier());
         if (particleCount == 0) return;
 
+        RandomSource rand = entity.level().getRandom();
         for (int j=0; j<particleCount; j++){
             Pair<BlockPos, BlockState> leafLoc = data.getAllLeavesWithPos().get(rand.nextInt(data.getAllLeavesWithPos().size()));
             BlockPos leavesPos = leafLoc.getKey().offset(data.basePos);
             BlockState leavesState = leafLoc.getValue();
             if (leavesState == null) return;
 
-            Vec3 newPos = getRelativeLeavesPosition(entity, leavesPos.getCenter());
-            ParticleOptions leavesParticle = getParticle(entity, leavesState, leavesPos);
+            ParticleOptions particle = getParticle(entity, leavesState, leavesPos);
 
-            entity.level().addParticle(leavesParticle,
-                    newPos.x+rand.nextFloat(), newPos.y+rand.nextFloat(), newPos.z+rand.nextFloat(),
-                    rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+            spawnParticlesAtLeaves(entity, leavesPos, particle, Vec3.ZERO, rand, particleCount, 1);
         }
     }
 
@@ -157,25 +155,17 @@ public class FalloverAnimationHandler implements AnimationHandler {
         if (toolAxis == Direction.Axis.X) angularVel = new Vec3(angularVel.z, angularVel.x, angularVel.y);
 
         for (Pair<BlockPos, BlockState> leafLoc : data.getAllLeavesWithPos()) {
-            BlockPos leaves = leafLoc.getKey().offset(data.basePos);
-            double r = leaves.getY() - data.basePos.getY();
+            BlockPos leavesPos = leafLoc.getKey().offset(data.basePos);
+            BlockState leavesState = leafLoc.getValue();
+            if (leavesState == null) return;
+            double r = leavesPos.getY() - data.basePos.getY();
             Vec3 velocity = angularVel.scale(r);
 
-            spawnParticlesAtLeaves(entity, leaves, leafLoc.getValue(), velocity, rand, particleCount, limitChance);
-        }
-    }
+            ParticleOptions leavesParticle = getParticle(entity, leavesState, leavesPos);
+            ParticleOptions blockParticle = new BlockParticleOption(ParticleTypes.BLOCK, leavesState);
+            ParticleOptions particle = rand.nextFloat() > LEAVES_TO_BLOCK_PARTICLE_RATIO ? blockParticle : leavesParticle;
 
-    protected void spawnParticlesAtLeaves(FallingTreeEntity entity, BlockPos leavesPos, BlockState leavesState, Vec3 velocity, RandomSource rand, int particleCount, double limitChance){
-        Vec3 newPos = getRelativeLeavesPosition(entity, leavesPos.getCenter());
-        if (leavesState == null) return;
-        ParticleOptions leavesParticle = getParticle(entity, leavesState, leavesPos);
-        ParticleOptions blockParticle = new BlockParticleOption(ParticleTypes.BLOCK, leavesState);
-        for (int j=0; j<particleCount; j++){
-            if (rand.nextDouble() < limitChance){
-                entity.level().addParticle(rand.nextFloat() > LEAVES_TO_BLOCK_PARTICLE_RATIO ? blockParticle : leavesParticle,
-                        newPos.x+rand.nextFloat(), newPos.y+rand.nextFloat(), newPos.z+rand.nextFloat(),
-                        velocity.x+rand.nextFloat(), velocity.y+rand.nextFloat(), velocity.z+rand.nextFloat());
-            }
+            spawnParticlesAtLeaves(entity, leavesPos, particle, velocity, rand, particleCount, limitChance);
         }
     }
 
@@ -197,6 +187,17 @@ public class FalloverAnimationHandler implements AnimationHandler {
             }
         }
         return new BlockParticleOption(ParticleTypes.BLOCK, leavesState);
+    }
+
+    protected void spawnParticlesAtLeaves(FallingTreeEntity entity, BlockPos leavesPos, ParticleOptions particle, Vec3 velocity, RandomSource rand, int particleCount, double limitChance){
+        Vec3 newPos = getRelativeLeavesPosition(entity, leavesPos.getCenter());
+        for (int j=0; j<particleCount; j++){
+            if (rand.nextDouble() < limitChance){
+                entity.level().addParticle(particle,
+                        newPos.x+rand.nextFloat(), newPos.y+rand.nextFloat(), newPos.z+rand.nextFloat(),
+                        velocity.x+rand.nextFloat(), velocity.y+rand.nextFloat(), velocity.z+rand.nextFloat());
+            }
+        }
     }
 
     protected Vec3 getRelativeLeavesPosition(FallingTreeEntity entity, Vec3 leaves){

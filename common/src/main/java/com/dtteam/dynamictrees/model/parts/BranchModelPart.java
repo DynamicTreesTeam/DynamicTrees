@@ -33,18 +33,6 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
         return this.quads.materialFlags();
     }
 
-    public BranchModelPart faceOnly(@Nullable Direction direction, boolean cull){
-        QuadCollection.Builder builder = new QuadCollection.Builder();
-        for (BakedQuad quad : getQuads(direction)){
-            if (direction != null && cull){
-                builder.addCulledFace(direction, quad);
-            } else {
-                builder.addUnculledFace(quad);
-            }
-        }
-        return new BranchModelPart(builder.build(), useAmbientOcclusion, particleMaterial);
-    }
-
     public static class UnbakedCore implements BlockStateModelPart.Unbaked{
         @Override
         public void resolveDependencies(Resolver resolver) {}
@@ -117,7 +105,7 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
 
                 for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
                     Direction face = e.getKey();
-                    builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+                    builder.addUnculledFace(ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
                 }
 
                 parts.put(dir, new BranchModelPart(builder.build(), true, material));

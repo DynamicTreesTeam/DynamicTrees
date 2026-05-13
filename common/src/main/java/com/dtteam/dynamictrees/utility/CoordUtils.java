@@ -74,7 +74,7 @@ public final class CoordUtils {
         }
     }
 
-    public static Direction getRandomDir(RandomSource rand) {
+    public static Direction getRandom2DDir(RandomSource rand) {
         return Direction.values()[2 + rand.nextInt(4)];//Return NSWE
     }
 
