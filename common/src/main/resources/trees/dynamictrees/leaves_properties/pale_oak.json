@@ -1,0 +1,7 @@
+{
+  "primitive_leaves": "minecraft:pale_oak_leaves",
+  "cell_kit": "dynamictrees:pale_oak",
+  "smother": 3,
+  "particle": "pale_oak_leaves",
+  "particle_chance": 0.02
+}

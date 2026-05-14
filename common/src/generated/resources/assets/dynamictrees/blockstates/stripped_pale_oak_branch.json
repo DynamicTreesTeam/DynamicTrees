@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "": {
+      "type": "dynamictrees:branch",
+      "family": "dynamictrees:pale_oak",
+      "textures": {
+        "bark": "minecraft:block/stripped_pale_oak_log",
+        "rings": "minecraft:block/stripped_pale_oak_log_top"
+      }
+    }
+  }
+}
