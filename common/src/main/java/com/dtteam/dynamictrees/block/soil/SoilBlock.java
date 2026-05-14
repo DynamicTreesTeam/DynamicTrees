@@ -161,10 +161,10 @@ public class SoilBlock extends BlockWithDynamicHardness implements TreePart, Ent
         return getPrimitiveSoilState(state).getDrops(builder);
     }
 
-//    @Override
-//    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
-//        return getPrimitiveSoilBlock().getCloneItemStack(level, pos, state, includeData);
-//    }
+    @Override
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
+        return getPrimitiveSoilState(state).getCloneItemStack(level, pos, includeData);
+    }
 
     @Override
     public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {

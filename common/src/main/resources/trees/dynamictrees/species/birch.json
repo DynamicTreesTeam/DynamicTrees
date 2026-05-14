@@ -18,7 +18,8 @@
             }
         },
         "rot_soil",
-        "bee_nest"
+        "bee_nest",
+        "leaf_litter"
     ],
     "lang_overrides": {
         "seed": "Birch Catkin"

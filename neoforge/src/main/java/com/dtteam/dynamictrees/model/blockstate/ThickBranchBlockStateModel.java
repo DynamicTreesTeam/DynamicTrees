@@ -4,11 +4,10 @@ import com.dtteam.dynamictrees.api.network.Connections;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
 import com.dtteam.dynamictrees.block.branch.ThickBranchBlock;
 import com.dtteam.dynamictrees.model.BlockStateModelWithConnectionData;
+import com.dtteam.dynamictrees.model.BranchMultiPartHolder;
 import com.dtteam.dynamictrees.model.ModelConnections;
 import com.dtteam.dynamictrees.model.ModelHelper;
-import com.dtteam.dynamictrees.model.parts.BranchModelPart;
 import com.dtteam.dynamictrees.tree.TreeHelper;
-import com.dtteam.dynamictrees.tree.family.Family;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -24,10 +23,8 @@ import java.util.List;
 
 public record ThickBranchBlockStateModel(
         BranchBlockStateModel fallback,
-        BranchModelPart[] trunksSideBark,
-        BranchModelPart[] trunksTopBark,
-        BranchModelPart[] trunksTopRings,
-        BranchModelPart[] trunksBotRings
+        BranchMultiPartHolder trunkBark,
+        BranchMultiPartHolder trunkRings
 ) implements DynamicBlockStateModel, BlockStateModelWithConnectionData {
 
     @Override
@@ -54,44 +51,41 @@ public record ThickBranchBlockStateModel(
         }
         coreRadius = Mth.clamp(coreRadius, BranchBlock.MAX_RADIUS + 1, ThickBranchBlock.MAX_RADIUS_THICK);
 
-        int[] connections = new int[]{0, 0, 0, 0, 0, 0};
-        Direction forceRingDir = null;
-        int twigRadius = 1;
+        final int[] connections = connectionsData.getAllRadii();
+        final Direction forceRingDir = ((ModelConnections) connectionsData).getRingOnly();
+        final int twigRadius = ((ModelConnections) connectionsData).getFamily().getPrimaryThickness();
 
-        if (connectionsData instanceof ModelConnections branchConnections) {
-            connections = branchConnections.getAllRadii();
-            forceRingDir = branchConnections.getRingOnly();
-            Family family = branchConnections.getFamily();
-            if (family.isValid()) {
-                twigRadius = family.getPrimaryThickness();
-            }
-        }
+        int numConnections = BranchBlockStateModel.countConnections(connections);
 
-        //Count number of connections
-        int numConnections = 0;
-        for (int i : connections) {
-            numConnections += (i != 0) ? 1 : 0;
-        }
         if (numConnections == 0 && forceRingDir != null) return;
 
         if (forceRingDir != null) {
             connections[forceRingDir.get3DDataValue()] = 0;
-            parts.add(this.trunksBotRings[coreRadius - 9].faceOnly(forceRingDir, false));
+            parts.add(trunkRings.getPart(forceRingDir, coreRadius - 9));
         }
 
-        boolean branchesAround = connections[2] + connections[3] + connections[4] + connections[5] != 0;
+        boolean branchesAround = areBranchesAround(connections);
 
-        parts.add(this.trunksSideBark[coreRadius - 9]);
         for (Direction face : Direction.values()) {
-            if (face == Direction.UP || face == Direction.DOWN) {
-                if (connections[face.get3DDataValue()] < twigRadius && !branchesAround) {
-                    parts.add(this.trunksTopRings[coreRadius - 9].faceOnly(face, false));
-                } else if (connections[face.get3DDataValue()] < coreRadius) {
-                    parts.add(this.trunksTopBark[coreRadius - 9].faceOnly(face, false));
-                }
-            }
+            gatherTrunkParts(parts, face, connections, twigRadius, branchesAround, coreRadius);
         }
 
+    }
+
+    private static boolean areBranchesAround(int[] connections) {
+        return connections[2] + connections[3] + connections[4] + connections[5] != 0;
+    }
+
+    private void gatherTrunkParts(List<BlockStateModelPart> parts, Direction face, int[] connections, int twigRadius, boolean branchesAround, int coreRadius) {
+        if (face == Direction.UP || face == Direction.DOWN) {
+            if (connections[face.get3DDataValue()] < twigRadius && !branchesAround) {
+                parts.add(this.trunkRings.getPart(face, coreRadius - 9));
+            } else if (connections[face.get3DDataValue()] < coreRadius) {
+                parts.add(this.trunkBark.getPart(face, coreRadius - 9));
+            }
+        } else {
+            parts.add(trunkBark.getPart(face, coreRadius - 9));
+        }
     }
 
     @Override

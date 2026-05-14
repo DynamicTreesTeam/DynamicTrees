@@ -33,49 +33,43 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
         return this.quads.materialFlags();
     }
 
-    public BranchModelPart faceOnly(@Nullable Direction direction, boolean cull){
-        QuadCollection.Builder builder = new QuadCollection.Builder();
-        for (BakedQuad quad : getQuads(direction)){
-            if (direction != null && cull){
-                builder.addCulledFace(direction, quad);
-            } else {
-                builder.addUnculledFace(quad);
-            }
-        }
-        return new BranchModelPart(builder.build(), useAmbientOcclusion, particleMaterial);
-    }
-
-    public record UnbakedCore(Material.Baked material, boolean flipNormals) implements BlockStateModelPart.Unbaked {
-
+    public static class UnbakedCore implements BlockStateModelPart.Unbaked{
         @Override
         public void resolveDependencies(Resolver resolver) {}
-
         @Override
         public BranchModelPart bake(ModelBaker baker) {
-            return bake(baker, 8, Direction.Axis.Y);
+            return bakeAllSides(baker, 8, Direction.Axis.Y).get(Direction.NORTH);
         }
 
-        public BranchModelPart bake(ModelBaker baker, int radius, Direction.Axis axis) {
+        protected Material.Baked material;
+        public UnbakedCore(Material.Baked material) {
+            this.material = material;
+        }
+
+        public EnumMap<Direction, BranchModelPart> bakeAllSides(ModelBaker baker, int radius, Direction.Axis axis) {
 
             CuboidModelElement part = generateCorePart(radius, axis);
-            QuadCollection.Builder builder = new QuadCollection.Builder();
+            EnumMap<Direction, QuadCollection.Builder> builders = new EnumMap<>(Direction.class);
+            for (Direction dir : Direction.values()){
+                builders.put(dir, new QuadCollection.Builder());
+            }
 
             for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
                 Direction face = e.getKey();
-                    builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+                builders.get(face).addUnculledFace(ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
             }
 
-            return new BranchModelPart(builder.build(), true, material);
+            EnumMap<Direction, BranchModelPart> parts = new EnumMap<>(Direction.class);
+            for (Direction dir : Direction.values()){
+                parts.put(dir, new BranchModelPart(builders.get(dir).build(), true, material));
+            }
+
+            return parts;
         }
 
         private CuboidModelElement generateCorePart(int radius, Direction.Axis axis){
             Vector3f posFrom = new Vector3f(8 - radius, 8 - radius, 8 - radius);
             Vector3f posTo = new Vector3f(8 + radius, 8 + radius, 8 + radius);
-            if (flipNormals){
-                Vector3f aux = posFrom;
-                posFrom = posTo;
-                posTo = aux;
-            }
 
             Map<Direction, CuboidFace> mapFacesIn = Maps.newEnumMap(Direction.class);
 
@@ -89,26 +83,35 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
 
     }
 
-    public record UnbakedSleeve(Material.Baked material) implements BlockStateModelPart.Unbaked {
-
+    public static class UnbakedSleeve implements BlockStateModelPart.Unbaked{
         @Override
         public void resolveDependencies(Resolver resolver) {}
-
         @Override
         public BranchModelPart bake(ModelBaker baker) {
-            return bake(baker, 0, Direction.UP);
+            return bakeAllSides(baker, 8).get(Direction.NORTH);
         }
 
-        public BranchModelPart bake(ModelBaker baker, int radius, Direction direction) {
-            CuboidModelElement part = generateSleevePart(radius, direction, false);
-            QuadCollection.Builder builder = new QuadCollection.Builder();
+        protected Material.Baked material;
+        public UnbakedSleeve(Material.Baked material) {
+            this.material = material;
+        }
 
-            for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
-                Direction face = e.getKey();
-                builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+        public EnumMap<Direction, BranchModelPart> bakeAllSides(ModelBaker baker, int radius) {
+
+            EnumMap<Direction, BranchModelPart> parts = new EnumMap<>(Direction.class);
+            for (Direction dir : Direction.values()){
+                CuboidModelElement part = generateSleevePart(radius, dir, false);
+                QuadCollection.Builder builder = new QuadCollection.Builder();
+
+                for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
+                    Direction face = e.getKey();
+                    builder.addUnculledFace(ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+                }
+
+                parts.put(dir, new BranchModelPart(builder.build(), true, material));
             }
 
-            return new BranchModelPart(builder.build(), true, material);
+            return parts;
         }
 
         public CuboidModelElement generateSleevePart(int radius, Direction dir, boolean flipNormals){
@@ -159,19 +162,27 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
         }
     }
 
-    public record UnbakedThickTrunk(Material.Baked material, boolean isRings) implements BlockStateModelPart.Unbaked {
-
+    public static class UnbakedThickTrunk implements BlockStateModelPart.Unbaked{
         @Override
         public void resolveDependencies(Resolver resolver) {}
 
-        @Override
-        public BranchModelPart bake(ModelBaker baker) {
-            return bake(baker, BranchBlock.MAX_RADIUS+1, EnumSet.noneOf(Direction.class));
+        protected Material.Baked material;
+        protected boolean isRings;
+        public UnbakedThickTrunk(Material.Baked material, boolean isRings) {
+            this.material = material;
+            this.isRings = isRings;
         }
 
-        public BranchModelPart bake(ModelBaker baker, int radius, EnumSet<Direction> faces) {
+        @Override
+        public BranchModelPart bake(ModelBaker baker) {
+            return bakeAllSides(baker, BranchBlock.MAX_RADIUS+1).get(Direction.UP);
+        }
 
-            QuadCollection.Builder builder = new QuadCollection.Builder();
+        public EnumMap<Direction, BranchModelPart> bakeAllSides(ModelBaker baker, int radius) {
+            return bakeSides(baker, radius, EnumSet.allOf(Direction.class));
+        }
+
+        public EnumMap<Direction, BranchModelPart> bakeSides(ModelBaker baker, int radius, EnumSet<Direction> sides) {
             AABB wholeVolume = new AABB(8 - radius, 0, 8 - radius, 8 + radius, 16, 8 + radius);
 
             ArrayList<Vec3i> offsets = new ArrayList<>();
@@ -181,7 +192,11 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
             }
             offsets.add(new Vec3i(0, 0, 0));//Center
 
-            for (Direction face : faces) {
+            EnumMap<Direction, BranchModelPart> parts = new EnumMap<>(Direction.class);
+
+            for (Direction face : sides) {
+                QuadCollection.Builder builder = new QuadCollection.Builder();
+
                 final Vec3i dirVector = face.getUnitVec3i();
 
                 for (Vec3i offset : offsets) {
@@ -202,13 +217,16 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
                         mapFacesIn.put(face, new CuboidFace(null, -1, material.toString(), uvFace, ModelHelper.getFaceQuadrant(Direction.Axis.Y, face)));
 
                         CuboidModelElement part = new CuboidModelElement(limits[0], limits[1], mapFacesIn);
-                        builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, part.faces().get(face), material, face));
-                    }
 
+                        builder.addUnculledFace(ModelHelper.makeBakedQuad(baker, part, part.faces().get(face), material, face));
+
+                    }
                 }
+
+                parts.put(face, new BranchModelPart(builder.build(), true, material));
             }
 
-            return new BranchModelPart(builder.build(), true, material);
+            return parts;
         }
 
         private static float @NotNull [] getUvs(Direction face, AABB partBoundary, int wholeVolumeWidth) {
@@ -230,150 +248,27 @@ public record BranchModelPart(QuadCollection quads, boolean useAmbientOcclusion,
 
     }
 
-    public record UnbakedRootsSleeveCross(Material.Baked material) implements BlockStateModelPart.Unbaked {
+    public static class UnbakedRootCore extends UnbakedCore {
 
-        @Override
-        public void resolveDependencies(Resolver resolver) {}
-
-        @Override
-        public BranchModelPart bake(ModelBaker baker) {
-            return bake(baker, 0, Direction.UP);
+        public UnbakedRootCore(Material.Baked material) {
+            super(material);
         }
+    }
 
-        public BranchModelPart bake(ModelBaker baker, int radius, Direction direction) {
-            QuadCollection.Builder builder = new QuadCollection.Builder();
+    public static class UnbakedOpaqueRootSleeve extends UnbakedSleeve {
 
-            for (Direction.Axis axis : Direction.Axis.values()){
-                if (axis == direction.getAxis()) continue;
-                CuboidModelElement insideCross = generateSleeveAxisPlane(radius, axis, direction);
-                for (Map.Entry<Direction, CuboidFace> e : insideCross.faces().entrySet()) {
-                    Direction face = e.getKey();
-                    builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, insideCross, e.getValue(), material, face));
-                }
-            }
-
-            return new BranchModelPart(builder.build(), true, material);
-        }
-
-        public CuboidModelElement generateSleeveAxisPlane(int radius, Direction.Axis axis, Direction dir){
-            Direction[] axisDirections = directionsOfAxis(axis);
-
-            int diameter = radius * 2;
-            int halfSize = (16 - diameter) / 2;
-            int halfSizeX = dir.getStepX() != 0 ? halfSize : diameter;
-            int halfSizeY = dir.getStepY() != 0 ? halfSize : diameter;
-            int halfSizeZ = dir.getStepZ() != 0 ? halfSize : diameter;
-            int move = 16 - halfSize;
-            int centerX = 16 + (dir.getStepX() * move);
-            int centerY = 16 + (dir.getStepY() * move);
-            int centerZ = 16 + (dir.getStepZ() * move);
-
-            Map<Direction, CuboidFace> mapFacesIn = Maps.newEnumMap(Direction.class);
-
-            Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2f, (centerY - halfSizeY) / 2f, (centerZ - halfSizeZ) / 2f);
-            Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2f, (centerY + halfSizeY) / 2f, (centerZ + halfSizeZ) / 2f);
-
-            if (axis == Direction.Axis.X){
-                posFrom = new Vector3f(8, posFrom.y(), posFrom.z());
-                posTo = new Vector3f(8, posTo.y(), posTo.z());
-            } else if (axis == Direction.Axis.Y){
-                posFrom = new Vector3f(posFrom.x(), 8, posFrom.z());
-                posTo = new Vector3f(posTo.x(), 8, posTo.z());
-            } else if (axis == Direction.Axis.Z){
-                posFrom = new Vector3f(posFrom.x(), posFrom.y(), 8);
-                posTo = new Vector3f(posTo.x(), posTo.y(), 8);
-            }
-
-            for (Direction face : axisDirections){
-
-                boolean negative = dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE;
-                if (dir.getAxis() == Direction.Axis.Z) {
-                    negative = !negative;
-                }
-
-                CuboidFace.UVs uvface = new CuboidFace.UVs(
-                        8 - radius, negative ? 16 - halfSize : 0, 8 + radius, negative ? 16 : halfSize);
-
-                mapFacesIn.put(face, new CuboidFace(null, -1, "", uvface, ModelHelper.getFaceQuadrant(dir.getAxis(), face.getOpposite())));
-            }
-
-            return new CuboidModelElement(posFrom, posTo, mapFacesIn);
-        }
-
-        private Direction[] directionsOfAxis(Direction.Axis axis){
-            return Arrays.stream(Direction.values()).filter(d -> d.getAxis() == axis).toList().toArray(Direction[]::new);
+        public UnbakedOpaqueRootSleeve(Material.Baked material) {
+            super(material);
         }
 
     }
 
-    public record UnbakedRootsSleeveFace(Material.Baked material) implements BlockStateModelPart.Unbaked {
+    public static class UnbakedRootSleeve extends UnbakedSleeve {
 
-        @Override
-        public void resolveDependencies(Resolver resolver) {}
-
-        @Override
-        public BranchModelPart bake(ModelBaker baker) {
-            return bake(baker, 0, Direction.UP);
+        public UnbakedRootSleeve(Material.Baked material) {
+            super(material);
         }
 
-        public BranchModelPart bake(ModelBaker baker, int radius, Direction direction) {
-            CuboidModelElement part = generateSleevePart(radius, direction, false);
-            QuadCollection.Builder builder = new QuadCollection.Builder();
-
-            for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
-                Direction face = e.getKey();
-                builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
-            }
-
-            return new BranchModelPart(builder.build(), true, material);
-        }
-
-        public CuboidModelElement generateSleevePart(int radius, Direction dir, boolean flipNormals){
-            //Work in double units(*2)
-            int diameter = radius * 2;
-            int halfSize = (16 - diameter) / 2;
-            int halfSizeX = dir.getStepX() != 0 ? halfSize : diameter;
-            int halfSizeY = dir.getStepY() != 0 ? halfSize : diameter;
-            int halfSizeZ = dir.getStepZ() != 0 ? halfSize : diameter;
-            int move = 16 - halfSize;
-            int centerX = 16 + (dir.getStepX() * move);
-            int centerY = 16 + (dir.getStepY() * move);
-            int centerZ = 16 + (dir.getStepZ() * move);
-
-            Vector3f posFrom = new Vector3f((centerX - halfSizeX) / 2f, (centerY - halfSizeY) / 2f, (centerZ - halfSizeZ) / 2f);
-            Vector3f posTo = new Vector3f((centerX + halfSizeX) / 2f, (centerY + halfSizeY) / 2f, (centerZ + halfSizeZ) / 2f);
-            if (flipNormals){
-                Vector3f aux = posFrom;
-                posFrom = posTo;
-                posTo = aux;
-                dir = dir.getOpposite();
-            }
-
-            boolean negative = dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE;
-            if (dir.getAxis() == Direction.Axis.Z) {//North/South
-                negative = !negative;
-            }
-
-            Map<Direction, CuboidFace> mapFacesIn = Maps.newEnumMap(Direction.class);
-
-            for (Direction face : Direction.values()) {
-                if (dir.getOpposite() != face) { //Discard side of sleeve that faces core
-                    CuboidFace.UVs uvface = null;
-                    if (dir == face) {//Side of sleeve that faces away from core
-                        if (radius == 1) { //We're only interested in end faces for radius == 1
-                            uvface = new CuboidFace.UVs(8 - radius, 8 - radius, 8 + radius, 8 + radius);
-                        }
-                    } else { //UV for Bark texture
-                        uvface = new CuboidFace.UVs(8 - radius, negative ? 16 - halfSize : 0, 8 + radius, negative ? 16 : halfSize);
-                    }
-                    if (uvface != null) {
-                        mapFacesIn.put(face, new CuboidFace(face, -1, material.toString(), uvface, ModelHelper.getFaceQuadrant(dir.getAxis(), face)));
-                    }
-                }
-            }
-
-            return new CuboidModelElement(posFrom, posTo, mapFacesIn);
-        }
     }
 
 }

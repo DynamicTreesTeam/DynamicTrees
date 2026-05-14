@@ -64,7 +64,8 @@ public final class LeavesPropertiesResourceLoader extends JsonRegistryResourceLo
                     ));
                 })
                 .register("particle_chance", Float.class, LeavesProperties::setLeavesParticleChance)
-                .register("particle", JsonElement.class, this::processParticle);
+                .register("particle", JsonElement.class, this::processParticle)
+                .register("particle_color", Integer.class, LeavesProperties::setForceParticleColor);
 
         this.reloadAppliers.register("requires_shears", Boolean.class, LeavesProperties::setRequiresShears)
                 .register("cell_kit", CellKit.class, LeavesProperties::setCellKit)

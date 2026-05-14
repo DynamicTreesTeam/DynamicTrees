@@ -68,7 +68,6 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> 
 
         if (destructionData.getNumBranches() > 0) {
             BlockState exState = destructionData.getBranchBlockState(0);
-            BlockPos cutPos = destructionData.cutPos;
             if (exState != null) {
 
                 //Draw the rooty block if it is set to fall too
@@ -125,7 +124,7 @@ public class FallingTreeEntityModel extends EntityModel<FallingTreeRenderState> 
                     List<BakedQuad> bakedQuads = QuadManipulator.getQuads(modelSet.get(leafState), leafState, new Vec3(leafLoc.getKey().getX(), leafLoc.getKey().getY(), leafLoc.getKey().getZ()), entity.getRandom(), null);
 
                     ClientLevel level = Minecraft.getInstance().level;
-                    int leavesColor = level == null ? 0xFFFFFF : TintSourceHelper.getLeavesColor(species, level, cutPos.offset(leafLoc.getKey()));
+                    int leavesColor = level == null ? 0xFFFFFF : TintSourceHelper.getLeavesColor(species, level, destructionData.basePos.offset(leafLoc.getKey()));
                     treeQuads.addAll(toTreeQuadData(bakedQuads, leavesColor, leafState));
                 }
             }

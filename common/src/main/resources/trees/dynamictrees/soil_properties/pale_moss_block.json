@@ -1,4 +1,4 @@
 {
-  "primitive_soil": "moss_block",
+  "primitive_soil": "pale_moss_block",
   "acceptable_soils": [ "dirt_like" ]
 }

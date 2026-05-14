@@ -1,4 +1,4 @@
-// 26.1.1	2026-04-30T13:57:11.486307708	Loot Tables
+// 26.1.1	2026-05-13T21:05:44.656838094	Loot Tables
 3ff99ae4223c6dc6f4ed715c8fa3f4796cdd9439 data/dynamictrees/loot_table/blocks/acacia_leaves.json
 2ac66fbd2e0b38eaabe31a9fac03c037bf9384b6 data/dynamictrees/loot_table/blocks/apple.json
 5f0998fa925b03e8e595619fc1abefa11e6763c2 data/dynamictrees/loot_table/blocks/azalea_leaves.json
@@ -13,6 +13,7 @@ a3a1e77dfd0fa4d7e65fe63b3f01d1ff455a0712 data/dynamictrees/loot_table/blocks/dar
 49fdcc2a7dad861e8e2a97f79f67fa206c908ae3 data/dynamictrees/loot_table/blocks/mangrove_leaves.json
 4a215f53c8c18270a143308e392c9b3fb40b8022 data/dynamictrees/loot_table/blocks/oak_leaves.json
 0db9a99d5b20534c90fc52ad30210c1fe60df4e2 data/dynamictrees/loot_table/blocks/oak_undergrowth_leaves.json
+cf686fbde6394ba1ae207c6b1a8d56c3830b93d4 data/dynamictrees/loot_table/blocks/pale_oak_leaves.json
 2f8b2f89545c2a3730ffa18c6dfc27b471f84c2b data/dynamictrees/loot_table/blocks/spruce_leaves.json
 00e12c9d45876fa5461edc690db078ea0bf2189d data/dynamictrees/loot_table/blocks/warped_wart.json
 d5f284be21d141ca2f0ef92e9cd80bf43e0c02ef data/dynamictrees/loot_table/trees/branches/acacia_branch.json
@@ -23,6 +24,7 @@ cffcf640d1af96380a6bc3e29f3858a56bd1982b data/dynamictrees/loot_table/trees/bran
 f89a489fce49b6a8f1ea90e3ffcbdd3d9877ae8a data/dynamictrees/loot_table/trees/branches/jungle_branch.json
 6792c51ac1ab3dfabc55b2badb04698f5c05b810 data/dynamictrees/loot_table/trees/branches/mangrove_branch.json
 438bc3e96aaa519a85c31d2bbe8fe00b3c8f9ca4 data/dynamictrees/loot_table/trees/branches/oak_branch.json
+fd51954590de101c50bbf97a98ae70dffa02bd5a data/dynamictrees/loot_table/trees/branches/pale_oak_branch.json
 63ae723f270361fb5f909414086490b449bf6f97 data/dynamictrees/loot_table/trees/branches/spruce_branch.json
 e1f52545461a6856dd6bd3f8fe2d33d5393db525 data/dynamictrees/loot_table/trees/branches/stripped_acacia_branch.json
 ef7d1dd4c85ee6df12a2dd68544cea8fe2dfbdbf data/dynamictrees/loot_table/trees/branches/stripped_birch_branch.json
@@ -32,6 +34,7 @@ e62694e7bbb3276d23b5b5469160e5e9ba87ceab data/dynamictrees/loot_table/trees/bran
 b94a8e9e577a22ca742fe8a1d086edf11aed6793 data/dynamictrees/loot_table/trees/branches/stripped_jungle_branch.json
 531e0ef89afbeb0a4b2c4a28d7b81518eb485604 data/dynamictrees/loot_table/trees/branches/stripped_mangrove_branch.json
 e4289eba394b7cfcee0c71a6a87742aef9ea1015 data/dynamictrees/loot_table/trees/branches/stripped_oak_branch.json
+04b453776e720713db933c2c8a85eac956c5cee9 data/dynamictrees/loot_table/trees/branches/stripped_pale_oak_branch.json
 b185fb3b0bfca32420e9f4ba4f346ab4a24d1808 data/dynamictrees/loot_table/trees/branches/stripped_spruce_branch.json
 d64dcd7f873a047a38211ca448ed8de2708b0e79 data/dynamictrees/loot_table/trees/branches/stripped_warped_branch.json
 eb1f4ac73da5d57e8958ca0a5836c8caf9094e5c data/dynamictrees/loot_table/trees/branches/warped_branch.json
@@ -47,6 +50,7 @@ c3a0daa4b79cf9b459a9862337564e538d6e035b data/dynamictrees/loot_table/trees/leav
 b7e97c614b4d1ee08b0050f453e4a7cebb725dff data/dynamictrees/loot_table/trees/leaves/mangrove.json
 f7c94ca36be1578aeb18a09bf49c3da6e07a0b9b data/dynamictrees/loot_table/trees/leaves/oak.json
 1963e2dd2a7f647bd0ae59e16a24cac605dd8bb9 data/dynamictrees/loot_table/trees/leaves/oak_undergrowth.json
+8bb472ec9329f132fa244eb12db576b5208e68d0 data/dynamictrees/loot_table/trees/leaves/pale_oak.json
 64f6dbb823becc461da78e458d113dedf21765b3 data/dynamictrees/loot_table/trees/leaves/spruce.json
 19a639dc5d4f68b89af589d18edb28c24dda7e13 data/dynamictrees/loot_table/trees/leaves/warped.json
 581b4de78db4abc16e8223663a6776e6ae92e1c5 data/dynamictrees/loot_table/trees/roots/mangrove_roots.json
@@ -65,5 +69,6 @@ b53ce46d7a51cfa68b09c232655b90b6f8f5006b data/dynamictrees/loot_table/trees/volu
 0de4a714246cbb2686ecdf8fc8eb079d18512683 data/dynamictrees/loot_table/trees/voluntary/mega_spruce.json
 f18a78def7f96ece3e9fc1413fc06c7c722a8083 data/dynamictrees/loot_table/trees/voluntary/mega_warped.json
 ef936ae821c0abb7eebbeaf7a3f0e7ce157f02eb data/dynamictrees/loot_table/trees/voluntary/oak.json
+57074de085eb1ac77a92db275c798cab71c6dcdc data/dynamictrees/loot_table/trees/voluntary/pale_oak.json
 421081926fb22967f40435297ef45b7b52b2a502 data/dynamictrees/loot_table/trees/voluntary/spruce.json
 6c1e5390f529c7be9958364cc95a63882c175bf4 data/dynamictrees/loot_table/trees/voluntary/warped.json

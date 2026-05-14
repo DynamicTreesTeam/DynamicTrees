@@ -178,7 +178,7 @@ public class ClientModEventHandler {
     public static void onModelRegistryEvent(RegisterBlockStateModels event) {
         // Register model loaders for baked models.
         event.registerModel(BRANCH, UnbakedBranchModel.CODEC);
-        event.registerModel(ROOTS, RootsBlockStateModel.Unbaked.CODEC);
+        event.registerModel(ROOTS, UnbakedRootsModel.CODEC);
         event.registerModel(SURFACE_ROOT, SurfaceRootBlockStateModel.Unbaked.CODEC);
         event.registerModel(POTTED_DYNAMIC_SAPLING, PottedSaplingBlockStateModel.Unbaked.CODEC);
 //        event.register(LARGE_PALM_FRONDS, new PalmLeavesModelLoader(0));

@@ -2,9 +2,9 @@ package com.dtteam.dynamictrees.model.blockstate;
 
 import com.dtteam.dynamictrees.api.network.Connections;
 import com.dtteam.dynamictrees.model.BlockStateModelWithConnectionData;
+import com.dtteam.dynamictrees.model.BranchMultiPartHolder;
 import com.dtteam.dynamictrees.model.ModelConnections;
 import com.dtteam.dynamictrees.model.ModelHelper;
-import com.dtteam.dynamictrees.model.parts.BranchModelPart;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
@@ -18,19 +18,12 @@ import net.neoforged.neoforge.client.model.DynamicBlockStateModel;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public record BranchBlockStateModel(
-        BranchModelPart[][] cores,
-        BranchModelPart[][] sleeves,
-        BranchModelPart[] rings,
-        Material.Baked particleMaterial
+        BranchMultiPartHolder cores,
+        BranchMultiPartHolder sleeves,
+        BranchMultiPartHolder rings
 ) implements DynamicBlockStateModel, BlockStateModelWithConnectionData {
-
-    @Override
-    public @BakedQuad.MaterialFlags int materialFlags() {
-        return this.cores[0][0].materialFlags();
-    }
 
     @Override
     public Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
@@ -41,58 +34,62 @@ public record BranchBlockStateModel(
     public void collectParts(BlockState state, List<BlockStateModelPart> parts, Connections connectionsData) {
         final int coreRadius = TreeHelper.getRadius(state);
         if (coreRadius > 8 || coreRadius == 0) return;
+        if (!(connectionsData instanceof ModelConnections)) return;
 
-        int[] connections = new int[]{0, 0, 0, 0, 0, 0};
-        Direction forceRingDir = null;
-        final AtomicInteger twigRadius = new AtomicInteger(1);
+        final int[] connections = connectionsData.getAllRadii();
+        final Direction forceRingDir = ((ModelConnections) connectionsData).getRingOnly();
+        final int twigRadius = ((ModelConnections) connectionsData).getFamily().getPrimaryThickness();
+        final int numConnections = countConnections(connections);
 
-        if (connectionsData instanceof ModelConnections branchConnections) {
-            connections = branchConnections.getAllRadii();
-            forceRingDir = branchConnections.getRingOnly();
+        if (forceRings(numConnections, forceRingDir)) {
+            parts.add(rings.getPart(forceRingDir, coreRadius - 1));
+        } else {
+            final Direction sourceDir = get3DSourceDir(coreRadius, connections);
+            final Direction.Axis coreDir = sourceDir == null ? Direction.Axis.Y : sourceDir.getAxis();
+            final Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
 
-            branchConnections.getFamily().ifValid(family ->
-                    twigRadius.set(family.getPrimaryThickness()));
+            for (Direction face : Direction.values()) {
+                gatherCoreParts(parts, face, coreRadius, connections, coreRingDir, coreDir);
+                gatherSleeveParts(parts, face, coreRadius, connections, twigRadius);
+            }
         }
+    }
 
-        // Count number of connections.
+    private void gatherSleeveParts(List<BlockStateModelPart> parts, Direction face, int coreRadius, int[] connections, int twigRadius) {
+        // Special case for r==8... If it's a solid block, it has no sleeves.
+        if (coreRadius == 8) return;
+
+        // Get quads for sleeves models.
+        for (Direction connDir : Direction.values()) {
+            final int idx = connDir.get3DDataValue();
+            final int connRadius = connections[idx];
+            // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius-1 connections for leaves (which are partly transparent).
+            if (connRadius > 0 && (connRadius <= twigRadius || face != connDir)) {
+                parts.add(sleeves.getPart(connDir, connRadius - 1));
+            }
+        }
+    }
+
+    private void gatherCoreParts(List<BlockStateModelPart> parts, Direction face, int coreRadius, int[] connections, Direction coreRingDir, Direction.Axis coreDir) {
+        if (coreRadius == connections[face.get3DDataValue()]) return;
+
+        if (coreRingDir != null && coreRingDir == face) {
+            parts.add(rings.getPart(face, coreRadius - 1));
+        } else {
+            parts.add(cores.getPart(coreDir, face, coreRadius - 1));
+        }
+    }
+
+    private static boolean forceRings(int numConnections, Direction forceRingDir) {
+        return numConnections == 0 && forceRingDir != null;
+    }
+
+    public static int countConnections(int[] connections) {
         int numConnections = 0;
         for (int i : connections) {
             numConnections += (i != 0) ? 1 : 0;
         }
-
-        if (numConnections == 0 && forceRingDir != null) {
-            parts.add(rings[coreRadius - 1].faceOnly(forceRingDir, false));
-        } else {
-            // The source direction is the biggest connection from one of the 6 directions.
-            final Direction sourceDir = get3DSourceDir(coreRadius, connections);
-            final int coreDir = resolveCoreDir(sourceDir);
-
-            // This is for drawing the isRings on a terminating branch.
-            final Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
-
-            for (Direction face : Direction.values()) {
-                // Get quads for core model.
-                if (coreRadius != connections[face.get3DDataValue()]) {
-                    if ((coreRingDir == null || coreRingDir != face)) {
-                        parts.add(cores[coreDir][coreRadius - 1].faceOnly(face, coreRadius == 8));
-                    } else {
-                        parts.add(rings[coreRadius - 1].faceOnly(face, coreRadius == 8));
-                    }
-                }
-                // Get quads for sleeves models.
-                if (coreRadius != 8) { // Special case for r!=8... If it's a solid block, so it has no sleeves.
-                    for (Direction connDir : Direction.values()) {
-                        final int idx = connDir.get3DDataValue();
-                        final int connRadius = connections[idx];
-                        // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius-1 connections for leaves (which are partly transparent).
-                        if (connRadius > 0 && (connRadius <= twigRadius.get() || face != connDir)) {
-                            parts.add(sleeves[idx][connRadius - 1].faceOnly(face, false));
-                        }
-                    }
-                }
-
-            }
-        }
+        return numConnections;
     }
 
     @Nullable
@@ -114,20 +111,19 @@ public record BranchBlockStateModel(
         return sourceDir;
     }
 
-    /**
-     * Converts direction DUNSWE to 3 axis numbers for Y,Z,X
-     */
-    public static int resolveCoreDir(@Nullable Direction dir) {
-        if (dir == null) {
-            return 0;
-        }
-        return dir.get3DDataValue() >> 1;
-    }
-
     @Override
     public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
         ModelConnections connectionsData = ModelHelper.getModelConnections(level, pos, state);
         collectParts(state, parts, connectionsData);
     }
 
+    @Override
+    public Material.Baked particleMaterial() {
+        return cores.getFirstMaterial();
+    }
+
+    @Override
+    public @BakedQuad.MaterialFlags int materialFlags() {
+        return cores.materialFlags();
+    }
 }

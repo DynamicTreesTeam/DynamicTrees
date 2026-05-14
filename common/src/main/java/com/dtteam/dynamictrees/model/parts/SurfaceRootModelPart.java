@@ -46,7 +46,7 @@ public record SurfaceRootModelPart(QuadCollection quads, boolean useAmbientOcclu
 
             for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
                 Direction face = e.getKey();
-                    builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+                    builder.addUnculledFace(ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
             }
 
             return new SurfaceRootModelPart(builder.build(), true, material);
@@ -92,7 +92,7 @@ public record SurfaceRootModelPart(QuadCollection quads, boolean useAmbientOcclu
 
             for (Map.Entry<Direction, CuboidFace> e : part.faces().entrySet()) {
                 Direction face = e.getKey();
-                builder.addCulledFace(face, ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
+                builder.addUnculledFace(ModelHelper.makeBakedQuad(baker, part, e.getValue(), material, face));
             }
 
             return new SurfaceRootModelPart(builder.build(), true, material);

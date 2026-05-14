@@ -15,7 +15,8 @@
             }
         },
         "mushroom_rot",
-        "bee_nest"
+        "bee_nest",
+        "leaf_litter"
     ],
     "lang_overrides": {
         "seed": "Oak Acorn"
