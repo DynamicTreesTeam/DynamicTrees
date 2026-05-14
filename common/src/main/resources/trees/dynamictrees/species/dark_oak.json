@@ -64,6 +64,10 @@
                 },
                 "place_chance": 0.1
             }
+        },
+        {
+            "name": "leaf_litter",
+            "quantity": 4
         }
     ],
     "lang_overrides": {

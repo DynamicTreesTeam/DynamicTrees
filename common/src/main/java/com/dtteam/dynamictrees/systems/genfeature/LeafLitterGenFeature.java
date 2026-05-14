@@ -2,7 +2,6 @@ package com.dtteam.dynamictrees.systems.genfeature;
 
 import com.dtteam.dynamictrees.api.configuration.ConfigurationProperty;
 import com.dtteam.dynamictrees.api.network.MapSignal;
-import com.dtteam.dynamictrees.block.soil.SoilHelper;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGenerationContext;
 import com.dtteam.dynamictrees.systems.genfeature.context.PostGrowContext;
 import com.dtteam.dynamictrees.systems.nodemapper.FindEndsNode;
@@ -98,9 +97,11 @@ public class LeafLitterGenFeature extends GenFeature {
 
     private static int countLitterAround(BlockPos placePos, LevelAccessor level, Block leafLitter) {
         int surroundingLitter = 0;
-        for (Direction dir : CoordUtils.HORIZONTALS){
-            BlockPos side = placePos.offset(dir.getUnitVec3i());
-            if (level.getBlockState(side).is(leafLitter)) surroundingLitter ++;
+        for (int i=-1; i<=1; i++){
+            for (CoordUtils.Surround sur : CoordUtils.Surround.values()){
+                BlockPos side = placePos.offset(sur.getOffset()).above(i);
+                if (level.getBlockState(side).is(leafLitter)) surroundingLitter ++;
+            }
         }
         return surroundingLitter;
     }
@@ -113,13 +114,13 @@ public class LeafLitterGenFeature extends GenFeature {
         final int z = pos.getZ() + random.nextInt(distance * 2 + 1) - distance;
 
         for (int i = 0; i < maxHeight; i++) {
-            final BlockPos offPos = new BlockPos(x, pos.getY() - 1 - i, z);
+            final BlockPos checkPos = new BlockPos(x, pos.getY() - 1 - i, z);
 
-            final BlockState offState = level.getBlockState(offPos);
-            if (level.isEmptyBlock(offPos)) continue;
+            final BlockState checkState = level.getBlockState(checkPos);
+            if (level.isEmptyBlock(checkPos)) continue;
 
-            if (SoilHelper.isSoilAcceptable(offState, SoilHelper.getSoilFlags(SoilHelper.DIRT_LIKE))) {
-                return offPos.above();
+            if (checkState.isFaceSturdy(level, checkPos, Direction.UP)) {
+                return checkPos.above();
             }
             break;
         }
