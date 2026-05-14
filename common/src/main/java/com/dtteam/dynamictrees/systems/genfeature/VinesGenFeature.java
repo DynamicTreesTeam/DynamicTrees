@@ -17,14 +17,15 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.GrowingPlantHeadBlock;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class VinesGenFeature extends GenFeature {
 
@@ -39,7 +40,7 @@ public class VinesGenFeature extends GenFeature {
         SIDE // Note that side vines will assume the vine uses the same blockstates as a vanilla vine.
     }
 
-    protected final BooleanProperty[] sideVineStates = new BooleanProperty[]{null, null, VineBlock.NORTH, VineBlock.SOUTH, VineBlock.WEST, VineBlock.EAST};
+    protected final BooleanProperty[] sideVineStates = new BooleanProperty[]{null, VineBlock.UP, VineBlock.NORTH, VineBlock.SOUTH, VineBlock.WEST, VineBlock.EAST};
 
     public static final ConfigurationProperty<Integer> MAX_LENGTH = ConfigurationProperty.integer("max_length");
     public static final ConfigurationProperty<Block> BLOCK = ConfigurationProperty.block("block");
@@ -166,12 +167,35 @@ public class VinesGenFeature extends GenFeature {
             return;
         }
 
-        this.placeVines(level, vinePos, configuration.get(BLOCK).defaultBlockState(),
+        this.placeVines(level, vinePos, getPlantState(configuration),
                 configuration.get(MAX_LENGTH),
-                configuration.getAsOptional(TIP_BLOCK)
-                        .map(block -> block.defaultBlockState().setValue(GrowingPlantHeadBlock.AGE, worldgen ? 25 : 0))
-                        .orElse(null),
+                getTipState(configuration, worldgen),
                 configuration.get(VINE_TYPE), worldgen);
+    }
+
+    private static BlockState getPlantState(GenFeatureConfiguration configuration) {
+        BlockState state = configuration.get(BLOCK).defaultBlockState();
+        if (state.hasProperty(BlockStateProperties.TIP)){
+            state = state.setValue(BlockStateProperties.TIP, false);
+        }
+        return state;
+    }
+
+    @Nullable
+    private static BlockState getTipState(GenFeatureConfiguration configuration, boolean worldgen) {
+        Optional<Block> tipBlock = configuration.getAsOptional(TIP_BLOCK);
+        if (tipBlock.isPresent()){
+            BlockState tipState = tipBlock.get().defaultBlockState();
+            if (tipState.hasProperty(BlockStateProperties.AGE_25)){
+                return tipState.setValue(BlockStateProperties.AGE_25, worldgen ? 25 : 0);
+            }
+            return tipState;
+        }
+        BlockState plantState = getPlantState(configuration);
+        if (plantState.hasProperty(BlockStateProperties.TIP)){
+            return plantState.setValue(BlockStateProperties.TIP, true);
+        }
+        return null;
     }
 
     // This is WIP (and isn't needed in the base mod anyway, as well as the fact that there's almost certainly a better way of doing this).

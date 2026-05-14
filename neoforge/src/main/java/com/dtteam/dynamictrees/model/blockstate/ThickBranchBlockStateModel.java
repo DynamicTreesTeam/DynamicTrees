@@ -61,7 +61,7 @@ public record ThickBranchBlockStateModel(
 
         if (forceRingDir != null) {
             connections[forceRingDir.get3DDataValue()] = 0;
-            parts.add(trunkRings.getPart(forceRingDir, coreRadius - 9));
+            parts.add(trunkRings.getPart(forceRingDir, coreRadius));
         }
 
         boolean branchesAround = areBranchesAround(connections);
@@ -79,12 +79,12 @@ public record ThickBranchBlockStateModel(
     private void gatherTrunkParts(List<BlockStateModelPart> parts, Direction face, int[] connections, int twigRadius, boolean branchesAround, int coreRadius) {
         if (face == Direction.UP || face == Direction.DOWN) {
             if (connections[face.get3DDataValue()] < twigRadius && !branchesAround) {
-                parts.add(this.trunkRings.getPart(face, coreRadius - 9));
+                parts.add(this.trunkRings.getPart(face, coreRadius));
             } else if (connections[face.get3DDataValue()] < coreRadius) {
-                parts.add(this.trunkBark.getPart(face, coreRadius - 9));
+                parts.add(this.trunkBark.getPart(face, coreRadius));
             }
         } else {
-            parts.add(trunkBark.getPart(face, coreRadius - 9));
+            parts.add(trunkBark.getPart(face, coreRadius));
         }
     }
 

@@ -19,19 +19,6 @@
                 "height": 6
             }
         },
-        {
-            "name": "rot_soil",
-            "properties": {
-                "rotten_soil": "podzol"
-            }
-        },
-        {
-            "name": "mushroom_rot",
-            "properties": {
-                "_comment": "An alternate mushroom chance of -1 means that a red mushroom will always be generated.",
-                "alternate_mushroom_chance": -1
-            }
-        },
         "bottom_flare",
         "mound",
         "roots",
@@ -43,6 +30,15 @@
                     "quantity": 8
                 },
                 "biome_predicate": "minecraft:pale_garden"
+            }
+        },
+        {
+            "name": "vines",
+            "properties": {
+                "vine_type": "ceiling",
+                "block": "pale_hanging_moss",
+                "max_length": 8,
+                "quantity": 24
             }
         }
     ],
