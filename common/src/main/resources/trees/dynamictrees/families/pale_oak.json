@@ -1,9 +1,10 @@
 {
+    "type": "creaking_heart",
     "common_leaves": "pale_oak",
     "common_species": "pale_oak",
     "primitive_log": "pale_oak_log",
     "primitive_stripped_log": "stripped_pale_oak_log",
+    "primitive_heart": "creaking_heart",
     "max_branch_radius": 24,
-    "generate_surface_root": true,
-    "conifer_variants": true
+    "generate_surface_root": true
 }

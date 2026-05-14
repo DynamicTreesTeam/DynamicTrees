@@ -7,6 +7,7 @@ import com.dtteam.dynamictrees.block.soil.SoilProperties;
 import com.dtteam.dynamictrees.deserialization.JsonHelper;
 import com.dtteam.dynamictrees.deserialization.applier.Applier;
 import com.dtteam.dynamictrees.deserialization.applier.PropertyApplierResult;
+import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
 import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -72,6 +73,7 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("reduce_radius_when_stripping", Boolean.class, Family::setReduceRadiusWhenStripping);
 
         registerMangroveAppliers();
+        registerPaleOakAppliers();
 
         super.registerAppliers();
     }
@@ -81,18 +83,21 @@ public final class FamilyResourceLoader extends JsonRegistryResourceLoader<Famil
                 .register("primitive_root", AerialRootsFamily.class, Block.class, AerialRootsFamily::setPrimitiveRoots)
                 .register("primitive_filled_root", AerialRootsFamily.class, Block.class, AerialRootsFamily::setPrimitiveRootsFilled)
                 .register("primitive_covered_root", AerialRootsFamily.class, Block.class, AerialRootsFamily::setPrimitiveRootsCovered)
-                //to-do: put in soil properties instead
                 .register("default_soil", AerialRootsFamily.class, SoilProperties.class, AerialRootsFamily::setDefaultSoil);
         this.setupAppliers
                 .register("primitive_root", AerialRootsFamily.class, Block.class, AerialRootsFamily::setPrimitiveRoots)
                 .register("primitive_filled_root", AerialRootsFamily.class, Block.class, AerialRootsFamily::setPrimitiveRootsFilled)
-                .register("primitive_covered_root", AerialRootsFamily.class, Block.class, AerialRootsFamily::setPrimitiveRootsCovered)
-                //.register("replaceable_by_roots", MangroveFamily.class , ,)
-        ;
+                .register("primitive_covered_root", AerialRootsFamily.class, Block.class, AerialRootsFamily::setPrimitiveRootsCovered);
         this.reloadAppliers
                 .register("default_soil", AerialRootsFamily.class, SoilProperties.class, AerialRootsFamily::setDefaultSoil)
                 .registerArrayApplier("root_system_acceptable_soils", AerialRootsFamily.class, String.class, (Applier<AerialRootsFamily, String>) this::addAcceptableSoilForRootSystem);
-        ;
+    }
+
+    private void registerPaleOakAppliers(){
+        this.gatherDataAppliers
+                .register("primitive_heart", CreakingHeartFamily.class, Block.class, CreakingHeartFamily::setPrimitiveAltLog);
+        this.setupAppliers
+                .register("primitive_heart", CreakingHeartFamily.class, Block.class, CreakingHeartFamily::setPrimitiveAltLog);
 
     }
 

@@ -21,10 +21,7 @@ import com.dtteam.dynamictrees.systems.genfeature.GenFeature;
 import com.dtteam.dynamictrees.systems.genfeature.GenFeatures;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKit;
 import com.dtteam.dynamictrees.systems.growthlogic.GrowthLogicKits;
-import com.dtteam.dynamictrees.tree.family.Family;
-import com.dtteam.dynamictrees.tree.family.NetherFungusFamily;
-import com.dtteam.dynamictrees.tree.family.PalmFamily;
-import com.dtteam.dynamictrees.tree.family.AerialRootsFamily;
+import com.dtteam.dynamictrees.tree.family.*;
 import com.dtteam.dynamictrees.tree.species.NetherFungusSpecies;
 import com.dtteam.dynamictrees.tree.species.PalmSpecies;
 import com.dtteam.dynamictrees.tree.species.Species;
@@ -80,6 +77,8 @@ public class ModEventHandler {
         Family.REGISTRY.registerType(DynamicTrees.location("nether_fungus"), NetherFungusFamily.TYPE);
         Family.REGISTRY.registerType(DynamicTrees.location("aerial_roots"), AerialRootsFamily.TYPE);
         Family.REGISTRY.registerType(DynamicTrees.location("palm"), PalmFamily.TYPE);
+        Family.REGISTRY.registerType(DynamicTrees.location("alt_branch"), AltBranchFamily.TYPE);
+        Family.REGISTRY.registerType(DynamicTrees.location("creaking_heart"), CreakingHeartFamily.TYPE);
     }
 
     private static void registerSpeciesTypes() {
