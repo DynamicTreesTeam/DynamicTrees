@@ -22,7 +22,8 @@ import java.util.List;
 public record BranchBlockStateModel(
         BranchMultiPartHolder cores,
         BranchMultiPartHolder sleeves,
-        BranchMultiPartHolder rings
+        BranchMultiPartHolder rings,
+        BranchMultiPartHolder sleeveRings
 ) implements DynamicBlockStateModel, BlockStateModelWithConnectionData {
 
     @Override
@@ -41,18 +42,25 @@ public record BranchBlockStateModel(
         final int twigRadius = ((ModelConnections) connectionsData).getFamily().getPrimaryThickness();
         final int numConnections = countConnections(connections);
 
-        if (forceRings(numConnections, forceRingDir)) {
-            parts.add(rings.getPart(forceRingDir, coreRadius - 1));
-        } else {
-            final Direction sourceDir = get3DSourceDir(coreRadius, connections);
-            final Direction.Axis coreDir = sourceDir == null ? Direction.Axis.Y : sourceDir.getAxis();
-            final Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
+        final Direction sourceDir = get3DSourceDir(coreRadius, connections);
+        final Direction.Axis coreDir = sourceDir == null ? Direction.Axis.Y : sourceDir.getAxis();
+        final Direction coreRingDir = (numConnections == 1 && sourceDir != null) ? sourceDir.getOpposite() : null;
 
+        if (forceRings(numConnections, forceRingDir)) {
+            parts.add(rings.getPart(forceRingDir, coreRadius));
+        } else {
             for (Direction face : Direction.values()) {
                 gatherCoreParts(parts, face, coreRadius, connections, coreRingDir, coreDir);
                 gatherSleeveParts(parts, face, coreRadius, connections, twigRadius);
             }
         }
+        addNullCorePart(parts, coreDir, coreRadius);
+    }
+
+    private void addNullCorePart(List<BlockStateModelPart> parts, Direction.Axis coreDir, int coreRadius) {
+        //The null side is usually empty, but roots have the cross.
+        BlockStateModelPart part = cores.getPart(coreDir, null, coreRadius - 1);
+        if (part != null) parts.add(part);
     }
 
     private void gatherSleeveParts(List<BlockStateModelPart> parts, Direction face, int coreRadius, int[] connections, int twigRadius) {
@@ -63,9 +71,13 @@ public record BranchBlockStateModel(
         for (Direction connDir : Direction.values()) {
             final int idx = connDir.get3DDataValue();
             final int connRadius = connections[idx];
+            if (connRadius == 0) continue;
             // If the connection side matches the quadpull side then cull the sleeve face.  Don't cull radius-1 connections for leaves (which are partly transparent).
-            if (connRadius > 0 && (connRadius <= twigRadius || face != connDir)) {
-                parts.add(sleeves.getPart(connDir, connRadius - 1));
+            if (connRadius <= twigRadius || face != connDir) {
+                parts.add(sleeves.getPart(connDir, connRadius));
+            }
+            if (face == connDir && !sleeveRings.isEmpty()){
+                parts.add(sleeveRings.getPart(connDir, connRadius));
             }
         }
     }
@@ -74,9 +86,9 @@ public record BranchBlockStateModel(
         if (coreRadius == connections[face.get3DDataValue()]) return;
 
         if (coreRingDir != null && coreRingDir == face) {
-            parts.add(rings.getPart(face, coreRadius - 1));
+            parts.add(rings.getPart(face, coreRadius));
         } else {
-            parts.add(cores.getPart(coreDir, face, coreRadius - 1));
+            parts.add(cores.getPart(coreDir, face, coreRadius));
         }
     }
 

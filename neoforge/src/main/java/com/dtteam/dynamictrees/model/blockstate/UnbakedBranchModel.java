@@ -15,6 +15,7 @@ import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 import java.util.Optional;
@@ -52,37 +53,45 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
         Material.Baked ringsMat = baker.materials().get(new Material(ringsTexture), ringsTexture::toDebugFileName);
 
         BranchBlockStateModel regular = bakeBasic(baker,
-                new BranchModelPart.UnbakedCore(barkMat), new BranchModelPart.UnbakedSleeve(barkMat), new BranchModelPart.UnbakedCore(ringsMat));
+                new BranchModelPart.UnbakedCore(barkMat),
+                new BranchModelPart.UnbakedSleeve(barkMat),
+                new BranchModelPart.UnbakedCore(ringsMat),
+                null);
 
         if (family.isPresent() && family.get().isThick()){
             Identifier thickRings = IdentifierUtils.suffix(ringsTexture, "_thick");
             Material.Baked thickRingsMat = baker.materials().get(new Material(thickRings), thickRings::toDebugFileName);
 
             return bakeThick(baker, regular,
-                    new BranchModelPart.UnbakedThickTrunk(barkMat, false), new BranchModelPart.UnbakedThickTrunk(thickRingsMat, true));
+                    new BranchModelPart.UnbakedThickTrunk(barkMat, false),
+                    new BranchModelPart.UnbakedThickTrunk(thickRingsMat, true));
         }
         return regular;
     }
 
     public static BranchBlockStateModel bakeBasic(
-            ModelBaker baker, BranchModelPart.UnbakedCore unbakedCores, BranchModelPart.UnbakedSleeve unbakedSleeves, BranchModelPart.UnbakedCore unbakedRings
-    ) {
+            ModelBaker baker, BranchModelPart.UnbakedCore unbakedCores, BranchModelPart.UnbakedSleeve unbakedSleeves, BranchModelPart.UnbakedCore unbakedRings, @Nullable BranchModelPart.UnbakedSleeve unbakedSleeveRings
+            ) {
         BranchMultiPartHolder sleeves = new BranchMultiPartHolder();
         BranchMultiPartHolder cores = new BranchMultiPartHolder();
         BranchMultiPartHolder rings = new BranchMultiPartHolder();
+        BranchMultiPartHolder sleeveRings = new BranchMultiPartHolder();
 
-        for (int i = 0; i < 8; i++) {
-            int radius = i + 1;
-            if (radius < 8) sleeves.putAllParts(i, unbakedSleeves.bakeAllSides(baker, radius));
+        for (int radius = 1; radius <= BranchBlock.MAX_RADIUS; radius++) {
+            if (radius < BranchBlock.MAX_RADIUS) {
+                sleeves.putAllParts(radius, unbakedSleeves.bakeAllSides(baker, radius));
+                if (unbakedSleeveRings != null)
+                    sleeveRings.putAllParts(radius, unbakedSleeveRings.bakeAllSides(baker, radius));
+            }
 
-            cores.putAllParts(Direction.Axis.Y, i, unbakedCores.bakeAllSides(baker, radius, Direction.Axis.Y)); //DOWN<->UP
-            cores.putAllParts(Direction.Axis.Z, i, unbakedCores.bakeAllSides(baker, radius, Direction.Axis.Z)); //NORTH<->SOUTH
-            cores.putAllParts(Direction.Axis.X, i, unbakedCores.bakeAllSides(baker, radius, Direction.Axis.X)); //WEST<->EAST
+            cores.putAllParts(Direction.Axis.Y, radius, unbakedCores.bakeAllSides(baker, radius, Direction.Axis.Y)); //DOWN<->UP
+            cores.putAllParts(Direction.Axis.Z, radius, unbakedCores.bakeAllSides(baker, radius, Direction.Axis.Z)); //NORTH<->SOUTH
+            cores.putAllParts(Direction.Axis.X, radius, unbakedCores.bakeAllSides(baker, radius, Direction.Axis.X)); //WEST<->EAST
 
-            rings.putAllParts(i, unbakedRings.bakeAllSides(baker, radius, Direction.Axis.Y));
+            rings.putAllParts(radius, unbakedRings.bakeAllSides(baker, radius, Direction.Axis.Y));
         }
 
-        return new BranchBlockStateModel(cores, sleeves, rings);
+        return new BranchBlockStateModel(cores, sleeves, rings, sleeveRings);
     }
 
     public static ThickBranchBlockStateModel bakeThick(
@@ -91,10 +100,9 @@ public record UnbakedBranchModel(Identifier barkTexture, Identifier ringsTexture
         BranchMultiPartHolder trunksBark = new BranchMultiPartHolder(); // The trunk will always feature bark on its sides.
         BranchMultiPartHolder trunksRings = new BranchMultiPartHolder(); // The trunk will feature rings on its top and bottom.
 
-        for (int i = 0; i < ThickBranchBlock.MAX_RADIUS_THICK - BranchBlock.MAX_RADIUS; i++) {
-            int radius = i + BranchBlock.MAX_RADIUS + 1;
-            trunksBark.putAllParts(i, unbakedBark.bakeAllSides(baker, radius));
-            trunksRings.putAllParts(i, unbakedRings.bakeSides(baker, radius, EnumSet.of(Direction.UP, Direction.DOWN)));
+        for (int radius = BranchBlock.MAX_RADIUS + 1; radius <= ThickBranchBlock.MAX_RADIUS_THICK; radius++) {
+            trunksBark.putAllParts(radius, unbakedBark.bakeAllSides(baker, radius));
+            trunksRings.putAllParts(radius, unbakedRings.bakeSides(baker, radius, EnumSet.of(Direction.UP, Direction.DOWN)));
         }
 
         return new ThickBranchBlockStateModel(fallback, trunksBark, trunksRings);

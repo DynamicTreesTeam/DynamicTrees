@@ -47,10 +47,16 @@ public record UnbakedRootsModel(Identifier side, Identifier top, boolean opaque)
         BranchBlockStateModel model;
         if (opaque){
             model = UnbakedBranchModel.bakeBasic(baker,
-                    new BranchModelPart.UnbakedCore(barkMat), new BranchModelPart.UnbakedOpaqueRootSleeve(barkMat), new BranchModelPart.UnbakedCore(ringsMat));
+                    new BranchModelPart.UnbakedCore(barkMat),
+                    new BranchModelPart.UnbakedSleeve(barkMat),
+                    new BranchModelPart.UnbakedCore(ringsMat),
+                    new BranchModelPart.UnbakedRootSleeveEnds(ringsMat));
         } else {
             model = UnbakedBranchModel.bakeBasic(baker,
-                    new BranchModelPart.UnbakedRootCore(barkMat), new BranchModelPart.UnbakedRootSleeve(barkMat), new BranchModelPart.UnbakedRootCore(ringsMat));
+                    new BranchModelPart.UnbakedRootCore(barkMat),
+                    new BranchModelPart.UnbakedRootSleeve(barkMat),
+                    new BranchModelPart.UnbakedCore(ringsMat),
+                    null);
         }
 
         return model;
