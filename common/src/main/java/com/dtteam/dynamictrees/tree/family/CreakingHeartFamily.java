@@ -71,31 +71,27 @@ public class CreakingHeartFamily extends AltBranchFamily {
     }
 
     @Override
-    public Identifier getAltBranchLoader() {
+    protected Identifier altBranchModelGenerator() {
         return DynamicTrees.location("creaking_heart");
     }
 
     @Override
-    public void addBranchTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveLogLocation, Block sourceBlock) {
+    public Identifier getAltBranchLoader() {
+        return DynamicTrees.location("creaking_heart");
+    }
+
+    public void addHeartTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveLogLocation, Block sourceBlock, String state) {
         Optional<Block> primAlt = getPrimitiveAltLog();
         if (primAlt.isPresent() && primAlt.get() == sourceBlock){
-            Identifier barkAwake = primitiveLogLocation.withSuffix("_awake");
-            Identifier ringsAwake = primitiveLogLocation.withSuffix("_top_awake");
-            Identifier barkDormant = primitiveLogLocation.withSuffix("_dormant");
-            Identifier ringsDormant = primitiveLogLocation.withSuffix("_top_dormant");
-            if (this.textureOverrides.containsKey("awake_heart_branch"))
-                barkAwake = this.textureOverrides.get("awake_heart_branch");
-            if (this.textureOverrides.containsKey("awake_heart_branch_top"))
-                ringsAwake = this.textureOverrides.get("awake_heart_branch_top");
-            if (this.textureOverrides.containsKey("dormant_heart_branch"))
-                barkDormant = this.textureOverrides.get("dormant_heart_branch");
-            if (this.textureOverrides.containsKey("dormant_heart_branch_top"))
-                ringsDormant = this.textureOverrides.get("dormant_heart_branch_top");
+            Identifier barkAwake = primitiveLogLocation.withSuffix("_"+state);
+            Identifier ringsAwake = primitiveLogLocation.withSuffix("_top_"+state);
+            if (this.textureOverrides.containsKey(state+"_heart_branch"))
+                barkAwake = this.textureOverrides.get(state+"_heart_branch");
+            if (this.textureOverrides.containsKey(state+"_heart_branch_top"))
+                ringsAwake = this.textureOverrides.get(state+"_heart_branch_top");
 
-            textureConsumer.accept("bark_awake", barkAwake);
-            textureConsumer.accept("rings_awake", ringsAwake);
-            textureConsumer.accept("bark_dormant", barkDormant);
-            textureConsumer.accept("rings_dormant", ringsDormant);
+            textureConsumer.accept("heart_bark", barkAwake);
+            textureConsumer.accept("heart_rings", ringsAwake);
             return;
         }
         super.addBranchTextures(textureConsumer, primitiveLogLocation, sourceBlock);

@@ -16,8 +16,6 @@ public final class DynamicBlockProperties {
     private DynamicBlockProperties() {
     }
 
-
-
     /**
      * A map of maximum ages to their respective age {@link IntegerProperty property}.
      */

@@ -87,8 +87,12 @@ public class AltBranchFamily extends Family {
     @Override
     public List<Identifier> getBlockModelGenerators() {
         List<Identifier> generators = new LinkedList<>(super.getBlockModelGenerators());
-        generators.add(DynamicTrees.location("alt_branch"));
+        generators.add(altBranchModelGenerator());
         return generators;
+    }
+
+    protected Identifier altBranchModelGenerator() {
+        return DynamicTrees.location("alt_branch");
     }
 
     public Identifier getAltBranchLoader() {

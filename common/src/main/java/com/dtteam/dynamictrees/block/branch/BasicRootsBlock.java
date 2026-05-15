@@ -96,7 +96,7 @@ public class BasicRootsBlock extends BranchBlock implements SimpleWaterloggedBlo
 
     public BasicRootsBlock(Identifier name, BlockBehaviour.Properties properties) {
         super(name, properties);
-        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(LAYER, Layer.EXPOSED));
+        registerDefaultState(defaultBlockState().setValue(RADIUS, 4).setValue(WATERLOGGED, false).setValue(LAYER, Layer.EXPOSED));
         rootLootTableSupplier = new LootTableSupplier("trees/roots/", name);
     }
 

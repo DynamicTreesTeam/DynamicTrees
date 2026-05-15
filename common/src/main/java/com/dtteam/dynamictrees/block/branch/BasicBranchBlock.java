@@ -17,9 +17,7 @@ import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -53,7 +51,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     private int flammability = 5; // Mimic vanilla logs
     private int fireSpreadSpeed = 5; // Mimic vanilla logs
 
-    private final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
+    protected final int maxRadiusForWaterLogging = 7; //the maximum radius for a branch to be allowed to be water logged
 
     /**
      * @param name name of branch, without a {@code _branch} suffix
@@ -80,7 +78,7 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
      * @return The {@code array} cache of {@link BlockState}s.
      */
     public BlockState[] createBranchStates(final IntegerProperty radiusProperty, final int maxRadius) {
-        this.registerDefaultState(this.stateDefinition.any().setValue(radiusProperty, 1).setValue(WATERLOGGED, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(radiusProperty, 4).setValue(WATERLOGGED, false));
 
         final BlockState[] branchStates = new BlockState[maxRadius + 1];
 
@@ -243,11 +241,15 @@ public class BasicBranchBlock extends BranchBlock implements SimpleWaterloggedBl
     @Override
     public int setRadius(LevelAccessor level, BlockPos pos, int radius, @Nullable Direction originDir, int flags) {
         destroyMode = DynamicTrees.DestroyMode.SET_RADIUS;
-        boolean replacingWater = level.getBlockState(pos).getFluidState() == Fluids.WATER.getSource(false);
-        boolean setWaterlogged = replacingWater && radius <= maxRadiusForWaterLogging;
-        level.setBlock(pos, getStateForRadius(radius).setValue(WATERLOGGED, setWaterlogged), flags);
+        level.setBlock(pos, getStateForRadius(radius, level.getBlockState(pos)), flags);
         destroyMode = DynamicTrees.DestroyMode.SLOPPY;
         return radius;
+    }
+
+    public BlockState getStateForRadius(int radius, BlockState previousState) {
+        boolean replacingWater = previousState.getFluidState() == Fluids.WATER.getSource(false);
+        boolean setWaterlogged = replacingWater && radius <= maxRadiusForWaterLogging;
+        return getStateForRadius(radius).setValue(WATERLOGGED, setWaterlogged);
     }
 
     @Override

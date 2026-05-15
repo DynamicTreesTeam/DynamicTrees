@@ -1,11 +1,19 @@
 {
   "variants": {
-    "": {
+    "creaking_heart_state=awake": {
       "type": "dynamictrees:branch",
       "family": "dynamictrees:pale_oak",
       "textures": {
         "bark": "minecraft:block/creaking_heart_awake",
         "rings": "minecraft:block/creaking_heart_top_awake"
+      }
+    },
+    "creaking_heart_state=dormant": {
+      "type": "dynamictrees:branch",
+      "family": "dynamictrees:pale_oak",
+      "textures": {
+        "bark": "minecraft:block/creaking_heart_dormant",
+        "rings": "minecraft:block/creaking_heart_top_dormant"
       }
     }
   }
