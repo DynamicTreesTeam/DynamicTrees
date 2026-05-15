@@ -27,15 +27,23 @@ public class CreakingHeartFamily extends AltBranchFamily {
         super(name);
     }
 
+    /**
+     * @return false if you are using a custom block entity for the heart.
+     * Otherwise, DT will register {@link com.dtteam.dynamictrees.block.branch.CreakingHeartBranchBlockEntity}
+     */
+    public boolean registerDefaultBlockEntity(){
+        return true;
+    }
+
     public boolean hasHeart(BlockState state, BlockGetter level, BlockPos pos){
         BlockPos heart = CreakingHeartBranchBlock.findFromBranch(state, level, pos, this.getMaxSignalDepth());
         return heart != null;
     }
 
-    public float getHeartHardnessMultiplier(BlockState state, BlockGetter level, BlockPos pos){
+    public float getHeartHardness(BlockState state, BlockGetter level, BlockPos pos, float baseHardness){
         if (hasHeart(state, level, pos))
-            return heartHardnessMultiplier;
-        return 1;
+            return baseHardness * heartHardnessMultiplier;
+        return baseHardness;
     }
 
     protected Identifier altBranchName(){
@@ -54,14 +62,12 @@ public class CreakingHeartFamily extends AltBranchFamily {
         final BasicBranchBlock branch = this.isThick() ? new ThickBranchBlock(name, this.getProperties()){
             @Override
             public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-                float multiplier = ((CreakingHeartFamily)getFamily()).getHeartHardnessMultiplier(state, level, pos);
-                return multiplier * super.getHardness(state, level, pos);
+                return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
             }
         } : new BasicBranchBlock(name, this.getProperties()){
             @Override
             public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-                float multiplier = ((CreakingHeartFamily)getFamily()).getHeartHardnessMultiplier(state, level, pos);
-                return multiplier * super.getHardness(state, level, pos);
+                return ((CreakingHeartFamily)getFamily()).getHeartHardness(state, level, pos, super.getHardness(state, level, pos));
             }
         };
         if (this.isFireProof()) {
@@ -83,12 +89,14 @@ public class CreakingHeartFamily extends AltBranchFamily {
     public void addHeartTextures(BiConsumer<String, Identifier> textureConsumer, Identifier primitiveLogLocation, Block sourceBlock, String state) {
         Optional<Block> primAlt = getPrimitiveAltLog();
         if (primAlt.isPresent() && primAlt.get() == sourceBlock){
-            Identifier barkAwake = primitiveLogLocation.withSuffix("_"+state);
-            Identifier ringsAwake = primitiveLogLocation.withSuffix("_top_"+state);
-            if (this.textureOverrides.containsKey(state+"_heart_branch"))
-                barkAwake = this.textureOverrides.get(state+"_heart_branch");
-            if (this.textureOverrides.containsKey(state+"_heart_branch_top"))
-                ringsAwake = this.textureOverrides.get(state+"_heart_branch_top");
+            String u = state.isEmpty() ? "" : "_";
+            Identifier barkAwake = primitiveLogLocation.withSuffix(u+state);
+            Identifier ringsAwake = primitiveLogLocation.withSuffix("_top"+u+state);
+            String textureName = state+u+"heart_branch";
+            if (this.textureOverrides.containsKey(textureName))
+                barkAwake = this.textureOverrides.get(textureName);
+            if (this.textureOverrides.containsKey(textureName+"_top"))
+                ringsAwake = this.textureOverrides.get(textureName+"_top");
 
             textureConsumer.accept("heart_bark", barkAwake);
             textureConsumer.accept("heart_rings", ringsAwake);

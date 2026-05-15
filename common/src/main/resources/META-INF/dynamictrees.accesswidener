@@ -24,3 +24,6 @@ accessible field net/minecraft/client/renderer/texture/SpriteContents originalIm
 accessible method net/minecraft/client/renderer/texture/atlas/SpriteSources register (Ljava/lang/String;Lcom/mojang/serialization/MapCodec;)Lnet/minecraft/client/renderer/texture/atlas/SpriteSourceType;
 
 accessible method net/minecraft/client/data/models/model/TextureSlot create (Ljava/lang/String;)Lnet/minecraft/client/data/models/model/TextureSlot;
+
+mutable field net/minecraft/world/level/block/entity/BlockEntity type Lnet/minecraft/world/level/block/entity/BlockEntityType;
+mutable field net/minecraft/world/level/block/entity/BlockEntity blockState Lnet/minecraft/world/level/block/state/BlockState;

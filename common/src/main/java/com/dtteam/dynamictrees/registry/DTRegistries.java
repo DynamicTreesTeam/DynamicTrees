@@ -3,6 +3,7 @@ package com.dtteam.dynamictrees.registry;
 import com.dtteam.dynamictrees.DynamicTrees;
 import com.dtteam.dynamictrees.api.network.BranchDestructionData;
 import com.dtteam.dynamictrees.block.branch.BranchBlock;
+import com.dtteam.dynamictrees.block.branch.CreakingHeartBranchBlockEntity;
 import com.dtteam.dynamictrees.block.branch.TrunkShellBlock;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlock;
 import com.dtteam.dynamictrees.block.sapling.PottedSaplingBlockEntity;
@@ -28,6 +29,9 @@ import com.dtteam.dynamictrees.loot.function.MultiplyCount;
 import com.dtteam.dynamictrees.platform.Services;
 import com.dtteam.dynamictrees.systems.BranchConnectables;
 import com.dtteam.dynamictrees.tree.TreeHelper;
+import com.dtteam.dynamictrees.tree.family.AltBranchFamily;
+import com.dtteam.dynamictrees.tree.family.CreakingHeartFamily;
+import com.dtteam.dynamictrees.tree.family.Family;
 import com.dtteam.dynamictrees.tree.species.Species;
 import com.dtteam.dynamictrees.worldgen.feature.CaveRootedTreeFeature;
 import com.dtteam.dynamictrees.worldgen.feature.CaveRootedTreePlacement;
@@ -169,10 +173,22 @@ public class DTRegistries {
             .registerBlockEntity("tile_entity_species", SpeciesBlockEntity::new, getAllRootyBlocks());
     public static Supplier<BlockEntityType<@NotNull PottedSaplingBlockEntity>> POTTED_SAPLING_BLOCK_ENTITY = Services.REGISTRY.getRegistryLoader()
             .registerBlockEntity("potted_sapling", Services.REGISTRY.getPottedSaplingBlockEntity(), ()->Set.of(POTTED_SAPLING.get()));
+    public static Supplier<BlockEntityType<@NotNull CreakingHeartBranchBlockEntity>> CREAKING_HEART_BLOCK_ENTITY = Services.REGISTRY.getRegistryLoader()
+            .registerBlockEntity("creaking_heart", CreakingHeartBranchBlockEntity::new, getCreakingHeartBlocks());
 
     public static Supplier<Set<Block>> getAllRootyBlocks(){
         return ()->SoilProperties.REGISTRY.getAll().stream()
                 .map(SoilProperties::getBlock)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+    }
+
+    public static Supplier<Set<Block>> getCreakingHeartBlocks(){
+        return ()-> Family.REGISTRY.getAll().stream()
+                .filter(f -> f instanceof CreakingHeartFamily chf && chf.registerDefaultBlockEntity())
+                .map(f -> (CreakingHeartFamily)f)
+                .map(AltBranchFamily::getAltBranch)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());

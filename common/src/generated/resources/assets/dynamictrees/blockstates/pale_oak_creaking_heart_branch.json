@@ -15,6 +15,14 @@
         "bark": "minecraft:block/creaking_heart_dormant",
         "rings": "minecraft:block/creaking_heart_top_dormant"
       }
+    },
+    "creaking_heart_state=uprooted": {
+      "type": "dynamictrees:branch",
+      "family": "dynamictrees:pale_oak",
+      "textures": {
+        "bark": "minecraft:block/creaking_heart",
+        "rings": "minecraft:block/creaking_heart_top"
+      }
     }
   }
 }

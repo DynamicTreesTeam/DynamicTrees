@@ -55,7 +55,6 @@ public class TreeHelper {
                 ageVolume(level, rootPos, 8, 32, 1, false);//blindly age a cuboid volume
             }
         }
-
     }
 
     /**
@@ -105,7 +104,6 @@ public class TreeHelper {
                 }
             }
         }
-
     }
 
     /**
@@ -130,7 +128,6 @@ public class TreeHelper {
                 }
             }
         }
-
     }
 
     public static Optional<JoCode> getRootsJoCode(Level level, BlockPos pos) {

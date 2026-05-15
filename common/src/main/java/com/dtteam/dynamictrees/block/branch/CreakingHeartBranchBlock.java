@@ -1,7 +1,7 @@
 package com.dtteam.dynamictrees.block.branch;
 
 import com.dtteam.dynamictrees.api.network.MapSignal;
-import com.dtteam.dynamictrees.block.CreakingHeartBranchState;
+import com.dtteam.dynamictrees.registry.DTRegistries;
 import com.dtteam.dynamictrees.tree.TreeHelper;
 import com.dtteam.dynamictrees.tree.family.AltBranchFamily;
 import net.minecraft.core.BlockPos;
@@ -9,25 +9,36 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CreakingHeartBlock;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.CreakingHeartBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.CreakingHeartState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Optional;
 
-public class CreakingHeartBranchBlock extends BasicBranchBlock {
+public class CreakingHeartBranchBlock extends BasicBranchBlock implements EntityBlock {
 
-    public static final EnumProperty<CreakingHeartBranchState> STATE = EnumProperty.create("creaking_heart_state", CreakingHeartBranchState.class);
+    public static final EnumProperty<CreakingHeartState> STATE = BlockStateProperties.CREAKING_HEART_STATE;
 
     public CreakingHeartBranchBlock(Identifier name, Properties properties) {
         super(name, properties);
-        registerDefaultState(defaultBlockState().setValue(STATE, CreakingHeartBranchState.DORMANT));
+        registerDefaultState(defaultBlockState().setValue(STATE, CreakingHeartState.DORMANT));
     }
 
     @Override
@@ -50,23 +61,105 @@ public class CreakingHeartBranchBlock extends BasicBranchBlock {
         }
     }
 
-    public static BlockState updateState(BlockState state, Level level, BlockPos pos) {
-        boolean shouldAwake = level.environmentAttributes().getValue(EnvironmentAttributes.CREAKING_ACTIVE, pos);
-        return state.setValue(STATE, shouldAwake ? CreakingHeartBranchState.AWAKE : CreakingHeartBranchState.DORMANT);
+    private static BlockState updateState(BlockState state, Level level, BlockPos pos) {
+        boolean hasLogs = CreakingHeartBlock.hasRequiredLogs(state, level, pos);
+        boolean disabled = state.getValue(STATE) == CreakingHeartState.UPROOTED;
+        CreakingHeartState wakeState = level.environmentAttributes().getValue(EnvironmentAttributes.CREAKING_ACTIVE, pos) ? CreakingHeartState.AWAKE : CreakingHeartState.DORMANT;
+        return hasLogs && disabled ? state.setValue(STATE, wakeState) : state;
+    }
+
+    public static boolean hasRequiredLogs(BlockState state, LevelReader level, BlockPos pos) {
+        return state.getBlock() instanceof CreakingHeartBranchBlock
+                && level.getBlockState(pos.above()).getBlock() instanceof BranchBlock
+                && level.getBlockState(pos.below()).getBlock() instanceof BranchBlock;
+    }
+
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        Containers.updateNeighboursAfterDestroy(state, level, pos);
     }
 
     @Override
     public BlockState getStateForRadius(int radius, BlockState previousState) {
         BlockState state = super.getStateForRadius(radius, previousState);
         if (previousState.hasProperty(CreakingHeartBranchBlock.STATE)){
-            return state.setValue(CreakingHeartBranchBlock.STATE, previousState.getValue(CreakingHeartBranchBlock.STATE));
+            CreakingHeartState heartState = previousState.getValue(CreakingHeartBranchBlock.STATE);
+            if (heartState == CreakingHeartState.UPROOTED) heartState = CreakingHeartState.DORMANT;
+            return state.setValue(CreakingHeartBranchBlock.STATE, heartState);
         }
         return state;
     }
 
+
     @Override
-    public float getHardness(BlockState state, BlockGetter level, BlockPos pos) {
-        return super.getHardness(state, level, pos);
+    public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        return new CreakingHeartBranchBlockEntity(blockPos, blockState);
+    }
+
+    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int b0, int b1) {
+        super.triggerEvent(state, level, pos, b0, b1);
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        return blockEntity == null ? false : blockEntity.triggerEvent(b0, b1);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected static <E extends BlockEntity, A extends BlockEntity> @Nullable BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> actual, BlockEntityType<E> expected, BlockEntityTicker<? super E> ticker) {
+        return expected == actual ? (BlockEntityTicker<A>) ticker : null;
+    }
+
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
+        if (level.isClientSide()) return null;
+
+        return blockState.getValue(STATE) != CreakingHeartState.UPROOTED
+                ? createTickerHelper(type, DTRegistries.CREAKING_HEART_BLOCK_ENTITY.get(), CreakingHeartBranchBlockEntity::serverTick)
+                : null;
+    }
+
+    @Override
+    public void futureBreak(BlockState state, Level level, BlockPos cutPos, LivingEntity entity) {
+        BlockEntity var6 = level.getBlockEntity(cutPos);
+        if (var6 instanceof CreakingHeartBranchBlockEntity creakingHeartBlockEntity && entity instanceof Player player) {
+            creakingHeartBlockEntity.removeProtector(player.damageSources().playerAttack(player));
+            this.tryAwardExperience(player, level, cutPos);
+        }
+
+        super.futureBreak(state, level, cutPos, entity);
+    }
+
+    @Override
+    public void onBlockExploded(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion) {
+        if (level.getBlockEntity(pos) instanceof CreakingHeartBlockEntity creakingHeartBlockEntity
+                && explosion instanceof ServerExplosion serverExplosion
+                && explosion.getBlockInteraction().shouldAffectBlocklikeEntities()) {
+            creakingHeartBlockEntity.removeProtector(serverExplosion.getDamageSource());
+
+            if (explosion.getIndirectSourceEntity() instanceof Player player) {
+                this.tryAwardExperience(player, level, pos);
+            }
+        }
+        super.onBlockExploded(state, level, pos, explosion);
+    }
+
+    private void tryAwardExperience(Player player, Level level, BlockPos pos) {
+        if (!player.preventsBlockDrops() && !player.isSpectator() && level instanceof ServerLevel serverLevel) {
+            this.popExperience(serverLevel, pos, level.getRandom().nextIntBetweenInclusive(20, 24));
+        }
+    }
+
+    protected boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
+        if (state.getValue(STATE) == CreakingHeartState.UPROOTED) return 0;
+
+        int signal;
+        if (level.getBlockEntity(pos) instanceof CreakingHeartBranchBlockEntity creakingHeartBlockEntity) {
+            signal = creakingHeartBlockEntity.getAnalogOutputSignal();
+        } else {
+            signal = 0;
+        }
+
+        return signal;
     }
 
     @Override
